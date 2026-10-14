@@ -1,0 +1,53 @@
+id: CHG-MOD-001
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Every lineage read of another module''s table goes through a query the owning module declares: 147 data-read
+  queries (one per owned table, `<table>Records` in x-ticvai-queries) asked by 499 operations through
+  x-ticvai-read-via, in process within one deployable and by the owner''s service route across deployables.'
+decision:
+  what: 'For each table another module reads raw, the owning module''s contract (the one that persists the table)
+    declares one query in its top-level x-ticvai-queries: `<table>Records: {module, table, inputs: {ids, where},
+    returns: the rows as the owner''s persisted schema, rule, served}`. Its rule says it is a data read, not a rule
+    question: the owner returns its rows as stored and as the caller''s scope lets it see them, and decides nothing;
+    a question with a rule of its own keeps (or gets) a query of its own. Each reading operation names the query in
+    x-ticvai-read-via, one entry per table it reads, route `in-process` when reader and owner share a deployable
+    (handoff/service-decomposition.json) and `service` across deployables; `served` lists exactly the routes its
+    askers take. derive-lineage copies the routes into the lineage as readVia.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-cross-module-reads/XR-UNCOVERED,
+  921 findings touching 758 Block A tickets (341 due by 28 October). ADR-0055 rule 2 as amended 14 October
+  (CHG-GEN-009): another module''s table is read through the owner''s declared query, or a view named for the reader
+  within one deployable; across deployables never by shared SQL (rule 4). Default ruling (lead, 14 October: "go with
+  your recommendation"): route each read through the owner''s declared query, grouped by owner module so one query
+  serves many readers. Count before 921 (914 on audit-base after the earlier r6 fixes), after 7: the 7 left are
+  Identity''s reads above the foundation tier, fixed by CHG-MOD-002.'
+keys_touched:
+  operations: []
+  files:
+  - contracts/
+  other:
+  - 'x-ticvai-queries: 147 new data-read queries in 30 contracts'
+  - 'x-ticvai-read-via: 499 operations'
+root_class: A22 LINEAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Batch MOD, 14 October 2026. Detail the ruling left open, taken as the option most consistent with ADR-0055:
+  one data-read query per owned table rather than per (reader, owner) pair, because a query belongs to its owner and
+  one declaration then serves every reader of that table; the generated views (DB-READ-VIEWS) were not used for the
+  in-deployable reads, because a view needs a lineage rewrite of the reads and gives the owner no say in what is
+  read, while the query keeps the lineage read and adds the route. A data-read query states no rule: the refusals
+  that rest on another module''s data keep their own rule queries (CHG-MOD-003). Verified: derive-lineage --apply
+  gave 499 entries their readVia; check-cross-module-reads XR-UNCOVERED 921 -> 7 (0 new), XR-QUERY, XR-ROUTE and
+  XR-LINEAGE 0; check-contract-shapes, check-contract-compat and check-lineage 0 new. Derived files restored before
+  the commit.'

@@ -77,6 +77,158 @@ x-ticvai-queries:
       `supervisor-step-up-refused` and nothing is written by it.'
     served: [in-process, service]
     operation: verifySupervisorStepUp
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  delegatedAccessRecords:
+    module: identity
+    table: identity.delegated_access
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.delegated_access rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/DelegatedAccess'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.delegated_access rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
+  principalRecords:
+    module: identity
+    table: identity.principal
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.principal rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Principal'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.principal rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
+  roleRecords:
+    module: identity
+    table: identity.role
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.role rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Role'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.role rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
+  rolePermissionRecords:
+    module: identity
+    table: identity.role_permission
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.role_permission rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/RolePermission'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.role_permission rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements.
+    served: [in-process]
+  segregationRuleRecords:
+    module: identity
+    table: identity.segregation_rule
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.segregation_rule rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SegregationRule'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.segregation_rule rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements.
+    served: [in-process]
+  subjectRecords:
+    module: identity
+    table: pii.subject
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The pii.subject rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A pii.subject row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its pii.subject rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
+  subjectBiometricRecords:
+    module: identity
+    table: pii.subject_biometric
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The pii.subject_biometric rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A pii.subject_biometric row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its pii.subject_biometric rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Identity's service route (serviceAuth).
+    served: [service]
+  subjectContactRecords:
+    module: identity
+    table: pii.subject_contact
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The pii.subject_contact rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A pii.subject_contact row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its pii.subject_contact rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
 paths:
   /internal/step-up/verify:
     post:
@@ -1492,6 +1644,10 @@ paths:
   /auth/sessions/{sessionId}/force-logout:
     post:
       operationId: forceLogout
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P08 BO-053 Staff Directory"
@@ -6026,6 +6182,13 @@ paths:
   /role-suggestions:
     get:
       operationId: suggestRoleAssignment
+      x-ticvai-read-via:
+      - query: workforce#employeeRecords
+        route: in-process
+        for: 'its read of workforce.employee, Tenancy''s data (CHG-MOD-001)'
+      - query: workforce#workAssignmentRecords
+        route: in-process
+        for: 'its read of workforce.work_assignment, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-053 Staff Directory"
         - "P08 BO-054 Role Assignment"
@@ -6198,6 +6361,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAccessReviewCampaign
+      x-ticvai-read-via:
+      - query: workforce#employeeRecords
+        route: in-process
+        for: 'its read of workforce.employee, Tenancy''s data (CHG-MOD-001)'
+      - query: workforce#workAssignmentRecords
+        route: in-process
+        for: 'its read of workforce.work_assignment, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
       x-ticvai-audience:

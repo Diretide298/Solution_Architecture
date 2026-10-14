@@ -79,10 +79,310 @@ tags:
 - name: case
 - name: loyalty
 - name: feedback
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  attributionTouchRecords:
+    module: marketing-crm
+    table: marketing.attribution_touch
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.attribution_touch rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AttributionTouch'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.attribution_touch rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  audienceListRecords:
+    module: marketing-crm
+    table: marketing.audience_list
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.audience_list rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AudienceList'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.audience_list rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  campaignRecords:
+    module: marketing-crm
+    table: marketing.campaign
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.campaign rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Campaign'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.campaign rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  caseRecords:
+    module: marketing-crm
+    table: marketing.case
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.case rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Case'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.case rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  consentQuestionRecords:
+    module: marketing-crm
+    table: marketing.consent_question
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.consent_question rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ConsentQuestion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.consent_question rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  consentQuestionVersionRecords:
+    module: marketing-crm
+    table: marketing.consent_question_version
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.consent_question_version rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ConsentQuestionVersion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.consent_question_version rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  consentRecords:
+    module: marketing-crm
+    table: marketing.consent_record
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.consent_record rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ConsentRecord'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.consent_record rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Marketing implements, and asked from another
+      deployable through Marketing's service route (serviceAuth).
+    served: [in-process, service]
+  guestProfileRecords:
+    module: marketing-crm
+    table: marketing.guest_profile
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.guest_profile rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GuestProfile'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.guest_profile rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  loyaltyPositionRecords:
+    module: marketing-crm
+    table: marketing.loyalty_position
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.loyalty_position rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/LoyaltyPosition'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.loyalty_position rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked in process within operations, through the C# query interface Marketing implements, and
+      asked from another deployable through Marketing's service route (serviceAuth).
+    served: [in-process, service]
+  loyaltyProgrammeRecords:
+    module: marketing-crm
+    table: marketing.loyalty_programme
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.loyalty_programme rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/LoyaltyProgramme'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.loyalty_programme rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  messageDispatchRecords:
+    module: marketing-crm
+    table: marketing.message_dispatch
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.message_dispatch rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MessageDispatch'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.message_dispatch rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  messageTemplateRecords:
+    module: marketing-crm
+    table: marketing.message_template
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.message_template rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MessageTemplate'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.message_template rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  messageTemplateVersionRecords:
+    module: marketing-crm
+    table: marketing.message_template_version
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.message_template_version rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MessageTemplateVersion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.message_template_version rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  programmeTierRecords:
+    module: marketing-crm
+    table: marketing.programme_tier
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.programme_tier rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MarketingProgrammeTier'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.programme_tier rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  segmentRecords:
+    module: marketing-crm
+    table: marketing.segment
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.segment rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Segment'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.segment rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Marketing implements, and asked from another
+      deployable through Marketing's service route (serviceAuth).
+    served: [in-process, service]
+  segmentCriterionRecords:
+    module: marketing-crm
+    table: marketing.segment_criterion
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.segment_criterion rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SegmentCriterion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.segment_criterion rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
 paths:
   /my/cases:
     get:
       operationId: listMyCases
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-025 Help Centre / FAQ"
         - "P01 WEB-034 Lost & Found"
@@ -547,6 +847,10 @@ paths:
   /guest-checkout/profile-match:
     post:
       operationId: checkGuestCheckoutMatch
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: service
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       summary: Does this contact already have a profile here
       deprecated: true
       description: '**Retired from checkout, 28 September (decided 28 September, audit R120 (b)).** A verified
@@ -603,6 +907,10 @@ paths:
   /guest-checkout/profile-match/decision:
     post:
       operationId: decideGuestCheckoutMatch
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: service
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: orders.cart
         operation: claimCart
@@ -658,6 +966,10 @@ paths:
   /guests/match:
     post:
       operationId: matchGuest
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-055 Create / Edit Reservation"
         - "P06 EMP-057 Guest Profile & Dining History"
@@ -724,6 +1036,10 @@ paths:
   /guests/merge:
     post:
       operationId: mergeGuests
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 BO-746 Duplicate Review & Merge"
@@ -948,6 +1264,13 @@ paths:
   /invitation-campaigns:
     post:
       operationId: createInvitationCampaign
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: A quota-bounded, addressed invitation
       description: 'BL-150 and CF-74''s issuance half. **A campaign broadcasts; an invitation is addressed
         and expects a response.**
@@ -994,6 +1317,10 @@ paths:
         type: string
     post:
       operationId: respondToInvitation
+      x-ticvai-read-via:
+      - query: orders#invitationRecords
+        route: service
+        for: 'its read of orders.invitation, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
         - "P02 GST-072 Share & Group Booking"
@@ -1062,6 +1389,10 @@ paths:
   /privacy-incidents:
     post:
       operationId: recordPrivacyIncident
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-752 Privacy & AI Governance"
       summary: Log a personal-data breach and start the clock
@@ -1154,6 +1485,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createForm
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-618 Accreditation Form Builder"
         - "P08 BO-747 Consent Policy Configuration"
@@ -1252,6 +1587,10 @@ paths:
   /form-submissions:
     post:
       operationId: submitForm
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
         - "P02 GST-035 Feedback & Ratings"
@@ -1309,6 +1648,13 @@ paths:
         format: uuid
     get:
       operationId: getWaiverStatus
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P08 BO-852 Documents, Search & Retention"
@@ -1364,6 +1710,10 @@ paths:
   /guest-documents:
     post:
       operationId: uploadGuestDocument
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
       security:
       - guestAuth: []
@@ -1411,6 +1761,10 @@ paths:
   /challenges:
     post:
       operationId: createChallenge
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-825 Challenge Builder"
         - "P08 BO-829 Family, Team & Event Challenges"
@@ -1639,6 +1993,10 @@ paths:
   /seo-metadata:
     get:
       operationId: getSeoMetadata
+      x-ticvai-read-via:
+      - query: platform-ops#seoMetadataRecords
+        route: in-process
+        for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-013 SEO & Metadata"
       summary: The metadata in force for one page
@@ -1694,6 +2052,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSeoMetadata
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: platform-ops#seoMetadataRecords
+        route: in-process
+        for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
@@ -1736,6 +2101,10 @@ paths:
   /seo-redirects:
     post:
       operationId: createUrlRedirect
+      x-ticvai-read-via:
+      - query: platform-ops#urlRedirectRecords
+        route: in-process
+        for: 'its read of control.url_redirect, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
@@ -1775,6 +2144,10 @@ paths:
   /lost-items:
     get:
       operationId: listLostItems
+      x-ticvai-read-via:
+      - query: venue-map#pointRecords
+        route: in-process
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-073 Lost & Found Register"
       security:
@@ -1820,6 +2193,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: recordLostItem
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: venue-map#pointRecords
+        route: in-process
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-034 Lost & Found"
         - "P02 GST-034 Lost & Found"
@@ -1907,6 +2287,10 @@ paths:
   /referrals:
     post:
       operationId: createReferral
+      x-ticvai-read-via:
+      - query: promotions#promotionRecords
+        route: service
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
@@ -2505,6 +2889,16 @@ paths:
   /guests/identify:
     post:
       operationId: identifyGuest
+      x-ticvai-read-via:
+      - query: access#blacklistRecords
+        route: service
+        for: 'its read of access.blacklist, Access''s data (CHG-MOD-001)'
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-027 Guest Lookup"
@@ -2718,6 +3112,10 @@ paths:
   /loyalty/accruals:
     post:
       operationId: accrueLoyaltyPoints
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Award points for a completed order
       description: '**`games` awards points on play and ticketing did not**, so a guest earned for an
         arcade game and not for the ticket that got them in.
@@ -2868,6 +3266,10 @@ paths:
   /conversations:
     get:
       operationId: listConversations
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-794 Omnichannel Command Center"
         - "P08 BO-795 Unified Inbox"
@@ -2936,6 +3338,10 @@ paths:
         format: uuid
     get:
       operationId: getConversation
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-796 Guest Conversation 360"
         - "P08 BO-799 Agent Workspace"
@@ -3203,6 +3609,10 @@ paths:
         format: uuid
     post:
       operationId: transferConversation
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
@@ -3312,6 +3722,10 @@ paths:
   /agent-availability:
     put:
       operationId: setAgentAvailability
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-003 Availability & Routing Settings"
@@ -3374,6 +3788,13 @@ paths:
   /kiosk-assists:
     post:
       operationId: startKioskAssist
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: service
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: tenancy#deviceRecords
+        route: service
+        for: 'its read of platform.device, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-799 Agent Workspace"
       x-ticvai-audience:
@@ -3763,6 +4184,13 @@ paths:
         format: uuid
     get:
       operationId: getGuestProfile
+      x-ticvai-read-via:
+      - query: identity#subjectContactRecords
+        route: service
+        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 ADM-680 Customer Recommendation Profile"
@@ -3930,6 +4358,10 @@ paths:
         format: uuid
     get:
       operationId: getGuestConsents
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Devices, Wishlist & Consent"
@@ -8510,6 +8942,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrivacyNoticePolicyGovernance
+      x-ticvai-read-via:
+      - query: white-label#policyRecords
+        route: in-process
+        for: 'its read of whitelabel.policy, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-028 Privacy Notice, Policy & Terms Version Management"
         - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
@@ -8844,6 +9280,10 @@ paths:
   /customer-privacy-consent:
     get:
       operationId: listCustomerPrivacyConsent
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-032 Customer Privacy, Consent & Preference 360°"
       x-ticvai-audience:
@@ -9930,6 +10370,25 @@ paths:
   /customer-service-profile:
     get:
       operationId: listCustomerServiceProfile
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: identity#subjectContactRecords
+        route: service
+        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#reservationRecords
+        route: service
+        for: 'its read of orders.reservation, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-737 Customer 360 Profile"
         - "P12 SUP-009 Customer Service Command Center"
@@ -11146,6 +11605,10 @@ paths:
   /escalation-critical-case:
     get:
       operationId: listEscalationCriticalCase
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-810 Escalation Rules"
         - "P12 SUP-024 Escalation & Critical Case Monitor"
@@ -11575,6 +12038,10 @@ paths:
   /service-root-cause:
     get:
       operationId: listServiceRootCause
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-823 VOC Analytics & Audit"
         - "P12 SUP-027 Service Analytics & Root-Cause Intelligence"
@@ -13106,6 +13573,16 @@ paths:
   /waiver:
     get:
       operationId: listWaiver
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-844 Waiver Command Center"
         - "P13 CMS-051 Waiver Operations Command Center"
@@ -13237,6 +13714,19 @@ paths:
   /participant-waiver-statu:
     get:
       operationId: listParticipantWaiverStatus
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-850 Pre-Arrival Completion"
         - "P08 BO-851 Verification & Access Control"
@@ -13355,6 +13845,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: actOnWaiverRequirements
+      x-ticvai-read-via:
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (delivery by email, WhatsApp or SMS; waiver reachable by QR code); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.29-37 (operational, bulk and corrective actions); the tracking screens need their write'
@@ -13619,6 +14113,19 @@ paths:
   /minor-guardian-group:
     get:
       operationId: listMinorGuardianGroup
+      x-ticvai-read-via:
+      - query: identity#subjectContactRecords
+        route: service
+        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-850 Pre-Arrival Completion"
         - "P13 CMS-054 Minor, Guardian & Group Consent Management"
@@ -13742,6 +14249,10 @@ paths:
   /waiver-verification-validation:
     get:
       operationId: listWaiverVerificationQueue
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-055 Waiver Verification & Validation Workspace"
       x-ticvai-audience:
@@ -13888,6 +14399,19 @@ paths:
   /missing-expired-invalid:
     get:
       operationId: listMissingExpiredInvalid
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-056 Missing, Expired & Invalid Waiver Management"
       x-ticvai-audience:
@@ -14177,6 +14701,10 @@ paths:
   /compliance-evidence-waiver:
     get:
       operationId: listComplianceEvidenceWaiver
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-852 Documents, Search & Retention"
         - "P08 BO-853 Legal Evidence & Audit"
@@ -14567,6 +15095,13 @@ paths:
         format: uuid
     get:
       operationId: getGuestTimeline
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-738 Activity Timeline"
@@ -14718,6 +15253,10 @@ paths:
         format: uuid
     get:
       operationId: getGuestIntelligence
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-743 AI Guest Intelligence"
@@ -14946,6 +15485,10 @@ paths:
   /retention-policies:
     put:
       operationId: setDataRetentionPolicy
+      x-ticvai-read-via:
+      - query: tenancy#dataRetentionSettingRecords
+        route: service
+        for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       summary: How long guest data is kept, and what happens at expiry
       description: 'Board 2.8. **`listDataRetentionExpiry` could read them and nothing set them.**
 

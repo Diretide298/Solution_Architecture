@@ -78,6 +78,65 @@ tags:
 - name: bill
 - name: kitchen
 - name: production
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  coldChainEventRecords:
+    module: fnb
+    table: fnb.cold_chain_event
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.cold_chain_event rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ColdChainEvent'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). F&B answers with its fnb.cold_chain_event rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface F&B implements.
+    served: [in-process]
+  menuItemRecords:
+    module: fnb
+    table: fnb.menu_item
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.menu_item rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MenuItem'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). F&B answers with its fnb.menu_item rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with
+      a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through F&B's service route (serviceAuth).
+    served: [service]
+  productionPlanRecords:
+    module: fnb
+    table: fnb.production_plan
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.production_plan rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ProductionPlan'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). F&B answers with its fnb.production_plan rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through F&B's service route (serviceAuth).
+    served: [service]
 paths:
   /reservation-policy:
     get:
@@ -349,6 +408,10 @@ paths:
         format: uuid
     post:
       operationId: verifyAllergens
+      x-ticvai-read-via:
+      - query: inventory#inventoryItemRecords
+        route: in-process
+        for: 'its read of inventory.inventory_item, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
         - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
@@ -484,6 +547,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: buildProductionPlan
+      x-ticvai-read-via:
+      - query: ai#suggestionRecords
+        route: service
+        for: 'its read of ai.suggestion, AI''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
       summary: Turn a forecast into a prep list
@@ -587,6 +654,10 @@ paths:
         format: uuid
     get:
       operationId: getProductionRun
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
@@ -626,6 +697,10 @@ paths:
         format: uuid
     post:
       operationId: sendBookingConfirmation
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-055 Create / Edit Reservation"
       summary: Confirm a booking, and ask them to confirm back
@@ -1017,6 +1092,10 @@ paths:
         format: uuid
     post:
       operationId: applyMenuActions
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: service
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
       summary: Do the same thing to many items at once
@@ -1133,6 +1212,10 @@ paths:
         format: uuid
     post:
       operationId: sendOrderNotification
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       summary: Tell the guest where their order is
       description: 'Board 3G. **Accepted, being made, ready, collected.** `getGuestOrderStatus` lets a
         guest ask; this tells them without asking.
@@ -1222,6 +1305,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCombo
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
       summary: A meal deal, priced as one thing
@@ -2038,6 +2125,10 @@ paths:
         format: uuid
     post:
       operationId: notifyServer
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P15 KIT-002 Kitchen Display System (KDS)"
       summary: The kitchen calls the server to the pass
@@ -2242,6 +2333,10 @@ paths:
         format: uuid
     post:
       operationId: notifyWaitlistParty
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-056 Walk-In & Waitlist Management"
       summary: Their table is ready
@@ -2305,6 +2400,13 @@ paths:
         format: uuid
     post:
       operationId: enterCountLine
+      x-ticvai-read-via:
+      - query: inventory#inventoryItemRecords
+        route: in-process
+        for: 'its read of inventory.inventory_item, Inventory''s data (CHG-MOD-001)'
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-066 Stock Count & Cycle Count Management"
         - "P08 BO-079 Stock Count"
@@ -3122,6 +3224,10 @@ paths:
         format: uuid
     put:
       operationId: reassignServer
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-058 Live Table & Service Management"
       summary: Hand a table to another server
@@ -3184,6 +3290,10 @@ paths:
         format: uuid
     post:
       operationId: compItem
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-write-via:
@@ -3413,6 +3523,10 @@ paths:
   /food-safety/cold-chain:
     post:
       operationId: logColdChain
+      x-ticvai-read-via:
+      - query: inventory#goodsReceiptRecords
+        route: in-process
+        for: 'its read of inventory.goods_receipt, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-065 Receiving"
       summary: The temperature a delivery arrived at, and what was decided
@@ -3515,6 +3629,10 @@ paths:
         format: uuid
     post:
       operationId: signCorrectiveAction
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
         - "P08 BO-044 F&B Outlets"
@@ -3586,6 +3704,10 @@ paths:
   /production-runs:
     get:
       operationId: listProductionRuns
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
@@ -3654,6 +3776,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: planProductionRun
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
       summary: Plan a batch, for one outlet or several
@@ -3782,6 +3911,10 @@ paths:
         format: uuid
     post:
       operationId: transferTableVisit
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
         - "P06 EMP-058 Live Table & Service Management"
@@ -3855,6 +3988,10 @@ paths:
   /waitlist:
     post:
       operationId: joinRestaurantWaitlist
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
@@ -4251,6 +4388,10 @@ paths:
         format: uuid
     get:
       operationId: listDiningOutlets
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
@@ -4813,6 +4954,10 @@ paths:
   /table-sessions:
     post:
       operationId: claimTableSession
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
       x-ticvai-audience:
       - guest
@@ -4988,6 +5133,10 @@ paths:
   /outlets/{outletId}/fulfilment-slots:
     get:
       operationId: listFulfilmentSlots
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
@@ -5053,6 +5202,10 @@ paths:
   /guest-orders:
     post:
       operationId: createGuestFnbOrder
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
@@ -5239,6 +5392,10 @@ paths:
         format: uuid
     get:
       operationId: getGuestBill
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-038 F&B – Order Tracking"
         - "P02 GST-025 F&B – Order Tracking"
@@ -6507,6 +6664,10 @@ paths:
         format: uuid
     get:
       operationId: getBill
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
@@ -7164,6 +7325,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setRecipe
+      x-ticvai-read-via:
+      - query: inventory#inventoryItemRecords
+        route: in-process
+        for: 'its read of inventory.inventory_item, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       x-ticvai-audience:
@@ -7213,6 +7378,10 @@ paths:
         format: uuid
     post:
       operationId: recordWaste
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
         - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
@@ -7341,6 +7510,10 @@ paths:
         format: uuid
     post:
       operationId: recordCorrectiveAction
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
       summary: Record what was done about a finding
@@ -7402,6 +7575,10 @@ paths:
         format: uuid
     post:
       operationId: escalateCorrectiveAction
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
       summary: Escalate a finding
@@ -7456,6 +7633,10 @@ paths:
         format: uuid
     post:
       operationId: closeCorrectiveAction
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
       summary: Close a signed finding
@@ -8217,6 +8398,10 @@ paths:
         format: uuid
     put:
       operationId: setDeliveryLocationOutletMapping
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
         - "P08 BO-065 Venue Configuration"
@@ -8293,6 +8478,10 @@ paths:
   /delivery-locations:
     post:
       operationId: createDeliveryLocation
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-065 Venue Configuration"
       x-ticvai-audience:

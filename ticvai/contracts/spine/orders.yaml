@@ -119,10 +119,226 @@ x-ticvai-queries:
       source: orders.sales_order
       feeds: [order.created, order.paid, order.completed, order.cancelled, order.lapsed, order.refunded,
               order.linkedToGuest, guest.merged]
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  cartRecords:
+    module: orders
+    table: orders.cart
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.cart rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Cart'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.cart rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  cartLineRecords:
+    module: orders
+    table: orders.cart_line
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.cart_line rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CartLine'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.cart_line rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Orders' service route (serviceAuth).
+    served: [service]
+  discountRecords:
+    module: orders
+    table: orders.discount
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.discount rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/OrdersDiscount'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.discount rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
+  groupBookingRecords:
+    module: orders
+    table: orders.group_booking
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.group_booking rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GroupBooking'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.group_booking rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Orders' service route (serviceAuth).
+    served: [service]
+  invitationRecords:
+    module: orders
+    table: orders.invitation
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.invitation rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Invitation'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.invitation rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Orders' service route (serviceAuth).
+    served: [service]
+  orderLineRecords:
+    module: orders
+    table: orders.order_line
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.order_line rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Order'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.order_line rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  paymentRecords:
+    module: orders
+    table: orders.payment
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.payment rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Payment'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.payment rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  refundRecords:
+    module: orders
+    table: orders.refund
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.refund rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Refund'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.refund rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  reservationRecords:
+    module: orders
+    table: orders.reservation
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.reservation rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Reservation'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.reservation rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Orders' service route (serviceAuth).
+    served: [service]
+  salesOrderRecords:
+    module: orders
+    table: orders.sales_order
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.sales_order rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Order'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.sales_order rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  tokenRecords:
+    module: orders
+    table: payments.token
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The payments.token rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PaymentToken'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its payments.token rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
 paths:
   /carts:
     post:
       operationId: createCart
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
       security:
@@ -186,6 +402,10 @@ paths:
   /my/orders:
     get:
       operationId: listMyOrders
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-019 Order History"
@@ -338,6 +558,10 @@ paths:
   /group-bookings:
     post:
       operationId: createGroupBooking
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
@@ -402,6 +626,13 @@ paths:
   /group-booking-requests:
     post:
       operationId: requestGroupBooking
+      x-ticvai-read-via:
+      - query: catalogue#groupPackageRecords
+        route: in-process
+        for: 'its read of catalogue.group_package, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
@@ -550,6 +781,10 @@ paths:
         format: uuid
     get:
       operationId: getGroupBooking
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
@@ -593,6 +828,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateGroupBooking
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
@@ -836,6 +1075,10 @@ paths:
         format: uuid
     post:
       operationId: resendPaymentLink
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
       x-ticvai-write-via:
@@ -969,6 +1212,10 @@ paths:
         format: uuid
     post:
       operationId: convertToTermProduct
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1030,6 +1277,10 @@ paths:
   /guest-credit-accounts:
     post:
       operationId: openGuestCreditAccount
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       summary: A credit limit for an individual booking ahead
       description: 'BL-051, 1.3.51. **`orders.CreditPosition` is B2B only** — a partner with net terms.
         The requirement puts a 25,000 AED limit on an **individual** who books ahead and settles X days
@@ -1204,6 +1455,13 @@ paths:
         format: uuid
     post:
       operationId: reissueEntitlement
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-026 Receipt & Reprint"
       x-ticvai-write-via:
@@ -1285,6 +1543,16 @@ paths:
         format: uuid
     post:
       operationId: shareEntitlement
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-072 Share & Group Booking"
@@ -1372,6 +1640,13 @@ paths:
         format: uuid
     post:
       operationId: revokeEntitlementShare
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.shareChanged
@@ -1421,6 +1696,10 @@ paths:
   /wallet-passes:
     post:
       operationId: issueWalletPass
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-018 Add to Calendar / Reminders"
@@ -1492,6 +1771,10 @@ paths:
         format: uuid
     post:
       operationId: pushWalletPassUpdate
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       summary: Push a change to every device holding it
       description: '**Every registered device, not just the one that asked.** A guest with the pass on
         a phone and a watch is one entitlement and two registrations, and a gate change that reaches one
@@ -1620,6 +1903,13 @@ paths:
   /resale-listings:
     post:
       operationId: createResaleListing
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-067 Refunds & Resale"
@@ -1693,6 +1983,16 @@ paths:
         format: uuid
     post:
       operationId: quoteUpgrade
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-652 Upgrade Price Difference & Value Proposition Manager"
         - "P08 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
@@ -1959,6 +2259,10 @@ paths:
         format: uuid
     post:
       operationId: printTicketProof
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-344 Media Design Studio Command Center"
       summary: Print a sample without selling anything
@@ -2052,6 +2356,10 @@ paths:
         format: uuid
     post:
       operationId: respondToChargeback
+      x-ticvai-read-via:
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-634 Chargeback & Dispute Command Center"
       summary: Submit evidence, or accept the loss
@@ -2255,6 +2563,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: storePaymentToken
+      x-ticvai-read-via:
+      - query: marketing-crm#consentRecords
+        route: service
+        for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
@@ -2425,6 +2737,13 @@ paths:
   /invitations:
     post:
       operationId: issueInvitation
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: invitation.issued
@@ -2532,6 +2851,10 @@ paths:
   /invitations/allowances:
     get:
       operationId: listInvitationAllowances
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       summary: Who may issue comps, and how many are left
       description: '8.1.5. **The allowance is the control.** Without it, restriction by profile is a yes/no
         on an unbounded right, which is not a restriction.
@@ -2568,6 +2891,16 @@ paths:
   /stored-value/authorisations:
     post:
       operationId: authoriseStoredValue
+      x-ticvai-read-via:
+      - query: promotions#voucherRecords
+        route: in-process
+        for: 'its read of promotions.voucher, Catalogue''s data (CHG-MOD-001)'
+      - query: wallet#giftCardRecords
+        route: in-process
+        for: 'its read of wallet.gift_card, Wallet''s data (CHG-MOD-001)'
+      - query: wallet#walletRecords
+        route: in-process
+        for: 'its read of wallet.wallet, Wallet''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
       x-ticvai-note: >-
@@ -2811,6 +3144,22 @@ paths:
         format: uuid
     get:
       operationId: getCart
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: in-process
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-010 Shopping Cart"
@@ -3084,6 +3433,12 @@ paths:
         - query: catalogue#variantsSellableAt
           route: in-process
           for: "the line's variantId on the caller's channel (409 notSellableOnChannel)"
+        - query: marketing-crm#consentQuestionRecords
+          route: service
+          for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+        - query: marketing-crm#consentQuestionVersionRecords
+          route: service
+          for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - $ref: ../shared/common.yaml#/components/parameters/AdmissionToken
@@ -3150,6 +3505,16 @@ paths:
         format: uuid
     patch:
       operationId: updateCartLine
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
@@ -3227,6 +3592,13 @@ paths:
                 $ref: '#/components/schemas/CartProblem'
     delete:
       operationId: removeCartLine
+      x-ticvai-read-via:
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
@@ -3283,6 +3655,16 @@ paths:
         format: uuid
     post:
       operationId: extendCart
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
@@ -3354,6 +3736,16 @@ paths:
         format: uuid
     post:
       operationId: claimCart
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-041 Checkout Entry"
@@ -3402,6 +3794,13 @@ paths:
         format: uuid
     post:
       operationId: checkoutCart
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-012 Checkout — Payment"
@@ -3659,6 +4058,10 @@ paths:
   /carts/abandoned:
     get:
       operationId: listAbandonedCarts
+      x-ticvai-read-via:
+      - query: identity#subjectContactRecords
+        route: in-process
+        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-778 Abandoned Cart Recovery"
       x-ticvai-audience:
@@ -3861,6 +4264,10 @@ paths:
   /billing-statements/{statementId}:
     get:
       operationId: getBillingStatement
+      x-ticvai-read-via:
+      - query: finance#taxInvoiceLineRecords
+        route: in-process
+        for: 'its read of ledger.tax_invoice_line, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-023 Membership Management"
         - "P02 GST-015 Memberships"
@@ -5317,6 +5724,13 @@ paths:
   /payments:
     post:
       operationId: createPayment
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
         - "P01 WEB-033 Shop"
@@ -5627,6 +6041,10 @@ paths:
         format: uuid
     post:
       operationId: capturePayment
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
         - "P06 EMP-035 Payment on device"
@@ -5773,6 +6191,16 @@ paths:
   /sync/orders:
     post:
       operationId: syncOrders
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceListRecords
+        route: in-process
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#variantRecords
+        route: in-process
+        for: 'its read of catalogue.variant, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P08 BO-037 Offline Package Status"
@@ -5855,6 +6283,10 @@ paths:
   /sync/rejections:
     get:
       operationId: listSyncRejections
+      x-ticvai-read-via:
+      - query: cross-region#rejectionRecords
+        route: service
+        for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P06 EMP-017 Sync & reconciliation"
@@ -5937,6 +6369,10 @@ paths:
         format: uuid
     post:
       operationId: resolveSyncRejection
+      x-ticvai-read-via:
+      - query: cross-region#rejectionRecords
+        route: service
+        for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-038 Reconciliation Queue"
         - "P08 BO-130 Offline Policy & Rules Configuration"
@@ -6085,6 +6521,19 @@ paths:
       description: The QR, wristband or card the guest is already carrying.
     get:
       operationId: getMediaEntitlements
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
@@ -6123,6 +6572,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: appendEntitlementToMedia
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
@@ -6527,6 +6980,10 @@ paths:
         format: uuid
     post:
       operationId: transferOrderTickets
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P01 WEB-030 Ticket Transfer"
@@ -6629,6 +7086,10 @@ paths:
         format: uuid
     post:
       operationId: claimTicketTransfer
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P02 GST-014 Ticket Transfer"
       x-ticvai-write-via:
@@ -6758,6 +7219,10 @@ paths:
         format: uuid
     get:
       operationId: getOrderStatement
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: in-process
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
@@ -7229,6 +7694,10 @@ paths:
   /upgrade-conversion:
     get:
       operationId: listUpgradeConversion
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-308 Upgrade & Conversion Command Center"
       x-ticvai-audience:
@@ -7323,6 +7792,10 @@ paths:
   /upgrade-conversion-path:
     put:
       operationId: setUpgradeConversionPath
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-309 Upgrade & Conversion Path Builder"
       x-ticvai-audience:
@@ -7381,6 +7854,13 @@ paths:
   /upgrade-eligibility-qualification:
     get:
       operationId: listUpgradeEligibilityQualification
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-310 Upgrade Eligibility & Qualification Rules"
       parameters:
@@ -7431,6 +7911,10 @@ paths:
   /upgrade-timing-usage:
     get:
       operationId: listUpgradeTimingUsage
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-311 Upgrade Timing, Usage & Ticket Status Rules"
       parameters:
@@ -7481,6 +7965,10 @@ paths:
   /upgrade-financial-treatment:
     get:
       operationId: listUpgradeFinancialTreatment
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-312 Upgrade Financial Treatment & Price Difference Rules"
       parameters:
@@ -7588,6 +8076,10 @@ paths:
   /person-type-product:
     get:
       operationId: listPersonTypeProduct
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-314 Person-Type, Product & Entitlement Conversion Rules"
       parameters:
@@ -7638,6 +8130,13 @@ paths:
   /bulk-group-assisted:
     get:
       operationId: listBulkGroupAssisted
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-315 Bulk, Group & Assisted Upgrade Operations"
       x-ticvai-audience:
@@ -7738,6 +8237,10 @@ paths:
   /upgrade-credential-regeneration:
     post:
       operationId: createUpgradeCredentialRegeneration
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       x-ticvai-write-via:
@@ -7797,6 +8300,10 @@ paths:
   /upgrade-exception:
     get:
       operationId: listUpgradeException
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-317 Upgrade History, Exception Management & Audit Explorer"
       x-ticvai-audience:
@@ -8127,6 +8634,16 @@ paths:
   /group-requirement-availability:
     get:
       operationId: listGroupRequirementAvailability
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-267 Group Requirements, Availability & Capacity Planner"
       parameters:
@@ -8172,6 +8689,16 @@ paths:
   /group-package-experience:
     put:
       operationId: setGroupPackageExperience
+      x-ticvai-read-via:
+      - query: catalogue#groupPackageRecords
+        route: in-process
+        for: 'its read of catalogue.group_package, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-268 Group Package & Experience Builder"
       x-ticvai-audience:
@@ -8226,6 +8753,10 @@ paths:
   /group-quotation-proposal:
     put:
       operationId: setGroupQuotationProposal
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-269 Group Quotation Builder & Proposal Generation"
       x-ticvai-audience:
@@ -8327,6 +8858,10 @@ paths:
   /group-discount-exception:
     put:
       operationId: approveGroupDiscountException
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-271 Group Discount, Exception & Approval Workflow"
       x-ticvai-audience:
@@ -8487,6 +9022,10 @@ paths:
   /group-booking:
     get:
       operationId: listGroupBooking
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-274 Group Booking Operations Command Center"
       parameters:
@@ -8584,6 +9123,10 @@ paths:
   /participant-guest-list:
     get:
       operationId: listParticipantGuestList
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-276 Participants, Guest Lists & Group Structure"
       parameters:
@@ -8681,6 +9224,10 @@ paths:
   /group-ticket-seat:
     get:
       operationId: listGroupTicketSeat
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-278 Group Ticket, Seat & Entitlement Allocation"
       parameters:
@@ -8726,6 +9273,13 @@ paths:
   /group-ticket-fulfillment:
     get:
       operationId: listGroupTicketFulfillment
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: marketing-crm#messageDispatchRecords
+        route: service
+        for: 'its read of marketing.message_dispatch, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-279 Group Ticket Fulfillment & Distribution"
       parameters:
@@ -8775,6 +9329,13 @@ paths:
   /group-arrival-check:
     get:
       operationId: listGroupArrivalCheck
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
@@ -8870,6 +9431,13 @@ paths:
   /group-booking-reconciliation:
     get:
       operationId: listGroupBookingReconciliation
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-274 Group Booking Operations Command Center"
         - "P08 BO-282 Group Booking Reconciliation, Closure & Performance"
@@ -8917,6 +9485,10 @@ paths:
   /group-sale-2:
     get:
       operationId: listGroupSale2
+      x-ticvai-read-via:
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-264 Group Sales Command Center"
         - "P08 BO-283 Group Sales Analytics & AI Intelligence Center"
@@ -9026,6 +9598,10 @@ paths:
   /order-reservation:
     get:
       operationId: listOrderReservation
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-304 Order & Reservation Command Center"
       x-ticvai-audience:
@@ -9165,6 +9741,13 @@ paths:
   /order-detail-transaction:
     put:
       operationId: setOrderDetailTransaction
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.5; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (13 non-field properties removed; added lines)'
@@ -9381,6 +9964,10 @@ paths:
   /customer-guest-account:
     put:
       operationId: setCustomerGuestAccount
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-309 Customer, Guest & Account Assignment"
       x-ticvai-audience:
@@ -9437,6 +10024,16 @@ paths:
   /order-line-product:
     get:
       operationId: listOrderLineProduct
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-310 Order Line, Product & Entitlement Composition"
       parameters:
@@ -9486,6 +10083,13 @@ paths:
   /capacity-reservation-inventory:
     get:
       operationId: listCapacityReservationInventory
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-311 Capacity Reservation & Inventory Commitment"
       parameters:
@@ -9536,6 +10140,10 @@ paths:
   /reservation-confirmation-expiry:
     get:
       operationId: listReservationConfirmationExpiry
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-312 Reservation Confirmation, Expiry & Fulfillment Readiness"
       parameters:
@@ -9586,6 +10194,10 @@ paths:
   /order-lifecycle-timeline:
     get:
       operationId: listOrderLifecycleTimeline
+      x-ticvai-read-via:
+      - query: cross-region#rejectionRecords
+        route: service
+        for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-313 Order Lifecycle Timeline, SLA, Exceptions & AI Operations"
       parameters:
@@ -9741,6 +10353,16 @@ paths:
   /order-amendment:
     put:
       operationId: setOrderAmendment
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.22; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (12 non-field properties removed)'
@@ -9969,6 +10591,10 @@ paths:
   /ticket-reissue-fulfillment:
     get:
       operationId: listTicketReissueFulfillment
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-027 Reissue & Media Replacement"
       parameters:
@@ -10216,6 +10842,13 @@ paths:
   /payment-order-financial:
     get:
       operationId: listPaymentOrderFinancial
+      x-ticvai-read-via:
+      - query: finance#settlementExceptionRecords
+        route: in-process
+        for: 'its read of ledger.settlement_exception, Ledger''s data (CHG-MOD-001)'
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-324 Payment & Order Financial Command Center"
       x-ticvai-audience:
@@ -10285,6 +10918,10 @@ paths:
   /order-payment-detail:
     get:
       operationId: listOrderPaymentDetail
+      x-ticvai-read-via:
+      - query: finance#settlementExceptionRecords
+        route: in-process
+        for: 'its read of ledger.settlement_exception, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-607 Mixed Tender Transaction Trace & Allocation Audit"
         - "P08 ADM-617 Refund Transaction Trace & Audit Investigation"
@@ -10579,6 +11216,10 @@ paths:
   /external-payment-partner:
     get:
       operationId: listExternalPaymentPartner
+      x-ticvai-read-via:
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-330 External Payment, Partner & Settlement Reference Mapping"
       parameters:
@@ -10628,6 +11269,13 @@ paths:
   /payment-reconciliation-exception:
     get:
       operationId: listPaymentReconciliationException
+      x-ticvai-read-via:
+      - query: finance#settlementExceptionRecords
+        route: in-process
+        for: 'its read of ledger.settlement_exception, Ledger''s data (CHG-MOD-001)'
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
         - "P08 BO-331 Payment Reconciliation & Exception Management"
@@ -10677,6 +11325,10 @@ paths:
   /financial-traceability:
     get:
       operationId: listFinancialTraceability
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: in-process
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-332 Financial Traceability, Control & Audit Explorer"
       x-ticvai-audience:
@@ -10738,6 +11390,13 @@ paths:
   /order-financial-reconciliation:
     get:
       operationId: listOrderFinancialReconciliation
+      x-ticvai-read-via:
+      - query: finance#settlementExceptionRecords
+        route: in-process
+        for: 'its read of ledger.settlement_exception, Ledger''s data (CHG-MOD-001)'
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-333 Order Financial Analytics & AI Reconciliation Intelligence"
       x-ticvai-audience:
@@ -10830,6 +11489,13 @@ paths:
   /resale-marketplace:
     get:
       operationId: listResaleMarketplace
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-278 Resale Marketplace Command Center"
       x-ticvai-audience:
@@ -11037,6 +11703,16 @@ paths:
   /listing-seller:
     post:
       operationId: createListingSeller
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-281 Listing Creation & Seller Configuration"
       x-ticvai-audience:
@@ -11093,6 +11769,10 @@ paths:
   /resale-pricing-price:
     get:
       operationId: listResalePricingPrice
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-282 Resale Pricing & Price Guardrails"
       parameters:
@@ -11249,6 +11929,13 @@ paths:
   /resale-inventory-availability:
     get:
       operationId: listResaleInventoryAvailability
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-285 Resale Inventory & Availability Management"
       parameters:
@@ -11397,6 +12084,10 @@ paths:
   /resale:
     get:
       operationId: listResale
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-288 Resale Operations Command Center"
         - "P08 ADM-297 Resale Analytics & AI Intelligence"
@@ -11446,6 +12137,10 @@ paths:
   /buyer-purchase-resale:
     get:
       operationId: listBuyerPurchaseResale
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-289 Buyer Purchase & Resale Order Management"
       parameters:
@@ -11490,6 +12185,10 @@ paths:
   /ticket-ownership-transfer:
     get:
       operationId: listTicketOwnershipTransfer
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-290 Ticket Ownership Transfer Management"
       parameters:
@@ -11541,6 +12240,10 @@ paths:
   /credential-revocation-regeneration:
     get:
       operationId: listCredentialRevocationRegeneration
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-291 Credential Revocation & Regeneration"
       parameters:
@@ -11588,6 +12291,13 @@ paths:
   /resale-fraud-duplicate:
     get:
       operationId: listResaleFraudDuplicate
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-292 Resale Fraud & Duplicate Sale Protection"
       parameters:
@@ -11634,6 +12344,13 @@ paths:
   /capacity-inventory-reconciliation:
     get:
       operationId: listCapacityInventoryReconciliation
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-293 Capacity & Inventory Reconciliation"
       parameters:
@@ -11783,6 +12500,10 @@ paths:
   /resale-ownership:
     get:
       operationId: listResaleOwnership
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-296 Resale Audit & Ownership History"
       x-ticvai-audience:
@@ -11899,6 +12620,10 @@ paths:
   /resale-2:
     get:
       operationId: listResale2
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-288 Resale Operations Command Center"
         - "P08 ADM-297 Resale Analytics & AI Intelligence"
@@ -11992,6 +12717,13 @@ paths:
   /ticket-resale-marketplace:
     get:
       operationId: listTicketResaleMarketplace
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-278 Resale Marketplace Command Center"
         - "P08 ADM-298 My Tickets & Resale Marketplace Entry"
@@ -12039,6 +12771,16 @@ paths:
   /resale-eligibility-ticket:
     get:
       operationId: listResaleEligibilityTicket
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-299 Resale Eligibility & Ticket Selection"
       parameters:
@@ -12176,6 +12918,13 @@ paths:
   /resale-listing-seller:
     get:
       operationId: listResaleListingSeller
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-302 My Resale Listings & Seller Dashboard"
       parameters:
@@ -12221,6 +12970,16 @@ paths:
   /official-resale-marketplace:
     get:
       operationId: listOfficialResaleMarketplace
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-278 Resale Marketplace Command Center"
         - "P08 ADM-303 Official Resale Marketplace & Buyer Discovery"
@@ -12267,6 +13026,16 @@ paths:
   /resale-ticket-detail:
     get:
       operationId: listResaleTicketDetail
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience"
       parameters:
@@ -12312,6 +13081,13 @@ paths:
   /buyer-checkout-inventory:
     get:
       operationId: listBuyerCheckoutInventory
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
       parameters:
@@ -12357,6 +13133,10 @@ paths:
   /resale-confirmation-ownership:
     get:
       operationId: listResaleConfirmationOwnership
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-296 Resale Audit & Ownership History"
         - "P08 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
@@ -12726,6 +13506,19 @@ paths:
         format: uuid
     post:
       operationId: applyCartPromoCode
+      x-ticvai-read-via:
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#couponCampaignRecords
+        route: in-process
+        for: 'its read of promotions.coupon_campaign, Catalogue''s data (CHG-MOD-001)'
+      - query: promotions#couponCodeRecords
+        route: in-process
+        for: 'its read of promotions.coupon_code, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
@@ -13353,6 +14146,10 @@ paths:
         format: uuid
     post:
       operationId: voidEntitlement
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
       x-ticvai-write-via:
@@ -14159,6 +14956,13 @@ paths:
   /chargebacks/intake:
     post:
       operationId: recordChargeback
+      x-ticvai-read-via:
+      - query: finance#accountMappingRecords
+        route: in-process
+        for: 'its read of ledger.account_mapping, Ledger''s data (CHG-MOD-001)'
+      - query: finance#fiscalPeriodRecords
+        route: in-process
+        for: 'its read of ledger.fiscal_period, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 BO-025 Chargebacks & Disputes"
@@ -14356,6 +15160,13 @@ paths:
         format: uuid
     post:
       operationId: recordChargebackOutcome
+      x-ticvai-read-via:
+      - query: finance#accountMappingRecords
+        route: in-process
+        for: 'its read of ledger.account_mapping, Ledger''s data (CHG-MOD-001)'
+      - query: finance#fiscalPeriodRecords
+        route: in-process
+        for: 'its read of ledger.fiscal_period, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 BO-025 Chargebacks & Disputes"
@@ -14432,6 +15243,13 @@ paths:
   /chargebacks/analytics:
     get:
       operationId: getChargebackAnalytics
+      x-ticvai-read-via:
+      - query: catalogue#productCategoryRecords
+        route: in-process
+        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 ADM-634 Chargeback & Dispute Command Center"

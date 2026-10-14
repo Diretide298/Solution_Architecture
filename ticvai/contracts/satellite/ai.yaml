@@ -118,10 +118,115 @@ tags:
   description: Decision records, explanation, evidence and replay (design C12)
 - name: monitoring
   description: Governance alerts, incidents, risk register and controls (design C13)
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  activityRecords:
+    module: ai
+    table: ai.activity
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.activity rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AiInteraction'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.activity rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with
+      a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through AI's service route (serviceAuth).
+    served: [service]
+  policyRecords:
+    module: ai
+    table: ai.policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AiPolicy'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.policy rows, as it stores them and as the caller's scope lets it see them
+      (the table's row-level security, under the caller's connection and transaction). It decides nothing: an
+      asker that refuses or chooses on these rows states that rule in its own operation, and a question with a
+      rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through AI's service route (serviceAuth).
+    served: [service]
+  proposedActionRecords:
+    module: ai
+    table: ai.proposed_action
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.proposed_action rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ProposedAction'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.proposed_action rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through AI's service route (serviceAuth).
+    served: [service]
+  providerRecords:
+    module: ai
+    table: ai.provider
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.provider rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AiProvider'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.provider rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with
+      a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through AI's service route (serviceAuth).
+    served: [service]
+  suggestionRecords:
+    module: ai
+    table: ai.suggestion
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.suggestion rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Suggestion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.suggestion rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with
+      a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through AI's service route (serviceAuth).
+    served: [service]
 paths:
   /ai/translate:
     post:
       operationId: proposeTranslations
+      x-ticvai-read-via:
+      - query: marketing-crm#messageTemplateRecords
+        route: service
+        for: 'its read of marketing.message_template, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#messageTemplateVersionRecords
+        route: service
+        for: 'its read of marketing.message_template_version, Marketing''s data (CHG-MOD-001)'
+      - query: platform-ops#contentBlockRecords
+        route: service
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-785 Template Library"
         - "P08 BO-793 AI Content, Translation & Audit"
@@ -238,6 +343,37 @@ paths:
   /ai/content-drafts:
     post:
       operationId: proposeMarketingContent
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#campaignRecords
+        route: service
+        for: 'its read of marketing.campaign, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#messageTemplateRecords
+        route: service
+        for: 'its read of marketing.message_template, Marketing''s data (CHG-MOD-001)'
+      - query: platform-ops#contentBlockRecords
+        route: service
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: service
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
+      - query: white-label#bannerRecords
+        route: service
+        for: 'its read of whitelabel.banner, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#contentPageRecords
+        route: service
+        for: 'its read of whitelabel.content_page, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#homepageSectionRecords
+        route: service
+        for: 'its read of whitelabel.homepage_section, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#promoBlockRecords
+        route: service
+        for: 'its read of whitelabel.promo_block, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-766 Campaign Builder"
         - "P08 BO-772 A/B & AI Optimization"
@@ -405,6 +541,28 @@ paths:
   /ai/segment-suggestions:
     post:
       operationId: proposeLookalikeSegment
+      x-ticvai-read-via:
+      - query: marketing-crm#audienceListRecords
+        route: service
+        for: 'its read of marketing.audience_list, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentRecords
+        route: service
+        for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#loyaltyPositionRecords
+        route: service
+        for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentCriterionRecords
+        route: service
+        for: 'its read of marketing.segment_criterion, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-761 AI Audience Discovery"
         - "P08 BO-762 Predictive Audiences"
@@ -503,6 +661,37 @@ paths:
   /ai/suggestions:
     post:
       operationId: requestSuggestion
+      x-ticvai-read-via:
+      - query: fnb#productionPlanRecords
+        route: service
+        for: 'its read of fnb.production_plan, F&B''s data (CHG-MOD-001)'
+      - query: inventory#movementRecords
+        route: service
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
+      - query: inventory#stockBatchRecords
+        route: service
+        for: 'its read of inventory.stock_batch, Inventory''s data (CHG-MOD-001)'
+      - query: marketing-crm#attributionTouchRecords
+        route: service
+        for: 'its read of marketing.attribution_touch, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: queue#queueRecords
+        route: service
+        for: 'its read of queue.queue, VenueOps''s data (CHG-MOD-001)'
+      - query: queue#readingRecords
+        route: service
+        for: 'its read of queue.reading, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#pointRecords
+        route: service
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#visitPlanItemRecords
+        route: service
+        for: 'its read of venuemap.visit_plan_item, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#visitPlanRecords
+        route: service
+        for: 'its read of venuemap.visit_plan, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
@@ -814,6 +1003,16 @@ paths:
         format: uuid
     post:
       operationId: proposeWalkways
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#importJobRecords
+        route: service
+        for: 'its read of venuemap.import_job, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#mapRecords
+        route: service
+        for: 'its read of venuemap.map, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-093 Map Import & Labelling"
       summary: Find walkable space in a drawing that has no vectors
@@ -920,6 +1119,13 @@ paths:
         format: uuid
     post:
       operationId: proposeVenueLabels
+      x-ticvai-read-via:
+      - query: venue-map#importJobRecords
+        route: service
+        for: 'its read of venuemap.import_job, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#pointRecords
+        route: service
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-093 Map Import & Labelling"
       summary: Suggest what each extracted shape is
@@ -981,6 +1187,28 @@ paths:
         format: uuid
     post:
       operationId: proposeSeatMapChanges
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: seating#accessibleRecords
+        route: service
+        for: 'its read of seating.accessible, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatCategoryRecords
+        route: service
+        for: 'its read of seating.seat_category, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatMapRecords
+        route: service
+        for: 'its read of seating.seat_map, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatRecords
+        route: service
+        for: 'its read of seating.seat, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#sectionRecords
+        route: service
+        for: 'its read of seating.section, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#zoneRecords
+        route: service
+        for: 'its read of seating.zone, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-959 Stage & Focal Point"
         - "P08 BO-970 AI Numbering & Labeling"
@@ -1651,6 +1879,13 @@ paths:
   /search:
     post:
       operationId: semanticSearch
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-040 Knowledge base"
         - "P06 EMP-041 Training"
@@ -1865,6 +2100,55 @@ paths:
   /generate/configuration:
     post:
       operationId: generateConfiguration
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceRecords
+        route: service
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#variantDimensionRecords
+        route: service
+        for: 'its read of catalogue.variant_dimension, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#loyaltyProgrammeRecords
+        route: service
+        for: 'its read of marketing.loyalty_programme, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: service
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatCategoryRecords
+        route: service
+        for: 'its read of seating.seat_category, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatMapRecords
+        route: service
+        for: 'its read of seating.seat_map, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatRecords
+        route: service
+        for: 'its read of seating.seat, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatingRulesRecords
+        route: service
+        for: 'its read of seating.seating_rules, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#sectionRecords
+        route: service
+        for: 'its read of seating.section, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
         - "P08 BO-597 AI Configuration Workspace"
@@ -1957,6 +2241,10 @@ paths:
   /generate/venue-layout:
     post:
       operationId: generateVenueLayout
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Draft a seat map from an uploaded plan
@@ -2805,6 +3093,40 @@ paths:
         format: uuid
     post:
       operationId: reindexSource
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: fnb#menuItemRecords
+        route: service
+        for: 'its read of fnb.menu_item, F&B''s data (CHG-MOD-001)'
+      - query: maintenance#inspectionTemplateRecords
+        route: service
+        for: 'its read of maintenance.inspection_template, VenueOps''s data (CHG-MOD-001)'
+      - query: marketing-crm#caseRecords
+        route: service
+        for: 'its read of marketing.case, Marketing''s data (CHG-MOD-001)'
+      - query: reporting#reportDefinitionRecords
+        route: service
+        for: 'its read of reporting.report_definition, Reporting''s data (CHG-MOD-001)'
+      - query: retail#merchandiseRecords
+        route: service
+        for: 'its read of retail.merchandise, Retail''s data (CHG-MOD-001)'
+      - query: white-label#contentPageRecords
+        route: service
+        for: 'its read of whitelabel.content_page, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#faqEntryRecords
+        route: service
+        for: 'its read of whitelabel.faq_entry, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#policyRecords
+        route: service
+        for: 'its read of whitelabel.policy, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Rebuild a source
@@ -4629,6 +4951,10 @@ paths:
         format: uuid
     post:
       operationId: attachConfigurationSource
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-469 AI Configuration Home & Start"
         - "P09 ADM-470 Setup Type & Business Intent Discovery"
@@ -7455,6 +7781,13 @@ paths:
         format: uuid
     post:
       operationId: scoreApprovalRequest
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: approvals#slaPolicyRecords
+        route: service
+        for: 'its read of approvals.sla_policy, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: minutes of 8 September (AI in approvals is context only and never recommends
         or influences approve or reject); AI system design 3.10 (rules-first); our build plan, shape follows scoreTransactionRisk
         (service)'
@@ -9826,6 +10159,10 @@ paths:
         format: uuid
     post:
       operationId: importVenueHistory
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P16 ANL-071 AI Maturity & Learning"
       x-ticvai-agreed: '29 September: AI functions review, packageFindings 7 (no historical import existed); shape follows

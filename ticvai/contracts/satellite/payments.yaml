@@ -53,6 +53,47 @@ servers:
 - url: https://api.ticvai.com/v1
 security:
 - bearerAuth: []
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  providerConnectionRecords:
+    module: payments
+    table: payments.provider_connection
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The payments.provider_connection rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PaymentProviderConnection'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its payments.provider_connection rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
+  storedForwardRecords:
+    module: payments
+    table: payments.stored_forward
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The payments.stored_forward rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/StoredForwardTransaction'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its payments.stored_forward rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
 paths:
   /dunning-policy:
     get:
@@ -908,6 +949,10 @@ paths:
   /payment-providers/economics:
     get:
       operationId: getPaymentProviderEconomics
+      x-ticvai-read-via:
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-577 Provider Cost, Commercial & Routing Economics"
         - "P08 ADM-624 Fees, Commission, FX & Settlement Economics"

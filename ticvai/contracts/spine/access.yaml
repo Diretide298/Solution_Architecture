@@ -104,10 +104,89 @@ x-ticvai-queries:
         partiallyConsumed->expired:timer: as issued->expired
         issued->cancelled:cancelPerformance: every holder is made whole by createRefund (F09), whose order.refunded
           the projection consumes; until then the guest is owed money and the entitlement rightly blocks
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  accessPointRecords:
+    module: access
+    table: access.access_point
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The access.access_point rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Access stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccessPoint'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Access answers with its access.access_point rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Access' service route (serviceAuth).
+    served: [service]
+  blacklistRecords:
+    module: access
+    table: access.blacklist
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The access.blacklist rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Access stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/BlacklistEntry'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Access answers with its access.blacklist rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Access' service route (serviceAuth).
+    served: [service]
+  entitlementRecords:
+    module: access
+    table: access.entitlement
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The access.entitlement rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Access stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Entitlement'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Access answers with its access.entitlement rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Access' service route (serviceAuth).
+    served: [service]
+  scanEventRecords:
+    module: access
+    table: access.scan_event
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The access.scan_event rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Access stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ScanEvent'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Access answers with its access.scan_event rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Access' service route (serviceAuth).
+    served: [service]
 paths:
   /access/validate:
     post:
       operationId: validateAccess
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
@@ -199,6 +278,10 @@ paths:
   /my/entitlements/all:
     get:
       operationId: listEntitlements
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"
@@ -257,6 +340,16 @@ paths:
   /guests/me/entitlements:
     get:
       operationId: listMyEntitlements
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#delegatedAccessRecords
+        route: service
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-017 My Account Dashboard"
@@ -348,6 +441,13 @@ paths:
         format: uuid
     get:
       operationId: getEntitlement
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#delegatedAccessRecords
+        route: service
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"
@@ -605,6 +705,10 @@ paths:
   /face-tag/enrolments:
     post:
       operationId: enrolFaceTag
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
       x-ticvai-write-via:
@@ -777,6 +881,13 @@ paths:
   /identity-verifications:
     post:
       operationId: verifyIdentity
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Check the person presenting against the person entitled
@@ -876,6 +987,16 @@ paths:
   /face-pass/enrolments:
     post:
       operationId: enrolFacePass
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentRecords
+        route: service
+        for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P02 GST-069 Face Pass"
       x-ticvai-write-via:
@@ -1102,6 +1223,10 @@ paths:
         format: uuid
     get:
       operationId: getFacePassEnrolment
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-069 Face Pass"
@@ -1151,6 +1276,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: revokeFacePass
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-069 Face Pass"
@@ -1355,6 +1484,19 @@ paths:
         format: uuid
     post:
       operationId: issueOrderEntitlements
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#variantRecords
+        route: service
+        for: 'its read of catalogue.variant, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -1456,6 +1598,10 @@ paths:
   /parking-entitlements:
     post:
       operationId: createParkingEntitlement
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -1611,6 +1757,10 @@ paths:
   /access/override:
     post:
       operationId: overrideAccess
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
@@ -1690,6 +1840,16 @@ paths:
   /access/lookup:
     get:
       operationId: lookupTicket
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
@@ -2700,6 +2860,10 @@ paths:
   /access/group-validate:
     post:
       operationId: validateGroupAccess
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
@@ -2852,6 +3016,19 @@ paths:
   /virtual-ticket:
     get:
       operationId: listVirtualTicket
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-334 Virtual Ticket Command Center"
       x-ticvai-audience:
@@ -3505,6 +3682,10 @@ paths:
   /virtual-ticket-architecture:
     get:
       operationId: listVirtualTicketArchitecture
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-343 Virtual Ticket Architecture Testing, Governance & Audit"
       x-ticvai-audience:
@@ -4268,6 +4449,13 @@ paths:
   /credential:
     get:
       operationId: listCredential
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-354 Credential Operations Command Center"
       x-ticvai-audience:
@@ -4396,6 +4584,19 @@ paths:
   /virtual-ticket-credential:
     put:
       operationId: setVirtualTicketCredential
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.43-44 (15.3.2); MoM
@@ -4456,6 +4657,13 @@ paths:
   /credential-generation-issuance:
     get:
       operationId: listCredentialGenerationIssuance
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-356 Credential Generation & Issuance Monitor"
       x-ticvai-audience:
@@ -4538,6 +4746,10 @@ paths:
   /credential-delivery-distribution:
     get:
       operationId: listCredentialDeliveryDistribution
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-357 Credential Delivery & Distribution Operations"
       x-ticvai-audience:
@@ -4608,6 +4820,10 @@ paths:
   /media-binding-activation:
     put:
       operationId: setMediaBindingActivation
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-036 Issue media"
         - "P08 BO-358 Media Binding, Activation & Assignment Operations"
@@ -4717,6 +4933,10 @@ paths:
   /failed-generation-delivery:
     get:
       operationId: listFailedGenerationDelivery
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-360 Failed Generation, Delivery & Credential Exception Management"
       x-ticvai-audience:
@@ -4858,6 +5078,10 @@ paths:
   /credential-security-operational:
     get:
       operationId: listCredentialSecurityOperational
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-173 Credential Security Simulation, Audit & Publication"
         - "P08 BO-362 Credential Security, Audit & Operational Evidence"
@@ -4934,6 +5158,10 @@ paths:
   /ticket-media:
     get:
       operationId: listTicketMedia
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-363 Ticket Media Analytics & AI Operations Intelligence"
       x-ticvai-audience:
@@ -5044,6 +5272,10 @@ paths:
   /access:
     get:
       operationId: listAccess
+      x-ticvai-read-via:
+      - query: cross-region#rejectionRecords
+        route: service
+        for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-144 Access Control Command Center"
       parameters:
@@ -5405,6 +5637,10 @@ paths:
   /access-graphical-map:
     put:
       operationId: setAccessGraphicalMap
+      x-ticvai-read-via:
+      - query: venue-map#mapRecords
+        route: service
+        for: 'its read of venuemap.map, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-150 Access Control Graphical Map Designer"
       x-ticvai-audience:
@@ -5896,6 +6132,10 @@ paths:
   /access-validity-time:
     get:
       operationId: listAccessValidityTime
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-158 Access Validity & Time Rules"
       parameters:
@@ -6249,6 +6489,10 @@ paths:
   /rule-conflict-check:
     put:
       operationId: publishRuleConflictCheck
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-163 Rule Simulation, Conflict Check & Publication"
       x-ticvai-audience:
@@ -6532,6 +6776,10 @@ paths:
   /device-binding-session:
     get:
       operationId: listDeviceBindingSession
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-167 Device Binding & Session Security"
       x-ticvai-audience:
@@ -6679,6 +6927,10 @@ paths:
   /credential-transfer-rebinding:
     get:
       operationId: listCredentialTransferRebinding
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-169 Credential Transfer & Rebinding"
       parameters:
@@ -7148,6 +7400,10 @@ paths:
   /virtual-credential-media:
     get:
       operationId: listVirtualCredentialMedia
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-174 Media & Credential Command Center"
         - "P08 BO-176 Virtual Credential & Media Association"
@@ -7698,6 +7954,10 @@ paths:
   /biometric-access:
     get:
       operationId: listBiometricAccess
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-184 Biometric Access Command Center"
       x-ticvai-audience:
@@ -8253,6 +8513,10 @@ paths:
   /face-change-enrollment:
     get:
       operationId: listFaceChangeEnrollment
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-190 Face Change, Re-enrollment & Identity Protection"
       x-ticvai-audience:
@@ -8358,6 +8622,10 @@ paths:
   /biometric-lifecycle-retention:
     get:
       operationId: listBiometricLifecycleRetention
+      x-ticvai-read-via:
+      - query: tenancy#dataRetentionSettingRecords
+        route: service
+        for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-audience:
@@ -8409,6 +8677,10 @@ paths:
       x-ticvai-bounded: retention rules per biometric data category, defined by hand
     put:
       operationId: setBiometricLifecycleRetention
+      x-ticvai-read-via:
+      - query: tenancy#dataRetentionSettingRecords
+        route: service
+        for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-write-via:
@@ -9163,6 +9435,13 @@ paths:
   /offline-edge:
     get:
       operationId: listOfflineEdge
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: cross-region#rejectionRecords
+        route: service
+        for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-204 Offline & Edge Operations Command Center"
       x-ticvai-audience:
@@ -9468,6 +9747,10 @@ paths:
   /reconnection-synchronization-conflict:
     get:
       operationId: listReconnectionSynchronizationConflict
+      x-ticvai-read-via:
+      - query: cross-region#rejectionRecords
+        route: service
+        for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-211 Reconnection, Synchronization & Conflict Resolution"
       x-ticvai-audience:
@@ -9521,6 +9804,10 @@ paths:
   /offline-resilience-testing:
     put:
       operationId: simulateOfflineResilienceTesting
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-212 Offline Simulation & Resilience Testing"
       x-ticvai-audience:
@@ -9739,6 +10026,13 @@ paths:
   /group-leader-fast:
     get:
       operationId: listGroupLeaderFast
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-216 Group Leader & Fast B2B Validation"
       x-ticvai-audience:
@@ -9795,6 +10089,13 @@ paths:
   /group-attendance-partial:
     get:
       operationId: listGroupAttendancePartial
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-217 Group Attendance & Partial Entry Manager"
       x-ticvai-audience:
@@ -9851,6 +10152,10 @@ paths:
   /family-child-pod:
     get:
       operationId: listFamilyChildPod
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-218 Family, Child, POD & Companion Journey"
       parameters:
@@ -10000,6 +10305,10 @@ paths:
   /fast-pass-attraction:
     get:
       operationId: listFastPassAttraction
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
       parameters:
@@ -10154,6 +10463,10 @@ paths:
   /podium-console:
     get:
       operationId: listPodiumConsole
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-225 Podium Operations Console"
       parameters:
@@ -10207,6 +10520,19 @@ paths:
   /ticket-credential-investigation:
     get:
       operationId: listTicketCredentialInvestigation
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-226 Ticket & Credential Investigation Console"
       x-ticvai-audience:
@@ -10386,6 +10712,10 @@ paths:
   /manual-override-supervisor:
     put:
       operationId: approveManualOverrideSupervisor
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 9.5 p.121; R228 (override keeps the denial
@@ -10688,6 +11018,10 @@ paths:
   /shift-handover-summary:
     get:
       operationId: listShiftHandoverSummary
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-233 Operations Audit, Shift Handover & Control Summary"
       x-ticvai-audience:
@@ -11168,6 +11502,13 @@ paths:
   /authorization-governance-temporary:
     get:
       operationId: listAuthorizationGovernanceTemporary
+      x-ticvai-read-via:
+      - query: identity#delegatedAccessRecords
+        route: service
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-240 Authorization Governance & Temporary Access"
       x-ticvai-audience:
@@ -11273,6 +11614,10 @@ paths:
   /policy-conflict-impact:
     put:
       operationId: simulatePolicyConflictImpact
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
       x-ticvai-audience:
@@ -11568,6 +11913,10 @@ paths:
   /unified-identity-credential:
     get:
       operationId: listUnifiedIdentityCredential
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-audience:
@@ -11624,6 +11973,10 @@ paths:
   /biometric-identity-integrity:
     get:
       operationId: listBiometricIdentityIntegrity
+      x-ticvai-read-via:
+      - query: identity#subjectBiometricRecords
+        route: service
+        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-248 Biometric & Identity Integrity Monitoring"
       x-ticvai-audience:
@@ -11999,6 +12352,10 @@ paths:
   /access-monitoring:
     get:
       operationId: listAccessMonitoring
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-254 Access Monitoring & Analytics Command Center"
       x-ticvai-audience:
@@ -12100,6 +12457,13 @@ paths:
   /graphical-access-map:
     get:
       operationId: listGraphicalAccessMap
+      x-ticvai-read-via:
+      - query: venue-map#mapRecords
+        route: service
+        for: 'its read of venuemap.map, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#pointRecords
+        route: service
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-256 Graphical Access Map & Live Gate Performance"
       x-ticvai-audience:
@@ -12165,6 +12529,16 @@ paths:
   /attendance-admission:
     get:
       operationId: listAttendanceAdmission
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-257 Attendance & Admission Analytics"
       x-ticvai-audience:
@@ -12282,6 +12656,10 @@ paths:
   /entry-exit-crossover:
     get:
       operationId: listEntryExitCrossover
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-258 Entry, Exit, Re-entry & Crossover Analytics"
       parameters:
@@ -12371,6 +12749,13 @@ paths:
   /validation-outcome-rejection:
     get:
       operationId: listValidationOutcomeRejection
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-260 Validation Outcome & Rejection Analytics"
       x-ticvai-audience:
@@ -12474,6 +12859,13 @@ paths:
   /guest-dwell-time:
     get:
       operationId: listGuestDwellTime
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: venue-map#pointRecords
+        route: service
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-261 Guest Dwell Time, Length of Stay & Attraction Flow"
       parameters:
@@ -12996,6 +13388,10 @@ paths:
   /guest-journey/simulate:
     post:
       operationId: simulateGuestJourney
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-223 Journey Simulation, Audit & Publication"
       x-ticvai-audience:
@@ -14882,6 +15278,10 @@ paths:
   /verification-method-policies:
     put:
       operationId: setVerificationMethodPolicy
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-177 Verification Method Selection & Locking"
       x-ticvai-audience:

@@ -192,6 +192,27 @@ x-ticvai-queries:
         pendingVariance: a count beyond the venue's threshold is cash nobody has explained; only a supervisor accepting
           it (acceptShiftVariance) or a recount within the threshold (submitShiftCount) may end it, and a timer that
           closed it would close the books over an unexplained difference
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  posShiftRecords:
+    module: shift
+    table: orders.pos_shift
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.pos_shift rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ShiftVarianceReasonRequest'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.pos_shift rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
 
 paths:
   /shifts:
@@ -258,6 +279,16 @@ paths:
 
     post:
       operationId: openShift
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
       x-ticvai-audience: [staff]
@@ -398,6 +429,13 @@ paths:
   /denominations:
     get:
       operationId: listDenominations
+      x-ticvai-read-via:
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'its read of platform.denomination, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
@@ -437,6 +475,10 @@ paths:
 
     put:
       operationId: setDenominations
+      x-ticvai-read-via:
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'its read of platform.denomination, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-1065 Currency, Timezone & Channels"
       summary: Set the notes and coins a region's tills count
@@ -508,6 +550,10 @@ paths:
   /deposit-boxes:
     get:
       operationId: listDepositBoxes
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-015 Cash Operations Dashboard"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
@@ -551,6 +597,13 @@ paths:
 
     post:
       operationId: allocateDepositBox
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
       x-ticvai-audience: [staff]
@@ -777,6 +830,10 @@ paths:
   /deposit-boxes/close:
     post:
       operationId: closeDepositBoxes
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
       x-ticvai-audience: [staff]
@@ -1286,6 +1343,12 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-step-up-reason: A supervisor closes a cashier's shift and sees the expected cash and the variance (CHG-FIN-003); their own PIN on the device in use proves who did it (pre-apply round, 2 October; CHG-CSP-012).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue   # was workstation; the supervisor closes from any till or the back office (CHG-CSP-012)
@@ -1620,6 +1683,13 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: submitShiftCount
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P06 EMP-009 End shift"

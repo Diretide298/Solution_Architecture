@@ -64,6 +64,102 @@ tags:
 - name: cell
 - name: metering
 - name: billing
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  licenceAddOnRecords:
+    module: subscription
+    table: control.licence_add_on
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.licence_add_on rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/LicenceAddOn'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.licence_add_on rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
+  partnerAgreementRecords:
+    module: subscription
+    table: control.partner_agreement
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.partner_agreement rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PartnerAgreement'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.partner_agreement rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Platform's service route (serviceAuth).
+    served: [service]
+  tenantRecords:
+    module: subscription
+    table: control.tenant
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.tenant rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Tenant'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.tenant rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements, and asked from another
+      deployable through Platform's service route (serviceAuth).
+    served: [in-process, service]
+  contractRecords:
+    module: subscription
+    table: subscription.contract
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The subscription.contract rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Subscription'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its subscription.contract rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
+  planRecords:
+    module: subscription
+    table: subscription.plan
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The subscription.plan rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Plan'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its subscription.plan rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
 paths:
   /onboarding-applications:
     post:
@@ -164,6 +260,10 @@ paths:
         format: uuid
     get:
       operationId: listPartnerUsers
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       summary: Users beneath a partner, by branch
       tags:
@@ -189,6 +289,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPartnerUser
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-025 Partner Contacts & User Administration"
       x-ticvai-api-scope: partner.write
@@ -237,6 +341,10 @@ paths:
   /channel-listings:
     get:
       operationId: listChannelListings
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-013 Channel & Distribution"
       summary: What is listed on which OTA
@@ -262,6 +370,16 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setChannelListing
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-013 Channel & Distribution"
       summary: List a product on a channel, with its own allocation
@@ -310,6 +428,16 @@ paths:
         format: uuid
     post:
       operationId: exportPartnerInvoice
+      x-ticvai-read-via:
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Partner invoice and settlement, in an ERP format
       description: '2.7.41 and 5.12.7, BL-077. **`subscription.generateInvoice` bills a tenant for the
         platform — a different ledger from invoicing a partner for tickets sold.**
@@ -369,6 +497,13 @@ paths:
   /ai-usage/settle:
     post:
       operationId: settleAiUsage
+      x-ticvai-read-via:
+      - query: ai#activityRecords
+        route: service
+        for: 'its read of ai.activity, AI''s data (CHG-MOD-001)'
+      - query: ai#policyRecords
+        route: service
+        for: 'its read of ai.policy, AI''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-461 Consumption Reconciliation & Billing Approval"
       x-ticvai-audience:
@@ -609,6 +744,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPartnerAgreement
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#tenantRecords
+        route: service
+        for: 'its read of platform.tenant, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -659,6 +801,10 @@ paths:
         format: uuid
     patch:
       operationId: updatePartnerAgreement
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Amend, suspend or terminate
@@ -796,6 +942,16 @@ paths:
         format: uuid
     get:
       operationId: getCommissionStatement
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-011 Quote Management"
         - "P10 PTR-017 Commission Statement"
@@ -1656,6 +1812,10 @@ paths:
         format: uuid
     post:
       operationId: previewSubscriptionChange
+      x-ticvai-read-via:
+      - query: tenancy#tenantRecords
+        route: service
+        for: 'its read of platform.tenant, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-011 Licence & Seat Management"
@@ -1855,6 +2015,10 @@ paths:
         format: uuid
     get:
       operationId: getEntitlementUsage
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-002 Platform Dashboard"
         - "P09 ADM-005 Tenant Directory"
@@ -2731,6 +2895,10 @@ paths:
   /usage-records:
     post:
       operationId: recordUsage
+      x-ticvai-read-via:
+      - query: ai#activityRecords
+        route: service
+        for: 'its read of ai.activity, AI''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - service
       security:
@@ -2793,6 +2961,10 @@ paths:
         type: string
     post:
       operationId: recordInvoicePayment
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-462 Invoice & Payment Management"
       x-ticvai-audience:
@@ -3191,6 +3363,10 @@ paths:
   /burst-environments:
     get:
       operationId: listBurstEnvironments
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       summary: On-sale environments
       description: '**What is running and what it is costing.** An environment nobody is watching is the
         one left up for a month.'
@@ -3216,6 +3392,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: requestBurstEnvironment
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       summary: Stand one up for a performance
       description: '**Threshold-based, not manual.** Requested when a performance''s expected demand exceeds
         what the shared cell absorbs — `catalogue.performance` carries `onSaleFrom`, `onSaleTo` and capacity,
@@ -3312,6 +3492,10 @@ paths:
   /burst-environments/{burstEnvironmentId}/reconcile:
     post:
       operationId: reconcileBurstEnvironment
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: orders.order_line
         operation: syncOrders
@@ -3494,6 +3678,16 @@ paths:
   /membership-annual-pass:
     get:
       operationId: listMembershipAnnualPass
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
       x-ticvai-audience:
@@ -3602,6 +3796,10 @@ paths:
   /membership-product-tier:
     put:
       operationId: setMembershipProductTier
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-285 Membership Product & Tier Builder"
       x-ticvai-audience:
@@ -3657,6 +3855,10 @@ paths:
   /membership-eligibility-qualification:
     put:
       operationId: setMembershipEligibilityQualification
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-286 Membership Eligibility & Qualification Rule Builder"
       x-ticvai-audience:
@@ -3707,6 +3909,10 @@ paths:
   /validity-activation-expiry:
     put:
       operationId: setValidityActivationExpiry
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-287 Validity, Activation & Expiry Configuration"
       x-ticvai-audience:
@@ -3756,6 +3962,13 @@ paths:
   /membership-entitlement-admission:
     put:
       operationId: setMembershipEntitlementAdmission
+      x-ticvai-read-via:
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-audience:
@@ -3806,6 +4019,10 @@ paths:
   /membership-usage-visit:
     get:
       operationId: listMembershipUsageVisit
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-audience:
@@ -3865,6 +4082,10 @@ paths:
   /family-household-dependent:
     put:
       operationId: setFamilyHouseholdDependent
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-290 Family, Household & Dependent Membership Configuration"
       x-ticvai-audience:
@@ -3914,6 +4135,16 @@ paths:
   /membership-commercial-pricing:
     get:
       operationId: listMembershipCommercialPricing
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-audience:
@@ -3986,6 +4217,10 @@ paths:
   /renewal-auto-membership:
     put:
       operationId: setRenewalAutoMembership
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
       x-ticvai-audience:
@@ -4038,6 +4273,13 @@ paths:
   /membership-product-validation:
     get:
       operationId: getMembershipProductValidation
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
       summary: A membership product's validation, as the approver sees it
@@ -4078,6 +4320,16 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: approveMembershipProductValidation
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
@@ -4162,6 +4414,16 @@ paths:
   /member:
     get:
       operationId: listMember
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-294 Member Operations Command Center"
       x-ticvai-audience:
@@ -4316,6 +4578,19 @@ paths:
   /member-membership-account:
     put:
       operationId: setMemberMembershipAccount
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-295 Member 360° Membership Account Workspace"
       x-ticvai-audience:
@@ -4367,6 +4642,19 @@ paths:
   /membership-activation-credential:
     get:
       operationId: listMembershipActivationCredential
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-296 Membership Activation, Assignment & Credential Management"
       x-ticvai-audience:
@@ -4445,6 +4733,13 @@ paths:
   /visit-admission-entitlement:
     get:
       operationId: listVisitAdmissionEntitlement
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-297 Visit, Admission & Entitlement Usage Monitor"
       x-ticvai-audience:
@@ -4535,6 +4830,13 @@ paths:
   /membership-freeze-suspension:
     get:
       operationId: listMembershipFreezeSuspension
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-audience:
@@ -4606,6 +4908,19 @@ paths:
   /membership-upgrade-downgrade:
     get:
       operationId: listMembershipUpgradeDowngrade
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-299 Membership Upgrade, Downgrade & Product Migration Operations"
       x-ticvai-audience:
@@ -4680,6 +4995,19 @@ paths:
   /renewal-auto:
     get:
       operationId: listRenewalAuto
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-300 Renewal Operations & Auto-Renewal Management"
       x-ticvai-audience:
@@ -4782,6 +5110,16 @@ paths:
   /member-exception-override:
     get:
       operationId: listMemberExceptionOverride
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
         - "P08 BO-949 Approval, Exception & Override Control Center"
@@ -4866,6 +5204,25 @@ paths:
   /member-lifecycle-case:
     get:
       operationId: listMemberLifecycleCase
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-302 Member Lifecycle History, Audit & Case Timeline"
       x-ticvai-audience:
@@ -4970,6 +5327,22 @@ paths:
   /membership-renewal-retention:
     get:
       operationId: listMembershipRenewalRetention
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center"
       x-ticvai-audience:
@@ -5083,6 +5456,13 @@ paths:
   /partner:
     get:
       operationId: listPartner
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-022 Partner Management Command Center"
         - "P10 PTR-042 Partner Operations Command Center"
@@ -5243,6 +5623,10 @@ paths:
   /partner-profile-organization:
     put:
       operationId: setPartnerProfileOrganization
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-023 Partner Profile & Organization Setup"
       x-ticvai-api-scope: partner.write
@@ -5293,6 +5677,10 @@ paths:
   /partner-onboarding-application:
     get:
       operationId: listPartnerOnboardingApplication
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-024 Partner Onboarding & Application Workflow"
       x-ticvai-api-scope: partner.read
@@ -5387,6 +5775,10 @@ paths:
   /partner-contact-user:
     get:
       operationId: listPartnerContactUser
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-025 Partner Contacts & User Administration"
       x-ticvai-api-scope: partner.read
@@ -5713,6 +6105,10 @@ paths:
   /partner-access-role:
     get:
       operationId: listPartnerAccessRole
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-api-scope: partner.read
@@ -5812,6 +6208,10 @@ paths:
   /partner-statu-lifecycle:
     put:
       operationId: approvePartnerStatuLifecycle
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
       x-ticvai-write-via:
@@ -5868,6 +6268,19 @@ paths:
   /partner-profile-readiness:
     get:
       operationId: listPartnerProfileReadiness
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-031 Partner 360° Profile, Readiness & AI Review"
       x-ticvai-api-scope: partner.read
@@ -5949,6 +6362,16 @@ paths:
   /commercial-agreement:
     get:
       operationId: listCommercialAgreement
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-032 Commercial Agreement Command Center"
       x-ticvai-api-scope: partner.read
@@ -6080,6 +6503,13 @@ paths:
   /agreement-contract-term:
     put:
       operationId: setAgreementContractTerm
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance"
         - "P10 PTR-033 Agreement & Contract Terms Builder"
@@ -6141,6 +6571,13 @@ paths:
   /partner-rate-net:
     put:
       operationId: setPartnerRateNet
+      x-ticvai-read-via:
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-034 Partner Rate & Net Pricing Configuration"
       x-ticvai-write-via:
@@ -6196,6 +6633,13 @@ paths:
   /commission-margin-incentive:
     get:
       operationId: listCommissionMarginIncentive
+      x-ticvai-read-via:
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-api-scope: partner.read
@@ -6274,6 +6718,16 @@ paths:
   /credit-limit-exposure:
     get:
       operationId: listCreditLimitExposure
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-api-scope: partner.read
@@ -6357,6 +6811,13 @@ paths:
   /deposit-guarantee-financial:
     get:
       operationId: listDepositGuaranteeFinancial
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-037 Deposit, Guarantee & Financial Security Management"
       x-ticvai-api-scope: partner.read
@@ -6444,6 +6905,19 @@ paths:
   /payment-term-billing:
     put:
       operationId: setPaymentTermBilling
+      x-ticvai-read-via:
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-038 Payment Terms, Billing & Account Configuration"
       x-ticvai-write-via:
@@ -6507,6 +6981,19 @@ paths:
   /commercial-allocation-quota:
     get:
       operationId: listCommercialAllocationQuota
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-api-scope: partner.read
@@ -6585,6 +7072,10 @@ paths:
   /booking-limit-commercial:
     put:
       operationId: approveBookingLimitCommercial
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
       x-ticvai-write-via:
@@ -6643,6 +7134,22 @@ paths:
   /commercial-agreement-health:
     get:
       operationId: listCommercialAgreementHealth
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-032 Commercial Agreement Command Center"
         - "P10 PTR-041 Commercial Agreement 360°, Health & AI Review"
@@ -6726,6 +7233,22 @@ paths:
   /partner-2:
     get:
       operationId: listPartner2
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-022 Partner Management Command Center"
         - "P10 PTR-042 Partner Operations Command Center"
@@ -6856,6 +7379,25 @@ paths:
   /partner-order-booking:
     get:
       operationId: listPartnerOrderBooking
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-043 Partner Orders & Booking Management"
       x-ticvai-api-scope: partner.read
@@ -6983,6 +7525,16 @@ paths:
   /reservation-hold-release:
     get:
       operationId: listReservationHoldRelease
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-044 Reservations, Holds & Release Management"
       x-ticvai-api-scope: partner.read
@@ -7067,6 +7619,19 @@ paths:
   /partner-cancellation-refund:
     get:
       operationId: listPartnerCancellationRefund
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
       x-ticvai-api-scope: partner.read
@@ -7165,6 +7730,19 @@ paths:
   /partner-statement-account:
     get:
       operationId: listPartnerStatementAccount
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-046 Partner Statement & Account Activity"
       x-ticvai-api-scope: partner.read
@@ -7263,6 +7841,19 @@ paths:
   /partner-reconciliation-exception:
     get:
       operationId: listPartnerReconciliationException
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-api-scope: partner.read
@@ -7354,6 +7945,22 @@ paths:
   /commission-calculation-settlement:
     get:
       operationId: listCommissionCalculationSettlement
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-api-scope: partner.read
@@ -7441,6 +8048,13 @@ paths:
   /partner-dispute-case:
     get:
       operationId: listPartnerDisputeCase
+      x-ticvai-read-via:
+      - query: approvals#slaPolicyRecords
+        route: service
+        for: 'its read of approvals.sla_policy, Tenancy''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-api-scope: partner.read
@@ -7552,6 +8166,19 @@ paths:
   /partner-performance-scorecard:
     get:
       operationId: listPartnerPerformanceScorecard
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-050 Partner Performance Scorecard & Risk Monitoring"
       x-ticvai-api-scope: partner.read
@@ -7645,6 +8272,13 @@ paths:
   /partner-relationship:
     get:
       operationId: listPartnerRelationship
+      x-ticvai-read-via:
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-051 Partner AI Intelligence & Relationship Optimization"
       x-ticvai-api-scope: partner.read
@@ -8513,6 +9147,13 @@ paths:
   /membership-commercial-config:
     put:
       operationId: setMembershipCommercialConfig
+      x-ticvai-read-via:
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-audience:
@@ -8600,6 +9241,10 @@ paths:
         format: uuid
     post:
       operationId: actOnPartnerApplicationReview
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-024 Partner Onboarding & Application Workflow"
       x-ticvai-write-via:
@@ -8746,6 +9391,10 @@ paths:
         format: uuid
     put:
       operationId: setPartnerDistributionRights
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-026 Territory, Market & Distribution Rights"
       x-ticvai-audience:
@@ -8828,6 +9477,10 @@ paths:
         format: uuid
     put:
       operationId: setPartnerCapabilityGrants
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-audience:
@@ -8915,6 +9568,13 @@ paths:
         format: uuid
     put:
       operationId: setPartnerCommissionRules
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-write-via:
@@ -9004,6 +9664,10 @@ paths:
         format: uuid
     put:
       operationId: setPartnerCreditProfile
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-write-via:
@@ -9145,6 +9809,19 @@ paths:
         format: uuid
     put:
       operationId: setPartnerAllocations
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-write-via:
@@ -9221,6 +9898,19 @@ paths:
   /partner-change-requests:
     post:
       operationId: createPartnerChangeRequest
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
       x-ticvai-write-via:
@@ -9308,6 +9998,10 @@ paths:
         format: uuid
     post:
       operationId: actOnPartnerReconciliationException
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-audience:
@@ -9505,6 +10199,10 @@ paths:
         format: uuid
     post:
       operationId: actOnPartnerSettlementBatch
+      x-ticvai-read-via:
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-audience:
@@ -9602,6 +10300,13 @@ paths:
   /partner-cases:
     post:
       operationId: createPartnerCase
+      x-ticvai-read-via:
+      - query: approvals#slaPolicyRecords
+        route: service
+        for: 'its read of approvals.sla_policy, Tenancy''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-api-scope: partner.write
@@ -9662,6 +10367,13 @@ paths:
         format: uuid
     post:
       operationId: actOnPartnerCase
+      x-ticvai-read-via:
+      - query: approvals#slaPolicyRecords
+        route: service
+        for: 'its read of approvals.sla_policy, Tenancy''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-api-scope: partner.write
