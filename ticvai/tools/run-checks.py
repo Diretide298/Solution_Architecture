@@ -165,6 +165,9 @@ CHECKS = [
     # entitlement, a shift, a variant) declares its problem types and an x-ticvai-read-via to the owner's declared
     # query (a ratchet over the 160 known); batch GEN's check-cross-module-reads covers the lineage side.
     "check-error-sources",
+    # 14 October (ADAM CR-004 on DB-READ-VIEWS, CHG-LIN-001): a read of personal data by another module names its
+    # columns, so its view is narrow; every read's column list is the derived one (tools/derive-read-columns.py).
+    "check-read-columns",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

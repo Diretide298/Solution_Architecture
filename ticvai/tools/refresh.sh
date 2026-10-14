@@ -50,6 +50,10 @@ python3 tools/derive-lineage.py --apply
 # lineage, so it runs after it; services are frozen at 1.0.0 against this list, not typed from memory.
 python3 tools/derive-delivery-slice.py
 python3 tools/derive-schema.py
+# **Each read in the lineage names the columns it reads** (14 October 2026, ADAM CR-004, CHG-LIN-001). DB-READ-VIEWS
+# generates each published view from `readColumns`, so a view exposes only what its readers read and a pii view is
+# always narrow. After derive-schema, because it compares the response fields with the columns that run produced.
+python3 tools/derive-read-columns.py --apply
 # **`service-decomposition.json` is an authored input and half of it is arithmetic.**
 # Which schemas a service owns is a boundary decision and nothing rewrites it; the
 # operation and table counts, and the cross-service read and write edges, are counted
