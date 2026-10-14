@@ -1,0 +1,42 @@
+id: CHG-SCO-008
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Four editors on P11, P13 and P16 read the record they edit before a change is saved; the other 36 that
+  edit and read nothing are keeps: their approved screen has no component a read could fill, or no read exists.'
+decision:
+  what: 'ANL-029 reads getDashboard into its table and panel; ACC-002 reads the resumed draft
+    (getAccreditationApplication) into its step indicator; CMS-023 and CMS-045, whose writes are sent by the return
+    transition, read listConsentPurposes and getSignatorySignatureGuardian into the inputs those records fill. No
+    component is added. Keeps (client-approved UI): an editor whose inputs already collect the write and which has
+    no display for the read (a component names one operation), a screen whose only controls are Save and Cancel, and
+    drafted writes with no read in the contract (proposed: a GET on the same path returning the write''s view, for
+    setTrialConfiguration, setAgreementContractTerm, setPartnerProfileOrganization, setPartnerBrandVenue,
+    setPartnerRateNet, setPaymentTermBilling, setAgentAvailability, setRefundCompensationService,
+    setCommunicationPreferenceMarketing, setConsentCapturePoint, setMinorGuardianAge, approvePrivacyTesting,
+    setDataDiscoveryAccess; the lead''s call, since several write through approvals).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, class check-screen-wiring S-NO-READ (R265; audit root class A30
+  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  your recommendation"): a screen that edits a record reads it first. The approved UI is fixed (lead, 14 October),
+  so a read is added only where a component of the approved screen shows what it returns. On these platforms: 41
+  members before (3 left with the writes removed under CHG-SCO-007), 36 after, all keeps.'
+keys_touched:
+  screens: [ANL-029, ACC-002, CMS-023, CMS-045]
+  operations: [getDashboard, getAccreditationApplication, listConsentPurposes, getSignatorySignatureGuardian]
+  other: [S-NO-READ]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCO, 14 October 2026. None of the four screens is on a Block A ticket. The 36 keeps are listed with
+  reasons in the batch hand-back.'

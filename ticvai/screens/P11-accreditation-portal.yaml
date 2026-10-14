@@ -191,6 +191,12 @@ screens:
     purpose: Save the draft as each step is completed (Save and finish later)
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: getAccreditationApplication
+    contract: accreditation
+    purpose: 'The draft being resumed from the acknowledgement link: where each step and requirement
+      stands'
+    trigger: onLoad
+    provenance: 'audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)'
   gaps:
   - operation: saveAccreditationDraft
     why: 'The pattern requires a draft that autosaves. **A four-step form that loses everything to a dropped
@@ -207,6 +213,7 @@ screens:
       components:
       - kind: progressIndicator
         label: Step 1 of 4 — Organisation
+        operation: getAccreditationApplication
         notes: Organisation · Coverage · Documents · Check and submit.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
     - name: contentBody

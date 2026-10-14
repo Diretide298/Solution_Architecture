@@ -4803,54 +4803,71 @@ screens:
       components:
       - kind: selectField
         label: Consent ID
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Name
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Processing Purpose
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Description
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Consent Text
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Mandatory / Optional
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: textField
         label: Explicit / Other configured consent method
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Default state
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Withdrawal permitted
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Renewal required
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Expiry
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Reconfirmation interval
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Age restrictions
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Guardian requirement
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Channel applicability
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Country applicability
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Brand applicability
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
     - name: actionBar
       slot: publish
@@ -4870,6 +4887,11 @@ screens:
     contract: marketing-crm
     purpose: Configure consent purposes
     trigger: onAction
+  - operationId: listConsentPurposes
+    contract: marketing-crm
+    purpose: 'The consent purposes as configured, which fill the builder before a change is saved'
+    trigger: onLoad
+    provenance: 'audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)'
   wireframe:
     status: notStarted
     provenance: generated
@@ -8165,41 +8187,53 @@ screens:
       components:
       - kind: selectField
         label: Signature Required
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Initials Required
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Typed Acceptance
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Checkbox Acceptance
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Digital Signature
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Date/Time
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Signatory Name
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Relationship
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: textField
         label: Identity Verification where required
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: textField
         label: Each participant signs individually
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §For group bookings,
           configure whether
       - kind: textField
         label: Guardian signs for each minor
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §For group bookings,
           configure whether
       - kind: textField
         label: Group leader signs where legally/operationally permitted
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §For group bookings,
           configure whether
     - name: actionBar
@@ -8230,6 +8264,11 @@ screens:
     contract: marketing-crm
     purpose: Signatory, Signature & Guardian Rule Configuration
     trigger: onAction
+  - operationId: getSignatorySignatureGuardian
+    contract: marketing-crm
+    purpose: 'The signatory and guardian rules as configured, which fill the form before a change is saved'
+    trigger: onLoad
+    provenance: 'audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)'
   wireframe:
     status: notStarted
     provenance: generated

@@ -5205,7 +5205,7 @@ screens:
         - Approval Status
         - Published Version
         bindsTo: null
-        operation: null
+        operation: getDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display
     - name: contextPanel
       slot: selection
@@ -5213,6 +5213,7 @@ screens:
       - kind: detailPanel
         label: The selected access publishing versioning
         bindsTo: null
+        operation: getDashboard
         columns:
         - Version Number
         - Changed By
@@ -5241,6 +5242,12 @@ screens:
     invalidates:
     - getDashboard
     - listDashboards
+  - operationId: getDashboard
+    contract: reporting
+    purpose: 'The dashboard as saved: who may see it, what is published and its versions, read before a
+      change is published'
+    trigger: onLoad
+    provenance: 'audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)'
   entryState:
     preloaded:
     - Version Number
