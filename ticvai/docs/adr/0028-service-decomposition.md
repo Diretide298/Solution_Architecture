@@ -10,6 +10,23 @@ rather than once per cell.
 
 ---
 
+## Amended 14 October 2026: `shift` is Orders', and a rule question goes through a declared query
+
+**Decided by Chinmay, 14 October 2026** (ADAM CR-083 and CR-084; change entry CHG-GEN-009).
+
+1. **`shift` belongs to OrderService.** "`shift` is not a service" below said its operations were folded into
+   TenancyService. They were moved to OrderService the same day (24 August): its rows are `orders.pos_shift`,
+   `orders.cash_movement`, `orders.deposit_box` and `orders.no_sale_event`, `handoff/service-decomposition.json` puts
+   the `shift` contract under OrderService, and the lineage agrees. The section is corrected below. A Tenancy
+   operation that needs to know about a shift (`configureWorkstation` refusing while one is open) asks Orders'
+   declared query in-process, as ADR-0055 (amended 14 October) says.
+2. **"Reads nothing above" (the Foundation tier) holds for Identity**, which reads a module above it only through a
+   projection fed by that module's events (`deleteGuestAccount` and `exportSubjectData` learn a guest's live
+   entitlements and open orders that way, CR-084). Tenancy, in the same `commerce` deployable as Orders and
+   Catalogue, asks them by declared in-process queries. `tools/check-cross-module-reads.py` holds both.
+
+---
+
 ## Amended 2 October 2026: F&B owns its own catalogue, so ticketing scales on its own
 
 **Decided by Chinmay, 2 October 2026** (DEC-034 in `docs/registers/decisions-2-october.md`, the BO-045
@@ -125,10 +142,12 @@ it.**
 **It owns no tables.** Its rows live in `orders.pos_shift`, `orders.cash_movement`,
 `orders.deposit_box` and `orders.no_sale_event` — 19 operations, zero schemas.
 
-**A service with no data is not a service; it is a set of operations**, and they belong with the
-scope they resolve against. Folded into TenancyService alongside `workforce` and `approvals`, all
-three of which read `platform.scope` constantly and write it rarely — **splitting them means
-four services doing the same joins.**
+**A service with no data is not a service; it is a set of operations**, and they belong where
+their data is. **Folded into OrderService** (corrected 14 October 2026): a shift holds cash,
+`orders.deposit_box` reconciles against payments and `orders.cash_movement` posts to the ledger at
+close, so a till's takings and its drawer are one service's data. (Folding it into TenancyService
+beside `workforce` and `approvals`, as this section first said, was undone on 24 August: all of
+Tenancy's 43 cross-service touches into `orders` were the `shift` contract.)
 
 ### Subscription, platform-ops and public-api are one service
 

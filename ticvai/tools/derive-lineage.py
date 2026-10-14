@@ -404,7 +404,23 @@ def derive(stored: dict) -> dict:
                 via = write_via(op)
                 if via:
                     out[op["operationId"]]["writeVia"] = via
+                # **A rule question asked of another module names the query it asks** (14 October 2026, CHG-GEN-009,
+                # ADR-0055 amended 14 October). `x-ticvai-read-via` on the operation names the owner's declared query
+                # (`x-ticvai-queries` in the owner's contract) and the route it takes; copied as `readVia`, like
+                # `writeVia`.
+                rvia = read_via(op)
+                if rvia:
+                    out[op["operationId"]]["readVia"] = rvia
     return out
+
+
+def read_via(op: dict) -> list:
+    """`x-ticvai-read-via` as the lineage records it: one `{query, route, for}` per question asked of another module."""
+    out = []
+    for r in op.get("x-ticvai-read-via") or []:
+        if isinstance(r, dict) and r.get("query"):
+            out.append({k: str(r[k]) for k in ("query", "route", "for") if r.get(k)})
+    return sorted(out, key=lambda r: (r["query"], r.get("for", "")))
 
 
 def write_via(op: dict) -> list:
@@ -588,8 +604,20 @@ def main() -> int:
             routed += 1
     if routed:
         print("  %d entry(s) given the route their cross-deployable writes take (writeVia)" % routed)
+    # `readVia` (CHG-GEN-009) is the contract's `x-ticvai-read-via`, refreshed the same way.
+    asked = 0
+    for o in sorted(set(stored) & set(fresh)):
+        want = fresh[o].get("readVia")
+        if want and stored[o].get("readVia") != want:
+            stored[o]["readVia"] = want
+            asked += 1
+        elif not want and "readVia" in stored[o]:
+            del stored[o]["readVia"]
+            asked += 1
+    if asked:
+        print("  %d entry(s) given the declared queries their cross-module reads ask (readVia)" % asked)
     if not missing and not repaired and not moved and not rehomed and not followed and not _bad and not retired \
-            and not keyed and not routed:
+            and not keyed and not routed and not asked:
         print("  nothing to add")
         return 0
     for o in missing:

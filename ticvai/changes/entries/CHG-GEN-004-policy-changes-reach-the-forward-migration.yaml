@@ -47,7 +47,7 @@ prevention:
   ref: tools/ddl_forward.py::rls_call
 status: open
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
-  Verified on this branch: derive-ddl --apply wrote backend/tenant/V0104__after_r1_20261014.sql with the function and
+  Verified on this branch: derive-ddl --apply wrote the tenant forward migration (V0104) with the function and
   nine policy swaps (platform.audit_record and identity.authz_audit to apply_append_audit_rls; product_media,
   quotation_line, dashboard_tile, seat_block_item, attendance_amendment, group_participant_list and group_participant
   to apply_parent_rls), parents before children, and the review list fell by the 9 "statement added" and 12

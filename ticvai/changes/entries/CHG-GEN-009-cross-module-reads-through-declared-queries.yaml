@@ -1,0 +1,73 @@
+id: CHG-GEN-009
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A rule question asked of another module goes through a query the owner declares (x-ticvai-queries) and the
+  asking operation names (x-ticvai-read-via, copied into the lineage as readVia); generated views are for bulk reads
+  within one deployable only; ADR-0055 is amended, ADR-0028 and ADR-0055 say Shift is Orders'', and
+  check-cross-module-reads holds the rule.'
+decision:
+  what: 'ADR-0055 "Amended 14 October 2026": rule questions through declared queries (`x-ticvai-queries` top-level map
+    in the owner contract: module, inputs, returns, rule, served; `x-ticvai-read-via: [{query: <contract>#<name>,
+    route, for}]` on the operation); route in-process within one deployable, service or projection across; views
+    `<table>_for_<reader>` for bulk data reads within one deployable only, never granted to another deployable''s role
+    (the DB-READ-VIEWS grant question, recorded on action item 7); ARCH-TESTS allows a view named for the module
+    (item 6); Identity reads above it only through a projection. tools/derive-lineage.py copies x-ticvai-read-via as
+    readVia (read_via), like writeVia. New tools/check-cross-module-reads.py (run-checks.py): XR-UNCOVERED,
+    XR-VIEW-ACROSS, XR-QUERY, XR-ROUTE, XR-FOUNDATION, XR-LINEAGE. The 944 cross-module reads and 9 Identity reads
+    above it in the lineage today are baselined in handoff/audit-baseline.json, except reads the r6 batches route
+    (MUST_FIX: createSaleBoard, updateSaleBoard, configureWorkstation, deleteGuestAccount, exportSubjectData and the
+    PIN step-up operations), which can never be baselined. ADR-0055''s deployable table and ADR-0028''s "shift is not
+    a service" now say Shift belongs to OrderService.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-081, CR-083 and CR-084 (tickets 30796, 30794, 30654) each needed another module''s data to decide a
+  refusal, and the package''s only way was a raw read (ADR-0055 rule 2 at line 58 offered views or an in-process
+  interface that did not exist; rule 4 at line 60 forbids shared SQL across deployables). The audit of 14 October
+  counted 941 cross-module table reads in 517 operations, 629 of them across deployables, and found the lineage check
+  ADR-0055 promised (line 65) missing. The lead decided "ask the owner by a declared query" as an ADR-0055 amendment.
+  ADR-0028:123-130 and ADR-0055:49 folded Shift into Tenancy while handoff/service-decomposition.json and the lineage
+  put it in OrderService (CR-083 finding).'
+keys_touched:
+  operations:
+  - createSaleBoard
+  - updateSaleBoard
+  - configureWorkstation
+  - deleteGuestAccount
+  - exportSubjectData
+  files:
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - docs/adr/0028-service-decomposition.md
+  - tools/derive-lineage.py
+  - tools/check-cross-module-reads.py
+  - tools/run-checks.py
+  - handoff/audit-baseline.json
+  tickets:
+  - DB-READ-VIEWS
+  - ARCH-TESTS
+root_class: A22 LINEAGE
+tickets:
+  started:
+  - '30796'
+  - '30794'
+  - '30654'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-081 (ADAM); CR-083 (ADAM); CR-084 (ADAM)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Run on the parent commit (r5, 1eb1d063) the check fails with 953 findings (944 XR-UNCOVERED, 9 XR-FOUNDATION) and no
+  baseline; on this branch it fails only on exportSubjectData''s raw reads of access.entitlement and
+  orders.sales_order (XR-UNCOVERED and XR-FOUNDATION, marked NEW*), on purpose, until batch GDL routes them through
+  its projection; the hidden reads of the other MUST_FIX operations are not in the lineage yet and will be checked
+  when batches TEN, GDL and CRD add them. derive-lineage dry run: no difference (no contract declares a readVia yet).
+  Choices left open by the decision: (1) a readVia covers every read of the owning module''s tables by that
+  operation, since a query declares no table; (2) "reads nothing above" is held for Identity only, because the lead''s
+  CR-083 decision has Tenancy (also foundation tier) ask Orders in-process inside commerce, and the amendment says so;
+  (3) the DB-READ-VIEWS task text (docs/active/block-a-extra-tasks.json, a plan input under the 24-hour rule, and a
+  ticket that may be started) is not rewritten; the decision is on ADR-0055 action item 7, which the ticket links.'
