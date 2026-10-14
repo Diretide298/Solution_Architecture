@@ -17,7 +17,8 @@ on an empty database.
 |---|---|
 | `paging-check.mjs` | the boot payload is split and compressed, every held-back field comes back from `/api/detail`, and the long list is built a group and a page at a time without losing a row |
 | `contract-trace-check.mjs` | a schema names the tables it is stored as, an operation names the tables it reaches, and an operation the lineage never resolved says so rather than reading as "touches nothing" |
-| `signoff-check.mjs` | the overview counts against the whole population rather than what was judged, unreviewed artefacts sort first, and a row leads to the artefact — including the three kinds that had no deep link until it needed one |
+| `signoff-check.mjs` | Reviews' coverage counts against the whole population rather than what was judged, unreviewed artefacts sort first, a row leads to the artefact (including the three kinds that had no deep link until it needed one), an answered ask reads as fixed, a kind the reader could not serve is said, and `validation.html` lands on `reviews.html#coverage` with its query |
+| `reviews-check.mjs` | on Reviews, answering an ask records how and takes it off the worklist, Reopen and Send back (reason required) do what they say, Discard needs a second press, "Show everything" clears the whole filter, every control is labelled, the pace chart is drawn at its own size with a table twin, and the notes that name you are paged rather than capped |
 | `pages-check.mjs` | every page loads, every layer renders every one of its modes, and **nothing anywhere logs a console error** |
 | `landing-check.mjs` | the door sends people where it says — the lockup stays on the door rather than falling into a package, all 46 rail-panel links land on the layer *and* mode they name, Overview deselects, and sign out really ends the session |
 | `canvas-check.mjs` | the screen canvas holds the platform it says it holds, shelves it by module, lists only the journeys that touch it, draws the links that cross a module, mounts a board only when it is legible and lets go when it is not — and a screen leads back into the Frontend layer |
@@ -92,7 +93,11 @@ TICVAI_VIEWER=http://127.0.0.1:4620 TICVAI_API=http://127.0.0.1:4620 \
 
 `signoff-check.mjs` **records one real verdict per kind** — six of them now that
 state models and schemas are reviewable — against real artefacts, because checking
-the join against a fake population would check nothing.
+the join against a fake population would check nothing. `reviews-check.mjs` writes
+verdicts too (and answers, sends back and discards them). Both pick artefacts nobody
+has judged, so a store that already holds a review does not decide the result, and
+both read `TICVAI_VIEWER`/`TICVAI_API`; give both the viewer's address and the page
+reads the accounts service through the viewer.
 
 Point the service at a scratch store before running it —
 

@@ -59,7 +59,9 @@ const PAGES = [
   { url: '/platforms.html', input: '#filter', rows: '.plat-card' },
   { url: '/uiux.html', input: '#filter', rows: '.uiux-card' },
   { url: '/domains.html', input: '#subsearch', rows: '.member-row, .stuck-row, .gap-row' },
-  { url: '/reviews.html', input: '#subsearch', rows: '.people-row, .contested-row, .mention-row' },
+  // Reviews has one search, in its page-wide filter, and it narrows the data
+  // every section draws from rather than hiding rows after the fact.
+  { url: '/reviews.html#reviewers', input: '#rv-scope input[type="search"]', rows: '#rv-people tr.rv-row' },
   { url: '/admin.html', input: '#subsearch', rows: '.account-row' },
 ];
 
