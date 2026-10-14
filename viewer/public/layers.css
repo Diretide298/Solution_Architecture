@@ -1510,7 +1510,7 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
 .drawer-group[hidden] { display: none; }
 .drawer-group-title {
   margin: 0 0 4px;
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+  font-size: 12px; font-weight: 600;
   color: var(--text-faint);
 }
 .drawer-link {
@@ -1520,7 +1520,22 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
   font-size: 13px; color: var(--text); text-decoration: none;
 }
 .drawer-link::after { content: '\203A'; font-size: 17px; line-height: 1; color: var(--text-faint); }
-.drawer-link:hover, .drawer-link:focus-visible { background: var(--bg-hover); outline: none; }
+.drawer-link:hover { background: var(--bg-hover); }
+.drawer-link:focus-visible { background: var(--bg-hover); outline: 2px solid var(--accent); outline-offset: -2px; }
+/* The page you are on: a bar on the left and the name at full weight. */
+.drawer-link[aria-current='page'] {
+  background: var(--accent-soft); color: var(--text); font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.drawer-link[hidden] { display: none; }
+/* A count sits where the chevron goes, so the name never changes length. */
+.drawer-badge {
+  margin-left: auto; min-width: 20px; padding: 1px 7px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 700; line-height: 1.5; text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--bg-panel); background: var(--accent);
+}
+.drawer-link:has(.drawer-badge)::after { display: none; }
 /* app.js marks the review link loud when somebody has named you */
 .drawer-link.auth-button-loud { color: var(--accent-text); font-weight: 600; }
 
