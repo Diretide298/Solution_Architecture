@@ -1,0 +1,39 @@
+id: CHG-SCR-006
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A region id is unique on its screen: a deriver on the refresh renames every earlier duplicate after its slot
+  (contentBody in slot headline becomes contentBodyHeadline), and the last keeps the name the wireframe draws.'
+decision:
+  what: 'tools/derive-screen-wiring.py gains rule S-DUP-REGION (fix_dup_regions). Region `name` is an internal id;
+    derive-wireframes keys regions by it, so with duplicates the last one drew and the others were invisible to it.
+    The last keeps its name, so every drawn frame is unchanged (derive-wireframes re-run: no wireframe changes); no
+    component, title or slot changes (client-approved UI, Chinmay, 14 October 2026).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R253): check-screen-wiring/S-DUP-REGION had 212 members
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 118 Block A tickets). Default ruling (triage.py): "Region names
+  unique per screen (rename the second)". After: 0 package-wide (233 regions renamed at the refresh).'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - screens/P08-venue-back-office.yaml
+  screens:
+  - P08 on this branch; the other platforms at the refresh
+  other:
+  - S-DUP-REGION
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-screen-wiring.py::fix_dup_regions
+status: open
+notes: 'Batch SCR, 14 October 2026. The ruling said rename the second; the last keeps the name instead so that no
+  drawn wireframe changes.'

@@ -2111,7 +2111,7 @@ screens:
         - MerchandiseItem.onHand
         operation: listMerchandise
         provenance: contract retail.yaml GET /merchandise
-    - name: contextPanel
+    - name: contextPanelSelection
       slot: selection
       components:
       - kind: detailPanel
@@ -2525,7 +2525,7 @@ screens:
         - ProductVariant.isActive
         operation: listProductVariants
         provenance: contract catalogue.yaml GET /products/{productId}/variants
-    - name: contextPanel
+    - name: contextPanelSelection
       slot: selection
       components:
       - kind: detailPanel
@@ -4074,7 +4074,7 @@ screens:
         - CommercialCampaign.validTo
         operation: listCommercialCampaigns
         provenance: contract promotions.yaml GET /commercial-campaigns
-    - name: contextPanel
+    - name: contextPanelSelection
       slot: selection
       components:
       - kind: detailPanel
@@ -20099,7 +20099,7 @@ screens:
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
         provenance: carried from the previous definition
-    - name: contextPanel
+    - name: contextPanelSelection
       slot: selection
       components:
       - kind: detailPanel
@@ -20449,7 +20449,7 @@ screens:
         - WorkOrder.elapsedMinutes
         operation: listWorkOrders
         provenance: contract maintenance.yaml GET /work-orders
-    - name: contextPanel
+    - name: contextPanelSelection
       slot: selection
       components:
       - kind: detailPanel
@@ -26196,7 +26196,7 @@ screens:
   layout:
     template: detail
     regions:
-    - name: contentBody
+    - name: contentBodyRecord
       slot: record
       components:
       - kind: detailPanel
@@ -31731,7 +31731,7 @@ screens:
       - kind: searchField
         label: Search category, brand
         provenance: carried from the previous definition
-    - name: contextPanel
+    - name: contextPanelSelection
       slot: selection
       components:
       - kind: detailPanel
@@ -38182,7 +38182,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -39515,7 +39515,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -40800,7 +40800,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -40812,7 +40812,7 @@ screens:
         - MediaCredentialCommandCenterViewSummary.ai
         notes: The pack filters this screen by ai — which are present is a decision the pack already made.
         provenance: pack Access Control Module_Reference.pdf, page 44 §Filters
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -41903,7 +41903,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -43248,7 +43248,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -44730,7 +44730,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -45668,7 +45668,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -45881,7 +45881,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -47085,7 +47085,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -48442,7 +48442,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -49593,7 +49593,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -50829,7 +50829,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -51055,7 +51055,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -51383,7 +51383,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -52179,7 +52179,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -54642,7 +54642,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -54836,7 +54836,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: multiSelect
@@ -56459,7 +56459,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -56482,7 +56482,7 @@ screens:
         notes: The pack filters this screen by venue, product, tier, status, member type, activation and
           5 more — which are present is a decision the pack already made.
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 21 §Filter by
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -56954,7 +56954,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -57704,7 +57704,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -58023,7 +58023,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -59175,7 +59175,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -60347,7 +60347,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -60531,7 +60531,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -61293,7 +61293,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -61744,7 +61744,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -61915,7 +61915,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -61940,7 +61940,7 @@ screens:
         notes: The pack filters this screen by brand, venue, event, product, performance, ticket type
           and 7 more — which are present is a decision the pack already made.
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Filter by
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -63300,7 +63300,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -64868,7 +64868,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -64891,7 +64891,7 @@ screens:
         notes: The pack filters this screen by brand, venue, event, product, date, media and 5 more —
           which are present is a decision the pack already made.
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Filter by
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -65062,7 +65062,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -66181,7 +66181,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -69394,7 +69394,7 @@ screens:
         notes: Sends `?groupBy=` (kind, approver, venue, day, week). The pack's slowest stages, workflows,
           venues and departments (page 47) are these groupings; stage and department are not among them.
         provenance: contract approvals.yaml GET /approval-analytics
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -69759,7 +69759,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -70817,7 +70817,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -72004,7 +72004,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -72022,7 +72022,7 @@ screens:
         notes: The pack filters this screen by venue, date, wallet type, credit type, customer, status
           — which are present is a decision the pack already made.
         provenance: pack Game_and_Ride_Module.pdf, page 23 §Filters
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -73104,7 +73104,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -74068,7 +74068,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -74841,7 +74841,7 @@ screens:
         label: Package / entitlement
         notes: A pack simulation input with no query parameter.
         provenance: pack Game_and_Ride_Module.pdf, page 50
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -75116,7 +75116,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -76370,7 +76370,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -77826,7 +77826,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -78146,7 +78146,7 @@ screens:
           The pack's statuses Synchronizing, Synchronized, Conflict and Failed Sync have no value in the
           enum.
         provenance: contract games.yaml GET /gameplay-sync-status
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -78342,7 +78342,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -78524,7 +78524,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -79554,7 +79554,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -80265,7 +80265,7 @@ screens:
         operation: getGameEligibility
         notes: Sends `?venueId=`.
         provenance: contract games.yaml GET /game-eligibility
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -80753,7 +80753,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -81917,7 +81917,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -83024,7 +83024,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -83765,7 +83765,7 @@ screens:
         operation: getRentalAvailability
         notes: Sends `?quantity=`.
         provenance: contract rental.yaml GET /rental-availability
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -84129,7 +84129,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -85076,7 +85076,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -86153,7 +86153,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -87125,7 +87125,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -87343,7 +87343,7 @@ screens:
         - Current duration
         notes: No rental read is bound; these are the pack's labels.
         provenance: pack Rental_Management.pdf, page 81
-    - name: contentBody
+    - name: contentBodyFields
       slot: fields
       components:
       - kind: selectField
@@ -88110,7 +88110,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -89117,7 +89117,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -89483,7 +89483,7 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createWorkOrder
-    - name: contextPanel
+    - name: contextPanelSelection
       slot: selection
       components:
       - kind: detailPanel
@@ -90502,7 +90502,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -90731,7 +90731,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -92645,7 +92645,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -93484,7 +93484,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -93516,7 +93516,7 @@ screens:
         operation: getGoLiveReadiness
         notes: The contract counts warnings; it does not record which were accepted.
         provenance: contract subscription.yaml GET /go-live-readiness
-    - name: contentBody
+    - name: contentBodyCollection
       slot: collection
       components:
       - kind: dataTable
@@ -95794,7 +95794,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -101203,7 +101203,7 @@ screens:
         operation: getKpiValues
         notes: Sends `?compareTo=` (previousPeriod, samePeriodLastYear, target, benchmark).
         provenance: contract reporting.yaml GET /kpi-values
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -105893,7 +105893,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyCollection
       slot: collection
       components:
       - kind: dataTable
@@ -116485,7 +116485,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -117652,7 +117652,7 @@ screens:
           participant picked on the leaderboard, or the guest the screen is opened for, supplies `subjectId`.
           `getLoyaltyPosition` was here until then, and it returns the caller''s own position.'
         provenance: contract marketing-crm.yaml GET /guests/{subjectId}/loyalty
-    - name: contentBody
+    - name: contentBodyCollection
       slot: collection
       components:
       - kind: dataTable
@@ -118016,7 +118016,7 @@ screens:
         operation: getTenantConfig
         notes: Sends `?version=`; defaults to live.
         provenance: contract white-label.yaml GET /tenant-config
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -120493,7 +120493,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: contentBodyFields
       slot: fields
       components:
       - kind: detailPanel
@@ -121820,7 +121820,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: contentBodyFields
       slot: fields
       components:
       - kind: calendarView
@@ -124550,7 +124550,7 @@ screens:
         notes: Client-side on `severity` (covered, tight, short, blocking); the pack's Informational /
           Warning / High / Critical scale does not map one to one.
         provenance: contract workforce.yaml GET /staffing-coverage
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -125375,7 +125375,7 @@ screens:
         notes: Best coverage, minimise overtime, minimise labour cost, balance hours, minimise cross-venue
           movement, maximise skill match, continuity.
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 61
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -125945,7 +125945,7 @@ screens:
         operation: getResourceUtilisation
         notes: Sends `?groupBy=` (resource, resourceType, category, venue).
         provenance: contract resources.yaml GET /resource-utilisation
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -128231,7 +128231,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -129164,7 +129164,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -129330,7 +129330,7 @@ screens:
         operation: getResourceCalendar
         notes: Sends `?granularity=`.
         provenance: contract resources.yaml GET /resource-calendar
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -132060,7 +132060,7 @@ screens:
         operation: getResourceUtilisation
         notes: Sends `?groupBy=`; venue gives the pack's venue comparison.
         provenance: contract resources.yaml GET /resource-utilisation
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -133061,7 +133061,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -136048,7 +136048,7 @@ screens:
         operation: diffSeatMapVersions
         notes: Sends `?toVersion=` (required).
         provenance: contract seating.yaml GET /seat-maps/{seatMapId}/diff
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -136812,7 +136812,7 @@ screens:
         operation: getSeatInventory
         notes: Sends `?sectionId=`.
         provenance: contract seating.yaml GET /seat-inventory
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -136975,7 +136975,7 @@ screens:
         operation: getSeatInventory
         notes: Sends `?sectionId=`.
         provenance: contract seating.yaml GET /seat-inventory
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -137399,7 +137399,7 @@ screens:
         label: Issue
         notes: Abandoned, timed-out, payment-pending, orphaned, channel-mismatched.
         provenance: pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 19
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -137853,7 +137853,7 @@ screens:
         operation: getSeatReconciliation
         notes: Client-side on `kind`.
         provenance: contract seating.yaml GET /seat-reconciliation
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -140126,7 +140126,7 @@ screens:
         operation: getSeatRules
         notes: Sends `?seatMapId=`.
         provenance: contract seating.yaml GET /seat-rules
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -141080,7 +141080,7 @@ screens:
         operation: validateSeatCompliance
         notes: Sends `?seatMapId=` (required).
         provenance: contract seating.yaml GET /seat-compliance
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -142289,7 +142289,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -143235,7 +143235,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -144350,7 +144350,7 @@ screens:
         operation: getKpiValues
         notes: Sends `?compareTo=`.
         provenance: contract reporting.yaml GET /kpi-values
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -144493,7 +144493,7 @@ screens:
         operation: getKpiValues
         notes: Sends `?compareTo=`; target, benchmark or prior period.
         provenance: contract reporting.yaml GET /kpi-values
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -144625,7 +144625,7 @@ screens:
         operation: getKpiValues
         notes: Sends `?compareTo=`; samePeriodLastYear gives the pack's prior-year variance.
         provenance: contract reporting.yaml GET /kpi-values
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -144848,7 +144848,7 @@ screens:
         operation: getKpiValues
         notes: Sends `?period=`.
         provenance: contract reporting.yaml GET /kpi-values
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -150979,7 +150979,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -155072,7 +155072,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -156412,7 +156412,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -157892,7 +157892,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -159673,7 +159673,7 @@ screens:
         operation: getWalletReconciliation
         notes: Sends `?to=` (required).
         provenance: contract wallet.yaml GET /wallet-reconciliation
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -160843,7 +160843,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -160869,7 +160869,7 @@ screens:
           and funding rules change for balances that already exist, not only for new ones.'
         provenance: authored — required by check-screens, 19 September 2026
         operation: publishWalletConfiguration
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -162209,7 +162209,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -164392,7 +164392,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -164413,7 +164413,7 @@ screens:
         notes: The pack filters this screen by venue, brand, market, country, currency, product type and
           3 more — which are present is a decision the pack already made.
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 6 §Filter by
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -165903,7 +165903,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -168644,7 +168644,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -168668,7 +168668,7 @@ screens:
         notes: The pack filters this screen by price list, product, venue, market, channel, legal entity
           and 6 more — which are present is a decision the pack already made.
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 57 §Filter by
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -170090,7 +170090,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -170723,7 +170723,7 @@ screens:
   layout:
     template: calendar
     regions:
-    - name: contentBody
+    - name: contentBody2
       components:
       - kind: dataTable
         derived: true
@@ -171467,7 +171467,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -171662,7 +171662,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -173147,7 +173147,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -175722,7 +175722,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -175744,7 +175744,7 @@ screens:
         notes: The pack filters this screen by venue, product type, owner, department, status, risk and
           4 more — which are present is a decision the pack already made.
         provenance: pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 15 §Filter by
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -176831,7 +176831,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -177209,7 +177209,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -177377,7 +177377,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -178160,7 +178160,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -180088,7 +180088,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -181222,7 +181222,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -181419,7 +181419,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -182587,7 +182587,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -184941,7 +184941,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -184969,7 +184969,7 @@ screens:
           membership, loyalty, demographic, behavioral and 8 more — which are present is a decision the
           pack already made.
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 94 §Filter by
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -188424,7 +188424,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -188718,7 +188718,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -189118,7 +189118,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -189258,7 +189258,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -189806,7 +189806,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -191110,7 +191110,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -191416,7 +191416,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -191804,7 +191804,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -192207,7 +192207,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -192626,7 +192626,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -193296,7 +193296,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -194036,7 +194036,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -195040,7 +195040,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -195183,7 +195183,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -195597,7 +195597,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -195633,7 +195633,7 @@ screens:
         - ResaleMarketplaceConfig.checkoutHoldMinutes
         operation: getResaleMarketplaceConfig
         provenance: contract orders.yaml GET /resale-marketplace-config
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -197115,7 +197115,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -197727,7 +197727,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -198254,7 +198254,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -198399,7 +198399,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -198986,7 +198986,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -199741,7 +199741,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -199761,7 +199761,7 @@ screens:
         notes: The pack filters this screen by venue, event, product, transaction type, channel, customer
           segment and 2 more — which are present is a decision the pack already made.
         provenance: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 3 §Filter by
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -200763,7 +200763,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -202119,7 +202119,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -202963,7 +202963,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -203316,7 +203316,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -204059,7 +204059,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -204652,7 +204652,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -205402,7 +205402,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -209540,7 +209540,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -210225,7 +210225,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -210518,7 +210518,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -213251,7 +213251,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -216638,7 +216638,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -218846,7 +218846,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyFilters
       slot: filters
       components:
       - kind: searchField
@@ -225158,7 +225158,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
@@ -225348,7 +225348,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: contentBodyHeadline
       slot: headline
       components:
       - kind: metricTile
