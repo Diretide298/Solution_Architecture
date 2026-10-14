@@ -356,7 +356,21 @@ def main() -> int:
         fam = lambda n: re.sub(r"(Summary|Detail|View|Row|Item|Line)$", "", n)
         if len(tables) == 1 and len(panels) == 1 and fam(tables[0]) != fam(panels[0]) \
                 and not fam(panels[0]).startswith(fam(tables[0])) and not fam(tables[0]).startswith(fam(panels[0])):
-            guard.add("S-PANEL-ENTITY", sid, f"{sid}: the table shows {tables[0]}, the panel {panels[0]}")
+            # **A related record is not a wrong one** (Block A audit, 14 October 2026, CHG-SCR-014). The panel shows
+            # another entity on purpose when its read needs no id the screen does not hold: the id comes from the
+            # selected row (the reader's device, a shared wallet's balance) or from the screen itself (the rules
+            # beside the performance they produce). It fails when the panel's read needs an id nothing gives it.
+            panel_op = next((c.get("operation") for c in comps if c.get("kind") == "detailPanel"
+                             and str(c.get("bindsTo") or "").replace("[]", "").split(".")[0] == panels[0]), None)
+            table_props = set()
+            for (st, n), node in by_schema.items():
+                if n == tables[0]:
+                    table_props |= set((node.get("properties") or {}).keys())
+            held = table_props | {p.get("name") if isinstance(p, dict) else str(p)
+                                  for p in ((s.get("entryState") or {}).get("params") or [])}
+            needs = set(re.findall(r"\{(\w+)\}", (ops.get(panel_op) or {}).get("path", ""))) if panel_op else {"?"}
+            if needs - held - {"id"}:
+                guard.add("S-PANEL-ENTITY", sid, f"{sid}: the table shows {tables[0]}, the panel {panels[0]}")
         # --- R257 offline promises -------------------------------------------------------------
         off = str(states.get("offline") or "")
         if off and OFFLINE_PROMISE.search(off):
