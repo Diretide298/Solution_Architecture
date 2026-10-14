@@ -191,6 +191,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CustomDomain'
         '409':
+          x-ticvai-problem-types: [domain-already-claimed]
           description: '**Already claimed.** Named as unavailable rather than attributed.
 
             '
@@ -313,6 +314,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
         '409':
+          x-ticvai-problem-types: [only-active-domain-for-app]
           description: '**The only active domain for a live app.** Refused, naming what would break.
 
             '
@@ -897,6 +899,8 @@ paths:
   /footer:
     put:
       operationId: setFooter
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
       summary: Footer columns, legal links and social
@@ -1320,6 +1324,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMaintenanceMode
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
@@ -1415,6 +1421,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBrandIdentity
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-836 Design System & Components"
         - "P09 ADM-016 White-Label Branding Management"
@@ -1461,6 +1469,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BrandIdentity'
         '400':
+          x-ticvai-problem-types: [media-too-large, media-type-not-permitted]
           description: An asset is larger than 2 MB, or is not PNG or SVG (audit R270)
           content:
             application/problem+json:
@@ -1506,6 +1515,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAppIcons
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-004 Logo & Assets"
@@ -1559,6 +1570,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppIcons'
         '400':
+          x-ticvai-problem-types: [icon-wrong-size, icon-has-transparency]
           description: Source is not 1024×1024, or contains transparency
           content:
             application/problem+json:
@@ -1718,6 +1730,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBookingFlowConfig
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-016 Site Settings"
       summary: Set how the guest booking flow looks and steps
@@ -1808,6 +1822,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTheme
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-005 Theme Editor"
@@ -1899,6 +1915,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFonts
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-003 Typography"
       x-ticvai-audience:
@@ -1943,6 +1961,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FontConfig'
         '400':
+          x-ticvai-problem-types: [primary-arabic-font-required, secondary-arabic-font-required]
           description: '`ar` is among the tenant''s languages and `primaryArabic` is not set, or `secondaryLatin`
             is set without `secondaryArabic` (audit R163)'
           content:
@@ -1954,6 +1973,8 @@ paths:
   /tenant-config/header:
     put:
       operationId: setHeader
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
@@ -2019,6 +2040,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setNavigation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
@@ -2064,6 +2087,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/NavigationConfig'
         '400':
+          x-ticvai-problem-types: [module-disabled, too-many-visible-items]
           description: An item targets a disabled module, or more than five are marked visible
           content:
             application/problem+json:
@@ -2099,6 +2123,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setHomepageLayout
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per site template, the one the body''s `templateKey` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-840 Mobile App CMS"
         - "P13 CMS-007 Page Builder"
@@ -2143,6 +2169,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/HomepageLayout'
         '400':
+          x-ticvai-problem-types: [module-disabled, content-block-missing]
           description: A section references a disabled module or a missing content block
           content:
             application/problem+json:
@@ -2762,6 +2789,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ContentPage'
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: Slug already in use
           content:
             application/problem+json:
@@ -2853,6 +2881,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Deleted
         '409':
+          x-ticvai-problem-types: [content-page-referenced]
           description: Page is referenced by navigation or the homepage
           content:
             application/problem+json:
@@ -2904,6 +2933,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFaqs
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set FAQ categories and entries
@@ -3057,6 +3088,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Policy'
         '400':
+          x-ticvai-problem-types: [english-version-required, arabic-version-required]
           description: The English (`en`) or Arabic (`ar`) version is missing (audit R096)
           content:
             application/problem+json:
@@ -3098,6 +3130,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setModuleEnablement
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P13 CMS-001 Tenant Workspace"
@@ -3187,6 +3221,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFeatureToggles
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
@@ -3246,6 +3282,8 @@ paths:
   /tenant-config/languages:
     put:
       operationId: setLanguages
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-018 Interface Languages"
         - "P13 CMS-011 Translations"
@@ -3299,6 +3337,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LanguageConfig'
         '400':
+          x-ticvai-problem-types: [default-language-not-enabled]
           description: Default is not among the enabled languages
           content:
             application/problem+json:
@@ -3958,6 +3997,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuidedChoice'
         '400':
+          x-ticvai-problem-types: [target-not-in-venue, target-id-missing, question-answer-count-out-of-bounds]
           description: A target is not in this venue, a required target id is missing for its `kind`, or
             the question and answer counts are outside their bounds
           content:
@@ -4027,6 +4067,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuidedChoice'
         '400':
+          x-ticvai-problem-types: [target-not-in-venue, question-answer-count-out-of-bounds]
           description: A target is not in this venue, or the counts are outside their bounds
           content:
             application/problem+json:
@@ -4190,6 +4231,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [guided-choice-published]
           description: The choice is `published`
           content:
             application/problem+json:
@@ -4245,12 +4287,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [guided-choice-published]
           description: Already `published`
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [answer-target-not-on-sale, answer-target-not-enabled, answer-filter-or-target-missing]
           description: An answer's target is not on sale or not enabled, or an answer lacks the filter or
             target its behaviour needs; the problem names the answer
           content:
@@ -4298,6 +4342,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [guided-choice-not-published]
           description: Not `published`
           content:
             application/problem+json:
@@ -4431,6 +4476,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tenant-config/analytics-providers/{analyticsProviderId}:
     put:
       operationId: setAnalyticsProvider
       x-ticvai-consumed-by:
@@ -4458,6 +4504,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: analyticsProviderId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4480,6 +4531,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [measurement-id-invalid, venue-not-active]
           description: A `measurementId` that does not match the provider's format, or a `venueId` not among the tenant's active venues
           content:
             application/problem+json:
@@ -4633,6 +4685,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted for publication. Nothing is returned.
         '400':
+          x-ticvai-problem-types: [field-outside-batch-shape, too-many-interactions]
           description: A field outside the batch shape (a URL with a query, free text, an unhashed id), or more than
             50 interactions.
           content:
@@ -5097,6 +5150,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingFlow'
         '400':
+          x-ticvai-problem-types: [unknown-flow-type, step-not-in-flow-type, duplicate-flow-step]
           description: An unknown flow type, a step the type does not have, or a step given twice
           content:
             application/problem+json:
@@ -5350,6 +5404,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingFlow'
         '400':
+          x-ticvai-problem-types: [step-not-in-type, step-given-twice]
           description: A step the type does not have, or a step given twice
           content:
             application/problem+json:
@@ -5539,6 +5594,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSiteSetupProgress
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-102 Site Builder"
       x-ticvai-agreed: '29 September: W12, M24-05; shape follows setBookingFlowConfig'
@@ -5578,6 +5635,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
+          x-ticvai-problem-types: [nothing-published]
           description: '`previewAndPublish` marked done while no version has been published'
           content:
             application/problem+json:
@@ -5620,6 +5678,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setStoreAccounts
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-104 App Build & Store Publishing"
       x-ticvai-agreed: '29 September: M24-08 (every client creates and owns its own Apple Developer (DUNS) and
@@ -5671,6 +5731,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StorePublishingChecklist'
         '400':
+          x-ticvai-problem-types: [duns-number-invalid, duplicate-store, listing-language-missing]
           description: An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing
             text missing a tenant language
           content:
@@ -5788,6 +5849,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [store-account-missing, nothing-published, app-build-in-progress]
           description: No store account for the platform, nothing published yet, or a build for the platform
             already running; the problem says which
           content:

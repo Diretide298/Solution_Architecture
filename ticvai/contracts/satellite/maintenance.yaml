@@ -357,6 +357,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AssetStatusResult' }
         '409':
+          x-ticvai-problem-types: [asset-inspection-required]
           description: >
             Return to service attempted without the inspection this asset category requires.
           content:
@@ -675,6 +676,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '409':
+          x-ticvai-problem-types: [timer-action-not-allowed]
           description: Action inconsistent with the current timer state
           content:
             application/problem+json:
@@ -741,6 +743,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrderDetail' }
         '409':
+          x-ticvai-problem-types: [insufficient-stock]
           description: Insufficient stock
           content:
             application/problem+json:
@@ -863,6 +866,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '400':
+          x-ticvai-problem-types: [completion-photos-required]
           description: Completion photographs required for this category and none supplied
           content:
             application/problem+json:
@@ -921,6 +925,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '403':
+          x-ticvai-problem-types: [verifier-is-technician]
           description: Verifier is the technician who completed the work
           content:
             application/problem+json:
@@ -966,6 +971,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '409':
+          x-ticvai-problem-types: [work-order-not-assigned-to-caller, work-order-already-accepted]
           description: Not assigned to this principal, or already accepted
           content:
             application/problem+json:
@@ -1320,6 +1326,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWorkOrderPriorityPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-577 Maintenance Work Order"
       x-ticvai-audience: [staff]
@@ -1352,6 +1360,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrderPriorityPolicy' }
         '400':
+          x-ticvai-problem-types: [weights-not-100, bands-not-descending]
           description: Weights that do not sum to 100, or bands that do not descend.
           content:
             application/problem+json:
@@ -1483,6 +1492,7 @@ paths:
               schema: { $ref: '#/components/schemas/VendorServiceRequest' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
+          x-ticvai-problem-types: [work-order-already-closed]
           description: The work order is closed or cancelled.
           content:
             application/problem+json:
@@ -1539,6 +1549,7 @@ paths:
               schema: { $ref: '#/components/schemas/VendorServiceRequest' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
+          x-ticvai-problem-types: [vendor-request-already-closed]
           description: The request is already `completed` or `cancelled`.
           content:
             application/problem+json:
@@ -1614,6 +1625,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MaintenancePlan' }
         '400':
+          x-ticvai-problem-types: [maintenance-trigger-missing]
           description: Neither an interval nor a usage trigger supplied
           content:
             application/problem+json:
@@ -1868,6 +1880,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/InspectionResult' }
         '400':
+          x-ticvai-problem-types: [required-item-unanswered]
           description: A required item was not answered
           content:
             application/problem+json:
@@ -2108,6 +2121,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400':
+          x-ticvai-problem-types: [closure-findings-required, closure-corrective-action-required]
           description: Closure attempted without findings or a corrective action
           content:
             application/problem+json:
@@ -2317,6 +2331,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Incident' }
         '409':
+          x-ticvai-problem-types: [incident-not-reportable]
           description: The incident is not reportable (`isReportable` false, audit R106 (6)).
           content:
             application/problem+json:

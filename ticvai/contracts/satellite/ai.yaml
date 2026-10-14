@@ -731,6 +731,8 @@ paths:
   /ai/suggestion-providers:
     put:
       operationId: setSuggestionProvider
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Point a question at a rule, a model, or both
       description: '**The swap, and it is a configuration change.** Per `SuggestionKind`: which producer
         answers it, at which version, and with what guard rails.
@@ -890,6 +892,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/WalkwayProposal'
         '409':
+          x-ticvai-problem-types: [map-has-vector-geometry]
           description: '**The map has vector geometry.** Refused deliberately — subtraction is available
             and better, and running a model where geometry exists is how a worse answer gets preferred
             because it arrived in a nicer format.
@@ -2015,6 +2018,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LayoutDraft'
         '422':
+          x-ticvai-problem-types: [plan-not-interpretable]
           description: The plan could not be interpreted. The reason is specific enough to act on
           content:
             application/problem+json:
@@ -2365,6 +2369,7 @@ paths:
                   $ref: '#/components/schemas/AiProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /providers/{providerId}:
     put:
       operationId: setAiProvider
       x-ticvai-consumed-by:
@@ -2443,6 +2448,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: providerId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2559,6 +2569,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAiPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-091 AI Policy & Spend"
       x-ticvai-audience:
@@ -2743,6 +2755,7 @@ paths:
                   $ref: '#/components/schemas/IndexSource'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /index-sources/{sourceId}:
     put:
       operationId: setIndexSource
       x-ticvai-audience:
@@ -2770,6 +2783,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: sourceId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2855,6 +2873,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IndexJob'
         '409':
+          x-ticvai-problem-types: [reindex-in-progress]
           description: Already rebuilding
           content:
             application/problem+json:
@@ -6738,6 +6757,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AiTransactionRiskScore'
         '422':
+          x-ticvai-problem-types: [order-or-wallet-required]
           description: Neither `orderId` nor `walletId` was sent
           content:
             application/problem+json:
@@ -6791,6 +6811,8 @@ paths:
   /risk/strategy:
     put:
       operationId: configureRiskStrategy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk (setRiskStrategy), 8 decision 6; our build plan,

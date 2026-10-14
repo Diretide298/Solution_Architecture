@@ -994,6 +994,7 @@ paths:
                   $ref: '#/components/schemas/ApprovalMatrix'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /approval-matrices/{matrixId}:
     put:
       operationId: setApprovalMatrix
       x-ticvai-consumed-by:
@@ -1058,6 +1059,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: matrixId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1457,6 +1463,8 @@ paths:
   /visual-business-rule:
     put:
       operationId: setVisualBusinessRule
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per business rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-239 Visual Business Rule Builder"
         - "P08 ADM-323 Condition & Decision Rule Builder"
@@ -1557,6 +1565,8 @@ paths:
   /visual-workflow:
     put:
       operationId: setVisualWorkflow
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-241 Visual Workflow Designer"
         - "P08 ADM-320 Create Approval Workflow"
@@ -1617,6 +1627,8 @@ paths:
   /matrix-multi-level:
     put:
       operationId: approveMatrixMultiLevel
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per approval matrix code, the one the body''s `code` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.5 p.11-12; MoM 8 Sep (authority by amount and category, N-of-M
@@ -1684,6 +1696,8 @@ paths:
   /role-authority-delegation:
     put:
       operationId: approveRoleAuthorityDelegation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.6 p.13; MoM 8 Sep (delegation/substitute approver, segregation
@@ -1794,6 +1808,8 @@ paths:
   /trigger-action-cross:
     put:
       operationId: setTriggerActionCross
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-245 Trigger, Action & Cross-Module Orchestration Configuration"
         - "P08 ADM-325 Workflow Outcome & Action Configuration"
@@ -1852,6 +1868,8 @@ paths:
   /workflow-testing-impact:
     put:
       operationId: simulateWorkflowTestingImpact
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-246 Workflow Testing, Simulation & Impact Analysis"
         - "P08 ADM-326 Workflow Validation & Simulation"
@@ -1909,6 +1927,8 @@ paths:
   /versioning-governance:
     put:
       operationId: approveVersioningGovernance
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-247 Versioning, Governance, Approval & Publication"
       x-ticvai-audience:
@@ -2045,6 +2065,8 @@ paths:
   /unified-decision:
     put:
       operationId: approveUnifiedDecision
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per approval request, the one the body''s `approvalRequestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.2 p.25-26; MoM 10 Aug §5.5 and 8 Sep (Approve, Reject, Return,
@@ -2768,6 +2790,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setStepUpPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per operation, the one the body''s `operationId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
         - "P08 ADM-343 Sensitive Action Confirmation"
@@ -2889,6 +2913,7 @@ paths:
                   $ref: '#/components/schemas/ApprovalControlPolicy'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /approval-control-policies/{controlPolicyId}:
     put:
       operationId: setApprovalControlPolicy
       x-ticvai-consumed-by:
@@ -2913,6 +2938,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - name: controlPolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -3048,7 +3078,7 @@ paths:
                 $ref: '#/components/schemas/ApprovalRecord'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /approval-sla-policies:
+  /approval-sla-policies/{slaPolicyId}:
     put:
       operationId: setApprovalSlaPolicy
       x-ticvai-consumed-by:
@@ -3081,6 +3111,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - name: slaPolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -3106,7 +3141,7 @@ paths:
                 $ref: '#/components/schemas/ApprovalSlaPolicy'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /approval-delegations/availability:
+  /approval-delegations/availability/{availabilityId}:
     put:
       operationId: setApproverAvailability
       x-ticvai-consumed-by:
@@ -3133,6 +3168,11 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       parameters:
+      - name: availabilityId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -3160,7 +3200,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /approval-retention:
+  /approval-retention/{retentionPolicyId}:
     put:
       operationId: setApprovalRetentionPolicy
       x-ticvai-consumed-by:
@@ -3189,6 +3229,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - name: retentionPolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -3467,12 +3512,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [execution-not-failed]
           description: The execution is queued, executing or succeeded; there is nothing to resolve
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [assignee-required]
           description: assigneeId missing for investigate or escalate
           content:
             application/problem+json:
@@ -3574,6 +3621,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [workflow-instance-ended, workflow-instance-transition-not-allowed, approval-node-not-skippable]
           description: The instance is completed or cancelled, the action does not apply in its current status
             (for example `resume` on an instance that has not failed), or the step to skip is an approval node
           content:
@@ -3581,6 +3629,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [action-field-missing, node-not-skippable, alternative-edge-not-allowed, assignee-is-requester]
           description: A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority,
             workflowExceptionId), the node is not skippable or the alternative is not an allowed edge, or the
             assignee is the requester of the approval
@@ -3642,6 +3691,7 @@ paths:
                         $ref: '#/components/schemas/ApprovalExternalProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /approval-external-providers/{externalProviderId}:
     put:
       operationId: setApprovalExternalProvider
       x-ticvai-consumed-by:
@@ -3682,6 +3732,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: externalProviderId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -3709,6 +3764,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalExternalProvider'
         '422':
+          x-ticvai-problem-types: [endpoint-not-https, api-client-not-active, decision-mapping-incomplete]
           description: The endpoint is not `https`, the API client is not an active client of the tenant, or
             the decision mapping has no value for `approve` or for `reject`
           content:
@@ -3865,6 +3921,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalStateProblem'
         '422':
+          x-ticvai-problem-types: [outcome-not-mapped, reason-required]
           description: The `outcome` is not in the provider's `decisionMapping`, or a rejection came with no
             `reason`.
           content:

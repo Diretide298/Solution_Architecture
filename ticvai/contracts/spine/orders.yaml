@@ -292,6 +292,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFraudRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-614 Refund Approval & Exception Workflow"
         - "P08 ADM-630 Payment Risk Rule & Decision Engine"
@@ -489,6 +491,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setDepositPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
       summary: Set how deposits work
@@ -1576,6 +1580,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setResaleFeePolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per event or product, the one the body''s `eventId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
       summary: Set resale commission and the price ceiling
@@ -2154,6 +2160,7 @@ paths:
                           $ref: '#/components/schemas/PaymentProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /payment-providers/{providerId}:
     put:
       operationId: setPaymentProvider
       x-ticvai-consumed-by:
@@ -2186,6 +2193,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: providerId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -7323,6 +7335,8 @@ paths:
   /upgrade-conversion-path:
     put:
       operationId: setUpgradeConversionPath
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per upgrade path, the one the body''s `pathCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-309 Upgrade & Conversion Path Builder"
       x-ticvai-audience:
@@ -7531,6 +7545,8 @@ paths:
   /pro-rata-residual:
     put:
       operationId: setProRataResidual
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration"
       x-ticvai-audience:
@@ -8076,6 +8092,7 @@ paths:
                   $ref: '#/components/schemas/GroupCustomerOrganizationProfileView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /group-customer-organization/{organisationId}:
     put:
       operationId: setGroupCustomerOrganization
       x-ticvai-consumed-by:
@@ -8100,6 +8117,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: VM close-out; pack label on BO-266 (Event Organizer); shape follows updateGroupBooking'
       parameters:
+      - name: organisationId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `organisationId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -8172,6 +8194,8 @@ paths:
   /group-package-experience:
     put:
       operationId: setGroupPackageExperience
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-268 Group Package & Experience Builder"
       x-ticvai-audience:
@@ -8226,6 +8250,8 @@ paths:
   /group-quotation-proposal:
     put:
       operationId: setGroupQuotationProposal
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-269 Group Quotation Builder & Proposal Generation"
       x-ticvai-audience:
@@ -8324,7 +8350,7 @@ paths:
                   $ref: '#/components/schemas/QuoteRevisionNegotiationVersionManagementView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /group-discount-exception:
+  /group-discount-exception/{approvalRequestId}:
     put:
       operationId: approveGroupDiscountException
       x-ticvai-consumed-by:
@@ -8362,6 +8388,11 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupDiscountExceptionApprovalWorkflowInput'
       parameters:
+        - name: approvalRequestId
+          in: path
+          required: true
+          description: 'The approval request this decision is on (approvals engine).'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -8427,6 +8458,8 @@ paths:
   /group-booking-handover:
     put:
       operationId: setGroupBookingHandover
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-273 Group Booking 360° & Handover Workspace"
       x-ticvai-audience:
@@ -8530,6 +8563,8 @@ paths:
   /group-operational-planning:
     put:
       operationId: setGroupOperationalPlanning
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-275 Group Operational Planning & Task Workspace"
       x-ticvai-audience:
@@ -9165,6 +9200,8 @@ paths:
   /order-detail-transaction:
     put:
       operationId: setOrderDetailTransaction
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.5; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (13 non-field properties removed; added lines)'
@@ -9214,6 +9251,8 @@ paths:
   /reservation-hold-policy:
     put:
       operationId: setReservationHoldPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-306 Reservation & Hold Policy Configuration"
       x-ticvai-audience:
@@ -9271,6 +9310,8 @@ paths:
   /order-reservation-statu:
     put:
       operationId: setOrderReservationStatus
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-307 Order & Reservation Status Lifecycle Configuration"
       x-ticvai-audience:
@@ -9381,6 +9422,8 @@ paths:
   /customer-guest-account:
     put:
       operationId: setCustomerGuestAccount
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per customer, the one the body''s `customerId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-309 Customer, Guest & Account Assignment"
       x-ticvai-audience:
@@ -9741,6 +9784,8 @@ paths:
   /order-amendment:
     put:
       operationId: setOrderAmendment
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.22; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (12 non-field properties removed)'
@@ -9800,6 +9845,8 @@ paths:
   /amendment-eligibility-policy:
     put:
       operationId: setAmendmentEligibilityPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-316 Amendment Eligibility & Policy Rule Builder"
       x-ticvai-audience:
@@ -9856,6 +9903,8 @@ paths:
   /cancellation-partial-policy:
     put:
       operationId: setCancellationPartialPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-317 Cancellation & Partial Cancellation Policy Configuration"
       x-ticvai-audience:
@@ -10014,6 +10063,8 @@ paths:
   /after-sale-financial:
     put:
       operationId: setAfterSaleFinancial
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per order, the one the body''s `orderId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-321 After-Sales Financial Settlement & Adjustment Workspace"
       x-ticvai-audience:
@@ -10068,7 +10119,7 @@ paths:
                 $ref: '#/components/schemas/AfterSalesFinancialSettlementAdjustmentWorkspaceView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /exception-service-recovery:
+  /exception-service-recovery/{approvalRequestId}:
     put:
       operationId: approveExceptionServiceRecovery
       x-ticvai-consumed-by:
@@ -10105,6 +10156,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ApprovalExceptionServiceRecoveryManagementInput'
       parameters:
+        - name: approvalRequestId
+          in: path
+          required: true
+          description: 'The approval request this decision is on (approvals engine).'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -10331,6 +10387,8 @@ paths:
   /multi-payment-split:
     put:
       operationId: setMultiPaymentSplit
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-601 Split Payment & Tender Allocation Manager"
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
@@ -10935,6 +10993,8 @@ paths:
   /resale-eligibility-rule:
     put:
       operationId: setResaleEligibilityRule
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-279 Resale Eligibility Rule Configuration"
       x-ticvai-audience:
@@ -11190,6 +11250,8 @@ paths:
   /listing-moderation:
     put:
       operationId: approveListingModeration
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-284 Listing Approval & Moderation"
       x-ticvai-audience:
@@ -11343,6 +11405,8 @@ paths:
   /resale-marketplace-recommendation:
     put:
       operationId: setResaleMarketplaceRecommendation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-287 AI Resale Configuration & Marketplace Recommendations"
       x-ticvai-audience:
@@ -13285,6 +13349,8 @@ paths:
   /refund-calculation-policy:
     put:
       operationId: setRefundCalculationPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
       summary: Set how a venue calculates a refund and where it goes
@@ -13639,6 +13705,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setResaleMarketplaceConfig
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-280 Resale Policy & Marketplace Settings"
         - "P08 ADM-282 Resale Pricing & Price Guardrails"

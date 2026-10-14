@@ -204,6 +204,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Release'
         '400':
+          x-ticvai-problem-types: [required-migration-missing, unknown-component-version]
           description: 'A required migration is absent, or a component version does not exist in the registry.
 
             '
@@ -292,6 +293,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [release-not-in-staging]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -343,6 +345,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [release-transition-not-allowed]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -414,6 +417,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Rollout'
         '403':
+          x-ticvai-problem-types: [approver-is-requester, step-up-token-missing, step-up-token-expired]
           description: Approver is the requester, or the step-up token is absent or expired
           content:
             application/problem+json:
@@ -632,6 +636,7 @@ paths:
                     format: uuid
                     description: The pending `releasePromotion` request.
         '409':
+          x-ticvai-problem-types: [rollout-transition-not-allowed]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -868,6 +873,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MigrationPlan'
         '400':
+          x-ticvai-problem-types: [unknown-target-version, migration-path-not-contiguous]
           description: Target version unknown, or the path between versions is not contiguous
           content:
             application/problem+json:
@@ -944,6 +950,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MigrationRun'
         '409':
+          x-ticvai-problem-types: [migration-plan-stale]
           description: 'The plan is stale — cell state changed since it was computed. Re-plan and review
             before applying.
 
@@ -1392,6 +1399,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UpgradeSchedule'
         '400':
+          x-ticvai-problem-types: [deferral-window-exceeded]
           description: Deferral exceeds the maximum permitted window
           content:
             application/problem+json:
@@ -1826,6 +1834,7 @@ paths:
                   $ref: '#/components/schemas/WafRule'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waf-policies/{wafRuleId}:
     put:
       operationId: setWafPolicy
       x-ticvai-consumed-by:
@@ -1851,6 +1860,11 @@ paths:
             schema:
               $ref: '#/components/schemas/WafRule'
       parameters:
+        - name: wafRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -1952,6 +1966,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setScalingPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per cell and service, the one the body''s `cellId` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
       x-ticvai-audience:

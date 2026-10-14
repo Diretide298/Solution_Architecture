@@ -82,6 +82,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setDunningPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-606 Partial Payment, Failure & Recovery Manager"
       x-ticvai-conflict-policy: serverWins
@@ -132,6 +134,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DunningPolicy'
         '422':
+          x-ticvai-problem-types: [attempts-exceed-maximum, attempts-too-close, terminal-action-not-permitted]
           description: '**An attempt schedule that would breach the policy''s own guard** — more
             attempts than `maxAttempts`, two attempts inside `minimumHoursBetweenAttempts`, or a
             `terminalAction` the caller is not permitted to set.
@@ -221,12 +224,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/DunningCase'
         '409':
+          x-ticvai-problem-types: [dunning-case-already-resolved, hard-decline-same-card]
           description: The case is already resolved, or the decline is hard and no other card was given.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [payment-declined]
           description: The payment was declined again.
           content:
             application/problem+json:
@@ -723,6 +728,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPaymentRoutingRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-573 Payment Routing Rule Builder"
         - "P08 ADM-574 Routing Strategy, Priority & Load Distribution"
@@ -775,6 +782,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PaymentRoutingRule'
         '409':
+          x-ticvai-problem-types: [provider-lacks-capability]
           description: A rule routes to a provider that cannot take it
           content:
             application/problem+json:
@@ -820,6 +828,8 @@ paths:
   /payment-failover-policy:
     put:
       operationId: setPaymentFailoverPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-575 Failover, Retry & Resilience Manager"
       x-ticvai-conflict-policy: serverWins
@@ -986,6 +996,7 @@ paths:
                   $ref: '#/components/schemas/PaymentTerminal'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /payment-terminals/{deviceId}:
     put:
       operationId: setPaymentTerminalConfiguration
       x-ticvai-consumed-by:
@@ -1008,6 +1019,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: deviceId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `deviceId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1082,6 +1098,8 @@ paths:
   /hosted-checkout-config:
     put:
       operationId: setHostedCheckoutConfiguration
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-594 Hosted Checkout, Redirect & Return Flow Configuration"
         - "P08 ADM-597 Digital Payment Exception, Recovery & Expiry Center"
@@ -1126,6 +1144,8 @@ paths:
   /payment-authentication-policy:
     put:
       operationId: setPaymentAuthenticationPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-596 Authentication, Tokenization & Recurring Payment Controls"
       x-ticvai-conflict-policy: serverWins
@@ -1195,6 +1215,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMixedTenderRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-600 Mixed Tender Rule & Combination Builder"
         - "P08 ADM-601 Split Payment & Tender Allocation Manager"
@@ -1424,6 +1446,7 @@ paths:
                   $ref: '#/components/schemas/ReconciliationSource'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /reconciliation-sources/{sourceId}:
     put:
       operationId: setReconciliationSource
       x-ticvai-consumed-by:
@@ -1438,6 +1461,11 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       parameters:
+      - name: sourceId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1463,6 +1491,8 @@ paths:
   /reconciliation-rules:
     put:
       operationId: setReconciliationMatchingRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-621 Transaction Matching & Reconciliation Engine"
       x-ticvai-conflict-policy: serverWins
@@ -1532,6 +1562,7 @@ paths:
                   $ref: '#/components/schemas/MerchantAccount'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /merchant-accounts/{merchantAccountId}:
     put:
       operationId: setMerchantAccount
       x-ticvai-consumed-by:
@@ -1545,6 +1576,11 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       parameters:
+      - name: merchantAccountId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1570,6 +1606,8 @@ paths:
   /payment-risk-rules:
     put:
       operationId: setPaymentRiskRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-630 Payment Risk Rule & Decision Engine"
         - "P08 ADM-631 Velocity, Behavioral & Transaction Risk Controls"
@@ -1805,6 +1843,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPaymentRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-567 Payment Policy, Governance & Approval Manager"
       x-ticvai-conflict-policy: serverWins
@@ -2024,6 +2064,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PayTerminalCertification'
         '422':
+          x-ticvai-problem-types: [expiry-before-approval, unknown-acquirer-connection]
           description: An expiry before the approval date, or a Level 3 entry for an acquirer connection that
             does not exist.
           content:
@@ -2059,6 +2100,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setInstalmentPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
       x-ticvai-audience:
@@ -2247,6 +2290,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PayInstalmentPlan'
         '409':
+          x-ticvai-problem-types: [order-already-has-plan, order-already-paid]
           description: The order already has a plan, or is already paid in full.
           content:
             application/problem+json:

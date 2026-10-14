@@ -467,6 +467,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SeatMap'
         '409':
+          x-ticvai-problem-types: [seat-map-published]
           description: Structural change attempted on a published map
           content:
             application/problem+json:
@@ -703,6 +704,7 @@ paths:
                     type: integer
                     description: Seats with tickets sold against them, which cannot be recategorised.
         '409':
+          x-ticvai-problem-types: [seat-map-published]
           description: Map is published and the change is structural
           content:
             application/problem+json:
@@ -1374,6 +1376,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [duplicate-band-code, band-ends-before-start]
           description: Two bands with the same `code`, or a band whose `effectiveTo` is not after its
             `effectiveFrom` (audit R275 (d)).
           content:
@@ -2069,6 +2072,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/SeatRecommendation'
         '404':
+          x-ticvai-problem-types: [seat-selection-not-found]
           description: No selection satisfies the constraints
           content:
             application/problem+json:
@@ -2327,6 +2331,7 @@ paths:
                   $ref: '#/components/schemas/SeatHoldType'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /seat-hold-types/{holdTypeId}:
     put:
       operationId: setSeatHoldType
       x-ticvai-consumed-by:
@@ -2343,6 +2348,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: holdTypeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2545,6 +2555,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSeatRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per seat map, the one the body''s `seatMapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1014 Seat Kill Rules"
         - "P08 BO-1015 Buffer Seat Rules"
@@ -2638,6 +2650,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccessibleSeating
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per seat map, the one the body''s `seatMapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1018 Accessible Seating Master"
         - "P08 BO-1019 Accessible Route Mapping"
@@ -2925,6 +2939,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSeatRecommendationRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per seat map, the one the body''s `seatMapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1034 Best Seat Recommendations"
         - "P08 BO-1035 Best Value Recommendations"

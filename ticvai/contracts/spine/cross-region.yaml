@@ -118,12 +118,14 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
+          x-ticvai-problem-types: [link-consent-missing, link-consent-expired]
           description: Consent absent or expired
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [subject-linked-to-other-guest]
           description: The subject in the target cell is already linked to a different guest
           content:
             application/problem+json:
@@ -271,6 +273,7 @@ paths:
                   link:
                     $ref: '#/components/schemas/GuestLink'
         '404':
+          x-ticvai-problem-types: [guest-link-not-found]
           description: No link exists for this subject
           content:
             application/problem+json:
@@ -320,6 +323,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
+          x-ticvai-problem-types: [entitlement-already-propagated]
           description: Right already propagated. Idempotent — returns the existing right.
           content:
             application/json:
@@ -383,6 +387,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Revoked
         '409':
+          x-ticvai-problem-types: [entitlement-already-consumed]
           description: 'Already fully consumed. Revocation cannot undo a redemption that has happened
             — the guest was admitted.
 
@@ -460,6 +465,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CrossRegionEntitlement'
         '409':
+          x-ticvai-problem-types: [entitlement-entries-exhausted, entitlement-revoked, entitlement-outside-window]
           description: Entries exhausted, or the right is revoked or outside its window
           content:
             application/problem+json:
@@ -618,6 +624,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WalletAuthorisation'
         '402':
+          x-ticvai-problem-types: [wallet-balance-insufficient]
           description: Insufficient balance
           content:
             application/problem+json:
@@ -630,6 +637,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '503':
+          x-ticvai-problem-types: [home-cell-unreachable]
           description: 'Home cell unreachable. The caller falls back to its allocation if one is configured,
             or declines wallet tender.
 
@@ -691,6 +699,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WalletAuthorisation'
         '409':
+          x-ticvai-problem-types: [wallet-hold-expired, already-captured, capture-exceeds-hold]
           description: Hold expired, already captured, or capture exceeds the hold
           content:
             application/problem+json:
@@ -775,6 +784,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletAllocationPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per region, the caller''s region: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: region

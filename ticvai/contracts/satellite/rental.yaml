@@ -341,6 +341,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalProduct'
         '409':
+          x-ticvai-problem-types: [blocking-findings-remain]
           description: Blocking findings remain; they are listed
           content:
             application/problem+json:
@@ -674,6 +675,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalInventoryModel'
         '409':
+          x-ticvai-problem-types: [inventory-model-has-bookings]
           description: Bookings exist under the current model
           content:
             application/problem+json:
@@ -899,6 +901,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalBlackout'
         '409':
+          x-ticvai-problem-types: [blackout-window-has-bookings]
           description: Bookings exist in the window; they are listed
           content:
             application/problem+json:
@@ -1117,6 +1120,8 @@ paths:
   /rental-deposit-policies:
     put:
       operationId: setRentalDepositPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per rental product or category, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-529 Deposit & Security Hold Policy"
         - "P08 BO-530 Deposit Lifecycle & Settlement Rules"
@@ -1165,6 +1170,8 @@ paths:
   /rental-fee-policies:
     put:
       operationId: setRentalFeePolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per rental product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-531 Late Fee, Grace Period & Extension Pricing"
         - "P08 BO-909 Deposit & Rental Financial Control"
@@ -1399,6 +1406,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalBooking'
         '409':
+          x-ticvai-problem-types: [no-availability]
           description: Not available for that window, quantity or location
           content:
             application/problem+json:
@@ -1782,6 +1790,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalBooking'
         '409':
+          x-ticvai-problem-types: [equipment-reserved-for-later-booking]
           description: '**The equipment is reserved for a later booking.** The conflicting booking''s
             window is named, so the counter can offer a shorter extension instead of a refusal.
 

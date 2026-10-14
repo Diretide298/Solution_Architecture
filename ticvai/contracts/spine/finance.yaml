@@ -981,6 +981,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccountMappings
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per region, the caller''s region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
       x-ticvai-audience:
@@ -2079,6 +2081,7 @@ paths:
                           $ref: '#/components/schemas/FxRate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /fx-rates/{rateId}:
     put:
       operationId: setFxRate
       x-ticvai-consumed-by:
@@ -2117,6 +2120,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: rateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -3554,6 +3562,8 @@ paths:
   /fx-rates/providers:
     put:
       operationId: setFxProvider
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per region, the caller''s region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Which provider serves which purpose
       description: '**Per purpose, per region.** A tender rate and a statutory reporting rate can come
         from different places and usually should — **`uaeCentralBank` for AED reporting because it is
@@ -3678,12 +3688,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [tax-exemption-expired, tax-exemption-not-required]
           description: The exemption is `expired`, or `notRequired`.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [evidence-document-required, rejection-note-required]
           description: '`verified` with no evidence document on the record or in the request, or `rejected`
             without a `note`.'
           content:
@@ -4191,6 +4203,7 @@ paths:
                         $ref: '#/components/schemas/FinTaxInvoiceTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tax-invoice-templates/{invoiceTemplateId}:
     put:
       operationId: setTaxInvoiceTemplate
       x-ticvai-consumed-by:
@@ -4216,6 +4229,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: invoiceTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4282,6 +4300,7 @@ paths:
                         $ref: '#/components/schemas/FinEInvoicingProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /e-invoicing/providers/{eInvoicingProviderId}:
     put:
       operationId: setEInvoicingProvider
       x-ticvai-consumed-by:
@@ -4309,6 +4328,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: eInvoicingProviderId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4555,6 +4579,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [transmission-already-accepted]
           description: The transmission is already `accepted`.
           content:
             application/problem+json:
@@ -4627,6 +4652,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FinVatReturn'
         '422':
+          x-ticvai-problem-types: [period-not-whole-tax-months, legal-entity-not-tax-registered]
           description: The period is not whole tax months, or the legal entity has no tax registration number.
           content:
             application/problem+json:

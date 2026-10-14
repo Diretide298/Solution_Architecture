@@ -288,6 +288,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Requisition'
         '409':
+          x-ticvai-problem-types: [requisition-already-approved, requisition-rejected-or-cancelled]
           description: '**Already approved**: the requisition is `approved`, `ordered` or `closed` (audit
             R171), or it is `rejected` or `cancelled`. The correct act is a new requisition, which the
             response names.
@@ -302,6 +303,8 @@ paths:
   /stock-counts/daily:
     put:
       operationId: setDailyCount
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per stock location, the one the body''s `locationId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P06 EMP-066 Stock Count & Cycle Count Management"
       summary: Which items get counted every day
@@ -769,6 +772,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InventoryItem'
         '409':
+          x-ticvai-problem-types: [item-has-movements]
           description: Attempt to change costing method or base unit after movements exist
           content:
             application/problem+json:
@@ -812,6 +816,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InventoryItem'
         '400':
+          x-ticvai-problem-types: [lookup-identifier-missing]
           description: Neither barcode nor SKU supplied
           content:
             application/problem+json:
@@ -1137,6 +1142,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [insufficient-stock]
           description: Insufficient stock, and the item does not permit negative balances
           content:
             application/problem+json:
@@ -1235,6 +1241,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StockCount'
         '409':
+          x-ticvai-problem-types: [stock-count-already-open]
           description: A count is already open for this location
           content:
             application/problem+json:
@@ -1419,6 +1426,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CountVariance'
         '409':
+          x-ticvai-problem-types: [stock-count-still-open]
           description: Count is still open. Variance is not available during counting
           content:
             application/problem+json:
@@ -1476,6 +1484,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StockCount'
         '409':
+          x-ticvai-problem-types: [stock-count-not-open]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -1556,6 +1565,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [stock-count-not-variance-pending]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -1616,6 +1626,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StockCount'
         '409':
+          x-ticvai-problem-types: [unreviewed-variance-lines, count-approval-required]
           description: Unreviewed variance lines remain, or approval is required
           content:
             application/problem+json:
@@ -1710,6 +1721,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StockTransfer'
         '409':
+          x-ticvai-problem-types: [insufficient-stock]
           description: Insufficient stock at the source
           content:
             application/problem+json:
@@ -1792,6 +1804,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [stock-transfer-not-partially-received]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -1867,6 +1880,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StockTransfer'
         '409':
+          x-ticvai-problem-types: [stock-transfer-not-in-transit]
           description: The transfer is not `inTransit` or `partiallyReceived` — it has already been
             received in full, or closed short
           content:
@@ -2064,6 +2078,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Requisition'
         '409':
+          x-ticvai-problem-types: [requisition-not-pending-approval]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2125,6 +2140,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Requisition'
         '409':
+          x-ticvai-problem-types: [requisition-not-pending-approval]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2181,6 +2197,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Requisition'
         '409':
+          x-ticvai-problem-types: [requisition-transition-not-allowed]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2259,6 +2276,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Requisition'
         '400':
+          x-ticvai-problem-types: [amended-quantity-exceeds-requested]
           description: An amended quantity exceeds the requested quantity
           content:
             application/problem+json:
@@ -2267,6 +2285,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [requisition-not-pending-approval, approver-is-requester]
           description: The requisition is not `pendingApproval`, or the caller raised it — the state
             model's guard is that the approver is not the requester
           content:
@@ -2702,6 +2721,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PurchaseOrder'
         '409':
+          x-ticvai-problem-types: [purchase-order-not-sent]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2777,6 +2797,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PurchaseOrder'
         '409':
+          x-ticvai-problem-types: [purchase-order-not-partially-received]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2853,6 +2874,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PurchaseOrder'
         '409':
+          x-ticvai-problem-types: [purchase-order-not-cancellable, purchase-order-goods-received]
           description: The order is not `raised` or `sent`. An order with goods received against it
             is closed short with `closePurchaseOrderShort`, not cancelled
           content:
@@ -2943,6 +2965,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GoodsReceipt'
         '409':
+          x-ticvai-problem-types: [over-receipt-tolerance-exceeded, purchase-order-closed]
           description: Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed
             default 5, audit R094), or the purchase order is closed
           content:
@@ -3049,6 +3072,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [rejection-exceeds-received, line-not-on-receipt]
           description: A line rejects more than was received and not already rejected on it, or names
             a `lineId` the receipt does not hold (audit R171)
           content:
@@ -3212,6 +3236,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [reservation-not-active]
           description: The reservation is not `active`.
           content:
             application/problem+json:
@@ -3363,6 +3388,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
         '422':
+          x-ticvai-problem-types: [window-ends-before-start, contract-document-reference-missing]
           description: '`validTo` before `validFrom`, or `active` without a `documentReference`.'
           content:
             application/problem+json:
@@ -3444,6 +3470,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [supplier-contract-ended]
           description: The contract is `terminated` or `expired`; a renewal is a new contract.
           content:
             application/problem+json:

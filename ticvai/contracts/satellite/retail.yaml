@@ -710,6 +710,7 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/RetailSale' }
         '400':
+          x-ticvai-problem-types: [lookup-identifier-missing]
           description: None of the three identifiers was sent
           content:
             application/problem+json:
@@ -1203,6 +1204,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/ShopAndDrop' }
         '400':
+          x-ticvai-problem-types: [lookup-identifier-missing]
           description: No identifier supplied
           content:
             application/problem+json:
@@ -1405,6 +1407,7 @@ paths:
                           $ref: '#/components/schemas/StoreRule'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /store-rules/{storeRuleId}:
     put:
       operationId: setStoreRules
       x-ticvai-consumed-by:
@@ -1430,6 +1433,11 @@ paths:
             schema:
               $ref: '#/components/schemas/StoreRule'
       parameters:
+        - name: storeRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':

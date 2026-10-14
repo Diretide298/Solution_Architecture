@@ -541,6 +541,7 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
         '409':
+          x-ticvai-problem-types: [queue-entry-not-waiting]
           description: Already called or redeemed
           content:
             application/problem+json:
@@ -912,7 +913,7 @@ paths:
                 items: { $ref: '#/components/schemas/QueueFeed' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-
+  /queue-feeds/{feedId}:
     put:
       operationId: configureQueueFeed
       x-ticvai-consumed-by:
@@ -942,6 +943,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: feedId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -963,17 +969,20 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/QueueFeed' }
         '409':
+          x-ticvai-problem-types: [feed-belongs-to-other-queue]
           description: The feed with this `id` belongs to a different queue. A feed does not move between queues
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400':
+          x-ticvai-problem-types: [unknown-adaptor, adaptor-credentials-missing]
           description: Unknown adaptor, or credentials missing for the selected adaptor
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
 
   /queue-feeds/readings:
     post:

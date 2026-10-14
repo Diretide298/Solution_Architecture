@@ -260,6 +260,7 @@ paths:
                   $ref: '#/components/schemas/ChannelListing'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /channel-listings/{listingId}:
     put:
       operationId: setChannelListing
       x-ticvai-consumed-by:
@@ -281,6 +282,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: listingId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -474,6 +480,7 @@ paths:
 
                       '
         '409':
+          x-ticvai-problem-types: [ai-usage-already-settled]
           description: 'Already settled for this period. **Settling twice would invoice twice**, and the
             idempotency key alone does not protect a re-run with a different key.
 
@@ -1045,6 +1052,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tenant'
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: Code already in use
           content:
             application/problem+json:
@@ -1251,6 +1259,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tenant'
         '409':
+          x-ticvai-problem-types: [tenant-terminated]
           description: Tenant is terminated, not suspended. Termination is not reversible here
           content:
             application/problem+json:
@@ -1322,12 +1331,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/TerminationSchedule'
         '400':
+          x-ticvai-problem-types: [confirmation-code-mismatch]
           description: Confirmation code does not match
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [unsettled-ledger-balances]
           description: Unsettled ledger balances exist
           content:
             application/problem+json:
@@ -1433,6 +1444,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Plan'
         '422':
+          x-ticvai-problem-types: [tenant-offer-on-standard-package, offered-tenant-not-found]
           description: '`offeredToTenantId` on a standard package, or a tenant that does not exist'
           content:
             application/problem+json:
@@ -1511,6 +1523,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Plan'
         '422':
+          x-ticvai-problem-types: [tenant-offer-on-standard-package, offered-tenant-not-found]
           description: '`offeredToTenantId` on a standard package, or a tenant that does not exist'
           content:
             application/problem+json:
@@ -1973,6 +1986,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Cell'
         '400':
+          x-ticvai-problem-types: [placement-outside-jurisdiction, no-cloud-region-in-country]
           description: 'Placement is outside the region''s jurisdiction, or the target cloud has no region
             in that country.
 
@@ -1982,6 +1996,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [region-cell-exists]
           description: A cell already exists for this region
           content:
             application/problem+json:
@@ -2070,6 +2085,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CellJob'
         '400':
+          x-ticvai-problem-types: [tier-unavailable-in-jurisdiction]
           description: Target tier is unavailable in this jurisdiction
           content:
             application/problem+json:
@@ -2121,6 +2137,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [cell-not-active]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2171,6 +2188,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [cell-not-decommissioning]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2331,6 +2349,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CellCluster'
         '409':
+          x-ticvai-problem-types: [model-cell-mid-migration]
           description: 'The model cell is mid-migration. Replicating a cell whose schema is moving produces
             a cluster at neither version.
 
@@ -2383,6 +2402,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [tenant-migration-not-cutting-over]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2579,6 +2599,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TenantMigration'
         '409':
+          x-ticvai-problem-types: [migration-plan-stale, tenant-traded-since-plan]
           description: Plan stale, or the tenant has traded since it was computed
           content:
             application/problem+json:
@@ -2829,6 +2850,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [invoice-not-payable]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2880,6 +2902,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [invoice-not-disputable]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2929,6 +2952,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [invoice-not-disputed]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2980,6 +3004,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [invoice-not-cancellable]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -3181,6 +3206,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SubscriptionInvoice'
         '409':
+          x-ticvai-problem-types: [period-already-invoiced]
           description: An invoice already exists for this period
           content:
             application/problem+json:
@@ -3602,6 +3628,8 @@ paths:
   /membership-product-tier:
     put:
       operationId: setMembershipProductTier
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-285 Membership Product & Tier Builder"
       x-ticvai-audience:
@@ -3657,6 +3685,8 @@ paths:
   /membership-eligibility-qualification:
     put:
       operationId: setMembershipEligibilityQualification
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-286 Membership Eligibility & Qualification Rule Builder"
       x-ticvai-audience:
@@ -3707,6 +3737,8 @@ paths:
   /validity-activation-expiry:
     put:
       operationId: setValidityActivationExpiry
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-287 Validity, Activation & Expiry Configuration"
       x-ticvai-audience:
@@ -3756,6 +3788,8 @@ paths:
   /membership-entitlement-admission:
     put:
       operationId: setMembershipEntitlementAdmission
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-audience:
@@ -3865,6 +3899,8 @@ paths:
   /family-household-dependent:
     put:
       operationId: setFamilyHouseholdDependent
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-290 Family, Household & Dependent Membership Configuration"
       x-ticvai-audience:
@@ -3986,6 +4022,8 @@ paths:
   /renewal-auto-membership:
     put:
       operationId: setRenewalAutoMembership
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
       x-ticvai-audience:
@@ -4078,6 +4116,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: approveMembershipProductValidation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
@@ -4316,6 +4356,8 @@ paths:
   /member-membership-account:
     put:
       operationId: setMemberMembershipAccount
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership, the one the body''s `membershipId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-295 Member 360° Membership Account Workspace"
       x-ticvai-audience:
@@ -5243,6 +5285,8 @@ paths:
   /partner-profile-organization:
     put:
       operationId: setPartnerProfileOrganization
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P10 PTR-023 Partner Profile & Organization Setup"
       x-ticvai-api-scope: partner.write
@@ -5581,6 +5625,8 @@ paths:
   /partner-brand-venue:
     put:
       operationId: setPartnerBrandVenue
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P10 PTR-027 Partner Brand, Venue & Business Scope Assignment"
       x-ticvai-api-scope: partner.write
@@ -5812,6 +5858,8 @@ paths:
   /partner-statu-lifecycle:
     put:
       operationId: approvePartnerStatuLifecycle
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
       x-ticvai-write-via:
@@ -6080,6 +6128,8 @@ paths:
   /agreement-contract-term:
     put:
       operationId: setAgreementContractTerm
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance"
         - "P10 PTR-033 Agreement & Contract Terms Builder"
@@ -6141,6 +6191,8 @@ paths:
   /partner-rate-net:
     put:
       operationId: setPartnerRateNet
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P10 PTR-034 Partner Rate & Net Pricing Configuration"
       x-ticvai-write-via:
@@ -6444,6 +6496,8 @@ paths:
   /payment-term-billing:
     put:
       operationId: setPaymentTermBilling
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P10 PTR-038 Payment Terms, Billing & Account Configuration"
       x-ticvai-write-via:
@@ -6585,6 +6639,8 @@ paths:
   /booking-limit-commercial:
     put:
       operationId: approveBookingLimitCommercial
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
       x-ticvai-write-via:
@@ -7768,6 +7824,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setVsiModel
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per platform, the caller''s platform: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-390 VSI Model Builder"
         - "P09 ADM-391 VSI Scoring & Tier Threshold Configuration"
@@ -7894,6 +7952,7 @@ paths:
                   $ref: '#/components/schemas/LicensingModel'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /licensing-models/{licensingModelId}:
     put:
       operationId: setLicensingModel
       x-ticvai-consumed-by:
@@ -7910,6 +7969,11 @@ paths:
       x-ticvai-scope-level: platform
       x-ticvai-config-scope: tenant
       parameters:
+      - name: licensingModelId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -7980,6 +8044,7 @@ paths:
                   $ref: '#/components/schemas/ModuleListing'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /module-catalogue/{moduleCode}:
     put:
       operationId: setModuleListing
       summary: Define a module's dependencies, incompatibilities and price
@@ -7990,6 +8055,11 @@ paths:
       - staff
       x-ticvai-scope-level: platform
       parameters:
+      - name: moduleCode
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `moduleCode`, when sent, must equal it.'
+        schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -8064,7 +8134,7 @@ paths:
                 $ref: '#/components/schemas/PackageSimulation'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /trial-configurations:
+  /trial-configurations/{trialConfigurationId}:
     put:
       operationId: setTrialConfiguration
       x-ticvai-consumed-by:
@@ -8087,6 +8157,11 @@ paths:
       x-ticvai-scope-level: platform
       x-ticvai-config-scope: tenant
       parameters:
+      - name: trialConfigurationId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -8246,6 +8321,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLicenceEnforcementPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per platform, the caller''s platform: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-453 License Enforcement & Decision Engine"
       summary: What happens at each threshold
@@ -8437,6 +8514,8 @@ paths:
   /membership-usage-policy:
     put:
       operationId: setMembershipUsagePolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-audience:
@@ -8502,6 +8581,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [cooldown-minutes-required, no-show-settings-required, limit-period-required]
           description: A conditional field is missing (cooldown for afterMinutes, the no-show triple for restrictReservations,
             the period for an admissions limit)
           content:
@@ -8513,6 +8593,8 @@ paths:
   /membership-commercial-config:
     put:
       operationId: setMembershipCommercialConfig
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-audience:
@@ -8656,18 +8738,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApplication'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such application
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-application-transition-not-allowed]
           description: The action does not fit the application's status (states/partner-application.yaml)
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [department-review-task-not-open, information-request-note-required]
           description: No open review task for that department, or a requestInformation without a note
           content:
             application/problem+json:
@@ -8675,7 +8760,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /partner-contacts:
+  /partner-contacts/{contactId}:
     put:
       operationId: setPartnerContact
       x-ticvai-consumed-by:
@@ -8704,6 +8789,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: contactId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `contactId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -8722,12 +8812,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerContact'
         '404':
+          x-ticvai-problem-types: [contact-not-found, partner-not-found]
           description: No such contact or partner
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-contact-transition-not-allowed, last-primary-contact]
           description: The action does not fit the contact's status (states/partner-contact.yaml), or it would leave
             the partner with no active primary contact
           content:
@@ -8799,18 +8891,21 @@ paths:
                     items:
                       $ref: '#/components/schemas/PartnerDistributionRight'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such partner
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [exclusive-right-overlap]
           description: An exclusive right overlaps another partner's exclusive right
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [dates-out-of-order, sub-agent-depth-required]
           description: Dates out of order, or sub-agents allowed with no maximum depth
           content:
             application/problem+json:
@@ -8886,18 +8981,21 @@ paths:
                     items:
                       $ref: '#/components/schemas/PartnerCapabilityGrant'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such partner
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-credit-not-enabled]
           description: useCredit granted while the partner's credit is not enabled
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [grant-end-date-required, grant-event-required]
           description: A time-limited grant with no end date, or an eventSpecific grant with no event
           content:
             application/problem+json:
@@ -8975,18 +9073,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalRoutedResult'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such agreement
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [commission-rules-overlap, commission-on-net-rate]
           description: Two rules overlap, or commission on a net-rate agreement
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [commission-rule-incomplete, tiers-out-of-order]
           description: A rule is missing the fields its model needs, or tiers out of order
           content:
             application/problem+json:
@@ -9053,12 +9154,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalRoutedResult'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such agreement
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [thresholds-out-of-order, credit-status-read-only, temporary-limit-end-required]
           description: Thresholds out of order, a computed credit status sent, or a temporary limit with no end
           content:
             application/problem+json:
@@ -9116,18 +9219,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerSecurity'
         '404':
+          x-ticvai-problem-types: [not-found, security-not-found]
           description: No such partner or security
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [verifier-is-recorder, supporting-document-required]
           description: Verified by the person who recorded it, or verified with no supporting document
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [expired-status-not-settable, dates-out-of-order]
           description: expired sent, or dates out of order
           content:
             application/problem+json:
@@ -9199,18 +9305,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalRoutedResult'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such agreement
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [allocation-below-sold]
           description: A quantity below what is already sold against the allocation
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [allocation-incomplete]
           description: An allocation is missing the fields its model or release mode needs
           content:
             application/problem+json:
@@ -9291,6 +9400,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [change-request-field-missing]
           description: A field the request type needs is missing
           content:
             application/problem+json:
@@ -9385,18 +9495,21 @@ paths:
                       nullable: true
                       description: The partner case opened by dispute
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such exception
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-reconciliation-exception-transition-not-allowed]
           description: The action does not fit the exception's status (states/partner-reconciliation-exception.yaml)
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [assignee-required, adjustment-ref-required, write-off-note-required]
           description: assign with no assignee, adjust with no adjustmentRef, or a write-off above tolerance with
             no note
           content:
@@ -9476,18 +9589,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerCommissionLine'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such line
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-commission-line-transition-not-allowed]
           description: The action does not fit the line's status (states/partner-commission-line.yaml)
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [reason-required, dispute-case-required]
           description: hold or reverse with no reason, dispute with no case
           content:
             application/problem+json:
@@ -9579,6 +9695,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerSettlementBatch'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such batch
           content:
             application/problem+json:
@@ -9592,6 +9709,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [schedule-date-required, reason-required, dispute-case-required]
           description: schedule with no date, hold or void with no reason, dispute with no case
           content:
             application/problem+json:
@@ -9645,6 +9763,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerCase'
         '422':
+          x-ticvai-problem-types: [money-category-subject-missing, unknown-sla-policy]
           description: A money category with nothing named, or an unknown SLA policy
           content:
             application/problem+json:
@@ -9743,18 +9862,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerCase'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such case
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-case-transition-not-allowed, reopen-window-closed]
           description: The action does not fit the case's status, or the reopening window has passed
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [action-field-missing]
           description: A field the action needs is missing
           content:
             application/problem+json:
@@ -9819,12 +9941,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [invoice-not-creditable]
           description: The invoice is a draft or cancelled and cannot be credited
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [credit-exceeds-invoice, line-not-on-invoice]
           description: The credit would take the invoice's credited total above its total, or a line names no line of the invoice
           content:
             application/problem+json:

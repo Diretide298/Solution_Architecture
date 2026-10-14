@@ -91,6 +91,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameCard'
         '409':
+          x-ticvai-problem-types: [game-card-already-active, unknown-card-code]
           description: Card already active, or the code is unknown
           content:
             application/problem+json:
@@ -98,7 +99,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /reader-profiles:
+  /reader-profiles/{readerProfileId}:
     put:
       operationId: setReaderProfile
       x-ticvai-consumed-by:
@@ -122,6 +123,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: readerProfileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -248,6 +254,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameCard'
         '409':
+          x-ticvai-problem-types: [target-card-has-balance, game-card-not-active]
           description: 'Target already carries a balance, or either card is not `active` (blocked,
             expired or already transferred).
 
@@ -403,6 +410,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Game'
         '409':
+          x-ticvai-problem-types: [plays-in-flight, game-transition-not-allowed]
           description: 'Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed
             while plays on this game are in flight, or `status` asks for a move states/game.yaml does not
             allow from `updateGame` (for example into `maintenance`, which only a work order does, or out
@@ -468,6 +476,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlayResult'
         '409':
+          x-ticvai-problem-types: [insufficient-credits, card-blocked, game-out-of-service]
           description: 'Insufficient credits on a live play (never on an offline one, audit R106 (3)), card
             blocked, or the game is out of service.
 
@@ -750,6 +759,7 @@ paths:
                   $ref: '#/components/schemas/AttractionType'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /attraction-types/{attractionTypeId}:
     put:
       operationId: setAttractionType
       x-ticvai-consumed-by:
@@ -763,6 +773,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - name: attractionTypeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1120,6 +1135,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGameplayValidationRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-425 Gameplay Validation Rule Configuration"
         - "P08 BO-426 Deduction Priority & Funding Source Rules"
@@ -1293,6 +1310,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGamePricing
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per game, the one the body''s `gameId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-435 Standard Game & Ride Price Configuration"
         - "P08 BO-436 Group Pricing Configuration"
@@ -1340,6 +1359,8 @@ paths:
   /redemption-rules:
     put:
       operationId: setRedemptionRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-445 Redemption Credit Rule Configuration"
         - "P08 BO-446 Ticket-Based Redemption / Ticket-Eater Integration"
@@ -1491,6 +1512,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameCard'
         '409':
+          x-ticvai-problem-types: [game-card-transition-not-allowed]
           description: 'The action is not a legal move from the card''s current status. `expired` and
             `transferred` are terminal (states/game-card.yaml), so nothing reactivates, blocks or
             replaces them.
@@ -1505,6 +1527,8 @@ paths:
   /game-card-expiry-rules:
     put:
       operationId: setGameCardExpiryRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-456 Card Expiry Rule Configuration"
       summary: When a card lapses, and what warns the guest first
@@ -1689,6 +1713,8 @@ paths:
   /game-kiosk-config:
     put:
       operationId: setGameKioskConfiguration
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per kiosk, the one the body''s `kioskDeviceId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-493 Self-Service UI Theme, Language & Journey Configuration"
       summary: The self-service journey, its theme and its languages
@@ -1794,6 +1820,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: '`code` already used by another game in the venue.'
           content:
             application/problem+json:
@@ -1921,6 +1948,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [target-is-source-reader, target-reader-not-found, target-reader-in-other-venue]
           description: A target is the source reader, does not exist, or is in another venue.
           content:
             application/problem+json:
@@ -2048,6 +2076,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [oldest-pending-at-missing]
           description: '`oldestPendingAt` missing while `pendingTransactions` is above 0.'
           content:
             application/problem+json:

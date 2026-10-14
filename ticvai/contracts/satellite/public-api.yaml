@@ -679,6 +679,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WebhookSubscription' }
         '422':
+          x-ticvai-problem-types: [unknown-event-type]
           description: An entry in `eventTypes` is not in the webhook event catalogue.
           content:
             application/problem+json:
@@ -868,6 +869,7 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-quotas/{quotaId}:
     put:
       operationId: setApiQuota
       x-ticvai-consumed-by:
@@ -892,6 +894,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: quotaId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -1186,6 +1193,7 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-licensing/{licenceId}:
     put:
       operationId: setApiLicensing
       x-ticvai-consumed-by:
@@ -1222,6 +1230,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: licenceId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -1305,11 +1318,13 @@ paths:
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
         '409':
+          x-ticvai-problem-types: [api-client-revoked]
           description: The client is `revoked`, which is terminal.
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [reason-required]
           description: '`suspended` without a `reason`.'
           content:
             application/problem+json:
@@ -1369,6 +1384,7 @@ paths:
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
         '422':
+          x-ticvai-problem-types: [event-type-not-subscribed]
           description: '`eventType` is not one this subscription takes.'
           content:
             application/problem+json:
@@ -1632,6 +1648,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [reason-required]
           description: '`reject` without a `reason`.'
           content:
             application/problem+json:
@@ -1675,6 +1692,7 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-anomaly-rules/{anomalyRuleId}:
     put:
       operationId: setApiAnomalyRule
       x-ticvai-consumed-by:
@@ -1698,6 +1716,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: anomalyRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true

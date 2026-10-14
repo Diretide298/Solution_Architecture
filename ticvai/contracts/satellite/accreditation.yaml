@@ -125,6 +125,8 @@ paths:
   /accreditation-requirements:
     put:
       operationId: setAccreditationRequirements
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-621 Applicant Type Configuration"
         - "P08 BO-622 Application Requirements Matrix"
@@ -265,6 +267,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '422':
+          x-ticvai-problem-types: [blocking-requirement-unsatisfied]
           description: Submitted with a requirement that blocks submission unsatisfied
           content:
             application/problem+json:
@@ -881,6 +884,7 @@ paths:
                   $ref: '#/components/schemas/BadgeTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /badge-templates/{badgeTemplateId}:
     put:
       operationId: setBadgeTemplate
       x-ticvai-consumed-by:
@@ -895,6 +899,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: badgeTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1012,6 +1021,7 @@ paths:
                   $ref: '#/components/schemas/AccessProfile'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /accreditation-access-profiles/{accessProfileId}:
     put:
       operationId: setAccessProfile
       x-ticvai-consumed-by:
@@ -1039,6 +1049,11 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       parameters:
+      - name: accessProfileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1261,6 +1276,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccreditationValidity
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-666 Validity Period Configuration"
         - "P08 BO-669 Temporary & Seasonal Accreditation"
@@ -1303,6 +1320,8 @@ paths:
   /accreditation-notifications:
     put:
       operationId: setAccreditationNotificationRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-675 Notification Rule Management"
         - "P08 BO-676 Expiry & Renewal Notification Scheduler"
@@ -1584,12 +1603,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationIdentityConflict'
         '409':
+          x-ticvai-problem-types: [identity-conflict-already-resolved]
           description: The conflict is already merged or rejected
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [surviving-holder-required, surviving-holder-not-in-conflict]
           description: survivingHolderId missing for merged, or not one of the conflict's holders
           content:
             application/problem+json:
@@ -1654,6 +1675,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationProgramme'
         '409':
+          x-ticvai-problem-types: [programme-is-template]
           description: A template cannot be opened for applications
           content:
             application/problem+json:
@@ -1757,6 +1779,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationProgramme'
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: A programme with this code already exists at this scope
           content:
             application/problem+json:
@@ -1859,18 +1882,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '403':
+          x-ticvai-problem-types: [not-own-application]
           description: A guest amending an application somebody else submitted
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [accreditation-application-not-editable]
           description: The application is not draft or informationRequested
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [subject-field-invalid]
           description: A subject field fails its requirement row's fieldType or validation
           content:
             application/problem+json:
@@ -1926,12 +1952,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '409':
+          x-ticvai-problem-types: [accreditation-application-not-draft, accreditation-window-closed]
           description: Not a draft, or the programme's application window is closed
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [blocking-requirement-unsatisfied]
           description: A requirement that blocks submission is not satisfied
           content:
             application/problem+json:
@@ -2025,18 +2053,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '403':
+          x-ticvai-problem-types: [not-own-application]
           description: A guest resubmitting an application somebody else submitted
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [accreditation-application-not-resubmittable, accreditation-window-closed]
           description: Not informationRequested or rejected, or the programme's window is closed
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [blocking-requirement-unsatisfied]
           description: A requirement that blocks submission is still not satisfied
           content:
             application/problem+json:
@@ -2106,12 +2137,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '403':
+          x-ticvai-problem-types: [not-own-application]
           description: A guest withdrawing an application somebody else submitted
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [accreditation-application-already-closed]
           description: The application is already decided, withdrawn or expired
           content:
             application/problem+json:
@@ -2289,12 +2322,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationCredentialDelivery'
         '403':
+          x-ticvai-problem-types: [not-own-credential]
           description: The credential is not the caller's
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [credential-not-mobile-or-qr, credential-not-issued-or-active]
           description: The credential is not a mobile or QR credential, or is not issued or active
           content:
             application/problem+json:
@@ -2369,12 +2404,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationCredentialDelivery'
         '409':
+          x-ticvai-problem-types: [credential-not-mobile-or-qr, credential-not-issued-or-active]
           description: Not a mobile or QR credential, or not issued or active
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [holder-contact-missing]
           description: The holder has no email or phone for the chosen channel
           content:
             application/problem+json:
@@ -2439,6 +2476,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationCredentialVerification'
         '400':
+          x-ticvai-problem-types: [identifier-required]
           description: No identifier supplied
           content:
             application/problem+json:
@@ -2523,12 +2561,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '403':
+          x-ticvai-problem-types: [not-own-accreditation]
           description: A guest renewing an accreditation that is not theirs
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [outside-renewal-window, holder-not-renewable, renewal-already-open]
           description: Outside the renewal window, the holder is revoked, suspended or archived, or a renewal
             is already open
           content:
@@ -2633,12 +2673,14 @@ paths:
                 exportId: $response.body#/id
               description: Export status, and the download link once ready.
         '403':
+          x-ticvai-problem-types: [pii-export-not-permitted]
           description: Personal data requested without REPORT_EXPORT_PII
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [export-purpose-required]
           description: Personal data requested without a purpose
           content:
             application/problem+json:

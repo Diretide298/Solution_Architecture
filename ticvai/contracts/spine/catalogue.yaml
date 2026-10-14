@@ -237,6 +237,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductCategories
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-103 Booking Flows"
@@ -291,6 +293,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProductCategory'
         '400':
+          x-ticvai-problem-types: [category-cycle, unknown-parent-category]
           description: The body contains a cycle — a category that is its own ancestor — or a `parentId`
             that names no category in the body.
           content:
@@ -311,6 +314,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [unknown-booking-flow]
           description: A category `bookingFlowId` that is not a booking flow of the venue (W12, 29 September).
           content:
             application/problem+json:
@@ -359,6 +363,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CatalogueImportJob'
         '409':
+          x-ticvai-problem-types: [catalogue-import-found-nothing, catalogue-import-already-committed]
           description: 'The job found nothing, or was already committed. **Partial application is reported
             rather than rolled back** — three thousand products half-created is a state somebody has to
             see to repair.
@@ -1387,6 +1392,7 @@ paths:
 
                         '
         '400':
+          x-ticvai-problem-types: [unknown-guided-answer]
           description: A `guidedAnswerIds` entry that is not an answer of the venue's published guided choice
             (W4, 29 September).
           content:
@@ -1595,6 +1601,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WaitlistEntry'
         '409':
+          x-ticvai-problem-types: [performance-not-sold-out]
           description: 'The performance is not sold out (sold, held and leased units are below capacity,
             audit R101). **Refused rather than accepted**, because a waitlist
             entry on available capacity will never be notified and the guest will wait forever.
@@ -1870,6 +1877,7 @@ paths:
                       items:
                         $ref: '#/components/schemas/Product'
         '400':
+          x-ticvai-problem-types: [category-not-in-venue, guided-answer-not-published]
           description: A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is
             not an answer of the venue's published guided choice (W4, 29 September).
           content:
@@ -1935,6 +1943,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
         '422':
+          x-ticvai-problem-types: [asset-not-ready, media-kind-mismatch, consent-question-not-active, variant-has-no-duration, booking-flow-not-in-venue]
           description: 'A `media` asset that is not `ready` or whose kind does not match, a
             `consentQuestionIds` entry that names no active consent question of the tenant, or
             `requiresTimeWindow` on a product whose variants carry no `durationMinutes` (decided 29 September,
@@ -2349,6 +2358,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '400':
+          x-ticvai-problem-types: [primary-media-missing, multiple-primary-media, duplicate-media-asset]
           description: '`media` with no `isPrimary` item or more than one, or one asset twice.'
           content:
             application/problem+json:
@@ -2361,6 +2371,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
         '422':
+          x-ticvai-problem-types: [asset-not-ready, media-kind-mismatch, unknown-consent-question, variant-has-no-duration, unknown-booking-flow]
           description: 'A `media` asset that is not `ready` or whose kind does not match, a
             `consentQuestionIds` entry that names no active consent question of the tenant, or
             `requiresTimeWindow` on a product whose variants carry no `durationMinutes` (decided 29 September,
@@ -2488,6 +2499,7 @@ paths:
 
                       '
         '400':
+          x-ticvai-problem-types: [duplicate-axis-code, duplicate-value-code]
           description: Two axes share a code, or one axis repeats a value code.
           content:
             application/problem+json:
@@ -2496,6 +2508,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [variant-ceiling-exceeded]
           description: 'Regeneration would exceed the variant ceiling for this product:
             `VenueSettings.catalogue.maxVariantsPerProduct`, a venue setting with a tenant default (decided
             28 September, audit R094). **Proposed default 200 variants, client to correct (audit R094).**
@@ -2654,6 +2667,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProductVariant'
         '400':
+          x-ticvai-problem-types: [description-too-long]
           description: A `description` value longer than 300 characters.
           content:
             application/problem+json:
@@ -2664,6 +2678,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [variant-retired, variant-not-of-product]
           description: The variant is retired (`isActive` false), or is not a variant of this product.
           content:
             application/problem+json:
@@ -2868,6 +2883,7 @@ paths:
                   applied:
                     type: integer
         '400':
+          x-ticvai-problem-types: [region-currency-mismatch, region-scale-mismatch]
           description: Currency or scale mismatch against the region
           content:
             application/problem+json:
@@ -3308,12 +3324,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChannelAllocationSet'
         '400':
+          x-ticvai-problem-types: [allocations-exceed-capacity, duplicate-channel-allocation]
           description: Allocations exceed the channel capacity in total, or a channel appears twice
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [allocation-below-sold]
           description: An allocation is below what that channel has already sold plus its leased units
             (audit R101)
           content:
@@ -3513,6 +3531,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [bundle-publish-in-progress]
           description: A publish is already in progress for this venue
           content:
             application/problem+json:
@@ -3776,6 +3795,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [no-capacity, seated-envelope-not-leasable]
           description: 'No units remain, or the envelope is seated — seated inventory cannot be leased
             because a seat map is not a count.
 
@@ -3845,6 +3865,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InventoryHold'
         '400':
+          x-ticvai-problem-types: [consumed-exceeds-granted, consumed-below-reported]
           description: '`consumedUnits` is more than `grantedUnits`, or less than the consumption already
             reported on this hold — units reported sold stay sold.
 
@@ -3856,6 +3877,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [hold-not-active]
           description: 'The hold is not `active`: it was already released, force-released or has expired,
             and its units are already back in the pool. `states/lease.yaml` releases only an active hold.
 
@@ -3929,6 +3951,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InventoryHold'
         '400':
+          x-ticvai-problem-types: [consumed-exceeds-granted, consumed-below-reported]
           description: '`consumedUnits` is more than `grantedUnits`, or less than the consumption already
             reported on this hold.
 
@@ -3938,6 +3961,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [hold-not-active]
           description: The hold is not `active` — it expired, or was released or force-released. Acquire
             a new one.
           content:
@@ -4094,6 +4118,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InventoryHold'
         '400':
+          x-ticvai-problem-types: [units-exceed-hold]
           description: '`units` is more than the hold grants.'
           content:
             application/problem+json:
@@ -4413,6 +4438,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/AlternativeCode'
         '400':
+          x-ticvai-problem-types: [variant-not-of-product, code-sent-twice]
           description: A `variantId` is not a variant of this product, or the body sends one code twice
             for the same partner.
           content:
@@ -4420,6 +4446,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: Code already mapped to a different product for that partner
           content:
             application/problem+json:
@@ -4932,6 +4959,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Performance'
         '409':
+          x-ticvai-problem-types: [performance-has-sold-tickets, performance-transition-not-allowed]
           description: A timing change on a performance with sold tickets, or a `status` move the state
             model does not allow. This call moves `scheduled` to `onSale`, `onSale` to `suspended` and
             `suspended` back to `onSale`, and nothing else (`states/performance.yaml`).
@@ -5036,6 +5064,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [performance-not-cancellable]
           description: 'The performance is `cancelled`, `completed` or `soldOut`. `states/performance.yaml`
             cancels only from `scheduled`, `onSale` and `suspended`.
 
@@ -5107,6 +5136,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChannelCapacity'
         '409':
+          x-ticvai-problem-types: [capacity-below-sold-and-leased]
           description: Capacity reduced below units already sold plus units under an unexpired lease
             (audit R101)
           content:
@@ -5390,6 +5420,8 @@ paths:
   /lifecycle-statu-workflow:
     put:
       operationId: setLifecycleStatuWorkflow
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-120 Lifecycle Status & Workflow Configuration"
       x-ticvai-audience:
@@ -5521,6 +5553,8 @@ paths:
   /product-context-ownership:
     put:
       operationId: setProductContextOwnership
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-123 Product Context, Ownership & Assignment"
       x-ticvai-audience:
@@ -5568,6 +5602,8 @@ paths:
   /channel-availability:
     put:
       operationId: publishChannelAvailability
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-124 Channel Publication & Availability"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
@@ -5618,55 +5654,6 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /activation-scheduler:
-    put:
-      operationId: publishActivationScheduler
-      x-ticvai-consumed-by:
-        - "P08 ADM-125 Publication & Activation Scheduler"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.10-11
-        (Screen 8 Publication & Activation Scheduler: Configurable Actions, Configuration, Calendar View, AI
-        Capability, Acceptance Condition); MoM 31 Aug 2026 §4.10 (publish/activation scheduler start/stop selling
-        at defined times; effective-dated higher-risk changes)'
-      summary: Publication & Activation Scheduler
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.** Product
-        Lifecycle   Catalogue Governance, page 10. The screen says: Automate future product lifecycle actions.
-
-
-        **Agreed (decided 29 September, readiness close-out).** the seven action options became one actionType;
-        date+time became scheduledAt with timeZone; references typed (product, venue, channels, target state);
-        calendar tiles dropped from the record; lifecycle conflicts are validationIssues; schedule id, status
-        and failure reason added to the response. Saves one scheduled lifecycle action; the calendar view (upcoming
-        activations/publications, end-of-sale dates, scheduled suspensions, conflicts, failed jobs) is a read
-        over these actions. AI flags suspicious schedules (e.g. available after validity ends) as validationIssues;
-        it does not change them.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PublicationActivationSchedulerInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Publication & Activation Scheduler
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PublicationActivationSchedulerView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listScheduledLifecycleActions
       x-ticvai-consumed-by:
@@ -5757,11 +5744,67 @@ paths:
                         items:
                           $ref: '#/components/schemas/PublicationActivationSchedulerView'
         '400':
+          x-ticvai-problem-types: [date-range-too-long, invalid-window]
           description: A range longer than 366 days, or `to` before `from`.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /activation-scheduler/{scheduleId}:
+    put:
+      operationId: publishActivationScheduler
+      x-ticvai-consumed-by:
+        - "P08 ADM-125 Publication & Activation Scheduler"
+      x-ticvai-audience:
+        - staff
+      x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.10-11
+        (Screen 8 Publication & Activation Scheduler: Configurable Actions, Configuration, Calendar View, AI
+        Capability, Acceptance Condition); MoM 31 Aug 2026 §4.10 (publish/activation scheduler start/stop selling
+        at defined times; effective-dated higher-risk changes)'
+      summary: Publication & Activation Scheduler
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.** Product
+        Lifecycle   Catalogue Governance, page 10. The screen says: Automate future product lifecycle actions.
+
+
+        **Agreed (decided 29 September, readiness close-out).** the seven action options became one actionType;
+        date+time became scheduledAt with timeZone; references typed (product, venue, channels, target state);
+        calendar tiles dropped from the record; lifecycle conflicts are validationIssues; schedule id, status
+        and failure reason added to the response. Saves one scheduled lifecycle action; the calendar view (upcoming
+        activations/publications, end-of-sale dates, scheduled suspensions, conflicts, failed jobs) is a read
+        over these actions. AI flags suspicious schedules (e.g. available after validity ends) as validationIssues;
+        it does not change them.'
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublicationActivationSchedulerInput'
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `scheduleId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Publication & Activation Scheduler
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicationActivationSchedulerView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-duplication-template:
@@ -5850,6 +5893,8 @@ paths:
   /catalogue-review:
     put:
       operationId: setCatalogueReview
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per catalogue builder session, the one the body''s `sessionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-127 AI Catalogue Builder & Configuration Review"
       x-ticvai-audience:
@@ -6080,6 +6125,8 @@ paths:
   /workflow:
     put:
       operationId: approveWorkflow
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-129 Approval Workflow Designer"
         - "P08 ADM-319 Approval Workflow Library"
@@ -6130,6 +6177,8 @@ paths:
   /review-decision:
     put:
       operationId: approveReviewDecision
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per pricing change request, the one the body''s `changeRequestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-130 Approval Review & Decision Workspace"
       x-ticvai-audience:
@@ -6944,6 +6993,8 @@ paths:
   /product-catalogue:
     put:
       operationId: setProductCatalogue
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per sales channel, the one the body''s `channelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-260 Product & Catalogue Assignment"
       x-ticvai-audience:
@@ -6993,6 +7044,8 @@ paths:
   /channel-pricing-commercial:
     put:
       operationId: setChannelPricingCommercial
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per sales channel, the one the body''s `channelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-261 Channel Pricing & Commercial Profile Assignment"
       x-ticvai-audience:
@@ -7356,6 +7409,8 @@ paths:
   /channel-fee-payment:
     put:
       operationId: setChannelFeePayment
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per sales channel, the one the body''s `channelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-266 Channel Fees, Payment & Fulfillment Configuration"
       x-ticvai-audience:
@@ -7404,6 +7459,8 @@ paths:
   /channel-readiness-validation:
     put:
       operationId: publishChannelReadinessValidation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per sales channel, the one the body''s `channelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-267 Channel Publication, Readiness & AI Validation"
       x-ticvai-audience:
@@ -8603,6 +8660,8 @@ paths:
   /product-service-price:
     put:
       operationId: setProductServicePrice
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per price assignment, the one the body''s `assignmentId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-052 Product & Service Price Assignment"
       x-ticvai-audience:
@@ -8828,6 +8887,8 @@ paths:
   /price-hierarchy-inheritance:
     put:
       operationId: setPriceHierarchyInheritance
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per price hierarchy, the one the body''s `hierarchyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-055 Price Hierarchy & Inheritance Configuration"
       x-ticvai-audience:
@@ -10063,6 +10124,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTaxProfileJurisdiction
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tax profile, the one the body''s `taxProfileCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
       x-ticvai-audience:
@@ -10110,6 +10173,8 @@ paths:
   /tax-rule-treatment:
     put:
       operationId: setTaxRuleTreatment
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tax rule, the one the body''s `taxRuleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-070 Tax Rule & Treatment Builder"
       x-ticvai-audience:
@@ -10245,6 +10310,8 @@ paths:
   /fee-applicability-charging:
     put:
       operationId: setFeeApplicabilityCharging
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per fee rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-072 Fee Applicability & Charging Rule Builder"
       x-ticvai-audience:
@@ -10490,6 +10557,8 @@ paths:
   /price-breakdown-calculation:
     put:
       operationId: simulatePriceBreakdownCalculation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-076 Price Breakdown, Calculation Simulation & Explainability"
         - "P08 BO-1049 Scenario & What-If Planning"
@@ -10784,7 +10853,7 @@ paths:
                           $ref: '#/components/schemas/PricingGovernanceCommandCenterView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /pricing-change-request:
+  /pricing-change-request/{changeId}:
     put:
       operationId: setPricingChangeRequest
       x-ticvai-consumed-by:
@@ -10822,6 +10891,11 @@ paths:
             schema:
               $ref: '#/components/schemas/PricingChangeRequestWorkspaceInput'
       parameters:
+        - name: changeId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `changeId`, when sent, must equal it.'
+          schema: { type: string }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -11078,6 +11152,8 @@ paths:
   /pricing-workflow-authority:
     put:
       operationId: approvePricingWorkflowAuthority
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per pricing approval policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-083 Pricing Approval Workflow & Authority Matrix"
       x-ticvai-audience:
@@ -11131,6 +11207,8 @@ paths:
   /pricing-effective-date:
     put:
       operationId: publishPricingEffectiveDate
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per pricing change request, the one the body''s `changeRequestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-084 Pricing Publication & Effective-Date Scheduler"
         - "P08 BO-443 Pricing Audit, Approval & Publication"
@@ -11424,6 +11502,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [rollback-target-required, scheduled-at-in-past, incident-reference-required]
           description: '`rollbackTargetRequired`, `scheduledAtInPast` or `incidentReferenceRequired`.'
           content:
             application/problem+json:
@@ -11815,6 +11894,8 @@ paths:
   /dynamic-pricing-strategy-2:
     put:
       operationId: setDynamicPricingStrategy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per pricing strategy, the one the body''s `strategyCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-089 Dynamic Pricing Strategy Builder"
       x-ticvai-audience:
@@ -11865,6 +11946,8 @@ paths:
   /demand-occupancy-availability:
     put:
       operationId: setDemandOccupancyAvailability
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per pricing rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-090 Demand, Occupancy & Availability Rule Builder"
       x-ticvai-audience:
@@ -11916,6 +11999,8 @@ paths:
   /booking-velocity-time:
     put:
       operationId: setBookingVelocityTime
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per pricing rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
       x-ticvai-audience:
@@ -12462,6 +12547,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setRulePriorityConflict
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-441 Price Priority & Conflict Rules"
       x-ticvai-audience:
@@ -12513,6 +12600,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RulePriorityConflictView'
         '409':
+          x-ticvai-problem-types: [critical-conflict-open]
           description: '`save` while a critical conflict is open (`criticalConflictOpen`); the conflicts are
             named in the problem.'
           content:
@@ -12520,6 +12608,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [test-scenario-required, unknown-rule]
           description: '`test` without a `testScenario` (`testScenarioRequired`), or `orderedRuleIds` naming a
             rule that does not exist or is archived (`unknownRule`).'
           content:
@@ -13674,6 +13763,8 @@ paths:
   /pricing-2:
     put:
       operationId: setPricing
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-109 Pricing Simulation Studio"
       x-ticvai-audience:
@@ -13816,6 +13907,8 @@ paths:
   /pricing-experiment:
     put:
       operationId: setPricingExperiment
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-111 A/B Pricing Experiment Studio"
       x-ticvai-audience:
@@ -14435,6 +14528,7 @@ paths:
                   $ref: '#/components/schemas/EventType'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /event-types/{eventTypeId}:
     put:
       operationId: setEventType
       x-ticvai-consumed-by:
@@ -14448,6 +14542,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - name: eventTypeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -14955,6 +15054,7 @@ paths:
                   $ref: '#/components/schemas/Space'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /spaces/{spaceId}:
     put:
       operationId: setSpace
       x-ticvai-consumed-by:
@@ -14968,6 +15068,11 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       parameters:
+      - name: spaceId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15233,6 +15338,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Moved
         '409':
+          x-ticvai-problem-types: [event-preconditions-not-met]
           description: Preconditions for the transition are not met; they are listed
           content:
             application/problem+json:
@@ -15281,6 +15387,7 @@ paths:
                   $ref: '#/components/schemas/PerformanceTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /performance-templates/{performanceTemplateId}:
     put:
       operationId: setPerformanceTemplate
       x-ticvai-consumed-by:
@@ -15301,6 +15408,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: performanceTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15320,7 +15432,7 @@ paths:
                 $ref: '#/components/schemas/PerformanceTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /prepaid-minute-packages:
+  /prepaid-minute-packages/{packageId}:
     put:
       operationId: setPrepaidMinutePackage
       x-ticvai-consumed-by:
@@ -15342,6 +15454,11 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       parameters:
+      - name: packageId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15678,6 +15795,7 @@ paths:
                   $ref: '#/components/schemas/CatalogueMembershipProgramme'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /membership-programmes/{programId}:
     put:
       operationId: setMembershipProgramme
       x-ticvai-consumed-by:
@@ -15691,6 +15809,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: programId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `programId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15744,6 +15867,7 @@ paths:
                   $ref: '#/components/schemas/CatalogueMembershipBenefit'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /membership-benefits/{benefitId}:
     put:
       operationId: setMembershipBenefit
       x-ticvai-consumed-by:
@@ -15757,6 +15881,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: benefitId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -16083,6 +16212,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [no-base-price, product-not-at-venue]
           description: >-
             The sample booking cannot be priced - the product has no price on that date or
             channel (`noBasePrice`), or the product is not sold at the venue (`productNotAtVenue`).
@@ -16144,6 +16274,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [not-submittable]
           description: >-
             The request is not `draft` or `returnedForModification` (`notSubmittable`).
           content:
@@ -16151,6 +16282,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [no-lines, retroactive-effective-date, unknown-object]
           description: >-
             Validation failed (`noLines`, `retroactiveEffectiveDate`, `unknownObject`); the request
             stays `draft`.
@@ -16218,6 +16350,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PricingChangeRequestWorkspaceView'
         '403':
+          x-ticvai-problem-types: [self-approval, outside-authority]
           description: '`selfApproval` (the requester cannot approve their own change) or `outsideAuthority`
             (the change is above the caller''s approval tier).'
           content:
@@ -16227,6 +16360,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [not-pending-approval]
           description: >-
             The request is not `pendingApproval` (`notPendingApproval`).
           content:
@@ -16234,6 +16368,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [comment-required]
           description: '`comment` missing on reject or return (`commentRequired`).'
           content:
             application/problem+json:
@@ -16308,6 +16443,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [already-decided, recommendation-expired]
           description: >-
             The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired (`recommendationExpired`).
           content:
@@ -16315,6 +16451,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [rejection-reason-required, human-selected-price-required, guardrail-breached, scheduled-for-in-past]
           description: '`rejectionReasonRequired`, `humanSelectedPriceRequired`, `guardrailBreached` or
             `scheduledForInPast`.'
           content:
@@ -16388,6 +16525,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [circular-dependency, duplicate-link]
           description: '`circularDependency` or `duplicateLink`.'
           content:
             application/problem+json:
@@ -16395,7 +16533,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /configuration-templates:
+  /configuration-templates/{configurationTemplateId}:
     put:
       operationId: setConfigurationTemplate
       x-ticvai-consumed-by:
@@ -16430,6 +16568,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: configurationTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -16448,6 +16591,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConfigurationTemplate'
         '422':
+          x-ticvai-problem-types: [source-required]
           description: '`sourceRequired`.'
           content:
             application/problem+json:
@@ -16514,6 +16658,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [already-executing, already-finished]
           description: '`alreadyExecuting` or `alreadyFinished`.'
           content:
             application/problem+json:
@@ -16603,12 +16748,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [already-closed]
           description: '`alreadyClosed`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [comment-required]
           description: '`commentRequired`.'
           content:
             application/problem+json:
@@ -16616,7 +16763,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /channel-connections:
+  /channel-connections/{connectionId}:
     put:
       operationId: setChannelConnectionConfiguration
       x-ticvai-consumed-by:
@@ -16645,6 +16792,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: connectionId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -16663,6 +16815,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChannelConnection'
         '422':
+          x-ticvai-problem-types: [secret-not-reference]
           description: '`secretNotReference`.'
           content:
             application/problem+json:
@@ -16737,12 +16890,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [connection-disabled]
           description: '`connectionDisabled`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [order-test-in-production]
           description: '`orderTestInProduction`.'
           content:
             application/problem+json:
@@ -16753,6 +16908,8 @@ paths:
   /channel-syncs:
     put:
       operationId: setChannelSyncSetting
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per sales channel and data domain, the one the body''s `salesChannelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-270 Product, Price & Availability Synchronization"
       summary: Set how one kind of data synchronises with a channel
@@ -16859,12 +17016,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChannelSalesRule'
         '409':
+          x-ticvai-problem-types: [rule-conflict]
           description: '`ruleConflict`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [invalid-range, eligibility-incomplete]
           description: '`invalidRange` or `eligibilityIncomplete`.'
           content:
             application/problem+json:
@@ -16943,12 +17102,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [illegal-transition]
           description: '`illegalTransition`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [resolution-note-required]
           description: '`resolutionNoteRequired`.'
           content:
             application/problem+json:
@@ -17002,6 +17163,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [not-retryable]
           description: '`notRetryable`.'
           content:
             application/problem+json:
@@ -17009,7 +17171,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /price-categories:
+  /price-categories/{priceCategoryId}:
     put:
       operationId: setPriceCategoryRateType
       x-ticvai-consumed-by:
@@ -17038,6 +17200,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: priceCategoryId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -17056,12 +17223,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/PriceCategory'
         '409':
+          x-ticvai-problem-types: [in-use]
           description: '`inUse`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [invalid-parent]
           description: '`invalidParent`.'
           content:
             application/problem+json:
@@ -17098,6 +17267,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPackagePricingDefinition
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per package product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-053 Package, Bundle & Add-On Pricing"
         - "P08 BO-011 Packages & Bundles"
@@ -17147,12 +17318,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/PackagePricing'
         '409':
+          x-ticvai-problem-types: [change-request-required]
           description: '`changeRequestRequired`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [price-required, circular-component]
           description: '`priceRequired` or `circularComponent`.'
           content:
             application/problem+json:
@@ -17160,7 +17333,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /pricing-markets:
+  /pricing-markets/{marketId}:
     put:
       operationId: setMarketPricingConfiguration
       x-ticvai-consumed-by:
@@ -17188,6 +17361,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: marketId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -17206,6 +17384,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PricingMarket'
         '422':
+          x-ticvai-problem-types: [currency-not-venue-currency, invalid-parent]
           description: '`currencyNotVenueCurrency` or `invalidParent`.'
           content:
             application/problem+json:
@@ -17213,7 +17392,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /fees:
+  /fees/{feeId}:
     put:
       operationId: setFeeDefinition
       x-ticvai-consumed-by:
@@ -17245,6 +17424,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: feeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -17263,12 +17447,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/PricingFee'
         '409':
+          x-ticvai-problem-types: [change-request-required]
           description: '`changeRequestRequired`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [value-required]
           description: '`valueRequired`.'
           content:
             application/problem+json:
@@ -17276,7 +17462,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /calculation-profiles:
+  /calculation-profiles/{calculationProfileId}:
     put:
       operationId: setPriceCalculationPolicy
       x-ticvai-consumed-by:
@@ -17309,6 +17495,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: calculationProfileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -17327,12 +17518,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/CalculationProfile'
         '409':
+          x-ticvai-problem-types: [version-in-use]
           description: '`versionInUse`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [invalid-sequence, circular-dependency]
           description: '`invalidSequence` or `circularDependency`.'
           content:
             application/problem+json:
@@ -17340,7 +17533,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /rounding-profiles:
+  /rounding-profiles/{roundingProfileId}:
     put:
       operationId: setCurrencyRoundingRule
       x-ticvai-consumed-by:
@@ -17368,6 +17561,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: roundingProfileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -17386,6 +17584,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoundingProfile'
         '422':
+          x-ticvai-problem-types: [precision-below-decimals]
           description: '`precisionBelowDecimals`.'
           content:
             application/problem+json:
@@ -17396,6 +17595,8 @@ paths:
   /dynamic-pricing-controls:
     put:
       operationId: setDynamicPricingGuardrailPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per scope node, the one the body''s `scopeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
         - "P08 ADM-096 Dynamic Pricing Automation Policy & Control"
@@ -17450,6 +17651,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DynamicPricingControl'
         '422':
+          x-ticvai-problem-types: [invalid-range, scope-id-required]
           description: '`invalidRange` or `scopeIdRequired`.'
           content:
             application/problem+json:
@@ -17517,12 +17719,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [strategy-active]
           description: '`strategyActive`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [invalid-bands, guardrail-breached]
           description: '`invalidBands` or `guardrailBreached`.'
           content:
             application/problem+json:
@@ -17600,12 +17804,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [illegal-transition]
           description: '`illegalTransition`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [strategy-incomplete]
           description: '`strategyIncomplete`.'
           content:
             application/problem+json:
@@ -17677,12 +17883,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/DemandSignal'
         '409':
+          x-ticvai-problem-types: [feed-signal]
           description: '`feedSignal`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [invalid-period]
           description: '`invalidPeriod`.'
           content:
             application/problem+json:
@@ -17690,7 +17898,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /signal-registry:
+  /signal-registry/{signalId}:
     put:
       operationId: setSignalRegistryPolicy
       x-ticvai-consumed-by:
@@ -17721,6 +17929,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: signalId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -17739,6 +17952,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SignalRegistryEntry'
         '422':
+          x-ticvai-problem-types: [trust-too-low]
           description: '`trustTooLow`.'
           content:
             application/problem+json:
