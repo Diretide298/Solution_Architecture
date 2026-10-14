@@ -1,0 +1,58 @@
+id: CHG-GT2-001
+date: '2026-10-15'
+source: audit
+kind: spec
+summary: The carried-ids deriver no longer adds a link or exit a client-approved screen's navigation does not have, and
+  the six links it had added since audit-base come off, so the approved screens look as the client approved them.
+decision:
+  what: 'tools/derive-carries-from-entrystate.py reads the approved snapshot (handoff/approved-ui.json): pass 1 does not
+    mirror an exit into an approved screen whose approved exits lack it, pass 3 does not add an owned edge an approved
+    screen''s navigation does not link to, and pass 2 drops such an owned edge (an empty transitions list goes with it).
+    The run reports what it withheld. Re-derived: BO-084, BO-085, BO-087, BO-088, BO-106 lose "to BO-086 | Approval
+    Matrix" and BO-223 loses "to BO-214 | Guest Journey Command Center"; each destination stays in the screen''s exits,
+    as approved.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'check-approved-ui/AU-FIELD at the r6 release gate on r6-gate2 (e2195db7, every r6 batch merged and fully derived):
+  6 new, 0 after (evidence audit/ticvai/runs/audit-1014/classes.json; gate log scratchpad audit/fix/gate2-checks.log).
+  No authored screen edit made them: CHG-SHP-003 gave setApprovalMatrix and setJourneyProfile keyed paths
+  (/approval-matrices/{matrixId}, /journey-profiles/{journeyProfileId}); derive-entrystate-params then declared an
+  optional matrixId on BO-086 (and BO-087) and journeyProfileId on BO-214, and derive-carries pass 3 added an owned
+  edge from every same-platform screen listing those destinations in its exits. The lead''s rule (14 October): "the UI
+  is fixed. approved by client so dont change that"; a link and its trigger are what the user sees of navigation.'
+keys_touched:
+  screens:
+  - BO-084
+  - BO-085
+  - BO-087
+  - BO-088
+  - BO-106
+  - BO-223
+  files:
+  - tools/derive-carries-from-entrystate.py
+  - screens/P08-venue-back-office.yaml
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted:
+  - '28028'
+  - '27830'
+  - '27939'
+  - '27952'
+  - '29003'
+  - '27825'
+  - '27931'
+  - '27946'
+  - '29002'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'Batch GT2 (r6 gate fix round 2). The generator rule is tools/derive-carries-from-entrystate.py::approved_navigation.
+  Carries stay invisible metadata: BO-086 -> BO-087 now carries matrixId, which check-approved-ui does not compare. A
+  screen the snapshot does not have is not limited. The links never reached a ticket (r6 is not tagged); the tickets
+  listed are the Block A FE and feature tickets of the six screens, for information only.'
