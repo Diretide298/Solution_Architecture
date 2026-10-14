@@ -3172,7 +3172,7 @@ screens:
         label: Resume work order
         operation: resumeWorkOrder
         provenance: contract maintenance.yaml POST /work-orders/{workOrderId}/resume
-    - name: contextPanel
+    - name: partsPanel
       slot: selection
       components:
       - kind: dataTable
@@ -14411,7 +14411,7 @@ screens:
           (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type,
           group/individual, readiness and 1 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 64 §Filters
-      name: contentBody
+      name: filters
       slot: filters
     - components:
       - kind: metricTile
@@ -15456,7 +15456,7 @@ screens:
           (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status,
           expected return and 2 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 78 §Filters
-      name: contentBody
+      name: filters
       slot: filters
     - components:
       - kind: metricTile
@@ -15713,7 +15713,7 @@ screens:
         - Current duration
         notes: No rental read is bound; these are the pack's labels.
         provenance: pack Rental_Management.pdf, page 81
-    - name: contentBody
+    - name: fields
       slot: fields
       components:
       - kind: selectField
@@ -16485,7 +16485,7 @@ screens:
         notes: The pack filters this screen by venue, return location, product, expected return, rental
           status, damage status and 2 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 92 §Filters
-      name: contentBody
+      name: filters
       slot: filters
     - components:
       - kind: metricTile

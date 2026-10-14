@@ -1,0 +1,43 @@
+id: CHG-SCP-003
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Five staff-app screens named two of their regions alike (contentBody twice, or contextPanel twice); each
+  region name is now unique on its screen, named after its slot. The regions, their components and their order are
+  unchanged.'
+decision:
+  what: 'screens/P06-staff-app.yaml: EMP-071, EMP-081 and EMP-091 rename their filters region (slot filters) from
+    contentBody to `filters`; EMP-083 renames its fields region (slot fields) from contentBody to `fields`; EMP-005
+    renames its second contextPanel (the parts reserved for the task) to `partsPanel`. Where the repeated name was
+    contentBody the first is renamed, not the second as the default ruling reads, because
+    tools/derive-wireframes.py renders the region named contentBody and with two it took the last: keeping the last
+    as contentBody leaves every derived wireframe exactly as it is drawn today (the approved UI is fixed).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+  S-DUP-REGION (R253) had 5 members on P06 (none on P04), 0 after. Ruling (the lead, 14 October 2026, "go with your
+  recommendation"): region names unique per screen. A region name is an identifier in the record, not text on the
+  screen.'
+keys_touched:
+  screens:
+  - EMP-005
+  - EMP-071
+  - EMP-081
+  - EMP-083
+  - EMP-091
+  other:
+  - S-DUP-REGION
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-STAFF-EMP-005 (#28662)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCP, 14 October 2026. EMP-071 to EMP-100 (the rental boards on the staff app) are not in Block A.'
