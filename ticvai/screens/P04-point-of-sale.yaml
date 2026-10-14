@@ -757,11 +757,11 @@ screens:
     trigger: onAction
   - operationId: getWorkstationHealth
     contract: tenancy
-    purpose: getWorkstationHealth
+    purpose: 'Whether the till and its peripherals are well before the shift opens'
     trigger: onLoad
   - operationId: listDenominations
     contract: shift
-    purpose: listDenominations
+    purpose: 'The notes and coins the opening float is counted in'
     trigger: onLoad
   entryState:
     params:
@@ -1978,7 +1978,7 @@ screens:
     - listProducts
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: 'Put a product, with its date, session or seats, in the sale''s cart'
     trigger: onAction
     invalidates:
     - listProducts
@@ -4341,7 +4341,7 @@ screens:
     trigger: onLoad
   - operationId: listDenominations
     contract: shift
-    purpose: listDenominations
+    purpose: 'The notes and coins the drawer is counted in, blind'
     trigger: onLoad
   - operationId: rejectShiftVariance
     contract: shift
@@ -5452,7 +5452,7 @@ screens:
     trigger: onAction
   - operationId: listSerialisedItems
     contract: inventory
-    purpose: listSerialisedItems
+    purpose: 'The serialised items a return takes back, found by serial'
     trigger: onLoad
   - operationId: issueCreditMemo
     contract: finance
@@ -7835,7 +7835,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: 'Put a menu item, with its modifiers, in the basket'
     trigger: onAction
   - operationId: evaluatePromotions
     contract: promotions
@@ -8385,7 +8385,7 @@ screens:
     trigger: onAction
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: 'Put a scanned or chosen item in the basket'
     trigger: onAction
   - operationId: evaluatePromotions
     contract: promotions

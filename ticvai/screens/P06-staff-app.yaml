@@ -13355,7 +13355,7 @@ screens:
     trigger: onAction
   - operationId: logColdChain
     contract: fnb
-    purpose: logColdChain
+    purpose: 'The temperature a chilled delivery arrived at, and what was decided about it'
     trigger: onAction
   - operationId: getStockTransfer
     contract: inventory
@@ -13761,11 +13761,11 @@ screens:
     trigger: onAction
   - operationId: logTemperature
     contract: fnb
-    purpose: logTemperature
+    purpose: 'Record a food-safety temperature check, in range or not'
     trigger: onAction
   - operationId: signCorrectiveAction
     contract: fnb
-    purpose: signCorrectiveAction
+    purpose: 'Say what was done about a food-safety finding, and put a name to it'
     trigger: onAction
   - operationId: getHaccpStatus
     contract: fnb
@@ -14133,7 +14133,7 @@ screens:
   apis:
   - operationId: listSerialisedItems
     contract: inventory
-    purpose: listSerialisedItems
+    purpose: 'Where each serialised item is, found by serial or status'
     trigger: onLoad
   - operationId: lookupMerchandise
     contract: retail
