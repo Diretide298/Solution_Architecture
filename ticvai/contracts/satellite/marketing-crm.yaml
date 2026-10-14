@@ -24942,6 +24942,7 @@ components:
       - isInternal
       - authorKind
       - recordedAt
+      - caseId
       properties:
         resolution:
           type: string
@@ -24980,6 +24981,12 @@ components:
           format: date-time
           readOnly: true
           description: Server time the message arrived.
+        caseId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: marketing.case
+          description: The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`).
     LoyaltyProgramme:
       x-ticvai-persistence: marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier
       type: object

@@ -197,6 +197,11 @@ NEW_PROPS = [
     ("fnb", "TableVisit", "note",
      "type: string\nmaxLength: 500\nnullable: true\nreadOnly: true\n"
      "description: The server's note on the visit (`updateTableVisit`)."),
+    # CHG-STO-016: a case's message keys its case (createCase writes the opening message; the relationship graph's
+    # case_id was nullable and undeclared by any field, so the message sat at the tenant root a venue cannot write)
+    ("marketing-crm", "CaseMessage", "caseId",
+     "type: string\nformat: uuid\nreadOnly: true\nx-ticvai-references: marketing.case\n"
+     "description: The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`)."),
     ("finance", "JournalEntry", "postingDate",
      "type: string\nformat: date\nnullable: true\nreadOnly: true\n"
      "description: The accounting day the entry posts on, in the region's time zone (`createJournalEntry`)."),
@@ -248,6 +253,8 @@ def main() -> int:
         except LookupError as e:
             print("  !", e)
             bad += 1
+    # a message always has its case (CHG-STO-016)
+    n += c.add_required("marketing-crm", "CaseMessage", "caseId") != "="
     for oid, path, key, value in FIELD:
         try:
             how, where = place(c, ops, oid, path, key, value)

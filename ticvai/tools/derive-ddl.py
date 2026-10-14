@@ -306,6 +306,7 @@ ROW_OWNER = {
     # a second protected candidate, and the rule picked the one protected first, which is not the row's owner: a line,
     # a cell, a point or an option is its parent's (the table it is the rows of); the other key names what it is about.
     "access.entry_rule_point": "admission_rules_id",          # a rule's points; the access point is where
+    "assets.media_collection_member": "collection_id",        # a collection's member rows; the asset is what is in it
     "fnb.menu_item": "menu_section_id",                       # CHG-STO-004: the section's item; the variant is reported as
     "fnb.menu_item_modifier": "item_id",                      # a menu item's attachment of a (tenant) modifier group
     "fnb.substitution_rule": "recipe_id",                     # a recipe's rule; the ingredients are what it swaps

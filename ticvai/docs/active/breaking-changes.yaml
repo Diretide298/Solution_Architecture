@@ -586,3 +586,28 @@ changes:
     tag: r6
     producer-tickets: [SVC-MARKETING-GUEST-1]
     consumer-tickets: [APP-WEB-WEB-024, APP-MOB-GST-073]
+  # BC-280 and BC-281 (CHG-STO-015, Block A storage audit, batch STO): CookieScanPolicy.frequency listed `off` unquoted,
+  # which YAML reads as the boolean false, so the enum the wire carried was [daily, weekly, monthly, false] and
+  # derive-ddl could give the column no CHECK (ST-ENUM-CHECK). Quoted, it is the string "off" the field always meant.
+  - id: BC-280
+    contract: marketing-crm
+    operation: setCookieScanPolicy
+    change: "`frequency`"
+    reason: >-
+      The value was never the boolean false: `off` is the fourth scan frequency, and a client sending false or the
+      string "off" saw the same field; the enum now says "off". No consumer is built (APP-SETUP-CMS-025 not started).
+      Block A audit before r6, class check-contract-storage/ST-ENUM-CHECK (CHG-STO-015).
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-MARKETING-CONSENT-24]
+    consumer-tickets: [APP-SETUP-CMS-025, APP-SETUP-CMS-025-REST]
+  - id: BC-281
+    contract: marketing-crm
+    operation: listCookieScanPolicies
+    change: "`items[].frequency`"
+    reason: >-
+      As BC-280: the response's `frequency` enum is the string "off", not the boolean false (CHG-STO-015).
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-MARKETING-CONSENT-23]
+    consumer-tickets: [APP-SETUP-CMS-025, APP-SETUP-CMS-025-REST]
