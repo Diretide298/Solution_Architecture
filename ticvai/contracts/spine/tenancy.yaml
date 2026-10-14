@@ -536,19 +536,7 @@ paths:
           description: Health
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  score: { type: integer }
-                  status: { type: string, enum: [healthy, warning, degraded, offline] }
-                  contributors:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        factor: { type: string, enum: [heartbeatAge, deviceOffline, deviceBattery, firmwareOutdated, syncBacklog, errorRate, profileDrift] }
-                        detail: { type: string }
-                        weight: { type: integer }
+              schema: { $ref: '#/components/schemas/WorkstationHealth' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -6216,6 +6204,24 @@ components:
           $ref: '#/components/schemas/DeploymentProfile'
         edgeNodeId: { type: string, format: uuid, nullable: true }
         isActive: { type: boolean, default: true }
+
+    WorkstationHealth:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      description: >
+        `getWorkstationHealth`'s answer, named in the Block A audit (14 October 2026, CHG-SCP-011) so a screen
+        can bind it (POS-001's Workstation health panel); the shape is unchanged.
+      properties:
+        score: { type: integer }
+        status: { type: string, enum: [healthy, warning, degraded, offline] }
+        contributors:
+          type: array
+          items:
+            type: object
+            properties:
+              factor: { type: string, enum: [heartbeatAge, deviceOffline, deviceBattery, firmwareOutdated, syncBacklog, errorRate, profileDrift] }
+              detail: { type: string }
+              weight: { type: integer }
 
     WorkstationShiftOpenProblem:
       x-ticvai-persistence: "none — error shape"
