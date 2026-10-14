@@ -230,11 +230,11 @@
    "operations": 47
   },
   {
-   "contract": "tenancy",
+   "contract": "payments",
    "operations": 46
   },
   {
-   "contract": "payments",
+   "contract": "tenancy",
    "operations": 46
   },
   {
@@ -246,11 +246,11 @@
    "operations": 44
   },
   {
-   "contract": "workforce",
+   "contract": "maintenance",
    "operations": 41
   },
   {
-   "contract": "maintenance",
+   "contract": "workforce",
    "operations": 41
   },
   {

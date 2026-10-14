@@ -61,11 +61,11 @@
    "operations": 3
   },
   {
-   "contract": "promotions",
+   "contract": "catalogue",
    "operations": 1
   },
   {
-   "contract": "catalogue",
+   "contract": "promotions",
    "operations": 1
   },
   {

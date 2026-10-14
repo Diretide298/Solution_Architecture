@@ -74,11 +74,11 @@
    "operations": 22
   },
   {
-   "contract": "identity",
+   "contract": "workforce",
    "operations": 14
   },
   {
-   "contract": "workforce",
+   "contract": "identity",
    "operations": 14
   },
   {
@@ -118,11 +118,11 @@
    "operations": 5
   },
   {
-   "contract": "tenancy",
+   "contract": "venue-map",
    "operations": 2
   },
   {
-   "contract": "venue-map",
+   "contract": "tenancy",
    "operations": 2
   },
   {

@@ -13,7 +13,7 @@ decision:
     (the project-bible copies are under repos/ too, emptied the same way, and differ in three files).'
   by: Chinmay
   date: '2026-10-15'
-why: 'The r6 rehearsal pull of r6-candidate c56b9dc4 (audit/rehearsal/rehearsal-summary.md, lead workspace) failed its
+why: 'The r6 rehearsal pull of r6-candidate c56b9dc4 (the r6 rehearsal summary (lead workspace), lead workspace) failed its
   dead-link criterion (CHG-GRD-003): 36 links on 18 tickets could not be found, all to repos/ticvai-docs/setup/{README,
   quickstart,dependencies}.md, which git tracks (so check-ticket-links TL-DEAD-LINK, CHG-GRD-001, passed) but ADAM''s
   release export empties. Before: check-ticket-links on c56b9dc4 judged by the export, 36 TL-DEAD-LINK; after, 0.'

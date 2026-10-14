@@ -17,7 +17,7 @@ decision:
     tasks.csv changes.'
   by: Chinmay
   date: '2026-10-15'
-why: 'The r6 rehearsal pull of r6-candidate c56b9dc4 (audit/rehearsal/rehearsal-summary.md, lead workspace) moved 5 of
+why: 'The r6 rehearsal pull of r6-candidate c56b9dc4 (the r6 rehearsal summary (lead workspace), lead workspace) moved 5 of
   Tanmay''s Block A tickets to people other than Narayan, against the lead''s words of CHG-PPL-001 ("tanmay is leaving so
   shift all tasks to narayan"): pinned_owners pins tasks only, so the app-modules he led were worked out again (whoever
   carries the most points); AM-TICKETING-P08-BLOCK-A #28171 and TEST-AM-TICKETING-P08-BLOCK-A #28196 are planned for
@@ -74,5 +74,5 @@ notes: 'Batch GT3 (r6 fix round 3). This completes CHG-PPL-001 (same decision, s
   have moved the same way. Tension, for the lead: in OpenProject #28196 (TEST-AM-TICKETING-P08-BLOCK-A) is held by
   Narayan, who builds most of that module, until New full-stack developer 2 has an account (the plan''s owner);
   the next apply after that moves it. op-release.rb could not be run here (no Ruby): the rule was counted with a
-  simulation of the assign phase (scratchpad audit/fix/GT3/tanmay_count.py). The rehearsal tooling should treat
+  simulation of the assign phase (scratchpad the batch count script (lead workspace)). The rehearsal tooling should treat
   placeholder names as having no account.'

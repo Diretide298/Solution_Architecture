@@ -385,6 +385,27 @@ def pinned_owners(team, rebalance=False, bundle_path=None):
                   + (f" ({handed} handed to the successor of someone who left: team.json successors)" if handed else ""))
 
 
+def handed_leads(team, bundle_path=None):
+    """{key: successor} for every pushed app-module (Feature) the last release gave someone who has left (team.json
+    `successors`, CHG-PPL-001; CHG-GT3-002). pinned_owners pins tasks only: an app-module's lead is worked out again
+    at every release (whoever carries the most of its points), so on 15 October r6 handed two of Tanmay Dukhande's
+    app-modules to other people. The lead's words were "shift all tasks to narayan": a leaver's pushed app-module goes
+    to the successor, like their tasks; every other app-module's lead is worked out as before."""
+    path = Path(bundle_path) if bundle_path else ROOT / "handoff" / "service-docs" / "op-release.json"
+    try:
+        b = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    succ = successors(team)
+    back = {v: k for k, v in (b.get("aliases") or {}).items()}
+    out = {}
+    for t in b.get("tickets") or []:
+        who = back.get(t.get("assignee"), t.get("assignee"))
+        if t.get("type") == "Feature" and who in succ:
+            out[t["key"]] = succ[who]
+    return out
+
+
 def successors(team):
     """team.json `successors` (CHG-PPL-001, 15 October 2026): a person who left -> the person who took their place,
     followed to the end of a chain (A left for B, then B for C: A's work is C's)."""

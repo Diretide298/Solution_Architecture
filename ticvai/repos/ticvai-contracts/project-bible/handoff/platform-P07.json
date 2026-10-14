@@ -43,11 +43,11 @@
    "operations": 2
   },
   {
-   "contract": "accreditation",
+   "contract": "orders",
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "accreditation",
    "operations": 1
   }
  ],

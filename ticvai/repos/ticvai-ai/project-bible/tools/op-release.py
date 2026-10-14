@@ -24,6 +24,8 @@ The bundle holds:
                and its comment; and (1 October) the service and app epics and features the sprint plan replaced
                with Block epics and app-module features (regroup: rejected once nothing is under them)
   unexplained  pushed tickets that left the plan with no reason in op-retire.py: listed, never touched
+  successors   team.json `successors` in OpenProject names (a person who left -> who took their place): a New
+               ticket's field still on a leaver goes to the successor when the plan's person has no account yet
 
 **Pointer bodies (C7).** OpenProject holds who, when, state and order; the package, served by ADAM at a release
 tag, holds what. A ticket's description becomes a pointer: a one-line summary, its key, the artefact ids it
@@ -87,6 +89,17 @@ OP_NAME = assign_sync.OP_NAME                   # plan name -> OpenProject name 
 _EXTRA = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
 # screen -> the decided sentence its tickets carry (block-a-extra-tasks.json `screenNotes`, CHG-RONEP-001, CHG-FXP-002)
 SCREEN_NOTES = (json.loads(_EXTRA.read_text(encoding="utf-8")).get("screenNotes") or {}) if _EXTRA.exists() else {}
+
+
+def successors_op() -> dict:
+    """team.json `successors` (CHG-PPL-001) in OpenProject names: a person who left -> the person who took their place.
+    op-release.rb hands a New ticket's assignee or accountable that is still someone who left to the successor when the
+    plan's person has no OpenProject account yet (a hire to come), where it used to leave the field as it was: on
+    15 October the r6 rehearsal found two of Tanmay Dukhande's tickets the plan gives New full-stack developer 2 that
+    would have stayed his (CHG-GT3-002)."""
+    sp = _load("sprint_plan", "sprint_plan.py")
+    team_ = json.loads((ROOT / "docs" / "active" / "team.json").read_text(encoding="utf-8"))
+    return {OP_NAME.get(a, a): OP_NAME.get(b, b) for a, b in sorted(sp.successors(team_).items())}
 
 
 def pushed(mp):
@@ -301,7 +314,7 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
         "release": release, "project": push.PROJECT, "field": push.PRIORITY_NO,
         "statuses": {"new": 1, "on_hold": 13, "rejected": 14},
         "reopen_marker": REOPEN_MARKER,
-        "author": "Chinmay Parab", "aliases": OP_NAME,
+        "author": "Chinmay Parab", "aliases": OP_NAME, "successors": successors_op(),
         "markers": {"pointer": POINTER_PREFIX, "release": RELEASE_PREFIX, "comment": COMMENT_MARKER},
         "comment": comment(release),
         "sprint_versions": sprint_versions,

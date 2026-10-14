@@ -418,6 +418,18 @@ if rel_run?("assign")
   rel_say "sprint versions not there yet (set once the create phase makes them): #{lost.join(', ')}" if lost.any?
   noted = Journal.where(journable_type: "WorkPackage", journable_id: wps.keys)
                  .where("notes LIKE ?", "%#{ASSIGN_MARKER}%").pluck(:journable_id).to_set
+  # **A field still on someone who left goes to their successor** (the bundle's `successors`, team.json, CHG-PPL-001;
+  # CHG-GT3-002). A New ticket the plan gives a person with no account yet (a hire to come) kept the field as it was,
+  # so a leaver's ticket stayed the leaver's: the r6 rehearsal found two of Tanmay Dukhande's. Until the planned person
+  # has an account, the successor holds it.
+  left = B["successors"] || {}
+  handed = Hash.new(0)
+  hand_on = lambda do |planned, current|
+    next planned if planned || current.nil? || !left.key?(current.name)
+    s = find_user.call(left[current.name])
+    handed["#{current.name} -> #{s.name}"] += 1 if s
+    s
+  end
   change, notes, moves = {}, [], Hash.new(0)
   tickets.each do |t|
     id = all_ids[t["key"]]
@@ -425,6 +437,10 @@ if rel_run?("assign")
     next unless w
     a = find_user.call(t["assignee"])
     r = find_user.call(t["responsible"])
+    if w.status_id == NEW_ID
+      a = hand_on.call(a, w.assigned_to)
+      r = hand_on.call(r, w.responsible)
+    end
     vid = version_of.call(t)
     v = vid && versions.key?(vid) ? vid : nil
     want = {}
@@ -443,6 +459,8 @@ if rel_run?("assign")
       notes << [id, t["key"], w.status.name, text]
     end
   end
+  rel_say "fields still on someone who left, handed to the successor (the plan's person has no account yet): " +
+          handed.map { |m, n| "#{n} #{m}" }.join(", ") if handed.any?
   n_of = lambda { |k| change.values.count { |x| x.key?(k) } }
   rel_say "New tickets to change: #{change.size} (assignee #{n_of.call(:assigned_to_id)}, accountable " \
       "#{n_of.call(:responsible_id)}, sprint #{n_of.call(version_col)}); started tickets that get a comment: #{notes.size}" +

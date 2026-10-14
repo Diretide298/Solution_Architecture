@@ -4053,6 +4053,9 @@ def main() -> int:
                 + "; ".join(parts_) + ".")
 
     block_end = {}
+    # A pushed app-module the last release gave someone who left goes to their successor, not to whoever now carries
+    # the most of it (team.json successors; CHG-GT3-002, the lead: "shift all tasks to narayan").
+    handed_leads = {} if "--rebalance" in sys.argv[1:] else sp.handed_leads(team)
     for t_ in tasks:
         if t_["type"] != "Feature":
             continue
@@ -4074,6 +4077,8 @@ def main() -> int:
         sp_ = span([x["key"] for x in ch])
         t_["points"] = pts
         t_["assignee"] = "" if t_["key"] in ai_phase2 else lead_of.get(t_["key"], "")   # phase 2: no lead (CHG-R4-006)
+        if t_["key"] in handed_leads and t_["key"] in kmap and t_["assignee"]:
+            t_["assignee"] = handed_leads[t_["key"]]    # a leaver's app-module is the successor's (CHG-GT3-002)
         t_["accountable"] = t_["assignee"]
         t_["area"] = {"P08": "VM", "P01": "WEB", "P02": "MOB", "P04": "POS", "P15": "POS"}.get(a["platform"], a["platform"])
         when = (f"planned Sprint {sp_[0]}" + (f" to Sprint {sp_[1]}" if sp_[1] != sp_[0] else "")

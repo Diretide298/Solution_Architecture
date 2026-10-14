@@ -18,13 +18,19 @@ OpenProject id, kind and id; viewer/api/load_links.py), against the plan and the
     TL-DEAD-LINK       a link resolves to nothing at HEAD: an operation `contract#operationId` no contract has, a
                        table neither in the schema reference nor a read view the lineage declares
                        (audit_guard.read_views), a screen not in screens/, an ADR with no docs/adr file, a `file`
-                       git does not track, a service service-decomposition.json does not have, or a kind ADAM has
-                       no lookup for.
+                       git does not track or ADAM's release export leaves out, a service
+                       service-decomposition.json does not have, or a kind ADAM has no lookup for.
     TL-REHEARSAL       docs/active/release-runbook.md section 4 does not hold the rehearsal pull as the gate step
                        before the tag (CHG-GRD-003; audit plan step 11a): a local ADAM on `r<N>-rc` with the stand-in
                        OpenProject, every block ticket pulled with the shipped connector, compared with the last live
                        pull, passing only with 0 pull errors, `r<N>` on every ticket, 0 tickets with nothing linked
                        and 0 dead links. The checks read the package; only a pull reads what a developer gets.
+
+**15 October 2026** (the r6 rehearsal pull, batch GT3, CHG-GT3-001): 36 links on 18 SETUP tickets named
+`repos/ticvai-docs/setup/*.md`, files git tracks and this passed, but ADAM serves a tag from an export that empties
+every `repos/<repo>/<dir>/` but the folders it keeps (viewer/lib/releases.mjs exportRule), so the pull found nothing.
+A `file` link now resolves only if the export keeps it, judged by the export's own list, viewer/lib/export-keep.json,
+which releases.mjs reads too: the two cannot drift. Without that file this fails rather than guess.
 
 Every finding is strict: it fails whether or not the baseline lists it, and is never written into it. A planned Block
 A ticket with no OpenProject id yet (made at the next apply) and a pushed one the plan no longer has (op-retire
@@ -49,6 +55,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
 
 DOCS = g.ROOT / "handoff" / "service-docs"
+# What ADAM's release export keeps under repos/<repo>/ (viewer/lib/releases.mjs reads the same file).
+EXPORT_KEEP = g.ROOT.parent / "viewer" / "lib" / "export-keep.json"
 BLOCK = "BLOCK-A"
 TICKET_TYPES = ("Feature", "Task")
 # Kinds adam_pull pulls as a file (lookupFor in viewer/mcp/tools.mjs). `adr` is listed, never pulled.
@@ -161,7 +169,16 @@ def block_tickets(rows: dict, bundle: dict | None) -> tuple:
 
 
 # ------------------------------------------------------------------------------------------------- the package
-def package_index() -> dict:
+def exported(rel: str, keep: dict) -> bool:
+    """Whether ADAM's release export keeps a package path (viewer/lib/releases.mjs exportRule): everything outside
+    repos/, a file at a repo's top, and under repos/<repo>/ only the folders `every_repo` or `per_repo[<repo>]` name."""
+    parts = rel.split("/")
+    if parts[0] != "repos" or len(parts) < 4:
+        return True
+    return parts[2] in (keep.get("every_repo") or []) or parts[2] in ((keep.get("per_repo") or {}).get(parts[1]) or [])
+
+
+def package_index(keep: dict) -> dict:
     ops, contracts = set(), set()
     for stem, _rel, doc in g.contracts():
         contracts.add(stem)
@@ -181,6 +198,7 @@ def package_index() -> dict:
                                 encoding="utf-8").stdout or "").split("\0")) - {""}
     if not files:       # an export of a commit (git archive), outside git: what it holds is what the commit tracks
         files = {p.relative_to(g.ROOT).as_posix() for p in g.ROOT.rglob("*") if p.is_file()}
+    files = {p for p in files if exported(p, keep)}       # ADAM serves the export, not the tree
     adrs = {f"ADR-{p.split('/')[-1][:4]}" for p in files
             if p.startswith("docs/adr/") and p.split("/")[-1][:4].isdigit() and p.endswith(".md")}
     dec = g.load_json(g.ROOT / "handoff" / "service-decomposition.json", {}) or {}
@@ -214,6 +232,13 @@ def self_test() -> list:
         {"key": "1", "kind": "operation", "id": "access#listPasses"},
         {"key": "1", "kind": "operation", "id": "access#listPasses"},        # a repeat is one finding at most
     ]
+    keep = {"every_repo": [".github", "openapi"], "per_repo": {"ticvai-docs": ["setup"]}}
+    for rel, want_kept in (("contracts/access.yaml", True), ("repos/ticvai-docs/README.md", True),
+                           ("repos/ticvai-docs/setup/README.md", True), ("repos/ticvai-ai/openapi/a.yaml", True),
+                           ("repos/ticvai-ai/project-bible/setup/README.md", False),
+                           ("repos/ticvai-backend/setup/README.md", False)):
+        if exported(rel, keep) != want_kept:
+            fails.append(f"exported({rel}) is {not want_kept}, expected {want_kept} (viewer/lib/releases.mjs exportRule)")
     got = findings(block, ids, links, idx)
     nothing = sorted(k for r, k, _ in got if r == "TL-NOTHING-LINKED")
     dead = sorted(k for r, k, _ in got if r == "TL-DEAD-LINK")
@@ -261,6 +286,11 @@ def main() -> int:
         print("FAIL - handoff/service-docs/tasks.csv or adam-links.json is missing: run build-service-docs.py and "
               "adam-links.py")
         return 1
+    keep = g.load_json(EXPORT_KEEP, None)
+    if not isinstance(keep, dict) or not keep.get("every_repo"):
+        print(f"FAIL - {EXPORT_KEEP} is missing or unreadable: without ADAM's export keep-list a file link cannot be "
+              f"judged against what ADAM serves")
+        return 1
     rows = {r["key"]: r for r in csv.DictReader(tasks.open(encoding="utf-8"))}
     bundle = g.load_json(DOCS / "op-release.json", None)
     ids = {k: v for k, v in (g.load_json(DOCS / "pms-map.json", {}) or {}).items()
@@ -270,7 +300,7 @@ def main() -> int:
             ids.setdefault(k, v)
     links = (g.load_json(links_file, {}) or {}).get("links") or []
     block, gone = block_tickets(rows, bundle)
-    for rule, key, msg in findings(block, ids, links, package_index()):
+    for rule, key, msg in findings(block, ids, links, package_index(keep)):
         guard.add(rule, key, msg, strict=True)
     book = g.ROOT / "docs" / "active" / "release-runbook.md"
     for rule, key, msg in rehearsal_findings(book.read_text(encoding="utf-8") if book.is_file() else ""):

@@ -241,13 +241,14 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `inventory` — 23 tables
+## `games` — 23 tables
 
-**Root: `inventory.inventory_item`**  ·  own 13 · reach 20 · out 2
+**Root: `games.game`**  ·  own 6 · reach 6 · out 3
 
-- **1 step from the root** — `count_line`, `goods_receipt_line`, `kit_component`, `movement`, `purchase_order_line`, `quotation_line`, `requisition_line`, `serialised_item`, `stock_batch`, `stock_earmark`, `stock_level`, `transfer_line`
+- **1 step from the root** — `gameplay_transaction`, `operational_config`, `play`, `pricing`, `pricing_exception`, `reader`
+- **2 steps from the root** — `reader_deployment`, `reader_sync_status`
 
-- **Reaches the root through nothing** — `count`, `daily_count_list`, `goods_receipt`, `location`, `purchase_order`, `quotation`, `requisition`, `supplier`, `supplier_contract`, `transfer`
+- **Reaches the root through nothing** — `attraction_type`, `authorisation`, `card`, `card_expiry_rules`, `credit_ledger`, `entitlement`, `kiosk_config`, `prize`, `prize_cost`, `reader_profile`, `redemption`, `redemption_line`, `redemption_rules`, `validation_rules`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -262,14 +263,13 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `games` — 23 tables
+## `inventory` — 23 tables
 
-**Root: `games.game`**  ·  own 6 · reach 6 · out 3
+**Root: `inventory.inventory_item`**  ·  own 13 · reach 20 · out 2
 
-- **1 step from the root** — `gameplay_transaction`, `operational_config`, `play`, `pricing`, `pricing_exception`, `reader`
-- **2 steps from the root** — `reader_deployment`, `reader_sync_status`
+- **1 step from the root** — `count_line`, `goods_receipt_line`, `kit_component`, `movement`, `purchase_order_line`, `quotation_line`, `requisition_line`, `serialised_item`, `stock_batch`, `stock_earmark`, `stock_level`, `transfer_line`
 
-- **Reaches the root through nothing** — `attraction_type`, `authorisation`, `card`, `card_expiry_rules`, `credit_ledger`, `entitlement`, `kiosk_config`, `prize`, `prize_cost`, `reader_profile`, `redemption`, `redemption_line`, `redemption_rules`, `validation_rules`
+- **Reaches the root through nothing** — `count`, `daily_count_list`, `goods_receipt`, `location`, `purchase_order`, `quotation`, `requisition`, `supplier`, `supplier_contract`, `transfer`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -358,6 +358,16 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
+## `tenancy` — 8 tables
+
+**Root: `tenancy.device_firmware`**  ·  own 1 · reach 1 · out 1
+
+- **1 step from the root** — `device_rollout`
+
+- **Reaches the root through nothing** — `data_retention_setting`, `device_assignment`, `device_audit`, `device_credential`, `device_tamper_event`, `device_telemetry`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
 ## `venuemap` — 8 tables
 
 **Root: `venuemap.map`**  ·  own 5 · reach 7 · out 4
@@ -366,16 +376,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **2 steps from the root** — `visit_plan_item`
 
 - **Reaches the root through nothing** — `visit_plan`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
-## `tenancy` — 8 tables
-
-**Root: `tenancy.device_firmware`**  ·  own 1 · reach 1 · out 1
-
-- **1 step from the root** — `device_rollout`
-
-- **Reaches the root through nothing** — `data_retention_setting`, `device_assignment`, `device_audit`, `device_credential`, `device_tamper_event`, `device_telemetry`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 

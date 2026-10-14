@@ -12,7 +12,7 @@ decision:
     (the others keep 28 September).'
   by: Chinmay
   date: '2026-10-14'
-why: 'The r6 rehearsal pull of r6-candidate c56b9dc4 (audit/rehearsal/rehearsal-summary.md, lead workspace): both left
+why: 'The r6 rehearsal pull of r6-candidate c56b9dc4 (the r6 rehearsal summary (lead workspace), lead workspace): both left
   Block A with status New -> New and links 4 -> 0, because the plan had dropped them (CHG-GT1-004 kept the two setup
   screens as one whole-screen task each) and op-retire.py had no reason for them, so the apply lists them as
   unexplained and never touches them. Before: 2 unexplained in the r6 bundle''s retire input; after: both retired as

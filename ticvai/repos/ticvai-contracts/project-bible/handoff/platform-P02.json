@@ -183,15 +183,15 @@
    "operations": 7
   },
   {
+   "contract": "wallet",
+   "operations": 6
+  },
+  {
    "contract": "resources",
    "operations": 6
   },
   {
    "contract": "finance",
-   "operations": 6
-  },
-  {
-   "contract": "wallet",
    "operations": 6
   },
   {
