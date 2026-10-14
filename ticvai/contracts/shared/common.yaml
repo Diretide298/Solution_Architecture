@@ -709,6 +709,15 @@ components:
             property carries `x-ticvai-unique` naming its scope, and `detail` names the code and the
             record already holding it. Returned through the shared `DuplicateCode` response, or listed
             beside the operation's own types where one `409` has several causes.
+        segregation-breach:
+          status: 409
+          title: Breaches a segregation rule
+          when: A permission set or a grant would leave one role or one principal holding both permissions of a
+            `SegregationRule` whose `severity` is `block` (decided 14 October 2026, ADAM CR-079; CHG-IDR-003).
+            `detail` names the rule, both permissions and, where a parent role's edit is refused, the child role
+            that inherits it. One type with one status wherever the rule is checked (`createRole`,
+            `setRolePermissions`, `setPrincipalModuleAccess`, `createDelegatedAccess`, `createPrincipal`);
+            `requireApproval` and `warn` never refuse.
         server-error:
           status: 500
           title: Server error

@@ -1,0 +1,82 @@
+id: CHG-IDR-001
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'createRole and updateRole are called at the tenant scope, as setRolePermissions always was (breaking in
+  declaration, BC-076 and BC-077); listRoles, listPrincipals and getPrincipal say what a venue-scoped caller sees, and
+  BO-054 and BO-106 show roles read-only to a venue-scoped ROLE_MANAGE.'
+decision:
+  what: 'contracts/spine/identity.yaml: createRole and updateRole x-ticvai-scope-level venue -> tenant, each with a
+    paragraph saying why; listRoles says a venue-scoped caller reads every tenant role, read-only, and that create,
+    rename and permission edits need ROLE_MANAGE at the tenant scope; listPrincipals (which had no description) and
+    getPrincipal say any staff grant may read identity.principal, USER_MANAGE is checked at the caller''s scope, the
+    list is the principals homed at or beneath a node the caller''s USER_MANAGE reaches, scopePath narrows it, a path
+    outside it is 403 and a principal outside it is 404. docs/active/breaking-changes.yaml BC-076 (createRole) and
+    BC-077 (updateRole), approver Chinmay, tag r6. screens/P08: BO-054''s role table, permission checklist, Create
+    role and Save role permissions say a venue-scoped ROLE_MANAGE sees them read-only (controls disabled, naming the
+    tenant scope), and its emptyNoAccess says so; BO-106''s role table is read-only; BO-053''s staff table says what a
+    venue manager lists. tools/applied/identity-roles-14-october.py sets the lineage scope of createRole and updateRole
+    to tenant (derive-lineage never updates an existing entry).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-076 (ticket 27764, SVC-IDENTITY-ADMINISTRATION-1), audited 14 October 2026: listRoles, listPrincipals and
+  createRole were venue-scope operations on tables under apply_tenant_rls (tenant_root_in_scope() USING and WITH CHECK,
+  backend 920 lines 177-212, 1148-1152), so a venue caller read nothing and createRole''s insert was refused.
+  setRolePermissions was already tenant (tenancy.yaml:446), setCapabilityTemplate and setSegregationRules tenant
+  (identity.yaml:545, 617), roles are tenant-wide by decision (Role.code x-ticvai-unique tenant, audit R108), and
+  ROLE_MANAGE needs MFA (R135). The lead''s decision: open SELECT on role, role_permission, capability_template and
+  segregation_rule to venue grants and on principal to any staff grant (batch GEN adds x-ticvai-rls and the
+  derive-ddl rule), keep role writes at the tenant root, and move createRole and updateRole to the tenant scope as a
+  breaking change in declaration.'
+keys_touched:
+  screens:
+  - BO-053
+  - BO-054
+  - BO-106
+  operations:
+  - createRole
+  - updateRole
+  - listRoles
+  - listPrincipals
+  - getPrincipal
+  tables:
+  - identity.role
+  - identity.role_permission
+  - identity.principal
+  files:
+  - contracts/spine/identity.yaml
+  - screens/P08-venue-back-office.yaml
+  - docs/active/breaking-changes.yaml
+  - handoff/api-data-lineage.json
+  - tools/applied/identity-roles-14-october.py
+root_class: A23 AUTH-SCOPE
+tickets:
+  started:
+  - SVC-IDENTITY-ADMINISTRATION-1 (#27764)
+  unstarted:
+  - SVC-IDENTITY-ADMINISTRATION-2 (#27765)
+  - VM-IDENTITY-ADMINISTRATION-1 (#27949)
+  - APP-SETUP-BO-054 (#27938)
+  - APP-SETUP-BO-054-REST (#28289)
+  - APP-CONSOLE-ADM-021 (#29068)
+  - VM-BO-053 (#29045)
+  - VM-BO-106 (#29003)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-076
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
+  IDR, branch cr/076-077-079-identity-roles. The prevention is batch GEN''s: the x-ticvai-rls rule in
+  tools/derive-ddl.py (read-beneath / grant-holder-read) and its check joining an operation''s lineage scope level
+  with the 920 policy class; the lead sets prevention.ref to that check''s file at the merge. This batch adds no
+  x-ticvai-rls. check-contract-compat compares neither x-ticvai-scope-level nor 4xx codes, so it reports BC-076 and
+  BC-077 as matching no breaking change; they are recorded so the producer and consumer tickets move together at r6.
+  27764 is started, so its ticket text is not rewritten: the lead comments on it and links a delta (ticvai/CLAUDE.md
+  rule 6). The other tickets are listed as unstarted from the lead''s brief, which names only 27764 as started.
+  Details chosen where the decision left them open: a venue manager lists principals homed at or beneath the venue
+  (the existing scopePath text: "every principal the caller''s USER_MANAGE scope reaches"); a principal outside it is
+  404, as common.yaml not-found says.'

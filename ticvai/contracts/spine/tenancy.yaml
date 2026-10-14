@@ -429,6 +429,16 @@ paths:
         **Refused where it breaches a `SegregationRule`.** The refusal names the rule and the two
         permissions in conflict — a venue told only *not allowed* will grant it another way.
 
+        **The role-time check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). Every rule is evaluated
+        against the role's own permissions (this body) united with those of `inheritsFromRoleId`, **whatever
+        the rule's `scopeSensitive`**: a role's permissions are granted together at one scope, so a pair
+        inside a role always overlaps. Only `severity: block` refuses, with `409 segregation-breach`
+        (`common.yaml`), the one type and status every segregation check answers with; `requireApproval`
+        and `warn` are accepted and surface when a grant attaches the role and in `listSegregationViolations`.
+        **A parent role's edit re-checks every role that inherits from it** (its own set united with the new
+        one); a breach there refuses this call too, naming the child role. Each change writes one
+        `platform.audit_record` row in the same transaction.
+
         **No escalated permission** (decided 28 September, audit R197): a role's permission set has
         no value to set a threshold on, and an escalation that repeated `ROLE_MANAGE` gated nothing.
         The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a
@@ -480,7 +490,9 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
           description: >
-            **Breaches a segregation rule.** Names the rule and both permissions.
+            **Breaches a segregation rule** whose severity is `block`, in this role or in a role inheriting
+            it (`segregation-breach`). Names the rule, both permissions and the role where they meet.
+          x-ticvai-problem-types: [segregation-breach]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
