@@ -1678,7 +1678,7 @@ function drawPersonChanges(name, mine) {
   for (const c of list) {
     const row = el('div', 'tk-p-ticket');
     const which = keys.has(String(c.childTicket || '')) ? `filed as #${c.childTicket}` : `raised on #${c.ticket}`;
-    row.append(link('/changes.html', 'tk-key', c.id), el('span', 'tk-subject', c.title),
+    row.append(link(`/changes.html?cr=${encodeURIComponent(c.id)}`, 'tk-key', c.id), el('span', 'tk-subject', c.title),
       el('span', 'tk-badge tk-badge-open', c.status), el('span', 'tk-p-when', which));
     wrap.append(row);
   }

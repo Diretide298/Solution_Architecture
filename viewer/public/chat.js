@@ -195,7 +195,7 @@ function showDraft(made) {
       const filed = await auth.fileDraft(auth.project(), code);
       box.replaceChildren(el('div', 'chat-who', 'Filed'));
       const link = el('a', 'chat-link', `${filed.change.id} — ${filed.change.title}`);
-      link.href = `/changes.html?project=${encodeURIComponent(auth.project() ?? '')}`;
+      link.href = `/changes.html?project=${encodeURIComponent(auth.project() ?? '')}&cr=${encodeURIComponent(filed.change.id)}`;
       box.append(link);
     } catch (error) {
       said.textContent = error.message;
