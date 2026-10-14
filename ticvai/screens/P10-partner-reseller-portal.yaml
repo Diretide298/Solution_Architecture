@@ -1259,7 +1259,8 @@ screens:
   pattern: listDetail
   patternReason: '`listChannelCapacities` reads the population and `getChannelAllocations` reads one of
     them — list, select, act'
-  purpose: See inventory & allocation view for this venue.
+  purpose: 'A partner sees the capacity allocated to its channel for each performance and the orders sold
+    against it, and returns unsold allocation to the general pool.'
   layout:
     template: split
     regions:
@@ -1905,7 +1906,8 @@ screens:
   density: compact
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select, act'
-  purpose: Add booking creation for this venue.
+  purpose: 'A partner books against its allocation: creates the order, then holds, resumes, modifies,
+    exchanges, reschedules or reprints it.'
   layout:
     template: split
     regions:
@@ -2298,7 +2300,8 @@ screens:
   pattern: listDetail
   patternReason: '`listSeatBlocks` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Work with group / bulk booking for this venue.
+  purpose: 'A partner blocks seats for a group, issues them from the block, and releases what the group
+    does not take back to sale.'
   layout:
     template: split
     regions:
@@ -2512,7 +2515,8 @@ screens:
   pattern: listDetail
   patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list, select,
     act'
-  purpose: Work with cart & quote for this venue.
+  purpose: 'A partner builds a cart, sees the promotions that apply and their usage, changes its lines, and
+    turns it into an order.'
   layout:
     template: split
     regions:
@@ -3171,7 +3175,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getB2bCredit` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: See credit limit & balance for this venue.
+  purpose: 'A partner sees its credit position: the limit, what it has used and what remains to book
+    against.'
   layout:
     template: detail
     regions:
@@ -3473,7 +3478,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrderStatement` reads one of them — list,
     select, act'
-  purpose: Find order history for this venue.
+  purpose: 'A partner reads its orders with their statements and refunds, and acts on one: modify,
+    exchange, reschedule, hold, resume or reprint.'
   layout:
     template: split
     regions:
@@ -3877,7 +3883,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrderRefunds` reads the population and `getOrder` reads one of them — list, select,
     act'
-  purpose: Work with voucher / ticket download for this venue.
+  purpose: 'A partner reprints or resends the vouchers and tickets of an order, beside the order, its
+    statement and its refunds.'
   layout:
     template: split
     regions:

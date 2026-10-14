@@ -422,7 +422,8 @@ screens:
   - Dashboards Board.dc.html#sup-002
   pattern: listDetail
   patternReason: '`listCases` reads the population and `getCase` reads one of them — list, select, act'
-  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  purpose: 'The support agent''s home: the cases and conversations waiting, filtered by status, assignee,
+    priority and breached SLA, the agents'' availability, and the actions on the selected case.'
   layout:
     template: split
     regions:
@@ -1540,7 +1541,8 @@ screens:
   pattern: listDetail
   patternReason: '`listMessageTemplates` reads a population and nothing reads one of them; the detail
     is the row until a `get` exists'
-  purpose: Find canned response management for this venue.
+  purpose: 'Support keeps the canned responses agents reuse: every message template by channel, and a new
+    one when a reply recurs.'
   layout:
     template: split
     regions:

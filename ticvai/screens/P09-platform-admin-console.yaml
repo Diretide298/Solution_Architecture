@@ -808,7 +808,9 @@ screens:
   pattern: listDetail
   patternReason: '`listTenants` reads the population and `getEntitlementUsage` reads one of them — list,
     select, act'
-  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  purpose: 'The platform operator''s home: every tenant with its status and plan, the cells it runs in, its
+    licence position and its usage against licensed limits, and the way into every other console screen.
+    Read-only; nothing is changed from here.'
   layout:
     template: split
     regions:
@@ -1332,7 +1334,9 @@ screens:
   pattern: listDetail
   patternReason: '`listAiInteractions` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Find platform audit log for this venue.
+  purpose: 'Read what happened on the platform: the audit records of who did what, where and when, and
+    every AI interaction with its prompt, response and outcome, filtered by principal, outcome and date,
+    inside the tenant the operator holds a grant into.'
   layout:
     template: split
     regions:
