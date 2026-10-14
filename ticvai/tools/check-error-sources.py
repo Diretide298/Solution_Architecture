@@ -21,6 +21,20 @@ error side of that convention; batch GEN's `check-cross-module-reads` covers the
     E-QUERY         an `x-ticvai-read-via` entry names a query no contract declares in `x-ticvai-queries`, or a route
                     the query does not serve (in-process, service, projection)
 
+**A refusal must also be able to end** (CHG-GDL-003, the lead's follow-up to CR-084). A query that names the states
+it counts (`states: {model, blocking, waitsOnActor}`) and the projection that answers it (`projection: {context,
+table, source, feeds, exitsWithoutEvent}`) is checked against its state model, the event catalogue and the lineage:
+
+    E-STUCK         a blocking state has no exit nobody has to take (a `timer` or `job` transition), and the query
+                    does not say in `waitsOnActor` why only a person may end it: a pending checkout the guest
+                    abandoned blocked deleteGuestAccount for ever
+    E-UNFED         the projection can miss a change: (a) a feeds event is not catalogued or has no consumer of the
+                    projecting context that writes the projection table; (b) a transition into or out of the
+                    blocking set neither emits a feeds event nor runs an operation that emits one, and is not in
+                    `exitsWithoutEvent` with its reason (key `from->to:operation|trigger`); (c) an operation writes
+                    the source table and touches who it belongs to (reads or writes a `pii.*` table) without
+                    emitting a feeds event: linkGuestCheckout attached guest-checkout orders to an account silently
+
 **An entity** is one of the records in ENTITIES below (`order`, `entitlement`, `shift`, `variant`, ...), each named with
 the table that holds it; its owner is the service whose schemas hold that table (handoff/service-decomposition.json),
 and the operation's module is its lineage `service`. A few phrases where the word is not the entity ("in order to",
@@ -42,6 +56,8 @@ RULES = {
     "E-PROBLEM-TYPE": "a 4xx naming another module's entity declares x-ticvai-problem-types (ADAM CR-084)",
     "E-READ-VIA": "a 4xx naming another module's entity has an x-ticvai-read-via to that module's query (ADAM CR-084)",
     "E-QUERY": "an x-ticvai-read-via names a declared x-ticvai-queries entry and a route it serves",
+    "E-STUCK": "a state a declared query counts as blocking has a timer or job exit, or says who ends it (CHG-GDL-003)",
+    "E-UNFED": "a projection-served query's projection hears of every change that moves a record in or out (CHG-GDL-003)",
 }
 ROUTES = ("in-process", "service", "projection")
 
@@ -128,6 +144,111 @@ def queries(service_of_contract):
     return out
 
 
+def query_specs():
+    """[('<contract>#<query>', spec)] for every declared query."""
+    out = []
+    for stem, _rel, doc in g.contracts():
+        for q, spec in ((doc or {}).get("x-ticvai-queries") or {}).items():
+            if isinstance(spec, dict):
+                out.append(("%s#%s" % (stem, q), spec))
+    return out
+
+
+def event_catalogue():
+    out = {}
+    for f in sorted((g.ROOT / "events").glob("*.yaml")):
+        if f.name.startswith("_"):
+            continue
+        e = g.load_yaml(f) or {}
+        if e.get("name"):
+            out[e["name"]] = e
+    return out
+
+
+def emitted_by_op(evs):
+    """operationId -> {event names} from events' emittedBy and operations' x-ticvai-emits."""
+    out = {}
+    for n, e in evs.items():
+        for o in e.get("emittedBy") or []:
+            out.setdefault(str(o).split(".")[-1], set()).add(n)
+    for oid, o in g.operations().items():
+        em = o["op"].get("x-ticvai-emits") or []
+        for n in (em if isinstance(em, list) else [em]):
+            out.setdefault(oid, set()).add(str(n))
+    return out
+
+
+def check_lifecycle(guard, lin):
+    """E-STUCK and E-UNFED over every query that declares `states` and/or `projection`."""
+    evs = event_catalogue()
+    emits = emitted_by_op(evs)
+    for qid, spec in query_specs():
+        st = spec.get("states") if isinstance(spec.get("states"), dict) else None
+        pr = spec.get("projection") if isinstance(spec.get("projection"), dict) else None
+        model, blocking = None, set()
+        if st:
+            path = g.ROOT / str(st.get("model") or "")
+            model = g.load_yaml(path) if path.is_file() else None
+            if not model:
+                guard.add("E-STUCK", "%s|model" % qid, "%s: states.model %s is not a state model" % (qid, st.get("model")))
+            blocking = {str(s) for s in st.get("blocking") or []}
+        trans = [t for t in (model or {}).get("transitions") or [] if isinstance(t, dict)]
+        if model:
+            known = {t.get("from") for t in trans} | {t.get("to") for t in trans} | set(model.get("initial") or [])
+            waits = st.get("waitsOnActor") or {}
+            for s in sorted(blocking):
+                if s not in known:
+                    guard.add("E-STUCK", "%s|%s" % (qid, s), "%s: blocking state %s is not in %s" % (qid, s, st["model"]))
+                    continue
+                if any(t.get("from") == s and t.get("trigger") in ("timer", "job") for t in trans):
+                    continue
+                if str(waits.get(s) or "").strip():
+                    continue
+                guard.add("E-STUCK", "%s|%s" % (qid, s),
+                          "%s: blocking state %s has no timer or job exit and waitsOnActor gives no reason: a record "
+                          "left there blocks the refusal for ever" % (qid, s))
+        if not pr:
+            continue
+        ctx, table, source = str(pr.get("context") or ""), str(pr.get("table") or ""), str(pr.get("source") or "")
+        feeds = {str(f) for f in pr.get("feeds") or []}
+        # (a) every feed is catalogued and has the projecting consumer.
+        for f in sorted(feeds):
+            e = evs.get(f)
+            if not e:
+                guard.add("E-UNFED", "%s|feed|%s" % (qid, f), "%s: projection feed %s is not in the event catalogue" % (qid, f))
+            elif not [c for c in e.get("consumers") or [] if str(c.get("context")) == ctx
+                      and table in (c.get("writes") or [])]:
+                guard.add("E-UNFED", "%s|feed|%s" % (qid, f),
+                          "%s: %s has no %s consumer that writes %s" % (qid, f, ctx, table))
+        # (b) every transition across the blocking boundary reaches the projection.
+        excused = {str(k): v for k, v in (pr.get("exitsWithoutEvent") or {}).items() if str(v or "").strip()}
+        for t in trans:
+            a, b = str(t.get("from")), str(t.get("to"))
+            if (a in blocking) == (b in blocking):
+                continue
+            how = str(t.get("operation") or t.get("trigger") or "")
+            if feeds & set(t.get("emits") or []) or feeds & emits.get(str(t.get("operation") or ""), set()):
+                continue
+            key = "%s->%s:%s" % (a, b, how)
+            if key in excused:
+                continue
+            guard.add("E-UNFED", "%s|%s" % (qid, key),
+                      "%s: %s moves a record %s the blocking set and no event the projection consumes says so "
+                      "(emit one of feeds, or list it in exitsWithoutEvent with the reason)"
+                      % (qid, key, "out of" if a in blocking else "into"))
+        # (c) a writer of the source that changes whom it belongs to emits a feed.
+        for oid, e in sorted(lin.items()):
+            if source not in (e.get("writes") or []):
+                continue
+            if not [x for x in (e.get("reads") or []) + (e.get("writes") or []) if str(x).startswith("pii.")]:
+                continue
+            if feeds & emits.get(oid, set()):
+                continue
+            guard.add("E-UNFED", "%s|writer|%s" % (qid, oid),
+                      "%s: %s writes %s and touches pii.* (whom the record belongs to) without emitting any of %s"
+                      % (qid, oid, source, ", ".join(sorted(feeds))))
+
+
 def main() -> int:
     g.force_utf8()
     guard = g.Guard("check-error-sources", RULES)
@@ -185,6 +306,7 @@ def main() -> int:
                 guard.add("E-READ-VIA", "%s|%s" % (oid, c),
                           "%s %s names %s and has no x-ticvai-read-via to a query of %s"
                           % (oid, c, named, ", ".join(missing)))
+    check_lifecycle(guard, lin)
     guard.note("%d entity words; %d declared queries" % (len(vocab), len(declared)))
     return guard.finish()
 

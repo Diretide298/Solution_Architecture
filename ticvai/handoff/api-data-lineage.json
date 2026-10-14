@@ -4927,7 +4927,8 @@
   "writes": [
    "cache:idempotency",
    "orders.sales_order",
-   "pii.subject"
+   "pii.subject",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -4942,7 +4943,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "fixNote": "14 October 2026 (ADAM CR-084, CHG-GDL-003): each attached order is announced as order.linkedToGuest through the outbox in the attaching transaction (ADR-0033), which Identity's identity.subject_holding consumes"
  },
  "deleteGuestAccount": {
   "contract": "identity",

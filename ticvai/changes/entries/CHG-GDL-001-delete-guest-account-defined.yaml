@@ -127,7 +127,8 @@ notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: 
   deadlines[].responseDays (PrivacyRequest.dueAt); Identity does not read them, so it is always null for now.
 
 
-  OPEN FOR THE LEAD: (a) a pending order with no payment attempt never leaves pending (states/order.yaml has no
+  OPEN FOR THE LEAD (14 October, later: the lead decided (a), (b) and the subject_id index in CHG-GDL-003 and deferred
+  (d)): (a) a pending order with no payment attempt never leaves pending (states/order.yaml has no
   timer out of pending), so an abandoned checkout blocks the guest''s erasure under the decided rule; (b)
   linkGuestCheckout attaches guest-checkout orders to the account without an event, so those orders and their
   entitlements reach the projection only through later order events; (c) exportSubjectData still reads four marketing.*

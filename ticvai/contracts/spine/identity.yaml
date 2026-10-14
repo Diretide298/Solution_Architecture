@@ -2535,6 +2535,13 @@ paths:
         **Only orders whose contact detail matches the now-verified identifier.** Attaching on an unverified
         claim would hand someone else''s booking history to whoever asked for it.
 
+
+        **Each attached order is announced as `order.linkedToGuest`** (ADAM CR-084, decided 14 October 2026,
+        CHG-GDL-003), one event per order with its `subjectId` and current status, written to `platform.outbox`
+        in the attaching transaction (ADR-0033). Identity''s projection identity.subject_holding consumes it, so an
+        attached order and the entitlements issued from it block `deleteGuestAccount` like any other the guest
+        holds; without it a guest could erase an account holding a valid ticket bought before registering.
+
         '
       tags:
       - guestAuth
@@ -7316,8 +7323,11 @@ components:
 
 
         **Fed by** (each event file lists the identity consumer): `order.created` (a `pending` row, when the
-        order names a subject), `order.paid` (`paid`), `order.completed` (`completed`), `order.cancelled`
-        (`voided`), `order.lapsed` (`failed`, or `voided` when a parked sale expired), `order.refunded`
+        order names a subject, or with no subject yet for a guest checkout), `order.linkedToGuest` (the subject
+        set on a guest-checkout order's row and its entitlements' rows when `linkGuestCheckout` attaches it,
+        CHG-GDL-003), `order.paid` (`paid`), `order.completed` (`completed`), `order.cancelled`
+        (`voided`), `order.lapsed` (`failed`, or `voided` when the payment window passed or a parked sale
+        expired), `order.refunded`
         (`refunded` or `partiallyRefunded`, and the refunded lines' entitlement rows `cancelled`),
         `entitlement.issued` (an `issued` row with `validTo`), `entitlement.voided` (`cancelled`),
         `entitlement.transferred` (the row moves to the new holder), `entitlement.reissued` (the old row
@@ -7330,12 +7340,19 @@ components:
         **The rules are the owners'**: `orders#openOrdersForSubject` (open = `pending`, `held`,
         `partiallyPaid`, `paid`) and `access#liveEntitlementsForSubject` (live = `issued` or
         `partiallyConsumed` with `validTo` ahead), declared in their contracts with `served: [projection]`.
-      required: [subjectId, holdingKind, holdingId, status, updatedAt]
+      required: [holdingKind, holdingId, status, updatedAt]
       properties:
         subjectId:
           type: string
           format: uuid
-          description: The guest who holds it (`pii.subject`).
+          nullable: true
+          # A declared reference, so the derived DDL gives subject_id its foreign key and its index: the erasure
+          # check and the export look rows up by subject (CHG-GDL-003). pii.subject is tombstoned, never deleted.
+          x-ticvai-references: pii.subject
+          description: The guest who holds it (`pii.subject`). Null only for a guest-checkout order, and the
+            entitlements issued from it, not yet attached to an account; `order.linkedToGuest` sets it. The table
+            is under subject row-level security, so a row with no subject is seen only by a tenant-root session,
+            which is how the event consumers run.
         holdingKind:
           type: string
           enum: [order, entitlement]

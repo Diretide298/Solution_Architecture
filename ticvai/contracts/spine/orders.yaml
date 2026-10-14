@@ -105,8 +105,20 @@ x-ticvai-queries:
       `paid`: not yet paid, or paid and not yet fulfilled. `completed`, `voided`, `refunded`, `partiallyRefunded` and
       `failed` are not open (ADAM CR-084, CHG-GDL-001).
     served: [projection]
-    # projection: Identity's identity.subject_holding, fed by order.created, order.paid, order.completed,
-    # order.cancelled, order.lapsed, order.refunded and guest.merged (each lists the identity consumer).
+    # Machine-read by tools/check-error-sources.py (CHG-GDL-003): E-STUCK (a blocking state has an exit nobody has to
+    # take) and E-UNFED (every way into or out of the blocking set reaches the projection by an event it consumes).
+    states:
+      model: states/order.yaml
+      blocking: [pending, held, partiallyPaid, paid]
+      waitsOnActor:
+        partiallyPaid: money was captured, so only a person may end it (createPayment for the balance, or createRefund);
+          a timer that dropped it would strand the guest's money, and blocking the erasure until then is right
+    projection:
+      context: identity
+      table: identity.subject_holding
+      source: orders.sales_order
+      feeds: [order.created, order.paid, order.completed, order.cancelled, order.lapsed, order.refunded,
+              order.linkedToGuest, guest.merged]
 paths:
   /carts:
     post:
@@ -22167,7 +22179,8 @@ components:
           nullable: true
           readOnly: true
           description: When a held order expires and is voided (states/order.yaml), from `holdOrder`'s
-            `holdUntil`. Null on an order not currently held.
+            `holdUntil`, or the venue's next business-day cut-off (`VenueSettings.businessDayCutoff`) when the
+            cashier sent none (CHG-GDL-003). Null on an order not currently held.
         createdAt:
           type: string
           format: date-time

@@ -29,7 +29,10 @@ transitions:
 - from: held
   to: voided
   trigger: timer
-  guard: Hold expired. A till that accumulates parked sales cannot be closed
+  guard: Hold expired. A till that accumulates parked sales cannot be closed. Expired is `Order.heldUntil` passed,
+    which is holdOrder's `holdUntil` or, when the cashier sent none, the venue's next business-day cut-off
+    (VenueSettings.businessDayCutoff, CHG-R6-032), so a parked sale nobody comes back for still lapses (ADAM CR-084,
+    CHG-GDL-003)
   emits:
   - order.lapsed
 - from: pending
@@ -71,6 +74,19 @@ transitions:
   guard: Nothing captured. A void before payment is not a refund and must not post one
   emits:
   - order.cancelled
+- from: pending
+  to: voided
+  trigger: timer
+  guard: 'Payment window passed with nothing captured (ADAM CR-084, CHG-GDL-003). The window is the one the order''s
+    capacity is already held for: the latest `expiresAt` of the holds checkout carried over to the order (set by the
+    narrowest ReservationHoldPolicy where one matches, else VenueSettings.cartLeaseSeconds, default 900 seconds, audit
+    R169; extended only by extendCart), or, for an order that holds no capacity, `createdAt` plus
+    VenueSettings.cartLeaseSeconds. An order with an active payment link lapses when the link expires
+    (PaymentLink.expiresAt) instead. Never while a payment against it is pendingConfirmation (inquirePaymentStatus may
+    still capture it). MoM 1 Sep 4.11 releases the hold to inventory when payment is not completed; the order now
+    lapses with it, so an abandoned checkout stops blocking the guest''s erasure'
+  emits:
+  - order.lapsed
 - from: paid
   to: refunded
   operation: createRefund
@@ -96,6 +112,9 @@ transitions:
   guard: Partial value returned
   isReversal: true
   requiresApproval: true
+  # order.refunded's emittedWhen already says partiallyRefunded; the emit was missing (CHG-GDL-003, E-UNFED).
+  emits:
+  - order.refunded
 - from: completed
   to: partiallyRefunded
   operation: createRefund
@@ -103,6 +122,8 @@ transitions:
   guard: Partial value returned after fulfilment
   isReversal: true
   requiresApproval: true
+  emits:
+  - order.refunded
 - from: partiallyRefunded
   to: refunded
   operation: createRefund

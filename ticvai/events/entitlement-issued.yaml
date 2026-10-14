@@ -66,9 +66,11 @@ consumers:
   onFailure: retry
   isCritical: false
 - context: identity
-  purpose: Record the entitlement in identity.subject_holding (subjectId, status issued, validTo, orderId, orderLineId), so
-    deleteGuestAccount refuses while a live entitlement remains without reading access.entitlement (Identity is
-    Foundation and reads nothing above it, ADR-0028) (ADAM CR-084, CHG-GDL-001)
+  purpose: Record the entitlement in identity.subject_holding (subjectId, status issued, validTo, orderId, orderLineId)
+    when it names a subject or its order already has a row there (a guest checkout, recorded without a subject until
+    order.linkedToGuest attaches it), so deleteGuestAccount refuses while a live entitlement remains without reading
+    access.entitlement (Identity is Foundation and reads nothing above it, ADR-0028) (ADAM CR-084, CHG-GDL-001,
+    CHG-GDL-003)
   writes:
   - identity.subject_holding
   idempotencyKey: entitlementId

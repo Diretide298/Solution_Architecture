@@ -1,0 +1,126 @@
+id: CHG-GDL-003
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'Nothing a guest holds can block their erasure for ever or change hands unheard: a pending order lapses when its
+  payment window passes and a parked sale without holdUntil lapses at the business-day cut-off (both emit order.lapsed),
+  linkGuestCheckout announces every order it attaches as order.linkedToGuest, which Identity''s projection consumes,
+  and identity.subject_holding.subject_id is a declared reference, so it is indexed. check-error-sources gains E-STUCK
+  and E-UNFED for the class.'
+decision:
+  what: '(1) states/order.yaml gains pending -> voided (timer, emits order.lapsed) when the payment window passes. The
+    window reuses what already holds the order''s capacity: the latest expiresAt of the holds checkout carried over
+    (ReservationHoldPolicy where one matches, else VenueSettings.cartLeaseSeconds, default 900 s, audit R169), or
+    createdAt + VenueSettings.cartLeaseSeconds for an order holding no capacity. An order with a live payment link
+    lapses at PaymentLink.expiresAt instead. Nothing lapses while a payment is pendingConfirmation. held -> voided
+    already had a timer: Order.heldUntil now falls back to the venue''s next business-day cut-off
+    (VenueSettings.businessDayCutoff, CHG-R6-032) when holdOrder got no holdUntil. partiallyPaid stays without a timer,
+    because the guest''s money was captured and only a person may end it (recorded as waitsOnActor). The two partial-refund
+    transitions now emit order.refunded, which its emittedWhen already said. (2) linkGuestCheckout announces each
+    attached order as the new event order.linkedToGuest (orderId, subjectId, status), declared in the event''s
+    emittedBy, with platform.outbox added to its lineage. Identity''s consumer sets the subject on the order''s
+    identity.subject_holding row and on the rows of the entitlements issued from it. order.created and
+    entitlement.issued now record guest-checkout orders and their entitlements with no subject yet, so
+    SubjectHolding.subjectId is nullable. (4) SubjectHolding.subjectId declares x-ticvai-references: pii.subject. The
+    package has no x-ticvai-index; derive-ddl indexes every declared reference, so the forward migration gets
+    subject_holding_subject_id_fkey and subject_holding_subject_id_idx. Gap (3), createDsarRequest taking no
+    requestId, is deferred by the lead and unchanged.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-084, the lead''s follow-up decision of 14 October 2026 on CHG-GDL-001''s open items (a), (b) and the
+  index. (a) states/order.yaml had no transition out of pending except createPayment and voidOrder, so an abandoned
+  checkout blocked erasure for ever. holdOrder''s holdUntil is optional, so a parked sale could do the same. The
+  existing windows are VenueSettings.cartLeaseSeconds (tenancy.yaml, audit R169), ReservationHoldPolicy
+  (setReservationHoldPolicy, MoM 1 Sep 4.11: the hold is released when payment is not completed) and
+  VenueSettings.businessDayCutoff (CHG-R6-032). (b) linkGuestCheckout wrote orders.sales_order and pii.subject with no
+  event (handoff/api-data-lineage.json), so identity.subject_holding never learned that an attached order and its
+  tickets belong to the guest. (4) deleteGuestAccount and exportSubjectData look holdings up by subject.'
+keys_touched:
+  operations:
+  - linkGuestCheckout
+  - holdOrder
+  - deleteGuestAccount
+  tables:
+  - identity.subject_holding
+  - orders.sales_order
+  schemas:
+  - SubjectHolding
+  - Order
+  files:
+  - states/order.yaml
+  - events/order-linkedToGuest.yaml
+  - events/order-lapsed.yaml
+  - events/order-created.yaml
+  - events/entitlement-issued.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/access.yaml
+  - handoff/api-data-lineage.json
+  - handoff/audit-baseline.json
+  - tools/applied/r6-cr084-delete-guest-account.py
+  - tools/check-error-sources.py
+  tickets:
+  - '30654'
+  other:
+  - event order.linkedToGuest (new)
+  - x-ticvai-queries states and projection blocks (orders#openOrdersForSubject, access#liveEntitlementsForSubject)
+root_class: A21 STATE-MODELS
+tickets:
+  started:
+  - '30654'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-084
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+
+
+  PREVENTION: tools/check-error-sources.py (already registered in run-checks.py by CHG-GDL-001) gains two rules over any
+  x-ticvai-queries entry that declares the states it counts and the projection that answers it:
+
+  - E-STUCK: every blocking state has a timer or job exit, or waitsOnActor says why only a person may end it.
+
+  - E-UNFED fails on three things. (a) A feed event is not catalogued, or has no consumer of the projecting context
+  that writes the projection table. (b) A transition into or out of the blocking set does not emit a feed (directly or
+  through its operation''s emittedBy) and is not listed in exitsWithoutEvent with a reason. (c) An operation writes the
+  source table and touches pii.* (whose record it is) without emitting a feed.
+
+  Both queries now carry those blocks: orders states/order.yaml blocking pending, held, partiallyPaid, paid; access
+  states/entitlement-status.yaml blocking issued, partiallyConsumed, with five exits listed and their reasons.
+
+  Run on the parent commit 2623c6d8 (CHG-GDL-001/002; states/order.yaml, identity.yaml and the lineage restored from
+  it, order-linkedToGuest.yaml removed, the new check and query blocks kept), it FAILS three ways: E-STUCK on
+  orders#openOrdersForSubject|pending; E-UNFED on the feed order.linkedToGuest not being catalogued; E-UNFED on writer
+  linkGuestCheckout. On this branch it PASSES.
+
+  Baselined, pre-existing: E-UNFED orders#openOrdersForSubject|writer|setCustomerGuestAccount. This is a drafted
+  BO-309 operation whose lineage writes orders.sales_order and reads pii.subject. If it really reassigns an order''s
+  customer it needs the same event. That is for whoever specifies it (its request schema says no table stores its
+  fields).
+
+  Why a check in check-error-sources, not check-states: a state with no timer exit is normal in most models (a draft
+  waits for its author). It is a defect only when a refusal waits on it, and only the query knows which states it
+  counts. A general "non-terminal state without an exit" rule already exists as check-states rule 3 (a state that
+  cannot reach a terminal one), and pending passed it.
+
+
+  The structured states/projection keys go beyond the r6 x-ticvai-queries shape (module, inputs, returns, rule,
+  served). Batch GEN''s query validation must allow them, or the two must agree on a home for them at the merge.
+
+  CONTRACT COMPATIBILITY: x-ticvai-emits on linkGuestCheckout was dropped because check-contract-compat counts a changed
+  x-ticvai-emits as breaking. The emit is declared in the event''s emittedBy, which W-OUTBOX and E-UNFED read.
+  SubjectHolding.subjectId becoming nullable touches only a never-returned schema added in r6.
+
+  [DB] The forward migration derive-ddl writes at the gate now holds the foreign key and index on subject_id beside the
+  table, the unique index and apply_subject_rls. A row with no subject is seen only by a tenant-root session, which is
+  how the consumers run.
+
+  TICKETS: the pending and held timers are run by the orders hold-expiry job, and holdOrder gains the heldUntil
+  default. I did not check whether the tickets that build them (holdOrder, the hold-expiry job, linkGuestCheckout) have
+  started. An unstarted ticket picks this up at r6 through its pointer body; a started one needs a comment and a linked
+  delta (ticvai/CLAUDE.md rule 6).'

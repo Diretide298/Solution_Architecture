@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""ADAM CR-084 (ticket 30654): what deleteGuestAccount and exportSubjectData read and write (14 October 2026, CHG-GDL-001..002).
+"""ADAM CR-084 (ticket 30654): what deleteGuestAccount, exportSubjectData and linkGuestCheckout read and write (14 October 2026, CHG-GDL-001..003).
 
 **The lineage said Identity read nothing it needed and wrote a table it cannot.** deleteGuestAccount refuses with 409
 while open orders or a live entitlement remain, and its lineage read only `pii.subject`; exportSubjectData read
@@ -49,6 +49,12 @@ LINEAGE = {
         "projection identity.subject_holding, not access.entitlement or orders.sales_order (ADR-0028); requestId is "
         "the approvals.request raised through createApprovalRequest; cross-region createDsarRequest, which writes "
         "platform.dsar_request, is called only when guestLinkId is set"),
+    # The lead's follow-up the same day (CHG-GDL-003): linkGuestCheckout announces each order it attaches.
+    "linkGuestCheckout": (
+        [], [],
+        ["platform.outbox"], [],
+        "14 October 2026 (ADAM CR-084, CHG-GDL-003): each attached order is announced as order.linkedToGuest through "
+        "the outbox in the attaching transaction (ADR-0033), which Identity's identity.subject_holding consumes"),
 }
 
 
@@ -67,7 +73,7 @@ def main() -> int:
             e["reads"], e["writes"], e["fixNote"] = reads, writes, why
             changed.append(op)
     if not changed:
-        print("nothing to do: both entries already read the projection and raise an approvals request")
+        print("nothing to do: every entry already carries its CR-084 change")
         return 0
     print("%s: %s" % ("changed" if apply else "would change (pass --apply)", ", ".join(changed)))
     if apply:
