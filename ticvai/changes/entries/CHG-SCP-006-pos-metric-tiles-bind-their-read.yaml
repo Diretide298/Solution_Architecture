@@ -1,0 +1,44 @@
+id: CHG-SCP-006
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Two POS metric tiles named no read: the Reports tile (gross, tickets, average basket) binds the terminal day
+  view runReport returns, and the Send to Kitchen tile (orders ahead, and the oldest) binds the kitchen queue.'
+decision:
+  what: 'screens/P04-point-of-sale.yaml: POS-008''s metric tile `operation: runReport`, `bindsTo: ReportResult` (the
+    seeded terminalDayView report the screen already runs, audit R282); POS-022''s metric tile `operation:
+    listKitchenTickets`, `bindsTo: KitchenTicket` (the queue the screen already lists). The tiles, their places and
+    their notes are unchanged. The other 26 P06 members are tiles on the rental twins EMP-071, EMP-081 and EMP-091,
+    copies of BO-544, BO-554 and BO-564 (batch SCR): no rental read computes most of them, and a rental
+    operations summary (proposed: rental getRentalOperationsSummary, one read for the checkout, active and return
+    command centres) is SCR''s to add with the P08 twins.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+  S-METRIC-NO-OP (R283) had 28 members on P04 and P06: 2 fixed here, 26 follow their P08 twins (batch SCR). Ruling
+  (the lead, 14 October 2026, "go with your recommendation"): a metric tile binds the read that computes it, or is
+  removed; the approved UI is fixed, so none is removed.'
+keys_touched:
+  screens:
+  - POS-008
+  - POS-022
+  operations:
+  - runReport
+  - listKitchenTickets
+  other:
+  - S-METRIC-NO-OP
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-008 (#28997)
+  - APP-POS-POS-022 (#28548)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCP, 14 October 2026.'

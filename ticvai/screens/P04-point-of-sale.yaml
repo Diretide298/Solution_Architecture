@@ -4573,6 +4573,8 @@ screens:
         operation: listReports
         provenance: contract reporting.yaml GET /reports
       - kind: metricTile
+        operation: runReport
+        bindsTo: ReportResult
         notes: Gross, tickets, average basket
         provenance: carried from the previous definition
       - kind: chart
@@ -8054,6 +8056,8 @@ screens:
         operation: listKitchenTickets
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: metricTile
+        operation: listKitchenTickets
+        bindsTo: KitchenTicket
         notes: Orders ahead, and the oldest. **A cashier quoting a wait needs the number the kitchen is
           actually working to.**
         provenance: carried from the previous definition
