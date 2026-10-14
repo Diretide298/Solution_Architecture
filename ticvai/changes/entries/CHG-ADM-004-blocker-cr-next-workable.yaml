@@ -1,0 +1,78 @@
+id: CHG-ADM-004
+date: '2026-10-14'
+source: cr
+kind: process
+summary: 'A blocker is always a CR: when the package blocks a ticket the agent raises a blocking CR, proposes the
+  ticket On hold naming it, never works around it, and takes the next ticket no open blocking CR affects, which ADAM
+  now works out per ticket on the board and the pull.'
+decision:
+  what: 'Agent behaviour: one BLOCKER_RULE sentence in the connector (adam_board, adam_draft_change, adam_pull and
+    adam_raise_change''s next step, the server''s instructions), the /ticket, /board, /cr and /done commands and both
+    CLAUDE.md starters: raise a CR with blocking true (draft, the person says yes, file), propose the ticket On hold
+    naming the CR (applied only after a yes), never work around it or build a guess, then take the next ticket no
+    open blocking CR affects (adam_board with only "workable", first in board order, naming the CR that holds back
+    each skipped ticket). Server: viewer/api/blockers.py works out the open blocking CRs that affect a ticket - a CR
+    blocks while blocking and open, or accepted and not in a served release; it affects the ticket it was raised
+    from (not its own child task), a ticket linked to one of its artefacts (target and artefact_ids; operations by
+    operationId), and a ticket whose operation reads or writes a table it names, by the served tree''s
+    handoff/api-data-lineage.json (cached by modification time; one query per board). /api/board/mine items carry
+    blockedBy, with workable and blocked counts and ?only=workable|blocked; /api/work-packages/{key} carries
+    blockedBy, which the pull shows as "Blocked by" above "Change requests on this ticket". ticvai/CLAUDE.md rule 18
+    and the developer brief say the same.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Lead decision, Chinmay, 14 October 2026, in his words: "if there is blocker we log it as CR always. and than
+  scour for next tasks that can be completed and if existing blockers effect it". At 602ce156 the starter CLAUDE.md
+  said to "offer" On hold and "Build whatever the question does not touch", the developer brief said "Carry on with
+  the rest of the ticket", and nothing told an agent which other tickets an open blocking CR affects, so finding the
+  next workable ticket was a guess. Follows CHG-ADM-002 (a settled CR reaches its ticket).'
+keys_touched:
+  files:
+  - viewer/api/blockers.py
+  - viewer/api/blockers-check.py
+  - viewer/api/main.py
+  - viewer/api/release-check.mjs
+  - viewer/mcp/tools.mjs
+  - viewer/mcp/server.mjs
+  - viewer/mcp/setup/starters/backend/.claude/commands/ticket.md
+  - viewer/mcp/setup/starters/backend/.claude/commands/board.md
+  - viewer/mcp/setup/starters/backend/.claude/commands/cr.md
+  - viewer/mcp/setup/starters/backend/.claude/commands/done.md
+  - viewer/mcp/setup/starters/backend/CLAUDE.md
+  - viewer/mcp/setup/starters/frontend/.claude/commands/ticket.md
+  - viewer/mcp/setup/starters/frontend/.claude/commands/board.md
+  - viewer/mcp/setup/starters/frontend/.claude/commands/cr.md
+  - viewer/mcp/setup/starters/frontend/.claude/commands/done.md
+  - viewer/mcp/setup/starters/frontend/CLAUDE.md
+  - CLAUDE.md
+  - docs/active/developer-brief.md
+  - tools/check-adam-blocker-rule.py
+  - tools/run-checks.py
+  tickets: []
+  other:
+  - CHG-ADM-002
+root_class: 'new: blocker-worked-around'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-adam-blocker-rule.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Choices where the instruction left a detail open: "accepted-not-yet-released" is an accepted CR whose resolved_ref
+  is not a release tag at or below the one served (no ref counts as not released); the lineage expansion is one way
+  (a ticket''s operations to the tables they read or write, matched against tables a CR names), because expanding
+  both sides would make every pair of operations that read a shared table block each other; a screen is not expanded
+  to the operations it calls; a CR does not block its own child task; ticvai/CLAUDE.md gets rule 18 (a new section)
+  so rules 1-17 keep their numbers; changes/README.md is not about agent behaviour and is unchanged. The new check
+  tools/check-adam-blocker-rule.py (BR-RULE, BR-WORKAROUND, BR-SERVER) was run on main at 602ce156: FAIL, 46 new
+  findings; on this branch: PASS. The matching is covered by viewer/api/blockers-check.py (10 cases on stand-in data;
+  the module does not exist on main) and viewer/api/release-check.mjs (94 pass, 9 new over HTTP: the board''s
+  blockedBy through a screen and through the lineage, a non-blocking CR blocking nothing, the counts, adam_board only
+  workable, the blocked column, the pull''s "Blocked by" section and next step, and a CR released or done blocking
+  nothing).'
