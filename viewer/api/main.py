@@ -4301,12 +4301,39 @@ class RateIn(BaseModel):
     note: str = Field(default="", max_length=200)
 
 
+# The currencies a rate, the default rate or a budget may be set in. A list
+# rather than free text, because free text is how "INR", "inr " and "Rs" become
+# three currencies that cannot be added, and the page then says it cannot total
+# a delivery that was only ever paid in one. Every one of these has two decimal
+# places, which is what "the smallest unit" means everywhere on this page; a
+# currency without (JPY) or with three (KWD) would need that rule rethought
+# before it is added here.
+CURRENCIES = ("INR", "USD", "EUR", "GBP", "AED", "SAR", "SGD")
+
+
+def _currency(value: str) -> str:
+    code = (value or "").strip().upper()
+    if code not in CURRENCIES:
+        raise HTTPException(
+            400, f"'{value}' is not a currency this page prices in. Pick one of "
+                 f"{', '.join(CURRENCIES)}.")
+    return code
+
+
 def _rate_row(row) -> dict:
     return {
         "id": row["id"], "person": row["person"],
         "hourly": row["hourly"], "currency": row["currency"],
         "note": row["note"], "setAt": row["set_at"],
     }
+
+
+def _default_rate(project: str) -> Optional[dict]:
+    row = db.one("SELECT * FROM default_rate WHERE project_id = ?", (project,))
+    if not row:
+        return None
+    return {"hourly": row["hourly"], "currency": row["currency"],
+            "note": row["note"], "setAt": row["set_at"]}
 
 
 @app.get("/api/rates")
@@ -4320,7 +4347,8 @@ def list_rates(project_id: str = Query(default=""),
     """
     project = _readable_project(reader, project_id)
     rows = db.all_rows("SELECT * FROM rate WHERE project_id = ? ORDER BY person", (project,))
-    return {"project": project, "rates": [_rate_row(r) for r in rows]}
+    return {"project": project, "rates": [_rate_row(r) for r in rows],
+            "default": _default_rate(project), "currencyChoices": list(CURRENCIES)}
 
 
 @app.put("/api/rates")
@@ -4330,12 +4358,13 @@ def set_rate(body: RateIn, admin: dict = Depends(require_admin)):
     person = body.person.strip()
     if not person:
         raise HTTPException(400, "Say whose rate this is.")
+    currency = _currency(body.currency)
     existing = db.one("SELECT id FROM rate WHERE project_id = ? AND person = ? COLLATE NOCASE",
                       (project, person))
     if existing:
         db.write("UPDATE rate SET hourly = ?, currency = ?, note = ?, set_by = ?, set_at = ? "
                  "WHERE id = ?",
-                 (body.hourly, body.currency.strip().upper(), body.note.strip(),
+                 (body.hourly, currency, body.note.strip(),
                   admin["id"], security.stamp(), existing["id"]))
         return {"ok": True, "id": existing["id"], "replaced": True}
     # Linked when an ADAM account plainly is this person. Display only: the
@@ -4346,9 +4375,50 @@ def set_rate(body: RateIn, admin: dict = Depends(require_admin)):
         "INSERT INTO rate (project_id, person, account_id, hourly, currency, note, set_by, set_at) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         (project, person, same["id"] if same else None,
-         body.hourly, body.currency.strip().upper(), body.note.strip(),
+         body.hourly, currency, body.note.strip(),
          admin["id"], security.stamp()))
     return {"ok": True, "replaced": False}
+
+
+class DefaultRateIn(BaseModel):
+    project_id: str = ""
+    hourly: int = Field(ge=0, le=100_000_00)
+    currency: str = Field(default="INR", max_length=8)
+    note: str = Field(default="", max_length=200)
+
+
+# Declared before `/api/rates/{rate_id}` on purpose: routes are matched in the
+# order they are written, and "default" would otherwise be taken for a rate id
+# and refused as not a number.
+@app.put("/api/rates/default")
+def set_default_rate(body: DefaultRateIn, admin: dict = Depends(require_admin)):
+    """The rate for anybody with hours and no rate of their own. Optional.
+
+    Zero is refused rather than stored: a default of nothing would turn every
+    unpriced person into a free one, which is the reading the page exists to
+    prevent. Removing the default is the way to say "no default".
+    """
+    project = _readable_project(admin, body.project_id)
+    if body.hourly <= 0:
+        raise HTTPException(400, "A default rate of nothing would price unpriced people "
+                                 "as free. Type an amount above zero, or remove the default.")
+    currency = _currency(body.currency)
+    db.write(
+        "INSERT INTO default_rate (project_id, hourly, currency, note, set_by, set_at) "
+        "VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(project_id) DO UPDATE SET "
+        "hourly = excluded.hourly, currency = excluded.currency, note = excluded.note, "
+        "set_by = excluded.set_by, set_at = excluded.set_at",
+        (project, body.hourly, currency, body.note.strip(), admin["id"], security.stamp()))
+    return {"ok": True, "default": _default_rate(project)}
+
+
+@app.delete("/api/rates/default")
+def drop_default_rate(project_id: str = Query(default=""),
+                      admin: dict = Depends(require_admin)):
+    project = _readable_project(admin, project_id)
+    if not db.change("DELETE FROM default_rate WHERE project_id = ?", (project,)):
+        raise HTTPException(404, "This project has no default rate to remove.")
+    return {"ok": True}
 
 
 @app.delete("/api/rates/{rate_id}")
@@ -4358,91 +4428,607 @@ def drop_rate(rate_id: int, admin: dict = Depends(require_admin)):
     return {"ok": True}
 
 
+# ── what the delivery was given to spend ─────────────────────────────
+#
+# Set on the costing page by an administrator, read by whoever reads the
+# costing. Append-only (see the table): a change is a new row and the history
+# is the answer to "was it always that much?", which is the first question
+# anybody asks of a page that says a delivery is over budget.
+
+
+class BudgetIn(BaseModel):
+    project_id: str = ""
+    # The smallest unit, as `rate.hourly`. Bounded only to keep a typo of a few
+    # extra zeros from being stored as a plan; ten trillion rupees is not one.
+    amount: int
+    currency: str = Field(default="INR", max_length=8)
+    note: str = Field(default="", max_length=300)
+
+
+BUDGET_CEILING = 10_000_000_000_000_00
+
+
+def _budget_history(project: str) -> list:
+    """Every budget this project has had, newest first, each with what it replaced."""
+    rows = db.all_rows(
+        "SELECT b.*, a.name AS by_name, a.email AS by_email FROM budget b "
+        "LEFT JOIN account a ON a.id = b.set_by WHERE b.project_id = ? ORDER BY b.id",
+        (project,))
+    out, before = [], None
+    for row in rows:
+        out.append({
+            "id": row["id"], "amount": row["amount"], "currency": row["currency"],
+            "note": row["note"], "setAt": row["set_at"],
+            "setBy": row["by_name"] or row["by_email"] or "",
+            "from": ({"amount": before["amount"], "currency": before["currency"]}
+                     if before else None),
+        })
+        before = row
+    out.reverse()
+    return out
+
+
+@app.get("/api/budget")
+def get_budget(project_id: str = Query(default=""),
+               reader: dict = Depends(require_reader)):
+    """The budget in force and every one before it. Read as the costing is read."""
+    project = _readable_project(reader, project_id)
+    history = _budget_history(project)
+    return {"project": project, "budget": history[0] if history else None,
+            "history": history, "currencyChoices": list(CURRENCIES)}
+
+
+@app.put("/api/budget")
+def set_budget(body: BudgetIn, admin: dict = Depends(require_admin)):
+    """Set the project's budget. A new row every time; nothing is overwritten."""
+    project = _readable_project(admin, body.project_id)
+    if body.amount <= 0:
+        raise HTTPException(400, "A budget has to be more than nothing. Type an amount above zero.")
+    if body.amount > BUDGET_CEILING:
+        raise HTTPException(400, "That budget is larger than any delivery this page was made "
+                                 "for; check for extra zeros.")
+    currency = _currency(body.currency)
+    db.write("INSERT INTO budget (project_id, amount, currency, note, set_by, set_at) "
+             "VALUES (?, ?, ?, ?, ?, ?)",
+             (project, body.amount, currency, body.note.strip(), admin["id"], security.stamp()))
+    history = _budget_history(project)
+    return {"ok": True, "budget": history[0], "history": history}
+
+
+# ── dated hours ──────────────────────────────────────────────────────
+#
+# **Time entries when the token may read them, the tickets when it may not.**
+# A time entry says who spent an hour and on which day, which is what a cost
+# by sprint and by week needs. OpenProject shows them only to a role with "View
+# time entries"; without it the read is a 403, and the costing falls back to
+# each ticket's `spentTime` grouped by the ticket's sprint. The reply says which
+# (`hoursSource`), because the two answer slightly different questions: the
+# entries put an hour in the sprint it was *spent* in and against the person
+# who *logged* it, the fallback in the sprint the ticket is *planned* in and
+# against whoever *holds* the ticket now.
+#
+# Held beside the project read and stamped with its `asOf`, so the hours and
+# the tickets on one page are always from the same read: a new project read
+# makes the held entries stale and the next costing request reads them again.
+# Behind the request, like the project read, and waited on only briefly.
+
+# {(adam project, openproject id): {"asOf", "entries" | None, "refused" | None}}
+_time_held: dict = {}
+# {(adam project, openproject id): threading.Event}: a time-entry read under way.
+_time_reading: dict = {}
+_time_guard = threading.Lock()
+
+
+def _dated_hours(account: dict, scope: dict, key: tuple, held: dict) -> tuple:
+    """The time entries for this project read, or the reason there are none.
+
+    Returns (held entries or None, still reading). A read stamped with an older
+    `asOf` is answered while the new one runs, and says so through the second
+    value, which the page treats exactly like `refreshing`.
+    """
+    have = _time_held.get(key)
+    if have and have["asOf"] == held["asOf"]:
+        return have, False
+    with _time_guard:
+        running = _time_reading.get(key)
+        if running is None:
+            running = threading.Event()
+            _time_reading[key] = running
+            as_of = held["asOf"]
+
+            def run() -> None:
+                try:
+                    endpoint, token = _pms_for(account["id"])
+                    entries = openproject.time_entries(endpoint, token, scope["pmsId"])
+                    _time_held[key] = {"asOf": as_of, "entries": entries, "refused": None}
+                except openproject.Refused as exc:
+                    _time_held[key] = {"asOf": as_of, "entries": None, "refused": (
+                        "This OpenProject account may not view time entries, so hours are "
+                        "each ticket's total, counted in the ticket's sprint."
+                        if exc.status in (401, 403) else
+                        f"Time entries could not be read ({exc}), so hours are each "
+                        f"ticket's total, counted in the ticket's sprint.")}
+                except Exception as exc:  # noqa: BLE001 — told on the page, never a failed costing
+                    _time_held[key] = {"asOf": as_of, "entries": None, "refused": (
+                        f"Time entries could not be read ({exc}), so hours are each "
+                        f"ticket's total, counted in the ticket's sprint.")}
+                finally:
+                    with _time_guard:
+                        _time_reading.pop(key, None)
+                    running.set()
+
+            threading.Thread(target=run, daemon=True).start()
+    running.wait(OVERVIEW_FIRST_WAIT_SECONDS)
+    have = _time_held.get(key)
+    return have, not (have and have["asOf"] == held["asOf"])
+
+
+def _working_days(start: date, end: date) -> int:
+    """Monday to Friday from `start` to `end`, both counted. Zero when end < start."""
+    if end < start:
+        return 0
+    days = (end - start).days + 1
+    weeks, rest = divmod(days, 7)
+    count = weeks * 5
+    for n in range(rest):
+        if (start.weekday() + n) % 7 < 5:
+            count += 1
+    return count
+
+
+def _on_day(value) -> Optional[date]:
+    """A YYYY-MM-DD (or the start of a timestamp) as a date, or None.
+
+    Not `_day`: that name is taken further down this file for a different
+    question, and Python keeps the later of two functions with one name.
+    """
+    try:
+        return date.fromisoformat(str(value)[:10]) if value else None
+    except ValueError:
+        return None
+
+
+# Money is carried as `rate × minutes`, an integer, and divided by sixty once,
+# for the figure shown. Summing figures already rounded to the unit makes the
+# sprints add up to a paisa more or less than the total; summing these does not,
+# so the last point of the cumulative line is the total exactly.
+def _minor(numerator: int) -> int:
+    return (numerator + 30) // 60
+
+
 @app.get("/api/costing")
 def costing(project_id: str = Query(default=""), refresh: int = Query(default=0),
+            person: str = Query(default=""), sprint: str = Query(default=""),
+            type: str = Query(default=""),  # noqa: A002 — the filter's name on the page
             reader: dict = Depends(require_reader)):
-    """Hours from the tickets, rates from here, cost multiplied on read.
+    """Hours from OpenProject, rates and the budget from here, cost multiplied on read.
 
     Reuses the overview's cached read of the project — the same five minutes,
     the same one call — because costing and the overview are the same question
     about the same rows and reading OpenProject twice to ask both would double
     the cost of a page somebody leaves open. Like the overview, a Refresh does
     not wait: the answer carries `refreshing` and the page asks again.
+
+    `person`, `sprint` and `type` narrow every figure to a slice, the way the
+    Tasks page's filter does. The budget is the whole project's whatever the
+    filter, and the projection is not made for a single sprint, where there is
+    no pace to carry forward.
     """
     scope = _pms_scope(reader, project_id)
+    key = (scope["project"], scope["pmsId"])
     held = _project_read(reader, scope, refresh=bool(refresh))
     payload = held["payload"]
+    today = security.now().date()
 
     rates = {r["person"].lower(): r for r in db.all_rows(
         "SELECT * FROM rate WHERE project_id = ?", (scope["project"],))}
+    default = _default_rate(scope["project"])
+    history = _budget_history(scope["project"])
+    budget = history[0] if history else None
+
+    items = payload["items"]
+    by_key = {item["key"]: item for item in items}
+    closed = {s["name"] for s in payload.get("statuses") or [] if s.get("isClosed")}
+
+    # The sprints, in the order they run. Only versions with dates can be placed
+    # on a calendar; the rest are named by the tickets and kept for the fallback,
+    # after the dated ones.
+    versions = payload.get("versions") or []
+    dated_sprints = sorted(
+        (v for v in versions if _on_day(v.get("startDate")) and _on_day(v.get("endDate"))),
+        key=lambda v: (_on_day(v["startDate"]), v["name"]))
+    undated = [v["name"] for v in versions if v not in dated_sprints]
+
+    dated, reading = _dated_hours(reader, scope, key, held)
+    entries_ok = bool(dated) and dated.get("entries") is not None
+    source = "time-entries" if entries_ok else "tickets-by-sprint"
+
+    def sprint_on(day: Optional[date]) -> str:
+        """The sprint a dated hour falls in: the last one begun by that day. The
+        gaps between sprints (a weekend, a planning day) belong to the sprint
+        before them, so no hour falls between two."""
+        found = ""
+        for v in dated_sprints:
+            if day and _on_day(v["startDate"]) <= day:
+                found = v["name"]
+        return found
+
+    # One row per hour logged, the same shape from either source:
+    # (person, hours, sprint, day or None, ticket or None).
+    logged: list = []
+    if entries_ok:
+        for entry in dated["entries"]:
+            day = _on_day(entry["spentOn"])
+            ticket = by_key.get(entry["workPackage"])
+            # With no sprint on a calendar there is nothing to date an hour
+            # into, so it goes where the fallback would put it: the ticket's.
+            where = sprint_on(day) if dated_sprints else (ticket or {}).get("version") or ""
+            logged.append((entry["user"] or "Nobody", entry["hours"], where, day, ticket))
+    else:
+        for item in items:
+            if item.get("spentHours"):
+                logged.append((item.get("assignee") or "Nobody", item["spentHours"],
+                               item.get("version") or "", None, item))
+
+    want_person = person.strip().lower()
+    want_type = type.strip()
+    want_sprint = sprint.strip()
+
+    def kept(who: str, sprint_name: str, ticket: Optional[dict]) -> bool:
+        if want_person and who.lower() != want_person:
+            return False
+        if want_sprint and sprint_name != want_sprint:
+            return False
+        if want_type and (ticket or {}).get("type") != want_type:
+            return False
+        return True
+
+    def priced(who: str) -> tuple:
+        """(hourly, currency, at the default) for a name, or (None, None, False)."""
+        rate = rates.get(who.lower())
+        if rate:
+            return rate["hourly"], rate["currency"], False
+        if default and who != "Nobody":
+            return default["hourly"], default["currency"], True
+        return None, None, False
 
     people: dict = {}
+
+    def person_row(name: str) -> dict:
+        return people.setdefault(name.lower(), {
+            "person": name, "tickets": 0, "minutes": 0, "estimated": 0.0,
+            "withoutHours": 0})
+
     # Counted apart from the hours, because they are three different facts and
     # adding them together is how a costing page comes to say a number nobody
     # can defend: work with no time logged, work whose time this token may not
     # read, and work by somebody with no rate set.
     no_hours = 0
     unreadable = 0
-    for item in payload["items"]:
+    remaining = {"hours": 0.0, "numerator": 0, "unpricedHours": 0.0, "withoutEstimate": 0,
+                 "currencies": set(), "atDefaultHours": 0.0}
+    for item in items:
         name = item.get("assignee") or "Nobody"
-        spent = item.get("spentHours")
-        who = people.setdefault(name.lower(), {
-            "person": name, "tickets": 0, "hours": 0.0, "estimated": 0.0,
-            "withoutHours": 0, "rate": None})
+        if not kept(name, item.get("version") or "", item):
+            continue
+        who = person_row(name)
         who["tickets"] += 1
         who["estimated"] += item.get("estimatedHours") or 0
+        spent = item.get("spentHours")
         if spent is None:
             unreadable += 1
             who["withoutHours"] += 1
         elif spent == 0:
             no_hours += 1
             who["withoutHours"] += 1
+        # What the open work is expected to cost still: its estimate less what
+        # is already logged against it, at the holder's rate. An estimate is a
+        # plan, not a cost, so it is reported apart and never added to spend.
+        if item.get("status") not in closed and item.get("type") not in ("Epic", "Feature"):
+            estimate = item.get("estimatedHours")
+            if estimate is None:
+                remaining["withoutEstimate"] += 1
+                continue
+            left = max(0.0, estimate - (spent or 0))
+            if not left:
+                continue
+            remaining["hours"] += left
+            hourly, currency, at_default = priced(name)
+            if hourly is None:
+                remaining["unpricedHours"] += left
+            else:
+                remaining["numerator"] += hourly * round(left * 60)
+                remaining["currencies"].add(currency)
+                if at_default:
+                    remaining["atDefaultHours"] += left
+
+    # The spend, at the finest grain the source gives: person × sprint × week.
+    sprints_seen: dict = {}
+    weeks: dict = {}
+    currencies: set = set()
+    for name, hours_logged, sprint_name, day, ticket in logged:
+        if not kept(name, sprint_name, ticket):
+            continue
+        minutes = round(hours_logged * 60)
+        who = person_row(name)
+        who["minutes"] += minutes
+        hourly, currency, at_default = priced(name)
+        cell = sprints_seen.setdefault(sprint_name, {
+            "minutes": 0, "numerator": 0, "unpricedMinutes": 0, "defaultNumerator": 0,
+            "currencies": set()})
+        cell["minutes"] += minutes
+        if hourly is None:
+            cell["unpricedMinutes"] += minutes
         else:
-            who["hours"] += spent
+            cell["numerator"] += hourly * minutes
+            cell["currencies"].add(currency)
+            currencies.add(currency)
+            if at_default:
+                cell["defaultNumerator"] += hourly * minutes
+        if day:
+            monday = day - timedelta(days=day.weekday())
+            week = weeks.setdefault(monday, {"minutes": 0, "numerator": 0, "unpricedMinutes": 0})
+            week["minutes"] += minutes
+            if hourly is None:
+                week["unpricedMinutes"] += minutes
+            else:
+                week["numerator"] += hourly * minutes
+
+    one_currency = len(currencies) <= 1
+    currency = next(iter(currencies)) if len(currencies) == 1 else None
 
     out = []
-    currencies = set()
-    unrated = []
+    unrated, at_default_people = [], []
     for entry in people.values():
-        rate = rates.get(entry["person"].lower())
+        hourly, rate_currency, at_default = priced(entry["person"])
+        hours_total = entry["minutes"] / 60
         cost = None
-        if rate and entry["hours"]:
+        if hourly is not None and entry["minutes"]:
             # Integer maths on the smallest unit, rounded once at the end. A
             # float rate times a float hour count, summed, is a total that
             # disagrees with itself between two readers.
-            cost = int(round(rate["hourly"] * entry["hours"]))
-            currencies.add(rate["currency"])
-        elif not rate and entry["hours"]:
+            cost = _minor(hourly * entry["minutes"])
+            if at_default:
+                at_default_people.append(entry["person"])
+        elif hourly is None and entry["minutes"]:
             unrated.append(entry["person"])
         out.append({
-            **entry,
-            "hours": round(entry["hours"], 2),
+            "person": entry["person"], "tickets": entry["tickets"],
+            "withoutHours": entry["withoutHours"],
+            "hours": round(hours_total, 2),
             "estimated": round(entry["estimated"], 2),
-            "hourly": rate["hourly"] if rate else None,
-            "currency": rate["currency"] if rate else None,
+            "hourly": hourly, "currency": rate_currency,
+            "atDefault": at_default and hourly is not None,
             "cost": cost,
         })
-    out.sort(key=lambda p: -(p["cost"] or 0) or -p["hours"])
+    out.sort(key=lambda p: (-(p["cost"] or 0), -p["hours"], p["person"].lower()))
+    total_numerator = sum(c["numerator"] for c in sprints_seen.values())
+    default_numerator = sum(c["defaultNumerator"] for c in sprints_seen.values())
+    total_cost = _minor(total_numerator) if currency else None
 
+    # ── by sprint, in the order they run, with the running total ──
+    order = [v["name"] for v in dated_sprints]
+    if not entries_ok or not dated_sprints:
+        # Undated versions only mean something in the fallback, where an hour
+        # belongs to the ticket's version whatever its dates.
+        order += [n for n in undated if n in sprints_seen]
+    # And any sprint the hours name that the versions read did not list (a token
+    # that may not read versions gets none), so no logged hour drops out of the
+    # table while still being in the total.
+    order += sorted((n for n in sprints_seen if n and n not in order), key=str.lower)
+    by_sprint = []
+    running = 0
+    running_minutes = 0
+    # Hours that belong to no sprint come first: before the first sprint began
+    # (time entries), or on tickets in no sprint (the fallback). Either way they
+    # are spent, so the running total starts from them rather than leaving them out.
+    if "" in sprints_seen and not want_sprint:
+        cell = sprints_seen[""]
+        running += cell["numerator"]
+        running_minutes += cell["minutes"]
+        by_sprint.append({
+            "name": "Before the first sprint" if entries_ok and dated_sprints else "In no sprint",
+            "outside": True, "startDate": None, "endDate": None, "state": "done",
+            "hours": round(cell["minutes"] / 60, 2),
+            "cost": _minor(cell["numerator"]) if one_currency and currency else None,
+            "costAtDefault": _minor(cell["defaultNumerator"]) if one_currency and currency else None,
+            "unpricedHours": round(cell["unpricedMinutes"] / 60, 2),
+            "cumulative": _minor(running) if one_currency and currency else None,
+            "cumulativeHours": round(running_minutes / 60, 2),
+        })
+    versions_by_name = {v["name"]: v for v in versions}
+    for name in order:
+        if want_sprint and name != want_sprint:
+            continue
+        cell = sprints_seen.get(name, {"minutes": 0, "numerator": 0, "unpricedMinutes": 0,
+                                       "defaultNumerator": 0})
+        running += cell["numerator"]
+        running_minutes += cell["minutes"]
+        v = versions_by_name.get(name, {})
+        start, end = _on_day(v.get("startDate")), _on_day(v.get("endDate"))
+        state = ("ahead" if start and start > today else
+                 "done" if end and end < today else
+                 "current" if start else "undated")
+        by_sprint.append({
+            "name": name, "outside": False,
+            "startDate": v.get("startDate"), "endDate": v.get("endDate"), "state": state,
+            "hours": round(cell["minutes"] / 60, 2),
+            "cost": _minor(cell["numerator"]) if currency else None,
+            "costAtDefault": _minor(cell["defaultNumerator"]) if currency else None,
+            "unpricedHours": round(cell["unpricedMinutes"] / 60, 2),
+            "cumulative": _minor(running) if currency else None,
+            "cumulativeHours": round(running_minutes / 60, 2),
+        })
+
+    by_week = []
+    if entries_ok:
+        running = 0
+        for monday in sorted(weeks):
+            cell = weeks[monday]
+            running += cell["numerator"]
+            by_week.append({
+                "week": monday.isoformat(),
+                "hours": round(cell["minutes"] / 60, 2),
+                "cost": _minor(cell["numerator"]) if currency else None,
+                "unpricedHours": round(cell["unpricedMinutes"] / 60, 2),
+                "cumulative": _minor(running) if currency else None,
+            })
+
+    projection = _projection(
+        dated_sprints, today, total_numerator, currency, entries_ok, want_sprint, budget)
+
+    rem_currency = next(iter(remaining["currencies"])) if len(remaining["currencies"]) == 1 else None
     return {
         "project": scope["project"],
-        "asOf": security.stamp(),
         "people": out,
         "totalHours": round(sum(p["hours"] for p in out), 2),
         # Only where a rate exists, and only when one currency is in play. Two
         # currencies cannot be added, and a page that added them would be
         # quietly wrong in the most expensive possible way.
-        "totalCost": (sum(p["cost"] or 0 for p in out) if len(currencies) == 1 else None),
-        "currency": next(iter(currencies)) if len(currencies) == 1 else None,
+        "totalCost": total_cost,
+        "currency": currency,
         "currencies": sorted(currencies),
+        # The part of the total priced at the default rate, so the page can say
+        # how much of the figure is a stand-in rather than a real rate.
+        "costAtDefault": _minor(default_numerator) if currency else None,
+        "peopleAtDefault": sorted(set(at_default_people)),
         "ticketsWithoutHours": no_hours,
         "ticketsHoursUnreadable": unreadable,
         "peopleWithoutRate": sorted(set(unrated)),
+        "defaultRate": default,
+        "budget": budget,
+        "hoursSource": source,
+        "hoursSays": (None if entries_ok else
+                      (dated or {}).get("refused") or
+                      "Time entries are still being read, so for now hours are each "
+                      "ticket's total, counted in the ticket's sprint."),
+        "bySprint": by_sprint,
+        "byWeek": by_week,
+        "projection": projection,
+        "estimateRemaining": {
+            "hours": round(remaining["hours"], 2),
+            "cost": _minor(remaining["numerator"]) if rem_currency else None,
+            "currency": rem_currency,
+            "unpricedHours": round(remaining["unpricedHours"], 2),
+            "atDefaultHours": round(remaining["atDefaultHours"], 2),
+            "ticketsWithoutEstimate": remaining["withoutEstimate"],
+        },
+        "filter": {"person": person.strip(), "sprint": want_sprint, "type": want_type},
+        # What the page's filter offers, from the whole read rather than the slice.
+        "facets": {
+            "people": sorted({row[0] for row in logged} | {i.get("assignee") or "Nobody"
+                                                          for i in items}, key=str.lower),
+            "sprints": [v["name"] for v in dated_sprints] + undated,
+            "types": sorted({i.get("type") for i in items if i.get("type")}, key=str.lower),
+        },
+        "today": today.isoformat(),
         "truncated": payload.get("truncated", False),
         "asOf": held["asOf"],
         "ageSeconds": int(time.monotonic() - held["at"]),
-        **_overview_state((scope["project"], scope["pmsId"]), held),
+        **_overview_state(key, held),
+        # Folded into `refreshing` so the page's one "ask again" loop covers it.
+        **({"refreshing": True} if reading else {}),
     }
+
+
+def _projection(sprints: list, today: date, numerator: int, currency: Optional[str],
+                dated: bool, one_sprint: str, budget: Optional[dict]) -> dict:
+    """Where the spend ends up at the end of the last sprint, at the pace so far.
+
+    Always an answer with `says`, never a bare number: either the projection and
+    what it rests on, or the sentence saying why there is none.
+
+    **Two paces, chosen by what the hours can carry.** Dated hours give a cost
+    per working day since the first sprint began, carried to the last sprint's
+    last day. Undated hours only know their sprint, so the pace is a cost per
+    sprint, with the sprint under way counted as the part of it that has gone.
+    """
+    def none(why: str) -> dict:
+        return {"projected": None, "says": why}
+
+    if one_sprint:
+        return none("One sprint is shown, so there is no pace to carry forward.")
+    if not currency:
+        return none("No cost to carry forward: nothing is priced, or more than one "
+                    "currency is in play.")
+    if not sprints:
+        return none("The sprints have no dates in OpenProject, so there is no pace to "
+                    "carry forward.")
+    first, last = _on_day(sprints[0]["startDate"]), _on_day(sprints[-1]["endDate"])
+    spent = _minor(numerator)
+    if today < first:
+        return none(f"{sprints[0]['name']} has not begun, so there is no pace yet.")
+    last_name = sprints[-1]["name"]
+    finished = today > last
+    if dated:
+        elapsed = _working_days(first, min(today, last))
+        total = _working_days(first, last)
+        if not elapsed:
+            return none("No working day has passed since the first sprint began.")
+        projected = spent if finished else (numerator * total + elapsed * 30) // (elapsed * 60)
+        per = (numerator + elapsed * 30) // (elapsed * 60)
+        basis, unit = "working-days", "working day"
+        says = (f"{_spell(spent, currency)} over {elapsed} working days since "
+                f"{sprints[0]['name']} began is {_spell(per, currency)} a working day; "
+                f"{total - elapsed} working days to the end of {last_name}.")
+        path = []
+        for v in sprints:
+            end = _on_day(v["endDate"])
+            if end < today:
+                continue
+            days = _working_days(first, end)
+            path.append({"name": v["name"],
+                         "cost": (numerator * days + elapsed * 30) // (elapsed * 60)})
+    else:
+        # Sprints begun, the one under way counted by the share of its working
+        # days that have passed: a third of the way into Sprint 5 is 4⅓ sprints.
+        gone = 0.0
+        for v in sprints:
+            start, end = _on_day(v["startDate"]), _on_day(v["endDate"])
+            if start > today:
+                continue
+            if end < today:
+                gone += 1
+            else:
+                whole = _working_days(start, end) or 1
+                gone += _working_days(start, today) / whole
+        if gone <= 0:
+            return none("No working day has passed since the first sprint began.")
+        # Hundredths of a sprint, so the arithmetic stays in integers.
+        elapsed = max(1, round(gone * 100))
+        total = len(sprints) * 100
+        projected = spent if finished else (numerator * total + elapsed * 30) // (elapsed * 60)
+        per = (numerator * 100 + elapsed * 30) // (elapsed * 60)
+        basis, unit = "sprints", "sprint"
+        says = (f"{_spell(spent, currency)} across {gone:.1f} sprints so far is "
+                f"{_spell(per, currency)} a sprint; {len(sprints)} sprints in all, "
+                f"to the end of {last_name}.")
+        path = []
+        for n, v in enumerate(sprints, 1):
+            if _on_day(v["endDate"]) < today:
+                continue
+            path.append({"name": v["name"],
+                         "cost": (numerator * n * 100 + elapsed * 30) // (elapsed * 60)})
+    if finished:
+        says = f"{last_name} has ended, so this is the whole cost, not a projection."
+        path = []
+    comparable = bool(budget) and budget["currency"] == currency
+    return {
+        "projected": max(projected, spent),
+        "basis": basis, "unit": unit, "per": per,
+        "elapsed": elapsed, "total": total,
+        "lastSprint": last_name, "finished": finished,
+        "path": path,
+        "says": says,
+        # Positive is over, negative is under. Only when the budget is in the
+        # same currency; otherwise there is nothing honest to subtract.
+        "overBudget": (max(projected, spent) - budget["amount"]) if comparable else None,
+    }
+
+
+def _spell(minor: int, currency: str) -> str:
+    """Money for a sentence the service writes: whole units, grouped by three."""
+    return f"{currency} {minor // 100:,}"
 
 
 # ── what the agent did ───────────────────────────────────────────────

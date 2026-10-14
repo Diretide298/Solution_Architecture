@@ -651,6 +651,62 @@ def everything(endpoint: str, token: str, project_id: int, limit: int = 20000,
     return list(found.values())[:limit]
 
 
+def time_entries(endpoint: str, token: str, project_id: int, limit: int = 50000) -> list:
+    """
+    Every time entry logged against one OpenProject project, dated.
+
+    What the costing page needs that a ticket cannot give it: *when* the hours
+    were spent and *who* spent them. A ticket's `spentTime` is one total with
+    no date and is attributed, by anything that reads it, to whoever holds the
+    ticket now, which is not always who did the work. A time entry is one
+    person, one day, one ticket.
+
+    Each comes back as {spentOn, hours, user, userId, workPackage}: the date as
+    OpenProject wrote it (a plain YYYY-MM-DD, the day the work was done rather
+    than the day it was typed in), hours parsed by `hours` above so a `P1D` is a
+    working day here as everywhere else, and the work package as its number.
+
+    **Needs "View time entries" on the token's role.** Without it OpenProject 10
+    answers 403, which arrives here as `Refused` with that status, and the
+    caller falls back to the tickets rather than treating it as a broken read:
+    a token that may not see the entries is a fact about the token, not about
+    the project. Paged exactly as `everything` is, for the same reasons.
+    """
+    filters = json.dumps([{"project": {"operator": "=", "values": [str(project_id)]}}])
+
+    def page_at(offset: int) -> tuple:
+        page = call(endpoint, token, "time_entries", {
+            "filters": filters,
+            "pageSize": EVERYTHING_PAGE,
+            "offset": offset,
+            "sortBy": json.dumps([["id", "asc"]]),
+        })
+        return page.get("_embedded", {}).get("elements", []), page.get("total")
+
+    first, total = page_at(1)
+    pages = [first]
+    if isinstance(total, int) and len(first) >= EVERYTHING_PAGE:
+        last = -(-min(total, limit) // EVERYTHING_PAGE)
+        with ThreadPoolExecutor(max_workers=EVERYTHING_WORKERS) as pool:
+            pages.extend(pool.map(lambda n: page_at(n)[0], range(2, last + 1)))
+
+    found: dict = {}
+    for elements in pages:
+        for raw in elements:
+            links = raw.get("_links", {})
+            spent = hours(raw.get("hours"))
+            if not spent:
+                continue
+            found[raw.get("id")] = {
+                "spentOn": str(raw.get("spentOn") or "")[:10],
+                "hours": spent,
+                "user": _titled(links.get("user")),
+                "userId": _id_from_href((links.get("user") or {}).get("href")),
+                "workPackage": str(_id_from_href((links.get("workPackage") or {}).get("href")) or ""),
+            }
+    return list(found.values())[:limit]
+
+
 def mine_finished(endpoint: str, token: str, project_id: Optional[int] = None,
                   limit: int = 50, assignee: str = "me") -> list:
     """What this person has closed lately, newest first.
