@@ -1,0 +1,78 @@
+id: CHG-ADM-002
+date: '2026-10-14'
+source: cr
+kind: process
+summary: 'A settled change request reaches the ticket it was raised from: a ticket that is not closed gets one
+  comment written for the AI agent that pulls it, a closed ticket gets one child task for the change (filed before
+  the CR is marked Done), and adam_pull lists every CR on the ticket near the top of README.md.'
+decision:
+  what: 'When a CR is settled (accepted, done or rejected) through POST /api/changes/<n>/resolve, the CSV bulk
+    settle or viewer/api/settle_changes.py, the ticket it came from (change_request.external_key, or its child task
+    once it has one) is told, before the status is written: not closed in OpenProject (status isClosed false), one
+    comment headed "ADAM CR-nnn · <status> — read before building" saying what was decided, which release carries
+    it and what to do now, sent without mail; closed, a child task of it through the existing child-ticket
+    machinery (_ticket_text with the decision and the release; change_request.child_key, at most one per CR) and
+    the same comment on it. A rejection on a closed ticket gets the comment only. Never two tickets or two
+    identical comments per CR; settle_changes.py stays a dry run unless --apply. A CR''s work is one child task of
+    its source ticket; migration work a CR causes is a child task of the affected MIG-* ticket, assigned to the
+    migration owner (docs/active/team.json migrations.owner), filed by the lead. adam_pull''s README.md gets
+    "Change requests on this ticket" with each CR''s status, decision and release: follow settled decisions, wait on
+    open ones. A started ticket''s OpenProject text is never rewritten. ticvai/CLAUDE.md rule 7 and release-runbook
+    R3, R5 and section 6 say so.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Lead decision, Chinmay, 14 October 2026, in his words: "whenever we have a cr we should create new tickets if
+  ticket is closed. if not then add comment for the AI agent when he pulls", and the same day: "we create child
+  tasks for CR remember that". At 1eb1d063 (r5) settle_changes.py commented "ADAM CR-011 · accepted" with the
+  resolution on every ticket, closed or not, the resolve route told no ticket at all, and a CR''s child ticket was
+  filed only by hand from the Changes page (a closed ticket''s change was never scheduled); ticvai/CLAUDE.md rule 6
+  said a fix to a started ticket is "a comment plus a linked delta ticket" (council of 2 October).'
+keys_touched:
+  files:
+  - viewer/api/cr_notice.py
+  - viewer/api/main.py
+  - viewer/api/openproject.py
+  - viewer/api/settle_changes.py
+  - viewer/api/fake-openproject.mjs
+  - viewer/api/release-check.mjs
+  - viewer/mcp/tools.mjs
+  - viewer/mcp/setup/starters/backend/.claude/commands/cr.md
+  - viewer/mcp/setup/starters/frontend/.claude/commands/cr.md
+  - CLAUDE.md
+  - docs/active/release-runbook.md
+  - docs/active/developer-brief.md
+  - changes/README.md
+  - tools/check-adam-cr-settlement.py
+  - tools/run-checks.py
+  tickets: []
+  other:
+  - CHG-ADM-001
+root_class: 'new: cr-settlement-misses-ticket'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-adam-cr-settlement.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  source is `cr`, the closest allowed value (the lead''s instruction). Details the decision left open, chosen here:
+  (1) a rejection on a closed ticket gets a comment, not a ticket (nothing to build; ADAM''s ticket guard already
+  refuses a rejected CR); (2) once a CR has its child task, later settlements tell that task; (3) the server routes
+  tell the ticket as the person settling, with their own OpenProject token (as every other OpenProject write in ADAM
+  is made), and without a token report it in `ticketFollowUp` and settle anyway; settle_changes.py sends
+  tell_ticket false and tells the ticket itself so its dry run shows it, filing the child task through ADAM''s
+  preview/apply as ADAM_EMAIL (that account needs OpenProject connected in ADAM); (4) the guard that refuses a
+  ticket for a Done CR is kept, so the settle flow files the child first (the route tells the ticket before it
+  writes the status; settle_changes.py settles as accepted, files the child, then marks done); (5) the MIG-* child
+  task for migration work is the lead''s to file, not automated (one child per CR is ADAM''s guard). The new check
+  tools/check-adam-cr-settlement.py (CS-OPEN-COMMENT, CS-CLOSED-CHILD, CS-REJECTED, CS-DRY-RUN, CS-ONCE, CS-ROUTE)
+  runs settle_changes.py against stand-ins for ADAM and OpenProject; on the parent commit 1eb1d063 (r5): FAIL, 7
+  new findings; on this branch: PASS. The live routes are covered by viewer/api/release-check.mjs (comment once on
+  an open ticket, one child task under a closed one, none on a rejection, tell_ticket false, the README section).
+  OpenProject is assumed to accept a child under a closed parent (it does on 10.x with default settings); if the
+  live instance refuses, ticketFollowUp says so and the CR is still settled.'

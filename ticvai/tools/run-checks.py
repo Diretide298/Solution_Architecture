@@ -120,6 +120,10 @@ CHECKS = [
     # 13 October (Chinmay, r5, CHG-R6-059): the frontend is one GitLab repository per app; every screen platform and
     # frontend app has its entry in docs/active/frontend-repos.yaml, and ADAM setup's table names the same ones.
     "check-frontend-repos",
+    # 14 October (Chinmay, r6, CHG-ADM-001 and CHG-ADM-002): developers and agents are always on the latest release
+    # (nothing ADAM says asks them to choose one), and a settled CR reaches its ticket: a comment for the agent while
+    # it is open, a child task when it is closed. Both read ../viewer, the way check-frontend-repos does.
+    "check-adam-latest-release", "check-adam-cr-settlement",
     # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
     # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
     "check-parameter-columns",

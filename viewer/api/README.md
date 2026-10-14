@@ -369,13 +369,15 @@ assertion passes against a lead who is told nothing at all, which is the wrong
 product and the easiest way for a check like this to look green while the bell
 is broken.
 
-`release-check.mjs` — 70 assertions over release tags, ticket pins, the diff since a pin and
-change request intake. **Self-contained**: it builds a throwaway git repository with tags `r1` and
-`r2` and an unreleased edit on top, starts its own stand-in OpenProject, accounts service and viewer
-on ports 8871-8873, and restarts the viewer the way a deploy does — working tree, then r1, then r2.
+`release-check.mjs` — 85 assertions over release tags, ticket pins, the diff since the previous pull,
+change request intake and settlement. **Self-contained**: it builds a throwaway git repository with tags
+`r1` and `r2` and an unreleased edit on top, starts its own stand-in OpenProject, accounts service and
+viewer on ports 8871-8873, and restarts the viewer the way a deploy does — working tree, then r1, then r2.
 It asserts the working tree is never what a tag serves, that the second export links rather than
-copies, that a breaking change makes the re-pin required for the producer and the consumer and for
-nobody else, and that the release note is exactly what was settled between the two tags.
+copies, that every pull is at the latest release (the pin moves by itself, for an older connector too),
+that a breaking change is called out for the producer and the consumer and nobody else, that the release
+note is exactly what was settled between the two tags, and that a settled request comments once on an
+open ticket and files one child task under a closed one (CHG-ADM-001, CHG-ADM-002).
 
 ```bash
 node api/release-check.mjs

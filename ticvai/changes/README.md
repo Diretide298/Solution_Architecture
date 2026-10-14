@@ -43,7 +43,7 @@ changes/
 | `why` | yes | the reason, **citing its source** so a reader can open it: a MoM (`sources/mom/...`), a design input (`DI-...`), an audit root (`R123`), an ADR (`ADR-0060`), the council, an audit fix (`F1`-`F8`), a client return (`POSV2-3`), a CR, a finding, a commit or another `CHG-` id. The check refuses a `why` with no citation |
 | `keys_touched` | yes | lists of the keys it changes: `screens`, `operations`, `tables`, `schemas`, `flows`, `tickets`, `files`, `other`. At least one key unless the kind is `process` or `plan` |
 | `root_class` | yes | the audit class it belongs to (`docs/active/root-classes.md` id, e.g. `CR-3`) or `new: <name>` for a new class (`change-rules.md` CR-7: a new class gets a guard) |
-| `tickets` | yes | `started: [...]` and `unstarted: [...]` OpenProject keys or ids it affects |
+| `tickets` | yes | `started: [...]` and `unstarted: [...]` OpenProject keys or ids it affects. A started ticket's text is never rewritten: it gets the change through its CR, as a comment for the agent that pulls it, or as a child task when it is closed; an unstarted one through its pointer body at the next tag. Everyone builds against the latest release (`ticvai/CLAUDE.md` rules 6 and 7, CHG-ADM-001, CHG-ADM-002) |
 | `release_tag` | yes | the tag that carries it (`r3`), or `pending` until it is tagged |
 | `decision_owner` | yes | who owns the decision (the lead, or the client for a minutes-sourced change) |
 | `client_signoff` | when `source: mom` | `{by: <name>, date: YYYY-MM-DD}` or `pending`. Batched weekly; silence for 5 working days after the batch is acceptance (`by: "silence (5 working days)"`) |
