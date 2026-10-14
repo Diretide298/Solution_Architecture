@@ -88263,8 +88263,12 @@ screens:
         - Deposit Status
         - Group/Individual
         notes: The pack filters this screen by venue, return location, product, expected return, rental
-          status, damage status and 2 more — which are present is a decision the pack already made.
+          status, damage status and 2 more — which are present is a decision the pack already made. Sends
+          `?status=` to `listRentalBookings` for Rental Status; Return Location sends `?locationId=` and
+          Expected Return `?from=` and `?to=`; Venue, Product, Damage Status, Deposit Status and Group/Individual
+          have no parameter on it yet (Block A audit, 14 October 2026, CHG-SCR-020).
         provenance: pack Rental_Management.pdf, page 92 §Filters
+        operation: listRentalBookings
     - name: contentBody
       slot: headline
       components:
