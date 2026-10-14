@@ -34860,6 +34860,8 @@ screens:
       provenance: flow F33 step 4→5
       crossesDevice: true
       back: false
+      carries:
+      - orderId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it** — the operations are real, the layout
     is not. **Owns POS board frame(s) POS-5F** (client pack, 24 August). **Assigned by board purpose rather
