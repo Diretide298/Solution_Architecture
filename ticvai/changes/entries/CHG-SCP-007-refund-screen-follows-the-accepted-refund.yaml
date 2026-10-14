@@ -1,0 +1,38 @@
+id: CHG-SCP-007
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'POS-011 Returns, Refunds & Exchanges calls createRefund, which answers 202 (pendingApproval or pendingGateway),
+  and read nothing from orders to follow it; it now polls the order''s refunds until the refund settles.'
+decision:
+  what: 'screens/P04-point-of-sale.yaml, POS-011: `apis` gains listOrderRefunds (GET /orders/{orderId}/refunds,
+    orderId from the screen''s entry), trigger onInterval, to follow the accepted refund to its outcome. A poll
+    read, invisible: nothing on the screen changes.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+  S-ASYNC-POLL (R288) had 1 member on P04 and P06, 0 after. Ruling (the lead, 14 October 2026, "go with your
+  recommendation"): a 202 operation''s screen reads the job or record that follows it.'
+keys_touched:
+  screens:
+  - POS-011
+  operations:
+  - listOrderRefunds
+  - createRefund
+  other:
+  - S-ASYNC-POLL
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-011 (#28620)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCP, 14 October 2026. orders.listOrderRefunds'' x-ticvai-consumed-by gains POS-011 at the next derive
+  (link-screens-contracts).'
