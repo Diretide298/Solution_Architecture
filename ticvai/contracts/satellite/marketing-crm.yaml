@@ -4556,9 +4556,20 @@ paths:
         audit R149).** The entry key is `variantId` plus `performanceId`; a save with no
         `performanceId` is a third, date-less entry for the product generally.
 
+        **Whether the variant may be sold is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM
+        CR-081; CHG-TEN-002; ADR-0055 rule 4). Marketing runs in another deployable, so it asks Catalogue''s
+        declared query `variantsSellableAt(venueId, [variantId], channel)` through Catalogue''s service route
+        with the guest''s channel (`web` or `mobile`) and never reads `catalogue.variant`. A variant Catalogue
+        does not know, or one not sellable at the venue on that channel, is the `404`. Catalogue''s published
+        service operation for the query is not written yet (a follow-up of CHG-TEN-002).
+
         '
       tags:
       - guest
+      x-ticvai-read-via:
+      - query: catalogue#variantsSellableAt
+        route: service
+        for: "the saved variantId (404 unknown-variant, variant-not-sellable)"
       x-ticvai-permission: null
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject
@@ -4606,7 +4617,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Wishlist'
         '404':
-          description: Variant not found or not sellable in this venue
+          description: Variant not found or not sellable in this venue (Catalogue's `variantsSellableAt`;
+            CHG-TEN-002)
+          x-ticvai-problem-types:
+          - unknown-variant
+          - variant-not-sellable
           content:
             application/problem+json:
               schema:

@@ -3613,9 +3613,19 @@ paths:
         **Open shifts are reported, not silently orphaned.** Revoking a cashier mid-shift leaves cash
         unreconciled, and whoever pulls this needs to know that before they do.
 
+        **The open shifts are asked of Orders, which owns them** (decided 14 October 2026, Chinmay, ADAM
+        CR-083; CHG-TEN-004; ADR-0055 rule 2). Identity calls Orders'' declared query
+        `openShiftsInScope(scopePath)` in process for the venue (or every venue in the caller''s scope) and
+        never reads `orders.pos_shift`; open means every state before `closed` or `autoClosed`, as the
+        query''s rule in shift.yaml says. `openShiftsAffected` is what it returns.
+
         '
       tags:
       - session
+      x-ticvai-read-via:
+      - query: shift#openShiftsInScope
+        route: in-process
+        for: "openShiftsAffected in the 200"
       x-ticvai-permission: SESSION_FORCE_LOGOUT
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false

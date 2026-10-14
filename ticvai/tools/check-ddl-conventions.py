@@ -283,6 +283,15 @@ def main() -> int:
                     if "PRIMARY KEY" in line:
                         pk.setdefault(name, [col])
                 tables[name] = cols
+    # **The baseline is frozen at r1; a column added after it is in a forward migration** (CHG-TEN-001, ADAM
+    # CR-080). `platform.sale_board_tile` got its columns in a V-file, and read from 010-*.sql alone it stayed a
+    # stub for ever. A forward migration's `ADD COLUMN` joins its table here, so a fixed stub stops being one.
+    for db in ("tenant", "control"):
+        for f in sorted((backend / db).glob("V*.sql")):
+            for name, col, rest in re.findall(r"ALTER TABLE ([a-z_]+\.[a-z_0-9]+) ADD COLUMN (?:IF NOT EXISTS )?"
+                                              r'"?([a-z_][a-z_0-9]*)"? ([^;\n]+);', f.read_text(encoding="utf-8")):
+                if name in tables:
+                    tables[name].setdefault(col, f"{col} {rest}")
 
     fks = []
     indexed = {}

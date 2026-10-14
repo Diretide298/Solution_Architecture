@@ -6740,11 +6740,17 @@ screens:
   - id: formConfigureWorkstation
     component: modal
     trigger: Configure workstation
-    body: '**Collects what `configureWorkstation` sends before it is called.** Required: `name`, `saleBoardId`.
-      Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `departmentId`, `accessPointId`,
-      `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing sends nothing; the screen behind
-      is unchanged. Not asked, because the server sets it (readOnly in the contract): `mediaStockRemaining`
-      (3 October 2026, CHG-SPF-001).'
+    body: '**Collects what `configureWorkstation` sends before it is called.** Required: `name`. Optional:
+      `saleBoardId` (absent or null, the till uses its outlet''s board; DEC-183, CHG-CSP-006), `outletId`,
+      `cashDrawerLimit` (null inherits the venue''s; DEC-179, CHG-CSP-016), `cashierInputMode`,
+      `guestDisplayContent`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`,
+      `isActive`. **The form opens filled with the workstation as `getWorkstation` returns it and sends it
+      back whole**: the call replaces the configuration, so a field left out takes its default
+      (`cashierInputMode` `hybrid`, `guestDisplayContent` line items only, `isActive` on) or is cleared
+      (ADAM CR-082, CHG-TEN-003). Dismissing sends nothing; the screen behind is unchanged. Not asked:
+      `loadedMediaStockId` and `mediaStockRemaining`, deprecated and stored nowhere until BL-095 (the media
+      stock record, on the printer device, waits on the BOCA stock answer; CHG-TEN-003). Refused `409
+      shift-open` while a shift is open on the till, naming the shift (CHG-TEN-004).'
     bindsTo: ConfigureWorkstationRequest
     confirm:
       label: Configure workstation
@@ -6754,9 +6760,10 @@ screens:
       discards:
       - name
       - saleBoardId
+      - outletId
+      - cashDrawerLimit
       - cashierInputMode
       - guestDisplayContent
-      - loadedMediaStockId
       - departmentId
       - accessPointId
       - devices

@@ -3038,6 +3038,12 @@ paths:
         cart and karting at 13:00 being added is a prompt, not a refusal, because a party of four may
         legitimately split.
 
+        **Whether the variant may be sold on this channel is asked of Catalogue** (decided 14 October 2026,
+        Chinmay, ADAM CR-081; CHG-TEN-002; ADR-0055 rule 2). Orders calls Catalogue''s declared query
+        `variantsSellableAt(venueId, [variantId], channel)` in process, in the cart''s transaction, with the
+        caller''s channel (`pos` at a till), rather than reading `catalogue.variant` and `catalogue.product`
+        itself; a variant that fails it is `409 notSellableOnChannel`.
+
         '
       tags:
       - cart
@@ -3045,6 +3051,10 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-via:
+        - query: catalogue#variantsSellableAt
+          route: in-process
+          for: "the line's variantId on the caller's channel (409 notSellableOnChannel)"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - $ref: ../shared/common.yaml#/components/parameters/AdmissionToken

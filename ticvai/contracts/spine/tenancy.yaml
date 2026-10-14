@@ -1457,11 +1457,32 @@ paths:
         **Configures an existing workstation; it never creates one** (pull audit R103). The
         target is the workstation in the path, and the body has no code, venue or region, which
         a new workstation would need — an unknown `workstationId` is `404`.
-        `mediaStockRemaining` is `readOnly` and ignored on input.
+        `loadedMediaStockId` and `mediaStockRemaining` are deprecated and ignored: nothing stores them
+        until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer;
+        ADAM CR-082, CHG-TEN-003).
+
+        **PUT replaces the configuration** (pull audit R103, as `updateSaleBoard`; decided 14 October
+        2026, ADAM CR-082, CHG-TEN-003). The body is the workstation's whole configuration, not a patch: a
+        field left out takes its declared default (`cashierInputMode` `hybrid`, `guestDisplayContent`
+        `[lineItems]`, `isActive` true) or, where it has none, null (`saleBoardId`, `outletId`,
+        `cashDrawerLimit`, `departmentId`, `accessPointId`, `edgeNodeId`) or empty (`devices`). A client
+        that changes one setting sends back the configuration it read (`getWorkstation`) with that setting
+        changed. `cashierInputMode` and `guestDisplayContent` are stored on the workstation and returned
+        on `Workstation`.
 
         **Refused while a shift is open on this workstation** (F73, pull audit R078). Changing
         the rules under an open shift means it closes against rules it did not open under, so
         the change waits for the shift to close.
+
+        **How it knows: it asks Orders, which owns the shift** (decided 14 October 2026, Chinmay, ADAM
+        CR-083; CHG-TEN-004; ADR-0055 rule 2). In one transaction Tenancy first locks the workstation row
+        (`SELECT ... FOR UPDATE` on `platform.workstation`), then calls Orders' declared query
+        `openShiftForWorkstation(workstationId)` in process (`x-ticvai-read-via`), then writes. The lock
+        serialises the check against `openShift`, whose insert of a shift takes a key-share lock on the
+        same row through its foreign key, so a shift cannot open between the question and the write.
+        **Open means every state before `closed` or `autoClosed`** (`pendingApproval`, `open`,
+        `suspended`, `pendingClosure`, `pendingVariance`; the query's rule in shift.yaml). A shift open
+        is `409 shift-open`, naming the shift (`WorkstationShiftOpenProblem`).
 
         **The till layout is the outlet's unless this till overrides it** (decided 2 October 2026,
         Chinmay, BO-109; DEC-183; CHG-CSP-006). `saleBoardId` is optional since 2 October: absent or
@@ -1474,6 +1495,10 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-via:
+        - query: shift#openShiftForWorkstation
+          route: in-process
+          for: "the open-shift refusal (409 shift-open), asked after locking the workstation row"
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -1494,11 +1519,14 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
           description: >
-            **A shift is open on this workstation.** The change is not applied; it can be made
-            once the shift has closed. Names the open shift.
+            **A shift is open on this workstation** (`shift-open`: Orders' `openShiftForWorkstation`
+            found one in `pendingApproval`, `open`, `suspended`, `pendingClosure` or `pendingVariance`;
+            ADAM CR-083, CHG-TEN-004). The change is not applied; it can be made once the shift has
+            closed. Names the open shift (`shiftId`, `shiftStatus`).
+          x-ticvai-problem-types: [shift-open]
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/WorkstationShiftOpenProblem' }
         '422':
           description: >
             No board would apply: the request sends no `saleBoardId` and the workstation's outlet has
@@ -1751,11 +1779,27 @@ paths:
         Tiles reference catalogue variants and are grouped into pages. A cashier finds an item
         faster on a well-arranged board than through search, which is the entire reason boards
         exist rather than a product list.
+
+        **Every product tile's variant is asked of Catalogue, never read from its tables** (decided
+        14 October 2026, Chinmay, ADAM CR-081; CHG-TEN-002; ADR-0055 rule 2). In the same transaction
+        Tenancy calls Catalogue's declared query `variantsSellableAt(venueId, variantIds, pos)`
+        in process (`x-ticvai-read-via`) with the variants of every `product` tile. A variant Catalogue
+        does not know is `422 unknown-variant`; one it knows and that is not sellable at this venue on
+        the till is `422 variant-not-sellable`. Both name each refused tile by page `sortOrder` and
+        `position` (`SaleBoardTileProblem`). **Sellable is not `Product.isSellable`**: that needs a
+        published bundle, and a board is how a new product reaches its first bundle, so asking it here
+        would refuse every new product (the query's rule, catalogue.yaml `x-ticvai-queries`).
+
+        A board `code` already used in the venue is `409 duplicate-code` (audit R108; CHG-TEN-001).
       tags: [workstation]
       x-ticvai-permission: WORKSTATION_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-via:
+        - query: catalogue#variantsSellableAt
+          route: in-process
+          for: "every product tile's variantId (422 unknown-variant, variant-not-sellable)"
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -1771,12 +1815,25 @@ paths:
               schema: { $ref: '#/components/schemas/SaleBoard' }
           headers:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
-        '400':
-          description: A tile references an unknown or unsellable variant
+        '409':
+          description: >
+            The board `code` is already used by another board of this venue (`duplicate-code`, audit
+            R108; CHG-TEN-001).
+          x-ticvai-problem-types: [duplicate-code]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            A product tile names a variant Catalogue does not know (`unknown-variant`) or one that is not
+            sellable at this venue on the till (`variant-not-sellable`, the rule of
+            `catalogue#variantsSellableAt`). `tiles` names each refused tile (ADAM CR-081; CHG-TEN-002).
+          x-ticvai-problem-types: [unknown-variant, variant-not-sellable]
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/SaleBoardTileProblem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1804,12 +1861,19 @@ paths:
         **PUT semantics** (pull audit R103). The target is the board in the path; this never
         creates one. The body replaces the board whole — every page and every tile — so a page
         or tile left out is removed. `id` is `readOnly` and ignored on input. Tiles are checked
-        as `createSaleBoard` checks them.
+        as `createSaleBoard` checks them: every product tile's variant is asked of Catalogue's
+        `variantsSellableAt` in process, in the same transaction (ADAM CR-081; CHG-TEN-002), and a refused
+        tile is `422 unknown-variant` or `422 variant-not-sellable`, naming the tile. A `code` already used
+        by another board of the venue is `409 duplicate-code` (CHG-TEN-001).
       tags: [workstation]
       x-ticvai-permission: WORKSTATION_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-via:
+        - query: catalogue#variantsSellableAt
+          route: in-process
+          for: "every product tile's variantId (422 unknown-variant, variant-not-sellable)"
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -1825,13 +1889,26 @@ paths:
               schema: { $ref: '#/components/schemas/SaleBoard' }
           headers:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
-        '400':
-          description: A tile references an unknown or unsellable variant
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: >
+            The board `code` is already used by another board of this venue (`duplicate-code`, audit
+            R108; CHG-TEN-001).
+          x-ticvai-problem-types: [duplicate-code]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '422':
+          description: >
+            A product tile names a variant Catalogue does not know (`unknown-variant`) or one that is not
+            sellable at this venue on the till (`variant-not-sellable`, the rule of
+            `catalogue#variantsSellableAt`). `tiles` names each refused tile (ADAM CR-081; CHG-TEN-002).
+          x-ticvai-problem-types: [unknown-variant, variant-not-sellable]
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/SaleBoardTileProblem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -4295,12 +4372,26 @@ components:
         isActive: { type: boolean }
 
     SaleBoard:
-      x-ticvai-persistence: "platform.sale_board"
+      # Three tables, the tiles a grandchild through the '+' chain (CHG-R1S-006): ADAM CR-080, CHG-TEN-001.
+      x-ticvai-persistence: "platform.sale_board + platform.sale_board_page + platform.sale_board_tile"
+      description: >
+        **A board is stored as three tables** (decided 14 October 2026, Chinmay, ADAM CR-080; CHG-TEN-001):
+        the board (`platform.sale_board`), one row per page (`pages[]`, `platform.sale_board_page`, keyed
+        to the board) and one row per tile (`pages[].tiles[]`, `platform.sale_board_tile`, keyed to its
+        page by a NOT NULL `sale_board_page_id`, so a tile follows its page's row-level security). Until
+        then the persistence named the board alone, and the tile table held an id and a nullable page key
+        and nothing a till could draw.
       type: object
       required: [id, code, name, venueId, kind, pages]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        code: { type: string, maxLength: 64 }
+        code:
+          type: string
+          maxLength: 64
+          x-ticvai-unique: venue
+          description: >
+            Unique within the venue (as the hand-written r0 table had it). A second board with the same
+            code is `409 duplicate-code` (audit R108; ADAM CR-080; CHG-TEN-001).
         name: { type: string, maxLength: 200 }
         venueId: { type: string, format: uuid }
         kind: { $ref: '#/components/schemas/SaleBoardKind' }
@@ -4315,19 +4406,97 @@ components:
               sortOrder: { type: integer }
               tiles:
                 type: array
-                items:
-                  type: object
-                  required: [position, kind]
-                  properties:
-                    position: { type: integer }
-                    kind:
-                      type: string
-                      enum: [product, category, action, spacer]
-                    variantId: { type: string, format: uuid, nullable: true }
-                    label: { type: string }
-                    colour: { type: string, nullable: true }
-                    imageAssetRef: { type: string, nullable: true }
+                items: { $ref: '#/components/schemas/SaleBoardTile' }
         isActive: { type: boolean }
+
+    SaleBoardTile:
+      x-ticvai-persistence: "platform.sale_board_tile"
+      description: >
+        **One button on one page of a till board** (ADAM CR-080, 14 October 2026; CHG-TEN-001): the rows of
+        `SaleBoard.pages[].tiles[]`, each keyed to its page. A position holds one tile on a page
+        (`x-ticvai-unique-together`).
+
+        **A tile that acts names what it acts on** (`x-ticvai-required-when`, carried as a CHECK): a
+        `product` tile names its variant, a `category` tile the catalogue category it opens, an `action`
+        tile the till action it runs (`actionCode`); a `spacer` names nothing. The hand-written r0 table
+        had the product rule as `sale_board_tile_product` ("a product tile with no variant is a button
+        that does nothing", handoff/storage-design.md).
+
+        **A tile's variant is checked when the board is saved and again when it is published.**
+        `createSaleBoard` and `updateSaleBoard` ask Catalogue whether every product tile's variant is
+        sellable at the board's venue (`catalogue#variantsSellableAt`, ADAM CR-081); `publishBundle`
+        leaves out a tile whose product is not `isSellable` when the bundle is cut, and the till never
+        draws it.
+      x-ticvai-unique-together:
+        - [sale_board_page_id, position]
+      x-ticvai-required-when:
+        variantId: { kind: product }
+        categoryId: { kind: category }
+        actionCode: { kind: action }
+      type: object
+      required: [position, kind]
+      properties:
+        position: { type: integer }
+        kind:
+          type: string
+          enum: [product, category, action, spacer]
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The catalogue variant a `product` tile sells (`catalogue.variant`). Required when `kind` is `product`.
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **The catalogue category a `category` tile opens** (`catalogue.product_category`; ADAM CR-080,
+            CHG-TEN-001). Required when `kind` is `category`; until 14 October a category tile referenced
+            nothing.
+        actionCode:
+          type: string
+          nullable: true
+          enum: [holdSale, recallHeld, applyDiscount, guestLookup, scanMedia, reprintReceipt]
+          description: >
+            **The till action an `action` tile runs** (ADAM CR-080, CHG-TEN-001). Required when `kind` is
+            `action`. The values are the sell screen's own actions (POS-002 hold and recall, discount, guest
+            lookup, media scan, receipt reprint); proposed, client to correct. Until 14 October an action tile
+            referenced nothing.
+        label: { type: string }
+        colour:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          description: '`#rrggbb`, as the hand-written r0 table held it (`char(7)`; audit R246; CHG-TEN-001).'
+        imageAssetRef: { type: string, nullable: true }
+
+    SaleBoardTileProblem:
+      x-ticvai-persistence: "none — error shape"
+      description: >
+        **Which tiles a board save refused, and why** (ADAM CR-081; CHG-TEN-002). One entry per refused
+        product tile, named by its page's `sortOrder` and its `position`, so the layout designer can mark the
+        tile rather than the board.
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [tiles]
+          properties:
+            tiles:
+              type: array
+              items:
+                type: object
+                required: [pageSortOrder, position, variantId, reason]
+                properties:
+                  pageSortOrder: { type: integer, description: The `sortOrder` of the tile's page. }
+                  position: { type: integer }
+                  variantId: { type: string, format: uuid }
+                  reason:
+                    type: string
+                    enum: [unknownVariant, notSellable]
+                    description: >
+                      `unknownVariant`: Catalogue has no such variant. `notSellable`: the variant exists and
+                      fails `variantsSellableAt` (retired, another venue's product, not approved or live, not
+                      on the till channel, or past its `onSaleTo`).
 
     RegisteredDevice:
       x-ticvai-persistence: "platform.device"
@@ -5769,6 +5938,22 @@ components:
           description: >
             **This till's drawer limit, overriding the venue's** (`VenueSettings.cashDrawerLimit`; DEC-179;
             CHG-CSP-016). Null inherits the venue's. Above it the till warns and offers a cash lift.
+        cashierInputMode:
+          type: string
+          enum: [keyboard, touch, scanner, hybrid]
+          default: hybrid
+          description: >
+            BL-061. **How the cashier at this till enters a sale**, as `configureWorkstation` set it. Stored
+            on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003): until then
+            the request took it and nothing kept it.
+        guestDisplayContent:
+          type: array
+          default: [lineItems]
+          description: >
+            BL-061. **What the guest-facing screen shows while a sale is in progress**, as
+            `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026
+            (ADAM CR-082; CHG-TEN-003).
+          items: { type: string, enum: [lineItems, total, loyaltyBalance, promotions, branding, upsell, queuePosition] }
         accessPointId:
           type: string
           format: uuid
@@ -5866,30 +6051,39 @@ components:
           default: hybrid
           description: >
             BL-061. **A till operator who touch-types is slower on a touchscreen and a new starter is
-            faster.** The mode is per workstation because the operator is.
+            faster.** The mode is per workstation because the operator is. Stored as
+            `Workstation.cashierInputMode` (ADAM CR-082; CHG-TEN-003); left out, it is `hybrid` (PUT replaces).
         guestDisplayContent:
           type: array
+          default: [lineItems]
           description: >
             **What the guest-facing screen shows while a sale is in progress.** Line items always;
             the rest is the venue's choice — and **a second screen showing nothing is a second screen
-            the guest ignores when it does show something that matters.**
+            the guest ignores when it does show something that matters.** Stored as
+            `Workstation.guestDisplayContent` (ADAM CR-082; CHG-TEN-003); left out, it is `[lineItems]`.
           items: { type: string, enum: [lineItems, total, loyaltyBalance, promotions, branding, upsell, queuePosition] }
         loadedMediaStockId:
           type: string
           format: uuid
           nullable: true
+          deprecated: true
+          x-ticvai-persisted: false
           description: >
-            BL-095. **Neither which stock a printer is loaded with nor how much is left.** A till that
-            runs out of wristbands mid-queue is an outage nobody predicted, and the stock is inventory
-            like anything else — this names which.
+            **Deprecated: not stored until BL-095** (the media stock record, on the printer device, waits on
+            the BOCA stock answer; ADAM CR-082, CHG-TEN-003). Ignored on input. BL-095. **Neither which stock
+            a printer is loaded with nor how much is left.** A till that runs out of wristbands mid-queue is
+            an outage nobody predicted. The stock belongs to the printer (`DeviceBinding`, `platform.device`),
+            not to the till, which is where BL-095 will put it.
         mediaStockRemaining:
           type: integer
           nullable: true
           readOnly: true
+          deprecated: true
+          x-ticvai-persisted: false
           description: >
-            Decremented on issue. **The number that turns a surprise into a reorder**, and it is
-            read-only because the count comes from what was printed rather than from somebody's
-            estimate.
+            **Deprecated: not stored until BL-095** (the media stock record, on the printer device, waits on
+            the BOCA stock answer; ADAM CR-082, CHG-TEN-003). A read-only field on a request is never returned,
+            so it was never readable. Decremented on issue, once BL-095 stores it on the printer.
         name: { type: string, maxLength: 200 }
         saleBoardId:
           type: string
@@ -5915,6 +6109,22 @@ components:
           $ref: '#/components/schemas/DeploymentProfile'
         edgeNodeId: { type: string, format: uuid, nullable: true }
         isActive: { type: boolean, default: true }
+
+    WorkstationShiftOpenProblem:
+      x-ticvai-persistence: "none — error shape"
+      description: >
+        **The shift that stopped a workstation change** (ADAM CR-083; CHG-TEN-004), as Orders'
+        `openShiftForWorkstation` returned it.
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [shiftId, shiftStatus]
+          properties:
+            shiftId: { type: string, format: uuid }
+            shiftStatus:
+              type: string
+              enum: [pendingApproval, open, suspended, pendingClosure, pendingVariance]
+              description: The shift's status (shift `ShiftStatus`), one of the states the query counts as open.
 
   securitySchemes:
     guestAuth:

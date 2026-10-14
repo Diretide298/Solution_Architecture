@@ -1,0 +1,76 @@
+id: CHG-TEN-002
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'Whether a variant may be sold is one declared Catalogue query, variantsSellableAt(venueId, variantIds,
+  channel); createSaleBoard and updateSaleBoard ask it in process and refuse with 422 unknown-variant or
+  variant-not-sellable naming the tiles, addCartLine and addToWishlist ask the same question, and publishBundle leaves
+  out a tile whose product is not isSellable when the bundle is cut.'
+decision:
+  what: 'contracts/spine/catalogue.yaml top-level x-ticvai-queries.variantsSellableAt (module catalogue, served
+    in-process and service, decision_owner Chinmay, notes "Catalogue owner to confirm"): a variant is sellable on
+    channel C at venue V when it exists and is_active, its product''s venue_id is V, lifecycle_state is approved or
+    live, channels contain C, and on_sale_to is null or in the future; returns known, sellable and a reason per
+    variant. createSaleBoard and updateSaleBoard: x-ticvai-read-via catalogue#variantsSellableAt in-process; the bare
+    400 becomes the shared 400 (validation) plus 422 [unknown-variant, variant-not-sellable] with
+    SaleBoardTileProblem (tiles: pageSortOrder, position, variantId, reason). publishBundle''s description: a product
+    tile whose product is not isSellable in the bundle is dropped from the bundle''s copy of the board; the till never
+    draws it. orders addCartLine: read-via in-process for 409 notSellableOnChannel. marketing-crm addToWishlist:
+    read-via route service (another deployable) and problem types on its 404. Lineage: the four operations read
+    catalogue.variant and catalogue.product (tools/applied/tenancy-reads-14-october.py).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-081 (ticket #30796): createSaleBoard and updateSaleBoard refused "a tile references an unknown or
+  unsellable variant" with a bare 400 (tenancy.yaml:1775-1779, 1806-1807, 1828-1829; baselined C-ERROR-PROBLEM-TYPE)
+  while their lineage read no Catalogue table and nothing defined unsellable. Product.isSellable
+  (catalogue.yaml:20758-20766) needs a published bundle, and a board is how a new product reaches its first bundle,
+  so it cannot be the save rule. ADR-0055 rule 2 (same deployable: in process), rule 4 (across: service). Lead''s
+  decision of 14 October 2026 (audit, CR-081 DECISION and the shared "ask the owner by a declared query" convention),
+  the Catalogue owner to confirm. common.yaml Problem: 400 is the shared validation type, an operation-specific
+  refusal declares its own types.'
+keys_touched:
+  operations:
+  - createSaleBoard
+  - updateSaleBoard
+  - publishBundle
+  - addCartLine
+  - addToWishlist
+  schemas:
+  - SaleBoardTileProblem
+  tables:
+  - catalogue.variant
+  - catalogue.product
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - tools/applied/tenancy-reads-14-october.py
+  - handoff/api-data-lineage.json
+  - handoff/audit-baseline.json
+  other:
+  - catalogue#variantsSellableAt
+root_class: A19 ERRORS-AND-STATES
+tickets:
+  started:
+  - '#30796 (CR-080/CR-081; a comment and a linked delta ticket, never a rewrite)'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-081
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  **The rule is pending the Catalogue owner''s confirmation**, recorded on the query itself. Reading of the contract:
+  ProductLifecycleState is draft, inReview, approved, live, withdrawn, archived; Channel is pos, kiosk, web, mobile,
+  b2b, ota, callCentre; Product.channels states no "empty = every channel" (catalogue.yaml says "empty = all" only
+  where it means it, e.g. the CatalogueAction channels), so an empty list is read as no channel and the variant is
+  not sellable; the owner to confirm. onSaleFrom is not part of the rule (a board may carry a product ahead of its
+  sale). Prevention: createSaleBoard:400, updateSaleBoard:400 and addToWishlist:404 are out of the
+  C-ERROR-PROBLEM-TYPE baseline, so check-contract-shapes fails if their problem types go; GEN''s read-via check
+  covers the read side. Follow-up: Catalogue''s published serviceAuth operation for variantsSellableAt (the service
+  route addToWishlist names) is not written; check-contract-compat reports no breaking change for the 400 -> 422
+  move (it compares with r1), so no breaking-changes.yaml entry was added; BO-109/BO-124 consume createSaleBoard.'
