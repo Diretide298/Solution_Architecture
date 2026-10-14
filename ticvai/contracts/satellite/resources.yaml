@@ -2345,6 +2345,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceBooking'
+        '409':
+          description: 'The booking is `returned`, `cancelled` or `noShow`; there is no allocation left to replace. Nothing changes.'
+          x-ticvai-problem-types: [resource-booking-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-allocation-policy:

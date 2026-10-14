@@ -114,6 +114,13 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '409':
+          description: 'The cell is not `pending` (already `running`, `complete`, `failed`, `skipped` or `rolledBack`); only a cell the wave has not reached can be skipped. Nothing changes.'
+          x-ticvai-problem-types: [rollout-cell-not-pending]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases:
@@ -697,6 +704,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RolloutDetail'
+        '409':
+          description: 'The rollout is already `paused` (`rollout-already-paused`), or is not `rolling` (`queued`, `canary`, or finished as `complete`, `failed` or `rolledBack`; `rollout-not-rolling`). Nothing changes.'
+          x-ticvai-problem-types: [rollout-already-paused, rollout-not-rolling]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}/rollback:

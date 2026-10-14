@@ -589,6 +589,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Sandbox' }
+        '409':
+          description: 'The sandbox is already `resetting` (`sandbox-already-resetting`), or is not `active` (`provisioning`, `expired` or `deleted`; `sandbox-not-active`). Nothing changes.'
+          x-ticvai-problem-types: [sandbox-already-resetting, sandbox-not-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -831,6 +838,13 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '409':
+          description: 'The subscription is `pendingVerification` (`webhook-subscription-not-verified`) or `disabled` (`webhook-subscription-disabled`); events are replayed only to a verified, enabled endpoint. Nothing is queued.'
+          x-ticvai-problem-types: [webhook-subscription-not-verified, webhook-subscription-disabled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1035,6 +1049,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ApiVersion' }
+        '409':
+          description: 'The version is not `current` (still `preview`, or already `deprecated` or `sunset`); only the current version is deprecated. Nothing changes and nobody is notified.'
+          x-ticvai-problem-types: [api-version-not-current]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1156,6 +1177,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/IntegrationListing' }
+        '409':
+          description: '`certify` or `reject` on a listing that is not `submitted` or `inReview` (`integration-listing-not-in-review`), or `revoke` on one that is not `certified` (`integration-listing-not-certified`). Nothing changes.'
+          x-ticvai-problem-types: [integration-listing-not-in-review, integration-listing-not-certified]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

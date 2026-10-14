@@ -2332,6 +2332,13 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Wallet' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: 'The wallet is `closed`; its balance is final and takes no adjustment. Nothing changes.'
+          x-ticvai-problem-types: [wallet-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-cards:
@@ -2459,6 +2466,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/GiftCard' }
+        '409':
+          description: 'The card is already `blocked` (`gift-card-already-blocked`), or is `issued` and not yet activated, `redeemed` or `expired`, with no live balance to protect (`gift-card-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [gift-card-already-blocked, gift-card-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-cards/{giftCardId}/activate:
@@ -2737,6 +2751,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Wallet'
+        '409':
+          description: 'The card is `expired` (`game-card-expired`) or was `transferred` (`game-card-transferred`), or the guest wallet behind it is `closed` (`wallet-closed`); only an `active` or `blocked` card is adjusted. Nothing changes.'
+          x-ticvai-problem-types: [game-card-expired, game-card-transferred, wallet-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/balance:
@@ -3228,6 +3249,13 @@ paths:
                 $ref: '#/components/schemas/WalletConfigurationVersion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.'
+          x-ticvai-problem-types: [unpublished-changes]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-risk-rules/{ruleCode}/status:

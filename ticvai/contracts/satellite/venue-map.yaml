@@ -560,6 +560,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/VenueMapImportProblem' }
+        '409':
+          description: 'The map is `archived`; an archived map takes no import. No job is started.'
+          x-ticvai-problem-types: [map-archived]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

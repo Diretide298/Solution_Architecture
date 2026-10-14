@@ -876,6 +876,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: 'The work order is not `inProgress`; only work that has been started can be completed. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-in-progress]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -935,6 +942,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: 'The work order is not `completed`; only completed work is verified. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-completed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1040,6 +1054,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is not `assigned`; only an assigned job can be declined. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-assigned]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1091,6 +1112,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is not `assigned`; only an assigned job can be started. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-assigned]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1155,6 +1183,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is not `inProgress`; only work under way can be paused. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-in-progress]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1189,6 +1224,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is not `paused` or `awaitingParts`; only a stopped job resumes. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-paused]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1244,6 +1286,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is already `closed` or `cancelled` (`work-order-already-closed`), or is `assigned` or `inProgress` with a technician on it (`work-order-in-progress`); pause, complete or reject it first. Nothing changes.'
+          x-ticvai-problem-types: [work-order-already-closed, work-order-in-progress]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

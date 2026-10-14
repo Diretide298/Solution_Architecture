@@ -1002,6 +1002,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReaderDeployment'
+        '409':
+          description: 'The reader is `unconfigured`, with nothing to deploy (`reader-not-configured`), or `disabled` (`reader-disabled`). Nothing is queued.'
+          x-ticvai-problem-types: [reader-not-configured, reader-disabled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /readers/{readerId}/test:
@@ -1960,6 +1967,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: 'The source reader is `unconfigured`; it has no configuration to copy. No target changes.'
+          x-ticvai-problem-types: [reader-not-configured]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /prizes/lookup:

@@ -718,6 +718,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '409':
+          description: 'The product is `archived`; an archived product takes no new version. Nothing changes.'
+          x-ticvai-problem-types: [product-archived]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/change-impact:
@@ -1093,6 +1100,13 @@ paths:
             application/json:
               schema:
                 $ref: ../spine/access.yaml#/components/schemas/Entitlement
+        '409':
+          description: 'Not `suspended`; only a suspended one is reinstated. Nothing changes.'
+          x-ticvai-problem-types: [entitlement-not-suspended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/freeze:
@@ -1195,6 +1209,13 @@ paths:
             application/json:
               schema:
                 $ref: ../spine/access.yaml#/components/schemas/Entitlement
+        '409':
+          description: 'Already `frozen`, or `suspended`, or ended as `expired` or `cancelled`; only an `active` one is frozen. Nothing changes.'
+          x-ticvai-problem-types: [entitlement-already-frozen, entitlement-suspended, entitlement-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/clone:
@@ -1697,6 +1718,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WaitlistEntry'
+        '409':
+          description: 'The entry already holds an offer (`offered`; `waitlist-entry-already-offered`), or has `converted`, `left` or `expired` (`waitlist-entry-closed`); only a `waiting` entry is offered capacity. Nothing is held.'
+          x-ticvai-problem-types: [waitlist-entry-already-offered, waitlist-entry-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products:
@@ -4054,6 +4082,13 @@ paths:
                 $ref: '#/components/schemas/InventoryHold'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: 'The hold is not `active` (expired, released, force-released or converted), so nothing is held to reclaim. Nothing changes.'
+          x-ticvai-problem-types: [hold-not-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-holds/{inventoryHoldId}/convert:
@@ -5310,6 +5345,13 @@ paths:
                     description: Cross-cell rights revoked alongside (ADR-0010).
                     items:
                       type: string
+        '409':
+          description: 'Already ended (`fullyConsumed`, `expired`, `cancelled` or `surrendered`); only a live one is suspended or reinstated. Nothing changes.'
+          x-ticvai-problem-types: [entitlement-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-lifecycle:
@@ -15195,6 +15237,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventReschedule'
+        '409':
+          description: 'The event is already `cancelled` (`event-already-cancelled`), or is `closed` or `archived` (`event-closed`); there is nothing left to move. Nothing changes and nobody is notified.'
+          x-ticvai-problem-types: [event-already-cancelled, event-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /spaces:
@@ -15933,6 +15982,13 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Assigned
+        '409':
+          description: 'The performance is `cancelled`; it has no participants to attribute media to. Nothing is assigned.'
+          x-ticvai-problem-types: [performance-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

@@ -5153,6 +5153,13 @@ paths:
                 $ref: '#/components/schemas/AiAnswerFeedback'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'This person has already labelled this answer; it takes one label per message per person (AIC-062). Nothing changes.'
+          x-ticvai-problem-types: [answer-feedback-already-recorded]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /assistant-profiles/{profileKey}:
@@ -7584,6 +7591,13 @@ paths:
                 $ref: '#/components/schemas/AiApprovalRequestScore'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The request is no longer `pending` or `escalated` (decided, withdrawn, cancelled or expired); there is no reviewer left to inform. No score is written.'
+          x-ticvai-problem-types: [approval-request-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:

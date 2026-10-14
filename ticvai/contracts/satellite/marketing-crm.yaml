@@ -2010,6 +2010,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CallDisposition'
+        '409':
+          description: 'The conversation has not ended (`withAssistant`, `queued`, `withAgent` or `waitingOnGuest`); a disposition records why it ended. Nothing is recorded.'
+          x-ticvai-problem-types: [conversation-not-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /lost-items/{itemId}/match:
@@ -2272,6 +2279,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Journey'
+        '409':
+          description: 'The journey is `archived` (`journey-archived`), or the move is not one its state model allows, such as pausing a `draft` journey or activating one already `active` (`journey-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [journey-archived, journey-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journeys/{journeyId}/performance:
@@ -2524,6 +2538,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageDispatch'
+        '409':
+          description: 'The dispatch has not failed (`queued`, `sent`, `delivered`, `opened` or `clicked`; `message-dispatch-not-failed`), or was `suppressed` (`message-dispatch-suppressed`); only a `failed` or `bounced` dispatch is retried. Nothing is sent.'
+          x-ticvai-problem-types: [message-dispatch-not-failed, message-dispatch-suppressed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/identify:
@@ -3276,6 +3297,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '409':
+          description: 'The conversation is not `withAgent` (still with the assistant, queued, waiting on the guest, or ended); only an agent''s conversation is transferred. Nothing changes.'
+          x-ticvai-problem-types: [conversation-not-with-agent]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/close:
@@ -3336,6 +3364,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '409':
+          description: 'The conversation is already `resolved`, `abandoned` or `timedOut` (`conversation-already-closed`), or is `queued` or `waitingOnGuest` (`conversation-transition-not-allowed`); only a conversation `withAssistant` or `withAgent` is closed. Nothing changes.'
+          x-ticvai-problem-types: [conversation-already-closed, conversation-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /agent-availability:
@@ -3504,6 +3539,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KioskAssistSession'
+        '409':
+          description: 'The assist session has already ended (`endedAt` is set). Nothing changes.'
+          x-ticvai-problem-types: [kiosk-assist-already-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/position:
@@ -6459,6 +6501,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Case'
+        '409':
+          description: 'The case is already `escalated` (`case-already-escalated`), or is not `inProgress` (`open`, `awaitingGuest`, `resolved` or `closed`; `case-not-in-progress`). Nothing changes.'
+          x-ticvai-problem-types: [case-already-escalated, case-not-in-progress]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/programmes:
@@ -6811,6 +6860,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Review'
+        '409':
+          description: 'The review was `rejected` in moderation and is shown to nobody; it takes no response. Nothing changes.'
+          x-ticvai-problem-types: [review-rejected]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /marketing-subscriptions:

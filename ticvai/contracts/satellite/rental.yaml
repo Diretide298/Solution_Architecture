@@ -1585,6 +1585,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalAgreementSignature'
+        '409':
+          description: 'The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is signed.'
+          x-ticvai-problem-types: [rental-booking-cancelled, rental-booking-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/check-out:
@@ -1874,6 +1881,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalBooking'
+        '409':
+          description: 'The booking is not out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`; `rental-booking-not-checked-out`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is swapped.'
+          x-ticvai-problem-types: [rental-booking-not-checked-out, rental-booking-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/return:
@@ -1943,6 +1957,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalSettlement'
+        '409':
+          description: 'The booking never went out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`; `rental-booking-not-checked-out`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is settled.'
+          x-ticvai-problem-types: [rental-booking-not-checked-out, rental-booking-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/inspection:
@@ -1994,6 +2015,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalInspection'
+        '409':
+          description: 'The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or the phase does not fit it: `preRental` once the equipment has gone out, or `postRental` before it has (`inspection-phase-mismatch`). Nothing is recorded.'
+          x-ticvai-problem-types: [rental-booking-cancelled, inspection-phase-mismatch]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/damage:
@@ -2043,6 +2071,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalDamageAssessment'
+        '409':
+          description: 'The booking never went out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`), so there is no equipment to assess. Nothing is recorded.'
+          x-ticvai-problem-types: [rental-booking-not-checked-out]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/overdue:

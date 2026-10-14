@@ -370,6 +370,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Voucher'
+        '409':
+          description: 'The voucher is already `voided` (`voucher-already-voided`), or is `redeemed` or `expired` with nothing left to void (`voucher-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [voucher-already-voided, voucher-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions:

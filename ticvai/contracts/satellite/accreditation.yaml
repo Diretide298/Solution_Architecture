@@ -673,6 +673,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationDocument'
+        '409':
+          description: 'The document is not `submitted` (already `verified` or `rejected`, or `expired`); only a submitted document is decided. Nothing changes.'
+          x-ticvai-problem-types: [accreditation-document-not-submitted]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-identity-conflicts:
@@ -856,6 +863,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationCredential'
+        '409':
+          description: 'The credential was already `replaced` (`accreditation-credential-already-replaced`), or is `revoked` or `expired` (`accreditation-credential-transition-not-allowed`), so there is no live credential to replace. Nothing is issued.'
+          x-ticvai-problem-types: [accreditation-credential-already-replaced, accreditation-credential-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /badge-templates:

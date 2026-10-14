@@ -1716,6 +1716,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChargebackEvidence'
+        '409':
+          description: 'The chargeback is still `received` and not yet under review (`chargeback-not-under-review`), its evidence was already submitted (`chargeback-evidence-already-submitted`), or it is closed as `accepted`, `won`, `lost` or `expired` (`chargeback-closed`). Nothing is sent.'
+          x-ticvai-problem-types: [chargeback-not-under-review, chargeback-evidence-already-submitted, chargeback-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-performance:
@@ -1970,6 +1977,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentsDepositActivity'
+        '409':
+          description: 'The deposit is already settled (`settledAt` is set) and takes no further movement. Nothing is recorded.'
+          x-ticvai-problem-types: [deposit-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-terminal-certifications:

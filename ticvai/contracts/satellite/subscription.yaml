@@ -565,6 +565,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
+        '409':
+          description: 'The subscription is already `cancelled` (`subscription-already-cancelled`), or is `trial` or `expired` (`subscription-not-active`); only an `active` or `pastDue` subscription is cancelled. Nothing changes.'
+          x-ticvai-problem-types: [subscription-already-cancelled, subscription-not-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /partner-agreements:
@@ -1224,6 +1231,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tenant'
+        '409':
+          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). Nothing changes.'
+          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/reactivate:
@@ -3343,6 +3357,13 @@ paths:
           content:
             application/json:
               schema: *id001
+        '409':
+          description: 'The environment is not `live` (not live yet, already `draining` or beyond, or `failed`); only a live environment is drained. Nothing changes.'
+          x-ticvai-problem-types: [burst-environment-not-live]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /burst-environments/{burstEnvironmentId}/reconcile:
@@ -3410,6 +3431,13 @@ paths:
                     type: integer
                   complete:
                     type: boolean
+        '409':
+          description: 'The environment has not been drained (still `requested`, `provisioning`, `warming` or `live`, or `failed`; `burst-environment-not-drained`), or is already `reconciled` or `decommissioned` (`burst-environment-already-reconciled`). Nothing is replayed.'
+          x-ticvai-problem-types: [burst-environment-not-drained, burst-environment-already-reconciled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /burst-environments/{burstEnvironmentId}/decommission:

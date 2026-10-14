@@ -881,6 +881,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
+        '409':
+          description: 'The request is already `escalated` (`approval-request-already-escalated`), or is not `pending` because it was decided, returned, withdrawn, cancelled or expired (`approval-request-not-pending`). Nothing changes.'
+          x-ticvai-problem-types: [approval-request-already-escalated, approval-request-not-pending]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/resubmit:
@@ -937,6 +944,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
+        '409':
+          description: 'The request is not `rejected`; only a rejected request is resubmitted (a `returned` or `informationRequested` one goes back through `submitApprovalRequest`). No request is created.'
+          x-ticvai-problem-types: [approval-request-not-rejected]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-matrices:
@@ -3051,6 +3065,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: 'The request has no decision to sign: it is not yet decided (`draft`, `pending`, `escalated`, `returned` or `informationRequested`) or ended without one (`withdrawn`, `cancelled` or `expired`); only an `approved` or `rejected` request is signed. Nothing is signed.'
+          x-ticvai-problem-types: [approval-request-not-decided]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/record:

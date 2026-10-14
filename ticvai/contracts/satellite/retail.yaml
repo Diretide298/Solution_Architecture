@@ -142,6 +142,13 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '409':
+          description: 'The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be collected. Stock does not move.'
+          x-ticvai-problem-types: [merchandise-reservation-not-reserved]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -178,6 +185,13 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '409':
+          description: 'The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be cancelled. Stock does not move.'
+          x-ticvai-problem-types: [merchandise-reservation-not-reserved]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -226,6 +240,13 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '409':
+          description: 'The item is still within its hold (`awaitingCollection` or `partiallyCollected`; `shop-and-drop-still-held`) or is already `collected` or `disposed` (`shop-and-drop-already-closed`); only an `uncollected` item is disposed of. Nothing changes.'
+          x-ticvai-problem-types: [shop-and-drop-still-held, shop-and-drop-already-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

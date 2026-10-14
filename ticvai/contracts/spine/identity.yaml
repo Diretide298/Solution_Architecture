@@ -1589,6 +1589,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: 'The session has already ended (`signedOut`, `terminated` or `expired`). Nothing changes.'
+          x-ticvai-problem-types: [session-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/session:
@@ -1844,6 +1851,13 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'A `password` reset for a principal provisioned by single sign-on (`Principal.ssoProviderId` set), who has no local password; it is changed at the identity provider. Nothing is written.'
+          x-ticvai-problem-types: [credential-managed-by-sso]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}:
@@ -3917,6 +3931,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: 'The challenge was already completed; a challenge is single-use, so ask for a new one. Nothing changes.'
+          x-ticvai-problem-types: [mfa-challenge-already-verified]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           description: '**Five wrong codes and step-up is locked** (decided 28 September, audit R126 (6)).
             The fifth failure voids the challenge, and no new challenge is issued to this principal for
@@ -4487,6 +4508,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthorisationPolicy'
+        '409':
+          description: 'The policy is `retired` (`authorisation-policy-retired`), or the move is not one its lifecycle allows, such as activating a policy that has not been through approval (`authorisation-policy-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [authorisation-policy-retired, authorisation-policy-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /authorisation-policies/simulate:

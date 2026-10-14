@@ -819,6 +819,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaTag'
+        '409':
+          description: 'The asset is still `processing`, or is `failed` or `quarantined`, so there is no usable file to analyse. Nothing is queued.'
+          x-ticvai-problem-types: [media-asset-not-ready]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/similar:

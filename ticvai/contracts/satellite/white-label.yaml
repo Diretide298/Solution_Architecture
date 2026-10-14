@@ -1190,6 +1190,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '409':
+          description: 'The block is already `published` (`content-block-published`; a change goes through a new draft) or is `archived` (`content-block-archived`). Nothing changes.'
+          x-ticvai-problem-types: [content-block-published, content-block-archived]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenant-config:
@@ -3814,6 +3821,13 @@ paths:
                 $ref: '#/components/schemas/TenantConfig'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.'
+          x-ticvai-problem-types: [unpublished-changes]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenant-config/versions/{version}/diff:

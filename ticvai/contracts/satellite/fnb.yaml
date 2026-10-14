@@ -581,6 +581,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductionPlan'
+        '409':
+          description: 'The plan is not a `draft` (already `released`, `superseded` or `cancelled`); only a draft is released. No runs are created.'
+          x-ticvai-problem-types: [production-plan-not-draft]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /production-runs/{runId}:
@@ -695,6 +702,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookingMessageReceipt'
+        '409':
+          description: 'A confirmation, reminder or reconfirmation request for a reservation that is `cancelled`, `seated`, `completed` or `noShow` (`table-reservation-closed`), or a `cancellation` message for one that is not `cancelled` (`table-reservation-not-cancelled`). Nothing is sent.'
+          x-ticvai-problem-types: [table-reservation-closed, table-reservation-not-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-reservations/conflicts:
@@ -1128,6 +1142,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderLabel'
+        '409':
+          description: 'The ticket is `cancelled`; there is no order to bag. No label is produced.'
+          x-ticvai-problem-types: [kitchen-ticket-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-orders/{orderId}/notify:
@@ -1188,6 +1209,13 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sent
+        '409':
+          description: 'The order is `cancelled` or `refunded` (`fnb-order-closed`), or has not reached the `stage` being announced, such as `ready` while still `inPreparation` (`fnb-order-stage-not-reached`). Nothing is sent.'
+          x-ticvai-problem-types: [fnb-order-closed, fnb-order-stage-not-reached]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /combos:
@@ -1460,6 +1488,13 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Chased
+        '409':
+          description: 'The ticket is already `served` or `cancelled`; there is nothing left to chase. No chase is recorded.'
+          x-ticvai-problem-types: [kitchen-ticket-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-stations/rebalance:
@@ -1799,6 +1834,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FnbOrder'
+        '409':
+          description: 'The order is not `ready` yet (`ordered`, `accepted` or `inPreparation`; `fnb-order-not-ready`), was already handed over (`served`, `collected`, `delivered` or `refunded`; `order-already-fulfilled`), or was `cancelled` (`fnb-order-cancelled`). Nothing changes.'
+          x-ticvai-problem-types: [fnb-order-not-ready, order-already-fulfilled, fnb-order-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/sections:
@@ -2092,6 +2134,13 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sent
+        '409':
+          description: 'The visit is `settled`, `merged` or `cancelled`; nobody is called to the pass for a closed table. Nothing is sent.'
+          x-ticvai-problem-types: [table-visit-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/transfer-items:
@@ -2303,6 +2352,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestaurantWaitlist'
+        '409':
+          description: 'The party is already `seated`, `walkedAway`, `noShow` or `cancelled`; only a `waiting` or `notified` party is notified. Nothing is sent.'
+          x-ticvai-problem-types: [waitlist-entry-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-stock-counts/{countId}/lines:
@@ -2454,6 +2510,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecountResult'
+        '409':
+          description: 'A named line already has a recount pending (`recount-already-requested`), or is `recounted`, `accepted` or `rejected` (`count-line-not-entered`); only an `entered` line is sent back. No line changes.'
+          x-ticvai-problem-types: [recount-already-requested, count-line-not-entered]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}/publish:
@@ -2525,6 +2588,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuVersion'
+        '409':
+          description: 'The menu has no draft changes since the live version, so there is nothing to publish. No version is written.'
+          x-ticvai-problem-types: [nothing-to-publish]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}/rollback:
@@ -2579,6 +2649,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuVersion'
+        '409':
+          description: '`toVersion` is the version already `live` (`menu-version-already-live`), or was never published (`draft` or `scheduled`; `menu-version-not-published`). No version is written.'
+          x-ticvai-problem-types: [menu-version-already-live, menu-version-not-published]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}/versions:
@@ -2709,6 +2786,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
+        '409':
+          description: 'The ticket is already `served` or `cancelled`; there is no course left to fire. Nothing changes.'
+          x-ticvai-problem-types: [kitchen-ticket-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-tickets/{ticketId}/hold:
@@ -2789,6 +2873,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
+        '409':
+          description: 'The ticket is already `served` or `cancelled`; there is no course left to hold. Nothing changes.'
+          x-ticvai-problem-types: [kitchen-ticket-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-tickets/{ticketId}/refire:
@@ -2863,6 +2954,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
+        '409':
+          description: 'The ticket is `cancelled`; a cancelled order is not made again. Nothing changes.'
+          x-ticvai-problem-types: [kitchen-ticket-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen-tickets/{ticketId}/recall:
@@ -3281,6 +3379,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '409':
+          description: 'The visit is `settled`, `merged` or `cancelled`; a line is comped only while the visit is `open` or `billRequested`. Nothing changes.'
+          x-ticvai-problem-types: [table-visit-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/checkpoints:
@@ -3878,6 +3983,13 @@ paths:
                 $ref: '#/components/schemas/TableVisit'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: 'The visit is `settled`, `merged` or `cancelled`; only an `open` or `billRequested` check changes server. Nothing changes.'
+          x-ticvai-problem-types: [table-visit-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist:
@@ -3985,6 +4097,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '409':
+          description: 'The bill is already requested (`table-visit-bill-already-requested`), or the visit is `settled`, `merged` or `cancelled` (`table-visit-closed`). Nothing changes.'
+          x-ticvai-problem-types: [table-visit-bill-already-requested, table-visit-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-reservations:
@@ -6838,6 +6957,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableState'
+        '409':
+          description: 'The table has an open bill (`ordered` or `billRequested`; `table-has-open-bill`) or is `reserved` (`table-reserved`); it is cleared only from `seated`, `needsClearing`, `free` or `outOfService`. Nothing changes.'
+          x-ticvai-problem-types: [table-has-open-bill, table-reserved]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen/tickets:
@@ -7064,6 +7190,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
+        '409':
+          description: 'The ticket is already `ready` (`kitchen-ticket-already-ready`), or `served` or `cancelled` (`kitchen-ticket-closed`); only a ticket still being made can move up the queue. Nothing changes.'
+          x-ticvai-problem-types: [kitchen-ticket-already-ready, kitchen-ticket-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kitchen/stations:
@@ -7463,6 +7596,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CorrectiveAction'
+        '409':
+          description: 'The finding is not `open` (already `actioned`, `signed`, `escalated` or `closed`); an action is recorded only against an open finding. Nothing changes.'
+          x-ticvai-problem-types: [corrective-action-not-open]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/corrective-actions/{actionId}/escalate:
@@ -7559,6 +7699,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CorrectiveAction'
+        '409':
+          description: 'The finding is not `signed` (still `open`, `actioned` or `escalated`, or already `closed`); only a signed finding is closed. Nothing changes.'
+          x-ticvai-problem-types: [corrective-action-not-signed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recipes/{recipeId}/substitutes:

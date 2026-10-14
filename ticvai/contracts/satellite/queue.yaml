@@ -648,6 +648,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
+        '409':
+          description: 'The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`); there is no failed redemption to override. Nobody is admitted.'
+          x-ticvai-problem-types: [queue-entry-already-redeemed, queue-entry-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -707,6 +714,13 @@ paths:
                     type: array
                     items: { type: string, format: uuid }
                   remainingInQueue: { type: integer }
+        '409':
+          description: 'The queue is `paused` or `closed`; parties are called only from an `open` or `atCapacity` queue. Nobody is called.'
+          x-ticvai-problem-types: [queue-not-open]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

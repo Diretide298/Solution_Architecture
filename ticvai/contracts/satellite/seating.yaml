@@ -1935,6 +1935,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatHold'
+        '409':
+          description: 'The block was already released (`seat-block-released`), or a named seat is no longer `blocked` (`seat-not-blocked`). No seat is allocated.'
+          x-ticvai-problem-types: [seat-block-released, seat-not-blocked]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-maps/{seatMapId}/rules:
@@ -2525,6 +2532,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatHoldPool'
+        '409':
+          description: 'The pool is already `released` (`seat-hold-pool-already-released`) or `expired` (`seat-hold-pool-expired`); its seats are no longer held. Nothing changes.'
+          x-ticvai-problem-types: [seat-hold-pool-already-released, seat-hold-pool-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-rules:

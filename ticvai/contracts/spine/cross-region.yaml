@@ -745,6 +745,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletAuthorisation'
+        '409':
+          description: 'Nothing is held to release: the authorisation is already `captured`, `released` or `expired`. Nothing changes.'
+          x-ticvai-problem-types: [authorisation-not-held]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-allocations:

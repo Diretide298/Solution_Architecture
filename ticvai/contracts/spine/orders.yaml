@@ -895,6 +895,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentLink'
+        '409':
+          description: 'The link is not live (`paid`, `expired`, `superseded` or `cancelled`); only an `issued` or `viewed` link is resent. Nothing is sent.'
+          x-ticvai-problem-types: [payment-link-not-live]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-links/{linkId}/cancel:
@@ -1035,6 +1042,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConvertToTermResult'
+        '409':
+          description: 'The order is not paid (`pending`, `held`, `partiallyPaid`, `voided` or `failed`; `order-not-paid`) or has been `refunded` (`order-refunded`), so there is no payment to credit. Nothing changes.'
+          x-ticvai-problem-types: [order-not-paid, order-refunded]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-credit-accounts:
@@ -1544,6 +1558,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletPass'
+        '409':
+          description: 'The pass is `voided` or `expired`; nothing is pushed to its devices.'
+          x-ticvai-problem-types: [wallet-pass-voided, wallet-pass-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resale-fee-policy:
@@ -3408,6 +3429,13 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '409':
+          description: 'The cart is `checkedOut` or `abandoned` (`cart-not-open`), or already belongs to another guest (`cart-already-claimed`). Nothing is attached or merged.'
+          x-ticvai-problem-types: [cart-not-open, cart-already-claimed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -5568,6 +5596,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/PaymentProblem'
+        '409':
+          description: 'The payment is not `pendingConfirmation`; its outcome is already known and there is nothing to ask the provider. Nothing changes.'
+          x-ticvai-problem-types: [payment-not-pending-confirmation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payments/{paymentId}/tip:
