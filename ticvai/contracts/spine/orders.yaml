@@ -205,7 +205,9 @@ paths:
         **Scoped to the caller, not filtered by it.** The same shape as `listMyCases` and `listMyEntitlements`:
         a guest-facing list that accepts a subject is a list somebody will call with another subject.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - orders
       x-ticvai-permission: null
@@ -260,7 +262,9 @@ paths:
         `riskWeight` accumulates across rules, so **three weak signals can hold a transaction that no
         single rule would** — which is the point of a weight rather than a flag.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - orders
       parameters:
@@ -1790,7 +1794,9 @@ paths:
         Inactive templates are returned only when asked for: a template retired last season still
         explains a ticket issued from it.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - orders
       x-ticvai-permission: PRODUCT_VIEW
@@ -2129,6 +2135,7 @@ paths:
   /payment-providers:
     get:
       operationId: listPaymentProviders
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P09 ADM-412 Payment Method & Settlement Setup"
       summary: Gateways configured for this scope
@@ -2234,7 +2241,9 @@ paths:
       description: '**Masked, always.** The last four digits and the brand — enough to choose between
         two saved cards and not enough to use one.
 
-        '
+        
+
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
       - orders
       parameters:
@@ -2548,7 +2557,9 @@ paths:
       description: '8.1.5. **The allowance is the control.** Without it, restriction by profile is a yes/no
         on an unbounded right, which is not a restriction.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - orders
       parameters:
@@ -3681,7 +3692,9 @@ paths:
         **Excludes carts abandoned deliberately.** A guest who emptied their cart said no, and chasing
         them is the difference between a reminder and a nuisance.
 
-        '
+        
+
+        **Order.** Sorted by `cartId` descending (a UUIDv7, so newest first).'
       tags:
       - cart
       x-ticvai-permission: MARKETING_MANAGE
@@ -3826,7 +3839,9 @@ paths:
         **A guest sees their own and nothing else** (`x-ticvai-self-scoped: subject`); supplying
         another subject is 403 rather than silently honoured.
 
-        '
+        
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -3967,7 +3982,9 @@ paths:
         own history is `listMyOrders`, which is scoped to the caller rather than filtered by a parameter
         (raised 24 August for `WEB-019` and `GST-019`). A guest surface does not load its list from here.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - order
       x-ticvai-permission: ORDER_VIEW
@@ -4752,6 +4769,8 @@ paths:
       summary: List refunds against an order
       description: An unknown order, or one outside the caller's scope, is the shared 404; an order with
         no refunds is an empty list.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - refund
       parameters:
@@ -5886,7 +5905,9 @@ paths:
         A rejection leaves this list''s unresolved view when `resolveSyncRejection` records what was
         done about it.
 
-        '
+        
+
+        **Order.** Newest first, by `recordedAt` descending, then by `id`.'
       tags:
       - sync
       x-ticvai-permission: ORDER_VIEW
@@ -6709,7 +6730,9 @@ paths:
         appears where the caller is its sender (`fromSubjectId`) or, once claimed, its recipient
         (`toSubjectId`).
 
-        '
+        
+
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
       - order
       x-ticvai-permission: null
@@ -6833,7 +6856,9 @@ paths:
         reservations; another guest''s reservation is refused exactly as one that does not exist, never
         returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - reservation
       x-ticvai-permission: ORDER_VIEW
@@ -12524,7 +12549,9 @@ paths:
 
         An unknown membership is the shared 404; one never renewed is an empty list.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -12628,6 +12655,8 @@ paths:
         `captured`, `released` and `forfeited` are what the card company knows; `ledger.deposit`
         holds the liability posting and its `refundableUntil`. Two tables called deposit, two
         different questions.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -12665,6 +12694,8 @@ paths:
         **Distinct from `promotions`, which decides whether a discount applies.** This records that
         one did, to this order, for this amount — the row a refund has to reverse and a report has
         to total.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -12704,6 +12735,8 @@ paths:
         to read them.
 
         An unknown order is the shared 404; an order with no fees is an empty list.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -12751,6 +12784,8 @@ paths:
         **`quoteUpgrade` priced an upgrade and nothing recorded that one happened.** The quote is
         the cheap half; the record is what a guest arriving with an upgraded entitlement is checked
         against.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -14077,7 +14112,9 @@ paths:
         mappings with their reason. Gateway references already on the payment and refund are not
         repeated here.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -14172,7 +14209,9 @@ paths:
         customer type. Narrowest match wins; a row naming nothing is the venue default. Filter by any
         match key; `isActive` defaults to true.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW

@@ -253,6 +253,7 @@ paths:
   /seat-maps:
     get:
       operationId: listSeatMaps
+      description: '**Order.** Newest first, by `publishedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-1061 Platform Command Center"
         - "P08 BO-953 Seat Map Command Center"
@@ -606,6 +607,7 @@ paths:
         format: uuid
     get:
       operationId: listSeats
+      description: '**Order.** Sorted by `position` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-1051 Seat Analytics Command Center"
         - "P08 BO-956 Rows & Seats"
@@ -1745,7 +1747,9 @@ paths:
       description: 'Seats withheld from sale — production holds, house seats, group allocations, maintenance.
         Distinct from a hold, which is a guest mid-purchase.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - block
       x-ticvai-permission: PRODUCT_VIEW

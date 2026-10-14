@@ -104,6 +104,7 @@ paths:
   /assets:
     get:
       operationId: listAssets
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
         - "P08 BO-108 Venue Operations"
@@ -385,6 +386,8 @@ paths:
       description: >
         Every work order, inspection, incident and status change, in sequence. What an
         insurer or a regulator asks for after something goes wrong.
+
+        **Order.** Newest first, by `occurredAt` descending, then by `principalId`.
       tags: [asset]
       x-ticvai-permission: ASSET_VIEW
       x-ticvai-scope-level: venue
@@ -430,6 +433,8 @@ paths:
       summary: List work orders
       description: >
         A technician's queue. Defaults to their own assignments; a supervisor sees the venue.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_VIEW
       x-ticvai-scope-level: venue
@@ -1418,6 +1423,7 @@ paths:
   /vendor-service-requests:
     get:
       operationId: listVendorServiceRequests
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
@@ -1560,6 +1566,7 @@ paths:
   /maintenance-plans:
     get:
       operationId: listMaintenancePlans
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-071 Planned Maintenance"
         - "P08 BO-575 Maintenance Rule & Service Plan Configuration"
@@ -1805,6 +1812,8 @@ paths:
       description: >
         Retained for seven years alongside the financial audit trail. This is the record an
         inspector asks for.
+
+        **Order.** Newest first, by `recordedAt` descending, then by `id`.
       tags: [inspection]
       x-ticvai-permission: INSPECTION_VIEW
       x-ticvai-scope-level: venue
@@ -1892,6 +1901,7 @@ paths:
   /incidents:
     get:
       operationId: listIncidents
+      description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-003 Home — on duty"
         - "P06 EMP-026 Incident report"

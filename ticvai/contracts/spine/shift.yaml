@@ -197,6 +197,7 @@ paths:
   /shifts:
     get:
       operationId: listShifts
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
@@ -524,6 +525,8 @@ paths:
 
         That separation is what makes a variance attributable to a person rather than to a
         counter.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
       tags: [shift]
       x-ticvai-permission: SHIFT_OPEN
       x-ticvai-scope-level: venue
@@ -1940,6 +1943,7 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listCashMovements
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P04 POS-015 Cash Operations Dashboard"

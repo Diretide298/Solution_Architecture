@@ -403,6 +403,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets live, published
         promotions, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.
       tags:
       - promotion
       x-ticvai-permission: PRICE_VIEW
@@ -979,7 +981,9 @@ paths:
       description: 'A campaign is the master definition. Individual codes are generated from it and carry
         their own redemption state.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - coupon
       x-ticvai-permission: PRICE_VIEW
@@ -1053,6 +1057,7 @@ paths:
         format: uuid
     get:
       operationId: listCouponCodes
+      description: '**Order.** Soonest first, by `validFrom` ascending, then by `assignedSubjectId`.'
       x-ticvai-consumed-by:
         - "P08 ADM-158 Coupon & Promo Code Command Center"
         - "P08 ADM-164 Code Distribution & Assignment Manager"
@@ -1412,7 +1417,9 @@ paths:
       description: 'Vouchers carry monetary value and are sold or issued. Distinct from coupons, which
         modify the price of something else.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - voucher
       x-ticvai-permission: PRICE_VIEW
@@ -1535,6 +1542,7 @@ paths:
   /bundles:
     get:
       operationId: listBundles
+      description: '**Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1775,7 +1783,9 @@ paths:
       description: 'How a bundled price divides across components. Consumed by the ledger at posting and
         at recognition.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - allocation
       x-ticvai-permission: LEDGER_VIEW
@@ -1879,7 +1889,9 @@ paths:
       description: 'Read at venue: a venue sees the rules of the region above it. Rules are owned at region
         (decided 28 September, audit R183).
 
-        '
+        
+
+        **Order.** Sorted by `priority` ascending, then by `id`.'
       tags:
       - upsell
       x-ticvai-permission: PRODUCT_VIEW
@@ -7493,7 +7505,9 @@ paths:
         budget are not in these rows; the governance and budget screens work them out on read.
         (decided 29 September, writers pass)
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - promotion
       x-ticvai-permission: PRICE_VIEW
@@ -7728,7 +7742,9 @@ paths:
         partner where it differs. The live figures (reserved, remaining) are the catalogue''s and are
         shown by listCapacityPoolReservation and listBundleAvailabilityChannel, not here.
 
-        '
+        
+
+        **Order.** Sorted by `channel` ascending, then by `id`.'
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
@@ -7856,7 +7872,9 @@ paths:
         stands for which partner product, on what price, commission and terms, and the last connection
         reading the partner sync job wrote. The cross-bundle monitor is listPartnerExternalProduct.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW

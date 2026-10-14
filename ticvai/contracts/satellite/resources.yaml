@@ -3000,7 +3000,9 @@ paths:
         and with `timesPerDay` every cleaning of the date must still be placeable once the window is taken.
         `freeCount` counts only rooms that pass all three.
 
-        '
+        
+
+        **Order.** Soonest first, by `startsAt` ascending.'
       x-ticvai-agreed: '29 September: W10 (cleaning policy) and W9 (date, start and duration checked together)'
       tags:
       - resources

@@ -474,7 +474,9 @@ paths:
       description: 'Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` does
         not appear to a venue-scoped user at all — an empty result is a worse answer than an absent entry.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - catalogue
       x-ticvai-permission: REPORT_VIEW_VENUE
@@ -899,7 +901,9 @@ paths:
         3 October 2026, Block A business rules; CHG-RUL-006). `mineOnly` narrows the list to the caller''s own runs;
         `getReportExecution` and `getReportResult` read any run this list shows.
 
-        '
+        
+
+        **Order.** Newest first, by `requestedAt` descending, then by `id`.'
       tags:
       - execution
       x-ticvai-permission: REPORT_VIEW_VENUE
@@ -1027,6 +1031,7 @@ paths:
         format: uuid
     get:
       operationId: getReportResult
+      description: '**Order.** Newest first, by `generatedAt` descending, then by `executionId`.'
       x-ticvai-consumed-by:
         - "P16 ANL-040 Save, Run & Report Results Viewer"
       x-ticvai-audience:
@@ -1061,6 +1066,7 @@ paths:
   /report-schedules:
     get:
       operationId: listReportSchedules
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-061 Scheduled Reports"
         - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
@@ -2843,7 +2849,9 @@ paths:
         newest period first (decided 29 September, writers pass). What `getAnalyticsBenchmark` divides
         by.
 
-        '
+        
+
+        **Order.** Newest period first, by `periodStart` descending, then by `id`.'
       tags:
       - reporting
       x-ticvai-permission: REPORT_VIEW_TENANT

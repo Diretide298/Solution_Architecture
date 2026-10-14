@@ -3079,7 +3079,9 @@ paths:
         what `publishWalletConfiguration` recorded, plus drafts created by
         `restoreWalletConfigurationVersion` (`publishedAt` null).
 
-        '
+        
+
+        **Order.** Newest first, by `publishedAt` descending.'
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW

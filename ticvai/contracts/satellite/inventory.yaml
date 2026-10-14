@@ -478,7 +478,9 @@ paths:
         **Searchable by serial first**, because the question is almost always asked with a serial in hand
         — a guest at a counter with a broken phone, or an auditor with a stock list.
 
-        '
+        
+
+        **Order.** Newest first, by `receivedAt` descending, then by `id`.'
       tags:
       - inventory
       x-ticvai-permission: PRODUCT_VIEW
@@ -529,7 +531,9 @@ paths:
         Ordered by expiry, not by value. **The cheapest thing expiring today matters more than the most
         expensive thing expiring next month**, because only one of them is about to become waste.
 
-        '
+        
+
+        **Order.** Soonest expiry first, by `expiresAt` ascending, then by `id`.'
       tags:
       - inventory
       x-ticvai-permission: PRODUCT_VIEW
@@ -566,6 +570,7 @@ paths:
   /inventory-items:
     get:
       operationId: listInventoryItems
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-048 Retail Products"
         - "P08 BO-081 Inventory Items"
@@ -829,6 +834,7 @@ paths:
   /stock:
     get:
       operationId: getStockPositions
+      description: '**Order.** Sorted by `itemId` descending (a UUIDv7, so newest first).'
       x-ticvai-consumed-by:
         - "P06 EMP-061 Retail Inventory Command Center"
         - "P06 EMP-062 Store Stock & SKU Availability"
@@ -898,6 +904,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: List stock locations
       description: Stores, bars, kitchens, retail floors, cellars.
+
+        **Order.** Sorted by `name` ascending, then by `id`.
       tags:
       - stock
       parameters:
@@ -1031,7 +1039,9 @@ paths:
       description: 'Every change to stock, with reason and principal. On-hand is derived from this — it
         is not a field anyone edits.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - movement
       x-ticvai-permission: PRODUCT_VIEW
@@ -1153,6 +1163,7 @@ paths:
   /stock-counts:
     get:
       operationId: listStockCounts
+      description: '**Order.** Newest first, by `startedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-066 Stock Count & Cycle Count Management"
         - "P08 BO-079 Stock Count"
@@ -1257,6 +1268,8 @@ paths:
       summary: The lines of a stock count
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; EMP-066: the count screen needs its pre-filled lines).** The count's `inventory.count_line` rows (CountLine), ordered by item. **A blind count hides what is expected**: while an `isBlind` count is open, `theoreticalQuantity`, `variance` and `variancePercent` are null; they appear once the count is submitted.
+
+        **Order.** Sorted by `itemId` ascending, then by `id`.
       tags:
       - count
       x-ticvai-permission: PRODUCT_VIEW
@@ -1648,7 +1661,9 @@ paths:
       description: '**Both venues see a transfer between them** (decided 28 September, audit R183): the
         list returns every transfer whose source or destination location is in the caller''s venue.
 
-        '
+        
+
+        **Order.** Newest first, by `receivedAt` descending, then by `id`.'
       tags:
       - transfer
       x-ticvai-permission: PRODUCT_VIEW
@@ -1892,6 +1907,7 @@ paths:
   /requisitions:
     get:
       operationId: listRequisitions
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-063 Requisition & Smart Store Replenishment"
         - "P08 BO-078 Requisitions"
@@ -2306,7 +2322,9 @@ paths:
       description: 'Suppliers are owned at tenant and read from any venue beneath it, which is where
         requisitions and quotations are raised (decided 28 September, audit R183).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - supplier
       x-ticvai-permission: PROCUREMENT_VIEW
@@ -2465,6 +2483,7 @@ paths:
   /purchase-orders:
     get:
       operationId: listPurchaseOrders
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-065 Receiving"
         - "P08 BO-051 Purchase Orders"
@@ -2886,6 +2905,7 @@ paths:
   /goods-receipts:
     get:
       operationId: listGoodsReceipts
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
@@ -3094,6 +3114,8 @@ paths:
         and without this it was one or the other.
 
         `expiresAt` is what stops a hold outliving the booking that made it.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - inventory
       x-ticvai-permission: PRODUCT_VIEW

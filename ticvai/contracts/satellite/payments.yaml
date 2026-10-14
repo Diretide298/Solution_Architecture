@@ -158,7 +158,9 @@ paths:
         could see them. A soft decline (`declineClass: soft`) is retried on the venue''s schedule anyway;
         this lets the guest act first.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - dunning
       x-ticvai-permission: null
@@ -266,7 +268,9 @@ paths:
         **Ordered by attempts remaining rather than by age**, because the ones about to exhaust
         are the ones somebody can still save by calling the guest.
 
-        '
+        
+
+        **Order.** Fewest attempts remaining first, by `attemptsMade` descending, then by `nextAttemptAt` ascending, then by `id`.'
       tags:
       - payments
       x-ticvai-permission: PAYMENT_CONFIGURE
@@ -1980,6 +1984,8 @@ paths:
         Level 1 (hardware) and Level 2 (kernel) approvals, the Level 3 certification per acquirer and card
         scheme, and the PCI PTS approval, each with its reference and expiry. Filter by model or by what
         expires before a date, which is the list somebody has to act on.
+
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.
       tags:
       - payments
       x-ticvai-permission: PAYMENT_VIEW
@@ -2169,6 +2175,8 @@ paths:
         4.2.17. Plans with every instalment, its due date, amount and outcome. A guest sees their own; staff
         filter by order, status or the next due date. Ordered by the next instalment due, `id` as the
         tiebreak.
+
+        **Order.** Soonest first, by `nextDueDate` ascending, then by `id`.
       tags:
       - payments
       x-ticvai-permission: PAYMENT_VIEW

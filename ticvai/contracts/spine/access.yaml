@@ -214,7 +214,9 @@ paths:
         is read at admission and must stay narrow; a history query that scans every entitlement a guest
         has ever held does not belong on the same endpoint.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - access
       x-ticvai-permission: null
@@ -287,7 +289,9 @@ paths:
         **Grouped by validity, not by purchase date.** A guest opening this at a gate wants what works
         today at the top; the order they bought things in is the operator''s question.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - access
       x-ticvai-permission: ORDER_VIEW
@@ -1243,7 +1247,9 @@ paths:
         guests, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
         found. `PARKING_CONFIGURE` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - access
       parameters:
@@ -1843,6 +1849,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listScans
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
@@ -2108,6 +2115,7 @@ paths:
   /access-points:
     get:
       operationId: listAccessPoints
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
@@ -2415,7 +2423,9 @@ paths:
       description: 'The rules governing entry for an entitlement — validation window, re-entry, duration
         limits, anti-passback.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - accessPoint
       x-ticvai-permission: SCOPE_VIEW
@@ -2559,6 +2569,7 @@ paths:
   /blacklist:
     get:
       operationId: listBlacklist
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `addedByPrincipalId`.'
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
       x-ticvai-audience:
@@ -2900,7 +2911,9 @@ paths:
         (`getEntitlementHistory`); View Audit (`getEntitlementHistory`); Diagnose Credential (no operation
         yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `virtualTicketId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -3271,7 +3284,9 @@ paths:
         by ticket, media type and credential. Sensitive values stay masked; face bindings reference the biometric
         service, never raw biometric data.
 
-        '
+        
+
+        **Order.** Sorted by `credentialBindingId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -3557,7 +3572,9 @@ paths:
         Run automatic configuration checks (no operation yet); Submit configuration for review and approval
         (`createApprovalRequest`).
 
-        '
+        
+
+        **Order.** Newest first, by `timestamp` descending.'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -3621,7 +3638,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Create Media Template (blank, duplicate, corporate,
         venue or product template, import) (no operation yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `templateId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -4341,7 +4360,9 @@ paths:
         (no operation yet); Replace (no operation yet); Revoke (no operation yet); Diagnose (no operation
         yet); View History (`getEntitlementHistory`).
 
-        '
+        
+
+        **Order.** Sorted by `product` ascending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -4529,7 +4550,9 @@ paths:
         (no operation yet); Retry Selected (no operation yet); Retry All Eligible (no operation yet); Escalate
         (no operation yet).
 
-        '
+        
+
+        **Order.** Newest first, by `requestedAt` descending, then by `requestId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -4611,7 +4634,9 @@ paths:
         operation yet); Resend Pending (no operation yet); Resend Failed (no operation yet); Send Group (no
         operation yet); Export Status (no operation yet).
 
-        '
+        
+
+        **Order.** Newest first, by `sentAt` descending.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -4793,7 +4818,9 @@ paths:
         (no operation yet); Escalate (no operation yet); Assign Owner (no operation yet); Open Technical Case
         (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `credential` ascending, then by `exceptionId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -4863,7 +4890,9 @@ paths:
         **Overlaps `getEntitlementHistory`,** which stays the operation of record for that write; this one
         serves the screen''s composite view of it.
 
-        '
+        
+
+        **Order.** Soonest first, by `presentationTimestamp` ascending.'
       tags:
       - access
       x-ticvai-permission: TICKET_LOOKUP
@@ -4933,7 +4962,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Generate credential-history evidence export (no
         operation yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `dateTime` ascending.'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -5716,7 +5747,9 @@ paths:
         **Overlaps `listAdmissionRules`,** which stays the operation of record for that write; this one serves
         the screen''s composite view of it.
 
-        '
+        
+
+        **Order.** Sorted by `ruleId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -6409,7 +6442,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Edit profile (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `profileId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -6643,7 +6678,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Deactivate binding (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `credential` ascending, then by `bindingId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -6999,7 +7036,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Run security simulation (no operation yet); Approve
         and publish (`createApprovalRequest`).
 
-        '
+        
+
+        **Order.** Newest first, by `timestamp` descending.'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -7051,7 +7090,9 @@ paths:
         to a summary beside a paged media directory; the directory row now carries the pack''s columns (media
         profile, technology, credential type, status, offline). The pack filters are query parameters.
 
-        '
+        
+
+        **Order.** Sorted by `mediaProfileId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -7269,7 +7310,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** View access history (`getEntitlementHistory`).
 
-        '
+        
+
+        **Order.** Sorted by `virtualCredentialId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -7493,7 +7536,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Swap media (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `swapId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -7832,7 +7877,9 @@ paths:
         a summary; each row is one biometric profile (name, Face Pass or Face Tag, credential, venue, status).
         Counts are integers.
 
-        '
+        
+
+        **Order.** Sorted by `profileId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -8073,7 +8120,9 @@ paths:
         there and in the venue''s consent form (`VenueSettings.biometrics.consentFormId`; DEC-128, DEC-549), so the
         action above now has its writes: `setVenueSettings` and `updateRegionSettings`.
 
-        '
+        
+
+        **Order.** Newest first, by `timestamp` descending, then by `consentRecordId`.'
       tags:
       - drafted
       x-ticvai-permission: SCOPE_VIEW
@@ -8410,7 +8459,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** View audit history (no operation yet); Security/guest
         service review of a blocked change (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `attemptId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -8654,7 +8705,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Run simulation (no operation yet); Submit for
         approval (`createApprovalRequest`); Emergency disable biometric verification (no operation yet).
 
-        '
+        
+
+        **Order.** Newest first, by `occurredAt` descending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -8761,7 +8814,9 @@ paths:
         and status next to its heartbeat and version columns. Device health is what the vendor reports; TICVAI
         does not detect it.
 
-        '
+        
+
+        **Order.** Sorted by `deviceId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: DEVICE_VIEW
@@ -8868,7 +8923,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Register device (no operation yet); Replace device
         (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `deviceId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: DEVICE_VIEW
@@ -9280,7 +9337,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Schedule Rollout (no operation yet); Rollback
         (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `deviceId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: DEVICE_VIEW
@@ -9332,7 +9391,9 @@ paths:
         the page; each row is one venue''s readiness with its checks as yes/no values. Counts are integers
         and the missing Sync Conflicts tile was added.
 
-        '
+        
+
+        **Order.** Sorted by `venueId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9444,7 +9505,9 @@ paths:
         list, device count, size, validity window and the pre-activation checks as yes/no values. Only a package
         that passes all four checks may activate on a device.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `packageId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9543,7 +9606,9 @@ paths:
         so an entitlement cannot be consumed twice offline; the online-only or offline-maximum setting belongs
         to the entitlement''s risk policy, not the ledger.
 
-        '
+        
+
+        **Order.** Newest first, by `timestamp` descending, then by `ledgerEntryId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9638,7 +9703,9 @@ paths:
         reconciliation conflicts, each with its resolution policy. The remaining balance is an entitlement
         count, not money. An access transaction is never silently discarded.
 
-        '
+        
+
+        **Order.** Sorted by `conflictId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9748,7 +9815,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Rollback (no operation yet); Force Online-Only
         (no operation yet); Schedule Deployment (no operation yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `scheduledAt` ascending, then by `policyVersionId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9803,7 +9872,9 @@ paths:
         of journey profiles (journey, type, venue, credential, status). The list of exception kinds was prose,
         not row fields.
 
-        '
+        
+
+        **Order.** Sorted by `journeyProfileId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9918,7 +9989,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Admit All (`validateGroupAccess`); Enter Actual
         Attendance / Confirm (`validateGroupAccess`); Load Group Booking (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `groupBookingId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9974,7 +10047,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Record Wave (`validateGroupAccess`).
 
-        '
+        
+
+        **Order.** Sorted by `waveId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10123,7 +10198,9 @@ paths:
         entry, re-entry or crossover so crossovers are counted separately. The crossover maximum is a rule
         set in Board 2 admission rules, not a journey field.
 
-        '
+        
+
+        **Order.** Newest first, by `occurredAt` descending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10275,7 +10352,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Open gate status (`getAccessPoint`).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `accessPointId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10390,7 +10469,9 @@ paths:
         **Overlaps `lookupTicket`,** which stays the operation of record for that write; this one serves the
         screen''s composite view of it.
 
-        '
+        
+
+        **Order.** Soonest first, by `visitDate` ascending, then by `ticketId`.'
       tags:
       - access
       x-ticvai-permission: TICKET_LOOKUP
@@ -10635,7 +10716,9 @@ paths:
         **Overlaps `listBlacklist`,** which stays the operation of record for that write; this one serves
         the screen''s composite view of it.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10695,7 +10778,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Change mode (single or bulk) (`setTurnstileMode`);
         Emergency / Drop Arm (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `accessPointId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10750,7 +10835,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Apply Recommendation (`setTurnstileMode`).
 
-        '
+        
+
+        **Order.** Sorted by `accessPointId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10872,7 +10959,9 @@ paths:
         Report (no operation yet); Override Report (no operation yet); Gate Mode Change Report (no operation
         yet); Incident Report (no operation yet); Exception Report (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `shiftId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -10926,7 +11015,9 @@ paths:
         paged list of policies; each row now carries the policy table columns (name, scope, type, priority,
         status). Counts typed as text or yes/no are integers; AI recommendations stay a read-only count.
 
-        '
+        
+
+        **Order.** Sorted by `priority` ascending, then by `policyId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -11370,7 +11461,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Request grant approval (`createApprovalRequest`);
         Revoke grant (no operation yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `grantId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -11522,7 +11615,9 @@ paths:
         a summary beside a paged list of security alerts; a sample alert was removed and counts typed as text
         are integers. The geographic drill-down is venue, park, zone and gate query parameters.
 
-        '
+        
+
+        **Order.** Newest first, by `detectedAt` descending, then by `alertId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -11721,7 +11816,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** View timeline (`getEntitlementHistory`); Lock
         credential (no operation yet).
 
-        '
+        
+
+        **Order.** Newest first, by `detectedAt` descending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -11777,7 +11874,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Lock (no operation yet); Unlock (permission,
         dual authorization for high-risk locks) (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `identityId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -11831,7 +11930,9 @@ paths:
         date, location, operator, process, reason, approval). References are opaque; raw biometric templates
         are never returned.
 
-        '
+        
+
+        **Order.** Sorted by `anomalyId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -12208,7 +12309,9 @@ paths:
         the venue comparison table (entries, in venue, rejected rate, throughput). Duplicate sample tiles
         were removed and the average validation time is seconds.
 
-        '
+        
+
+        **Order.** Sorted by `venueId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: REPORT_VIEW_VENUE
@@ -12912,6 +13015,8 @@ paths:
         clearest case in the merge: their normalisation was taken because an array cannot carry
         per-row state. A point that is temporarily closed under one rule and open under another has
         nowhere to live in an array.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -16476,7 +16581,9 @@ paths:
         **Gate policies only.** Software-permission policies are identity''s `AuthorisationPolicy`, reported by
         `listAuthorisationPolicyEffectiveness`; see `AccessDynamicPolicy` for which engine governs what.
 
-        '
+        
+
+        **Order.** Sorted by `policyId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW

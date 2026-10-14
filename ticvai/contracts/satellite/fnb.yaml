@@ -1698,7 +1698,9 @@ paths:
         **86 is a kitchen word and a real event.** Time off, time back, who called it, and what it cost
         in refused orders.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - fnb
       parameters:
@@ -2598,7 +2600,9 @@ paths:
 
         Newest first. Each version carries the sections and items as published.
 
-        '
+        
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
       tags:
       - menu
       x-ticvai-permission: PRODUCT_VIEW
@@ -3293,7 +3297,9 @@ paths:
         range a freezer is required to hold, and a range that exists only on the readings that happened
         cannot answer — least of all for the reading nobody took.
 
-        '
+        
+
+        **Order.** Sorted by `label` ascending, then by `id`.'
       tags:
       - fnb
       x-ticvai-permission: PRODUCT_VIEW
@@ -3618,7 +3624,9 @@ paths:
         `actualQuantity`, and the yield is derived from the two by whoever reads it — never stored
         (`getProductionRun`). Splitting it into a second call would mean two round trips for one question.
 
-        '
+        
+
+        **Order.** Soonest first, by `scheduledFor` ascending, then by `id`.'
       tags:
       - fnb
       parameters:
@@ -3993,7 +4001,9 @@ paths:
         on the same outlet, read alongside this. A reservation carries its tables and, once seated, its
         `tableVisitId`; it does not carry the table''s state.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - fnb
       parameters:
@@ -4283,7 +4293,9 @@ paths:
         Ordering method is stated per outlet, because it varies within one venue: a table service restaurant,
         a counter that takes app orders for collection, and a bar that does neither are all normal.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `outletId`.'
       tags:
       - guestOrdering
       parameters:
@@ -4416,7 +4428,9 @@ paths:
         parameter, so the list cannot be asked for anybody else; `listTableReservations` stays the host''s
         list under `ORDER_MODIFY`. A signed-out guest has no list (401).
 
-        '
+        
+
+        **Order.** Soonest first, by `startsAt` ascending (a waitlist entry by `recordedAt`), then by `id`.'
       tags:
       - fnb
       parameters:
@@ -4573,7 +4587,9 @@ paths:
         configuration screen lists the locations it creates and edits (`createDeliveryLocation`,
         `updateDeliveryLocation`). A staff token was already accepted; the audience now says so.
 
-        '
+        
+
+        **Order.** Sorted by `label` ascending, then by `id`.'
       tags:
       - guestOrdering
       parameters:
@@ -5020,7 +5036,9 @@ paths:
         slots. A slot closes when the kitchen cannot make it, so the guest never picks a time that will
         be missed.
 
-        '
+        
+
+        **Order.** Soonest first, by `start` ascending.'
       tags:
       - guestOrdering
       x-ticvai-permission: null
@@ -5308,7 +5326,9 @@ paths:
       summary: List menus
       description: 'Back-office use. A terminal reads its menu from the catalogue bundle.
 
-        '
+        
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
       tags:
       - menu
       x-ticvai-permission: PRODUCT_VIEW
@@ -5680,6 +5700,7 @@ paths:
   /modifier-groups:
     get:
       operationId: listModifierGroups
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
@@ -5776,6 +5797,7 @@ paths:
   /fnb-orders:
     get:
       operationId: listFnbOrders
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P04 POS-029 Order Queue"
         - "P06 EMP-051 Restaurant Service Command Center"
@@ -7039,6 +7061,7 @@ paths:
   /kitchen/stations:
     get:
       operationId: listKitchenStations
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-134 Kitchen & Preparation Stations"
         - "P15 KIT-001 Kitchen Operations Command Center"
@@ -7158,7 +7181,9 @@ paths:
       description: 'Links menu items to inventory. A recipe is what makes stock deplete when a dish is
         sold, and what makes an item unavailable when an ingredient runs out.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - production
       x-ticvai-permission: PRODUCT_VIEW
@@ -7538,6 +7563,8 @@ paths:
         **A kitchen out of an ingredient substitutes it whether or not the system says so.**
         Recording which swaps are approved is how an allergen declaration survives a delivery that
         did not arrive.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - fnb
       x-ticvai-permission: PRODUCT_VIEW
@@ -7632,6 +7659,8 @@ paths:
         **Seventeen columns and no way to read them.** Kept whole from the backend workbook when the
         ten duplicate catalogue tables were collapsed, because we have nothing like it —
         `promotions.getUpsellSuggestions` computes, and this is what a venue configured.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - fnb
       x-ticvai-permission: PRODUCT_VIEW
@@ -8500,6 +8529,8 @@ paths:
       summary: The corrective actions
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; BO-044, EMP-067: record, sign, escalate and close take an actionId nothing listed).** The venue's corrective actions, newest raised first; `status` narrows it.
+
+        **Order.** Newest first, by `raisedAt` descending, then by `id`.
       tags:
       - fnb
       x-ticvai-permission: INCIDENT_VIEW

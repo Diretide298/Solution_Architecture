@@ -848,6 +848,7 @@ paths:
   /tenants:
     get:
       operationId: listTenants
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-594 Environment Ready & Handoff to AI Setup"
         - "P09 ADM-002 Platform Dashboard"
@@ -2656,6 +2657,7 @@ paths:
         format: uuid
     get:
       operationId: listCellJobs
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
         - "P09 ADM-013 Tenant Performance Monitor"
@@ -3117,7 +3119,9 @@ paths:
       description: 'Platform billing to the tenant. Distinct from the tenant''s own ledger, which records
         their sales to guests.
 
-        '
+        
+
+        **Order.** Newest first, by `issuedAt` descending, then by `id`.'
       tags:
       - billing
       x-ticvai-permission: PLATFORM_BILLING_VIEW
@@ -3540,7 +3544,9 @@ paths:
         structure, effective dates). Quick actions Create Membership, Clone, Edit, Preview, Submit for Approval,
         Publish, Suspend and View Members are buttons on BO-284; Create/Clone/Edit open setMembershipProductTier,
         Preview/Submit for Approval/Publish are served by approveMembershipProductValidation, View Members opens
-        listMember filtered by product.'
+        listMember filtered by product.
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `productId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -3857,7 +3863,9 @@ paths:
         reservation options became reservationRequirement; no-show example became a threshold/window/restriction
         triple; the counter example dropped (counters live on listVisitAdmissionEntitlement); duplicates merged;
         types corrected; paged. One row per membership product/tier usage rule set. Access Control consumes
-        the resulting entitlement decision and does not recreate these rules (pack p.12).'
+        the resulting entitlement decision and does not recreate these rules (pack p.12).
+
+        **Order.** Sorted by `membershipCode` ascending.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -3968,7 +3976,9 @@ paths:
         four payment flags became paymentTerms; five sales-period flags became salesPeriod with window and capacity;
         profiles typed as references, not money; Upgrade Price Policy added; paged. One row per membership product.
         All monetary calculation stays in pricing (Area 10) and payment processing outside the membership engine;
-        tier and renewal prices are shown as read from the linked pricing profile.'
+        tier and renewal prices are shown as read from the linked pricing profile.
+
+        **Order.** Sorted by `membershipCode` ascending.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4221,7 +4231,9 @@ paths:
         purchased/pending stages) and renewalStatus (grace period, renewed); dates and usage typed; filters
         typed and venue, tier, acquisition channel and at-risk added; paged. Rows open setMemberMembershipAccount
         (Member 360). The pack''s Renewed and Replaced statuses are lifecycle events shown in listMemberLifecycleCase,
-        not states.'
+        not states.
+
+        **Order.** Soonest first, by `expiryDate` ascending, then by `customerId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4427,7 +4439,9 @@ paths:
         filter; eight required checks became requiredChecks; seven credential types became credentialTypes;
         duplicate detection added; dates typed; paged. Assignment associates the purchased membership with a
         customer/member; actual credential generation uses the Ticket Media/Credential services; an unactivated
-        membership expires at activationDeadline (MoM 25 Aug fallback expiry).'
+        membership expires at activationDeadline (MoM 25 Aug fallback expiry).
+
+        **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4505,7 +4519,9 @@ paths:
         usage exceptions; the manual-adjustment form and the guest-ticket example dropped from the row; types
         corrected; paged by membership. Access Control stays the authoritative admission-validation engine (pack
         p.27); counter corrections are an Entitlement Adjustment exception (listMemberExceptionOverride) needing
-        reason, previous and new value, user and approval where required, recorded in the lifecycle history.'
+        reason, previous and new value, user and approval where required, recorded in the lifecycle history.
+
+        **Order.** Sorted by `code` ascending, then by `visitId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4596,7 +4612,9 @@ paths:
         typed in days, approver as a name; suspension reasons, validity treatment, entitlement treatment, new
         expiry and the record''s own status added; paged. Freeze and Resume execute via catalogue freezeEntitlement/reinstateEntitlement,
         Suspend and Reactivate via suspendEntitlement/reinstateEntitlement; before reactivation TICVAI checks
-        suspension resolved, payment status, eligibility, credential and the new expiry (pack p.28).'
+        suspension resolved, payment status, eligibility, credential and the new expiry (pack p.28).
+
+        **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4670,7 +4688,9 @@ paths:
         transaction: Area 11 conversion rules decide eligibility and consumed-benefit treatment, Area 10 prices
         the pro-rata credit and difference (MoM 1 Sep §4.9), Area 12 raises the order and payment. A downgrade
         takes effect at the next renewal unless the configured conversion rule says otherwise, so no mid-term
-        refund arises from it (decided 29 September, readiness close-out).'
+        refund arises from it (decided 29 September, readiness close-out).
+
+        **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4743,7 +4763,9 @@ paths:
         payment method, consent and membership version; auto-renew runs Scheduled -> Pre-Notification -> Payment
         Attempt (payments module charges the card on file) -> Success/Failure -> Membership Extension via orders
         renewMembership, retrying per setRenewalAutoMembership; the renewed period starts the day after the
-        current expiry so there is no gap.'
+        current expiry so there is no gap.
+
+        **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4843,7 +4865,9 @@ paths:
         as money, duration in days); approval status, approver, remedy and AI suggestion added; paged. Approval
         is configured by exception type, value, duration, tier and user role; high-value exceptions require
         requestor != approver; remedies priced through central commercial services; AI suggestions are advisory.
-        Served alongside BO-949''s general approval centre.'
+        Served alongside BO-949''s general approval centre.
+
+        **Order.** Sorted by `exceptionId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4925,7 +4949,9 @@ paths:
         and related-transaction words became eventType, actorType and relatedTransactions; before/after became
         field/previousValue/newValue; export audiences and examples dropped; paged. Events are immutable; authorised
         users add case notes as caseNote events without changing history. Export (pack p.35) produces governed
-        history exports for customer service, finance, audit, compliance and management.'
+        history exports for customer service, finance, audit, compliance and management.
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5032,7 +5058,9 @@ paths:
         renewal with drivers and recommended actions; the driver examples, the NL question and stray register
         text dropped; filters typed; churn flag added; paged. Predictions expose confidence, key drivers, model
         version and data freshness and never make irreversible member changes automatically; any commercial
-        offer uses approved pricing/promotion rules; natural-language questions go through the assistant.'
+        offer uses approved pricing/promotion rules; natural-language questions go through the assistant.
+
+        **Order.** Soonest first, by `expiryDate` ascending, then by `membershipId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5149,7 +5177,9 @@ paths:
         Assign Account Manager are served by setPartnerProfileOrganization, Review Application by listPartnerOnboardingApplication,
         Approve and Suspend by approvePartnerStatuLifecycle, Open Commercial Profile by listCommercialAgreementHealth,
         View Users by listPartnerContactUser, View Documents by listPartnerDocumentationCompliance and View
-        Performance by listPartnerPerformanceScorecard; AI attention flags are advisory.'
+        Performance by listPartnerPerformanceScorecard; AI attention flags are advisory.
+
+        **Order.** Sorted by `partnerId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5360,7 +5390,9 @@ paths:
         Applications arrive through registerPartner from the registration link; Approve, Reject, Request More
         Information, Reassign and Escalate are PTR-024 actions routed through the approvals engine, which holds
         the configurable sequential/parallel, mandatory/optional stages and SLAs; a partner cannot become active
-        until every mandatory stage is complete.'
+        until every mandatory stage is complete.
+
+        **Order.** Newest first, by `submittedAt` descending, then by `applicationId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5453,7 +5485,9 @@ paths:
         is an action; names aligned with PartnerUser. User actions Invite, Activate, Disable, Reset Access,
         Reassign Role and Revoke Access are PTR-025 buttons served by createPartnerUser and the Identity/RBAC
         operations; the main agent and sub-agents are users on the partner''s branch tree; a user''s permissions
-        can never exceed the partner ceiling from listPartnerAccessRole.'
+        can never exceed the partner ceiling from listPartnerAccessRole.
+
+        **Order.** Sorted by `position` ascending, then by `contactId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5550,7 +5584,9 @@ paths:
         dropped and allowed/not-allowed carried as one flag; the four exclusivity and three sub-agent options
         became enums; Review Date added from the pack; overlapping exclusive rights reported as validationIssues.
         One row is one distribution right of one partner; a blank territory dimension means all within the dimensions
-        above it; overlapping exclusive rights for the same market and period are rejected on save.'
+        above it; overlapping exclusive rights for the same market and period are rejected on save.
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -5696,7 +5732,9 @@ paths:
         and the seven status fields verificationStatus; compliance-rule options became expiryAction; Issue Date
         added from the pack; dates typed. Review, Accept, Reject and Resubmit (MoM 31 Aug 4.3) are PTR-028 actions;
         AI extraction is advisory and human verification stays required; a missing or expired mandatory document
-        applies its expiryAction to the partner.'
+        applies its expiryAction to the partner.
+
+        **Order.** Soonest first, by `expiryDate` ascending, then by `documentId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5779,7 +5817,9 @@ paths:
         option fields became one row per partner capability grant: capability (the pack''s 18 plus refund, reschedule
         and the sensitive functions), allowed, requiresInternalApproval and grantType with dates. The partner
         grant is the ceiling: Identity/RBAC never gives a partner user a permission its partner lacks (pack
-        p.17); sensitive functions may need internal approval through the approvals engine.'
+        p.17); sensitive functions may need internal approval through the approvals engine.
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -5937,7 +5977,9 @@ paths:
         the sections typed as counts and lists; actions and prose fragments dropped; Board/Area references renamed
         to what they hold. Actions Approve Partner, Activate, Restrict (approvePartnerStatuLifecycle), Return
         for Changes, Assign Action and Schedule Review are PTR-031 buttons; AI may recommend, final approval
-        stays with configured human authorization.'
+        stays with configured human authorization.
+
+        **Order.** Sorted by `partnerId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6017,7 +6059,9 @@ paths:
         with the approval stage held by the approvals engine); effective dates renamed validFrom/validTo and
         payment terms creditTermDays as on PartnerAgreement; pricing, commission and allocation models typed
         as their vocabularies; paymentModel and partnerId added; Expiry filter replaced by expiringWithinDays.
-        Row opens setAgreementContractTerm and listCommercialAgreementHealth; AI commercial-risk flags are advisory.'
+        Row opens setAgreementContractTerm and listCommercialAgreementHealth; AI commercial-risk flags are advisory.
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6267,7 +6311,9 @@ paths:
         **Agreed (decided 29 September, readiness close-out).** The eight commission-model fields became commissionModel;
         one row is one commission rule with its dimensions, rate or tiers, incentive type and effective dates;
         margin visibility and overlap detection added read-only. Rules are governed and effective-dated; overlapping
-        rules are flagged; AI analysis of commission against incremental sales is advisory.'
+        rules are flagged; AI analysis of commission against incremental sales is advisory.
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -6348,7 +6394,9 @@ paths:
         fields renamed to percentages with Block at 100% added; temporary limit given its end date; actions
         and prose dropped; money typed. Increase Limit, Reduce Limit, Temporary Increase (approval required),
         Place Credit Hold, Release Hold and Block Credit Transactions are PTR-036 actions; a credit sale confirms
-        only if transaction amount + exposure <= available credit unless an approved exception exists (approveBookingLimitCommercial).'
+        only if transaction amount + exposure <= available credit unless an approved exception exists (approveBookingLimitCommercial).
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -6428,7 +6476,9 @@ paths:
         the example coverage figures became creditExposure, securityCoverage and unsecuredExposure; the five
         expiry-rule options became expiryAction; references renamed to ids; dates and money typed. Expiry alerts
         and "exposure exceeds verified security" are raised by the finance controls; an expired security applies
-        its expiryAction automatically.'
+        its expiryAction automatically.
+
+        **Order.** Soonest first, by `expiryDate` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -6582,7 +6632,9 @@ paths:
         and the five commitment-rule fields commitmentRule and releaseMode; Release Date added from the pack;
         references renamed to ids; performance figures typed. Approved contractual allocation feeds the Area
         4 channel allocation and never exceeds core capacity; unused allocation is released automatically or
-        manually per releaseMode; AI under-utilisation flags are advisory.'
+        manually per releaseMode; AI under-utilisation flags are advisory.
+
+        **Order.** Sorted by `allocationId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -6721,7 +6773,9 @@ paths:
         options became recommendations; actions and prose dropped. Actions Start Renewal, Request Commercial
         Review, Change Terms (setAgreementContractTerm), Request Credit Review, Create Exception (approveBookingLimitCommercial)
         and Suspend Commercial Access (approvePartnerStatuLifecycle) are PTR-041 buttons; scenario simulation
-        is an on-demand AI action, not part of this read; AI output is advisory.'
+        is an on-demand AI action, not part of this read; AI output is advisory.
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6801,7 +6855,9 @@ paths:
         feed) beside a paged operations table; money, counts and rates typed; partnerId, operational status
         and risk given their vocabularies; the missing filters (partner, partner type, account manager, operational
         status, risk) added and date split into a range. AI attention flags are advisory and ranked by business
-        impact; rows open the partner''s orders (listPartnerOrderBooking) and statement (listPartnerStatementAccount).'
+        impact; rows open the partner''s orders (listPartnerOrderBooking) and statement (listPartnerStatementAccount).
+
+        **Order.** Newest first, by `at` descending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6932,7 +6988,9 @@ paths:
         dates typed. View, Modify, Cancel, Rebook, Resend Tickets, Reissue, Add Internal Note, Escalate and
         Open Financial Record are PTR-043 actions served by the Orders service; before any modification agreement,
         product eligibility, rate, allocation, credit, booking limit and cancellation policy are revalidated;
-        the order stays owned by Order Management.'
+        the order stays owned by Order Management.
+
+        **Order.** Soonest first, by `visitDate` ascending, then by `orderId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7059,7 +7117,9 @@ paths:
         actions and prose dropped; timestamps, money and status typed; partnerId and extensions used added.
         Extend Hold, Reduce Hold, Release Hold, Convert to Booking, Reassign and Escalate are PTR-044 actions;
         an expired hold returns to its capacity pool automatically unless an approved extension exists; AI release
-        suggestions are advisory.'
+        suggestions are advisory.
+
+        **Order.** Sorted by `product` ascending, then by `holdId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7142,7 +7202,9 @@ paths:
         pack''s worked example became the evaluated outcome (original value, fee, refund/credit, allocation
         and commission impact); audit fields typed. The permitted action is evaluated from product policy, partner
         agreement, channel rule and transaction context; approval runs through the approvals engine; the cancellation
-        fee and refund amounts come from the client-configured policies, this record only carries them.'
+        fee and refund amounts come from the client-configured policies, this record only carries them.
+
+        **Order.** Newest first, by `requestedAt` descending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7239,7 +7301,9 @@ paths:
         to a summary beside the paged ledger lines; the statement-period options became period/from/to filters;
         transaction type and line status given their vocabularies; money typed. Accounting entries stay owned
         by Finance; this is a partner-centric view; an authorised partner user can view and download its own
-        statement.'
+        statement.
+
+        **Order.** Sorted by `dueDate` ascending.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7340,7 +7404,9 @@ paths:
         partnerAmount, ticvaiAmount and difference; resolution actions dropped in favour of a resolution status;
         ids added. Match, Correct, Accept Difference, Create Adjustment, Assign, Escalate and Dispute (listPartnerDisputeCase)
         are PTR-047 actions; every unresolved difference stays open until resolved; AI grouping and root-cause
-        suggestions are advisory.'
+        suggestions are advisory.
+
+        **Order.** Sorted by `exceptionId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -7430,7 +7496,9 @@ paths:
         beside paged calculation lines; the settlement-period and adjustment options became settlementPeriod
         and adjustmentReason; the lifecycle carried as status; money typed and names aligned with CommissionStatement.
         Finance creates settlement batches by partner, currency, period and legal entity; payment is blocked
-        until the lines and adjustments are reconciled; posting and payment execution belong to Finance.'
+        until the lines and adjustments are reconciled; posting and payment execution belong to Finance.
+
+        **Order.** Sorted by `product` ascending, then by `lineId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -7516,7 +7584,9 @@ paths:
         flag); collaboration items (notes, assignments, escalations, reviews) dropped as case actions, attachments
         folded into evidence; priority given values. Notes, attachments, assignment, department escalation,
         finance review and technical review are PTR-049 case actions; AI summaries, categorisation, related-transaction
-        and policy suggestions are advisory.'
+        and policy suggestions are advisory.
+
+        **Order.** Sorted by `priority` ascending, then by `caseId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7625,7 +7695,9 @@ paths:
         **Agreed (decided 29 September, readiness close-out).** The three trend fields became trend and the
         four benchmark fields a benchmark object; overall and per-dimension scores, risk rating and the pack''s
         missing Refund Rate and Sync Reliability added; metrics typed (money, percent, days, counts); agreementStatus
-        refs PartnerAgreementStatus. One row per partner for the selected period; AI risk detection is advisory.'
+        refs PartnerAgreementStatus. One row per partner for the selected period; AI risk detection is advisory.
+
+        **Order.** Sorted by `partnerId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7722,7 +7794,9 @@ paths:
         example fragments and the architecture register prose dropped. Accept, Modify, Reject, Simulate, Assign
         and Create Commercial Review are PTR-051 actions; natural-language questions and scenario simulation
         are served by the AI assistant over governed data, not by this list; AI never changes credit, rates,
-        commission, allocation, status or exceptions without an explicitly governed automation policy.'
+        commission, allocation, status or exceptions without an explicitly governed automation policy.
+
+        **Order.** Newest first, by `createdAt` descending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -10048,7 +10122,9 @@ paths:
         **A person acts**: an account manager applies an accepted recommendation through `previewSubscriptionChange`
         then `setSubscription`, or `addCapacityPack`; nothing is changed by this read and the tenant is not told by it.
 
-        '
+        
+
+        **Order.** Sorted by `targetPlanId` descending (a UUIDv7, so newest first).'
       tags:
       - subscription
       x-ticvai-permission: PLATFORM_BILLING_VIEW

@@ -139,6 +139,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets queues that are open and
         visible, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
         found. `QUEUE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `name` ascending, then by `id`.
       tags: [queue]
       x-ticvai-permission: QUEUE_VIEW
       x-ticvai-guest-callable: true
@@ -721,6 +723,8 @@ paths:
       x-ticvai-read-routing: primary
       summary: List entries in a queue
       description: Operator view. Position order, with no-shows and expiries visible.
+
+        **Order.** Sorted by `positionInQueue` ascending, then by `joinedAt`.
       tags: [entry]
       x-ticvai-permission: QUEUE_VIEW
       x-ticvai-scope-level: venue

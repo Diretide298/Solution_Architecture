@@ -1413,7 +1413,9 @@ paths:
         configurations; type, status and source module are query parameters. AI duplicate-logic detection
         is advisory analytics only.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `ruleWorkflowId`.'
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_VIEW
@@ -2015,7 +2017,9 @@ paths:
         list of running workflow instances; counts are integers and status is an enum; the source module list
         became one module enum and a filter. The AI problem summary is analytics only.
 
-        '
+        
+
+        **Order.** Sorted by `priority` ascending, then by `workflowInstanceId`.'
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_VIEW
@@ -2184,7 +2188,9 @@ paths:
         Open Source Record is navigation to the source module''s screen by `businessObjectType` and `businessObjectId`,
         not an operation.
 
-        '
+        
+
+        **Order.** Sorted by `businessObject` ascending.'
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_VIEW
@@ -2260,7 +2266,9 @@ paths:
         `retryStep`; Reassign is `reassign`; Correct Data is `resume` with `correctedInput`; Use Approved Alternative
         is `skipStep` with `alternativeNodeId`; Resume, Cancel and Escalate are `resume`, `cancel` and `escalateException`.
 
-        '
+        
+
+        **Order.** Sorted by `priority` ascending, then by `exceptionId`.'
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_VIEW
@@ -2339,7 +2347,9 @@ paths:
         Extend SLA, Add Backup Approver and Change Priority are `actOnWorkflowInstance` (decided 29 September,
         writers pass), each with its mandatory reason.
 
-        '
+        
+
+        **Order.** Sorted by `instance` ascending.'
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_VIEW
@@ -2472,7 +2482,9 @@ paths:
         is one participating module node with an enum status, timestamps, a retry count and what the workflow
         does on failure, keyed by the shared correlation id for distributed tracing.
 
-        '
+        
+
+        **Order.** Sorted by `correlationId` descending (a UUIDv7, so newest first).'
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_VIEW
@@ -2650,7 +2662,9 @@ paths:
         a filter; sample figures were removed. Findings are process analytics: any change they suggest goes
         through simulation, versioning and approval, and nothing here approves or rejects an individual request.
 
-        '
+        
+
+        **Order.** Sorted by `process` ascending.'
       tags:
       - approvals
       x-ticvai-permission: REPORT_VIEW_VENUE
@@ -3401,7 +3415,9 @@ paths:
         permission and reports the outcome here, so an approval that was granted and then failed to run is visible
         rather than assumed done.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - request
       x-ticvai-permission: APPROVAL_VIEW
@@ -3655,7 +3671,9 @@ paths:
       description: '11.1.65. Every third-party workflow system registered to decide an approval level, with
         its endpoint, mappings, timeout and status. Secrets are never returned.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - matrix
       x-ticvai-permission: APPROVAL_VIEW
@@ -3789,7 +3807,9 @@ paths:
         provider''s own reference, and whether it answered, failed or timed out. **The integration''s
         delivery log** — without it a level stuck in somebody else''s system is a support ticket.
 
-        '
+        
+
+        **Order.** Newest first, by `sentAt` descending, then by `id`.'
       tags:
       - request
       x-ticvai-permission: APPROVAL_VIEW

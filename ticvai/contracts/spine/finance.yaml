@@ -727,6 +727,7 @@ paths:
   /accounts:
     get:
       operationId: listAccounts
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
       x-ticvai-audience:
@@ -953,7 +954,9 @@ paths:
       description: 'Maps revenue, tax, payment, refund, variance and breakage events to accounts. This
         is the table that makes posting deterministic rather than hard-coded.
 
-        '
+        
+
+        **Order.** Sorted by `creditAccountId` descending (a UUIDv7, so newest first).'
       tags:
       - accounts
       parameters:
@@ -1048,6 +1051,7 @@ paths:
   /cost-centers:
     get:
       operationId: listCostCenters
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
       x-ticvai-audience:
@@ -1131,6 +1135,7 @@ paths:
   /tax-codes:
     get:
       operationId: listTaxCodes
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
       x-ticvai-audience:
@@ -1320,6 +1325,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: List tax exemptions
       description: Exemption by account, product class or channel — diplomatic, export, B2B.
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.
       tags:
       - tax
       parameters:
@@ -1425,6 +1432,7 @@ paths:
   /recognition-schedules:
     get:
       operationId: listRecognitionSchedules
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-076 Revenue Recognition"
       x-ticvai-audience:
@@ -1615,6 +1623,7 @@ paths:
   /journal-entries:
     get:
       operationId: listJournalEntries
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
       x-ticvai-audience:
@@ -2030,7 +2039,9 @@ paths:
         force, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
         found. `LEDGER_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
-        '
+        
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       tags:
       - ledger
       x-ticvai-permission: LEDGER_VIEW
@@ -2230,7 +2241,9 @@ paths:
         Neither entity ever holds a balance in a currency that is not its own. That is the whole of the
         policy, applied twice.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - ledger
       x-ticvai-permission: LEDGER_VIEW
@@ -2347,6 +2360,7 @@ paths:
   /ledger/entries:
     get:
       operationId: listLedgerEntries
+      description: '**Order.** Newest first, by `postedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-043 Daily Reconciliation"
       x-ticvai-audience:
@@ -2469,7 +2483,9 @@ paths:
         The threshold is `orders.RefundPolicy.varianceThreshold`, a venue setting with a tenant default
         (decided 28 September, audit R094; proposed default AED 5.00 per order line, client to correct).
 
-        '
+        
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
       tags:
       - variance
       x-ticvai-permission: LEDGER_VIEW
@@ -2592,6 +2608,7 @@ paths:
   /settlements:
     get:
       operationId: listSettlements
+      description: '**Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 ADM-623 Settlement & Payout Manager"
         - "P08 BO-025 Chargebacks & Disputes"
@@ -2813,7 +2830,9 @@ paths:
         **An unknown or out-of-scope `settlementId` is 404, not an empty page**: the path addresses the
         settlement. An empty page means a settlement that exists and has no exceptions.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - settlement
       x-ticvai-permission: SETTLEMENT_VIEW
@@ -2945,7 +2964,9 @@ paths:
       description: 'One per country of operation. Carries the country, currency, tax registration and
         fiscal calendar (12 Aug §14).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - fiscal
       parameters:
@@ -3008,6 +3029,7 @@ paths:
   /fiscal-periods:
     get:
       operationId: listFiscalPeriods
+      description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
         - "P08 BO-1170 Wallet Financial Period & Closing Controls"
@@ -4166,6 +4188,7 @@ paths:
   /tax-invoice-templates:
     get:
       operationId: listTaxInvoiceTemplates
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
       x-ticvai-audience:
@@ -4267,6 +4290,7 @@ paths:
   /e-invoicing/providers:
     get:
       operationId: listEInvoicingProviders
+      description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
         - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"

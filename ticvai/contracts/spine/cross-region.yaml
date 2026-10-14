@@ -968,6 +968,8 @@ paths:
         `correlationId` is what joins a slow guest-facing request to the hop that made it slow.
         Routed to the analytical replica: this is diagnosis, and it must not compete with the
         traffic it is diagnosing.
+
+        **Order.** Newest first, by `requestedAt` descending, then by `id`.
       tags:
       - cross-region
       x-ticvai-permission: ORDER_VIEW

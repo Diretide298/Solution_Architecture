@@ -102,7 +102,9 @@ paths:
         **Scoped to the caller, not filtered by it.** A guest-facing list that takes a subject parameter
         is a list somebody will call with another subject.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - marketing
       parameters:
@@ -1116,7 +1118,9 @@ paths:
       description: 'The builder''s list. **The latest version of each form**; older versions stay readable
         through `getForm` with `version`.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - marketing
       x-ticvai-permission: MARKETING_VIEW
@@ -1793,7 +1797,9 @@ paths:
         The suggested matches for an item come from `getLostItemMatches`; an item already tied to its
         other half carries it in `matchedItemId`.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - marketing
       parameters:
@@ -2115,6 +2121,7 @@ paths:
   /journeys:
     get:
       operationId: listJourneys
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-120 Omnichannel Commerce & Journey Configuration"
         - "P08 BO-774 Journey Automation Center"
@@ -2299,6 +2306,7 @@ paths:
   /message-triggers:
     get:
       operationId: listMessageTriggers
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-776 Trigger Event Catalog"
       summary: What fires a message, and when
@@ -2897,7 +2905,9 @@ paths:
 
         A conversation may *create* a case (22.8.12). It is not one.
 
-        '
+        
+
+        **Order.** Newest first, by `sentAt` descending, then by `id`.'
       tags:
       - marketing
       x-ticvai-permission: CASE_VIEW
@@ -3593,7 +3603,9 @@ paths:
         **never filled in from their real name**, which is the disclosure this exists to prevent
         and would arrive silently on the day they first placed.
 
-        '
+        
+
+        **Order.** Sorted by `rank` ascending.'
       tags:
       - loyalty
       x-ticvai-permission: null
@@ -3717,7 +3729,9 @@ paths:
         principals holding `GUEST_VIEW_PII`; everyone else sees the opaque subject reference and behavioural
         attributes.
 
-        '
+        
+
+        **Order.** Sorted by `displayName` ascending, then by `id`.'
       tags:
       - guest
       x-ticvai-permission: GUEST_VIEW
@@ -4346,6 +4360,8 @@ paths:
         purposes a guest is asked for, and nothing in draft, unpublished or withdrawn; asked for by id, such a
         record answers as not found. `GUEST_VIEW` is what a staff caller must hold, and staff also see drafts
         (ADR-0025).
+
+        **Order.** Sorted by `displayName` ascending.
       tags:
       - consent
       parameters:
@@ -4438,7 +4454,9 @@ paths:
       description: 'Hard bounces, complaints, explicit global opt-outs and unsubscribes. Checked at send
         time regardless of segment or consent — a complaint outranks a consent record.
 
-        '
+        
+
+        **Order.** Sorted by `channel` ascending, then by `id`.'
       tags:
       - consent
       x-ticvai-permission: GUEST_VIEW
@@ -4983,6 +5001,7 @@ paths:
   /segments:
     get:
       operationId: listSegments
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-121 Personalized Offers & Guest Engagement"
@@ -5179,6 +5198,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: List guests currently matching a segment
       description: Evaluated live. Useful for spot-checking a definition before use.
+
+        **Order.** Sorted by `displayName` ascending, then by `id`.
       tags:
       - segment
       x-ticvai-permission: MARKETING_VIEW
@@ -5207,6 +5228,7 @@ paths:
   /campaigns:
     get:
       operationId: listCampaigns
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-118 Campaign & Audience Management"
@@ -5788,6 +5810,7 @@ paths:
   /message-templates:
     get:
       operationId: listMessageTemplates
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-766 Campaign Builder"
         - "P08 BO-768 Multichannel Composer"
@@ -5995,6 +6018,7 @@ paths:
   /cases:
     get:
       operationId: listCases
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
@@ -6453,6 +6477,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published loyalty
         programmes, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `rank` ascending, then by `id`.
       tags:
       - loyalty
       parameters:
@@ -6636,6 +6662,7 @@ paths:
   /reviews:
     get:
       operationId: listReviews
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-819 Review Collection & Rating Rules"
       x-ticvai-audience:
@@ -15086,7 +15113,9 @@ paths:
         **Merging is not reversible in practice**, whatever the system claims, so the preview is the
         control.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - guests
       x-ticvai-permission: GUEST_MANAGE
@@ -15314,6 +15343,7 @@ paths:
   /audience-lists:
     get:
       operationId: listAudienceLists
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-756 Static Lists & Imports"
       summary: Static and imported audiences
@@ -15390,6 +15420,7 @@ paths:
   /audience-activations:
     get:
       operationId: listAudienceActivations
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-763 Activation & Governance"
       summary: Where audiences are being used, and whether they are still in sync
@@ -15624,7 +15655,9 @@ paths:
         the programme''s earning rule plus a window, and without this table it is a rule somebody has
         to remember to switch off.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -15715,7 +15748,9 @@ paths:
         Every row carries `balance_after`, so a disputed balance can be walked rather than argued
         about.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: LOYALTY_ACCRUE
@@ -15787,6 +15822,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published rewards, and
         nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
         `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `name` ascending, then by `id`.
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -15869,7 +15906,9 @@ paths:
       description: '**A reward is a definition and an assignment is an instance**, which is why the
         code, the expiry and the order it was redeemed against live here rather than on the reward.
 
-        '
+        
+
+        **Order.** Newest first, by `issuedAt` descending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -15952,6 +15991,7 @@ paths:
   /badges:
     get:
       operationId: listBadges
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-826 Achievement & Badge Engine"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
@@ -16050,7 +16090,9 @@ paths:
         not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest
         (ADR-0025).
 
-        '
+        
+
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -16149,6 +16191,8 @@ paths:
         and the alternative is a `notes` column nobody can report on.
 
         The options come back with the field because a select with no options is not a field.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - marketing
       x-ticvai-permission: GUEST_VIEW
@@ -16309,6 +16353,8 @@ paths:
         first response, resolution, escalation, and whether the clock runs outside business hours.
         Two tables with one name, and the `audit-duplicate-tables` pairing was a false positive for
         exactly that reason.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - marketing
       x-ticvai-permission: CASE_VIEW
@@ -16390,6 +16436,8 @@ paths:
         **`getWaiverStatus` answered whether a guest had signed and nothing could produce the
         signature.** A waiver whose evidence cannot be retrieved is not a waiver, which is the
         entire reason venues collect them.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
       tags:
       - marketing
       x-ticvai-permission: GUEST_VIEW_PII
@@ -16732,7 +16780,9 @@ paths:
         **Scoped to the caller, not filtered by it**, like `/me/cases`: there is no subject parameter.
         `unreadOnly` returns only what the guest has not opened. Agreed 29 September, our build plan.
 
-        '
+        
+
+        **Order.** Sorted by `title` ascending, then by `id`.'
       tags:
       - message
       parameters:

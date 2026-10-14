@@ -1660,6 +1660,8 @@ paths:
         venue of the tenant, so a swap cannot move a meal or a shop to a park the party is not in
         that day. `kind=shop` returns the venue's retail points, shops and retail kiosks alike;
         `kind=meal` its dining points, food kiosks included.
+
+        **Order.** Best first, by `matchedInterests` descending, then by `walkMinutes` ascending.
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true

@@ -5843,7 +5843,9 @@ paths:
         first by default, so nobody waits behind a newer submission. Personal fields are returned only to a
         caller holding `GUEST_VIEW_PII`, the permission this operation requires.
 
-        '
+        
+
+        **Order.** Oldest first, by `submittedAt` ascending, then by `id`.'
       tags:
       - identity
       x-ticvai-permission: GUEST_VIEW_PII

@@ -120,6 +120,8 @@ paths:
       description: >
         Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets nothing
         references — the working set for a library clear-out.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_VIEW
       x-ticvai-scope-level: venue

@@ -503,7 +503,9 @@ paths:
         its own expiry and who verified or refused it and why; `expiringWithinDays` finds the insurance
         certificates that will lapse before the accreditation does.
 
-        '
+        
+
+        **Order.** Newest first, by `submittedAt` descending, then by `id`; with `status=submitted` (the verification queue) oldest first, by `submittedAt` ascending.'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_VIEW
@@ -2172,7 +2174,9 @@ paths:
         which is the date the status screen promises. A guest-facing list that takes a subject parameter is a
         list somebody will call with another subject.
 
-        '
+        
+
+        **Order.** Newest first, by `submittedAt` descending, then by `id`.'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
@@ -2225,7 +2229,9 @@ paths:
         the badge screen renders; a revoked, replaced or expired one is returned with that status and not
         rendered as scannable.
 
-        '
+        
+
+        **Order.** Newest first, by `issuedAt` descending, then by `id`.'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
@@ -2589,7 +2595,9 @@ paths:
         The history BO-682 shows: who asked, when, with which filters and fields, how many records, and
         whether personal data went with it.
 
-        '
+        
+
+        **Order.** Newest first, by `requestedAt` descending, then by `id`.'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_MANAGE

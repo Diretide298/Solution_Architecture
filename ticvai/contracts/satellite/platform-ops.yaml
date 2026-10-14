@@ -119,6 +119,7 @@ paths:
   /releases:
     get:
       operationId: listReleases
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
@@ -482,7 +483,9 @@ paths:
       description: 'A rollout is one release reaching one environment across many cells. The deployment
         monitor reads this.
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - rollout
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
@@ -782,7 +785,9 @@ paths:
       description: 'Every migration, its module, whether it is reversible, and which cells have applied
         it. This is the migration console''s landing view.
 
-        '
+        
+
+        **Order.** Newest first, by `rollbackTestedAt` descending.'
       tags:
       - migration
       x-ticvai-permission: PLATFORM_MIGRATION_VIEW

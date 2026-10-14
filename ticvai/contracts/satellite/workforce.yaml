@@ -91,6 +91,8 @@ paths:
         18.9.2. A supervisor sees the venue; a steward sees themselves. **The same operation,
         scoped by permission** — a steward without `WORKFORCE_VIEW` gets their own assignments
         and no one else's, which is what `EMP-022 My rota` renders.
+
+        **Order.** Soonest first, by `startsAt` ascending, then by `id`.
       tags: [rota]
       x-ticvai-permission: WORKFORCE_VIEW
       x-ticvai-scope-level: venue
@@ -1226,7 +1228,9 @@ paths:
         **`workforce.employee` had no operation of any kind until 20 September** — the rota, attendance
         and leave were all wired and the people they are about were not.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1808,7 +1812,9 @@ paths:
       description: 'Resource board 10 asks the page to show successful records, failed records,
         warnings and mapping errors rather than *"integration failed"*.
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1915,7 +1921,9 @@ paths:
         **`affectedAssignmentIds` is a snapshot, not a live join** — what was at risk when the conflict
         was raised, which must not change when a roster does.
 
-        '
+        
+
+        **Order.** Newest first, by `raisedAt` descending, then by `id`.'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -2010,7 +2018,9 @@ paths:
         writers pass). Filtered by venue and department, and by a date range that returns every budget whose
         period overlaps it.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -2138,7 +2148,9 @@ paths:
         this list, whatever their permissions; a conversation is visible to its participants and no one
         else. Each row carries the caller''s unread count.
 
-        '
+        
+
+        **Order.** Newest activity first, by `lastMessageAt` descending, then by `id`.'
       tags:
       - announcements
       x-ticvai-permission: WORKFORCE_VIEW
@@ -2191,7 +2203,9 @@ paths:
         `404`, not a `403`**: whether a conversation exists between two other people is itself not the
         caller''s business.
 
-        '
+        
+
+        **Order.** Newest first, by `sentAt` descending, then by `id`.'
       tags:
       - announcements
       x-ticvai-permission: WORKFORCE_VIEW

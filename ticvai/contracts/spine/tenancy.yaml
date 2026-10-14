@@ -224,6 +224,7 @@ paths:
   /org-units:
     get:
       operationId: listOrgUnits
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-055 Rota & Scheduling"
         - "P08 BO-064 Zones & Areas"
@@ -346,6 +347,8 @@ paths:
         fields this operation filters on, and the list is the shared `Page`. **Gated by
         `AUDIT_VIEW`, not `AI_AUDIT_VIEW`**: this is the platform trail of every principal's
         actions, and the AI key covers only what an assistant did.
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.
       tags: [tenancy]
       x-ticvai-permission: AUDIT_VIEW
       x-ticvai-audience: [staff]
@@ -569,6 +572,8 @@ paths:
 
         One row per profile, at its latest version. Earlier versions are read one at a time
         through `getConfigurationProfile` with `version`.
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
@@ -1378,6 +1383,7 @@ paths:
   /workstations:
     get:
       operationId: listWorkstations
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
         - "P08 BO-037 Offline Package Status"
@@ -1962,6 +1968,8 @@ paths:
 
         **`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a
         credential, and a list at venue level is not where a credential is read back.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
       tags: [workstation]
       x-ticvai-permission: DEVICE_VIEW
       x-ticvai-scope-level: venue
@@ -3050,7 +3058,9 @@ paths:
         from (`anchor`), what happens at expiry, and — where law sets a limit — the limit and its basis.
         See `TenantDataRetentionClass` for the classes and their defaults.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - tenancy
       x-ticvai-permission: TENANT_VIEW

@@ -285,6 +285,8 @@ paths:
 
         A guest or public caller sees `active` routes only; `status` is honoured only for a
         caller holding `TRANSPORT_VIEW`.
+
+        **Order.** Sorted by `sequence` ascending, then by `id`.
       tags: [route]
       x-ticvai-permission: null   # guest/public read of published network data
       x-ticvai-scope-level: venue
@@ -768,6 +770,7 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listTransportTimetables
+      description: '**Order.** Newest first, by `publishedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-1186 Transport Timetables"
       x-ticvai-audience: [staff]
@@ -1028,6 +1031,8 @@ paths:
         `soldOut` departure is returned with `seatsLeft` 0 so the card can say so. With
         `passengers`, a departure with fewer seats left than the party is marked
         `fitsParty: false` and the fares are totalled for the party.
+
+        **Order.** Sorted by `departureId` descending (a UUIDv7, so newest first).
       tags: [departure]
       x-ticvai-permission: null   # guest/public read of published network data
       x-ticvai-scope-level: venue
@@ -1174,6 +1179,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: A route's departures, for operations
       description: Every status, with seats sold and the vehicle. Venue Management departure board.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
       tags: [departure]
       x-ticvai-permission: TRANSPORT_VIEW
       x-ticvai-scope-level: venue
@@ -1310,6 +1317,8 @@ paths:
         weekly and monthly unlimited, for the chosen route, each with its price and what it saves
         against single adult trips. A pass bought here is a catalogue `openDated` product
         (`catalogueProductId`) added to the cart with `attributes.transport` naming the stations.
+
+        **Order.** Sorted by `name` ascending, then by `catalogueProductId`.
       tags: [pass]
       x-ticvai-permission: null   # guest/public read of published network data
       x-ticvai-scope-level: venue
@@ -1357,6 +1366,7 @@ paths:
   /transport/pass-types:
     get:
       operationId: listTransportPassTypes
+      description: '**Order.** Sorted by `sortOrder` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-1188 Transport Pass Types"
       x-ticvai-audience: [staff]
@@ -1501,6 +1511,8 @@ paths:
         The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of stations
         with its current adult fare and **Book this route**, which fills the one-way search.
         Scoped to the caller; newest first.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags: [favourite]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
       x-ticvai-scope-level: venue

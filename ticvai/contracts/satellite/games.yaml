@@ -574,7 +574,9 @@ paths:
       description: 'Point cost and stock. Out-of-stock prizes stay visible with their availability shown
         — hiding them means a child asks for the one thing that vanished.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - prize
       x-ticvai-permission: PRODUCT_VIEW

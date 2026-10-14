@@ -2138,6 +2138,8 @@ paths:
         **We held `agreement_rules` and `agreement_signature` and no agreement.** The signature
         referenced a participant and a version *string*, so it signed a version number rather than a
         document. Decision 1 took their `rental_agreement` for exactly this.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - rental
       x-ticvai-permission: RENTAL_VIEW

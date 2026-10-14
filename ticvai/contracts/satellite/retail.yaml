@@ -267,6 +267,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that
         is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `name` ascending, then by `id`.
       tags: [merchandise]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-guest-callable: true
@@ -522,6 +524,7 @@ paths:
   /retail-sales:
     get:
       operationId: listRetailSales
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
       x-ticvai-audience: [staff]
@@ -775,6 +778,7 @@ paths:
   /retail-returns:
     get:
       operationId: listRetailReturns
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List returns
@@ -1029,6 +1033,8 @@ paths:
       description: >
         Shaped for a handheld on a shop floor — low stock first, with sibling outlet
         availability so a colleague can be sent rather than the sale lost.
+
+        **Order.** Low stock first, by `available` ascending, then by `name`.
       tags: [floor]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-scope-level: venue
@@ -1380,7 +1386,9 @@ paths:
       summary: Rules and controls in force in the store
       description: '**Drafted 4 September as a stub.** BO-142 *Store Rules, Controls & Permissions* had nothing of its own, so wiring `listRoles` onto BO-106 on 4 September made the two screens identical. **The collision was a symptom** - BO-142 needs store rules and there were none to give it. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - retail
       x-ticvai-permission: PRODUCT_VIEW
@@ -1461,6 +1469,8 @@ paths:
         The retail half of the same table F&B keeps. **Separate because the merchandising is
         separate** — a coffee pairs with a pastry and a jacket pairs with a hat, and one list
         serving both would be filtered on every read.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - retail
       x-ticvai-permission: PRODUCT_VIEW

@@ -2238,6 +2238,7 @@ paths:
   /tenant-config/banners:
     get:
       operationId: listBanners
+      description: '**Order.** Soonest first, by `startsAt` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
       x-ticvai-audience:
@@ -2691,7 +2692,9 @@ paths:
         **A guest screen reads `listPublishedContentPages`** (decided 2 October, GFIX-2), which needs no
         session: help and accessibility pages are public.
 
-        '
+        
+
+        **Order.** Sorted by `sortOrder` ascending, then by `id`.'
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
@@ -3735,6 +3738,7 @@ paths:
   /tenant-config/versions:
     get:
       operationId: listConfigVersions
+      description: '**Order.** Newest first, by `publishedAt` descending, then by `approvalRequestId`.'
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-015 Version History"
@@ -3919,7 +3923,9 @@ paths:
       description: 'Drafts, AI suggestions awaiting review and the published one (decided 29 September,
         rev 3 REV3-11). Filter by `status` or `source` to show the suggestions waiting for a person.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
@@ -5008,7 +5014,9 @@ paths:
         comes after date and time), and the settings each step owns. The full catalogue is `x-ticvai-system-catalogue`
         on `BookingFlowType`.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending.'
       tags:
       - bookingFlows
       x-ticvai-permission: TENANT_CONFIGURE
@@ -5069,7 +5077,9 @@ paths:
       description: 'The flows this venue has picked, each with its steps in the venue''s order. Draft rows:
         guests read the published copy through `getPublishedBookingFlow` (decided 29 September, W12).
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - bookingFlows
       x-ticvai-permission: TENANT_CONFIGURE
@@ -5743,6 +5753,7 @@ paths:
   /tenant-config/app-builds:
     get:
       operationId: listAppBuilds
+      description: '**Order.** Newest first, by `requestedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P13 CMS-104 App Build & Store Publishing"
       x-ticvai-agreed: '29 September: M24-08 (submission status); shape follows listConfigVersions'
