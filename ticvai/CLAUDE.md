@@ -55,3 +55,13 @@ stop and ask the lead (Chinmay). Do not work around it.
 ## The lead's rhythm
 16. After each release, a canary pulls **5 tickets** through ADAM as a developer would.
 17. Triage gets a **daily 30-minute slot**. A CR waits for it, and is not decided ad hoc.
+
+## Blockers (developers and their agents)
+18. **A blocker is always a CR, then the next workable ticket** (CHG-ADM-004; Chinmay, 14 October 2026: "if
+    there is blocker we log it as CR always. and than scour for next tasks that can be completed and if
+    existing blockers effect it"). When the package blocks a ticket (a contradiction, missing storage, an
+    undefined rule), the agent raises a CR with `blocking: true` and proposes the ticket **On hold** naming
+    it; it never works around the blocker and never builds a guess. Then it takes the next ticket it can
+    finish: `adam_board` with `only: "workable"` lists, in board order, the tickets no open blocking CR
+    affects (by the ticket's links, and the tables its operations read or write). Nothing is filed or
+    changed in OpenProject until the person says yes.

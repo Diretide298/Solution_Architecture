@@ -24,7 +24,7 @@ When the lead settles a CR raised from your ticket (accepted, done or rejected),
 - **Your ticket is closed:** the change becomes a **child task** of it, carrying the CR, the decision and the release. A CR's work is one child task; migration work it causes is a child task of the affected MIG-* ticket, for the migration owner.
 
 ## When you find a gap
-If an operation, field, table or screen state is missing, or wrong, **raise it from `/ticket` as a CR** (source: developer). Don't work around it silently, and don't edit the package. The lead triages it: clarification, scope or defect; now or later. It lands in a release.
+If an operation, field, table or screen state is missing, or wrong, **raise it from `/ticket` as a CR** (source: developer). Don't work around it, and don't edit the package. If it blocks the ticket, the CR is `blocking`, the ticket goes On hold and you move to the next workable ticket (below). The lead triages it: clarification, scope or defect; now or later. It lands in a release.
 
 ## When a ticket conflicts with the spec
 Sometimes what you pulled contradicts itself or the contract. For example: a guest screen calls a staff-only
@@ -36,10 +36,14 @@ happens:
 2. **Name the invariant it breaks**, in one line. Examples: "a guest screen never binds a staff-audience
    operation", "every form control maps to a contract field", "a pre-sign-in load needs no session". This
    is what lets the lead turn your report into a check, so it cannot happen again anywhere.
-3. **Carry on with the rest of the ticket.** Don't invent the missing piece. The lead triages the CR in the
-   daily slot, as a blocker, a fix-forward or a defer, and the fix reaches you as a comment for your agent
-   (or a child task, if your ticket is closed by then; see "When a change request is settled"). Your
-   ticket's text is never rewritten.
+3. **If it blocks the ticket, put the ticket On hold and move on.** A blocker is always a CR, raised with
+   `blocking: true` (CHG-ADM-004). Never work around it and never build a guess. Your agent proposes the
+   ticket **On hold** naming the CR, then the next ticket you can finish: `/board` marks each ticket an open
+   blocking CR affects (`blocked`) and names the first workable one, and `/ticket` shows a **Blocked by**
+   section. If the CR does not block the ticket, build the rest. The lead triages the CR in the daily slot,
+   as a blocker, a fix-forward or a defer, and the fix reaches you as a comment for your agent (or a child
+   task, if your ticket is closed by then; see "When a change request is settled"). Your ticket's text is
+   never rewritten.
 
 **Known issues** are listed in three places:
 - the change log, one file per change in `changes/entries/` (indexed in `CHANGELOG.md` beside it at each release); open entries are the known, unfixed changes;

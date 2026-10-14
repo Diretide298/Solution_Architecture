@@ -207,7 +207,7 @@ building.
 | `adam_module` | none, or `name` | all 32 modules; one with its tables |
 | `adam_decisions` | none, or `id` / `q` | the ADRs and registers; one ADR in full |
 | `adam_file` | `path`, optional `from` / `lines` | one file's source, windowed |
-| `adam_board` | nothing | what is open and assigned to you, and what each item touches |
+| `adam_board` | none, or `only` (`workable` / `blocked`), `subtasks`, `limit` | what is open and assigned to you, what each item touches, and which open blocking CRs affect it (`blocked`; `firstWorkable`) |
 | `adam_team` | none, or `person` (a name, first name or part of one), `days`, `limit` | **read-only**: everybody's in-progress tickets with in progress / awaiting QA / stalled / open / finished-in-14-days counts; or one teammate's open tickets (in progress first) and what they finished lately (closed or moved to Ready for QA, with status and date). Read with your own OpenProject token, so it shows only what you could see there; refused to client accounts |
 | `adam_work` | `key` | one work package, live, plus the artefacts it touches |
 | `adam_links` | `kind`, `id` | what work is scheduled against one artefact |
@@ -248,6 +248,16 @@ that pulls it (what was decided, which release carries it, what to do now); a cl
 task for the change (one per request, at most; filed before the request is marked Done). `adam_pull` lists every
 request raised from the ticket near the top of README.md, under "Change requests on this ticket", with
 its decision and release: follow the settled ones, wait on the open ones.
+
+**A blocker is always a change request, then the next workable ticket (CHG-ADM-004).** When the package
+blocks a ticket (a contradiction, missing storage, an undefined rule), the agent raises a CR with
+`blocking: true` (draft, the person says yes, file), proposes the ticket On hold naming the CR (applied only
+after a yes), and never works around it or builds a guess. Then it looks for the next ticket it can finish:
+the service works out, for every ticket on the board, which open blocking CRs affect it (raised from it, or
+naming one of its linked artefacts, or a table one of its operations reads or writes by the lineage of the
+release served; an accepted CR blocks until a served release carries it), so `adam_board` with
+`only: "workable"` is a lookup. The pull's README.md has a "Blocked by" section above "Change requests on
+this ticket".
 
 **Change request intake (C8).** A draft carries where the change came from (`source`: minutes,
 answer, design, developer, audit, and `sourceRef`, the line that finds it again — a developer's

@@ -21,7 +21,7 @@
 
 import { createInterface } from 'node:readline';
 import { ViewerClient, Forbidden } from './client.mjs';
-import { TOOLS, BY_NAME } from './tools.mjs';
+import { TOOLS, BY_NAME, BLOCKER_RULE } from './tools.mjs';
 
 const NAME = 'adam';
 const VERSION = '0.1.0';
@@ -147,7 +147,8 @@ async function handle(message) {
           + 'the status change and a comment, show the person, and adam_apply only after they say yes. '
           + 'If the package contradicts itself or lacks what the ticket needs, do not settle it in code: '
           + 'check adam_changes, then adam_draft_change, show the draft, and adam_raise_change only '
-          + 'after they say yes. To see what a teammate or the whole team is working on, adam_team (read-only).',
+          + 'after they say yes. ' + BLOCKER_RULE + ' '
+          + 'To see what a teammate or the whole team is working on, adam_team (read-only).',
       });
     }
 

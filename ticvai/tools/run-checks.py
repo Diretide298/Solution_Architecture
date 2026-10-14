@@ -124,6 +124,9 @@ CHECKS = [
     # (nothing ADAM says asks them to choose one), and a settled CR reaches its ticket: a comment for the agent while
     # it is open, a child task when it is closed. Both read ../viewer, the way check-frontend-repos does.
     "check-adam-latest-release", "check-adam-cr-settlement",
+    # 14 October (Chinmay, CHG-ADM-004): a blocker is always a CR, the ticket goes On hold, and the agent takes the next
+    # ticket no open blocking CR affects; every text an agent reads says so and ADAM answers it on the board and the pull.
+    "check-adam-blocker-rule",
     # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
     # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
     "check-parameter-columns",
