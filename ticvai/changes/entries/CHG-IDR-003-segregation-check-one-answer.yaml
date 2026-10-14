@@ -1,0 +1,97 @@
+id: CHG-IDR-003
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'The segregation check is defined once: at role time every rule against the role''s own and inherited
+  permissions whatever scopeSensitive says, at grant time with scope overlap; only block refuses, always 409
+  segregation-breach (createRole moves from 422, BC-079; createDelegatedAccess gains it); a parent role''s edit
+  re-checks its children; createRole is audited; and check-contract-shapes C-SEGREGATION-409 holds the one answer.'
+decision:
+  what: 'contracts/shared/common.yaml: segregation-breach catalogued as a shared problem type, status 409.
+    contracts/spine/identity.yaml: createRole''s description defines the role-time check (every SegregationRule
+    against the role''s permissions regardless of scopeSensitive; only block refuses; requireApproval and warn are
+    accepted and surface when a grant attaches the role and in listSegregationViolations), writes one
+    platform.audit_record, and its 409 lists duplicate-code and segregation-breach (422 keeps unknown-preset only);
+    setPrincipalModuleAccess and createDelegatedAccess define the grant-time check (everything the principal would
+    hold, scopeSensitive rules only where scopes overlap, DENY never refused) with a 409 segregation-breach
+    (createDelegatedAccess''s is new, additive); createPrincipal runs the same check (CHG-IDR-002); updateRole says it
+    changes no permission and runs no check; SegregationRule.severity says what each severity does;
+    listSegregationViolations says where requireApproval and warn surface; Role.code says it is compared
+    case-insensitively. contracts/spine/tenancy.yaml setRolePermissions: own united with inherited permissions, a
+    parent role''s edit re-checks every role inheriting it, 409 problem type segregation-breach, audited.
+    docs/active/breaking-changes.yaml BC-079. Lineage (tools/applied/identity-roles-14-october.py): createRole writes
+    platform.audit_record; createDelegatedAccess and setPrincipalModuleAccess read identity.segregation_rule and the
+    permission sets they compare. screens/P08 BO-054: the create dialog and Save role permissions say how a 409 is
+    shown. tools/check-contract-shapes.py: rule C-SEGREGATION-409.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-079 (ticket 27764), audited 14 October 2026: createRole answered 422 segregation-breach
+  (identity.yaml:1635, 1695-1698), setRolePermissions 409 with no problem type (tenancy.yaml:480-485) and
+  setPrincipalModuleAccess 409 (identity.yaml:420-424, 474), both baselined in C-ERROR-PROBLEM-TYPE;
+  createDelegatedAccess declared no segregation answer (1837-1857); severity had no semantics; no scope was named for a
+  role, which has none. The CR''s Option A was wrong: every permission of one role is granted together at one scope,
+  so skipping scopeSensitive rules (default true, "should rarely be false", 8113-8125) would switch off almost every
+  role-time check. The lead decided: every rule against own and inherited permissions regardless of scopeSensitive,
+  only block refuses, one problem type with status 409 everywhere, added to createDelegatedAccess, createRole
+  audited. The lower(code) index is batch GEN''s derive-ddl rule (settles CR-066 too).'
+keys_touched:
+  screens:
+  - BO-054
+  operations:
+  - createRole
+  - updateRole
+  - setRolePermissions
+  - setPrincipalModuleAccess
+  - createDelegatedAccess
+  - createPrincipal
+  - listSegregationViolations
+  schemas:
+  - SegregationRule
+  - SegregationViolation
+  - Role
+  - Problem
+  tables:
+  - identity.segregation_rule
+  - platform.audit_record
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/breaking-changes.yaml
+  - screens/P08-venue-back-office.yaml
+  - handoff/api-data-lineage.json
+  - handoff/audit-baseline.json
+  - tools/applied/identity-roles-14-october.py
+  - tools/check-contract-shapes.py
+root_class: A19 ERRORS-AND-STATES
+tickets:
+  started:
+  - SVC-IDENTITY-ADMINISTRATION-1 (#27764)
+  unstarted:
+  - SVC-TENANCY-IDENTITY-1 (#27933)
+  - SVC-IDENTITY-ADMINISTRATION-7 (#29049)
+  - SVC-IDENTITY-ADMINISTRATION-8 (#29095)
+  - SVC-IDENTITY-IDENTITY-1 (#27750)
+  - SVC-IDENTITY-IDENTITY-7 (#29096)
+  - APP-SETUP-BO-054 (#27938)
+  - APP-CONSOLE-ADM-021 (#29068)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-079
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
+  IDR. New rule C-SEGREGATION-409 in check-contract-shapes (registered in run-checks.py already): a POST, PUT or PATCH
+  whose description names `SegregationRule` must declare a 409 listing segregation-breach, and no response may carry
+  that type at another status; reads that name the rule (listPermissionFindings) refuse nothing and are not asked.
+  Run on the parent commit r5 (1eb1d063, its contracts with this check copied in): FAIL, 4 new
+  (createRole 422 carries segregation-breach; createRole, setPrincipalModuleAccess and setRolePermissions have no 409
+  listing it). On this branch: PASS, 0 found, no baseline. The lower() unique index on Role.code and every
+  x-ticvai-unique text column is batch GEN''s derive-ddl rule; this batch only states the comparison on Role.code.
+  Details chosen where the decision left them open: requireApproval does not route an approval (the decision says
+  "accepted and surfaced"); a DENY grant is never refused; createPrincipal''s role grants run the check; a refused
+  parent-role edit names the child role in detail. 27764 is started: comment plus linked delta (ticvai/CLAUDE.md
+  rule 6).'

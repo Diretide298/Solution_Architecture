@@ -23,6 +23,9 @@ same kind that nothing held:
   C-UNTYPED-BODY           a request or 2xx body that is a bare object with no properties (R088)
   C-PAGED-ORDER            a cursor-paged list that says nothing about its order (R154)
   C-PROSE-SPLIT            a word split by line-wrap or find-and-replace (`s ervice`) (R138)
+  C-SEGREGATION-409        a write whose description cites `SegregationRule` declares no 409 carrying the
+                           `segregation-breach` problem type, or a response carries that type with a status
+                           other than 409 (ADAM CR-079, CHG-IDR-003: one rule, one type, one status)
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -61,7 +64,10 @@ RULES = {
     "C-CLONE-CODE": "a clone of an entity with a unique code takes no new code (R108, CHG-R4-016)",
     "C-NAME-LOCALISED": "an entity localises other text but not its name (CHG-R4-011)",
     "C-SERIES-WINDOW": "a series repeating every N minutes has no last start time of the day (DI-995, CHG-R4-014)",
+    "C-SEGREGATION-409": "a segregation check answered other than 409 segregation-breach (ADAM CR-079, CHG-IDR-003)",
 }
+# CHG-IDR-003: a write that says it runs the segregation check names the rule schema in its description.
+SEGREGATION = re.compile(r"\bSegregationRule\b")
 CREATES = re.compile(r"^(create|add|register|import)[A-Z]")
 LOCALISED = re.compile(r"schemas/(LocalisedText|LocalisedRichText)['\"]")
 INTERNAL = re.compile(r"^(createdByPrincipalId|updatedByPrincipalId|principalId|approvedByPrincipalId|"
@@ -262,7 +268,33 @@ def main() -> int:
             if (a + b) in vocab and b not in vocab:
                 guard.add("C-PROSE-SPLIT", f"{where}:{a} {b}", f"{where}: '{a} {b}' reads as a split '{a + b}'")
     extra_rules(guard, ops, docs)
+    segregation_rules(guard, ops, docs)
     return guard.finish()
+
+
+def segregation_rules(guard, ops, docs):
+    """**One segregation rule, one answer** (14 October 2026, ADAM CR-079; CHG-IDR-003). The same check was `422
+    segregation-breach` on createRole, a bare 409 on setRolePermissions and setPrincipalModuleAccess, and nothing on
+    createDelegatedAccess, so a client could not switch on it and a grant could bypass it. Every write whose
+    description says it runs the check (it names `SegregationRule`) declares a 409 listing `segregation-breach`, and no
+    response anywhere carries that type with another status. Reads that name the rule (listPermissionFindings) report
+    conflicts and refuse nothing, so they are not asked for a 409."""
+    for oid, f in sorted(ops.items()):
+        op, doc, m = f["op"], docs[f["contract"]], f["method"]
+        carried = {}
+        for code, r in (op.get("responses") or {}).items():
+            rr, _ = deref(r, doc)
+            types = (rr or {}).get("x-ticvai-problem-types") if isinstance(rr, dict) else None
+            if isinstance(types, list) and "segregation-breach" in types:
+                carried[str(code)] = True
+        for c in sorted(carried):
+            if c != "409":
+                guard.add("C-SEGREGATION-409", f"{oid}:{c}",
+                          f"{oid}: {c} carries segregation-breach; the one status for it is 409")
+        if m in ("post", "put", "patch") and SEGREGATION.search(str(op.get("description") or "")) \
+                and "409" not in carried:
+            guard.add("C-SEGREGATION-409", oid,
+                      f"{oid}: its description runs the SegregationRule check and no 409 lists segregation-breach")
 
 
 def family(name: str) -> str:
