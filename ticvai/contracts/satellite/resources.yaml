@@ -1211,6 +1211,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/state:
@@ -1634,6 +1636,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourcePackage'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/venues:
@@ -3977,6 +3981,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -4054,6 +4059,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -4110,6 +4116,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         label:
           type: string
@@ -4286,6 +4293,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -4727,6 +4735,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
         name:
           type: string

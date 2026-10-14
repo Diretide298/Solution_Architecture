@@ -112,8 +112,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/RolloutCell'
         '409':
           description: 'The cell is not `pending` (already `running`, `complete`, `failed`, `skipped` or `rolledBack`); only a cell the wave has not reached can be skipped. Nothing changes.'
           x-ticvai-problem-types: [rollout-cell-not-pending]

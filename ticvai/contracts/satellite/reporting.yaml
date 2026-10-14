@@ -496,6 +496,7 @@ paths:
         schema:
           $ref: '#/components/schemas/ReportCategory'
       - name: search
+        description: 'Matched case-insensitively as a substring of the report definition''s `name` or `description`; no wildcards.'
         in: query
         schema:
           type: string
@@ -3088,6 +3089,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
           description: '`takings` and `admissions` are seeded for every tenant as system KPIs (decided 28
             September, audit R283), and the five accreditation KPIs for every tenant with the accreditation

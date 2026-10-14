@@ -2568,6 +2568,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /blacklist:
@@ -6586,7 +6588,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's activation/display rules, defined by hand
-  /credential-activation-display/{ruleId}:
+  /credential-activation-display/{credentialPolicyId}:
     put:
       operationId: setCredentialActivationDisplay
       x-ticvai-consumed-by:
@@ -6626,10 +6628,10 @@ paths:
             schema:
               $ref: '#/components/schemas/CredentialActivationDisplayRulesInput'
       parameters:
-      - name: ruleId
+      - name: credentialPolicyId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
+        description: 'Addresses the activation and display rule this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -8593,7 +8595,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: retention rules per biometric data category, defined by hand
-  /biometric-lifecycle-retention/{policyId}:
+  /biometric-lifecycle-retention/{retentionSettingId}:
     put:
       operationId: setBiometricLifecycleRetention
       x-ticvai-consumed-by:
@@ -8645,10 +8647,10 @@ paths:
             schema:
               $ref: '#/components/schemas/BiometricLifecycleRetentionDeletionInput'
       parameters:
-      - name: policyId
+      - name: retentionSettingId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `policyId`, when sent, must equal it.'
+        description: 'Addresses the retention rule this write creates or replaces. The body''s `policyId`, when sent, must equal it.'
         schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -25691,6 +25693,7 @@ components:
 
             '
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         perProductRules:
@@ -26547,6 +26550,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
         name:
           type: string

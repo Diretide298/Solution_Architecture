@@ -1,0 +1,47 @@
+id: CHG-SHP-008
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'updateDonationCampaign, updatePartnerAgreement, updateRotaAssignment and updateTableReservation take an
+  Update<X>Request (minProperties 1, no required, no defaults, request only), the CR-089 pattern.
+  UpdateTableReservationRequest leaves out `groupId` (a party grouping is not changed by a PATCH, and the glossary
+  bans the name).'
+decision:
+  what: 'contracts/catalogue, subscription, workforce, fnb: new UpdateDonationCampaignRequest,
+    UpdatePartnerAgreementRequest, UpdateRotaAssignmentRequest, UpdateTableReservationRequest, each the resource''s
+    caller-sendable properties copied line for line without defaults; the PATCH bodies point at them. Breaking in
+    declaration only (server fields leave the request): BC-364..BC-367.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-PATCH-FULL-BODY (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 4 members before, 0 after on this branch (CHG-SHP; ruling "go with your
+  recommendation", Chinmay, 14 October 2026). ADAM CR-089, CHG-CNS-001.'
+keys_touched:
+  operations:
+  - updateDonationCampaign
+  - updatePartnerAgreement
+  - updateRotaAssignment
+  - updateTableReservation
+  files:
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A18 API-CONVENTIONS
+tickets:
+  started: []
+  unstarted: ['28226', '28228', '28229', '28416', '28417', '28446', '28455', '28556', '28559', '28563', '28564',
+    '28713']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

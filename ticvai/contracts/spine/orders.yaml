@@ -8416,7 +8416,7 @@ paths:
                   $ref: '#/components/schemas/QuoteRevisionNegotiationVersionManagementView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /group-discount-exception/{approvalRequestId}:
+  /group-discount-exception:
     put:
       operationId: approveGroupDiscountException
       x-ticvai-consumed-by:
@@ -8454,11 +8454,6 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupDiscountExceptionApprovalWorkflowInput'
       parameters:
-        - name: approvalRequestId
-          in: path
-          required: true
-          description: 'The approval request this decision is on (approvals engine).'
-          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -10185,7 +10180,7 @@ paths:
                 $ref: '#/components/schemas/AfterSalesFinancialSettlementAdjustmentWorkspaceView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /exception-service-recovery/{approvalRequestId}:
+  /exception-service-recovery:
     put:
       operationId: approveExceptionServiceRecovery
       x-ticvai-consumed-by:
@@ -10222,11 +10217,6 @@ paths:
             schema:
               $ref: '#/components/schemas/ApprovalExceptionServiceRecoveryManagementInput'
       parameters:
-        - name: approvalRequestId
-          in: path
-          required: true
-          description: 'The approval request this decision is on (approvals engine).'
-          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -22332,6 +22322,7 @@ components:
         principalId:
           type: string
           format: uuid
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest (R164).
         workstationId:
           type: string
           format: uuid

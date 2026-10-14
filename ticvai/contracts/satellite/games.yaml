@@ -2449,6 +2449,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -3440,6 +3441,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
           maxLength: 64
         name:

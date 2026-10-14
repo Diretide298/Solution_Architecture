@@ -1329,6 +1329,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
       - name: q
+        description: 'Keywords matched case-insensitively against the product''s `name` and `summary`, in the requested language and in English; every word must match.'
         in: query
         required: true
         schema:
@@ -1529,7 +1530,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DonationCampaign'
+              $ref: '#/components/schemas/UpdateDonationCampaignRequest'
       responses:
         '200':
           headers:
@@ -5821,7 +5822,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /activation-scheduler/{scheduleId}:
+  /activation-scheduler/{lifecycleActionId}:
     put:
       operationId: publishActivationScheduler
       x-ticvai-consumed-by:
@@ -5858,10 +5859,10 @@ paths:
             schema:
               $ref: '#/components/schemas/PublicationActivationSchedulerInput'
       parameters:
-        - name: scheduleId
+        - name: lifecycleActionId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces. The body''s `scheduleId`, when sent, must equal it.'
+          description: 'Addresses the scheduled lifecycle action this write creates or replaces. The body''s `scheduleId`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -15656,7 +15657,7 @@ paths:
                 $ref: '#/components/schemas/PerformanceTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /prepaid-minute-packages/{packageId}:
+  /prepaid-minute-packages/{prepaidMinutesId}:
     put:
       operationId: setPrepaidMinutePackage
       x-ticvai-consumed-by:
@@ -15678,7 +15679,7 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       parameters:
-      - name: packageId
+      - name: prepaidMinutesId
         in: path
         required: true
         description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
@@ -20490,6 +20491,7 @@ components:
           readOnly: true
           description: Assigned by the server on create; `createEntitlementTemplate` does not take it.
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -20919,6 +20921,58 @@ components:
           description: '**Not reversed when the campaign closes.** The money is still owed.
 
             '
+    UpdateDonationCampaignRequest:
+      type: object
+      x-ticvai-persistence: none — request only; a partial update of catalogue.donation_campaign
+      description: '**A partial update of DonationCampaign** (the CR-089 pattern; CHG-SHP-008): `updateDonationCampaign` sends only what changes, and a field left out keeps its stored value. Nothing is required and nothing has a default, so a generated client never resends a value it did not mean to change. The server''s own fields (id, raisedTotal) are not sendable.'
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+        beneficiary:
+          type: string
+          description: Who the money is for. Shown to the guest, and it is the reason they give.
+        venueIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        amountMode:
+          $ref: '#/components/schemas/DonationAmountMode'
+        fixedAmounts:
+          type: array
+          description: 1.1.129. Predefined values, e.g. 5, 10, 25.
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/Money
+        minAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        maxAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        liabilityAccountId:
+          type: string
+          format: uuid
+          description: '**Donations post here, not to revenue** (1.1.132). Money collected for a charity
+            is not the venue''s to recognise, and treating it as revenue is a restatement waiting to happen.
+
+            '
+        channels:
+          type: array
+          description: 1.1.133. Where it may be solicited — POS, kiosk, web, app.
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+        isActive:
+          type: boolean
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
     WaitlistStatus:
       type: string
       enum:
@@ -21279,6 +21333,7 @@ components:
           type: string
           format: uuid
           readOnly: true
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest or a visitor (R164).
           description: '1.4.18. **The approval gate refuses an approver who is the author, and nothing
             recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this
             and the product passing through approval did not.
@@ -21289,6 +21344,7 @@ components:
           format: uuid
           nullable: true
           readOnly: true
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest or a visitor (R164).
         responsibleDepartmentId:
           type: string
           format: uuid
@@ -21935,6 +21991,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string

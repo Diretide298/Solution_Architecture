@@ -1309,8 +1309,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/VenueMapLiveState'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bookable-venue-maps:
@@ -3540,3 +3539,22 @@ components:
                     nullable: true
                     enum: [outletId, productId, accessPointId]
                     description: For `brokenLink`, which link on the point is broken.
+    VenueMapLiveState:
+      type: object
+      x-ticvai-persistence: none — response only; live state over the published map, assembled at read time
+      description: '**The live operational state on the published map** (`getVenueMapLive`): one entry per point that has a live figure. Changes every few seconds, so it is read apart from the map itself (`getVenueMap`).'
+      required: [mapId, asOf, points]
+      properties:
+        mapId: { type: string, format: uuid }
+        asOf: { type: string, format: date-time }
+        points:
+          type: array
+          items:
+            type: object
+            required: [pointId]
+            properties:
+              pointId: { type: string, format: uuid }
+              isOpen: { type: boolean, nullable: true }
+              waitMinutes: { type: integer, minimum: 0, nullable: true }
+              queueLength: { type: integer, minimum: 0, nullable: true }
+              occupancyPercent: { type: number, minimum: 0, nullable: true }

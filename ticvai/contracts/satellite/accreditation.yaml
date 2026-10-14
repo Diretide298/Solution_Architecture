@@ -3059,6 +3059,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string

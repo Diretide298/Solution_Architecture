@@ -1,0 +1,1454 @@
+{
+ "approveBookingLimitCommercial": {
+  "kind": "S",
+  "note": "One per partner, the one the body's `partnerId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveCampaignWorkflow": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveDecision": {
+  "kind": "keep",
+  "why": "a drafted decision workspace whose body names no record to decide"
+ },
+ "approveExceptionServiceRecovery": {
+  "kind": "keep",
+  "why": "a drafted decision workspace whose body names no record to decide"
+ },
+ "approveGroupDiscountException": {
+  "kind": "keep",
+  "why": "a drafted decision workspace whose body names no record to decide"
+ },
+ "approveListingModeration": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveManualOverrideSupervisor": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveMatrixMultiLevel": {
+  "kind": "S",
+  "note": "One per approval matrix code, the one the body's `code` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveMembershipProductValidation": {
+  "kind": "S",
+  "note": "One per membership product, the one the body's `membershipCode` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveMultiMediaPreview": {
+  "kind": "S",
+  "note": "One per ticket media template, the one the body's `templateId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approvePartnerStatuLifecycle": {
+  "kind": "S",
+  "note": "One per partner, the one the body's `partnerId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "approvePricingWorkflowAuthority": {
+  "kind": "S",
+  "note": "One per pricing approval policy, the one the body's `policyId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approvePrivacyTesting": {
+  "kind": "S",
+  "note": "One per privacy change set, the one the body's `changeSetId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveReviewDecision": {
+  "kind": "S",
+  "note": "One per pricing change request, the one the body's `changeRequestId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveRoleAuthorityDelegation": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveUnifiedDecision": {
+  "kind": "S",
+  "note": "One per approval request, the one the body's `approvalRequestId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveVersioningGovernance": {
+  "kind": "S",
+  "note": "One per workflow, the one the body's `workflowId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveWaiverTesting": {
+  "kind": "S",
+  "note": "One per waiver form, the one the body's `formId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "approveWorkflow": {
+  "kind": "S",
+  "note": "One per workflow, the one the body's `workflowId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "configureQueueFeed": {
+  "kind": "K",
+  "param": "feedId"
+ },
+ "configureRiskStrategy": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "deleteGuestAccount": {
+  "kind": "S",
+  "note": "The caller's own account: one per signed-in guest, so there is no key in the path."
+ },
+ "guestLogout": {
+  "kind": "S",
+  "note": "The caller's own session: one per signed-in guest, so there is no key in the path."
+ },
+ "publishActivationScheduler": {
+  "kind": "K",
+  "param": "lifecycleActionId"
+ },
+ "publishChannelAvailability": {
+  "kind": "S",
+  "note": "One per product, the one the body's `productId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "publishChannelReadinessValidation": {
+  "kind": "S",
+  "note": "One per sales channel, the one the body's `channelId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "publishMediaCompatibilityTesting": {
+  "kind": "S",
+  "note": "One per media profile, the one the body's `mediaProfileId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "publishPricingEffectiveDate": {
+  "kind": "S",
+  "note": "One per pricing change request, the one the body's `changeRequestId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "publishRuleConflictCheck": {
+  "kind": "S",
+  "note": "One per access rule version, the one the body's `ruleVersionId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "publishTopologyValidation": {
+  "kind": "S",
+  "note": "One per access configuration version, the one the body's `configurationVersionId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAccessAreaZone": {
+  "kind": "S",
+  "note": "One per access zone, the one the body's `zoneId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAccessAttributeCatalog": {
+  "kind": "K",
+  "param": "attributeKey"
+ },
+ "setAccessGraphicalMap": {
+  "kind": "S",
+  "note": "One per venue access map, the one the body's `mapId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAccessPointGroup": {
+  "kind": "K",
+  "param": "groupId"
+ },
+ "setAccessProfile": {
+  "kind": "K",
+  "param": "accessProfileId"
+ },
+ "setAccessibleSeating": {
+  "kind": "S",
+  "note": "One per seat map, the one the body's `seatMapId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAccountMappings": {
+  "kind": "S",
+  "note": "One set per region, the caller's region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setAccreditationNotificationRules": {
+  "kind": "S",
+  "note": "One per accreditation programme, the one the body's `programmeId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAccreditationRequirements": {
+  "kind": "S",
+  "note": "One per accreditation programme, the one the body's `programmeId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAccreditationValidity": {
+  "kind": "S",
+  "note": "One per accreditation programme, the one the body's `programmeId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAfterSaleFinancial": {
+  "kind": "S",
+  "note": "One per order, the one the body's `orderId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAgentAvailability": {
+  "kind": "S",
+  "note": "The caller's own availability: one per signed-in staff member, so there is no key in the path."
+ },
+ "setAgentServiceProfile": {
+  "kind": "K",
+  "param": "agentServiceProfileId"
+ },
+ "setAgreementContractTerm": {
+  "kind": "S",
+  "note": "One per partner agreement, the one the body's `agreementId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAiPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAiProvider": {
+  "kind": "K",
+  "param": "providerId"
+ },
+ "setAlertRule": {
+  "kind": "K",
+  "param": "alertRuleId"
+ },
+ "setAmendmentEligibilityPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAnalyticsProvider": {
+  "kind": "K",
+  "param": "analyticsProviderId"
+ },
+ "setApiAnomalyRule": {
+  "kind": "K",
+  "param": "anomalyRuleId"
+ },
+ "setApiLicensing": {
+  "kind": "K",
+  "param": "licenceId"
+ },
+ "setApiQuota": {
+  "kind": "K",
+  "param": "quotaId"
+ },
+ "setAppIcons": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAppleWalletPass": {
+  "kind": "S",
+  "note": "One per ticket media template, the one the body's `templateId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setApprovalControlPolicy": {
+  "kind": "K",
+  "param": "controlPolicyId"
+ },
+ "setApprovalExternalProvider": {
+  "kind": "K",
+  "param": "externalProviderId"
+ },
+ "setApprovalMatrix": {
+  "kind": "K",
+  "param": "matrixId"
+ },
+ "setApprovalRetentionPolicy": {
+  "kind": "K",
+  "param": "retentionPolicyId"
+ },
+ "setApprovalSlaPolicy": {
+  "kind": "K",
+  "param": "slaPolicyId"
+ },
+ "setApproverAvailability": {
+  "kind": "K",
+  "param": "availabilityId"
+ },
+ "setAttractionAccess": {
+  "kind": "S",
+  "note": "One per attraction, the one the body's `attractionId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setAttractionType": {
+  "kind": "K",
+  "param": "attractionTypeId"
+ },
+ "setBadge": {
+  "kind": "K",
+  "param": "badgeId"
+ },
+ "setBadgeTemplate": {
+  "kind": "K",
+  "param": "badgeTemplateId"
+ },
+ "setBiometricLifecycleRetention": {
+  "kind": "K",
+  "param": "retentionSettingId"
+ },
+ "setBiometricVerificationProfile": {
+  "kind": "S",
+  "note": "One per biometric verification profile, the one the body's `profileId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setBleBeaconGeofence": {
+  "kind": "S",
+  "note": "One per beacon, the one the body's `beaconId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setBookingFlowConfig": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setBookingVelocityTime": {
+  "kind": "S",
+  "note": "One per pricing rule, the one the body's `ruleId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setBrandIdentity": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setBrandingLocalizationTemplate": {
+  "kind": "S",
+  "note": "One per scope node, the one the body's `scopeId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setBusinessEventMapping": {
+  "kind": "K",
+  "param": "eventId"
+ },
+ "setCampaignBudgetFinancial": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCancellationPartialPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCapabilityTemplate": {
+  "kind": "K",
+  "param": "capabilityTemplateId"
+ },
+ "setCaseCategoryDefinition": {
+  "kind": "K",
+  "param": "caseCategoryId"
+ },
+ "setCaseInternalRequest": {
+  "kind": "K",
+  "param": "internalRequestId"
+ },
+ "setCaseInvestigationResolution": {
+  "kind": "S",
+  "note": "One per case and linked record, the one the body's `caseId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCaseResolution": {
+  "kind": "K",
+  "param": "caseResolutionId"
+ },
+ "setCatalogueReview": {
+  "kind": "S",
+  "note": "One per catalogue builder session, the one the body's `sessionId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setChannelConnectionConfiguration": {
+  "kind": "K",
+  "param": "connectionId"
+ },
+ "setChannelFeePayment": {
+  "kind": "S",
+  "note": "One per sales channel, the one the body's `channelId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setChannelListing": {
+  "kind": "K",
+  "param": "listingId"
+ },
+ "setChannelPricingCommercial": {
+  "kind": "S",
+  "note": "One per sales channel, the one the body's `channelId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setChannelProvider": {
+  "kind": "K",
+  "param": "communicationProviderId"
+ },
+ "setChannelSyncSetting": {
+  "kind": "S",
+  "note": "One per sales channel and data domain, the one the body's `salesChannelId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCodeDistributionManager": {
+  "kind": "S",
+  "note": "One per code batch, the one the body's `batchId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCommunicationPreferenceMarketing": {
+  "kind": "S",
+  "note": "One per communication preference category, the one the body's `categoryCode` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCommunicationRoutingRule": {
+  "kind": "K",
+  "param": "routingRuleId"
+ },
+ "setConfigurationProfile": {
+  "kind": "K",
+  "param": "profileId"
+ },
+ "setConfigurationTemplate": {
+  "kind": "K",
+  "param": "configurationTemplateId"
+ },
+ "setConnectivityThresholds": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setConsentCapturePoint": {
+  "kind": "S",
+  "note": "One per capture point and channel, the one the body's `capturePoint` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setConsentPurposes": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setContactAutomation": {
+  "kind": "K",
+  "param": "automationId"
+ },
+ "setContextTimeEvent": {
+  "kind": "S",
+  "note": "One per access policy, the one the body's `policyId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCookieBannerDesign": {
+  "kind": "K",
+  "param": "bannerDesignId"
+ },
+ "setCookieScanPolicy": {
+  "kind": "K",
+  "param": "scanPolicyId"
+ },
+ "setCredentialActivationDisplay": {
+  "kind": "K",
+  "param": "credentialPolicyId"
+ },
+ "setCredentialEventPropagationRule": {
+  "kind": "S",
+  "note": "One per ticket lifecycle event, the one the body's `triggerEvent` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCredentialIssuanceRetryPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCreditConsumptionPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCurrencyRoundingRule": {
+  "kind": "K",
+  "param": "roundingProfileId"
+ },
+ "setCustomerGuestAccount": {
+  "kind": "S",
+  "note": "One per customer, the one the body's `customerId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setCustomerServiceCopilot": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDailyCount": {
+  "kind": "S",
+  "note": "One per stock location, the one the body's `locationId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDataDiscoveryAccess": {
+  "kind": "S",
+  "note": "One per privacy request, the one the body's `requestId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDataProcessingPurpose": {
+  "kind": "K",
+  "param": "purposeId"
+ },
+ "setDataRetentionPolicy": {
+  "kind": "K",
+  "param": "retentionPolicyId"
+ },
+ "setDemandOccupancyAvailability": {
+  "kind": "S",
+  "note": "One per pricing rule, the one the body's `ruleId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDenominations": {
+  "kind": "S",
+  "note": "One per currency, the one the body's `currencyCode` names, within the caller's region: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDepositPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDeviceBindingPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDeviceSoftwareContent": {
+  "kind": "S",
+  "note": "One per device group, the one the body's `deviceGroupId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDigitalBarcodeTicket": {
+  "kind": "S",
+  "note": "One per ticket media template, the one the body's `templateId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDigitalCardMembership": {
+  "kind": "S",
+  "note": "One per ticket media template, the one the body's `templateId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDigitalWaiverForm": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDunningPolicy": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDynamicFieldData": {
+  "kind": "S",
+  "note": "One per dynamic field, the one the body's `fieldKey` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDynamicFieldQuestion": {
+  "kind": "K",
+  "param": "formId/key"
+ },
+ "setDynamicPricingGuardrailPolicy": {
+  "kind": "S",
+  "note": "One per scope node, the one the body's `scopeId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDynamicPricingStrategy": {
+  "kind": "S",
+  "note": "One per pricing strategy, the one the body's `strategyCode` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setDynamicSecurityProfile": {
+  "kind": "S",
+  "note": "One per dynamic QR security profile, the one the body's `profileId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setEInvoicingProvider": {
+  "kind": "K",
+  "param": "providerId"
+ },
+ "setEdgeNodeLocal": {
+  "kind": "S",
+  "note": "One per edge node, the one the body's `edgeNodeId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setEmbeddedEntitlementPayload": {
+  "kind": "S",
+  "note": "One per payload profile, the one the body's `profileId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setEntitlementConsumption": {
+  "kind": "K",
+  "param": "ruleId"
+ },
+ "setEventType": {
+  "kind": "K",
+  "param": "eventTypeId"
+ },
+ "setFaceMatchingVerification": {
+  "kind": "K",
+  "param": "profileId"
+ },
+ "setFacePassEnrollment": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setFaceTagTemporaryEnrollment": {
+  "kind": "K",
+  "param": "profileId"
+ },
+ "setFamilyHouseholdDependent": {
+  "kind": "S",
+  "note": "One per membership product, the one the body's `membershipCode` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setFaqs": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setFastPassProfile": {
+  "kind": "K",
+  "param": "fastPassProfileId"
+ },
+ "setFeatureToggles": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setFeeApplicabilityCharging": {
+  "kind": "S",
+  "note": "One per fee rule, the one the body's `ruleId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setFeeDefinition": {
+  "kind": "K",
+  "param": "feeId"
+ },
+ "setFnbDeliveryPolicy": {
+  "kind": "S",
+  "note": "One per outlet, the one the body's `outletId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setFnbReservationPolicy": {
+  "kind": "S",
+  "note": "One per outlet, the one the body's `outletId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setFnbServiceChargePolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setFonts": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setFooter": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setFraudDetectionRule": {
+  "kind": "K",
+  "param": "ruleId"
+ },
+ "setFraudRules": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setFxProvider": {
+  "kind": "S",
+  "note": "One set per region, the caller's region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setFxRate": {
+  "kind": "K",
+  "param": "rateId"
+ },
+ "setGameCardExpiryRules": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGameKioskConfiguration": {
+  "kind": "S",
+  "note": "One per kiosk, the one the body's `kioskDeviceId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGamePricing": {
+  "kind": "S",
+  "note": "One per game, the one the body's `gameId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGameplayValidationRules": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGateLane": {
+  "kind": "S",
+  "note": "One per gate, the one the body's `gateId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGateModePolicy": {
+  "kind": "K",
+  "param": "gateModePolicyId"
+ },
+ "setGateOfflinePolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGiftCardProduct": {
+  "kind": "K",
+  "param": "giftCardProductId"
+ },
+ "setGoogleWalletPass": {
+  "kind": "S",
+  "note": "One per ticket media template, the one the body's `templateId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGroupAdmissionProfile": {
+  "kind": "S",
+  "note": "One per group admission profile, the one the body's `profileId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGroupBookingHandover": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGroupCustomerOrganization": {
+  "kind": "K",
+  "param": "organisationId"
+ },
+ "setGroupOperationalPlanning": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGroupPackageExperience": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGroupQuotationProposal": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGuestAttributeModel": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGuestCompanionEligibility": {
+  "kind": "K",
+  "param": "ruleId"
+ },
+ "setGuestExtraFields": {
+  "kind": "S",
+  "note": "One set per venue, the caller's venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setGuestMatchPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setGuestVerificationPolicy": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setHandheldMobileAccess": {
+  "kind": "S",
+  "note": "One per handheld device profile, the one the body's `profileId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setHardwareModel": {
+  "kind": "K",
+  "param": "modelId"
+ },
+ "setHeader": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setHomepageLayout": {
+  "kind": "S",
+  "note": "One per site template, the one the body's `templateKey` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setHostedCheckoutConfiguration": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setHotelWalletExternal": {
+  "kind": "K",
+  "param": "integrationId"
+ },
+ "setIdentityResolutionRules": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setIndexSource": {
+  "kind": "K",
+  "param": "sourceId"
+ },
+ "setInstalmentPolicy": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setIntegrationSource": {
+  "kind": "K",
+  "param": "sourceId"
+ },
+ "setIntelligentRoutingSkill": {
+  "kind": "K",
+  "param": "routingRuleId"
+ },
+ "setJobTitle": {
+  "kind": "K",
+  "param": "jobTitleId"
+ },
+ "setJourneyProfile": {
+  "kind": "K",
+  "param": "journeyProfileId"
+ },
+ "setJourneySequenceRule": {
+  "kind": "K",
+  "param": "ruleId"
+ },
+ "setKitchenStations": {
+  "kind": "S",
+  "note": "One set per venue, the caller's venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setLabourBudget": {
+  "kind": "K",
+  "param": "labourBudgetId"
+ },
+ "setLanguages": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setLeaderboardNickname": {
+  "kind": "S",
+  "note": "The caller's own leaderboard nickname: one per signed-in guest, so there is no key in the path."
+ },
+ "setLeaveType": {
+  "kind": "K",
+  "param": "leaveTypeId"
+ },
+ "setLegalHold": {
+  "kind": "K",
+  "param": "holdId"
+ },
+ "setLicenceEnforcementPolicy": {
+  "kind": "S",
+  "note": "One per platform, the caller's platform: a PUT replaces it whole. There is no key in the path."
+ },
+ "setLicensingModel": {
+  "kind": "K",
+  "param": "licensingModelId"
+ },
+ "setLifecycleStatuWorkflow": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setLocalizationBrandingCustomer": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setLoyaltyCampaign": {
+  "kind": "K",
+  "param": "loyaltyCampaignId"
+ },
+ "setMaintenanceMode": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMarketPricingConfiguration": {
+  "kind": "K",
+  "param": "marketId"
+ },
+ "setMarketingSubscription": {
+  "kind": "S",
+  "note": "One per guest, channel and list, the one the body's `subjectId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMediaBindingActivation": {
+  "kind": "S",
+  "note": "One per virtual ticket, the one the body's `virtualTicketId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMediaBindingRule": {
+  "kind": "K",
+  "param": "ruleId"
+ },
+ "setMediaDistributionChannels": {
+  "kind": "K",
+  "param": "code"
+ },
+ "setMediaIssuanceEncoding": {
+  "kind": "K",
+  "param": "encodingProfileId"
+ },
+ "setMediaReplacementRevocation": {
+  "kind": "K",
+  "param": "replacementReason"
+ },
+ "setMediaTaxonomy": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMediaTypeTechnology": {
+  "kind": "K",
+  "param": "mediaTypeId"
+ },
+ "setMemberMembershipAccount": {
+  "kind": "S",
+  "note": "One per membership, the one the body's `membershipId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMembershipBenefit": {
+  "kind": "K",
+  "param": "benefitId"
+ },
+ "setMembershipCommercialConfig": {
+  "kind": "S",
+  "note": "One per membership product, the one the body's `membershipCode` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMembershipEligibilityQualification": {
+  "kind": "S",
+  "note": "One per membership product, the one the body's `membershipCode` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMembershipEntitlementAdmission": {
+  "kind": "S",
+  "note": "One per membership product, the one the body's `membershipCode` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMembershipProductTier": {
+  "kind": "S",
+  "note": "One per membership product, the one the body's `membershipCode` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMembershipProgramme": {
+  "kind": "K",
+  "param": "programId"
+ },
+ "setMembershipUsagePolicy": {
+  "kind": "S",
+  "note": "One per membership product, the one the body's `membershipCode` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMerchantAccount": {
+  "kind": "K",
+  "param": "merchantAccountId"
+ },
+ "setMinorGuardianAge": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setMixedTenderRules": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setModuleEnablement": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setModuleListing": {
+  "kind": "K",
+  "param": "moduleCode"
+ },
+ "setMultiPaymentSplit": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setNavigation": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setOfflinePolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setOperatingCalendarEntry": {
+  "kind": "K",
+  "param": "entryId"
+ },
+ "setOperationalIncidentException": {
+  "kind": "S",
+  "note": "One per incident, the one the body's `incidentId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setOrderAmendment": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setOrderBookingTicket": {
+  "kind": "K",
+  "param": "serviceActionId"
+ },
+ "setOrderDetailTransaction": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setOrderReservationStatus": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setOutletTemplate": {
+  "kind": "K",
+  "param": "code"
+ },
+ "setPackagePricingDefinition": {
+  "kind": "S",
+  "note": "One per package product, the one the body's `productId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setParkingFacility": {
+  "kind": "K",
+  "param": "parkingFacilityId"
+ },
+ "setPartnerBrandVenue": {
+  "kind": "S",
+  "note": "One per partner, the one the body's `partnerId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPartnerContact": {
+  "kind": "K",
+  "param": "contactId"
+ },
+ "setPartnerProfileOrganization": {
+  "kind": "S",
+  "note": "One per partner, the one the body's `partnerId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPartnerRateNet": {
+  "kind": "S",
+  "note": "One per partner agreement, the one the body's `agreementId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPasswordPolicy": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPaymentAuthenticationPolicy": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPaymentFailoverPolicy": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPaymentProvider": {
+  "kind": "K",
+  "param": "providerId"
+ },
+ "setPaymentRiskRules": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setPaymentRoutingRules": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setPaymentRules": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPaymentTermBilling": {
+  "kind": "S",
+  "note": "One per partner agreement, the one the body's `agreementId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPaymentTerminalConfiguration": {
+  "kind": "K",
+  "param": "deviceId"
+ },
+ "setPdfPrintablePos": {
+  "kind": "S",
+  "note": "One per ticket media template, the one the body's `templateId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPerformanceTemplate": {
+  "kind": "K",
+  "param": "performanceTemplateId"
+ },
+ "setPodium": {
+  "kind": "K",
+  "param": "podiumId"
+ },
+ "setPolicyEvaluationSetting": {
+  "kind": "S",
+  "note": "One per policy category, the one the body's `policyCategory` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPolicyScopeHierarchy": {
+  "kind": "K",
+  "param": "policyId"
+ },
+ "setPrepaidMinutePackage": {
+  "kind": "K",
+  "param": "prepaidMinutesId"
+ },
+ "setPriceCalculationPolicy": {
+  "kind": "K",
+  "param": "calculationProfileId"
+ },
+ "setPriceCategoryRateType": {
+  "kind": "K",
+  "param": "priceCategoryId"
+ },
+ "setPriceHierarchyInheritance": {
+  "kind": "S",
+  "note": "One per price hierarchy, the one the body's `hierarchyId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPricing": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPricingChangeRequest": {
+  "kind": "K",
+  "param": "changeId"
+ },
+ "setPricingExperiment": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPrivacyAction": {
+  "kind": "K",
+  "param": "actionId"
+ },
+ "setPrivacyComplianceException": {
+  "kind": "K",
+  "param": "exceptionId"
+ },
+ "setPrivacyNoticePolicyGovernance": {
+  "kind": "K",
+  "param": "governanceId"
+ },
+ "setPrivacyRequest": {
+  "kind": "K",
+  "param": "requestId"
+ },
+ "setPrivacyRequestTypes": {
+  "kind": "K",
+  "param": "requestTypeId"
+ },
+ "setProRataResidual": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setProductCatalogue": {
+  "kind": "S",
+  "note": "One per sales channel, the one the body's `channelId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setProductCategories": {
+  "kind": "S",
+  "note": "One set per venue, the caller's venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setProductContextOwnership": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setProductRelationships": {
+  "kind": "S",
+  "note": "One set per venue, the caller's venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setProductServicePrice": {
+  "kind": "S",
+  "note": "One per price assignment, the one the body's `assignmentId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setPromotionStackingRule": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setQualityEvaluation": {
+  "kind": "K",
+  "param": "evaluationId"
+ },
+ "setReaderProfile": {
+  "kind": "K",
+  "param": "readerProfileId"
+ },
+ "setReaderScannerPeripheral": {
+  "kind": "S",
+  "note": "One per access point, the one the body's `accessPointId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setRealTimeSecurity": {
+  "kind": "S",
+  "note": "One per security playbook, the one the body's `playbookId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setReasonCode": {
+  "kind": "K",
+  "param": "reasonCodeId"
+ },
+ "setRecipe": {
+  "kind": "K",
+  "param": "recipeId"
+ },
+ "setRecommendationSuppression": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setReconciliationMatchingRules": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setReconciliationSource": {
+  "kind": "K",
+  "param": "sourceId"
+ },
+ "setRedemptionRules": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setRefundCalculationPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setRefundCompensationService": {
+  "kind": "K",
+  "param": "compensationRequestId"
+ },
+ "setRelationshipFraudRule": {
+  "kind": "S",
+  "note": "One per relationship fraud rule, the one the body's `ruleId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setRenewalAutoMembership": {
+  "kind": "S",
+  "note": "One per membership product, the one the body's `membershipCode` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setRentalDepositPolicy": {
+  "kind": "S",
+  "note": "One per rental product or category, the one the body's `productId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setRentalFeePolicy": {
+  "kind": "S",
+  "note": "One per rental product, the one the body's `productId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setResaleEligibilityRule": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setResaleFeePolicy": {
+  "kind": "S",
+  "note": "One per event or product, the one the body's `eventId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setResaleMarketplaceConfig": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setResaleMarketplaceRecommendation": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setReservationHoldPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setResourceAllocationPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setResourceSelectionPolicy": {
+  "kind": "S",
+  "note": "One per ticket type, the one the body's `ticketTypeId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setReward": {
+  "kind": "K",
+  "param": "rewardId"
+ },
+ "setRfidNfc": {
+  "kind": "S",
+  "note": "One per RFID/NFC profile, the one the body's `rfidNfcProfileId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setRfidNfcCard": {
+  "kind": "S",
+  "note": "One per ticket media template, the one the body's `templateId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setRiskScoringConfig": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setRulePriorityConflict": {
+  "kind": "S",
+  "note": "One set per venue, the caller's venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setRuleTestRecommendation": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setScalingPolicy": {
+  "kind": "S",
+  "note": "One per cell and service, the one the body's `cellId` names, within the caller's region: a PUT replaces it whole. There is no key in the path."
+ },
+ "setSeatHoldType": {
+  "kind": "K",
+  "param": "holdTypeId"
+ },
+ "setSeatRecommendationRules": {
+  "kind": "S",
+  "note": "One per seat map, the one the body's `seatMapId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setSeatRules": {
+  "kind": "S",
+  "note": "One per seat map, the one the body's `seatMapId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setSecurityInvestigationEvidence": {
+  "kind": "S",
+  "note": "One per investigation, the one the body's `investigationId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setSegregationRules": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setSemanticModel": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setSenderIdentityDomain": {
+  "kind": "K",
+  "param": "senderIdentityId"
+ },
+ "setSeoMetadata": {
+  "kind": "S",
+  "note": "One per entity and locale, the one the body's `entityId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setServiceQueueDefinition": {
+  "kind": "K",
+  "param": "queueId"
+ },
+ "setShiftPattern": {
+  "kind": "K",
+  "param": "shiftPatternId"
+ },
+ "setShiftTemplate": {
+  "kind": "K",
+  "param": "shiftTemplateId"
+ },
+ "setSignalRegistryPolicy": {
+  "kind": "K",
+  "param": "signalId"
+ },
+ "setSignatorySignatureGuardian": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setSiteNormalisationBasis": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setSiteSetupProgress": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setSlaPolicy": {
+  "kind": "K",
+  "param": "slaPolicyId"
+ },
+ "setSpace": {
+  "kind": "K",
+  "param": "spaceId"
+ },
+ "setSsoConfig": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setStaffingRules": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setStepUpPolicy": {
+  "kind": "S",
+  "note": "One per operation, the one the body's `operationId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setStoreAccounts": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setStoreRules": {
+  "kind": "K",
+  "param": "storeRuleId"
+ },
+ "setSubstitutionRules": {
+  "kind": "S",
+  "note": "One set per venue, the caller's venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setSuggestionProvider": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setTaxInvoiceTemplate": {
+  "kind": "K",
+  "param": "invoiceTemplateId"
+ },
+ "setTaxProfileJurisdiction": {
+  "kind": "S",
+  "note": "One per tax profile, the one the body's `taxProfileCode` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setTaxRuleTreatment": {
+  "kind": "S",
+  "note": "One per tax rule, the one the body's `taxRuleId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setTemperatureCheckpoint": {
+  "kind": "K",
+  "param": "checkpointId"
+ },
+ "setTheme": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setTicketStatusTransition": {
+  "kind": "S",
+  "note": "One per status transition (fromStatus, toStatus), the one the body's `fromStatus` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setTrackingTechnology": {
+  "kind": "K",
+  "param": "technologyId"
+ },
+ "setTrialConfiguration": {
+  "kind": "K",
+  "param": "trialConfigurationId"
+ },
+ "setTriggerActionCross": {
+  "kind": "S",
+  "note": "One per workflow, the one the body's `workflowId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setTurnstileLaneBehavior": {
+  "kind": "S",
+  "note": "One per access point, the one the body's `accessPointId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setUpgradeConversionPath": {
+  "kind": "S",
+  "note": "One per upgrade path, the one the body's `pathCode` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setValidationOutcomeGuest": {
+  "kind": "S",
+  "note": "One per outcome profile, the one the body's `outcomeProfileId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setValidityActivationExpiry": {
+  "kind": "S",
+  "note": "One per membership product, the one the body's `membershipCode` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setVenueSettingsDefaults": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setVerificationMethodPolicy": {
+  "kind": "S",
+  "note": "One per product, the one the body's `productId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setVirtualTicketCredential": {
+  "kind": "S",
+  "note": "One per virtual ticket, the one the body's `virtualTicketId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setVirtualTicketIdentity": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setVisualAccessRule": {
+  "kind": "S",
+  "note": "One per access rule, the one the body's `ruleId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setVisualBusinessRule": {
+  "kind": "S",
+  "note": "One per business rule, the one the body's `ruleId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setVisualDynamicPolicy": {
+  "kind": "S",
+  "note": "One per dynamic policy, the one the body's `policyId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setVisualWorkflow": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setVsiModel": {
+  "kind": "S",
+  "note": "One per platform, the caller's platform: a PUT replaces it whole. There is no key in the path."
+ },
+ "setWafPolicy": {
+  "kind": "K",
+  "param": "wafRuleId"
+ },
+ "setWaiverAssociation": {
+  "kind": "K",
+  "param": "associationId"
+ },
+ "setWaiverException": {
+  "kind": "K",
+  "param": "waiverExceptionId"
+ },
+ "setWaiverTemplateMaster": {
+  "kind": "K",
+  "param": "waiverId"
+ },
+ "setWaiverTriggerRule": {
+  "kind": "K",
+  "param": "triggerRuleId"
+ },
+ "setWaiverVerificationValidation": {
+  "kind": "K",
+  "param": "verificationId"
+ },
+ "setWalletAccountingMapping": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setWalletAllocationPolicy": {
+  "kind": "S",
+  "note": "One per region, the caller's region: a PUT replaces it whole. There is no key in the path."
+ },
+ "setWalletAuthenticationPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setWalletChannelRules": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setWalletFundingRules": {
+  "kind": "S",
+  "note": "One per wallet type, the one the body's `walletTypeId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setWalletIntegrationMapping": {
+  "kind": "S",
+  "note": "One per API client, the one the body's `apiClientId` names, within the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setWalletReconciliationSources": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setWalletRefundPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "setWalletRiskRules": {
+  "kind": "S",
+  "note": "One set per tenant, the caller's tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path."
+ },
+ "setWalletTransferRules": {
+  "kind": "S",
+  "note": "One per tenant, the caller's tenant: a PUT replaces it whole. There is no key in the path."
+ },
+ "setWorkAssignment": {
+  "kind": "K",
+  "param": "workAssignmentId"
+ },
+ "setWorkOrderPriorityPolicy": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "simulateBundlePreviewRecommendation": {
+  "kind": "S",
+  "note": "One per bundle, the one the body's `bundleId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "simulateOfflineResilienceTesting": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "simulatePolicyConflictImpact": {
+  "kind": "S",
+  "note": "One per access policy, the one the body's `policyId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "simulatePriceBreakdownCalculation": {
+  "kind": "S",
+  "note": "One per venue, the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "simulateWorkflowTestingImpact": {
+  "kind": "S",
+  "note": "One per workflow, the one the body's `workflowId` names, within the caller's venue: a PUT replaces it whole. There is no key in the path."
+ },
+ "updateMyProfile": {
+  "kind": "S",
+  "note": "The caller's own profile: one per signed-in guest, so there is no key in the path."
+ }
+}

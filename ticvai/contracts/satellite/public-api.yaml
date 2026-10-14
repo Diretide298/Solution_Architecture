@@ -836,8 +836,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/WebhookReplayJob'
         '409':
           description: 'The subscription is `pendingVerification` (`webhook-subscription-not-verified`) or `disabled` (`webhook-subscription-disabled`); events are replayed only to a verified, enabled endpoint. Nothing is queued.'
           x-ticvai-problem-types: [webhook-subscription-not-verified, webhook-subscription-disabled]
@@ -2515,3 +2514,15 @@ components:
         revenueSharePercent: { type: number, nullable: true }
         effectiveFrom: { type: string, format: date }
         effectiveTo: { type: string, format: date, nullable: true }
+    WebhookReplayJob:
+      type: object
+      x-ticvai-persistence: none — response only; the replayed deliveries are written as webhook deliveries marked as replays
+      description: '**A queued replay** (`replayEvents`): the window and event types it re-delivers. Each delivery it makes is marked as a replay in its payload.'
+      required: [replayId, subscriptionId, from, queuedAt]
+      properties:
+        replayId: { type: string, format: uuid }
+        subscriptionId: { type: string, format: uuid }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time, nullable: true }
+        eventTypes: { type: array, items: { $ref: '#/components/schemas/WebhookEventType' } }
+        queuedAt: { type: string, format: date-time }

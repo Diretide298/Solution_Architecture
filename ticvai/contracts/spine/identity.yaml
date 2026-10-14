@@ -4444,6 +4444,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthorisationPolicy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /authorisation-policies/{policyId}/state:
@@ -7783,6 +7785,7 @@ components:
           readOnly: true
           description: Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update.
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string

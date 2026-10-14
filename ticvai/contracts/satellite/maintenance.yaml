@@ -3256,7 +3256,7 @@ components:
 
             '
         id: { type: string, format: uuid, readOnly: true }
-        code: { type: string, maxLength: 64 }
+        code: { type: string, maxLength: 64, x-ticvai-unique: tenant }
         name: { type: string, maxLength: 200 }
         venueId: { type: string, format: uuid, nullable: true }
         appliesToAssetCategoryId: { type: string, format: uuid, nullable: true }

@@ -4296,7 +4296,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TableReservation'
+              $ref: '#/components/schemas/UpdateTableReservationRequest'
       responses:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
@@ -10295,6 +10295,79 @@ components:
           type: string
           format: date-time
           readOnly: true
+    UpdateTableReservationRequest:
+      type: object
+      x-ticvai-persistence: none — request only; a partial update of fnb.table_reservation
+      description: '**A partial update of TableReservation** (the CR-089 pattern; CHG-SHP-008): `updateTableReservation` sends only what changes, and a field left out keeps its stored value. Nothing is required and nothing has a default, so a generated client never resends a value it did not mean to change. The server''s own fields (actualPartySize, createdAt, id, tableVisitId, takenByPrincipalId) are not sendable.'
+      minProperties: 1
+      properties:
+        outletId:
+          type: string
+          format: uuid
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+        guestName:
+          type: string
+        contactPoint:
+          type: string
+        partySize:
+          type: integer
+          minimum: 1
+        startsAt:
+          type: string
+          format: date-time
+        durationMinutes:
+          type: integer
+          description: '**How long the cover is held.** An outlet turning tables twice an evening needs
+            this to be real, or the second sitting cannot be booked.
+
+            '
+        tables:
+          type: array
+          description: >
+            The dining tables assigned to this reservation, one row each.
+
+            **Usually empty until seating.** Committing a specific table at booking time refuses
+            later bookings against a constraint that did not need to exist — that was true of the
+            `tableIds` array this replaces and it is still true, because it is about *when* a
+            table is assigned rather than how the assignment is stored.
+
+            **Replaces `tableIds`, retired 20 September.** An array cannot carry per-row state,
+            which is the same reason this merge took `entry_rule_point`, `menu_item_modifier`,
+            `seat_block_item`, `plan_benefit`, `payment_method_config` and `tier_module` from the
+            backend workbook. A party seated across three tables that releases one early has
+            nowhere to say so in an array, and *"which reservations are on table 7 tonight"* is a
+            GIN scan over every reservation instead of an index seek.
+          items:
+            $ref: '#/components/schemas/FnbReservationTable'
+        status:
+          $ref: '#/components/schemas/TableReservationStatus'
+        notes:
+          type: string
+          description: Allergies, accessibility needs and other requests, as the guest wrote them.
+        seatingPreference:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: '**The seating area the guest asked for**, e.g. indoor, terrace, majlis (Chinmay, 2 October,
+            workbook Q204; DI-791; CHG-CSA-018). The outlet''s own area names, as the waitlist''s
+            `RestaurantWaitlist.seatingPreference` takes them. A preference, not a table: the host seats the
+            party on the night.'
+        occasion:
+          type: string
+          nullable: true
+          enum:
+          - birthday
+          - anniversary
+          - business
+          - celebration
+          - other
+          description: The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). Shown to the host and
+            the server; never a price.
+        deposit:
+          $ref: '#/components/schemas/TableReservationDeposit'
     TableReservationDeposit:
       type: object
       nullable: true
@@ -11074,6 +11147,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
           maxLength: 64
         name:
@@ -11257,6 +11331,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
         name:
           type: string

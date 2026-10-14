@@ -140,8 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/MerchandiseReservation'
         '409':
           description: 'The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be collected. Stock does not move.'
           x-ticvai-problem-types: [merchandise-reservation-not-reserved]
@@ -183,8 +182,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/MerchandiseReservation'
         '409':
           description: 'The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be cancelled. Stock does not move.'
           x-ticvai-problem-types: [merchandise-reservation-not-reserved]
@@ -238,8 +236,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/ShopAndDrop'
         '409':
           description: 'The item is still within its hold (`awaitingCollection` or `partiallyCollected`; `shop-and-drop-still-held`) or is already `collected` or `disposed` (`shop-and-drop-already-closed`); only an `uncollected` item is disposed of. Nothing changes.'
           x-ticvai-problem-types: [shop-and-drop-still-held, shop-and-drop-already-closed]

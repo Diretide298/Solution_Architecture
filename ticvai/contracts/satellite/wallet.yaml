@@ -369,6 +369,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditType'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-types/{creditTypeId}/eligibility:
@@ -4346,6 +4348,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -4466,6 +4469,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -5009,6 +5013,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string

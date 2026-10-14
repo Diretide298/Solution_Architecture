@@ -5948,7 +5948,7 @@ paths:
                 $ref: '#/components/schemas/CampaignApprovalWorkflowDesignerView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /decision/{approvalRequestId}:
+  /decision:
     put:
       operationId: approveDecision
       x-ticvai-consumed-by:
@@ -5990,11 +5990,6 @@ paths:
             schema:
               $ref: '#/components/schemas/ApprovalInboxDecisionWorkspaceInput'
       parameters:
-        - name: approvalRequestId
-          in: path
-          required: true
-          description: 'The approval request this decision is on (approvals engine).'
-          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -6955,6 +6950,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationStrategy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-relationships:
@@ -8058,6 +8055,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -8454,6 +8452,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -9891,6 +9890,7 @@ components:
       - validFrom
       properties:
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -10549,6 +10549,7 @@ components:
       - allocation
       properties:
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:

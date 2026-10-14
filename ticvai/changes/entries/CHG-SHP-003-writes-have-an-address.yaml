@@ -1,0 +1,465 @@
+id: CHG-SHP-003
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Every PUT/PATCH/DELETE has an address: 237 that replace the one record of a scope, parent or caller declare
+  `x-ticvai-singleton: true` with an `x-ticvai-singleton-note` saying what they are one of; 123 that create or replace
+  one item of a collection move to `<collection>/{key}` (breaking: BC-340..BC-363, one entry per contract with
+  `operations`); 3 drafted decision workspaces are kept. check-screens counts a create-or-replace PUT''s key as the
+  screen''s own when the body carries it. derive-lineage now re-reads an operation''s verb and path from the contract;
+  check-contract-compat and derive-lineage read a breaking-change entry''s `operations` list.'
+decision:
+  what: 'contracts/*: x-ticvai-singleton + note on 237 operations (one per scope, the caller''s; one per parent the
+    body names; one set per scope replaced whole; the caller''s own record). Path keys on 123: the item path reuses an
+    existing `/{x}` sibling (7 ops), else the body''s own key (ruleId, profileId ...) or `{<entity>Id}` equal to the
+    body''s `id`. Kept: approveDecision, approveExceptionServiceRecovery and approveGroupDiscountException, drafted
+    decision workspaces whose bodies name no record to decide (which record each decides is a design question for the
+    lead; a path key would be a new required input no screen can supply). A key is named for the table the lineage
+    reaches where the entity name differs (communicationProviderId, providerId, prepaidMinutesId, retentionSettingId,
+    credentialPolicyId, lifecycleActionId), so check-parameter-columns matches it. docs/active/breaking-changes.yaml
+    BC-340..BC-363. tools/check-screens.py: the entry-parameter rule counts a create-or-replace PUT''s key carried in
+    its body. tools/check-contract-compat.py entry_operations(); tools/derive-lineage.py verb/path refresh and
+    approved_removals over `operations`.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-NO-ADDRESS (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 363 members before, 3 after on this branch (CHG-SHP; ruling "go with
+  your recommendation", Chinmay, 14 October 2026). R162, R103. Prefer-singleton ruling followed where the resource is
+  one per scope or per parent (237); per-parent singletons name the body field that picks the parent. Breaking per op,
+  grouped per contract (24 entries) because the block has 40 ids; ADAM''s release-diff reads `operation` only, so it
+  sees the first op of a grouped entry (ADAM change, not made here). derive-lineage --apply on this branch re-read 140
+  paths (123 moved here, 17 stale before).'
+keys_touched:
+  operations:
+  - approveBookingLimitCommercial
+  - approveCampaignWorkflow
+  - approveListingModeration
+  - approveManualOverrideSupervisor
+  - approveMatrixMultiLevel
+  - approveMembershipProductValidation
+  - approveMultiMediaPreview
+  - approvePartnerStatuLifecycle
+  - approvePricingWorkflowAuthority
+  - approvePrivacyTesting
+  - approveReviewDecision
+  - approveRoleAuthorityDelegation
+  - approveUnifiedDecision
+  - approveVersioningGovernance
+  - approveWaiverTesting
+  - approveWorkflow
+  - configureQueueFeed
+  - configureRiskStrategy
+  - deleteGuestAccount
+  - guestLogout
+  - publishActivationScheduler
+  - publishChannelAvailability
+  - publishChannelReadinessValidation
+  - publishMediaCompatibilityTesting
+  - publishPricingEffectiveDate
+  - publishRuleConflictCheck
+  - publishTopologyValidation
+  - setAccessAreaZone
+  - setAccessAttributeCatalog
+  - setAccessGraphicalMap
+  - setAccessPointGroup
+  - setAccessProfile
+  - setAccessibleSeating
+  - setAccountMappings
+  - setAccreditationNotificationRules
+  - setAccreditationRequirements
+  - setAccreditationValidity
+  - setAfterSaleFinancial
+  - setAgentAvailability
+  - setAgentServiceProfile
+  - setAgreementContractTerm
+  - setAiPolicy
+  - setAiProvider
+  - setAlertRule
+  - setAmendmentEligibilityPolicy
+  - setAnalyticsProvider
+  - setApiAnomalyRule
+  - setApiLicensing
+  - setApiQuota
+  - setAppIcons
+  - setAppleWalletPass
+  - setApprovalControlPolicy
+  - setApprovalExternalProvider
+  - setApprovalMatrix
+  - setApprovalRetentionPolicy
+  - setApprovalSlaPolicy
+  - setApproverAvailability
+  - setAttractionAccess
+  - setAttractionType
+  - setBadge
+  - setBadgeTemplate
+  - setBiometricLifecycleRetention
+  - setBiometricVerificationProfile
+  - setBleBeaconGeofence
+  - setBookingFlowConfig
+  - setBookingVelocityTime
+  - setBrandIdentity
+  - setBrandingLocalizationTemplate
+  - setBusinessEventMapping
+  - setCampaignBudgetFinancial
+  - setCancellationPartialPolicy
+  - setCapabilityTemplate
+  - setCaseCategoryDefinition
+  - setCaseInternalRequest
+  - setCaseInvestigationResolution
+  - setCaseResolution
+  - setCatalogueReview
+  - setChannelConnectionConfiguration
+  - setChannelFeePayment
+  - setChannelListing
+  - setChannelPricingCommercial
+  - setChannelProvider
+  - setChannelSyncSetting
+  - setCodeDistributionManager
+  - setCommunicationPreferenceMarketing
+  - setCommunicationRoutingRule
+  - setConfigurationProfile
+  - setConfigurationTemplate
+  - setConnectivityThresholds
+  - setConsentCapturePoint
+  - setConsentPurposes
+  - setContactAutomation
+  - setContextTimeEvent
+  - setCookieBannerDesign
+  - setCookieScanPolicy
+  - setCredentialActivationDisplay
+  - setCredentialEventPropagationRule
+  - setCredentialIssuanceRetryPolicy
+  - setCreditConsumptionPolicy
+  - setCurrencyRoundingRule
+  - setCustomerGuestAccount
+  - setCustomerServiceCopilot
+  - setDailyCount
+  - setDataDiscoveryAccess
+  - setDataProcessingPurpose
+  - setDataRetentionPolicy
+  - setDemandOccupancyAvailability
+  - setDenominations
+  - setDepositPolicy
+  - setDeviceBindingPolicy
+  - setDeviceSoftwareContent
+  - setDigitalBarcodeTicket
+  - setDigitalCardMembership
+  - setDigitalWaiverForm
+  - setDunningPolicy
+  - setDynamicFieldData
+  - setDynamicFieldQuestion
+  - setDynamicPricingGuardrailPolicy
+  - setDynamicPricingStrategy
+  - setDynamicSecurityProfile
+  - setEInvoicingProvider
+  - setEdgeNodeLocal
+  - setEmbeddedEntitlementPayload
+  - setEntitlementConsumption
+  - setEventType
+  - setFaceMatchingVerification
+  - setFacePassEnrollment
+  - setFaceTagTemporaryEnrollment
+  - setFamilyHouseholdDependent
+  - setFaqs
+  - setFastPassProfile
+  - setFeatureToggles
+  - setFeeApplicabilityCharging
+  - setFeeDefinition
+  - setFnbDeliveryPolicy
+  - setFnbReservationPolicy
+  - setFnbServiceChargePolicy
+  - setFonts
+  - setFooter
+  - setFraudDetectionRule
+  - setFraudRules
+  - setFxProvider
+  - setFxRate
+  - setGameCardExpiryRules
+  - setGameKioskConfiguration
+  - setGamePricing
+  - setGameplayValidationRules
+  - setGateLane
+  - setGateModePolicy
+  - setGateOfflinePolicy
+  - setGiftCardProduct
+  - setGoogleWalletPass
+  - setGroupAdmissionProfile
+  - setGroupBookingHandover
+  - setGroupCustomerOrganization
+  - setGroupOperationalPlanning
+  - setGroupPackageExperience
+  - setGroupQuotationProposal
+  - setGuestAttributeModel
+  - setGuestCompanionEligibility
+  - setGuestExtraFields
+  - setGuestMatchPolicy
+  - setGuestVerificationPolicy
+  - setHandheldMobileAccess
+  - setHardwareModel
+  - setHeader
+  - setHomepageLayout
+  - setHostedCheckoutConfiguration
+  - setHotelWalletExternal
+  - setIdentityResolutionRules
+  - setIndexSource
+  - setInstalmentPolicy
+  - setIntegrationSource
+  - setIntelligentRoutingSkill
+  - setJobTitle
+  - setJourneyProfile
+  - setJourneySequenceRule
+  - setKitchenStations
+  - setLabourBudget
+  - setLanguages
+  - setLeaderboardNickname
+  - setLeaveType
+  - setLegalHold
+  - setLicenceEnforcementPolicy
+  - setLicensingModel
+  - setLifecycleStatuWorkflow
+  - setLocalizationBrandingCustomer
+  - setLoyaltyCampaign
+  - setMaintenanceMode
+  - setMarketPricingConfiguration
+  - setMarketingSubscription
+  - setMediaBindingActivation
+  - setMediaBindingRule
+  - setMediaDistributionChannels
+  - setMediaIssuanceEncoding
+  - setMediaReplacementRevocation
+  - setMediaTaxonomy
+  - setMediaTypeTechnology
+  - setMemberMembershipAccount
+  - setMembershipBenefit
+  - setMembershipCommercialConfig
+  - setMembershipEligibilityQualification
+  - setMembershipEntitlementAdmission
+  - setMembershipProductTier
+  - setMembershipProgramme
+  - setMembershipUsagePolicy
+  - setMerchantAccount
+  - setMinorGuardianAge
+  - setMixedTenderRules
+  - setModuleEnablement
+  - setModuleListing
+  - setMultiPaymentSplit
+  - setNavigation
+  - setOfflinePolicy
+  - setOperatingCalendarEntry
+  - setOperationalIncidentException
+  - setOrderAmendment
+  - setOrderBookingTicket
+  - setOrderDetailTransaction
+  - setOrderReservationStatus
+  - setOutletTemplate
+  - setPackagePricingDefinition
+  - setParkingFacility
+  - setPartnerBrandVenue
+  - setPartnerContact
+  - setPartnerProfileOrganization
+  - setPartnerRateNet
+  - setPasswordPolicy
+  - setPaymentAuthenticationPolicy
+  - setPaymentFailoverPolicy
+  - setPaymentProvider
+  - setPaymentRiskRules
+  - setPaymentRoutingRules
+  - setPaymentRules
+  - setPaymentTermBilling
+  - setPaymentTerminalConfiguration
+  - setPdfPrintablePos
+  - setPerformanceTemplate
+  - setPodium
+  - setPolicyEvaluationSetting
+  - setPolicyScopeHierarchy
+  - setPrepaidMinutePackage
+  - setPriceCalculationPolicy
+  - setPriceCategoryRateType
+  - setPriceHierarchyInheritance
+  - setPricing
+  - setPricingChangeRequest
+  - setPricingExperiment
+  - setPrivacyAction
+  - setPrivacyComplianceException
+  - setPrivacyNoticePolicyGovernance
+  - setPrivacyRequest
+  - setPrivacyRequestTypes
+  - setProRataResidual
+  - setProductCatalogue
+  - setProductCategories
+  - setProductContextOwnership
+  - setProductRelationships
+  - setProductServicePrice
+  - setPromotionStackingRule
+  - setQualityEvaluation
+  - setReaderProfile
+  - setReaderScannerPeripheral
+  - setRealTimeSecurity
+  - setReasonCode
+  - setRecipe
+  - setRecommendationSuppression
+  - setReconciliationMatchingRules
+  - setReconciliationSource
+  - setRedemptionRules
+  - setRefundCalculationPolicy
+  - setRefundCompensationService
+  - setRelationshipFraudRule
+  - setRenewalAutoMembership
+  - setRentalDepositPolicy
+  - setRentalFeePolicy
+  - setResaleEligibilityRule
+  - setResaleFeePolicy
+  - setResaleMarketplaceConfig
+  - setResaleMarketplaceRecommendation
+  - setReservationHoldPolicy
+  - setResourceAllocationPolicy
+  - setResourceSelectionPolicy
+  - setReward
+  - setRfidNfc
+  - setRfidNfcCard
+  - setRiskScoringConfig
+  - setRulePriorityConflict
+  - setRuleTestRecommendation
+  - setScalingPolicy
+  - setSeatHoldType
+  - setSeatRecommendationRules
+  - setSeatRules
+  - setSecurityInvestigationEvidence
+  - setSegregationRules
+  - setSemanticModel
+  - setSenderIdentityDomain
+  - setSeoMetadata
+  - setServiceQueueDefinition
+  - setShiftPattern
+  - setShiftTemplate
+  - setSignalRegistryPolicy
+  - setSignatorySignatureGuardian
+  - setSiteNormalisationBasis
+  - setSiteSetupProgress
+  - setSlaPolicy
+  - setSpace
+  - setSsoConfig
+  - setStaffingRules
+  - setStepUpPolicy
+  - setStoreAccounts
+  - setStoreRules
+  - setSubstitutionRules
+  - setSuggestionProvider
+  - setTaxInvoiceTemplate
+  - setTaxProfileJurisdiction
+  - setTaxRuleTreatment
+  - setTemperatureCheckpoint
+  - setTheme
+  - setTicketStatusTransition
+  - setTrackingTechnology
+  - setTrialConfiguration
+  - setTriggerActionCross
+  - setTurnstileLaneBehavior
+  - setUpgradeConversionPath
+  - setValidationOutcomeGuest
+  - setValidityActivationExpiry
+  - setVenueSettingsDefaults
+  - setVerificationMethodPolicy
+  - setVirtualTicketCredential
+  - setVirtualTicketIdentity
+  - setVisualAccessRule
+  - setVisualBusinessRule
+  - setVisualDynamicPolicy
+  - setVisualWorkflow
+  - setVsiModel
+  - setWafPolicy
+  - setWaiverAssociation
+  - setWaiverException
+  - setWaiverTemplateMaster
+  - setWaiverTriggerRule
+  - setWaiverVerificationValidation
+  - setWalletAccountingMapping
+  - setWalletAllocationPolicy
+  - setWalletAuthenticationPolicy
+  - setWalletChannelRules
+  - setWalletFundingRules
+  - setWalletIntegrationMapping
+  - setWalletReconciliationSources
+  - setWalletRefundPolicy
+  - setWalletRiskRules
+  - setWalletTransferRules
+  - setWorkAssignment
+  - setWorkOrderPriorityPolicy
+  - simulateBundlePreviewRecommendation
+  - simulateOfflineResilienceTesting
+  - simulatePolicyConflictImpact
+  - simulatePriceBreakdownCalculation
+  - simulateWorkflowTestingImpact
+  - updateMyProfile
+  files:
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/cross-region.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/shift.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-contract-compat.py
+  - tools/derive-lineage.py
+  - tools/check-screens.py
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A18 API-CONVENTIONS
+tickets:
+  started: []
+  unstarted: ['27711', '27715', '27718', '27727', '27739', '27740', '27743', '27746', '27747', '27749', '27765',
+    '27776', '27777', '27780', '27781', '27782', '27801', '27808', '27809', '27810', '27812', '27817', '27831',
+    '27847', '27854', '27855', '27856', '27864', '27869', '27877', '27880', '27881', '27882', '27883', '27884',
+    '27886', '27887', '27898', '27899', '27904', '27905', '27907', '27908', '27911', '27912', '27914', '27919',
+    '27921', '27923', '27924', '27926', '27928', '27930', '27934', '27935', '27936', '27937', '27938', '27939',
+    '27941', '27942', '27943', '27945', '27952', '27953', '27955', '27957', '27960', '27964', '27966', '27967',
+    '27969', '27974', '27976', '27985', '27986', '28009', '28013', '28014', '28016', '28022', '28025', '28033',
+    '28034', '28036', '28037', '28042', '28044', '28048', '28049', '28054', '28055', '28056', '28080', '28096',
+    '28099', '28102', '28106', '28112', '28113', '28115', '28139', '28140', '28245', '28255', '28267', '28270',
+    '28272', '28273', '28289', '28291', '28304', '28307', '28322', '28324', '28331', '28337', '28338', '28377',
+    '28380', '28381', '28385', '28386', '28388', '28390', '28394', '28418', '28419', '28423', '28424', '28425',
+    '28426', '28427', '28428', '28429', '28430', '28431', '28432', '28434', '28442', '28446', '28456', '28458',
+    '28459', '28464', '28465', '28469', '28470', '28471', '28473', '28474', '28475', '28476', '28480', '28485',
+    '28486', '28487', '28494', '28495', '28497', '28503', '28504', '28505', '28508', '28509', '28529', '28547',
+    '28605', '28606', '28710', '28712', '28713', '28726', '28729', '28731', '28733', '28738', '28739', '28741',
+    '28746', '28751', '28752', '28755', '28758', '28759', '28761', '28764', '28766', '28768', '28777', '28796',
+    '28799', '28804', '28809', '28811', '28812', '28813', '28817', '28821', '28822', '28823', '28834', '28835',
+    '28837', '28838', '28839', '28843', '28845', '28846', '28847', '28872', '28882', '28883', '28884', '28885',
+    '28906', '28907', '28908', '28909', '28910', '28916', '28918', '28919', '28920', '28923', '28925', '28926',
+    '28927', '28929', '28930', '28934', '28935', '28937', '28939', '28942', '28943', '28953', '28956', '28959',
+    '28968', '28970', '28979', '28994', '28995', '29006', '29010', '29021', '35643']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

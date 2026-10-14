@@ -4330,7 +4330,7 @@ paths:
                         $ref: '#/components/schemas/FinEInvoicingProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /e-invoicing/providers/{eInvoicingProviderId}:
+  /e-invoicing/providers/{providerId}:
     put:
       operationId: setEInvoicingProvider
       x-ticvai-consumed-by:
@@ -4358,7 +4358,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-      - name: eInvoicingProviderId
+      - name: providerId
         in: path
         required: true
         description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
@@ -5996,6 +5996,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -7369,6 +7370,7 @@ components:
           format: uuid
           readOnly: true
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:

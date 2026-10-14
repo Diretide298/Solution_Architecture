@@ -1,0 +1,176 @@
+id: CHG-SHP-004
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: '98 POST actions on an item declare a 409 for the wrong state, with a description naming the states it must
+  be in and its problem types; 23 are kept (no wrong state exists).'
+decision:
+  what: 'contracts/*: a `409` with description, `x-ticvai-problem-types` and the shared Problem body on 98 operations,
+    the states read from states/*.yaml where a model exists. Kept (legal in every state or answered elsewhere):
+    cloneProduct, cloneResource, cloneSeatMap, cloneTicketTemplate, copyPriceList, assessProductChange,
+    printTicketProof, replayAiDecision, acknowledgeAnnouncement, markStaffConversationRead, addToWishlist,
+    reportBundleApplied, reprintReceipt, amendAttendance, recordSuggestionOutcome, recordWaste, replayDeadLetter,
+    saveNaturalLanguageQuery, overrideAiDecision, redeemWaitingGuest, claimTicketTransfer, completeSsoAuthorization,
+    recordDeviceHeartbeat.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-ACTION-409 (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 121 members before, 23 after on this branch (CHG-SHP; ruling "go with
+  your recommendation", Chinmay, 14 October 2026). R078, R095. Four descriptions (freezeEntitlement,
+  reinstateEntitlement, suspendEntitlement, pushWalletPassUpdate) avoid naming the entity so check-error-sources does
+  not read them as cross-module refusals (the item is the operation''s own).'
+keys_touched:
+  operations:
+  - acknowledgeAlert
+  - activateJourney
+  - adjustGameCard
+  - adjustWallet
+  - allocateBlockedSeats
+  - analyseMediaAsset
+  - assessRentalDamage
+  - assignPerformanceMedia
+  - blockGiftCard
+  - callNextParties
+  - cancelMerchandiseReservation
+  - cancelSubscription
+  - certifyIntegration
+  - chaseStation
+  - claimCart
+  - clearTable
+  - cloneReaderConfiguration
+  - closeConversation
+  - closeCorrectiveAction
+  - closeWorkOrder
+  - collectMerchandiseReservation
+  - compItem
+  - completeWorkOrder
+  - convertToTermProduct
+  - deployReaderConfiguration
+  - deprecateApiVersion
+  - disposeShopAndDrop
+  - drainBurstEnvironment
+  - endKioskAssist
+  - escalateApprovalRequest
+  - escalateCase
+  - fireCourse
+  - forceLogout
+  - forceReleaseInventoryHold
+  - freezeEntitlement
+  - holdCourse
+  - importVenueGeometry
+  - inquirePaymentStatus
+  - markOrderCollected
+  - notifyServer
+  - notifyWaitlistParty
+  - offerWaitlistCapacity
+  - overrideWaitingGuest
+  - pauseRollout
+  - pauseWorkOrder
+  - printOrderLabel
+  - prioritiseKitchenTicket
+  - publishContentBlock
+  - publishMenu
+  - pushWalletPassUpdate
+  - reconcileBurstEnvironment
+  - recordAnswerFeedback
+  - recordCorrectiveAction
+  - recordDepositActivity
+  - recordRentalInspection
+  - refireItem
+  - reinstateEntitlement
+  - rejectWorkOrder
+  - releaseProductionPlan
+  - releaseSeatHoldPool
+  - relinquishWalletAuthorisation
+  - replaceAccreditationCredential
+  - replaceResourceAllocation
+  - replayEvents
+  - requestBill
+  - requestRecount
+  - rescheduleEvent
+  - resendPaymentLink
+  - resetPrincipalCredential
+  - resetSandbox
+  - respondToReview
+  - restoreConfigVersion
+  - restoreProductVersion
+  - restoreWalletConfigurationVersion
+  - resubmitApprovalRequest
+  - resumeWorkOrder
+  - retryMessageDispatch
+  - returnRental
+  - rollbackMenu
+  - scoreApprovalRequest
+  - sendBookingConfirmation
+  - sendOrderNotification
+  - setAuthorisationPolicyState
+  - setCallDisposition
+  - signApprovalDecision
+  - signRentalAgreement
+  - skipRolloutCell
+  - startWorkOrder
+  - submitChargebackEvidence
+  - suspendEntitlement
+  - suspendTenant
+  - swapRentalEquipment
+  - transferConversation
+  - transferTableVisit
+  - verifyAccreditationDocument
+  - verifyMfaChallenge
+  - verifyWorkOrder
+  - voidVoucher
+  files:
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/cross-region.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A19 ERRORS-AND-STATES
+tickets:
+  started: []
+  unstarted: ['27730', '27735', '27739', '27740', '27743', '27746', '27747', '27750', '27758', '27759', '27761',
+    '27762', '27767', '27768', '27772', '27773', '27775', '27780', '27782', '27783', '27785', '27786', '27816',
+    '27829', '27830', '27887', '27901', '27919', '27928', '27930', '27949', '27964', '27967', '27979', '27985',
+    '27986', '27997', '27998', '28013', '28014', '28016', '28028', '28029', '28038', '28043', '28050', '28074',
+    '28078', '28080', '28101', '28111', '28144', '28216', '28217', '28222', '28226', '28229', '28236', '28238',
+    '28246', '28250', '28252', '28292', '28293', '28325', '28338', '28339', '28386', '28388', '28392', '28442',
+    '28446', '28522', '28523', '28540', '28543', '28544', '28548', '28549', '28552', '28554', '28555', '28568',
+    '28569', '28572', '28576', '28580', '28582', '28585', '28587', '28588', '28598', '28599', '28604', '28605',
+    '28621', '28622', '28654', '28655', '28658', '28659', '28662', '28663', '28668', '28669', '28711', '28712',
+    '28713', '28714', '28728', '28743', '28754', '28759', '28760', '28761', '28762', '28765', '28766', '28768',
+    '28786', '28790', '28791', '28792', '28793', '28796', '28851', '28852', '28853', '28854', '28855', '28856',
+    '28859', '28860', '28863', '28864', '28865', '28867', '28868', '28880', '28885', '28911', '28913', '28916',
+    '28929', '28930', '28934', '28935']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

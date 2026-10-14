@@ -1252,7 +1252,7 @@ components:
       type: object
       required: [code, name, venueId, capacityPerCycle, cycleMinutes]
       properties:
-        code: { type: string, maxLength: 64 }
+        code: { type: string, maxLength: 64, x-ticvai-unique: venue }
         name: { $ref: '#/components/schemas/LocalisedText' }
         venueId: { type: string, format: uuid }
         attractionProductId: { type: string, format: uuid }

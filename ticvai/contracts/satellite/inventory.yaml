@@ -4141,6 +4141,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
         name:
           type: string

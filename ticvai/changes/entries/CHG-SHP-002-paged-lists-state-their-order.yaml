@@ -1,0 +1,519 @@
+id: CHG-SHP-002
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Every cursor-paged list states its order by a field of its items: a "**Order.**" paragraph appended to the
+  description, createdAt descending then id where nothing else was said (the generator default of the ruling; the
+  package has no list generator, so the default is written once by tools/applied/shp-contract-shapes-14-october/ and
+  held by the check).'
+decision:
+  what: 'contracts/*: 403 list operations get "**Order.** ..." in their description. Field chosen in this order: a
+    creation/occurrence time (createdAt first) descending; else a schedule/validity date ascending; else a sort key or
+    name ascending; else the item key (a UUIDv7) descending; then the item key as tiebreak. 16 lists whose description
+    already stated an order without a field (position order, oldest pending first, by expiry, by next due date ...)
+    state that order with its field instead; 8 lists with no key or time got a field by hand.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-PAGED-ORDER (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 403 members before, 0 after on this branch (CHG-SHP; ruling "go with
+  your recommendation", Chinmay, 14 October 2026). R154. Where a description said "newest first" the field is the one
+  the items carry. Lead to confirm the defaults on reports-style lists (117 had no time field and are ordered by their
+  key).'
+keys_touched:
+  operations:
+  - getAssetHistory
+  - getForecastAccuracy
+  - getOutletStock
+  - getPlanRecommendations
+  - getReportResult
+  - getStockPositions
+  - getSuppressionList
+  - list86Events
+  - listAbandonedCarts
+  - listAccessMonitoring
+  - listAccessPoints
+  - listAccessRule
+  - listAccessSecurityFraud
+  - listAccountMappings
+  - listAccounts
+  - listAccreditationDocuments
+  - listAccreditationExports
+  - listAdmissionRules
+  - listAiCapabilities
+  - listAiCapabilityHealth
+  - listAiCapabilityMaturity
+  - listAiControls
+  - listAiConversations
+  - listAiEvaluations
+  - listAiGovernanceAlerts
+  - listAiGovernancePolicyVersions
+  - listAiIncidents
+  - listAiInsights
+  - listAiInteractions
+  - listAiModels
+  - listAiRiskRegister
+  - listAiTools
+  - listAiTrainingRuns
+  - listAllocationSplits
+  - listAnomalyDetectors
+  - listApiAnomalies
+  - listApiScopes
+  - listAppBuilds
+  - listApprovalExternalDispatches
+  - listApprovalExternalProviders
+  - listApprovedActionExecutions
+  - listAssets
+  - listAssistantProfiles
+  - listAudienceActivations
+  - listAudienceLists
+  - listAuditRecords
+  - listAuthorizationGovernanceTemporary
+  - listAutomationPolicyAutonomous
+  - listBadges
+  - listBanners
+  - listBillingStatements
+  - listBiometric
+  - listBiometricAccess
+  - listBiometricConsentGuardian
+  - listBiometricIdentityIntegrity
+  - listBlacklist
+  - listBookingFlowTypes
+  - listBookingFlows
+  - listBulkPricingUpdate
+  - listBundleCapacityPolicies
+  - listBundlePartnerProductMappings
+  - listBundles
+  - listCalculationValidationReconciliation
+  - listCampaigns
+  - listCases
+  - listCashMovements
+  - listCellJobs
+  - listChangePropagationDependency
+  - listChannel
+  - listChannel2
+  - listChannelAllocationRebalancing
+  - listChannelBasedPricing
+  - listChannelCapacities
+  - listChannelConnectionIntegration
+  - listChannelCustomerSegment
+  - listChannelExceptionIncident
+  - listChannelGovernanceSla
+  - listChannelLogTransaction
+  - listChannelPerformanceCommercial
+  - listChannelSaleRule
+  - listChannelSaleSchedule
+  - listCommercialAgreement
+  - listCommercialAgreementHealth
+  - listCommercialAllocationQuota
+  - listCommercialCampaigns
+  - listCommercialPricing
+  - listCommercialPricingStructure
+  - listCommissionCalculationSettlement
+  - listCommissionMarginIncentive
+  - listCompetitorPricingMarket
+  - listConfigVersions
+  - listConfigurationProfiles
+  - listConfigurationSessions
+  - listConfigurationSources
+  - listConsentPurposes
+  - listContentPages
+  - listConversations
+  - listCorrectiveActions
+  - listCostCenters
+  - listCouponCampaigns
+  - listCouponCodes
+  - listCredential
+  - listCredentialDeliveryDistribution
+  - listCredentialDisableBlacklist
+  - listCredentialGenerationIssuance
+  - listCredentialIdentityToken
+  - listCredentialSecurity
+  - listCredentialSecurityOperational
+  - listCredentialSharingConcurrent
+  - listCredentialUsageCross
+  - listCreditLimitExposure
+  - listCrossCellRequests
+  - listCrossModuleOrchestration
+  - listCustomerBadges
+  - listCustomerEligibilityRule
+  - listCustomerSegmentProfile
+  - listDataRetentionSettings
+  - listDeliveryLocations
+  - listDemandBookingCurve
+  - listDepositBoxes
+  - listDepositGuaranteeFinancial
+  - listDeposits
+  - listDeviceBindingSession
+  - listDeviceGate
+  - listDevices
+  - listDigitalCredentialSecurity
+  - listDiningOutlets
+  - listDunningCases
+  - listDuplicateCandidates
+  - listDynamicAccessPolicy
+  - listDynamicPolicyEffectiveness
+  - listDynamicPriceBand
+  - listDynamicPricingAutomation
+  - listDynamicPricingGuardrail
+  - listDynamicPricingPerformance
+  - listDynamicPricingStrategy
+  - listEInvoicingProviders
+  - listEdgePackageData
+  - listEdgeSecurityDeployment
+  - listEffectiveDateSeason
+  - listEmployees
+  - listEntitlements
+  - listEntryRulePoints
+  - listEvents
+  - listExpiringBatches
+  - listExternalReferenceMappings
+  - listFaceChangeEnrollment
+  - listFailedGenerationDelivery
+  - listFeeSurcharge
+  - listFeeWaiverTax
+  - listFiscalPeriods
+  - listFnbOrders
+  - listFnbRecommendations
+  - listForecastDefinitions
+  - listForecastSignals
+  - listForecastVersions
+  - listForms
+  - listFraudRules
+  - listFulfilmentSlots
+  - listFxRates
+  - listGoodsReceipts
+  - listGovernanceRiskMonitoring
+  - listGroupAttendancePartial
+  - listGroupLeaderFast
+  - listGroupPackages
+  - listGuestExtraFields
+  - listGuestIdentityVerifications
+  - listGuestJourney
+  - listGuestMemberships
+  - listGuidedChoices
+  - listHardwareCompatibilityHealth
+  - listIncidents
+  - listIngredientSubstitutes
+  - listInspections
+  - listInstalmentPlans
+  - listInterEntityObligations
+  - listInternalDemandBooking
+  - listInventoryCapacityChannel
+  - listInventoryHolds
+  - listInventoryItems
+  - listInvitationAllowances
+  - listJournalEntries
+  - listJourneys
+  - listKitchenStations
+  - listKnowledgeGaps
+  - listLabourBudgets
+  - listLeaderboard
+  - listLearningModelPerformance
+  - listLedgerEntries
+  - listLegalEntities
+  - listLiveAccess
+  - listLiveGateMode
+  - listLocationVenueEvent
+  - listLostItems
+  - listLoyaltyCampaigns
+  - listLoyaltyPointEntries
+  - listLoyaltyProgrammes
+  - listMaintenancePlans
+  - listMarketTourismHoliday
+  - listMarketVenueCurrency
+  - listMarketingRecommendations
+  - listMediaCredential
+  - listMediaDesign
+  - listMediaSwapReplacement
+  - listMember
+  - listMemberExceptionOverride
+  - listMemberLifecycleCase
+  - listMembershipActivationCredential
+  - listMembershipAnnualPass
+  - listMembershipCommercialPricing
+  - listMembershipFreezeSuspension
+  - listMembershipLoyaltyPricing
+  - listMembershipRenewalRetention
+  - listMembershipRenewals
+  - listMembershipUpgradeDowngrade
+  - listMembershipUsageVisit
+  - listMenuVersions
+  - listMenus
+  - listMerchandise
+  - listMessageTemplates
+  - listMessageTriggers
+  - listMigrations
+  - listModifierGroups
+  - listMultiParkCrossover2
+  - listMyAccreditationApplications
+  - listMyAccreditationCredentials
+  - listMyCases
+  - listMyEntitlements
+  - listMyFavouriteRoutes
+  - listMyNotifications
+  - listMyOrders
+  - listMyPaymentIssues
+  - listMyTableReservations
+  - listNearbyEventExhibition
+  - listOfflineEdge
+  - listOfflineEntitlementUsage
+  - listOperationalRequirements
+  - listOrderDiscounts
+  - listOrderFees
+  - listOrderRefunds
+  - listOrders
+  - listOrgUnits
+  - listPackageBundleAdd
+  - listParkingFacilities
+  - listPartner
+  - listPartner2
+  - listPartnerAccessRole
+  - listPartnerCancellationRefund
+  - listPartnerContactUser
+  - listPartnerDisputeCase
+  - listPartnerDocumentationCompliance
+  - listPartnerOnboardingApplication
+  - listPartnerOrderBooking
+  - listPartnerPerformanceScorecard
+  - listPartnerProfileReadiness
+  - listPartnerReconciliationException
+  - listPartnerRelationship
+  - listPartnerStatementAccount
+  - listPaymentAllocationRules
+  - listPaymentProviders
+  - listPaymentTerminalCertifications
+  - listPaymentTokens
+  - listPerformances
+  - listPhysicalDeviceRegistration
+  - listPriceCalculationSequence
+  - listPriceCategoryRate
+  - listPriceElasticityRevenue
+  - listPriceListTemplate
+  - listPriceLists
+  - listPriceVariances
+  - listPrices
+  - listPricing
+  - listPricingChangeImpact
+  - listPricingCompliance
+  - listPricingDistributionSynchronization
+  - listPricingGovernance
+  - listPricingRecommendationExplainability
+  - listPricingRollbackEmergency
+  - listPricingRule
+  - listPricingRulePriority
+  - listPricingVersionBaseline
+  - listPrizes
+  - listProcessAutomationOpportunity
+  - listProductDuplicationTemplate
+  - listProductGovernance
+  - listProductImportExport
+  - listProductLifecycle
+  - listProductPriceAvailability
+  - listProductRetirementSuspension
+  - listProductStartTimes
+  - listProductTrailChange
+  - listProductVariants
+  - listProductionAccessRequests
+  - listProductionRuns
+  - listProducts
+  - listPromotions
+  - listPromptTemplates
+  - listPurchaseOrders
+  - listQuantityGroupVolume
+  - listQueueEntries
+  - listQueueThroughputLane
+  - listQueues
+  - listRealTimeChannel
+  - listRecipes
+  - listRecognitionSchedules
+  - listRecommendationReviewDecision
+  - listReconnectionSynchronizationConflict
+  - listReleases
+  - listRenewalAuto
+  - listRentalAgreements
+  - listReportExecutions
+  - listReportSchedules
+  - listReports
+  - listRequisitions
+  - listReservationHoldRelease
+  - listReservations
+  - listResidencyNationalityMarket
+  - listRetailRecommendations
+  - listRetailReturns
+  - listRetailSales
+  - listRevenue
+  - listRevenueDemandImpact
+  - listReviews
+  - listRewardAssignments
+  - listRewards
+  - listRollbackRecovery
+  - listRollouts
+  - listRotaAssignments
+  - listRulePriorityConflict
+  - listRuleWorkflow
+  - listSaleChannel
+  - listScans
+  - listScenarioModelingWhat
+  - listSeasonalCalendarDay
+  - listSeatBlocks
+  - listSeatMaps
+  - listSeats
+  - listSegmentMembers
+  - listSegments
+  - listSerialisedItems
+  - listSettlementExceptions
+  - listSettlements
+  - listShiftHandoverSummary
+  - listShifts
+  - listSignalDataQuality
+  - listSiteNormalisationBases
+  - listSlaEscalationBottleneck
+  - listSlaPolicies
+  - listStaffConversations
+  - listStaffMessages
+  - listStockCountLines
+  - listStockCounts
+  - listStockLocations
+  - listStockMovements
+  - listStockReservations
+  - listStockTransfers
+  - listStoreRules
+  - listSubscriptionInvoices
+  - listSuppliers
+  - listSyncConflicts
+  - listSyncRejections
+  - listSyncRuns
+  - listTableReservations
+  - listTaxCodes
+  - listTaxExemptions
+  - listTaxFeeCalculation
+  - listTaxInvoiceTemplates
+  - listTemperatureCheckpoints
+  - listTenants
+  - listTerritoryMarketDistribution
+  - listTicketCredentialInvestigation
+  - listTicketTemplates
+  - listTicketTransfers
+  - listTimeslotPerformanceTime
+  - listTransportPassOffers
+  - listTransportPassTypes
+  - listTransportRouteDepartures
+  - listTransportRoutes
+  - listTransportTimetables
+  - listUnifiedIdentityCredential
+  - listUpgrades
+  - listUpsellRules
+  - listVendorServiceRequests
+  - listVenueHistoryImports
+  - listVirtualCredentialMedia
+  - listVirtualTicket
+  - listVirtualTicketArchitecture
+  - listVisitAdmissionEntitlement
+  - listVisitPlanAlternatives
+  - listVoucherBatches
+  - listWaiverSignatures
+  - listWalletConfigurationVersions
+  - listWeatherDemandImpact
+  - listWebhookEventTypes
+  - listWorkOrders
+  - listWorkflow
+  - listWorkflowExceptionFailure
+  - listWorkflowInstanceProcess
+  - listWorkstations
+  - searchAiDecisions
+  - searchGuests
+  - searchMedia
+  - searchTransportDepartures
+  files:
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/transport.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/cross-region.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/shift.yaml
+  - contracts/spine/tenancy.yaml
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A18 API-CONVENTIONS
+tickets:
+  started: []
+  unstarted: ['27716', '27717', '27734', '27745', '27775', '27779', '27790', '27793', '27794', '27800', '27810',
+    '27822', '27824', '27836', '27842', '27843', '27863', '27870', '27873', '27875', '27876', '27879', '27886',
+    '27887', '27891', '27897', '27901', '27906', '27907', '27908', '27909', '27912', '27913', '27914', '27916',
+    '27919', '27920', '27928', '27929', '27930', '27937', '27945', '27953', '27956', '27957', '27964', '27965',
+    '27966', '27967', '27973', '27974', '27981', '27982', '27983', '27984', '27985', '27986', '28000', '28002',
+    '28003', '28008', '28010', '28013', '28014', '28027', '28031', '28032', '28038', '28042', '28043', '28044',
+    '28048', '28050', '28051', '28055', '28056', '28057', '28058', '28059', '28062', '28063', '28068', '28069',
+    '28070', '28071', '28072', '28079', '28080', '28084', '28085', '28097', '28099', '28105', '28106', '28116',
+    '28117', '28118', '28119', '28121', '28122', '28123', '28124', '28125', '28128', '28129', '28135', '28138',
+    '28139', '28140', '28143', '28145', '28146', '28147', '28148', '28149', '28150', '28152', '28156', '28157',
+    '28159', '28160', '28161', '28162', '28163', '28165', '28166', '28168', '28170', '28177', '28182', '28185',
+    '28186', '28188', '28190', '28195', '28196', '28197', '28198', '28200', '28202', '28213', '28217', '28221',
+    '28224', '28225', '28227', '28228', '28229', '28231', '28232', '28233', '28237', '28238', '28240', '28241',
+    '28244', '28246', '28248', '28256', '28258', '28260', '28262', '28267', '28271', '28273', '28280', '28282',
+    '28283', '28292', '28293', '28295', '28296', '28298', '28299', '28310', '28311', '28313', '28317', '28325',
+    '28332', '28333', '28334', '28335', '28336', '28337', '28338', '28339', '28340', '28342', '28343', '28344',
+    '28345', '28346', '28347', '28348', '28349', '28351', '28352', '28353', '28354', '28355', '28356', '28368',
+    '28370', '28371', '28373', '28378', '28384', '28385', '28386', '28387', '28388', '28394', '28395', '28396',
+    '28397', '28399', '28400', '28401', '28407', '28409', '28412', '28414', '28416', '28417', '28419', '28420',
+    '28421', '28422', '28426', '28433', '28439', '28440', '28442', '28446', '28455', '28456', '28457', '28460',
+    '28461', '28462', '28463', '28465', '28466', '28467', '28468', '28477', '28478', '28483', '28484', '28485',
+    '28486', '28487', '28488', '28493', '28494', '28495', '28496', '28497', '28498', '28499', '28501', '28502',
+    '28503', '28504', '28505', '28511', '28512', '28513', '28515', '28516', '28517', '28520', '28525', '28527',
+    '28528', '28532', '28533', '28534', '28535', '28537', '28538', '28542', '28547', '28549', '28550', '28555',
+    '28556', '28559', '28560', '28563', '28564', '28567', '28571', '28574', '28576', '28578', '28579', '28580',
+    '28582', '28583', '28588', '28592', '28595', '28596', '28598', '28600', '28601', '28603', '28604', '28605',
+    '28609', '28610', '28612', '28613', '28614', '28616', '28619', '28620', '28621', '28622', '28639', '28646',
+    '28647', '28650', '28652', '28653', '28657', '28659', '28660', '28662', '28663', '28665', '28667', '28669',
+    '28682', '28683', '28684', '28685', '28686', '28687', '28688', '28689', '28690', '28691', '28692', '28693',
+    '28694', '28695', '28700', '28701', '28702', '28711', '28712', '28713', '28719', '28720', '28721', '28727',
+    '28728', '28730', '28737', '28738', '28739', '28740', '28741', '28743', '28744', '28746', '28748', '28752',
+    '28753', '28754', '28755', '28756', '28757', '28758', '28759', '28760', '28761', '28762', '28763', '28764',
+    '28765', '28766', '28767', '28768', '28771', '28773', '28775', '28776', '28778', '28779', '28780', '28781',
+    '28787', '28788', '28789', '28790', '28791', '28792', '28793', '28794', '28795', '28796', '28799', '28802',
+    '28804', '28805', '28806', '28807', '28808', '28809', '28810', '28811', '28812', '28813', '28816', '28817',
+    '28818', '28819', '28820', '28821', '28822', '28823', '28825', '28826', '28836', '28840', '28841', '28842',
+    '28846', '28847', '28850', '28851', '28853', '28855', '28856', '28859', '28860', '28863', '28864', '28865',
+    '28867', '28868', '28874', '28875', '28876', '28877', '28878', '28879', '28880', '28882', '28883', '28884',
+    '28885', '28892', '28893', '28894', '28895', '28896', '28898', '28899', '28901', '28902', '28903', '28904',
+    '28905', '28906', '28907', '28908', '28910', '28913', '28915', '28916', '28929', '28930', '28934', '28935',
+    '28939', '28940', '28941', '28942', '28943', '28952', '28956', '28959', '28960', '28962', '28964', '28966',
+    '28967', '28968', '28969', '28970', '28971', '28972', '28973', '28974', '28975', '28976', '28977', '28978',
+    '28979', '28982', '28983', '28984', '28985', '28986', '28988', '28990', '28991', '28992', '28993', '28994',
+    '28995', '28997', '28998', '29004', '29006', '29010', '29012', '29014', '29015', '29018', '29019', '29021']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

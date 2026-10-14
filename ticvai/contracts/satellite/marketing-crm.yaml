@@ -7023,7 +7023,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /channel-provider/{channelProviderId}:
+  /channel-provider/{communicationProviderId}:
     put:
       operationId: setChannelProvider
       x-ticvai-consumed-by:
@@ -7057,7 +7057,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ChannelProviderConfigurationInput'
       parameters:
-        - name: channelProviderId
+        - name: communicationProviderId
           in: path
           required: true
           description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
@@ -12310,6 +12310,7 @@ paths:
           schema:
             type: boolean
         - name: q
+          description: 'Matched case-insensitively as a substring of `waiverName`, `internalDescription` or `customTypeLabel`; no wildcards.'
           in: query
           required: false
           schema:
@@ -22296,6 +22297,7 @@ components:
           format: uuid
           nullable: true
         code:
+          x-ticvai-unique: tenant
           readOnly: true
           type: string
         status:
@@ -24942,6 +24944,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
