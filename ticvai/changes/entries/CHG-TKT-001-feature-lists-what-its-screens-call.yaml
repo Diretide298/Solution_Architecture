@@ -43,4 +43,4 @@ prevention:
   ref: tools/check-ticket-scope.py
 status: open
 notes: 'Generator rule: tools/build-service-docs.py (feature block, back_end_sentence). Run on audit-base the check finds
-  741 (52 new); on this branch 0 after build-service-docs. the impact list is in the hand-back (scratchpad the batch's impact list (in the lead's workspace)).'
+  741 (52 new); on this branch 0 after build-service-docs. the impact list is in the hand-back (scratchpad the batch impact list (lead workspace)).'
