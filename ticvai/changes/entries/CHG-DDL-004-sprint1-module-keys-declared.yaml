@@ -1,0 +1,90 @@
+id: CHG-DDL-004
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'The keys payments, queue, venuemap and retail carried by naming convention only are declared references (a
+  foreign key in 900, the missing index on queue.entry.priority_tier_id), venuemap.map_version and
+  venuemap.placed_resource are scoped through their map, and retail.product_recommendation''s product keys stop
+  pointing at the recommendation table itself.'
+decision:
+  what: 'x-ticvai-references on the contract fields (tools/applied/ddl-crs-14-october.py): payments
+    PayInstalmentPlan.orderId -> orders.sales_order, ChargebackEvidence.chargebackId -> orders.chargeback,
+    PaymentsEligibilityRule and PaymentsMethodConfig .paymentMethodId -> payments.method, PaymentTerminal.deviceId ->
+    platform.device, orders PaymentRouting.providerId and fallbackProviderId and PaymentToken.providerId ->
+    payments.provider; venue-map VenueMapVersion.mapId and PlacedResource.mapId -> venuemap.map,
+    VenueMapVersion.publishedByPrincipalId -> identity.principal, VenuePath fromPointId, toPointId and
+    restrictedByPointId -> venuemap.point; queue CreateQueueRequest.parentQueueId -> queue.queue,
+    WaitingGuest.priorityTierId -> marketing.programme_tier, priorityPromotionId -> promotions.promotion,
+    overriddenByPrincipalId -> identity.principal, QueueReading.feedId -> queue.feed; retail
+    RetailProductRecommendation.sourceProductId -> catalogue.product and targetProductId -> none (targetService names
+    which module''s product). tools/derive-ddl.py ROW_OWNER: venuemap.placed_resource follows map_id (its map, as the
+    CR asks, not resources.resource), payments.token keeps the subject policy (subject_id; provider_id names the issuer,
+    not the owner). payments.instalment_plan keeps its scope_path policy (a scope column outranks an owner).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-069 (MIG-PAYMENTS, #27679), settled as CR-013 was (CHG-R6-015): NOT NULL references get keys and children
+  follow their parent''s scope. Audit: TRUE for every column named (910-indexes.sql "convention, not declared" lines,
+  e.g. 1998 instalment_plan.order_id, 2524 map_version.map_id; 920:1270 map_version at the tenant root; no 900 line).
+  PARTLY: instalment_plan is scoped by scope_path, which derive-ddl puts ahead of any owner by rule, and that stays.
+  Same gap found beyond the list: chargeback_evidence.chargeback_id, eligibility_rule and method_config
+  .payment_method_id, terminal.device_id, map_version.published_by_principal_id (all NOT NULL), and
+  retail.product_recommendation source/target_product_id guessed as the recommendation table (CR-070''s class).'
+keys_touched:
+  tables:
+  - payments.instalment_plan
+  - payments.chargeback_evidence
+  - payments.eligibility_rule
+  - payments.method_config
+  - payments.terminal
+  - payments.routing_rule
+  - payments.token
+  - venuemap.map_version
+  - venuemap.placed_resource
+  - venuemap.path
+  - queue.queue
+  - queue.entry
+  - queue.reading
+  - retail.product_recommendation
+  files:
+  - contracts/satellite/payments.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/retail.yaml
+  - tools/derive-ddl.py
+  - tools/applied/ddl-crs-14-october.py
+  tickets:
+  - MIG-PAYMENTS
+  - MIG-PAYMENTS-3
+  - MIG-PAYMENTS-7
+  - MIG-PAYMENTS-9
+  - MIG-PAYMENTS-10
+  - MIG-QUEUE
+  - MIG-VENUEMAP
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - MIG-PAYMENTS (#27679)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-069 (ADAM)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Contract impact: additive (x-ticvai extensions only; check-contract-compat PASS). Migration
+  effect: one forward migration per schema, all listed in migration-review.md for a person: 20 "constraint added"
+  foreign keys (validate existing rows, NOT VALID then VALIDATE), the policy switches (map_version tenant -> parent
+  through venuemap.map; placed_resource parent through resources.resource -> through venuemap.map), and the dropped
+  product_recommendation_target_product_id_idx; the generator writes only the new index entry_priority_tier_id_idx (and,
+  by the precedent rule, kiosk_assist_session_device_id_idx) into the next V-file. Tickets: MIG-PAYMENTS (instalment_plan,
+  routing_rule, token), MIG-PAYMENTS-3 (terminal), -7 (eligibility_rule), -9 (chargeback_evidence), -10
+  (method_config), MIG-QUEUE (queue, entry, reading), MIG-VENUEMAP (map_version, placed_resource, path); retail
+  product_recommendation is in no migration ticket yet. Left as they are, for Block B: payment_policy_id on
+  currency_rule, eligibility_rule, fee_rule and method_config (NOT NULL, no payments.payment_policy table exists),
+  credit_account.organisation_id, deposit_activity.deposit_id (no target named), visit_plan.venue_id (venue policy
+  already). Check: check-storage-promises SP-KEY-UNDECLARED (NOT NULL convention keys; 391 baselined elsewhere) fails on
+  r5 (1eb1d063) with the 14 keys of these modules and passes here.'

@@ -1,0 +1,87 @@
+id: CHG-DDL-006
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'The bare money columns of payments and retail take naming-and-style 5.1 names (overdue_amount, due_amount,
+  attempted_amount, gross_amount, unit_amount and the rest; the wire keeps its names), and 3.3 records the canonical
+  words the four Sprint 1 modules keep: the merchandise GTIN barcode, the venue map''s show and other kinds, and the
+  retail.sale and retail.merchandise table names.'
+decision:
+  what: 'tools/derive-schema-history.py COLUMN_RENAMES on 2026-10-14 and x-ticvai-column on the contract fields
+    (tools/applied/ddl-names-14-october.py): payments.dunning_case.amount -> overdue_amount, instalment.amount ->
+    due_amount, payment_attempt.amount -> attempted_amount, stored_forward.amount -> transaction_amount,
+    provider_cost.amount -> cost_amount, instalment_plan.total -> gross_amount and paid_to_date -> paid_amount,
+    instalment_policy.minimum_order_value -> minimum_order_amount and instalment_fee -> instalment_fee_amount;
+    retail.sale_line.unit_price -> unit_amount, discount -> discount_amount, line_total -> gross_amount;
+    retail.return_policy.self_authorise_limit -> self_authorise_limit_amount, requires_second_user_above ->
+    second_user_above_amount, requires_approval_above -> approval_above_amount; retail.exchange.returned_value ->
+    returned_amount, replacement_value -> replacement_amount, difference -> difference_amount. naming-and-style 3.3
+    (the six repos/* copies and ADAM''s starter copy, identically): Barcode gains retail.merchandise.barcode; Other gains
+    venuemap.point.kind and visit_plan_item.kind; new rows Show (guest wire value) and Sale, Merchandise (retail DDL).
+    Not renamed now (the CR''s own recommendation, Block B): the booleans of 6.1, ids held as text, key names, and
+    queue.entry''s missing recorded_at.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-072 (MIG-PAYMENTS, #27679), the third naming addendum to CR-011 (CHG-R6-010..012, CHG-R6-018), settled
+  the same way: bare money names renamed at the generator with the wire unchanged; wire values and external terms
+  recorded. Audit: TRUE for the money columns (010-payments.sql, 010-retail.sql; schema-reference sources
+  payments.DunningCase.amount etc.) and three more of the same rule in the same modules (provider_cost.amount, the
+  retail.exchange *_value and difference). PARTLY for the canonical terms: retail.sale is not the Order (RetailSale
+  carries orderId to orders.sales_order, retail.yaml:1823-1825), it is Retail''s receipt record of one, so renaming it
+  to an Order name would create a second Order; barcode is a GTIN, recorded for catalogue.variant and inventory_item
+  by CR-012 and CR-014; show and other are contract enum values (venue-map.yaml:1674, 2118, 2228, 2701), so changing
+  them is a breaking change, which CR-012 records rather than makes.'
+keys_touched:
+  tables:
+  - payments.dunning_case
+  - payments.instalment
+  - payments.payment_attempt
+  - payments.stored_forward
+  - payments.provider_cost
+  - payments.instalment_plan
+  - payments.instalment_policy
+  - retail.sale_line
+  - retail.return_policy
+  - retail.exchange
+  files:
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/retail.yaml
+  - tools/derive-schema-history.py
+  - tools/applied/ddl-names-14-october.py
+  - repos/ticvai-docs/setup/naming-and-style.md
+  - repos/ticvai-ai/project-bible/setup/naming-and-style.md
+  - repos/ticvai-backend/project-bible/setup/naming-and-style.md
+  - repos/ticvai-contracts/project-bible/setup/naming-and-style.md
+  - repos/ticvai-frontend/project-bible/setup/naming-and-style.md
+  - repos/ticvai-infra/project-bible/setup/naming-and-style.md
+  - viewer/mcp/setup/starters/docs/naming-and-style.md
+  tickets:
+  - MIG-PAYMENTS
+  - MIG-RETAIL
+  - VM-MIG-PAYMENTS
+root_class: A24 GLOSSARY
+tickets:
+  started:
+  - MIG-PAYMENTS (#27679)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-072 (ADAM)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Lead to confirm: (1) the column names, chosen by the agent and open to correction:
+  overdue_amount (the sum a dunning case chases), due_amount (an instalment), attempted_amount, transaction_amount (as
+  wallet), gross_amount for a total (5.1), unit_amount (as ledger.tax_invoice_line, CR-014), second_user_above_amount
+  and approval_above_amount for the two return thresholds; (2) retail.sale and retail.merchandise kept and recorded (3.3)
+  rather than renamed: the alternative is retail.sale -> a receipt name and retail.merchandise ->
+  retail.merchandise_item, with their keys (sale_id, merchandise_id in six tables and games.prize), a decision for
+  Retail''s owner. Contract impact: additive (x-ticvai-column only; check-contract-compat PASS). Migration effect: 18
+  "column renamed" rows in migration-review.md (RENAME COLUMN by hand: MIG-PAYMENTS for dunning_case, instalment,
+  instalment_plan, instalment_policy, payment_attempt, stored_forward; VM-MIG-PAYMENTS for provider_cost; MIG-RETAIL for
+  sale_line and return_policy; retail.exchange is in no migration ticket yet). Prevention: check-ddl-conventions
+  D-RENAME-APPLIED fails if the schema reference stops showing a declared rename, and D-BANNED-NAME on a bare money
+  name a table takes after r1 (CHG-R6-012); both run in run-checks and pass on this branch.'

@@ -1,0 +1,50 @@
+id: CHG-DDL-005
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'orders.refund.tax_reversal_entry_id is a declared key to ledger.journal_entry, the entry reverseJournalEntry
+  posts, not a convention index into queue.entry.'
+decision:
+  what: 'contracts/spine/orders.yaml Refund.taxReversalEntryId `x-ticvai-references: ledger.journal_entry`. 900 gains
+    refund_tax_reversal_entry_id_fkey; the index stays (now "declared"); the lineage and relationship graph stop
+    recording a refund-to-queue reference.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-070 (MIG-ORDERS, #27675). Audit: TRUE. 910-indexes.sql:1912-1913 "convention, not declared:
+  orders.refund.tax_reversal_entry_id -> queue.entry": the name rule matched entry_id to queue.entry. The field''s own
+  description (orders.yaml Refund.taxReversalEntryId) says the refund reverses the tax entry it created through
+  reverseJournalEntry, which creates a ledger.journal_entry (finance.yaml reverseJournalEntry); its sibling
+  refund.ledger_entry_id already points at ledger.journal_entry. Orders and Ledger are both in the commerce deployable
+  (service-decomposition.json), as orders.invitation -> ledger.cost_center is already a declared key. Same class found:
+  check-storage-promises SP-KEY-GUESSED lists ten more name-rule guesses into another module (e.g.
+  rental.booking.deposit_authorisation_id -> games.authorisation, approvals.workflow_instance.current_node_id ->
+  access.edge_node), baselined for their owners.'
+keys_touched:
+  tables:
+  - orders.refund
+  schemas:
+  - orders.Refund
+  files:
+  - contracts/spine/orders.yaml
+  - tools/applied/ddl-crs-14-october.py
+  tickets:
+  - MIG-ORDERS
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - MIG-ORDERS (#27675)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-070 (ADAM)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Contract impact: additive (an x-ticvai extension; check-contract-compat PASS). Migration
+  effect: MIG-ORDERS; one "constraint added" row in migration-review.md (refund_tax_reversal_entry_id_fkey: validate,
+  then add); no index change. Check: check-storage-promises SP-KEY-GUESSED (a convention key whose target the name rule
+  took from another module the column does not name, or on one generic word) fails on r5 (1eb1d063) with
+  orders.refund.tax_reversal_entry_id -> queue.entry and passes here.'

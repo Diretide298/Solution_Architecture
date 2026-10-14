@@ -20126,6 +20126,7 @@ components:
         priority:
           type: integer
         providerId:
+          x-ticvai-references: payments.provider
           type: string
           format: uuid
         conditions:
@@ -20160,6 +20161,7 @@ components:
             maxAmount:
               $ref: ../shared/common.yaml#/components/schemas/Money
         fallbackProviderId:
+          x-ticvai-references: payments.provider
           type: string
           format: uuid
           nullable: true
@@ -20205,6 +20207,7 @@ components:
           type: string
           format: uuid
         providerId:
+          x-ticvai-references: payments.provider
           type: string
           format: uuid
         token:
@@ -22410,6 +22413,7 @@ components:
 
             '
         taxReversalEntryId:
+          x-ticvai-references: ledger.journal_entry
           type: string
           format: uuid
           nullable: true
