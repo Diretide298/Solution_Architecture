@@ -1,0 +1,78 @@
+id: CHG-GT3-002
+date: '2026-10-15'
+source: plan
+kind: plan
+proposed: '2026-10-15T00:40'
+summary: Every ticket Tanmay Dukhande held at r5 is Narayan Gaonkar's after the r6 apply, the app-modules he led and the
+  tickets the plan gives a hire who has no OpenProject account yet included; the one module test Narayan now builds
+  most of goes to a peer, as decision 5 requires.
+decision:
+  what: 'tools/sprint_plan.py handed_leads: every pushed app-module (Feature) the last release (r5) gave someone who
+    left goes to their successor (team.json successors); tools/build-service-docs.py applies it after the lead-of rule
+    (not with --rebalance). tools/op-release.py writes the bundle''s `successors` (OpenProject names), and
+    tools/op-release.rb, in the assign phase, gives a New ticket''s assignee or accountable that is still someone who
+    left to the successor when the plan''s person has no OpenProject account yet (it used to leave the field as it
+    was). Re-derived: 9 app-modules move to Narayan (2 in Block A: AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST #28081
+    from Hrushikant Patkar, AM-MARKETING-CRM-P08-BLOCK-A #28827 from Pranay Shinde; 7 in Blocks B to D); nothing else in
+    tasks.csv changes.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'The r6 rehearsal pull of r6-candidate c56b9dc4 (audit/rehearsal/rehearsal-summary.md, lead workspace) moved 5 of
+  Tanmay''s Block A tickets to people other than Narayan, against the lead''s words of CHG-PPL-001 ("tanmay is leaving so
+  shift all tasks to narayan"): pinned_owners pins tasks only, so the app-modules he led were worked out again (whoever
+  carries the most points); AM-TICKETING-P08-BLOCK-A #28171 and TEST-AM-TICKETING-P08-BLOCK-A #28196 are planned for
+  New full-stack developer 2, who has no OpenProject account, so the apply leaves them on Tanmay (the stand-in
+  OpenProject had made placeholder users and hid it); TEST-AM-SETUP-VENUE-OPERATIONS-P08 #28446 moved under decision 5
+  (CHG-TKT-007). Counted over the live r5 state of 14 October with op-release.rb''s rules, whole project: before 2 open
+  tickets left on Tanmay and 13 of his r5 tickets not Narayan''s; after 0 on Tanmay and 1 not Narayan''s (#28446, keep).'
+keys_touched:
+  files:
+  - tools/sprint_plan.py
+  - tools/build-service-docs.py
+  - tools/op-release.py
+  - tools/op-release.rb
+  tickets:
+  - '28081'
+  - '28827'
+  - '28171'
+  - '28196'
+  - '29758'
+  - '30037'
+  - '30049'
+  - '30087'
+  - '30110'
+  - '30112'
+  - '30114'
+  other:
+  - team.json successors
+  - CHG-PPL-001
+  - CHG-TKT-007
+root_class: 'new: person-leaves-the-team'
+tickets:
+  started: []
+  unstarted:
+  - '28081'
+  - '28827'
+  - '28171'
+  - '28196'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-15'
+    quote: Waive off 24 hour period
+prevention:
+  type: generator-rule
+  ref: tools/sprint_plan.py::handed_leads
+status: open
+notes: 'Batch GT3 (r6 fix round 3). This completes CHG-PPL-001 (same decision, same waiver). Keep: TEST-AM-SETUP-VENUE-
+  OPERATIONS-P08 #28446 goes to Pallavi Sawant, not Narayan: Narayan builds 24 of its points and the lead''s decision 5
+  (14 October) says a module test is never its main builder''s (check-plan-owners O-SELF-TEST); with Tanmay it would
+  have moved the same way. Tension, for the lead: in OpenProject #28196 (TEST-AM-TICKETING-P08-BLOCK-A) is held by
+  Narayan, who builds most of that module, until New full-stack developer 2 has an account (the plan''s owner);
+  the next apply after that moves it. op-release.rb could not be run here (no Ruby): the rule was counted with a
+  simulation of the assign phase (scratchpad audit/fix/GT3/tanmay_count.py). The rehearsal tooling should treat
+  placeholder names as having no account.'
