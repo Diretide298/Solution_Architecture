@@ -412,6 +412,67 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/guest-sessions/end-for-device:
+    post:
+      operationId: endGuestDeviceSessions
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Sign a guest's revoked device out
+      description: '**The owner''s end of a guest''s sessions on one device** (14 October 2026, the lead''s decision on
+        ticket 27741: revoking a guest device also signs that device out; CHG-MOD-009; ADR-0055 rule 4).
+        `marketing-crm.revokeGuestDevice` (in `operations`) calls this, cell-internal over mTLS, after it has revoked
+        the device row, with the guest''s own `subjectId` from their session, the device''s `installationId` as
+        `deviceId`, and the `Idempotency-Key` it was called with. The guest sessions live in Identity''s session
+        registry (`GuestSession`, `identity.guest_session`), in `commerce`.
+
+
+        **What ends**: every live session of that subject whose sign-in named this `deviceId` (the app sends its
+        `installationId` as `deviceId` on `verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin` and
+        `guestUaePassLogin`), and the refresh token each holds (`TokenPair.refreshToken`), so the device''s next
+        `refreshToken` call is `401` and its access token is refused at its next request (the session registry is
+        read on every request). Sessions of the same guest on other devices stay. Nothing to end is not an error:
+        `endedSessions` is 0, and a repeat of the same call ends nothing more.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestDeviceSessionsEnd'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The device's sessions ended (none, if it had none).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestDeviceSessionsEnded'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/login:
     post:
       operationId: login
@@ -2782,6 +2843,7 @@ paths:
                   maxLength: 10
                 deviceId:
                   type: string
+                  description: 'Send the app''s `installationId` (the value it registers its push token with, marketing-crm `registerGuestDevice`), so revoking that device signs this session out (`endGuestDeviceSessions`, CHG-MOD-009).'
                 venueId:
                   type: string
                   format: uuid
@@ -2879,7 +2941,7 @@ paths:
                   description: Compared with `GuestCredential.passwordHash` and never stored (ADR-0071, CHG-CRD-003).
                 deviceId:
                   type: string
-                  description: Names the device; a new sign-in here ends the previous session on it.
+                  description: 'Names the device; a new sign-in here ends the previous session on it. Send the app''s `installationId` (the value it registers its push token with, marketing-crm `registerGuestDevice`), so revoking that device signs this session out (`endGuestDeviceSessions`, CHG-MOD-009).'
                 venueId:
                   type: string
                   format: uuid
@@ -2954,6 +3016,7 @@ paths:
                   type: string
                 deviceId:
                   type: string
+                  description: 'Send the app''s `installationId` (the value it registers its push token with, marketing-crm `registerGuestDevice`), so revoking that device signs this session out (`endGuestDeviceSessions`, CHG-MOD-009).'
                 venueId:
                   type: string
                   format: uuid
@@ -3029,6 +3092,7 @@ paths:
                   type: string
                 deviceId:
                   type: string
+                  description: 'Send the app''s `installationId` (the value it registers its push token with, marketing-crm `registerGuestDevice`), so revoking that device signs this session out (`endGuestDeviceSessions`, CHG-MOD-009).'
                 venueId:
                   type: string
                   format: uuid
@@ -6789,6 +6853,39 @@ components:
         capturedAt:
           type: string
           format: date-time
+    GuestDeviceSessionsEnd:
+      type: object
+      x-ticvai-persistence: none — request only; ends sessions in the session registry (identity.guest_session)
+      description: What `marketing-crm.revokeGuestDevice` sends `endGuestDeviceSessions` (CHG-MOD-009).
+      required:
+      - subjectId
+      - deviceId
+      properties:
+        subjectId:
+          type: string
+          format: uuid
+          description: The guest whose device was revoked (pii.subject), from the revoking guest's own session.
+        deviceId:
+          type: string
+          maxLength: 64
+          description: The revoked device's `GuestDevice.installationId`, which the app sent as `deviceId` when it
+            signed in. A device registered without an installationId has none, and the call is not made.
+        reason:
+          type: string
+          enum:
+          - deviceRevoked
+          default: deviceRevoked
+          description: Why the sessions end, kept on the ended session for the guest's security history.
+    GuestDeviceSessionsEnded:
+      type: object
+      x-ticvai-persistence: none — computed
+      required:
+      - endedSessions
+      properties:
+        endedSessions:
+          type: integer
+          minimum: 0
+          description: How many of the guest's sessions on that device ended, each with its refresh token.
     GuestSubjectDetailsUpdate:
       type: object
       x-ticvai-persistence: none — request only; lands on pii.subject

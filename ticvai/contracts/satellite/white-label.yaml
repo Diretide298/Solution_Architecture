@@ -7233,6 +7233,7 @@ components:
       - medium
       - large
     BookingFlowStep:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createBookingFlowDefinition, getBookingFlow, getKioskConfigValidation, listBookingFlows and others
       x-ticvai-persistence: whitelabel.booking_flow_step
       type: object
       description: One step of a venue's flow, in the venue's order (decided 29 September, W12).
@@ -7240,7 +7241,12 @@ components:
       - stepKey
       - enabled
       - sortOrder
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -9888,6 +9894,7 @@ components:
                 - null
                 description: For `heroBanner` only (decided 29 September, MOB-3).
     Banner:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.banner
       type: object
       required:
@@ -9938,6 +9945,7 @@ components:
         isActive:
           type: boolean
     PromoBlock:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.promo_block
       type: object
       required:
@@ -10113,6 +10121,7 @@ components:
           format: date-time
           readOnly: true
     ContentPage:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.content_page
       type: object
       required:
@@ -10767,6 +10776,7 @@ components:
           items:
             $ref: '#/components/schemas/KioskConfigFinding'
     ConfigVersion:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getKioskConfigValidation
       x-ticvai-persistence: whitelabel.config_version
       type: object
       required:

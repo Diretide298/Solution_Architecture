@@ -4048,6 +4048,7 @@ components:
           type: string
           format: date-time
     StockBatch:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listExpiringBatches, listSerialisedItems, requestSuggestion
       type: object
       x-ticvai-persistence: inventory.stock_batch
       description: 'BL-122. **`isPerishable` and `shelfLifeDays` are on the item, so a shelf life is declared

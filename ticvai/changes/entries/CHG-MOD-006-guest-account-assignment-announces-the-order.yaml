@@ -35,5 +35,5 @@ prevention:
   type: check
   ref: tools/check-error-sources.py
 status: open
-notes: 'Batch MOD, 14 October 2026. The lineage is derived: run tools/applied/mod-lineage-14-october.py --apply before
-  derive-lineage at the merge. Verified: E-UNFED 1 -> 0, check-write-lineage and check-states pass.'
+notes: 'Batch MOD, 14 October 2026. The lineage is derived: run tools/applied/mod-lineage-14-october.py --apply after
+  derive-lineage --apply at the merge. Verified: E-UNFED 1 -> 0, check-write-lineage and check-states pass.'

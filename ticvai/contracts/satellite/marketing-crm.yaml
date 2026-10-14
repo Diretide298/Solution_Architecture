@@ -5183,7 +5183,8 @@ paths:
         **Every status is listed**, `active`, `failed` and `revoked`, each with its `status` and, for a revoked
         one, `revokedAt`: GST-073 and WEB-024 show a revoked device as revoked rather than dropping it, so a
         guest can see that the old phone that still held tickets was cut off, and a failed one as needing the
-        app opened again. There is no status filter; a screen that wants active devices only filters what it
+        app opened again. **A revoked device is also signed out** (CHG-MOD-009): `revokeGuestDevice` ended its
+        guest sessions and refresh tokens in Identity, so a revoked device is neither sent to nor signed in. There is no status filter; a screen that wants active devices only filters what it
         is given.
 
         **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here
@@ -5349,6 +5350,11 @@ paths:
         format: uuid
     delete:
       operationId: revokeGuestDevice
+      x-ticvai-write-via:
+      - table: identity.guest_session
+        operation: endGuestDeviceSessions
+      x-ticvai-calls:
+      - identity.endGuestDeviceSessions
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
@@ -5363,6 +5369,17 @@ paths:
         `status` `revoked`, `revokedAt` now, and `tokenRef`, `tokenFingerprint` and `installationId` cleared, so
         nothing can be sent to it and no later registration matches it. The row stays, with its platform, model
         and dates, as the guest''s record of the device. Revoking a revoked device is `204` again.
+
+
+        **A revoke also signs that device out** (decided 14 October 2026, Chinmay, the audit of ticket 27741;
+        CHG-MOD-009). After the row is revoked, and only where it had an `installationId`, this calls Identity''s
+        `endGuestDeviceSessions` (serviceAuth, cell-internal: Identity is in `commerce`, this in `operations`,
+        ADR-0055 rule 4) with the guest''s `subjectId` and that `installationId`, which the app sent as `deviceId`
+        when it signed in. Identity ends every guest session of this guest on that device and revokes each one''s
+        refresh token, so the old phone can neither refresh nor call again; the guest''s other devices stay
+        signed in. Revoking the device the guest is using signs it out too, so the app returns to sign-in. If
+        Identity does not answer, the device stays revoked and this answers `502`
+        `device-sessions-not-ended`; the client calls again, which is a `204` revoke that asks Identity again.
 
         '
       tags:
@@ -5388,9 +5405,18 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Revoked
+          description: Revoked, and the device signed out
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '502':
+          description: The device is revoked but Identity did not end its sessions (`device-sessions-not-ended`);
+            call again to retry (CHG-MOD-009).
+          x-ticvai-problem-types:
+          - device-sessions-not-ended
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segments:
@@ -19011,6 +19037,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
     TrackingTechnologyCatalogueEntry:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listTrackingTechnologyCatalogue
       type: object
       x-ticvai-persistence: marketing.tracking_technology_catalogue
       description: '**The platform''s catalogue of known cookies and trackers** (Chinmay, 2 October, contract
@@ -19783,6 +19810,7 @@ components:
           format: date-time
           nullable: true
     MarketingGuestExtraOption:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listGuestExtraFields, setGuestExtraFields
       type: object
       x-ticvai-persistence: marketing.guest_extra_option
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores dropdown choices only when an extra field uses SELECT type, for example Language = English, Hindi, Marathi.'
@@ -19791,7 +19819,12 @@ components:
       - name
       - displayOrder
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19806,6 +19839,7 @@ components:
         isActive:
           type: boolean
     MarketingGuestExtraValue:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestExtraValues, setGuestExtraValues
       type: object
       x-ticvai-persistence: marketing.guest_extra_value
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores the value entered by a customer for each Admin-created extra field.'
@@ -19813,7 +19847,12 @@ components:
       - customerId
       - fieldId
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19835,6 +19874,7 @@ components:
           format: date-time
           nullable: true
     MarketingBadge:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listBadges, setBadge
       type: object
       x-ticvai-persistence: marketing.badge
       description: '**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.'
@@ -19844,7 +19884,12 @@ components:
       - type
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -20012,6 +20057,7 @@ components:
           type: string
           format: date-time
     MarketingLoyaltyCampaign:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listLoyaltyCampaigns, setLoyaltyCampaign
       type: object
       x-ticvai-persistence: marketing.loyalty_campaign
       description: '**Taken from the backend workbook, 20 September.** Links a marketing campaign to temporary loyalty bonuses, rewards, or earning changes.'
@@ -20023,7 +20069,12 @@ components:
       - endAt
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -20052,6 +20103,7 @@ components:
           type: string
           format: date-time
     MarketingLoyaltyPoints:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by adjustLoyaltyPoints, getGuestTimeline, listLoyaltyPointEntries
       type: object
       x-ticvai-persistence: marketing.loyalty_points
       description: '**Taken from the backend workbook, 20 September.** Stores every loyalty point earn, redeem, expire, adjustment, or reversal transaction for a customer.'
@@ -20062,7 +20114,12 @@ components:
       - points
       - balanceAfter
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -20155,6 +20212,7 @@ components:
         isActive:
           type: boolean
     MarketingPointsRedemptionRule:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getLoyaltyRules, setLoyaltyRules
       type: object
       x-ticvai-persistence: marketing.points_redemption_rule
       description: '**Taken from the backend workbook, 20 September.** Defines how loyalty points can be exchanged for discounts, products, or other benefits.'
@@ -20164,7 +20222,12 @@ components:
       - name
       - redemptionType
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -20240,6 +20303,7 @@ components:
           format: date-time
           nullable: true
     MarketingReward:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listRewards, setReward
       type: object
       x-ticvai-persistence: marketing.reward
       description: '**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.'
@@ -20249,7 +20313,12 @@ components:
       - name
       - type
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -20880,6 +20949,7 @@ components:
         scopePath:
           type: string
     DataRetentionPolicy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listPrivacy, listPrivacyCompliance
       type: object
       x-ticvai-persistence: marketing.retention_policy
       description: 'Board 2.8. **The only routine operation that destroys data irrecoverably at scale.**'
@@ -20983,6 +21053,7 @@ components:
           format: date-time
           nullable: true
     AudienceList:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeLookalikeSegment
       type: object
       x-ticvai-persistence: marketing.audience_list
       description: 'Board 3.3. **Consent basis is required on the import, not optional metadata.**'
@@ -21242,6 +21313,7 @@ components:
           type: string
           format: date-time
     MessageChannel:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getConsentHistory, listConsentEvidenceWithdrawal, listCustomerPrivacyConsent
       type: string
       enum:
       - email
@@ -21394,6 +21466,7 @@ components:
 
             **Operations write it at `venue` scope.**'
     PrivacyIncident:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listPrivacy
       type: object
       x-ticvai-persistence: marketing.privacy_incident
       description: 'BL-176. **A personal-data breach has a regulator clock**, and UAE PDPL gives 72 hours
@@ -21694,6 +21767,7 @@ components:
             equals:
               type: string
     FormSubmission:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestTimeline, getWaiverStatus, listComplianceEvidenceWaiver, listContact and others
       type: object
       x-ticvai-persistence: marketing.form_submission
       description: '**The acceptance record, and it is evidence.** Bound to the exact version accepted,
@@ -21776,6 +21850,7 @@ components:
           type: string
           nullable: true
     GuestDocument:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listComplianceEvidenceWaiver, uploadGuestDocument
       type: object
       x-ticvai-persistence: marketing.guest_document
       description: 'BL-133. **No store for guest photos, avatars, IDs or signed documents anywhere.**
@@ -22498,6 +22573,7 @@ components:
           type: string
           nullable: true
     TouchPoint:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestIntelligence, getGuestTimeline
       type: object
       x-ticvai-persistence: marketing.touch_point
       description: '22.14.17, 22.14.18, BL-177. **`CampaignPerformance.attributedOrders` models single-touch
@@ -23901,6 +23977,7 @@ components:
           format: date-time
           nullable: true
     ConsentPurposeConfig:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestConsents, listCustomerPrivacyConsent, listPrivacyConsent
       x-ticvai-persistence: marketing.consent_purpose + marketing.consent_purpose_channel
       type: object
       required:
@@ -23961,6 +24038,7 @@ components:
           type: string
           format: date-time
     ConsentRecord:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by enrolFacePass, getConsentHistory, getGuestConsents, getGuestIntelligence and others
       x-ticvai-persistence: marketing.consent_record + marketing.consent_record_channel
       allOf:
       - $ref: '#/components/schemas/RecordConsentRequest'
@@ -24034,6 +24112,7 @@ components:
                 format: date-time
                 nullable: true
     Suppression:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listConsentPreferenceCommunication, listCustomerServiceProfile, previewSegmentDraft, retryMessageDispatch
       x-ticvai-persistence: marketing.suppression
       type: object
       required:
@@ -24570,6 +24649,7 @@ components:
           format: date-time
           readOnly: true
     GuestPreferences:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listCustomerPrivacyConsent, listCustomerServiceProfile
       type: object
       x-ticvai-persistence: marketing.guest_preference
       description: '**What the guest likes, kept apart from what they permit** (consent) and from who they
@@ -24654,6 +24734,7 @@ components:
           nullable: true
           description: '`goalReached` over `entrants`. Null while there are no entrants.'
     AgentAvailability:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createCaseClassificationIntelligent, listAgentWorkloadAvailability, listContact
       type: object
       x-ticvai-persistence: marketing.agent_availability
       required:
@@ -25046,6 +25127,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005), the campaign''s.'
     MessageTemplate:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createJourney, listBusinessEventNotification, listCommunicationService, listDeliveryQueueFailure and others
       x-ticvai-persistence: marketing.message_template
       type: object
       required:
@@ -25110,6 +25192,7 @@ components:
             version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed
             operations)'
     MessageDispatch:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getCampaignPerformance, getGuestTimeline, getJourneyPerformance, getMessageStatus and others
       x-ticvai-append-only: queuedAt
       x-ticvai-persistence: marketing.message_dispatch
       type: object
@@ -25434,6 +25517,7 @@ components:
             items:
               $ref: '#/components/schemas/CaseMessage'
     CaseMessage:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by addCaseMessage, getCase, listCustomerService, listUnifiedInteractionCommunication
       x-ticvai-persistence: marketing.case_message
       type: object
       required:
@@ -25442,7 +25526,12 @@ components:
       - isInternal
       - authorKind
       - recordedAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         resolution:
           type: string
           description: '**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.
@@ -30044,6 +30133,7 @@ components:
           nullable: true
           description: The `recordPrivacyIncident` record, when the exception is also a breach.
     PrivacyAuditEvidenceComplianceReportingView:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listCustomerPrivacyConsent, listPrivacyEvidenceCompliance
       type: object
       x-ticvai-persistence: marketing.privacy_audit_event
       description: One privacy audit event (pack 17.2.9 Audit Fields). Append-only; written by the operation

@@ -46,7 +46,7 @@ prevention:
   ref: tools/check-cross-module-reads.py
 status: open
 notes: 'Batch MOD, 14 October 2026. The lineage is derived: run `python tools/applied/mod-lineage-14-october.py
-  --apply` before derive-lineage at the merge (it also carries CHG-MOD-006). Verified on the branch:
+  --apply` after derive-lineage --apply at the merge (it also carries CHG-MOD-006 and CHG-MOD-009). Verified on the branch:
   check-cross-module-reads XR-FOUNDATION 7 -> 6 and XR-UNCOVERED 7 -> 6, 0 new. The six kept are not fixed by a
   projection here because each projection would copy a guest''s Marketing record, media or unattached orders into
   Identity, which is a privacy and design decision (ADR-0047), not a mechanical one.'

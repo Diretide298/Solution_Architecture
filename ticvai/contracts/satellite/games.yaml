@@ -2152,6 +2152,7 @@ components:
                       nullable: true
                       description: The screen that fixes it, e.g. BO-407.
     AttractionType:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listAttractionTypes
       type: object
       x-ticvai-persistence: games.attraction_type
       description: 'Board 1.4. **The type decides which settings apply.**'
@@ -2337,10 +2338,16 @@ components:
         scopePath:
           type: string
     ReaderDeployment:
+      required: [scopePath]
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by deployReaderConfiguration, getGameplaySyncStatus, testReader, validateGameConfiguration
       type: object
       x-ticvai-persistence: games.reader_deployment
       description: 'Boards 9.5 and 9.8. **A change nobody deployed is a change that did not happen.**'
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -3501,6 +3508,7 @@ components:
           type: string
           format: date-time
     PlayResult:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGameplaySyncStatus, recordGamePlay, updateGame
       x-ticvai-persistence: games.play
       type: object
       required:
@@ -3509,7 +3517,12 @@ components:
       - pointsAwarded
       - creditsRemaining
       - pointsBalance
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         playId:
           type: string
         cardCode:

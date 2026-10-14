@@ -3113,6 +3113,7 @@ components:
           format: date-time
           readOnly: true
     KpiDefinition:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by askReportingQuestion, getKpiValues
       type: object
       x-ticvai-persistence: reporting.kpi_definition
       description: 'BI boards 2.5 and 10.2. **One definition, referenced everywhere** — otherwise
@@ -3394,6 +3395,7 @@ components:
           minimum: 0
           description: '`perSquareMetre`. Operated area.'
     SemanticModel:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by askReportingQuestion
       type: object
       x-ticvai-persistence: reporting.semantic_model
       description: 'BI boards 3.3 and 10.6. **A vocabulary, not a schema.** Exposing joins to report

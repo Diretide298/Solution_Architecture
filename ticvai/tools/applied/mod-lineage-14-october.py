@@ -12,8 +12,13 @@
   orders#openOrdersForSubject projection; CHG-GDL-003). It now emits order.linkedToGuest for each order it attaches
   (events/order-linkedToGuest.yaml emittedBy), written to the outbox in its own transaction (ADR-0033), so its
   lineage writes platform.outbox (check-write-lineage W-OUTBOX).
+* **Revoking a guest device signs that device out** (CHG-MOD-009; the lead's decision of 14 October 2026 on ticket
+  27741). revokeGuestDevice (Marketing, operations) calls Identity's new endGuestDeviceSessions (serviceAuth, commerce;
+  x-ticvai-write-via), which ends the guest's sessions on that device in the session registry: both write
+  identity.guest_session, and the new operation reads it to find them.
 
-Run once, before derive-lineage; a second run changes nothing.
+Run after derive-lineage --apply (it adds the new operation's entry; it never removes what this adds), at every
+refresh until the next release folds it in; a second run changes nothing.
 
     python tools/applied/mod-lineage-14-october.py [--apply]
 """
@@ -26,7 +31,7 @@ import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# operation -> (reads to drop, writes to add, why)
+# operation -> (reads to drop, writes to add, why[, reads to add])
 LINEAGE = {
     "listDelegations": (["marketing.guest_profile"], [],
                         "CHG-MOD-002: Identity reads nothing above it (ADR-0028); the names are the guests' own in "
@@ -34,6 +39,12 @@ LINEAGE = {
     "setCustomerGuestAccount": ([], ["platform.outbox"],
                                 "CHG-MOD-006: emits order.linkedToGuest for each order it attaches to a guest, through "
                                 "the outbox (ADR-0033)"),
+    "revokeGuestDevice": ([], ["identity.guest_session"],
+                          "CHG-MOD-009: ends the device's guest sessions through Identity's endGuestDeviceSessions "
+                          "(x-ticvai-write-via, service route)"),
+    "endGuestDeviceSessions": ([], ["identity.guest_session"],
+                               "CHG-MOD-009: ends a guest's sessions on one device in the session registry",
+                               ["identity.guest_session"]),
 }
 
 
@@ -45,22 +56,25 @@ def main() -> int:
     raw = io.open(path, encoding="utf-8", newline="").read()
     lin = json.loads(raw)
     n = 0
-    for op, (drop, add, why) in LINEAGE.items():
+    for op, (drop, add, why, *more) in LINEAGE.items():
         e = lin.get(op)
         if e is None:
-            raise SystemExit("%s is not in the lineage" % op)
-        reads = sorted(t for t in (e.get("reads") or []) if t not in drop)
+            raise SystemExit("%s is not in the lineage: run derive-lineage --apply first" % op)
+        add_reads = more[0] if more else []
+        reads = sorted({t for t in (e.get("reads") or []) if t not in drop} | set(add_reads))
         writes = sorted(set(e.get("writes") or []) | set(add))
         if reads == sorted(e.get("reads") or []) and writes == sorted(e.get("writes") or []):
             continue
         gone = sorted(t for t in (e.get("reads") or []) if t in drop)
         new = sorted(set(add) - set(e.get("writes") or []))
+        new_reads = sorted(set(add_reads) - set(e.get("reads") or []))
         e["reads"], e["writes"] = reads, writes
         rc = e.get("readColumns")
         if isinstance(rc, dict):
             for t in gone:
                 rc.pop(t, None)
-        bits = ([t + " no longer read" for t in gone] + ["writes " + t for t in new])
+        bits = ([t + " no longer read" for t in gone] + ["reads " + t for t in new_reads] +
+                ["writes " + t for t in new])
         note = "14 October 2026: " + ", ".join(bits) + " (" + why + ")"
         e["fixNote"] = (e["fixNote"] + "; " + note) if e.get("fixNote") else note
         n += 1

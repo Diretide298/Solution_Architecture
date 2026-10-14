@@ -21,8 +21,8 @@ why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): clas
   (CHG-GEN-009): another module''s table is read through the owner''s declared query, or a view named for the reader
   within one deployable; across deployables never by shared SQL (rule 4). Default ruling (lead, 14 October: "go with
   your recommendation"): route each read through the owner''s declared query, grouped by owner module so one query
-  serves many readers. Count before 921 (914 on audit-base after the earlier r6 fixes), after 7: the 7 left are
-  Identity''s reads above the foundation tier, fixed by CHG-MOD-002.'
+  serves many readers. Count before 921, after 6: 914 routed here; of the 7 Identity reads above the foundation tier
+  (routed by CHG-MOD-002, not here) one is fixed and six are kept for the lead, listed in CHG-MOD-002.'
 keys_touched:
   operations: []
   files:
@@ -48,6 +48,6 @@ notes: 'Batch MOD, 14 October 2026. Detail the ruling left open, taken as the op
   in-deployable reads, because a view needs a lineage rewrite of the reads and gives the owner no say in what is
   read, while the query keeps the lineage read and adds the route. A data-read query states no rule: the refusals
   that rest on another module''s data keep their own rule queries (CHG-MOD-003). Verified: derive-lineage --apply
-  gave 499 entries their readVia; check-cross-module-reads XR-UNCOVERED 921 -> 7 (0 new), XR-QUERY, XR-ROUTE and
+  gave 499 entries their readVia; check-cross-module-reads XR-UNCOVERED 921 -> 6 (0 new), XR-QUERY, XR-ROUTE and
   XR-LINEAGE 0; check-contract-shapes, check-contract-compat and check-lineage 0 new. Derived files restored before
   the commit.'

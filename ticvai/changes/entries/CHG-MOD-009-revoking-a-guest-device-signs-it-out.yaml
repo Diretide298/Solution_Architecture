@@ -1,0 +1,65 @@
+id: CHG-MOD-009
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Revoking a guest device also signs that device out: revokeGuestDevice calls Identity''s new
+  endGuestDeviceSessions (serviceAuth, Identity''s service route), which ends that guest''s sessions on the device
+  and their refresh tokens; a failed call is a 502 device-sessions-not-ended the client retries.'
+decision:
+  what: 'contracts/spine/identity.yaml: new operation endGuestDeviceSessions (POST
+    /internal/guest-sessions/end-for-device, serviceAuth, audience service, scope subject; body
+    GuestDeviceSessionsEnd {subjectId, deviceId, reason}; 200 GuestDeviceSessionsEnded {endedSessions}; 400, 401
+    unauthenticated, 429). The guest sign-ins (verifyGuestOtp, guestPasswordLogin, guestSocialLogin,
+    guestUaePassLogin) say the app sends its push installationId as `deviceId`, which is how Identity finds the
+    sessions of one device. contracts/satellite/marketing-crm.yaml: revokeGuestDevice declares x-ticvai-write-via
+    {table: identity.guest_session, operation: endGuestDeviceSessions} and x-ticvai-calls
+    identity.endGuestDeviceSessions (Marketing is in operations, Identity in commerce: the service route, per
+    handoff/service-decomposition.json and ADR-0055 rule 4), a 502 with x-ticvai-problem-types
+    [device-sessions-not-ended], and its description and listGuestDevices'' say a revoked device is signed out.
+    registerGuestDevice''s storage fields (CHG-MKT-001) are not touched. tools/applied/mod-lineage-14-october.py adds
+    identity.guest_session to both operations'' lineage.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json, class check-screens/S-PANEL-ENTITY, the
+  GST-073 call): ticket 27741 problem 2 asked what revoking a guest device does, stop push only or also sign the
+  device out. The lead decided on 14 October ("go with your recommendation", decision 1 in the audit fix rules):
+  it also ends that device''s guest sessions and refresh tokens in Identity. Batch SCR changes GST-073''s screen to
+  match (ADR-0055 rule 4 routes the call; finding S-PANEL-ENTITY GST-073).'
+keys_touched:
+  operations:
+  - revokeGuestDevice
+  - listGuestDevices
+  - endGuestDeviceSessions
+  - verifyGuestOtp
+  - guestPasswordLogin
+  - guestSocialLogin
+  - guestUaePassLogin
+  schemas:
+  - identity.GuestDeviceSessionsEnd
+  - identity.GuestDeviceSessionsEnded
+  tables:
+  - identity.guest_session
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - tools/applied/mod-lineage-14-october.py
+  screens:
+  - GST-073
+  - WEB-024
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'Batch MOD, 14 October 2026. The 502 is additive (check-contract-compat passes). The guest sessions are in
+  Identity''s session registry (GuestSession, persistence: Redis), with identity.guest_session the table the lineage
+  names for them, as guestLogout''s does. A device registered without an installationId (an app that predates
+  CHG-MKT-001) is revoked without the call: nothing ties its sessions to it. The new operation needs a backend task
+  in the Identity service ticket (batch TKT generates feature and task links).'

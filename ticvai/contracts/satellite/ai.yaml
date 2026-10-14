@@ -11377,6 +11377,7 @@ components:
           nullable: true
           description: JSON Schema the extracted answer must satisfy.
     AiCapabilityRegistration:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by buildConfigurationPlan, getEffectiveAiPolicy, listAiCapabilities, listAiCapabilityMaturity and others
       type: object
       x-ticvai-persistence: ai.capability
       description: '**An entry in the capability registry** (design 3.1 Registry, AIC-144, AIC-145; ADM-520). Nothing
@@ -11491,6 +11492,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiModel:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by setAiProvider
       type: object
       x-ticvai-persistence: ai.model
       description: '**The model catalogue** (design 3.1 Registry, 3.3; AIC-013, AIC-026). One row per model a task
@@ -11683,6 +11685,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiPromptTemplate:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeMarketingContent, suggestGuidedChoice
       type: object
       x-ticvai-persistence: ai.prompt_template
       description: '**The prompt registry** (design 3.1 Registry, AIC-022). Versioned and **immutable once published**:
@@ -11751,6 +11754,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiTool:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by buildConfigurationPlan, generateConfiguration, proposeRiskAction, proposeSeatMapChanges and others
       type: object
       x-ticvai-persistence: ai.tool
       description: '**The tool registry** (design 3.1 Registry, 3.8; AIC-088, AIC-089). The executor calls owning
@@ -11995,6 +11999,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiGovernancePolicy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getEffectiveAiPolicy
       type: object
       x-ticvai-persistence: ai.governance_policy
       description: '**A governance policy** (design 3.1 Governance, 3.8; ADM-523..528). Its rules live on versions:
@@ -12047,6 +12052,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiGovernancePolicyVersion:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by attachConfigurationSource, buildConfigurationPlan, getEffectiveAiPolicy, proposeMarketingContent and others
       type: object
       x-ticvai-persistence: ai.governance_policy_version
       description: 'One version of a governance policy. **Published versions are never edited**: a change is a new
@@ -12112,6 +12118,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiPolicyException:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getEffectiveAiPolicy
       type: object
       x-ticvai-persistence: ai.policy_exception
       description: '**A temporary, recorded exception to a governance policy** (AIC-162, ADM-526): an expiry, an
@@ -12873,6 +12880,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiAssistantProfile:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by sendAiMessage
       type: object
       x-ticvai-persistence: ai.assistant_profile
       description: '**One assistant runtime, many profiles** (design 5.10, C5; AIC-069..080). The profile decides
@@ -15452,6 +15460,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiRelease:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by decideRecommendations, requestSuggestion
       type: object
       x-ticvai-persistence: ai.release
       description: '**The release pointer per capability and tenant** (design 3.5): draft, offline evaluation, shadow,
@@ -16521,6 +16530,7 @@ components:
           type: string
           format: uuid
     AiConfigurationSource:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by attachConfigurationSource, getConfigurationBlueprint, listConfigurationSources
       type: object
       x-ticvai-persistence: ai.config_source
       description: '**A document attached to a configuration session** (1.3.31, 1.4.21, 2.6.50): the uploaded asset,
@@ -16531,7 +16541,12 @@ components:
       - assetId
       - sourceKind
       - status
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -17429,6 +17444,7 @@ components:
                 - overpowered
                 - unscored
     AiPolicy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by answerConfigurationQuestion, askReportingQuestion, attachConfigurationSource, explainMetricChange and others
       type: object
       x-ticvai-persistence: ai.policy
       required:
@@ -18490,6 +18506,7 @@ components:
           format: date-time
           nullable: true
     KnowledgeCollection:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by semanticSearch
       type: object
       x-ticvai-persistence: ai.knowledge_collection
       required:
@@ -18574,6 +18591,7 @@ components:
         isActive:
           type: boolean
     KnowledgeDocument:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by generateConfiguration, semanticSearch, sendAiMessage
       type: object
       x-ticvai-persistence: ai.knowledge_document
       required:

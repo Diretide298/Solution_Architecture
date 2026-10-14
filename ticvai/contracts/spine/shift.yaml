@@ -2305,6 +2305,7 @@ components:
         closedAt: { type: string, format: date-time, nullable: true }
 
     Denomination:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listDenominations, setDenominations
       x-ticvai-persistence: "platform.denomination"
       description: >
         **Raised in review by Tanmay: denominations belong in a table, not in JSON.** He is right,
@@ -2321,8 +2322,12 @@ components:
         the order they sit in the drawer, and `sortOrder` is what makes the count screen match the
         physical tray."
       type: object
-      required: [currencyCode, kind, value]
+      required: [currencyCode, kind, value, scopePath]
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id: { type: string, format: uuid }
         currencyCode: { type: string }
         displayName:

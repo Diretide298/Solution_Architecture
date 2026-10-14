@@ -4464,6 +4464,7 @@ components:
           type: boolean
           default: true
     CreditType:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by expireCreditLots, simulateCreditConsumption
       type: object
       x-ticvai-persistence: wallet.credit_type
       description: 'Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one
@@ -5480,6 +5481,7 @@ components:
         scopePath:
           type: string
     WalletAccountingMapping:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by expireCreditLots
       type: object
       x-ticvai-persistence: wallet.accounting_mapping
       description: 'Boards 9.2 and 9.3. **Different credit types are different liabilities.**'
@@ -5724,6 +5726,7 @@ components:
         scopePath:
           type: string
     Wallet:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by adjustGameCard, adjustWallet, authoriseStoredValue, closeWallet and others
       # `credits[]` is not a column of `wallet.wallet`: each entry is a live lot in
       # `wallet.credit_lot`, so the lot table is named here as the child and a read of the wallet
       # reads both.
@@ -5830,6 +5833,7 @@ components:
       type: string
       enum: [topUp, spend, refund, adjustment, bonus, expiry, transfer]
     GiftCard:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by activateGiftCard, authoriseStoredValue, blockGiftCard, getGiftCard and others
       x-ticvai-persistence: "wallet.gift_card"
       type: object
       required: [cardCode, faceValue, balance, status, issuedAt]

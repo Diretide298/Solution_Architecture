@@ -20745,6 +20745,7 @@ components:
           type: string
           readOnly: true
     AccessHardwareModel:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listDeviceTypeHardware, listHardwareCompatibilityHealth, listPhysicalDeviceRegistration, placeAccessDevice and others
       type: object
       x-ticvai-persistence: access.hardware_model
       description: 'One hardware model in the reusable library, independent of deployed devices: manufacturer, model,

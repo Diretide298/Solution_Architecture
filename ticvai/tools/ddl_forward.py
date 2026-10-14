@@ -228,9 +228,16 @@ def relaxed(coldef: str) -> str:
 SCOPE_OWNER_KEYS = ("org_unit_id", "scope_id", "region_id")
 
 
-def scope_path_backfill(t: str, cols) -> str | None:
-    """The statements that fill and then close a scope_path added nullable to `t`, or None when the owner is unknown."""
+# **A table that was the tenant root's alone has rows only the tenant root wrote** (MOD audit, 14 October 2026,
+# CHG-MOD-007). Until its scope_path arrives, its policy (`apply_tenant_rls`) let no other connection insert a row, so
+# every row it holds sits at the tenant root by construction: the backfill is the tenant root's path, then NOT NULL.
+def scope_path_backfill(t: str, cols, was_tenant_root: bool = False) -> str | None:
+    """The statements that fill and then close a scope_path added nullable to `t`, or None when the owner is unknown.
+    `was_tenant_root`: the table's policy before this migration was the tenant root's alone."""
     owner = next((c for c in SCOPE_OWNER_KEYS if c in cols), None)
+    if not owner and was_tenant_root:
+        return (f"UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE "
+                f"scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
     if not owner:
         return None
     return (f"UPDATE {t} x SET scope_path = s.path FROM platform.scope s WHERE s.id = x.{owner} AND x.scope_path IS "
@@ -359,6 +366,16 @@ def rls_call(stmt: str):
     else None."""
     m = RLS_CALL.match(norm(stmt))
     return (m.group(1).lower(), unq(m.group(2)), m.group(2)) if m else None
+
+
+def was_tenant_root(model, t: str) -> bool:
+    """`t` had the tenant root's policy alone in `model` before any scope policy: every row it held then was written by
+    the tenant root, so its scope_path backfill is the tenant root's path (CHG-MOD-007)."""
+    for _k, st in model.order:
+        rc = rls_call(st)
+        if rc and rc[1] == t and rc[0] != "drop_rls_policies":
+            return rc[0] == "apply_tenant_rls"
+    return False
 
 
 def tables_named(stmt: str, known: set) -> set:
@@ -498,7 +515,7 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                         # CHG-GEN-008: a row with no scope_path is invisible to every grant once the table's policy reads
                         # it, so the backfill is due in the same release as the column, not later. CHG-R6G-002: the
                         # backfill is named when the table holds its owning scope's key, before the NOT NULL.
-                        fill = scope_path_backfill(t, b.cols)
+                        fill = scope_path_backfill(t, b.cols, was_tenant_root(old, t))
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL, and row-"
                                "level security reads it",
                                (f"in the forward migration that adds it, backfill first, then the NOT NULL: {fill}"
@@ -509,7 +526,17 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL",
                                "backfill, then ALTER COLUMN ... SET NOT NULL in a forward migration")
                 elif a.cols[c] != d and (t, c) not in old.handled:
-                    if a.cols[c] == relaxed(d):
+                    fill = scope_path_backfill(t, b.cols, was_tenant_root(old, t)) if c == "scope_path" else None
+                    if a.cols[c] == relaxed(d) and fill:
+                        # **A scope_path an earlier forward migration added keeps its named backfill** (MOD audit,
+                        # 14 October 2026, CHG-MOD-007). Once that migration is in the old side, the column is "still
+                        # nullable", and this row used to drop the backfill CHG-R6G-002 names, so
+                        # check-ddl-conventions D-SCOPE-NOTNULL failed on the next derive (region_settings,
+                        # upsell_rule) for a column nobody had changed.
+                        review("not null", f"{t}.{c}", "still nullable in the databases; the schema reference says "
+                               "NOT NULL, and row-level security reads it",
+                               f"in a forward migration, backfill first, then the NOT NULL: {fill}")
+                    elif a.cols[c] == relaxed(d):
                         review("not null", f"{t}.{c}", "still nullable in the databases; the schema reference "
                                "says NOT NULL", "backfill, then ALTER COLUMN ... SET NOT NULL")
                     else:

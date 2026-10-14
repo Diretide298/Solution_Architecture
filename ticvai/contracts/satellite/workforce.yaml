@@ -3720,6 +3720,7 @@ components:
         scopePath:
           type: string
     TrainingRecord:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getStaffingCoverage, listTrainingRecords, validateWorkforceCompliance
       type: object
       x-ticvai-persistence: workforce.training_record
       description: '**Drafted 4 September.** One person, one course, one outcome. **The field that

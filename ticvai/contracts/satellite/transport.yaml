@@ -2098,6 +2098,7 @@ components:
             east: { type: number }
 
     PassengerType:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getTransportFareTable, setTransportFareTable
       x-ticvai-persistence: "transport.fare_passenger_type"
       type: object
       required: [code, name, fareMultiplier]
@@ -2248,6 +2249,7 @@ components:
         total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
 
     TimetableRun:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createTransportTimetable, listTransportTimetables, publishTransportTimetable, updateTransportTimetable and others
       x-ticvai-persistence: "transport.timetable_run"
       type: object
       required: [departsAt, days]
