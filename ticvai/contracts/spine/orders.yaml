@@ -4111,6 +4111,11 @@ paths:
       x-ticvai-guest-callable: true
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
+      x-ticvai-offline-refused-on: [POS-004]
+      x-ticvai-offline-condition: 'No line carries a seat hold or a resource hold (Chinmay, 14 October 2026: "POS
+        createOrder and payments are offline-capable on the POS"; CHG-OFL-001). Seated inventory stays online
+        (ADR-0013) and a resource hold is a live reservation (REV3-15), so the seat map (POS-004) refuses a sale
+        offline; any other sale is written to the local journal and replayed through `syncOrders`.'
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -5422,6 +5427,14 @@ paths:
       x-ticvai-guest-callable: true
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
+      x-ticvai-offline-apps: [P04]
+      x-ticvai-offline-refused-on: [POS-004]
+      x-ticvai-offline-condition: 'Cash only, at a till (Chinmay, 14 October 2026: "POS createOrder and payments
+        are offline-capable on the POS"; CHG-OFL-001). Card, wallet, gift card and voucher need the gateway, and
+        cash is refused off a till (`cashNotOnHandheld`), so the payment queues in the till''s outbox and nowhere
+        else: the guest app and the staff app take it online, and the seat map (POS-004), where no seated sale is
+        made offline (ADR-0013), refuses it. The offline payment carries `recordedAt` and is replayed through
+        `syncOrders`.'
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -5564,6 +5577,7 @@ paths:
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
+      x-ticvai-offline-apps: [P04]
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -5817,6 +5831,7 @@ paths:
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
+      x-ticvai-outbox-replay: true
       x-ticvai-conflict-policy: append
       requestBody:
         required: true
@@ -6437,6 +6452,7 @@ paths:
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
+      x-ticvai-offline-apps: [P04, P06]
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey

@@ -1,0 +1,40 @@
+id: CHG-OFL-005
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'frontend-patterns 4.4 says exactly the 14 October rule: the contract''s x-ticvai-offline-capable decides
+  which writes queue, only those queue and only in an offline app, a web app never queues, the contract may narrow
+  the flag (apps, refusing screens, condition), and POS createOrder and payments are offline-capable on the POS.'
+decision:
+  what: 'Rewrite 4.4 in viewer/mcp/setup/starters/docs/frontend-patterns.md (and its six project-bible copies under
+    repos/, which check-starter-fit SF-DOCS-MIRROR holds equal): "Not every mutation goes through the outbox"; the
+    outbox entry carries Idempotency-Key, recordedAt and the contract''s conflict policy; x-ticvai-offline-apps,
+    x-ticvai-offline-refused-on, x-ticvai-offline-condition and x-ticvai-outbox-replay are named; every other write,
+    and every write in a web app, is disabled offline with the reason on screen.'
+  by: Chinmay
+  date: '2026-10-14'
+why: '#27741 problem 4 (the developer''s agent read 4.4 as "every mutation goes through the offline-core outbox", audit
+  root R026), and decision 2 of 14 October (CHG-OFL-001). GST-010, GST-042 and GST-073, the guest screens #27741
+  names, are consistent with it without a screen change: their writes are online-only on the guest app
+  (reprintOrder lists the till and staff app only, CHG-OFL-001), and each says it waits for the connection.'
+keys_touched:
+  files: [viewer/mcp/setup/starters/docs/frontend-patterns.md, repos/ticvai-ai/project-bible/setup/frontend-patterns.md,
+    repos/ticvai-backend/project-bible/setup/frontend-patterns.md,
+    repos/ticvai-contracts/project-bible/setup/frontend-patterns.md, repos/ticvai-docs/setup/frontend-patterns.md,
+    repos/ticvai-frontend/project-bible/setup/frontend-patterns.md,
+    repos/ticvai-infra/project-bible/setup/frontend-patterns.md]
+  screens: [GST-010, GST-042, GST-073]
+root_class: A06 STARTER-STANDARDS
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch OFL. The setup zip carries the starter docs, so it is rebuilt from HEAD after the merge. No ticket links
+  the standards doc; every offline-app frontend ticket reads it through the project bible.'

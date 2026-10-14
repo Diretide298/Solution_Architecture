@@ -1,0 +1,53 @@
+id: CHG-OFL-001
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'The contracts follow the client-approved screens offline: createPayment and addTip queue on the till only,
+  reprintOrder on the till and the staff app, joinRestaurantWaitlist on the staff app; the seat map (POS-004) refuses
+  createOrder and createPayment and Outlet Setup (POS-024) refuses setItemAvailability; recordLostItem and submitForm
+  become online-only; the scanner''s delegated-right screen (SCN-011) now says what its locally authoritative
+  contract does.'
+decision:
+  what: 'Decision 2 of 14 October (the contract''s x-ticvai-offline-capable decides; only offline-capable writes queue;
+    web apps never queue; POS createOrder and payments are offline-capable on the POS) with the lead''s later rule
+    that the client-approved UI is not changed: where an approved screen refuses offline a write its contract marks
+    offline-capable, the contract changes. Two new operation keys narrow the flag: x-ticvai-offline-apps (the platform
+    codes a write queues on) and x-ticvai-offline-refused-on (the screens that refuse it), with the reason in
+    x-ticvai-offline-condition. createOrder and createPayment keep their outbox details (Idempotency-Key, recordedAt,
+    conflict policy append, replay through syncOrders). check-screen-wiring reads the two keys (offline_here).
+    SCN-011''s offline text is spec prose no approved frame shows, so it is rewritten to the contract.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-screen-wiring/S-OFFLINE-REFUSED, 19 members before, 7 after (audit/ticvai/runs/audit-1014/classes.json;
+  CHG-SWP-004 added the rule). GST-009, EMP-035 (createPayment, addTip): cash is the only offline tender and is refused
+  off a till (createPayment, decided 2 October, DEC-200). GST-010 (reprintOrder), GST-034 (recordLostItem, audit R148),
+  GST-035 (submitForm), GST-070 (joinRestaurantWaitlist): the approved guest app waits for the connection, as its
+  banner says. POS-004: seated inventory stays online (ADR-0013). POS-024: Outlet Setup refuses configuration offline.
+  SCN-011: consumeCrossRegionEntitlement is locally authoritative (cross-region contract).'
+keys_touched:
+  operations: [createOrder, createPayment, addTip, reprintOrder, joinRestaurantWaitlist, setItemAvailability,
+    recordLostItem, submitForm]
+  screens: [SCN-011, GST-009, GST-010, GST-034, GST-035, GST-070, POS-004, POS-024, EMP-035]
+  files: [contracts/spine/orders.yaml, contracts/satellite/fnb.yaml, contracts/satellite/marketing-crm.yaml,
+    screens/P07-staff-scanner.yaml, tools/check-screen-wiring.py]
+  other: [x-ticvai-offline-apps, x-ticvai-offline-refused-on, x-ticvai-offline-condition, S-OFFLINE-REFUSED]
+root_class: A34 SCREEN-CONTEXT
+tickets:
+  started: []
+  unstarted: [27691, 27701, 27703, 27705, 27709, 27734, 27737, 27740, 27742, 27860, 27873, 27923, 28144, 28206, 28222,
+    28225, 28236, 28256, 28258, 28260, 28342, 28359, 28403, 28523, 28545, 28556, 28559, 28563, 28565, 28566, 28574,
+    28585, 28621, 28727, 28754, 28807, 28808, 28818, 28819, 28891, 28892]
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch OFL. Keeps (7, client-approved UI, the approved copy refuses only another operation and the keyword
+  reading counts it as refusing the queued ones): POS-006 applyManualDiscount, createOrder, holdOrder, reprintOrder,
+  voidOrder ("resuming another till''s sale needs the server" is about resumeOrder); POS-001 resumeShift ("Cannot
+  open offline" is about openShift); EMP-009 suspendShift ("Cannot close"). recordLostItem and submitForm going
+  online-only also takes marketing.lost_item and marketing.form_submission out of ST-OFFLINE-RECORDED-AT.
+  check-contract-compat: 0 unapproved breaking changes.'

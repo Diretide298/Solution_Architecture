@@ -2218,6 +2218,12 @@ components:
             When the device recorded the allocation. `allocateDepositBox` is offline-capable, so
             for a box allocated offline this differs from the server's receipt time.
         closedAt: { type: string, format: date-time, nullable: true }
+        recordedAt:
+          type: string
+          format: date-time
+          description: '**When the device made the write** (R113; CHG-OFL-003): for an allocation, the same moment as
+            `allocatedAt`, kept in `recorded_at`, the column every offline-written table carries for the sync to
+            order replays by. Omitted online, the server sets it to the time it received the call.'
 
     Denomination:
       x-ticvai-persistence: "platform.denomination"

@@ -25,6 +25,15 @@ caught a screen whose every write is online-only; these catch the rest of the co
                         is not offline-capable (4.4: disabled offline), on a screen with other offline-capable
                         writes; or a web app's screen (no offline store) promises to queue its writes
 
+**The contract decides, and it may narrow** (14 October 2026, CHG-OFL-001; the lead: "POS createOrder and payments are
+offline-capable on the POS", and the client-approved screens are not changed). `x-ticvai-offline-apps` lists the
+platform codes a write queues on (createPayment: P04, because only a till takes cash); `x-ticvai-offline-refused-on`
+lists the screens where the approved UI refuses it offline (createOrder on the seat map, ADR-0013), with the reason in
+`x-ticvai-offline-condition`. On any other platform or on a listed screen the write counts as online-only in all
+three rules. `x-ticvai-outbox-replay: true` marks the outbox's own replay call (syncOrders), which a screen never
+queues and never has to call disabled. S-OFFLINE-CLAIM, like S-OFFLINE-QUEUED, reads an offline state that also refuses ("Nothing here is
+offered offline ... a request queued and never sent is worse") as a refusal, not a promise.
+
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
     python3 tools/check-screen-wiring.py [--all] [--update-baseline]
@@ -112,6 +121,18 @@ OFFLINE_REFUSAL = re.compile(r"(not offered|not available|nothing here is offere
                              r"cannot (be )?(open|done|made)|needs? (a |the )?(connection|network|server|gateway|primary)|"
                              r"requires? (a |the )?(connection|network|primary)|waits? for the connection|"
                              r"with the reason|connect to)", re.I)
+
+
+def offline_here(op: dict, plat: str, sid: str) -> bool:
+    """The write may queue on this screen (frontend-patterns 4.4, CHG-OFL-001): the contract marks it
+    `x-ticvai-offline-capable: true`, this platform is in its `x-ticvai-offline-apps` where it lists any, and
+    this screen is not in its `x-ticvai-offline-refused-on`."""
+    if op.get("x-ticvai-offline-capable") is not True:
+        return False
+    apps = op.get("x-ticvai-offline-apps")
+    if apps and str(plat)[:3] not in {str(a)[:3] for a in apps}:
+        return False
+    return sid not in set(op.get("x-ticvai-offline-refused-on") or [])
 
 
 def required_body(op: dict) -> bool:
@@ -347,15 +368,15 @@ def main() -> int:
             guard.add("S-PANEL-ENTITY", sid, f"{sid}: the table shows {tables[0]}, the panel {panels[0]}")
         # --- R257 offline promises -------------------------------------------------------------
         off = str(states.get("offline") or "")
-        if off and OFFLINE_PROMISE.search(off):
+        if off and OFFLINE_PROMISE.search(off) and not OFFLINE_REFUSAL.search(off):
             writes = [o for o, f in facts.items() if f and f["method"] in WRITES]
-            if writes and not any(facts[o]["op"].get("x-ticvai-offline-capable") for o in writes):
+            if writes and not any(offline_here(facts[o]["op"], plat, sid) for o in writes):
                 guard.add("S-OFFLINE-CLAIM", sid,
                           f"{sid}: offline state promises to queue or sync and none of its "
                           f"{len(writes)} write(s) is x-ticvai-offline-capable")
         # --- CHG-SWP-004 offline writes against frontend-patterns 4.4 ---------------------------
         writes = [o for o, f in facts.items() if f and f["method"] in WRITES]
-        capable = [o for o in writes if facts[o]["op"].get("x-ticvai-offline-capable") is True]
+        capable = [o for o in writes if offline_here(facts[o]["op"], plat, sid)]
         offline_app = bool(offline_platforms.get(plat))
         refuses = bool(off and OFFLINE_REFUSAL.search(off))
         promises = bool(off and QUEUE_PROMISE.search(off))
@@ -367,7 +388,9 @@ def main() -> int:
         if promises and not refuses:
             if offline_app and capable:
                 for o in writes:
-                    if o not in capable and o not in off:
+                    # The outbox's own replay call (x-ticvai-outbox-replay: syncOrders) runs when the link is
+                    # back; it is never queued and never "disabled offline" (CHG-OFL-002).
+                    if o not in capable and o not in off and not facts[o]["op"].get("x-ticvai-outbox-replay"):
                         guard.add("S-OFFLINE-QUEUED", f"{sid}:{o}",
                                   f"{sid} ({plat[:3]}): offline state promises to queue or sync and does not say "
                                   f"{o} (not offline-capable) is disabled offline: {off[:90]}")

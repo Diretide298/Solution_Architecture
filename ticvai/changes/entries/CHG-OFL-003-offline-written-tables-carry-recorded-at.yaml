@@ -1,0 +1,43 @@
+id: CHG-OFL-003
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'The seven schemas an offline-capable write persists without a recorded_at column gain recordedAt (device
+  time), so derive-ddl adds recorded_at to their tables in r6''s forward migration.'
+decision:
+  what: 'Add an optional recordedAt (date-time, the device''s time of the write, set by the client and kept on replay;
+    the server''s receipt time when omitted) to IdentityBenefitUsage, RecommendationOutcome, RentalIncident,
+    RentalInspection, DepositBox, DeviceTamperEvent and WalletCredential. The column comes from the generator
+    (derive-schema, then derive-ddl in frozen mode: ALTER TABLE ... ADD COLUMN IF NOT EXISTS recorded_at timestamptz on
+    identity.benefit_usage, promotions.recommendation_outcome, rental.incident, rental.inspection, orders.deposit_box,
+    tenancy.device_tamper_event, wallet.credential); no baseline migration is edited.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-contract-storage/ST-OFFLINE-RECORDED-AT, 9 members before, 0 after
+  (audit/ticvai/runs/audit-1014/classes.json; root R113: offline writes carry recorded_at). Two members
+  (marketing.form_submission, marketing.lost_item) went with CHG-OFL-001, which made their writes online-only.'
+keys_touched:
+  schemas: [IdentityBenefitUsage, RecommendationOutcome, RentalIncident, RentalInspection, DepositBox,
+    DeviceTamperEvent, WalletCredential]
+  tables: [identity.benefit_usage, promotions.recommendation_outcome, rental.incident, rental.inspection,
+    orders.deposit_box, tenancy.device_tamper_event, wallet.credential]
+  operations: [recordBenefitUsage, recordRecommendationOutcome, reportRentalIncident, recordRentalInspection,
+    allocateDepositBox, recordDeviceTamperEvent, linkWalletCredential]
+  files: [contracts/spine/identity.yaml, contracts/satellite/promotions.yaml, contracts/satellite/rental.yaml,
+    contracts/spine/shift.yaml, contracts/spine/tenancy.yaml, contracts/satellite/wallet.yaml]
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: [27675]
+  unstarted: [27686, 27792, 27793, 27794, 27798, 27802, 27948, 28140, 28279, 28528, 28530, 28547, 28593, 28728, 28754]
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Batch OFL. On this branch derive-ddl numbered the file V0105 because V0104 is already committed; the lead''s
+  r6 derive writes the seven ALTERs into r6''s forward migration (V0104). The derived files were restored before every
+  commit. DepositBox already had allocatedAt (device time); recordedAt holds the same moment under the column every
+  offline-written table carries. #27675 is started: it gets this as an agent comment through the CR.'

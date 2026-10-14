@@ -1277,7 +1277,7 @@ paths:
       - staff
       - guest
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: true
+      x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -1842,7 +1842,7 @@ paths:
       - staff
       - guest
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: true
+      x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -6159,7 +6159,7 @@ paths:
       - case
       x-ticvai-permission: CASE_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -6311,7 +6311,7 @@ paths:
       - case
       x-ticvai-permission: CASE_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -6370,7 +6370,7 @@ paths:
       - case
       x-ticvai-permission: CASE_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey

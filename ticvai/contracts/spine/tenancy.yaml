@@ -4107,6 +4107,12 @@ components:
         scopePath:
           type: string
           readOnly: true
+        recordedAt:
+          type: string
+          format: date-time
+          description: '**When the device made the write** (R113; CHG-OFL-003). `recordDeviceTamperEvent` is offline-capable, so
+            the client sets this from its own clock and keeps it on replay; `created_at` is when the server
+            heard of it. Omitted online, the server sets it to the time it received the call.'
     OutletKind:
       type: string
       enum: [shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile]

@@ -1,0 +1,44 @@
+id: CHG-OFL-004
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Offline states promising queued writes now have an offline-capable write behind them: requestShiftSwap,
+  acknowledgeAlert, createStockTransfer and receiveStockTransfer become offline-capable (with updateIncident and
+  recordAuthorityNotification from CHG-OFL-002); two screens'' unapproved spec prose (EMP-041, EMP-070) is corrected;
+  and S-OFFLINE-CLAIM reads a text that also refuses as a refusal.'
+decision:
+  what: 'Contract side first, as the lead ruled for the client-approved screens: the writes behind EMP-023 (Queues
+    locally), EMP-061 and EMP-064 (Works from cache and queues what it records) become offline-capable, keeping their
+    Idempotency-Key and conflict policy. EMP-041 and EMP-070 have offline text no approved frame shows, so it is
+    rewritten to the contract. check-screen-wiring S-OFFLINE-CLAIM, like S-OFFLINE-QUEUED, no longer counts an
+    offline state that refuses ("Nothing here is offered offline ... queued and never sent is worse") as a promise:
+    WEB-024, GST-066, GST-067, GST-069 and GST-073 were refusals the keyword reading took for promises, and POS-000''s
+    text carries "cannot open".'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-screen-wiring/S-OFFLINE-CLAIM, 19 members before, 7 after (audit/ticvai/runs/audit-1014/classes.json;
+  root R257).'
+keys_touched:
+  operations: [requestShiftSwap, acknowledgeAlert, createStockTransfer, receiveStockTransfer]
+  screens: [EMP-023, EMP-041, EMP-061, EMP-064, EMP-070, WEB-024, GST-066, GST-067, GST-069, GST-073, POS-000]
+  files: [contracts/satellite/workforce.yaml, contracts/satellite/reporting.yaml, contracts/satellite/inventory.yaml,
+    screens/P06-staff-app.yaml, tools/check-screen-wiring.py]
+  other: [S-OFFLINE-CLAIM]
+root_class: A34 SCREEN-CONTEXT
+tickets:
+  started: []
+  unstarted: [28454, 28455, 28650, 28651, 28652, 28663, 28713, 28771, 28775, 28786, 28793]
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch OFL. Keeps (7, client-approved UI): EMP-033 ("Last synced, with age" describes the data''s age, not a
+  queued write); EMP-053 (table layout), POS-019 (till policy), KIT-005 (station rebalancing), KIT-009 (kitchen SLA):
+  configuration, refused offline elsewhere (POS-024); EMP-055 (a table reservation holds capacity); EMP-068 (retail
+  reservations stay online, ADR-0013). Each carries approved boilerplate ("Works from cache and queues what it
+  records", "every bump journals locally and syncs") the lead may want reworded with the client. POS-000 passes only
+  because its approved text carries "cannot open"; offline sign-in is a local check, no write queues.'
