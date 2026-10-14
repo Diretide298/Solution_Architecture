@@ -10,7 +10,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: Block A audit before r6, class check-contract-storage/ST-REQUIRED-MISMATCH (33 at audit-base b93b5a87, 0 after), evidence
-  audit/ticvai/runs/audit-1014/classes.json; triage ruling "Required and NOT NULL agree (the contract decides)." (R089).
+  docs/active/audit/audit-1014/classes.json; triage ruling "Required and NOT NULL agree (the contract decides)." (R089).
   The contract does decide, and it already required them.
 keys_touched:
   files:

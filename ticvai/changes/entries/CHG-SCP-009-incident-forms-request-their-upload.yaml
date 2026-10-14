@@ -18,7 +18,7 @@ decision:
     of which this batch may make.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring S-UPLOAD
+why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-screen-wiring S-UPLOAD
   (R196) had 7 members on P06 (none on P04): 3 fixed here, 4 kept for a contract decision. Ruling (the lead, 14
   October 2026, "go with your recommendation"): a write taking a file reference has an upload on its screen; the
   approved UI is fixed, so the upload is the forms'' background call, not a new control.'

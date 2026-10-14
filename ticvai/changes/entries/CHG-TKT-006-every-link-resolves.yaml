@@ -10,7 +10,7 @@ decision:
     the run prints what it repointed and dropped.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit class adam-pull/links ADAM cannot resolve: 55 Block A tickets (38 due by 28 October; audit/ticvai/runs/audit-1014/classes.json):
+why: 'Audit class adam-pull/links ADAM cannot resolve: 55 Block A tickets (38 due by 28 October; docs/active/audit/audit-1014/classes.json):
   old table names on pushed sub-tasks (wallet.funding_rules, catalogue.inventory_hold), lineage views (platform.sale_board_for_catalogue),
   platform.schema_version and sub-task parts read as operations (SETUP-HOSTS#commerce). After the fix 0 unresolved links
   in adam-links.json. Audit finding, Block A audit on audit-base b93b5a87.'

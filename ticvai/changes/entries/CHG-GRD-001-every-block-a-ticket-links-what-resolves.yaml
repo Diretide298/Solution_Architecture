@@ -17,7 +17,7 @@ decision:
   date: '2026-10-14'
 why: 'Lead, 14 October 2026: "With the pattern of errors we need to get them updated": the gate must stop the audit''s
   error patterns coming back. Audit classes adam-pull/feature: nothing linked (123 Block A features), adam-pull/task:
-  nothing linked (29 tasks) and adam-pull/links ADAM cannot resolve (55 tickets), audit/ticvai/runs/audit-1014/classes.json;
+  nothing linked (29 tasks) and adam-pull/links ADAM cannot resolve (55 tickets), docs/active/audit/audit-1014/classes.json;
   batch TKT fixed the generator (CHG-TKT-004, CHG-TKT-005, CHG-TKT-006) and nothing in the gate held it. Finding counts:
   on audit-base b93b5a87 the check finds 152 tickets with nothing linked (123 features, 29 tasks: the audit''s count
   exactly) and 66 dead links on 61 tickets (12 of them among the audit''s 1,406 Block A tickets, the rest their

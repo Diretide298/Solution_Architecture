@@ -10,7 +10,7 @@ decision:
     provider_id and fallback_provider_id are two roles, not one key twice).'
   by: Chinmay
   date: '2026-10-14'
-why: Block A audit before r6, class check-ddl-conventions/D-DOUBLE-KEY (2 at audit-base b93b5a87, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json;
+why: Block A audit before r6, class check-ddl-conventions/D-DOUBLE-KEY (2 at audit-base b93b5a87, 0 after), evidence docs/active/audit/audit-1014/classes.json;
   triage ruling "One key per parent per concept; drop the renamed-table key." (R102, R160).
 keys_touched:
   tables:

@@ -19,7 +19,7 @@ decision:
     `productId`; createApprovalRequest''s "one refund" example). linkGuestCheckout 403 is kept with CHG-MOD-002.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-error-sources/E-READ-VIA, 88
+why: 'Audit of 14 October 2026 (docs/active/audit/audit-1014/classes.json): class check-error-sources/E-READ-VIA, 88
   findings touching 160 Block A tickets (68 due by 28 October); ADAM CR-084 and the ADR-0055 amendment (CHG-GEN-009):
   a refusal that depends on another module''s record says where it is read from. Default ruling (lead, 14 October):
   "A 4xx naming another module''s entity has a read-via to that module''s query." Count before 88 (70 after

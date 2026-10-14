@@ -13,7 +13,7 @@ decision:
     (CHG-GEN-004); a child that follows such a table by its key follows it for reading only (CHG-GEN-005).'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-rls-scope-fit/RF-OWNED-ABOVE,
+why: 'Audit of 14 October 2026 (docs/active/audit/audit-1014/classes.json): class check-rls-scope-fit/RF-OWNED-ABOVE,
   127 findings touching 209 Block A tickets (66 due by 28 October); R183 ("owned above, read below") and ADAM
   CR-076. Default ruling (lead, 14 October): "A below-tenant read of a tenant-written table declares x-ticvai-rls:
   read-beneath." Count before 127, after 4: the four left read resources.venue_assignment and ai.byok_enablement,

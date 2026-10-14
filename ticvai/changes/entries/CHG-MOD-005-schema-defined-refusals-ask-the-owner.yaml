@@ -16,7 +16,7 @@ decision:
     records, and leave the class through the vocabulary of CHG-MOD-003.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-error-sources/E-SCHEMA-READ-VIA,
+why: 'Audit of 14 October 2026 (docs/active/audit/audit-1014/classes.json): class check-error-sources/E-SCHEMA-READ-VIA,
   12 findings touching 43 Block A tickets (27 due by 28 October); ADAM CR-085 (CHG-FIN-012): a refusal written in
   its schema rests on the records the schema names. Default ruling (lead, 14 October): "As E-READ-VIA, for 4xx
   defined in the response schema (CR-085)." Count before 12, after 0.'

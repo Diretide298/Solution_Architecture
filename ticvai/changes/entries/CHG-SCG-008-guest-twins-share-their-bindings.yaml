@@ -17,7 +17,7 @@ decision:
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, finding class check-navigation N-TWIN-OPS (R281; lead''s decision 4 of 14
   October: "Guest web and guest app twins call the same operations unless a difference is sanctioned in writing";
-  the approved UI is fixed). Evidence: audit/ticvai/runs/audit-1014/classes.json. 30 groups before, 29 after (all
+  the approved UI is fixed). Evidence: docs/active/audit/audit-1014/classes.json. 30 groups before, 29 after (all
   keeps, each by a visible control on one shell only).'
 keys_touched:
   screens: [WEB-001, WEB-028, WEB-040, GST-041]

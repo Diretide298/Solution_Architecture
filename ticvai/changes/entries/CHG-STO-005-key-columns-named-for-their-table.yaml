@@ -19,7 +19,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit before r6, class check-ddl-conventions/D-FK-TARGET-NAME (12 at audit-base b93b5a87, 0 after), evidence
-  audit/ticvai/runs/audit-1014/classes.json; triage ruling "A key column is named for the table it references." Read from
+  docs/active/audit/audit-1014/classes.json; triage ruling "A key column is named for the table it references." Read from
   the frozen r1 900-foreign-keys.sql the class could never fall: the baseline is never rewritten (CHG-R6-010 lists a rename
   for a person), so the check reads what check-storage-promises reads.'
 keys_touched:

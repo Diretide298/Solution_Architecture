@@ -19,7 +19,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R273): check-screen-wiring/S-OP-UNREACHED had 2,171 members
-  (evidence audit/ticvai/runs/audit-1014/classes.json, 858 Block A tickets). Default ruling (triage.py): "wire onLoad
+  (evidence docs/active/audit/audit-1014/classes.json, 858 Block A tickets). Default ruling (triage.py): "wire onLoad
   reads to the load; otherwise remove it from the screen". After: 1,640 package-wide, every one a keep reported by
   the deriver (client-approved UI): 1,305 have no control on the approved screen (788 actions, 515 loads, 2 saves)
   and 337 have a control whose body nothing on the screen collects. 531 bindings made (342 proposed components, 155

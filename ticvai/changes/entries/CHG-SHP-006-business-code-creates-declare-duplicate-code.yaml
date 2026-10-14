@@ -10,7 +10,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit of 14 October 2026, class check-contract-shapes/C-CODE-409 (evidence
-  audit/ticvai/runs/audit-1014/classes.json): 39 members before, 0 after on this branch (CHG-SHP; ruling "go with your
+  docs/active/audit/audit-1014/classes.json): 39 members before, 0 after on this branch (CHG-SHP; ruling "go with your
   recommendation", Chinmay, 14 October 2026). R108, CHG-R4-015. The 409 promises a unique code, so
   check-storage-promises SP-DUPLICATE-409 asks for the index: `x-ticvai-unique` added on the `code` of 36 persisted
   schemas (tenant, the 28 September rule for configuration codes; venue for things placed at a venue: access points,

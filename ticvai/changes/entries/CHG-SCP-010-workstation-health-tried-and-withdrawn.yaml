@@ -12,7 +12,7 @@ decision:
     the response with a state-model exemption for a health status, or accept the warning.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-screen-wiring
   S-PANEL-ENTITY (R256), 1 member on P04 (POS-001); still 1. With the schema named, check-states warned
   "tenancy.WorkstationHealth.status is a lifecycle with 4 states and no state model".'
 keys_touched:

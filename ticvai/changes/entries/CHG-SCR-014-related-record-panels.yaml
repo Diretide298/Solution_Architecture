@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R256; #27741 problem 2): check-screen-wiring/S-PANEL-ENTITY had
-  8 members (evidence audit/ticvai/runs/audit-1014/classes.json, 29 Block A tickets): GST-073, POS-001, BO-406,
+  8 members (evidence docs/active/audit/audit-1014/classes.json, 29 Block A tickets): GST-073, POS-001, BO-406,
   BO-1116, BO-1149, ADM-598, ADM-351, CMS-102. Each panel reads a related record whose id the row or the screen holds
   (getDevice for a reader, getWalletBalance for a shared wallet, getCurrentShift beside the denominations, the rules
   beside their performance). After: 0.'

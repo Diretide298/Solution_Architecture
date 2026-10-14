@@ -12,7 +12,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R253): check-screen-wiring/S-DUP-REGION had 212 members
-  (evidence audit/ticvai/runs/audit-1014/classes.json, 118 Block A tickets). Default ruling (triage.py): "Region names
+  (evidence docs/active/audit/audit-1014/classes.json, 118 Block A tickets). Default ruling (triage.py): "Region names
   unique per screen (rename the second)". After: 0 package-wide (233 regions renamed at the refresh).'
 keys_touched:
   files:

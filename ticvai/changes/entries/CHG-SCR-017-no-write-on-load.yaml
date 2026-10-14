@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R268): check-screen-wiring/S-ONLOAD-WRITE had 3 members
-  (evidence audit/ticvai/runs/audit-1014/classes.json, 22 Block A tickets). Default ruling (triage.py): "No write on
+  (evidence docs/active/audit/audit-1014/classes.json, 22 Block A tickets). Default ruling (triage.py): "No write on
   load; move it to an action (analytics events go through the event sink)". After: 0 package-wide.'
 keys_touched:
   files:

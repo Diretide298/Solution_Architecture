@@ -21,7 +21,7 @@ decision:
 why: 'Lead, 14 October 2026: "the UI is fixed. approved by client so dont change that" and "With the pattern of errors
   we need to get them updated" (AUDIT-FIX-RULES, the approved UI is fixed; Block A audit plan, gate after the audit:
   an approved-UI guard). Eleven audit batches edited screens/ in parallel and nothing checked that the visible UI
-  stayed as approved (audit/ticvai/runs/audit-1014/classes.json is the fix stage''s evidence). Finding counts: on
+  stayed as approved (docs/active/audit/audit-1014/classes.json is the fix stage''s evidence). Finding counts: on
   audit-base b93b5a87 0 (it is the snapshot); a snapshot of r5 (80390e75) against audit-base finds 6 (ADM-342, ADM-422,
   POS-000 PIN fields, BO-053 open-shifts table, BO-054 no-access text, POS-001 shift trigger), so the check sees real
   changes; on audit/gate-guards-base e7211da9 it finds 3, all from 185f7a28 (CHG-OFL-001..004): the offline state text

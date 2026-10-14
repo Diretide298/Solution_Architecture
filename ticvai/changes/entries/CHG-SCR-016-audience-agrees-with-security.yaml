@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026: check-audience-match/AM-GUEST-SECURITY had 4 members (evidence
-  audit/ticvai/runs/audit-1014/classes.json, 6 Block A tickets). Default ruling (triage.py): "An operation''s audience
+  docs/active/audit/audit-1014/classes.json, 6 Block A tickets). Default ruling (triage.py): "An operation''s audience
   and its security agree". ADR-0025 (one audience field) is the vocabulary. After: 0.'
 keys_touched:
   files:

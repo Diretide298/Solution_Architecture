@@ -18,7 +18,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit before r6, class check-storage-promises/SP-KEY-GUESSED (10 at audit-base b93b5a87, 0 after),
-  evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "A guessed key into another module is declared to
+  evidence docs/active/audit/audit-1014/classes.json; triage ruling "A guessed key into another module is declared to
   the right table or dropped." Same class as ADAM CR-070 (CHG-DDL-005, refund.tax_reversal_entry_id).'
 keys_touched:
   tables:

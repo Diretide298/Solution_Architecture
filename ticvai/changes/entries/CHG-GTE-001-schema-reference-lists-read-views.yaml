@@ -21,7 +21,7 @@ why: 'Release gate on audit-base (14 October 2026, run 20261014-180113-8116, che
   table links, the same three. CHG-R6G-007 recorded publishBundle''s reads by the view and taught check-lineage and
   check-parameter-columns the convention, not check-package or audit-links; tracker Follow-ups F27 (DB-READ-VIEWS must
   publish the three views). Class: check-package lineage-table and audit-links operation -> table, 3 -> 0 each
-  (evidence audit/ticvai/runs/audit-1014/classes.json other_checks, check-package and audit-links rc 1). ADR-0055
+  (evidence docs/active/audit/audit-1014/classes.json other_checks, check-package and audit-links rc 1). ADR-0055
   rule 2.'
 keys_touched:
   operations:

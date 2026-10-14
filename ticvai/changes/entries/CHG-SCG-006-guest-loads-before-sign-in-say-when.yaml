@@ -20,7 +20,7 @@ decision:
 why: 'Block A audit of 14 October 2026, finding classes check-preauth-session PS-UNDECLARED-SIGNIN and
   PS-LOAD-NEEDS-SESSION (council of 2 October typed properties; rulings "A pre-sign-in screen that loads the guest''s
   own record declares sign-in" and "A pre-sign-in screen loads only public reads", lead: "go with your
-  recommendation"). Evidence: audit/ticvai/runs/audit-1014/classes.json. PS-UNDECLARED-SIGNIN 18 -> 0,
+  recommendation"). Evidence: docs/active/audit/audit-1014/classes.json. PS-UNDECLARED-SIGNIN 18 -> 0,
   PS-LOAD-NEEDS-SESSION 5 -> 0 (all on P01, P02, P05).'
 keys_touched:
   screens: [WEB-025, WEB-026, WEB-036, WEB-041, WEB-044, GST-027, GST-031, GST-032, GST-033, GST-035, GST-039, GST-048,

@@ -22,7 +22,7 @@ decision:
   date: '2026-10-14'
 why: 'Block A audit before r6, class check-storage-promises/SP-KEY-UNDECLARED (389 at audit-base b93b5a87, 0 after)
   and SP-KEY-TENANT-FALLBACK (45, 2 of them new on the base: pricing.dynamic_price_action and
-  dynamic_price_condition, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "Every NOT
+  dynamic_price_condition, 0 after), evidence docs/active/audit/audit-1014/classes.json; triage ruling "Every NOT
   NULL key into its own database is declared (x-ticvai-references), as CHG-DDL-004 did" and "A child table follows
   its parent''s scope by its declared key (the 21+2 tenant-root tables, class 1)" (tracker F29). Same class as ADAM
   CR-069 (CHG-DDL-004) and CR-090 (CHG-CNS-002).'

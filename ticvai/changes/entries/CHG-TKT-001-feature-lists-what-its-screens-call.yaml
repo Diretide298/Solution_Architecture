@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit class check-ticket-scope/S-FEATURE-OP-UNUSED (#27741 problem 1; CHG-SWP-001): 741 findings, 1080 tickets, 500
-  due by 28 October (audit/ticvai/runs/audit-1014/classes.json); after the fix 0. Cause: a backend operations task is put
+  due by 28 October (docs/active/audit/audit-1014/classes.json); after the fix 0. Cause: a backend operations task is put
   under the first feature that needs any of its group''s operations, and the feature listed the whole group as its own.
   Regrouping the back-end tasks instead would have moved pushed sub-tasks (check-key-stability blocks it), so the list is
   fixed where the developer reads it. Reuses the unfinished GAP rule (27741-ticket-rule patch). Audit finding, Block A audit

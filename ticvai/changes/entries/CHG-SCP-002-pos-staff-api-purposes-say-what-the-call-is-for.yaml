@@ -11,7 +11,7 @@ decision:
     written from the contract summary and the screen''s use of it. Invisible metadata; nothing on the screen changes.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-screen-wiring
   S-PURPOSE-TEMPLATE (R260) had 11 members on P04 and P06, 0 after. Ruling (the lead, 14 October 2026, "go with
   your recommendation"): each api purpose says what the call is for (from the contract summary). addCartLine''s own
   contract summary is "Add something", so its three purposes say what each sale screen puts in the cart.'

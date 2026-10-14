@@ -13,7 +13,7 @@ decision:
 why: 'Release gate on audit-base (14 October 2026, run 20261014-180113-8116): check-config-scope failed 1, "identity.
   recordConsentIdentifier: no x-ticvai-config-scope. Every configuration operation declares its level (ADR-0018)".
   The operation is CHG-XDW-004''s owner write; its name matched the configuration pattern (Consent) and it configures
-  nothing. Class: check-config-scope missing level, 1 -> 0 (evidence audit/ticvai/runs/audit-1014/classes.json
+  nothing. Class: check-config-scope missing level, 1 -> 0 (evidence docs/active/audit/audit-1014/classes.json
   other_checks).'
 keys_touched:
   operations:

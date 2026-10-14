@@ -14,7 +14,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit class check-contract-storage/ST-OFFLINE-RECORDED-AT, 9 members before, 0 after
-  (audit/ticvai/runs/audit-1014/classes.json; root R113: offline writes carry recorded_at). Two members
+  (docs/active/audit/audit-1014/classes.json; root R113: offline writes carry recorded_at). Two members
   (marketing.form_submission, marketing.lost_item) went with CHG-OFL-001, which made their writes online-only.'
 keys_touched:
   schemas: [IdentityBenefitUsage, RecommendationOutcome, RentalIncident, RentalInspection, DepositBox,

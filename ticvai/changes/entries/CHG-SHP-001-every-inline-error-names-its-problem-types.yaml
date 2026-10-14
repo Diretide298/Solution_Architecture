@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit of 14 October 2026, class check-contract-shapes/C-ERROR-PROBLEM-TYPE (evidence
-  audit/ticvai/runs/audit-1014/classes.json): 569 members before, 42 after on this branch (CHG-SHP; ruling "go with
+  docs/active/audit/audit-1014/classes.json): 569 members before, 42 after on this branch (CHG-SHP; ruling "go with
   your recommendation", Chinmay, 14 October 2026). R075, R133. The 42 left are the responses check-error-sources
   E-PROBLEM-TYPE / E-SCHEMA-READ-VIA holds (a refusal naming another module''s entity): batch MOD writes their types
   with the read-via, so the class reaches 0 when MOD merges. Slugs were drafted per response and are the part to

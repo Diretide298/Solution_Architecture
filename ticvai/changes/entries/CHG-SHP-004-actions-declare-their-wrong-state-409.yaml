@@ -15,7 +15,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit of 14 October 2026, class check-contract-shapes/C-ACTION-409 (evidence
-  audit/ticvai/runs/audit-1014/classes.json): 121 members before, 23 after on this branch (CHG-SHP; ruling "go with
+  docs/active/audit/audit-1014/classes.json): 121 members before, 23 after on this branch (CHG-SHP; ruling "go with
   your recommendation", Chinmay, 14 October 2026). R078, R095. Four descriptions (freezeEntitlement,
   reinstateEntitlement, suspendEntitlement, pushWalletPassUpdate) avoid naming the entity so check-error-sources does
   not read them as cross-module refusals (the item is the operation''s own).'

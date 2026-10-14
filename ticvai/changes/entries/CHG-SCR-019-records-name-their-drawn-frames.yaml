@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R258): check-wireframe-coverage/W-INCOMING-UNLINKED had 17
-  members (evidence audit/ticvai/runs/audit-1014/classes.json, 73 Block A tickets), all P02 frames under
+  members (evidence docs/active/audit/audit-1014/classes.json, 73 Block A tickets), all P02 frames under
   wireframes/incoming/P02-mobile-v4/. Default ruling (triage.py): "A drawn frame in wireframes/incoming is named by its
   screen record". After: 0 at the refresh (the P02 file is the guest batch''s; nothing committed to it here).'
 keys_touched:

@@ -10,7 +10,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: Block A audit before r6, class check-ddl-conventions/D-RENAME-RESIDUE (5 at audit-base b93b5a87, 0 after), evidence
-  audit/ticvai/runs/audit-1014/classes.json; triage ruling "Old table names replaced by the new ones in comments and descriptions."
+  docs/active/audit/audit-1014/classes.json; triage ruling "Old table names replaced by the new ones in comments and descriptions."
   (R160).
 keys_touched:
   files:

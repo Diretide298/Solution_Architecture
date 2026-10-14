@@ -14,7 +14,7 @@ decision:
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R254, CHG-WIR-001; the contract gap CHG-WIR-004):
   check-screen-wiring/S-STAFF-AUDIENCE had 6 members and check-audience-match/AM-STAFF-OP 6 (evidence
-  audit/ticvai/runs/audit-1014/classes.json). Default ruling (triage.py): "Staff screens call the staff variant of a
+  docs/active/audit/audit-1014/classes.json). Default ruling (triage.py): "Staff screens call the staff variant of a
   guest operation"; the variant is the same operation opened to staff. After: 1 each, ADM-415 on P09
   (setAgreementContractTerm, partner and prospect), which the platform-admin screens batch owns.'
 keys_touched:

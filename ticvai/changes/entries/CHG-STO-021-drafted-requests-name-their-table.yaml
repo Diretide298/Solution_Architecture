@@ -10,7 +10,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: Block A audit before r6, class check-parameter-columns/P-DRAFTED-UNMAPPED (65 at audit-base b93b5a87, 0 after), evidence
-  audit/ticvai/runs/audit-1014/classes.json; triage ruling "A drafted write's request schema names the table that stores
+  docs/active/audit/audit-1014/classes.json; triage ruling "A drafted write's request schema names the table that stores
   it."
 keys_touched:
   files:

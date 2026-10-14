@@ -14,7 +14,7 @@ decision:
     key through the parent''s own child (menu_section_id -> menu_section.menu_id).'
   by: Chinmay
   date: '2026-10-14'
-why: Block A audit before r6, class check-ddl-conventions/D-CHILD-PARENT (5 at audit-base b93b5a87, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json;
+why: Block A audit before r6, class check-ddl-conventions/D-CHILD-PARENT (5 at audit-base b93b5a87, 0 after), evidence docs/active/audit/audit-1014/classes.json;
   triage ruling "A child table's key to its parent is NOT NULL and declared." Same class as CHG-R6-004..006 (ADAM CR-007,
   CR-009, CR-010).
 keys_touched:

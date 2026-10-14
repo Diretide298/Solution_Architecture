@@ -16,7 +16,7 @@ decision:
     text carries "cannot open".'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit class check-screen-wiring/S-OFFLINE-CLAIM, 19 members before, 7 after (audit/ticvai/runs/audit-1014/classes.json;
+why: 'Audit class check-screen-wiring/S-OFFLINE-CLAIM, 19 members before, 7 after (docs/active/audit/audit-1014/classes.json;
   root R257).'
 keys_touched:
   operations: [requestShiftSwap, acknowledgeAlert, createStockTransfer, receiveStockTransfer]

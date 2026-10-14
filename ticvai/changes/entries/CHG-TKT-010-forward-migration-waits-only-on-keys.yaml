@@ -10,7 +10,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit class check-migration-tickets/M-FILE-ORDER (CHG-TBF-002): 7 findings, MIG-CATALOGUE-2, -3, -5 to -9 (V1091-V1122)
-  waited on MIG-CATALOGUE-11 (V1126), 4 tickets (audit/ticvai/runs/audit-1014/classes.json); after the fix 0. No file is
+  waited on MIG-CATALOGUE-11 (V1126), 4 tickets (docs/active/audit/audit-1014/classes.json); after the fix 0. No file is
   renumbered. Audit finding, Block A audit on audit-base b93b5a87.'
 keys_touched:
   files:

@@ -10,7 +10,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit class adam-pull/feature: nothing linked: 123 Block A features reached developers with nothing linked (34 due
-  by 28 October; audit/ticvai/runs/audit-1014/classes.json); on this branch adam-links.json links all 123. A feature linked
+  by 28 October; docs/active/audit/audit-1014/classes.json); on this branch adam-links.json links all 123. A feature linked
   only `service` before, and app-module features have none. Audit finding, Block A audit on audit-base b93b5a87.'
 keys_touched:
   files:

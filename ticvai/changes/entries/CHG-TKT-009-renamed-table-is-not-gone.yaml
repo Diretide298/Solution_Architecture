@@ -9,7 +9,7 @@ decision:
     migrations that built them (build-service-docs.py, the parked second-gate fix of r6h-wip).
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit class check-plan-closure/C-GONE (CHG-RONEP-002): 4 findings, 7 tickets, 4 due by 28 October (audit/ticvai/runs/audit-1014/classes.json):
+why: 'Audit class check-plan-closure/C-GONE (CHG-RONEP-002): 4 findings, 7 tickets, 4 due by 28 October (docs/active/audit/audit-1014/classes.json):
   platform.guest_link, dsar_request, cross_region_entitlement, wallet_authorisation (now sync.*); after 0. Audit finding,
   Block A audit on audit-base b93b5a87.'
 keys_touched:

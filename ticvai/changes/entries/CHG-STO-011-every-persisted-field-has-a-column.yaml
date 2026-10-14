@@ -15,7 +15,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit before r6, class check-contract-storage/ST-FIELD-NO-COLUMN (171 at audit-base b93b5a87, 0 after; most
-  are the SP-ARRAY-NOWHERE arrays, CHG-STO-010), evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "A persisted
+  are the SP-ARRAY-NOWHERE arrays, CHG-STO-010), evidence docs/active/audit/audit-1014/classes.json; triage ruling "A persisted
   field gets a column, or x-ticvai-persisted: false." (R086 R099 R107 ... R248).'
 keys_touched:
   operations:

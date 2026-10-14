@@ -13,7 +13,7 @@ decision:
     names. 188 r1 columns declared renamed in tools/derive-schema-history.py COLUMN_RENAMES.'
   by: Chinmay
   date: '2026-10-14'
-why: Block A audit before r6, class check-ddl-conventions/D-NAMING (211 at audit-base b93b5a87, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json;
+why: Block A audit before r6, class check-ddl-conventions/D-NAMING (211 at audit-base b93b5a87, 0 after), evidence docs/active/audit/audit-1014/classes.json;
   triage ruling "Booleans read as assertions (is_/has_/supports_)" (R093, R119, naming-and-style 6.1). The generator and
   the check used two word lists, so the class could not fall.
 keys_touched:

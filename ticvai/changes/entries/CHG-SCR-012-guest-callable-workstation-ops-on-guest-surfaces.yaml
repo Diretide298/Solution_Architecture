@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R100): check-screen-wiring/S-WORKSTATION-OP had 41 members
-  (evidence audit/ticvai/runs/audit-1014/classes.json, 73 Block A tickets). Default ruling (triage.py): "the guest
+  (evidence docs/active/audit/audit-1014/classes.json, 73 Block A tickets). Default ruling (triage.py): "the guest
   storefront uses the guest variant"; the guest variant of createPayment and inquirePaymentStatus is the same
   operation, guest-callable since CHG-GCF-003 (rule asked by the guest-screens batch). After: 34 package-wide (7 guest
   members cleared): P07 scanner 19, P10 partner 13, P09/P12 getCurrentSession 2, none on P08.'

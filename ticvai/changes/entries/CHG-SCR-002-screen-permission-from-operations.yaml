@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R255): check-screen-wiring/S-SCREEN-PERMISSION had 2,202
-  members (evidence audit/ticvai/runs/audit-1014/classes.json, 917 Block A tickets): operations needing a permission
+  members (evidence docs/active/audit/audit-1014/classes.json, 917 Block A tickets): operations needing a permission
   and a no-access state promising to name it, but no screen permission. Default ruling (triage.py): "A screen''s
   permission is derived from the permissions its operations need (generator)". After: 0 package-wide (2,207 screens
   gain a permission at the refresh: P04 30, P06 90, P07 10, P08 1,601, P09 202, P10 42, P11 7, P12 27, P13 103, P14

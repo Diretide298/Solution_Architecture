@@ -12,7 +12,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R260): check-screen-wiring/S-PURPOSE-TEMPLATE had 40 members
-  (evidence audit/ticvai/runs/audit-1014/classes.json, 203 Block A tickets). Default ruling (triage.py): "Each api
+  (evidence docs/active/audit/audit-1014/classes.json, 203 Block A tickets). Default ruling (triage.py): "Each api
   purpose says what the call is for (from the contract summary)". After: 0 package-wide.'
 keys_touched:
   files:

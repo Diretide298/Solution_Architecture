@@ -14,7 +14,7 @@ decision:
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, finding class check-screen-wiring S-ASYNC-POLL (R288; ruling "A 202
   operation''s screen reads the job or record that follows it", lead: "go with your recommendation"). Evidence:
-  audit/ticvai/runs/audit-1014/classes.json. Guest platforms: 11 findings before, 4 after, all keeps (4 went with the
+  docs/active/audit/audit-1014/classes.json. Guest platforms: 11 findings before, 4 after, all keeps (4 went with the
   recommendation slot removed in CHG-SCG-004, 3 fixed here). Package-wide 44 -> 37.'
 keys_touched:
   screens: [WEB-018, GST-012, GST-013]

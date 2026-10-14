@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'The lead''s decision 5 of the Block A audit (14 October 2026). Audit class check-plan-owners/O-SELF-TEST: 22 findings,
-  20 tickets, 8 due by 28 October (audit/ticvai/runs/audit-1014/classes.json); after the fix 0. Until then a pushed test
+  20 tickets, 8 due by 28 October (docs/active/audit/audit-1014/classes.json); after the fix 0. Until then a pushed test
   kept its owner unless moduleTestPeers named it (CHG-R4-005), and the 20 were baselined. Includes the parked second-gate
   fix of r6h-wip (a test the lead moved never lands back on its main builder). Audit finding, Block A audit on audit-base
   b93b5a87.'

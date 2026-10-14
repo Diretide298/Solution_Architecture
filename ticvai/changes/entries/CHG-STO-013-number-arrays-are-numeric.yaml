@@ -9,7 +9,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: Block A audit before r6, class check-contract-storage/ST-TYPE-MISMATCH (1 at audit-base b93b5a87, 0 after), evidence
-  audit/ticvai/runs/audit-1014/classes.json; triage ruling "Column type follows the field type." (R227).
+  docs/active/audit/audit-1014/classes.json; triage ruling "Column type follows the field type." (R227).
 keys_touched:
   tables:
   - assets.media_fingerprint

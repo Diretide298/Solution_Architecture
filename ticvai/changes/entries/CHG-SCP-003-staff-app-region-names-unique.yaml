@@ -14,7 +14,7 @@ decision:
     and with two it takes the last, so the derived wireframes stay as drawn.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-screen-wiring
   S-DUP-REGION (R253) had 5 members on P06 (none on P04); 1 fixed here, 4 follow their P08 twins (batch SCR). Ruling (the lead, 14 October 2026, "go with your
   recommendation"): region names unique per screen. A region name is an identifier in the record, not text on the
   screen.'

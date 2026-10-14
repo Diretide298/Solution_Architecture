@@ -10,7 +10,7 @@ decision:
     the screen record''s statement for designers and developers, not copy on the screen.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-screen-wiring
   S-PURPOSE-BOILERPLATE (CHG-WIR-003) had 24 members on P04 and P06, 0 after (the rest of the class is other
   platforms'' batches). Ruling (the lead, 14 October 2026, "go with your recommendation"): screen purpose written from
   what the screen does, not the template. A purpose that is a board title tells a developer nothing to build against.'

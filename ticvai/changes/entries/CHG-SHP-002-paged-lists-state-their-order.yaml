@@ -15,7 +15,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit of 14 October 2026, class check-contract-shapes/C-PAGED-ORDER (evidence
-  audit/ticvai/runs/audit-1014/classes.json): 403 members before, 0 after on this branch (CHG-SHP; ruling "go with
+  docs/active/audit/audit-1014/classes.json): 403 members before, 0 after on this branch (CHG-SHP; ruling "go with
   your recommendation", Chinmay, 14 October 2026). R154. Where a description said "newest first" the field is the one
   the items carry. Lead to confirm the defaults on reports-style lists (117 had no time field and are ordered by their
   key).'

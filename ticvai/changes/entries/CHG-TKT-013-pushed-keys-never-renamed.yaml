@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Gate failure check-key-stability: FAIL, 62 pushed keys renamed or unstable (MIG-CATALOGUE-4, -10, -12, -15, MIG-PLATFORM-3,
-  -4 left the plan; 8 pushed sub-tasks moved) (audit/ticvai/runs/audit-1014/classes.json, other_checks); after the fix PASS,
+  -4 left the plan; 8 pushed sub-tasks moved) (docs/active/audit/audit-1014/classes.json, other_checks); after the fix PASS,
   0. Audit finding, Block A audit on audit-base b93b5a87.'
 keys_touched:
   files:

@@ -25,7 +25,7 @@ decision:
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, finding class check-screen-wiring S-OP-UNREACHED (R273; ruling "An operation no
   component reaches: wire onLoad reads to the load; otherwise remove it from the screen", lead: "go with your
-  recommendation"; the approved UI is fixed, lead 14 October 2026). Evidence: audit/ticvai/runs/audit-1014/classes.json.
+  recommendation"; the approved UI is fixed, lead 14 October 2026). Evidence: docs/active/audit/audit-1014/classes.json.
   Guest platforms P01, P02, P05: 62 findings before, 0 after (package-wide 2171 -> 2109).'
 keys_touched:
   screens: [WEB-001, WEB-006, WEB-007, WEB-008, WEB-011, WEB-016, WEB-020, WEB-021, WEB-023, WEB-024, WEB-036, WEB-043,

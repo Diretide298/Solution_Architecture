@@ -12,7 +12,7 @@ decision:
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, finding class check-screen-wiring S-PURPOSE-TEMPLATE (R260; ruling "Each api
   purpose says what the call is for (from the contract summary)", lead: "go with your recommendation"). Evidence:
-  audit/ticvai/runs/audit-1014/classes.json. Guest platforms P01, P02, P05: 9 findings before, 0 after (package-wide
+  docs/active/audit/audit-1014/classes.json. Guest platforms P01, P02, P05: 9 findings before, 0 after (package-wide
   40 -> 31; the rest belong to the other screen batches).'
 keys_touched:
   screens: [GST-032, GST-048, GST-050, GST-056, GST-072, KSK-017, WEB-008, WEB-010, WEB-033]

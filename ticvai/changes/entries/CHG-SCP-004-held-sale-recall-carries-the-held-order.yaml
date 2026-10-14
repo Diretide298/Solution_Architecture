@@ -14,7 +14,7 @@ decision:
     unchanged; nothing on either screen changes.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-navigation
+why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-navigation
   N-CARRIES-HELD (R251 R262) had 6 members on P04 (all this one edge), 0 after. Ruling (the lead, 14 October 2026, "go
   with your recommendation"): a transition carries only ids the source screen holds.'
 keys_touched:

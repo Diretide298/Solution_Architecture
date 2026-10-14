@@ -12,7 +12,7 @@ decision:
 why: 'Found verifying the Block A audit fixes (batch STO) against the instruction that a second derive must not grow
   V0104: on audit-base b93b5a87 itself, re-running derive-ddl wrote a V0105 holding only the policy of
   platform.outlet_opening_hour (created by V0104 with no policy at all; CHG-DDL-007, ADAM CR-073), which the first run
-  had listed as "statement added" for a person. Evidence audit/ticvai/runs/audit-1014/classes.json (the storage
+  had listed as "statement added" for a person. Evidence docs/active/audit/audit-1014/classes.json (the storage
   classes this batch fixes add tables of the same shape).'
 keys_touched:
   tables:

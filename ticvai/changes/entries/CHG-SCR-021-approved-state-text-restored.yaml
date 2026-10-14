@@ -19,7 +19,7 @@ why: 'Audit finding on r6-integrate 425d0417: tools/check-approved-ui.py (CHG-GR
   AU-FIELD findings: 2,026 state texts CHG-SCR-001 rewrote and 4 overlay confirm labels. The lead: "the UI is fixed.
   approved by client so dont change that"; state text is visible copy. After: 0, with derive-screen-wiring run
   package-wide as the refresh runs it. S-STATE-BOILERPLATE (R250) is back to 2,326 (all keeps, client-approved UI);
-  evidence audit/ticvai/runs/audit-1014/classes.json.'
+  evidence docs/active/audit/audit-1014/classes.json.'
 keys_touched:
   files:
   - tools/derive-screen-wiring.py

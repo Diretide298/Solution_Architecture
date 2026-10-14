@@ -20,7 +20,7 @@ why: 'Finding: two false positives of CHG-GRD-002 on r6-integrate (coordinator, 
   (S-DUP-REGION) with nothing on screen changed, reported three times, and the snapshot keyed by name had kept only the
   last of the two regions. Counts on r6-integrate 5bd53a8e: 4 -> 0. The r5 (80390e75) snapshot against audit-base
   b93b5a87 still finds its 6 (ADM-342, ADM-422, BO-053, BO-054, POS-000, POS-001). Evidence of the audit classes:
-  audit/ticvai/runs/audit-1014/classes.json.'
+  docs/active/audit/audit-1014/classes.json.'
 keys_touched:
   files:
   - tools/check-approved-ui.py

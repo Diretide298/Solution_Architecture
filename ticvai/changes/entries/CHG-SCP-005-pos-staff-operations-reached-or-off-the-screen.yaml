@@ -24,7 +24,7 @@ decision:
     their P08 twins (batch SCR).'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-screen-wiring
   S-OP-UNREACHED (R273) had 62 members on P04 and P06: 13 fixed here, 17 kept (client-approved UI), 32 on the rental
   twins EMP-071 to EMP-100 (copies of BO-544 to BO-573, batch SCR). Ruling (the lead, 14 October 2026, "go with your
   recommendation"): wire onLoad reads to the load; otherwise remove the operation from the screen. The approved UI
