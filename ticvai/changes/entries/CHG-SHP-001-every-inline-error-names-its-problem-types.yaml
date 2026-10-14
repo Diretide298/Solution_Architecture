@@ -1,0 +1,536 @@
+id: CHG-SHP-001
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Every inline 4xx/5xx error response names its problem types: 527 responses got `x-ticvai-problem-types`, one
+  kebab-case slug per cause the response description names (reusing the shared catalogued types and the package''s
+  existing slugs at the same status). check-problem-types CEILING lowered 707 -> 168.'
+decision:
+  what: 'contracts/*: `x-ticvai-problem-types: [...]` on 527 operation-specific error responses, slugs drafted from
+    each response description (a backticked cause code kept in kebab case; a shared type only at its catalogued
+    status: validation 400, not-found 404, forbidden 403, duplicate-code 409 ...). tools/check-problem-types.py
+    CEILING 707 -> 168 (the ratchet falls to the count left).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-ERROR-PROBLEM-TYPE (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 569 members before, 42 after on this branch (CHG-SHP; ruling "go with
+  your recommendation", Chinmay, 14 October 2026). R075, R133. The 42 left are the responses check-error-sources
+  E-PROBLEM-TYPE / E-SCHEMA-READ-VIA holds (a refusal naming another module''s entity): batch MOD writes their types
+  with the read-via, so the class reaches 0 when MOD merges. Slugs were drafted per response and are the part to
+  review: a few judgement calls are listed in the hand-back (replacement-approval-required,
+  waiver-approver-is-submitter on a 422, seat-selection-not-found on a 404, variant-not-of-product on both a 409 and a
+  400).'
+keys_touched:
+  operations:
+  - acceptShiftVariance
+  - acceptWorkOrder
+  - acknowledgePurchaseOrder
+  - acquireInventoryHold
+  - actOnPartnerApplicationReview
+  - actOnPartnerCase
+  - actOnPartnerCommissionLine
+  - actOnPartnerReconciliationException
+  - actOnPartnerSettlementBatch
+  - actOnWorkflowInstance
+  - activateAudience
+  - amendFnbOrder
+  - applyMigration
+  - approveRequisition
+  - approveShiftOpen
+  - approveWaiverTesting
+  - archiveMediaTemplate
+  - assignCoupon
+  - attachModifierGroup
+  - authoriseWalletSpend
+  - awardBadge
+  - bindCredentialDevice
+  - cancelDecommission
+  - cancelGateModeChange
+  - cancelInvoice
+  - cancelPerformance
+  - cancelPricingRollback
+  - cancelPurchaseOrder
+  - cancelReportExecution
+  - cancelRequisition
+  - cancelStockCount
+  - captureWalletAuthorisation
+  - checkGuestCheckoutMatch
+  - claimConversation
+  - claimCustomDomain
+  - claimOpenShift
+  - cloneAccreditationProgramme
+  - cloneGame
+  - cloneReaderConfiguration
+  - closeDepositBoxes
+  - closePurchaseOrderShort
+  - closeShift
+  - closeTransferShort
+  - commitCatalogueImport
+  - completeProductionRun
+  - completeSsoAuthorization
+  - completeWorkOrder
+  - concludeRecommendationExperiment
+  - configureQueueFeed
+  - consumeCrossRegionEntitlement
+  - convertInventoryHold
+  - createAccreditationApplication
+  - createBookingFlowDefinition
+  - createBundle
+  - createCashMovement
+  - createCommercialCampaign
+  - createContentPage
+  - createDashboard
+  - createDelegatedAccess
+  - createDeliveryLocation
+  - createDeviceFirmware
+  - createGoodsReceipt
+  - createGuestLink
+  - createGuidedChoice
+  - createInstalmentPlan
+  - createJourney
+  - createMaintenancePlan
+  - createMessageTemplate
+  - createModifierGroup
+  - createParkingEntitlement
+  - createPartnerCase
+  - createPartnerChangeRequest
+  - createPlan
+  - createPlanVersion
+  - createProduct
+  - createRelease
+  - createRentalBlackout
+  - createRentalBooking
+  - createReport
+  - createReportSchedule
+  - createResource
+  - createResourceCost
+  - createRotaAssignment
+  - createSegment
+  - createStockMovement
+  - createStockTransfer
+  - createSupplierContract
+  - createTenant
+  - createUpload
+  - createVendorServiceRequest
+  - createWebhookSubscription
+  - decideAccessReviewItem
+  - decideCatalogueAiFinding
+  - decideGuestCheckoutMatch
+  - decideGuestIdentityVerification
+  - decidePricingChangeRequest
+  - decidePricingRecommendation
+  - decideProductionAccess
+  - decommissionCell
+  - deleteAccessPointGroup
+  - deleteContentPage
+  - deleteDashboard
+  - deleteGuidedChoice
+  - deleteOperatingCalendarEntry
+  - deletePodium
+  - deleteReasonCode
+  - deliverAccreditationCredential
+  - deliverCredential
+  - deployConfigurationProfile
+  - disputeInvoice
+  - endPodiumShift
+  - endPromotion
+  - enrolFacePass
+  - enrolFaceTag
+  - executeTenantMigration
+  - exportAccreditationData
+  - exportReportResult
+  - extendRental
+  - generateCouponCodes
+  - generateInvoice
+  - generateVenueLayout
+  - getAccessRiskScore
+  - getCountVariance
+  - getEmployee
+  - getEntitlement
+  - getGuestMenu
+  - getLoyaltyRules
+  - getMembership
+  - getReportResult
+  - getVatReturn
+  - grantDelegation
+  - guestSocialLogin
+  - issueCreditNote
+  - issueGameCard
+  - issueGiftCard
+  - issueMyAccreditationWalletPass
+  - issueReward
+  - joinWaitlist
+  - launchCellCluster
+  - leaveQueue
+  - leaveRestaurantWaitlist
+  - linkWalletCredential
+  - listAuthorisationPolicyEffectiveness
+  - listDynamicPolicyEffectiveness
+  - listProducts
+  - listScheduledLifecycleActions
+  - lockIdentity
+  - login
+  - lookupInventoryItem
+  - lookupRetailSale
+  - lookupShopAndDrop
+  - lookupTicket
+  - mergeTableVisits
+  - moveTableVisit
+  - openTableVisit
+  - overrideAccess
+  - pausePromotion
+  - planMigration
+  - postStockCount
+  - previewAllocationSplit
+  - promoteRelease
+  - propagateCrossRegionEntitlement
+  - proposeGuidedChoice
+  - proposeWalkways
+  - provisionCell
+  - publishBundle
+  - publishGuidedChoice
+  - publishHardwareDeployment
+  - publishRentalProduct
+  - raiseResourceRequest
+  - reactivateTenant
+  - recallKitchenTicket
+  - receiveStockTransfer
+  - recommendSeats
+  - recordAttendance
+  - recordAuthorityNotification
+  - recordBenefitUsage
+  - recordConsent
+  - recordDeviceConsent
+  - recordEInvoiceTransmissionStatus
+  - recordExternalApprovalDecision
+  - recordGamePlay
+  - recordInvoicePayment
+  - recordNoSale
+  - recordOrderHandover
+  - recordPaymentTerminalCertification
+  - recordStorefrontSessionEvents
+  - recordWorkOrderParts
+  - recordWorkOrderTime
+  - recountStockCount
+  - redeemVoucher
+  - registerDevice
+  - registerGuest
+  - reindexSource
+  - rejectReceivedGoods
+  - rejectRelease
+  - rejectRequisition
+  - releaseCredentialDevice
+  - releaseIdentityLock
+  - releaseStockReservation
+  - relinquishCustomDomain
+  - relinquishInventoryHold
+  - removeMfaMethod
+  - renewAccreditation
+  - renewInventoryHold
+  - reopenShift
+  - replaceCredential
+  - reportReaderQueue
+  - requestAppBuild
+  - requestPricingRollback
+  - resolveApprovedActionExecution
+  - resolveCredentialException
+  - resolveGuestLink
+  - resolveIdentityConflict
+  - resolveInvoiceDispute
+  - resolveSyncConflict
+  - resolveWalletDispute
+  - restoreAuthorisationPolicyVersion
+  - resubmitAccreditationApplication
+  - resumeShift
+  - retryChannelIncident
+  - retryCredentialGeneration
+  - retryMyDunningPayment
+  - returnRequisition
+  - reverseWalletFunding
+  - reviewFaceReenrolment
+  - revokeAllSessions
+  - revokeCrossRegionEntitlement
+  - rollbackAccessPolicy
+  - rollbackConfigurationVersion
+  - rollbackDeviceFirmware
+  - rollbackTenantMigration
+  - runReport
+  - scheduleMenuPublish
+  - scheduleTenantUpgrade
+  - scoreTransactionRisk
+  - searchCatalogue
+  - searchGuests
+  - seatTableReservation
+  - sendStaffMessage
+  - sendTransactionalMessage
+  - setAccessAttributeCatalog
+  - setAccessPointGroup
+  - setAlternativeCodes
+  - setAnalyticsProvider
+  - setApiClientStatus
+  - setAppIcons
+  - setApprovalExternalProvider
+  - setAssetStatus
+  - setBiometricLifecycleRetention
+  - setBrandIdentity
+  - setBrandingLocalizationTemplate
+  - setBundleCapacityPolicy
+  - setBundlePartnerProductMappings
+  - setBusinessEventMapping
+  - setCaseCategoryDefinition
+  - setCaseInvestigationResolution
+  - setChannelAllocations
+  - setChannelConnectionConfiguration
+  - setChannelProvider
+  - setChannelSalesRule
+  - setCommunicationPreferenceMarketing
+  - setCommunicationRoutingRule
+  - setConfigurationTemplate
+  - setConsentCapturePoint
+  - setCookieBannerDesign
+  - setCookieScanPolicy
+  - setCredentialActivationDisplay
+  - setCredentialIssuanceRetryPolicy
+  - setCurrencyRoundingRule
+  - setCustomerServiceCopilot
+  - setDataDiscoveryAccess
+  - setDataRetentionPolicy
+  - setDataRetentionSetting
+  - setDemandSignalConfiguration
+  - setDenominations
+  - setDeviceFirmwareStatus
+  - setDigitalWaiverForm
+  - setDunningPolicy
+  - setDynamicFieldQuestion
+  - setDynamicPricingGuardrailPolicy
+  - setEntitlementConsumption
+  - setEventLifecycleState
+  - setFaceMatchingVerification
+  - setFastPassProfile
+  - setFeeDefinition
+  - setFonts
+  - setGameCardLifecycle
+  - setGateOfflinePolicy
+  - setHomepageLayout
+  - setHotelWalletExternal
+  - setKitchenTicketStatus
+  - setLabourBudget
+  - setLanguages
+  - setLegalHold
+  - setLocalizationBrandingCustomer
+  - setMarketPricingConfiguration
+  - setMediaAssetTags
+  - setMediaBindingRule
+  - setMediaIssuanceEncoding
+  - setMediaTypeTechnology
+  - setMembershipUsagePolicy
+  - setMessageTrigger
+  - setMinorGuardianAge
+  - setNavigation
+  - setOutletTemplate
+  - setPackagePricingDefinition
+  - setPartnerAllocations
+  - setPartnerCapabilityGrants
+  - setPartnerCommissionRules
+  - setPartnerContact
+  - setPartnerCreditProfile
+  - setPartnerDistributionRights
+  - setPartnerSecurity
+  - setPaymentRoutingRules
+  - setPodium
+  - setPolicy
+  - setPolicyEvaluationSetting
+  - setPriceCalculationPolicy
+  - setPriceCategoryRateType
+  - setPriceLadderMatrix
+  - setPrices
+  - setPrivacyAction
+  - setPrivacyComplianceException
+  - setPrivacyNoticePolicyGovernance
+  - setPrivacyRequest
+  - setPrivacyRequestTypes
+  - setProductAttributes
+  - setProductCategories
+  - setProductLinks
+  - setPromotionVariants
+  - setRefundCompensationService
+  - setRelationshipFraudRule
+  - setRentalInventoryModel
+  - setResourceBookingProgress
+  - setRiskScoringConfig
+  - setRulePriorityConflict
+  - setSenderIdentityDomain
+  - setServiceQueueDefinition
+  - setSignalRegistryPolicy
+  - setSignatorySignatureGuardian
+  - setSiteNormalisationBasis
+  - setSiteSetupProgress
+  - setSsoConfig
+  - setStoreAccounts
+  - setTicketStatusTransition
+  - setTrackingTechnology
+  - setVerificationMethodPolicy
+  - setWaiverAssociation
+  - setWaiverTemplateMaster
+  - setWaiverTriggerRule
+  - setWaiverVerificationValidation
+  - setWalletAuthenticationPolicy
+  - setWalletAutoReloadSetting
+  - setWalletIntegrationMapping
+  - setWalletReconciliationSources
+  - setWalletRiskRuleStatus
+  - setWorkOrderPriorityPolicy
+  - settleAiUsage
+  - settleWalletAtExit
+  - signCorrectiveAction
+  - splitBill
+  - startDeviceFirmwareRollout
+  - startRollout
+  - startStockCount
+  - startSync
+  - submitAccreditationApplication
+  - submitGuestIdentityDocument
+  - submitInspection
+  - submitPricingChangeRequest
+  - suggestRoleAssignment
+  - suspendShift
+  - terminateTenant
+  - testChannelConnection
+  - testPricingRule
+  - testWebhookSubscription
+  - transferGameCard
+  - transitionDynamicPricingStrategy
+  - unpublishGuidedChoice
+  - unschedulePromotion
+  - updateAccreditationApplication
+  - updateAccreditationProgramme
+  - updateAdmissionRules
+  - updateBookingFlowDefinition
+  - updateBundle
+  - updateCase
+  - updateCellTier
+  - updateChannelCapacity
+  - updateChannelIncident
+  - updateCommercialCampaign
+  - updateDashboard
+  - updateGame
+  - updateIncident
+  - updateInventoryItem
+  - updatePerformance
+  - updateProduct
+  - updateProductVariant
+  - updatePromotion
+  - updateRequisitionLines
+  - updateResource
+  - updateSeatCategory
+  - updateSeatMap
+  - updateSeats
+  - updateSecurityAlert
+  - updateSupplierContract
+  - updateTableVisit
+  - updateVendorServiceRequest
+  - updateWalletType
+  - validateAccess
+  - validateGroupAccess
+  - verifyAccreditationCredential
+  - verifyGuestEmail
+  - verifyGuestOtp
+  - verifyIdentity
+  - verifyMfaEnrolment
+  - verifyTaxExemption
+  - verifyWorkOrder
+  - voidCouponCode
+  - withdrawAccreditationApplication
+  - withdrawFromDepositBox
+  - withdrawRelease
+  - withdrawWalletDispute
+  files:
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/cross-region.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/shift.yaml
+  - contracts/spine/tenancy.yaml
+  - tools/check-problem-types.py
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A19 ERRORS-AND-STATES
+tickets:
+  started: []
+  unstarted: ['27666', '27685', '27691', '27701', '27703', '27705', '27706', '27709', '27712', '27728', '27729',
+    '27730', '27731', '27732', '27733', '27737', '27739', '27740', '27742', '27743', '27745', '27746', '27747',
+    '27757', '27758', '27759', '27761', '27762', '27767', '27768', '27772', '27773', '27775', '27776', '27777',
+    '27780', '27781', '27783', '27785', '27786', '27792', '27800', '27818', '27819', '27820', '27823', '27832',
+    '27839', '27841', '27842', '27843', '27845', '27846', '27847', '27848', '27852', '27853', '27854', '27858',
+    '27859', '27866', '27869', '27870', '27876', '27877', '27878', '27879', '27880', '27882', '27884', '27886',
+    '27887', '27894', '27895', '27898', '27902', '27905', '27907', '27908', '27911', '27912', '27914', '27916',
+    '27919', '27921', '27926', '27928', '27929', '27930', '27934', '27937', '27938', '27945', '27957', '27962',
+    '27963', '27964', '27965', '27967', '27969', '27976', '27979', '27985', '27986', '27994', '27995', '28000',
+    '28001', '28003', '28007', '28013', '28014', '28016', '28017', '28019', '28020', '28021', '28023', '28024',
+    '28027', '28030', '28031', '28032', '28035', '28038', '28041', '28043', '28044', '28046', '28048', '28050',
+    '28051', '28052', '28055', '28056', '28057', '28058', '28071', '28073', '28078', '28079', '28080', '28098',
+    '28099', '28102', '28104', '28105', '28108', '28116', '28127', '28133', '28135', '28143', '28145', '28146',
+    '28147', '28149', '28152', '28155', '28156', '28157', '28159', '28160', '28161', '28162', '28163', '28165',
+    '28166', '28168', '28169', '28170', '28174', '28176', '28177', '28178', '28182', '28194', '28195', '28196',
+    '28197', '28200', '28202', '28213', '28214', '28216', '28217', '28226', '28227', '28233', '28243', '28244',
+    '28246', '28247', '28250', '28251', '28259', '28260', '28261', '28262', '28273', '28279', '28286', '28289',
+    '28295', '28296', '28298', '28299', '28310', '28311', '28313', '28317', '28322', '28325', '28328', '28331',
+    '28333', '28334', '28335', '28337', '28338', '28339', '28342', '28344', '28346', '28347', '28349', '28350',
+    '28351', '28354', '28355', '28356', '28359', '28368', '28370', '28372', '28373', '28377', '28385', '28386',
+    '28387', '28388', '28389', '28390', '28396', '28397', '28400', '28401', '28410', '28416', '28417', '28418',
+    '28420', '28423', '28425', '28426', '28431', '28433', '28436', '28438', '28439', '28440', '28441', '28442',
+    '28443', '28446', '28455', '28457', '28458', '28459', '28463', '28465', '28466', '28468', '28470', '28477',
+    '28478', '28487', '28488', '28503', '28505', '28507', '28522', '28527', '28529', '28530', '28532', '28534',
+    '28535', '28536', '28537', '28539', '28544', '28547', '28548', '28549', '28550', '28552', '28553', '28556',
+    '28557', '28559', '28560', '28562', '28563', '28564', '28565', '28566', '28568', '28569', '28572', '28576',
+    '28578', '28580', '28582', '28583', '28585', '28586', '28587', '28588', '28592', '28595', '28596', '28597',
+    '28598', '28601', '28605', '28609', '28610', '28612', '28614', '28616', '28618', '28620', '28621', '28622',
+    '28634', '28635', '28639', '28645', '28646', '28647', '28650', '28651', '28652', '28653', '28655', '28657',
+    '28658', '28659', '28660', '28661', '28662', '28663', '28666', '28667', '28668', '28669', '28673', '28674',
+    '28675', '28676', '28677', '28678', '28680', '28682', '28683', '28684', '28686', '28687', '28689', '28691',
+    '28692', '28693', '28695', '28696', '28697', '28700', '28701', '28702', '28710', '28712', '28713', '28718',
+    '28719', '28720', '28721', '28728', '28729', '28730', '28732', '28733', '28734', '28735', '28737', '28738',
+    '28739', '28740', '28741', '28742', '28743', '28744', '28746', '28748', '28752', '28753', '28754', '28757',
+    '28758', '28759', '28760', '28761', '28762', '28763', '28765', '28766', '28767', '28768', '28771', '28773',
+    '28774', '28775', '28776', '28777', '28778', '28780', '28784', '28785', '28790', '28793', '28795', '28796',
+    '28802', '28811', '28812', '28813', '28821', '28822', '28823', '28825', '28826', '28837', '28838', '28839',
+    '28840', '28843', '28846', '28847', '28850', '28851', '28853', '28855', '28856', '28859', '28860', '28864',
+    '28865', '28867', '28868', '28873', '28875', '28876', '28879', '28880', '28882', '28883', '28884', '28885',
+    '28889', '28890', '28891', '28892', '28896', '28899', '28906', '28907', '28908', '28910', '28913', '28915',
+    '28916', '28918', '28919', '28920', '28923', '28925', '28926', '28927', '28929', '28930', '28934', '28935',
+    '28942', '28943', '28953', '28956', '28968', '28997', '28998', '29006', '29010', '29014', '29015', '29017',
+    '29019', '29021', '35640', '35641', '35642']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

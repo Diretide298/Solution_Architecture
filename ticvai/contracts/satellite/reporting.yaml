@@ -283,6 +283,7 @@ paths:
                   $ref: '#/components/schemas/AlertRule'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /alert-rules/{alertRuleId}:
     put:
       operationId: setAlertRule
       x-ticvai-read-via:
@@ -318,6 +319,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: alertRuleId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -489,6 +495,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Alert'
+        '409':
+          description: 'The alert is already `acknowledged`, `resolved` or `expired`; only a `raised` alert can be acknowledged. Nothing changes.'
+          x-ticvai-problem-types: [alert-not-raised]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reports:
@@ -515,7 +528,9 @@ paths:
       description: 'Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` does
         not appear to a venue-scoped user at all — an empty result is a worse answer than an absent entry.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - catalogue
       x-ticvai-permission: REPORT_VIEW_VENUE
@@ -528,6 +543,7 @@ paths:
         schema:
           $ref: '#/components/schemas/ReportCategory'
       - name: search
+        description: 'Matched case-insensitively as a substring of the report definition''s `name` or `description`; no wildcards.'
         in: query
         schema:
           type: string
@@ -600,12 +616,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReportDefinition'
         '400':
+          x-ticvai-problem-types: [unknown-report-field, invalid-report-filter, report-cost-limit-exceeded]
           description: Unknown field, invalid filter, or estimated cost beyond the limit
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
+          x-ticvai-problem-types: [assigned-permission-not-held]
           description: Author does not hold the permission they assigned to the report
           content:
             application/problem+json:
@@ -913,6 +931,7 @@ paths:
                 executionId: $response.body#/id
               description: The rows, once the execution has completed.
         '400':
+          x-ticvai-problem-types: [report-parameter-missing, date-range-too-long]
           description: Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days
             when the definition sets none, audit R158)
           content:
@@ -937,7 +956,9 @@ paths:
         3 October 2026, Block A business rules; CHG-RUL-006). `mineOnly` narrows the list to the caller''s own runs;
         `getReportExecution` and `getReportResult` read any run this list shows.
 
-        '
+        
+
+        **Order.** Newest first, by `requestedAt` descending, then by `id`.'
       tags:
       - execution
       x-ticvai-permission: REPORT_VIEW_VENUE
@@ -1047,6 +1068,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cancelled
         '409':
+          x-ticvai-problem-types: [report-execution-already-completed]
           description: Already completed
           content:
             application/problem+json:
@@ -1064,6 +1086,7 @@ paths:
         format: uuid
     get:
       operationId: getReportResult
+      description: '**Order.** Newest first, by `generatedAt` descending, then by `executionId`.'
       x-ticvai-consumed-by:
         - "P16 ANL-040 Save, Run & Report Results Viewer"
       x-ticvai-audience:
@@ -1087,6 +1110,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReportResult'
         '409':
+          x-ticvai-problem-types: [report-execution-not-completed]
           description: Execution has not completed
           content:
             application/problem+json:
@@ -1097,6 +1121,7 @@ paths:
   /report-schedules:
     get:
       operationId: listReportSchedules
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-061 Scheduled Reports"
         - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
@@ -1173,6 +1198,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReportSchedule'
         '400':
+          x-ticvai-problem-types: [invalid-cadence, schedule-recipients-missing]
           description: Invalid cadence (a field its frequency needs is missing, or one it does not take is
             sent, audit R158), or no recipients
           content:
@@ -1326,6 +1352,7 @@ paths:
                 exportId: $response.body#/id
               description: Export status, and the download link once ready.
         '403':
+          x-ticvai-problem-types: [pii-export-not-permitted]
           description: Personal data requested without REPORT_EXPORT_PII
           content:
             application/problem+json:
@@ -1501,6 +1528,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Dashboard'
         '400':
+          x-ticvai-problem-types: [refresh-budget-exceeded]
           description: The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute`
             (proposed default 24, audit R094)
           content:
@@ -1508,6 +1536,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [module-not-licensed, module-permission-not-held]
           description: '**The caller is not entitled to the dashboard''s module** — the tenant has not
             licensed it, or the principal holds no permission in it. Refused here rather than hidden in
             the client, because hiding an option enforces nothing.
@@ -1646,6 +1675,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [module-not-entitled]
           description: '**Moving a dashboard to a module the caller is not entitled to.** The same
             guard as `createDashboard` — without it, an update would be the way round the create
             check.
@@ -1698,6 +1728,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Archived
         '409':
+          x-ticvai-problem-types: [dashboard-shared]
           description: The dashboard is shared. Un-share it first.
           content:
             application/problem+json:
@@ -2085,6 +2116,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KpiDefinition'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kpis/{kpiId}/targets:
@@ -2536,6 +2569,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSemanticModel
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P16 ANL-066 Semantic Model & Business Data Catalogue"
       summary: Publish the catalogue
@@ -2902,7 +2937,9 @@ paths:
         newest period first (decided 29 September, writers pass). What `getAnalyticsBenchmark` divides
         by.
 
-        '
+        
+
+        **Order.** Newest period first, by `periodStart` descending, then by `id`.'
       tags:
       - reporting
       x-ticvai-permission: REPORT_VIEW_TENANT
@@ -2949,6 +2986,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSiteNormalisationBasis
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P16 ANL-064 Benchmark & Comparative Analytics Configuration"
       x-ticvai-audience:
@@ -3007,6 +3046,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [period-ends-before-start, basis-period-overlap]
           description: A period ends before it starts, or overlaps another basis for the same site.
           content:
             application/problem+json:
@@ -3128,6 +3168,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
           description: '`takings` and `admissions` are seeded for every tenant as system KPIs (decided 28
             September, audit R283), and the five accreditation KPIs for every tenant with the accreditation
@@ -3820,6 +3861,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         name:
@@ -3896,6 +3938,7 @@ components:
         isActive:
           type: boolean
         scopePath:
+          readOnly: true
           type: string
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,

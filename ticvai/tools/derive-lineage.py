@@ -487,7 +487,7 @@ def main() -> int:
     # operation's owning contract is read straight off the file that declares it, so when the
     # two disagree the stored one is simply out of date, and the service inferred from it with
     # it. A hand-narrowed `audience` or a deliberate service override is still left alone.
-    repaired = moved = rehomed = followed = 0
+    repaired = moved = rehomed = followed = rerouted = 0
     svc = service_by_contract(stored)
     if a.apply:
         # **The one repair to an existing entry's reads and writes, and it is narrow on purpose.**
@@ -541,6 +541,14 @@ def main() -> int:
             if want and stored[o].get("service") not in (None, want):
                 stored[o]["service"] = want
                 rehomed += 1
+            # **Where an operation is served is a fact too** (14 October 2026, CHG-SHP-003). 123 writes moved from a
+            # collection path to an item path (`PUT /badges` -> `PUT /badges/{badgeId}`); the stored entry kept the old
+            # route, and every reader of the lineage (service docs, the API list) would have printed a path no
+            # server answers. Verb and path are read straight off the contract, like the owning contract below.
+            for k in ("verb", "path"):
+                if fresh[o].get(k) and stored[o].get(k) != fresh[o][k]:
+                    stored[o][k] = fresh[o][k]
+                    rerouted += 1
             if fresh[o].get("contract") and stored[o].get("contract") != fresh[o]["contract"]:
                 print("     moved %-28s %s -> %s" % (o, stored[o].get("contract"),
                                                      fresh[o]["contract"]))
@@ -553,6 +561,8 @@ def main() -> int:
               "schemas" % followed)
     if repaired:
         print("  repaired %d entry(s) that had no service" % repaired)
+    if rerouted:
+        print("  %d verb/path value(s) re-read from the contract" % rerouted)
     if moved:
         print("  re-attributed %d operation(s) that changed contract" % moved)
     if rehomed:
@@ -617,7 +627,7 @@ def main() -> int:
     if asked:
         print("  %d entry(s) given the declared queries their cross-module reads ask (readVia)" % asked)
     if not missing and not repaired and not moved and not rehomed and not followed and not _bad and not retired \
-            and not keyed and not routed and not asked:
+            and not keyed and not routed and not asked and not rerouted:
         print("  nothing to add")
         return 0
     for o in missing:
@@ -652,7 +662,12 @@ def approved_removals() -> set:
         return set()
     import yaml
     doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    return {str(e.get("operation")) for e in doc.get("changes") or [] if isinstance(e, dict) and e.get("operation")}
+    out = set()
+    for e in doc.get("changes") or []:
+        if isinstance(e, dict) and e.get("operation"):
+            # `operations` groups several operations of one contract under one reason (CHG-SHP-003).
+            out |= {str(e["operation"])} | {str(x) for x in e.get("operations") or [] if x}
+    return out
 
 
 if __name__ == "__main__":

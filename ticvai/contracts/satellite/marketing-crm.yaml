@@ -402,7 +402,11 @@ paths:
         **Scoped to the caller, not filtered by it.** A guest-facing list that takes a subject parameter
         is a list somebody will call with another subject.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - marketing
       parameters:
@@ -793,6 +797,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestMatchPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-745 Identity Resolution Rules"
       summary: Set how returning guests are recognised
@@ -889,6 +895,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestCheckoutMatch'
         '403':
+          x-ticvai-problem-types: [contact-not-verified]
           description: The contact has not been proven with a one-time code.
           content:
             application/problem+json:
@@ -948,6 +955,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestMatchDecision'
         '409':
+          x-ticvai-problem-types: [profile-match-expired, already-decided]
           description: The match has expired or was already decided.
           content:
             application/problem+json:
@@ -1443,7 +1451,11 @@ paths:
       description: 'The builder''s list. **The latest version of each form**; older versions stay readable
         through `getForm` with `version`.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`retired`, `superseded`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - marketing
       x-ticvai-permission: MARKETING_VIEW
@@ -2059,6 +2071,8 @@ paths:
       - query: platform-ops#seoMetadataRecords
         route: in-process
         for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per entity and locale, the one the body''s `entityId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
@@ -2160,7 +2174,9 @@ paths:
         The suggested matches for an item come from `getLostItemMatches`; an item already tied to its
         other half carries it in `matchedItemId`.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - marketing
       parameters:
@@ -2331,6 +2347,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Referral'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/disposition:
@@ -2376,6 +2394,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CallDisposition'
+        '409':
+          description: 'The conversation has not ended (`withAssistant`, `queued`, `withAgent` or `waitingOnGuest`); a disposition records why it ended. Nothing is recorded.'
+          x-ticvai-problem-types: [conversation-not-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /lost-items/{itemId}/match:
@@ -2493,6 +2518,9 @@ paths:
   /journeys:
     get:
       operationId: listJourneys
+      description: '**Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-consumed-by:
         - "P08 BO-120 Omnichannel Commerce & Journey Configuration"
         - "P08 BO-774 Journey Automation Center"
@@ -2571,6 +2599,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Journey'
         '422':
+          x-ticvai-problem-types: [journey-graph-not-terminating, journey-step-target-missing]
           description: '**The graph does not terminate, or a step points at nothing.** Refused at creation
             rather than discovered by a guest stuck in a loop.
 
@@ -2634,6 +2663,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Journey'
+        '409':
+          description: 'The journey is `archived` (`journey-archived`), or the move is not one its state model allows, such as pausing a `draft` journey or activating one already `active` (`journey-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [journey-archived, journey-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journeys/{journeyId}/performance:
@@ -2676,6 +2712,7 @@ paths:
   /message-triggers:
     get:
       operationId: listMessageTriggers
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-776 Trigger Event Catalog"
       summary: What fires a message, and when
@@ -2754,6 +2791,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageTrigger'
         '400':
+          x-ticvai-problem-types: [optimised-send-not-allowed, unknown-event]
           description: '`sendTimeMode` `optimised` on a trigger whose `priority` is `operational` or `transactional`
             (29 September, build pass, group G2), or an `event` not in the event catalogue.'
           content:
@@ -2884,6 +2922,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageDispatch'
+        '409':
+          description: 'The dispatch has not failed (`queued`, `sent`, `delivered`, `opened` or `clicked`; `message-dispatch-not-failed`), or was `suppressed` (`message-dispatch-suppressed`); only a `failed` or `bounced` dispatch is retried. Nothing is sent.'
+          x-ticvai-problem-types: [message-dispatch-not-failed, message-dispatch-suppressed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/identify:
@@ -3014,6 +3059,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateMyProfile
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own profile: one per signed-in guest, so there is no key in the path.'
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
@@ -3289,7 +3336,9 @@ paths:
 
         A conversation may *create* a case (22.8.12). It is not one.
 
-        '
+        
+
+        **Order.** Newest first, by `sentAt` descending, then by `id`.'
       tags:
       - marketing
       x-ticvai-permission: CASE_VIEW
@@ -3592,6 +3641,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Conversation'
         '409':
+          x-ticvai-problem-types: [already-claimed]
           description: Already claimed by another agent
           content:
             application/problem+json:
@@ -3657,6 +3707,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '409':
+          description: 'The conversation is not `withAgent` (still with the assistant, queued, waiting on the guest, or ended); only an agent''s conversation is transferred. Nothing changes.'
+          x-ticvai-problem-types: [conversation-not-with-agent]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/close:
@@ -3717,6 +3774,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '409':
+          description: 'The conversation is already `resolved`, `abandoned` or `timedOut` (`conversation-already-closed`), or is `queued` or `waitingOnGuest` (`conversation-transition-not-allowed`); only a conversation `withAssistant` or `withAgent` is closed. Nothing changes.'
+          x-ticvai-problem-types: [conversation-already-closed, conversation-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /agent-availability:
@@ -3726,6 +3790,8 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own availability: one per signed-in staff member, so there is no key in the path.'
       x-ticvai-consumed-by:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-003 Availability & Routing Settings"
@@ -3894,6 +3960,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KioskAssistSession'
+        '409':
+          description: 'The assist session has already ended (`endedAt` is set). Nothing changes.'
+          x-ticvai-problem-types: [kiosk-assist-already-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/position:
@@ -4001,7 +4074,9 @@ paths:
         **never filled in from their real name**, which is the disclosure this exists to prevent
         and would arrive silently on the day they first placed.
 
-        '
+        
+
+        **Order.** Sorted by `rank` ascending.'
       tags:
       - loyalty
       x-ticvai-permission: null
@@ -4050,6 +4125,8 @@ paths:
   /loyalty/leaderboard-nickname:
     put:
       operationId: setLeaderboardNickname
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own leaderboard nickname: one per signed-in guest, so there is no key in the path.'
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
@@ -4123,7 +4200,9 @@ paths:
         principals holding `GUEST_VIEW_PII`; everyone else sees the opaque subject reference and behavioural
         attributes.
 
-        '
+        
+
+        **Order.** Sorted by `displayName` ascending, then by `id`.'
       tags:
       - guest
       x-ticvai-permission: GUEST_VIEW
@@ -4167,6 +4246,7 @@ paths:
                       items:
                         $ref: '#/components/schemas/GuestProfile'
         '403':
+          x-ticvai-problem-types: [forbidden, pii-search-not-permitted]
           description: Not permitted at the requested scope, or `search` passed without `GUEST_VIEW_PII`.
           content:
             application/problem+json:
@@ -4476,6 +4556,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConsentState'
         '400':
+          x-ticvai-problem-types: [unknown-notice-version, purpose-not-configured]
           description: Notice version unknown, or the purpose is not configured
           content:
             application/problem+json:
@@ -4761,6 +4842,8 @@ paths:
         purposes a guest is asked for, and nothing in draft, unpublished or withdrawn; asked for by id, such a
         record answers as not found. `GUEST_VIEW` is what a staff caller must hold, and staff also see drafts
         (ADR-0025).
+
+        **Order.** Sorted by `displayName` ascending.
       tags:
       - consent
       parameters:
@@ -4789,6 +4872,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setConsentPurposes
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
@@ -4851,7 +4936,9 @@ paths:
       description: 'Hard bounces, complaints, explicit global opt-outs and unsubscribes. Checked at send
         time regardless of segment or consent — a complaint outranks a consent record.
 
-        '
+        
+
+        **Order.** Sorted by `channel` ascending, then by `id`.'
       tags:
       - consent
       x-ticvai-permission: GUEST_VIEW
@@ -5422,6 +5509,7 @@ paths:
   /segments:
     get:
       operationId: listSegments
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-121 Personalized Offers & Guest Engagement"
@@ -5509,6 +5597,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Segment'
         '400':
+          x-ticvai-problem-types: [segment-criteria-contradictory, unknown-segment-attribute]
           description: Criteria are contradictory or reference unknown attributes
           content:
             application/problem+json:
@@ -5617,6 +5706,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: List guests currently matching a segment
       description: Evaluated live. Useful for spot-checking a definition before use.
+
+        **Order.** Sorted by `displayName` ascending, then by `id`.
       tags:
       - segment
       x-ticvai-permission: MARKETING_VIEW
@@ -5645,6 +5736,7 @@ paths:
   /campaigns:
     get:
       operationId: listCampaigns
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-118 Campaign & Audience Management"
@@ -6226,6 +6318,7 @@ paths:
   /message-templates:
     get:
       operationId: listMessageTemplates
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-766 Campaign Builder"
         - "P08 BO-768 Multichannel Composer"
@@ -6307,11 +6400,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageTemplate'
         '400':
+          x-ticvai-problem-types: [unknown-merge-field, required-language-missing]
           description: Unknown merge field, or a required language is missing
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /messages:
@@ -6386,6 +6482,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageDispatch'
         '409':
+          x-ticvai-problem-types: [address-suppressed, no-address-for-channel]
           description: Address suppressed, or the guest has no address for that channel
           content:
             application/problem+json:
@@ -6431,6 +6528,7 @@ paths:
   /cases:
     get:
       operationId: listCases
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
@@ -6653,6 +6751,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Case'
         '400':
+          x-ticvai-problem-types: [case-resolution-note-required]
           description: Resolving without a resolution note
           content:
             application/problem+json:
@@ -6860,6 +6959,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Case'
+        '409':
+          description: 'The case is already `escalated` (`case-already-escalated`), or is not `inProgress` (`open`, `awaitingGuest`, `resolved` or `closed`; `case-not-in-progress`). Nothing changes.'
+          x-ticvai-problem-types: [case-already-escalated, case-not-in-progress]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/programmes:
@@ -6888,6 +6994,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published loyalty
         programmes, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `rank` ascending, then by `id`.
       tags:
       - loyalty
       parameters:
@@ -7071,6 +7179,9 @@ paths:
   /reviews:
     get:
       operationId: listReviews
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`rejected`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-consumed-by:
         - "P08 BO-819 Review Collection & Rating Rules"
       x-ticvai-audience:
@@ -7207,6 +7318,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Review'
+        '409':
+          description: 'The review was `rejected` in moderation and is shown to nobody; it takes no response. Nothing changes.'
+          x-ticvai-problem-types: [review-rejected]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /marketing-subscriptions:
@@ -7253,6 +7371,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMarketingSubscription
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per guest, channel and list, the one the body''s `subjectId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
@@ -7361,7 +7481,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /channel-provider:
+  /channel-provider/{communicationProviderId}:
     put:
       operationId: setChannelProvider
       x-ticvai-consumed-by:
@@ -7395,6 +7515,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ChannelProviderConfigurationInput'
       parameters:
+        - name: communicationProviderId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -7411,6 +7536,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [provider-credentials-failed, provider-connection-failed, webhook-verification-failed, secret-reference-unresolved]
           description: >
             The provider cannot be activated: credentials, connection or webhook verification failed, or
             the secret reference does not resolve.
@@ -7420,7 +7546,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /sender-identity-domain:
+  /sender-identity-domain/{senderIdentityId}:
     put:
       operationId: setSenderIdentityDomain
       x-ticvai-consumed-by:
@@ -7454,6 +7580,11 @@ paths:
             schema:
               $ref: '#/components/schemas/SenderIdentityDomainBrandConfigurationInput'
       parameters:
+        - name: senderIdentityId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -7470,6 +7601,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [sender-identity-not-verified, channel-fields-missing, provider-not-on-channel]
           description: >
             The identity cannot take this status (not yet verified), the channel-specific fields are
             missing, or the provider does not serve this channel.
@@ -7658,6 +7790,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /business-event-notification/{eventId}:
     put:
       operationId: setBusinessEventMapping
       x-ticvai-audience:
@@ -7680,6 +7813,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `eventId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -7702,6 +7840,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [event-type-not-registered, template-channel-mismatch, template-not-platform-owned]
           description: >
             The eventType is not registered, a template's channel does not match its entry, or a template
             is not a platform template.
@@ -7785,6 +7924,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /routing-priority-throttling/{routingRuleId}:
     put:
       operationId: setCommunicationRoutingRule
       x-ticvai-audience:
@@ -7806,6 +7946,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: routingRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -7828,6 +7973,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [unknown-provider, provider-not-on-channel, provider-listed-twice, fallback-includes-own-channel]
           description: >
             A provider is unknown, on another channel or listed twice, or the fallback includes the
             rule's own channel.
@@ -8451,6 +8597,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /data-processing-purpose/{purposeId}:
     put:
       operationId: setDataProcessingPurpose
       x-ticvai-consumed-by:
@@ -8473,6 +8620,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: purposeId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `purposeId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -8499,6 +8651,8 @@ paths:
   /communication-preference-marketing:
     put:
       operationId: setCommunicationPreferenceMarketing
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per communication preference category, the one the body''s `categoryCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-749 Guest Preference Center"
         - "P13 CMS-024 Communication Preference & Marketing Permission Configuration"
@@ -8546,6 +8700,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [marketing-category-defaults-on, consent-purpose-missing]
           description: A marketing category that defaults to on, or names no consent purpose.
           content:
             application/problem+json:
@@ -8655,6 +8810,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-tracking-digital/{technologyId}:
     put:
       operationId: setTrackingTechnology
       x-ticvai-consumed-by:
@@ -8676,6 +8832,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: technologyId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `technologyId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -8696,6 +8857,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [category-required, non-essential-without-consent]
           description: Approved with no category, or a non-essential technology marked as needing no consent.
           content:
             application/problem+json:
@@ -8778,6 +8940,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-banner-preference/{bannerDesignId}:
     put:
       operationId: setCookieBannerDesign
       x-ticvai-consumed-by:
@@ -8802,6 +8965,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: bannerDesignId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -8822,6 +8990,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [reject-harder-than-accept, non-essential-pre-ticked, do-not-sell-button-missing]
           description: A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button.
           content:
             application/problem+json:
@@ -8832,6 +9001,8 @@ paths:
   /consent-capture-point:
     put:
       operationId: setConsentCapturePoint
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per capture point and channel, the one the body''s `capturePoint` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-027 Consent Capture Point & Customer Journey Configuration"
       x-ticvai-audience:
@@ -8879,6 +9050,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [consent-purpose-missing, policy-kind-missing]
           description: A consent step naming no consent purpose, or a notice step naming no policy kind.
           content:
             application/problem+json:
@@ -8966,6 +9138,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /privacy-notice-policy/{governanceId}:
     put:
       operationId: setPrivacyNoticePolicyGovernance
       x-ticvai-read-via:
@@ -9011,6 +9184,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: governanceId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -9035,6 +9213,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [privacy-notice-transition-not-allowed, approval-fields-read-only, classification-locked-after-approval]
           description: A status move the lifecycle does not allow, approval fields sent by the caller, or a
             change to the classification after approval.
           content:
@@ -9042,6 +9221,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [change-classification-required]
           description: '`review` without a `changeClassification`.'
           content:
             application/problem+json:
@@ -9052,6 +9232,8 @@ paths:
   /minor-guardian-age:
     put:
       operationId: setMinorGuardianAge
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-029 Minor, Guardian & Age-Based Privacy Configuration"
       x-ticvai-audience:
@@ -9098,6 +9280,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [guardian-age-above-minor-age, verification-method-required]
           description: '`guardianRequiredBelowAge` above `minorBelowAge`, or no verification method.'
           content:
             application/problem+json:
@@ -9108,6 +9291,8 @@ paths:
   /privacy-testing:
     put:
       operationId: approvePrivacyTesting
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per privacy change set, the one the body''s `changeSetId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
       x-ticvai-audience:
@@ -9254,6 +9439,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /privacy/{requestTypeId}:
     put:
       operationId: setPrivacyRequestTypes
       x-ticvai-audience:
@@ -9276,6 +9462,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: requestTypeId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -9296,6 +9487,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
+          x-ticvai-problem-types: [request-type-has-open-requests]
           description: Retiring a type that still has open requests.
           content:
             application/problem+json:
@@ -9576,6 +9768,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /data-subject-customer/{requestId}:
     put:
       operationId: setPrivacyRequest
       x-ticvai-consumed-by:
@@ -9601,6 +9794,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: requestId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `requestId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -9623,12 +9821,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [dsar-fan-out-incomplete, privacy-request-already-completed]
           description: Completion while the cross-cell DSAR fan-out is not `completed`, or a change to a completed request.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [identity-not-verified, outcome-required, unknown-request-type]
           description: Progressed past verification without a verified identity, completed without an outcome, or an unknown request type.
           content:
             application/problem+json:
@@ -9639,6 +9839,8 @@ paths:
   /data-discovery-access:
     put:
       operationId: setDataDiscoveryAccess
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per privacy request, the one the body''s `requestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-750 Data Subject Requests"
         - "P13 CMS-035 Data Discovery, Access, Export & Correction Workspace"
@@ -9686,6 +9888,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [request-kind-not-supported, request-not-in-progress, identity-not-verified, approver-is-generator]
           description: The request is not an access, export or correction request, is not `inProgress`,
             its identity is not verified, or the approver is the principal who generated the package.
           content:
@@ -9783,6 +9986,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /deletion-anonymization-restriction/{actionId}:
     put:
       operationId: setPrivacyAction
       x-ticvai-audience:
@@ -9806,6 +10010,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: actionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `actionId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -9828,12 +10037,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [privacy-action-not-decidable]
           description: A decision on an action already executing, completed or cancelled.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [approval-out-of-order, same-approver-both-steps, legal-hold-blocks-action]
           description: Approval out of order, the same principal approving both steps, or an action blocked by a legal hold.
           content:
             application/problem+json:
@@ -9901,6 +10112,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /data-retention-expiry/{holdId}:
     put:
       operationId: setLegalHold
       x-ticvai-consumed-by:
@@ -9924,6 +10136,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: holdId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `holdId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -9946,6 +10163,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [hold-approved-by-placer, release-reason-required, hold-already-released]
           description: Approved by the principal who placed it, released without a reason, or a change to a released hold.
           content:
             application/problem+json:
@@ -10062,6 +10280,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /privacy-compliance-exception/{exceptionId}:
     put:
       operationId: setPrivacyComplianceException
       x-ticvai-consumed-by:
@@ -10092,6 +10311,11 @@ paths:
             schema:
               $ref: '#/components/schemas/PrivacyComplianceExceptionInvestigationWorkspaceInput'
       parameters:
+        - name: exceptionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -10108,6 +10332,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [root-cause-required, corrective-action-required, exception-closed]
           description: Closed without root cause and corrective action, or a change to a closed exception.
           content:
             application/problem+json:
@@ -10627,6 +10852,8 @@ paths:
   /case-investigation-resolution:
     put:
       operationId: setCaseInvestigationResolution
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per case and linked record, the one the body''s `caseId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
       x-ticvai-audience:
@@ -10672,6 +10899,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [linked-record-not-found, linked-record-out-of-scope]
           description: The referenced record does not exist or is outside the caller's scope.
           content:
             application/problem+json:
@@ -10717,7 +10945,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /order-booking-ticket:
+  /order-booking-ticket/{serviceActionId}:
     put:
       operationId: setOrderBookingTicket
       x-ticvai-read-via:
@@ -10758,6 +10986,11 @@ paths:
             schema:
               $ref: '#/components/schemas/OrderBookingTicketServiceWorkspaceInput'
       parameters:
+        - name: serviceActionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -10787,7 +11020,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /refund-compensation-service:
+  /refund-compensation-service/{compensationRequestId}:
     put:
       operationId: setRefundCompensationService
       x-ticvai-consumed-by:
@@ -10821,6 +11054,11 @@ paths:
             schema:
               $ref: '#/components/schemas/RefundCompensationServiceExceptionWorkspaceInput'
       parameters:
+        - name: compensationRequestId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -10839,6 +11077,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [refund-request-not-draft, exceeds-refundable]
           description: The request is no longer a draft, or the amount exceeds what remains refundable
             (`exceedsRefundable`).
           content:
@@ -10949,6 +11188,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /escalation-collaboration-internal/{internalRequestId}:
     put:
       operationId: setCaseInternalRequest
       x-ticvai-audience:
@@ -10970,6 +11210,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: internalRequestId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -11103,6 +11348,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /case-resolution-closure/{caseResolutionId}:
     put:
       operationId: setCaseResolution
       x-ticvai-audience:
@@ -11123,6 +11369,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: caseResolutionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -11178,6 +11429,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCustomerServiceCopilot
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-798 Intent & Knowledge Management"
         - "P12 SUP-018 AI Customer Service Copilot & Knowledge Workspace"
@@ -11228,6 +11481,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [venue-widens-tenant-configuration, venue-widens-ai-policy]
           description: A venue row would widen the tenant's configuration or the AI policy.
           content:
             application/problem+json:
@@ -11348,6 +11602,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /intelligent-routing-skill/{routingRuleId}:
     put:
       operationId: setIntelligentRoutingSkill
       x-ticvai-consumed-by:
@@ -11381,6 +11636,11 @@ paths:
             schema:
               $ref: '#/components/schemas/IntelligentRoutingSkillsAssignmentEngineInput'
       parameters:
+        - name: routingRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -11589,6 +11849,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /agent-workload-availability/{agentServiceProfileId}:
     put:
       operationId: setAgentServiceProfile
       x-ticvai-audience:
@@ -11610,6 +11871,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: agentServiceProfileId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -11658,6 +11924,8 @@ paths:
         customer's name is returned only to callers holding `GUEST_VIEW_PII`, as `Case.guestName` is.
         Ordered by `escalatedAt` descending then `caseId`; keyset cursor. (decided 29 September,
         readiness close-out)
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
       tags:
         - case
       x-ticvai-permission: CASE_VIEW
@@ -11891,6 +12159,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /quality-agent-evaluation/{evaluationId}:
     put:
       operationId: setQualityEvaluation
       x-ticvai-audience:
@@ -11913,6 +12182,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: evaluationId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -12217,6 +12491,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /contact-automation/{automationId}:
     put:
       operationId: setContactAutomation
       x-ticvai-audience:
@@ -12241,6 +12516,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: automationId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -12490,6 +12770,8 @@ paths:
         check (products and venues that reference the waiver). `q` matches name and description, which
         is how the create dialog offers similar existing templates before a duplicate is made. Ordered by
         `waiverName` then `waiverId`; keyset cursor. (decided 29 September, readiness close-out)
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`, `expired`); a screen that shows only live rows filters on `status` itself.
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -12526,6 +12808,7 @@ paths:
           schema:
             type: boolean
         - name: q
+          description: 'Matched case-insensitively as a substring of `waiverName`, `internalDescription` or `customTypeLabel`; no wildcards.'
           in: query
           required: false
           schema:
@@ -12551,6 +12834,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waiver-template-master/{waiverId}:
     put:
       operationId: setWaiverTemplateMaster
       x-ticvai-audience:
@@ -12573,6 +12857,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: waiverId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `waiverId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -12597,6 +12886,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [form-kind-not-waiver, source-waiver-required]
           description: The form is not of kind `waiver` or `consentForm` (CHG-CSA-026), or `sourceWaiverId` is
             missing for a duplicate.
           content:
@@ -12608,6 +12898,8 @@ paths:
   /digital-waiver-form:
     put:
       operationId: setDigitalWaiverForm
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-845 Waiver Template Builder"
         - "P13 CMS-043 Digital Waiver & Form Builder"
@@ -12664,12 +12956,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [form-version-not-draft]
           description: The version is no longer a draft.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [block-field-unknown, block-content-missing]
           description: A block names a field the version does not have, or a block kind needs content it lacks.
           content:
             application/problem+json:
@@ -12789,6 +13083,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /dynamic-field-question/{formId}/{key}:
     put:
       operationId: setDynamicFieldQuestion
       x-ticvai-audience:
@@ -12810,6 +13105,16 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: formId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `formId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
+        - name: key
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `key`, when sent, must equal it.'
+          schema: { type: string }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -12832,12 +13137,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [form-version-not-draft, field-used-by-layout-block]
           description: The version is not a draft, or a layout block still uses the field.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [field-condition-invalid, field-validation-invalid]
           description: A condition or validation rule that cannot hold.
           content:
             application/problem+json:
@@ -12848,6 +13155,8 @@ paths:
   /signatory-signature-guardian:
     put:
       operationId: setSignatorySignatureGuardian
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-848 Signature Experience Setup"
         - "P08 BO-849 Guardian & Group Signing"
@@ -12899,12 +13208,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [form-version-not-draft]
           description: The version is no longer a draft.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [signatory-mode-unsupported, group-mode-unsupported]
           description: A signatory or group mode the version's fields cannot collect (e.g. a guardian mode
             with no guardian signature field).
           content:
@@ -12980,6 +13291,8 @@ paths:
         `includeImpact` fills `impact`, the pack's dependency check shown before an association is
         removed. Written by `setWaiverAssociation`. Ordered by `targetType`, `targetId`, `sequence`, then
         `id`; keyset cursor. (decided 29 September, readiness close-out)
+
+        **Statuses.** Every `status` is returned, ended ones included (`removed`); a screen that shows only live rows filters on `status` itself.
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -13063,6 +13376,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-event-experience/{associationId}:
     put:
       operationId: setWaiverAssociation
       x-ticvai-audience:
@@ -13083,6 +13397,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: associationId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -13105,12 +13424,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [waiver-retired]
           description: The waiver is retired.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [condition-rule-required, target-type-mismatch]
           description: A conditional association without a rule, or a target that does not match its type.
           content:
             application/problem+json:
@@ -13199,6 +13520,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waiver-trigger-eligibility/{triggerRuleId}:
     put:
       operationId: setWaiverTriggerRule
       x-ticvai-audience:
@@ -13220,6 +13542,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: triggerRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -13242,6 +13569,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [deadline-offset-required, deadline-after-trigger-point]
           description: A deadline without its offset, or one that cannot be met before the point it enforces.
           content:
             application/problem+json:
@@ -13326,6 +13654,8 @@ paths:
   /localization-branding-customer:
     put:
       operationId: setLocalizationBrandingCustomer
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-049 Localization, Branding & Customer Experience Configuration"
       x-ticvai-audience:
@@ -13375,12 +13705,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [published-version-languages-locked]
           description: A language of a published version was changed.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [human-reviewer-required, approver-is-translator]
           description: An approval without a human reviewer, or approved by the translator.
           content:
             application/problem+json:
@@ -13435,6 +13767,8 @@ paths:
   /waiver-testing:
     put:
       operationId: approveWaiverTesting
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per waiver form, the one the body''s `formId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-050 Waiver Approval, Testing & Publication Workspace"
       x-ticvai-audience:
@@ -13486,12 +13820,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [waiver-version-transition-not-allowed]
           description: The action does not apply to the version's current stage.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [critical-checklist-failure, waiver-approver-is-submitter]
           description: A critical checklist failure, or the approver is the submitter.
           content:
             application/problem+json:
@@ -14366,6 +14702,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waiver-verification-validation/{verificationId}:
     put:
       operationId: setWaiverVerificationValidation
       x-ticvai-consumed-by:
@@ -14401,6 +14738,11 @@ paths:
             schema:
               $ref: '#/components/schemas/WaiverVerificationValidationWorkspaceInput'
       parameters:
+        - name: verificationId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -14419,6 +14761,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [checks-failing, reason-required]
           description: '`verified` while an automatic check fails or no signature is present
             (`checksFailing`), or a required `note` or `escalatedTo` is missing (`reasonRequired`).'
           content:
@@ -14674,6 +15017,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /site-waiver-exception/{waiverExceptionId}:
     put:
       operationId: setWaiverException
       x-ticvai-read-via:
@@ -14701,6 +15045,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: waiverExceptionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -15084,6 +15433,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestAttributeModel
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-736 Guest Master Configuration"
       summary: Change the model, as a version
@@ -15352,6 +15703,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setIdentityResolutionRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-745 Identity Resolution Rules"
       summary: Matching weights, thresholds and survivorship
@@ -15410,7 +15763,11 @@ paths:
         **Merging is not reversible in practice**, whatever the system claims, so the preview is the
         control.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
+
+        **Statuses.** Every `status` is returned, ended ones included (`rejected`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - guests
       x-ticvai-permission: GUEST_MANAGE
@@ -15518,7 +15875,7 @@ paths:
                 $ref: '#/components/schemas/DuplicateCandidate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /retention-policies:
+  /retention-policies/{retentionPolicyId}:
     put:
       operationId: setDataRetentionPolicy
       x-ticvai-read-via:
@@ -15554,6 +15911,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: tenant
       parameters:
+      - name: retentionPolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15572,6 +15934,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataRetentionPolicy'
         '422':
+          x-ticvai-problem-types: [retention-exceeds-tenant-period]
           description: '`retainMonths` longer than the tenant''s effective `guestProfile` retention
             period (tenancy `setDataRetentionSetting`); a rule here may only shorten it'
           content:
@@ -15636,6 +15999,7 @@ paths:
   /audience-lists:
     get:
       operationId: listAudienceLists
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-756 Static Lists & Imports"
       summary: Static and imported audiences
@@ -15712,6 +16076,9 @@ paths:
   /audience-activations:
     get:
       operationId: listAudienceActivations
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`, `failed`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-consumed-by:
         - "P08 BO-763 Activation & Governance"
       summary: Where audiences are being used, and whether they are still in sync
@@ -15785,6 +16152,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AudienceActivation'
         '409':
+          x-ticvai-problem-types: [audience-consent-blocked, audience-volume-exceeded, audience-approval-required]
           description: Blocked by consent, volume or approval
           content:
             application/problem+json:
@@ -15875,6 +16243,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoyaltyRuleSet'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such programme
           content:
             application/problem+json:
@@ -15949,7 +16318,9 @@ paths:
         the programme''s earning rule plus a window, and without this table it is a rule somebody has
         to remember to switch off.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -15988,6 +16359,7 @@ paths:
                         $ref: '#/components/schemas/MarketingLoyaltyCampaign'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /loyalty/campaigns/{loyaltyCampaignId}:
     put:
       operationId: setLoyaltyCampaign
       x-ticvai-consumed-by:
@@ -16003,6 +16375,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: venue
       parameters:
+      - name: loyaltyCampaignId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -16034,7 +16411,9 @@ paths:
         Every row carries `balance_after`, so a disputed balance can be walked rather than argued
         about.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: LOYALTY_ACCRUE
@@ -16106,6 +16485,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published rewards, and
         nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
         `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `name` ascending, then by `id`.
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -16141,6 +16522,7 @@ paths:
                         $ref: '#/components/schemas/MarketingReward'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /loyalty/rewards/{rewardId}:
     put:
       operationId: setReward
       x-ticvai-consumed-by:
@@ -16156,6 +16538,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: venue
       parameters:
+      - name: rewardId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -16182,7 +16569,9 @@ paths:
       description: '**A reward is a definition and an assignment is an instance**, which is why the
         code, the expiry and the order it was redeemed against live here rather than on the reward.
 
-        '
+        
+
+        **Order.** Newest first, by `issuedAt` descending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -16254,6 +16643,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MarketingRewardAssignment'
         '409':
+          x-ticvai-problem-types: [insufficient-points, reward-not-available-at-venue]
           description: Not enough points, or the reward is not available at this venue
           content:
             application/problem+json:
@@ -16264,6 +16654,7 @@ paths:
   /badges:
     get:
       operationId: listBadges
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-826 Achievement & Badge Engine"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
@@ -16302,6 +16693,7 @@ paths:
                         $ref: '#/components/schemas/MarketingBadge'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /badges/{badgeId}:
     put:
       operationId: setBadge
       x-ticvai-consumed-by:
@@ -16317,6 +16709,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: venue
       parameters:
+      - name: badgeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -16356,7 +16753,9 @@ paths:
         not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest
         (ADR-0025).
 
-        '
+        
+
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -16437,6 +16836,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MarketingCustomerBadge'
         '409':
+          x-ticvai-problem-types: [badge-already-held]
           description: Already held and not expired
           content:
             application/problem+json:
@@ -16454,6 +16854,8 @@ paths:
         and the alternative is a `notes` column nobody can report on.
 
         The options come back with the field because a select with no options is not a field.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - marketing
       x-ticvai-permission: GUEST_VIEW
@@ -16484,6 +16886,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestExtraFields
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-736 Guest Master Configuration"
       summary: Define the extra guest fields
@@ -16612,6 +17016,8 @@ paths:
         first response, resolution, escalation, and whether the clock runs outside business hours.
         Two tables with one name, and the `audit-duplicate-tables` pairing was a false positive for
         exactly that reason.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - marketing
       x-ticvai-permission: CASE_VIEW
@@ -16640,6 +17046,7 @@ paths:
                         $ref: '#/components/schemas/MarketingSlaPolicy'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /sla-policies/{slaPolicyId}:
     put:
       operationId: setSlaPolicy
       x-ticvai-consumed-by:
@@ -16660,6 +17067,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: venue
       parameters:
+      - name: slaPolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -16687,6 +17099,8 @@ paths:
         **`getWaiverStatus` answered whether a guest had signed and nothing could produce the
         signature.** A waiver whose evidence cannot be retrieved is not a waiver, which is the
         entire reason venues collect them.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
       tags:
       - marketing
       x-ticvai-permission: GUEST_VIEW_PII
@@ -17035,7 +17449,9 @@ paths:
         **Scoped to the caller, not filtered by it**, like `/me/cases`: there is no subject parameter.
         `unreadOnly` returns only what the guest has not opened. Agreed 29 September, our build plan.
 
-        '
+        
+
+        **Order.** Sorted by `title` ascending, then by `id`.'
       tags:
       - message
       parameters:
@@ -17208,6 +17624,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /case-categories/{caseCategoryId}:
     put:
       operationId: setCaseCategoryDefinition
       x-ticvai-consumed-by:
@@ -17236,6 +17653,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: caseCategoryId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -17258,12 +17680,14 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [category-has-active-subcategories]
           description: Retiring a category that still has active subcategories.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [parent-not-top-level-category, category-is-own-parent]
           description: The parent is not a top-level category of this venue, or the row names itself as
             its parent.
           content:
@@ -17325,6 +17749,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /service-queues/{queueId}:
     put:
       operationId: setServiceQueueDefinition
       x-ticvai-consumed-by:
@@ -17352,6 +17777,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: queueId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -17374,6 +17804,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [queue-named-by-routing-rule, queue-has-waiting-cases]
           description: Retiring a queue that an active routing rule names, or that an unresolved case still
             waits in.
           content:
@@ -17461,6 +17892,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeviceConsent'
         '400':
+          x-ticvai-problem-types: [banner-design-not-published, category-not-offered]
           description: No published banner design with this id for the channel, or a category the design does not offer
           content:
             application/problem+json:
@@ -17475,6 +17907,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [strictly-necessary-declined, preference-categories-missing]
           description: '`strictlyNecessary` declined, or `savePreferences` with no categories'
           content:
             application/problem+json:
@@ -18212,6 +18645,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-scan-policy/{scanPolicyId}:
     put:
       operationId: setCookieScanPolicy
       x-ticvai-consumed-by:
@@ -18236,6 +18670,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: scanPolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -18256,6 +18695,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [day-of-week-required, day-of-month-required]
           description: A weekly schedule with no `dayOfWeek`, or a monthly one with no `dayOfMonth`
           content:
             application/problem+json:
@@ -19913,6 +20353,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
         updatedAt:
@@ -19990,6 +20431,7 @@ components:
           format: date-time
           nullable: true
         status:
+          readOnly: true
           type: string
           maxLength: 20
     MarketingJourneyStep:
@@ -20100,6 +20542,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
     MarketingLoyaltyPoints:
@@ -20381,6 +20824,7 @@ components:
           format: uuid
           nullable: true
         status:
+          readOnly: true
           type: string
           maxLength: 30
         issuedAt:
@@ -20439,6 +20883,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
         updatedAt:
@@ -21541,6 +21986,7 @@ components:
           type: string
           nullable: true
         status:
+          readOnly: true
           type: string
           enum:
           - open
@@ -22490,6 +22936,7 @@ components:
           format: uuid
           nullable: true
         code:
+          x-ticvai-unique: tenant
           readOnly: true
           type: string
         status:
@@ -22594,6 +23041,7 @@ components:
       - occurredAt
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         subjectId:
@@ -25142,6 +25590,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -31340,6 +31789,7 @@ components:
         - orderId
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: Client-generated UUIDv7; equals the `Idempotency-Key` header.
@@ -31496,6 +31946,7 @@ components:
         - reason
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: Client-generated UUIDv7; equals the `Idempotency-Key` header.
@@ -31597,6 +32048,7 @@ components:
         - escalationType
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: Client-generated UUIDv7; equals the `Idempotency-Key` header on the write.
@@ -32770,6 +33222,7 @@ components:
       - criteria
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         agentPrincipalId:

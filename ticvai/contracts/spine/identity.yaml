@@ -559,6 +559,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [session-active-elsewhere, workstation-in-use]
           description: 'An active session already exists for this principal on another device. Per §3.1.3
             the new login is refused. A supervisor with the SESSION_FORCE_LOGOUT permission may terminate
             the existing session. **The same holds on a till somebody else is signed in to**: the sign-in
@@ -702,6 +703,7 @@ paths:
                     format: date-time
                     nullable: true
         '410':
+          x-ticvai-problem-types: [verification-token-expired, verification-token-used]
           description: '**The token expired or was already used.** Distinct from an invalid one — a guest
             who clicked an old link should be offered a new one rather than told they are wrong.
 
@@ -746,6 +748,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPasswordPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
         - "P09 ADM-422 Administrator & Security Initialization"
@@ -999,6 +1003,7 @@ paths:
                   $ref: '#/components/schemas/CapabilityTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /capability-templates/{capabilityTemplateId}:
     put:
       operationId: setCapabilityTemplate
       x-ticvai-consumed-by:
@@ -1013,6 +1018,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - name: capabilityTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1066,6 +1076,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSegregationRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-340 Segregation of Duties Policy Manager"
       x-ticvai-config-scope: tenant
@@ -1447,6 +1459,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DelegatedAccess'
         '409':
+          x-ticvai-problem-types: [delegation-cycle, minor-grants-adult-authority]
           description: '**A cycle, or a minor granting authority over an adult.** Both are refused — a
             delegation graph with a loop is one nobody can reason about, and the second is a safeguarding
             concern rather than a modelling one. A subject with no date of birth counts as a minor
@@ -1810,6 +1823,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: 'The session has already ended (`signedOut`, `terminated` or `expired`). Nothing changes.'
+          x-ticvai-problem-types: [session-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/session:
@@ -2065,6 +2085,13 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'A `password` reset for a principal provisioned by single sign-on (`Principal.ssoProviderId` set), who has no local password; it is changed at the identity provider. Nothing is written.'
+          x-ticvai-problem-types: [credential-managed-by-sso]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}:
@@ -2530,6 +2557,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DelegatedAccess'
         '400':
+          x-ticvai-problem-types: [wildcard-on-allow, scope-outside-own-grants]
           description: Wildcard on an ALLOW, or scope outside the caller's own grants
           content:
             application/problem+json:
@@ -2723,6 +2751,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestSession'
         '409':
+          x-ticvai-problem-types: [identifier-already-registered]
           description: 'Identifier already registered. Deliberately indistinguishable in timing from success
             — a registration endpoint that reveals which addresses exist is an account enumeration tool.
 
@@ -2862,6 +2891,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestSession'
         '401':
+          x-ticvai-problem-types: [otp-code-invalid, otp-code-expired, otp-attempts-exceeded]
           description: 'Code invalid or expired. Attempts are counted; the code is invalidated after the
             configured limit rather than allowing indefinite guessing. **The limit is
             `VenueSettings.identity.guestOtpMaxAttempts`, read from the tenant default** (a guest code
@@ -3035,6 +3065,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestSession'
         '401':
+          x-ticvai-problem-types: [provider-token-invalid, provider-token-expired]
           description: Provider token invalid or expired
           content:
             application/problem+json:
@@ -3147,6 +3178,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: guestLogout
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own session: one per signed-in guest, so there is no key in the path.'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -3261,6 +3294,8 @@ paths:
   /auth/guest/account:
     delete:
       operationId: deleteGuestAccount
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own account: one per signed-in guest, so there is no key in the path.'
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
@@ -3516,6 +3551,7 @@ paths:
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '403':
+          x-ticvai-problem-types: [sso-group-not-mapped]
           description: 'Authenticated, but no group maps to a role in this tenant. The provider proved
             who they are; it did not grant them anything.
 
@@ -3554,6 +3590,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSsoConfig
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
       x-ticvai-audience:
@@ -3589,6 +3627,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SsoProviderConfig'
         '400':
+          x-ticvai-problem-types: [sso-metadata-unreachable, group-mappings-required]
           description: Metadata unreachable, or no group mappings supplied
           content:
             application/problem+json:
@@ -3815,6 +3854,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MfaMethod'
         '401':
+          x-ticvai-problem-types: [mfa-enrolment-code-invalid]
           description: Code invalid
           content:
             application/problem+json:
@@ -3871,6 +3911,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
         '409':
+          x-ticvai-problem-types: [last-required-mfa-method]
           description: Last remaining method of a principal who holds a permission that requires MFA
             (audit R135)
           content:
@@ -4128,6 +4169,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: 'The challenge was already completed; a challenge is single-use, so ask for a new one. Nothing changes.'
+          x-ticvai-problem-types: [mfa-challenge-already-verified]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           description: '**Five wrong codes and step-up is locked** (decided 28 September, audit R126 (6)).
             The fifth failure voids the challenge, and no new challenge is issued to this principal for
@@ -4445,6 +4493,7 @@ paths:
                           type: string
                           format: uuid
         '403':
+          x-ticvai-problem-types: [step-up-token-missing, step-up-token-expired, step-up-token-wrong-action]
           description: Step-up token missing, expired or issued for a different action
           content:
             application/problem+json:
@@ -4560,6 +4609,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthorisationPolicy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /authorisation-policies/{policyId}:
@@ -4631,6 +4682,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthorisationPolicy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /authorisation-policies/{policyId}/state:
@@ -4695,6 +4748,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthorisationPolicy'
+        '409':
+          description: 'The policy is `retired` (`authorisation-policy-retired`), or the move is not one its lifecycle allows, such as activating a policy that has not been through approval (`authorisation-policy-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [authorisation-policy-retired, authorisation-policy-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /authorisation-policies/simulate:
@@ -5532,6 +5592,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MembershipDetail'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such membership
           content:
             application/problem+json:
@@ -5585,6 +5646,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdentityBenefitUsage'
         '409':
+          x-ticvai-problem-types: [benefit-exhausted, membership-not-active]
           description: The benefit is exhausted for this period, or the membership is not active
           content:
             application/problem+json:
@@ -5739,6 +5801,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [version-never-approved, version-already-current, policy-retired]
           description: The target version was never approved, is the current version, or the policy is retired
           content:
             application/problem+json:
@@ -5769,7 +5832,9 @@ paths:
         **Ordered by `name` ascending, `policyId` as the tiebreak** (decided 14 October 2026, ADAM CR-077;
         CHG-IDR-002): BO-1066 reads the policies by name, and the counts beside each are what it compares.
 
-        '
+        
+
+        **Statuses.** Every `status` is returned, ended ones included (`retired`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - administration
       x-ticvai-permission: PERMISSION_VIEW
@@ -5817,6 +5882,7 @@ paths:
                       items:
                         $ref: '#/components/schemas/AuthorisationPolicyEffectiveness'
         '422':
+          x-ticvai-problem-types: [window-ends-before-start, date-range-too-long]
           description: '`to` is before `from`, or the range is longer than 366 days'
           content:
             application/problem+json:
@@ -5986,12 +6052,14 @@ paths:
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '409':
+          x-ticvai-problem-types: [identity-verification-pending]
           description: A verification is already pending for this guest
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted]
           description: The document has expired, or its kind is not accepted by the tenant's policy
           content:
             application/problem+json:
@@ -6047,7 +6115,9 @@ paths:
         first by default, so nobody waits behind a newer submission. Personal fields are returned only to a
         caller holding `GUEST_VIEW_PII`, the permission this operation requires.
 
-        '
+        
+
+        **Order.** Oldest first, by `submittedAt` ascending, then by `id`.'
       tags:
       - identity
       x-ticvai-permission: GUEST_VIEW_PII
@@ -6163,12 +6233,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [already-decided]
           description: Already decided
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [reason-required]
           description: A rejection or resubmission request without a reason
           content:
             application/problem+json:
@@ -6202,6 +6274,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestVerificationPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
@@ -6372,6 +6446,7 @@ paths:
                       items:
                         $ref: '#/components/schemas/IdentityRoleSuggestion'
         '400':
+          x-ticvai-problem-types: [principal-or-job-title-required, principal-and-job-title-exclusive]
           description: Neither `principalId` nor `jobTitleId` with `scopePath`, or both.
           content:
             application/problem+json:
@@ -6651,12 +6726,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdentityAccessReviewItem'
         '400':
+          x-ticvai-problem-types: [revoke-reason-required, certify-override-reason-required]
           description: '`revoke` without a `reason`, or `certify` against a `revoke` recommendation without one.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
+          x-ticvai-problem-types: [reviewer-holds-grant, forbidden]
           description: The item is for a grant the caller holds, or the caller lacks `PERMISSION_GRANT` at its scope.
           content:
             application/problem+json:
@@ -7049,6 +7126,7 @@ components:
           type: string
           maxLength: 200
         scopePath:
+          readOnly: true
           type: string
           description: '**The partition key** (ADR-0005), and what is reviewed: every grant at or below it. Inside the
             caller''s own scope. Operations write it at `venue` scope.'
@@ -7998,6 +8076,7 @@ components:
           readOnly: true
           description: Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update.
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -9539,6 +9618,7 @@ components:
       - groupMappings
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         displayName:

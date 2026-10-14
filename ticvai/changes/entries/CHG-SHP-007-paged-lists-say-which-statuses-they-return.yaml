@@ -1,0 +1,85 @@
+id: CHG-SHP-007
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Every paged list of items whose status can end says it returns every status, ended ones included, and that a
+  screen showing live rows filters on `status`.'
+decision:
+  what: 'contracts/*: a "**Statuses.**" paragraph naming the ended values on 30 lists.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-PAGED-STATUS (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 30 members before, 0 after on this branch (CHG-SHP; ruling "go with your
+  recommendation", Chinmay, 14 October 2026). ADAM CR-088, CHG-MKT-003. A status filter parameter was not added
+  (additive, but a server change on 30 lists); the sentence is the ruling''s first option.'
+keys_touched:
+  operations:
+  - listAppBuilds
+  - listAudienceActivations
+  - listAuthorisationPolicyEffectiveness
+  - listCellJobs
+  - listChargebacks
+  - listContentBlocks
+  - listCredentialIdentityToken
+  - listDepositBoxes
+  - listDuplicateCandidates
+  - listDynamicPolicyEffectiveness
+  - listEscalationCriticalCase
+  - listExpiringBatches
+  - listForms
+  - listGuestMemberships
+  - listJourneys
+  - listMenuVersions
+  - listMyCases
+  - listMyOrders
+  - listOrderRefunds
+  - listPerformances
+  - listProductEventExperience
+  - listQueues
+  - listReviews
+  - listRotaAssignments
+  - listStockCountLines
+  - listStockReservations
+  - listTableReservations
+  - listVenueHistoryImports
+  - listWaiverTemplateMaster
+  - searchMedia
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/shift.yaml
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A18 API-CONVENTIONS
+tickets:
+  started: []
+  unstarted: ['27782', '27836', '27842', '27843', '27863', '27873', '27876', '27891', '27909', '27912', '27914',
+    '27919', '27928', '27930', '28002', '28003', '28032', '28050', '28079', '28080', '28152', '28157', '28162',
+    '28182', '28195', '28196', '28197', '28198', '28202', '28213', '28217', '28224', '28229', '28232', '28237',
+    '28256', '28338', '28339', '28344', '28385', '28395', '28397', '28399', '28401', '28416', '28417', '28442',
+    '28446', '28455', '28528', '28533', '28535', '28542', '28549', '28555', '28646', '28647', '28660', '28662',
+    '28663', '28683', '28684', '28685', '28686', '28687', '28688', '28689', '28690', '28691', '28695', '28700',
+    '28702', '28712', '28713', '28727', '28728', '28754', '28756', '28759', '28760', '28761', '28762', '28768',
+    '28791', '28792', '28806', '28807', '28808', '28810', '28813', '28818', '28819', '28820', '28823', '28875',
+    '28885', '28895', '28896', '28916', '28960']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

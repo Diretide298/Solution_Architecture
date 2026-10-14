@@ -270,6 +270,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
+          x-ticvai-problem-types: [media-not-found]
           description: Media not recognised in this cell
           content:
             application/problem+json:
@@ -296,7 +297,9 @@ paths:
         is read at admission and must stay narrow; a history query that scans every entitlement a guest
         has ever held does not belong on the same endpoint.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - access
       x-ticvai-permission: null
@@ -379,7 +382,9 @@ paths:
         **Grouped by validity, not by purchase date.** A guest opening this at a gate wants what works
         today at the top; the order they bought things in is the operator''s question.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - access
       x-ticvai-permission: ORDER_VIEW
@@ -485,6 +490,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Entitlement'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: '**Not found and not permitted return the same response.** A distinct *"exists
             but not yours"* tells anybody with an id whether it is real.
 
@@ -858,6 +864,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FacePassEnrolment'
         '409':
+          x-ticvai-problem-types: [biometrics-not-enabled, ticket-type-biometrics-disabled, consent-method-mismatch]
           description: '**Biometrics are not enabled at this venue**, this ticket type''s
             `biometricPolicy` is `disabled`, or `consent.method` is not the one the venue''s Face Tag
             profile requires (`consentCapture`).
@@ -973,6 +980,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdentityVerification'
         '409':
+          x-ticvai-problem-types: [no-enrolment-to-compare, biometrics-not-enabled]
           description: '**Nothing to compare against** — `liveCaptureToEnrolment` where the
             entitlement has no enrolment, or a biometric method at a venue that has not enabled
             biometrics.
@@ -1176,6 +1184,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FacePassEnrolment'
         '409':
+          x-ticvai-problem-types: [face-on-another-pass]
           description: '**This face is already on another annual pass.** Returned with the reason and without naming the
             other pass — a counter agent needs to know it is a duplicate, not whose.
 
@@ -1367,7 +1376,9 @@ paths:
         guests, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
         found. `PARKING_CONFIGURE` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - access
       parameters:
@@ -1404,6 +1415,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /parking-facilities/{parkingFacilityId}:
     put:
       operationId: setParkingFacility
       x-ticvai-consumed-by:
@@ -1445,6 +1457,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: parkingFacilityId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1650,6 +1667,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ParkingEntitlement'
         '502':
+          x-ticvai-problem-types: [parking-push-rejected]
           description: '**The parking system rejected the push. The entitlement is still created** and
             flagged, because the guest has paid and the failure is ours to chase.
 
@@ -1830,6 +1848,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [scan-not-denied, scan-already-overridden]
           description: The scan was not a denial, or has already been overridden
           content:
             application/problem+json:
@@ -1898,6 +1917,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TicketStatus'
         '400':
+          x-ticvai-problem-types: [lookup-identifier-missing]
           description: Neither mediaCode nor ticketId supplied
           content:
             application/problem+json:
@@ -1989,6 +2009,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listScans
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
@@ -2254,6 +2275,7 @@ paths:
   /access-points:
     get:
       operationId: listAccessPoints
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
@@ -2335,6 +2357,8 @@ paths:
                 $ref: '#/components/schemas/AccessPoint'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-points/{accessPointId}/direction:
@@ -2561,7 +2585,9 @@ paths:
       description: 'The rules governing entry for an entitlement — validation window, re-entry, duration
         limits, anti-passback.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - accessPoint
       x-ticvai-permission: SCOPE_VIEW
@@ -2624,6 +2650,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdmissionRules'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /admission-rules/{profileId}:
@@ -2693,17 +2721,21 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [entry-count-required, validity-days-required, validity-ends-before-start]
           description: A count missing for an n* entry mode, days missing for a relative validity anchor, or
             validity.to before validity.from
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /blacklist:
     get:
       operationId: listBlacklist
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `addedByPrincipalId`.'
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
       x-ticvai-audience:
@@ -2945,6 +2977,7 @@ paths:
                     remainingAdmissions:
                       type: integer
         '409':
+          x-ticvai-problem-types: [group-allowance-exceeded]
           description: Requested count exceeds the remaining group allowance
           content:
             application/problem+json:
@@ -3061,7 +3094,9 @@ paths:
         (`getEntitlementHistory`); View Audit (`getEntitlementHistory`); Diagnose Credential (no operation
         yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `virtualTicketId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -3198,6 +3233,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setVirtualTicketIdentity
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-335 Virtual Ticket Identity & Master Record Configuration"
       x-ticvai-audience:
@@ -3430,7 +3467,11 @@ paths:
         by ticket, media type and credential. Sensitive values stay masked; face bindings reference the biometric
         service, never raw biometric data.
 
-        '
+        
+
+        **Order.** Sorted by `credentialBindingId` descending (a UUIDv7, so newest first).
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`, `revoked`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -3626,6 +3667,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: one replacement policy per replacement reason, defined by hand
+  /media-replacement-revocation/{replacementReason}:
     put:
       operationId: setMediaReplacementRevocation
       x-ticvai-read-via:
@@ -3664,6 +3706,11 @@ paths:
             schema:
               $ref: '#/components/schemas/MediaReplacementRevocationRebindingRulesInput'
       parameters:
+      - name: replacementReason
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `replacementReason`, when sent, must equal it.'
+        schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -3719,7 +3766,9 @@ paths:
         Run automatic configuration checks (no operation yet); Submit configuration for review and approval
         (`createApprovalRequest`).
 
-        '
+        
+
+        **Order.** Newest first, by `timestamp` descending.'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -3783,7 +3832,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Create Media Template (blank, duplicate, corporate,
         venue or product template, import) (no operation yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `templateId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -3839,6 +3890,8 @@ paths:
   /digital-barcode-ticket:
     put:
       operationId: setDigitalBarcodeTicket
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-345 Digital QR & Barcode Ticket Designer"
       x-ticvai-audience:
@@ -3941,6 +3994,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPdfPrintablePos
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-346 PDF, Printable & POS Ticket Designer"
       x-ticvai-audience:
@@ -3996,6 +4051,8 @@ paths:
   /apple-wallet-pass:
     put:
       operationId: setAppleWalletPass
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-347 Apple Wallet Pass Designer"
       x-ticvai-audience:
@@ -4058,6 +4115,8 @@ paths:
   /google-wallet-pass:
     put:
       operationId: setGoogleWalletPass
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-348 Google Wallet Pass Designer"
       x-ticvai-audience:
@@ -4118,6 +4177,8 @@ paths:
   /rfid-nfc-card:
     put:
       operationId: setRfidNfcCard
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
       x-ticvai-audience:
@@ -4175,6 +4236,8 @@ paths:
   /digital-card-membership:
     put:
       operationId: setDigitalCardMembership
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-350 Digital Card, Membership & Wearable Designer"
       x-ticvai-audience:
@@ -4231,6 +4294,8 @@ paths:
   /dynamic-field-data:
     put:
       operationId: setDynamicFieldData
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per dynamic field, the one the body''s `fieldKey` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-351 Dynamic Fields, Data Mapping & Content Builder"
       x-ticvai-audience:
@@ -4337,6 +4402,8 @@ paths:
       x-ticvai-bounded: branding profiles per inheritance level, defined by hand
     put:
       operationId: setBrandingLocalizationTemplate
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per scope node, the one the body''s `scopeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-352 Branding, Localization & Template Inheritance"
       x-ticvai-audience:
@@ -4382,6 +4449,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BrandingLocalizationTemplateInheritanceView'
         '422':
+          x-ticvai-problem-types: [invalid-language-tag, parent-scope-not-above]
           description: A language that is not a BCP 47 tag, or parentScopeId at a level that is not above
           content:
             application/problem+json:
@@ -4392,6 +4460,8 @@ paths:
   /multi-media-preview:
     put:
       operationId: approveMultiMediaPreview
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-353 Multi-Media Preview, Testing, Approval & Publication"
       x-ticvai-audience:
@@ -4491,7 +4561,9 @@ paths:
         (no operation yet); Replace (no operation yet); Revoke (no operation yet); Diagnose (no operation
         yet); View History (`getEntitlementHistory`).
 
-        '
+        
+
+        **Order.** Sorted by `product` ascending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -4602,6 +4674,8 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per virtual ticket, the one the body''s `virtualTicketId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.43-44 (15.3.2); MoM
@@ -4697,7 +4771,9 @@ paths:
         (no operation yet); Retry Selected (no operation yet); Retry All Eligible (no operation yet); Escalate
         (no operation yet).
 
-        '
+        
+
+        **Order.** Newest first, by `requestedAt` descending, then by `requestId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -4783,7 +4859,9 @@ paths:
         operation yet); Resend Pending (no operation yet); Resend Failed (no operation yet); Send Group (no
         operation yet); Export Status (no operation yet).
 
-        '
+        
+
+        **Order.** Newest first, by `sentAt` descending.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -4829,6 +4907,8 @@ paths:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per virtual ticket, the one the body''s `virtualTicketId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P06 EMP-036 Issue media"
         - "P08 BO-358 Media Binding, Activation & Assignment Operations"
@@ -4971,7 +5051,9 @@ paths:
         (no operation yet); Escalate (no operation yet); Assign Owner (no operation yet); Open Technical Case
         (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `credential` ascending, then by `exceptionId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -5041,7 +5123,9 @@ paths:
         **Overlaps `getEntitlementHistory`,** which stays the operation of record for that write; this one
         serves the screen''s composite view of it.
 
-        '
+        
+
+        **Order.** Soonest first, by `presentationTimestamp` ascending.'
       tags:
       - access
       x-ticvai-permission: TICKET_LOOKUP
@@ -5115,7 +5199,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Generate credential-history evidence export (no
         operation yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `dateTime` ascending.'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -5473,6 +5559,8 @@ paths:
   /access-area-zone:
     put:
       operationId: setAccessAreaZone
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access zone, the one the body''s `zoneId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-146 Access Area & Zone Builder"
       x-ticvai-audience:
@@ -5528,6 +5616,8 @@ paths:
   /attraction-access:
     put:
       operationId: setAttractionAccess
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per attraction, the one the body''s `attractionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-147 Attraction Access Configuration"
       x-ticvai-audience:
@@ -5583,6 +5673,8 @@ paths:
   /gate-lane:
     put:
       operationId: setGateLane
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per gate, the one the body''s `gateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-149 Gate & Lane Configuration"
       x-ticvai-audience:
@@ -5646,6 +5738,8 @@ paths:
       - query: venue-map#mapRecords
         route: service
         for: 'its read of venuemap.map, VenueOps''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue access map, the one the body''s `mapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-150 Access Control Graphical Map Designer"
       x-ticvai-audience:
@@ -5798,6 +5892,8 @@ paths:
   /topology-validation:
     put:
       operationId: publishTopologyValidation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access configuration version, the one the body''s `configurationVersionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-153 Topology Validation & Publication"
       x-ticvai-audience:
@@ -5900,7 +5996,9 @@ paths:
         **Overlaps `listAdmissionRules`,** which stays the operation of record for that write; this one serves
         the screen''s composite view of it.
 
-        '
+        
+
+        **Order.** Sorted by `ruleId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -5980,6 +6078,8 @@ paths:
   /visual-access-rule:
     put:
       operationId: setVisualAccessRule
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-155 Visual Access Rule Builder"
       x-ticvai-audience:
@@ -6233,6 +6333,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's consumption rules, defined by hand
+  /entitlement-consumption/{ruleId}:
     put:
       operationId: setEntitlementConsumption
       x-ticvai-consumed-by:
@@ -6271,6 +6372,11 @@ paths:
             schema:
               $ref: '#/components/schemas/EntitlementConsumptionEngineInput'
       parameters:
+      - name: ruleId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -6285,6 +6391,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [quantity-or-unlimited-required]
           description: Neither quantity nor unlimited given
           content:
             application/problem+json:
@@ -6388,6 +6495,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's eligibility rules, defined by hand
+  /guest-companion-eligibility/{ruleId}:
     put:
       operationId: setGuestCompanionEligibility
       x-ticvai-consumed-by:
@@ -6425,6 +6533,11 @@ paths:
             schema:
               $ref: '#/components/schemas/GuestCompanionEligibilityRulesInput'
       parameters:
+      - name: ruleId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -6498,6 +6611,8 @@ paths:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access rule version, the one the body''s `ruleVersionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-163 Rule Simulation, Conflict Check & Publication"
       x-ticvai-audience:
@@ -6584,7 +6699,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Edit profile (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `profileId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -6616,6 +6733,8 @@ paths:
   /dynamic-security-profile:
     put:
       operationId: setDynamicSecurityProfile
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per dynamic QR security profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-165 Dynamic QR Security Profile Builder"
       x-ticvai-audience:
@@ -6718,6 +6837,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's activation/display rules, defined by hand
+  /credential-activation-display/{credentialPolicyId}:
     put:
       operationId: setCredentialActivationDisplay
       x-ticvai-consumed-by:
@@ -6757,6 +6877,11 @@ paths:
             schema:
               $ref: '#/components/schemas/CredentialActivationDisplayRulesInput'
       parameters:
+      - name: credentialPolicyId
+        in: path
+        required: true
+        description: 'Addresses the activation and display rule this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -6771,6 +6896,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [activation-trigger-required, display-options-contradict]
           description: No activation trigger, or a display option that contradicts another (hideQr with blurQr)
           content:
             application/problem+json:
@@ -6813,7 +6939,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Deactivate binding (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `credential` ascending, then by `bindingId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -6871,6 +6999,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBleBeaconGeofence
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per beacon, the one the body''s `beaconId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-168 BLE Beacon & Geofence Configuration"
       x-ticvai-audience:
@@ -7083,6 +7213,8 @@ paths:
   /embedded-entitlement-payload:
     put:
       operationId: setEmbeddedEntitlementPayload
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per payload profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-172 Embedded Entitlement Payload Designer"
       x-ticvai-audience:
@@ -7169,7 +7301,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Run security simulation (no operation yet); Approve
         and publish (`createApprovalRequest`).
 
-        '
+        
+
+        **Order.** Newest first, by `timestamp` descending.'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -7221,7 +7355,9 @@ paths:
         to a summary beside a paged media directory; the directory row now carries the pack''s columns (media
         profile, technology, credential type, status, offline). The pack filters are query parameters.
 
-        '
+        
+
+        **Order.** Sorted by `mediaProfileId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -7342,6 +7478,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's media type profiles, defined by hand
+  /media-type-technology/{mediaTypeId}:
     put:
       operationId: setMediaTypeTechnology
       x-ticvai-consumed-by:
@@ -7381,6 +7518,11 @@ paths:
             schema:
               $ref: '#/components/schemas/MediaTypeTechnologyLibraryInput'
       parameters:
+      - name: mediaTypeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `mediaTypeId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -7395,6 +7537,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [media-type-in-use]
           description: Retiring a media type an active encoding profile still uses
           content:
             application/problem+json:
@@ -7436,7 +7579,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** View access history (`getEntitlementHistory`).
 
-        '
+        
+
+        **Order.** Sorted by `virtualCredentialId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -7565,6 +7710,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: encoding profiles a venue defines per medium
+  /media-issuance-encoding/{encodingProfileId}:
     put:
       operationId: setMediaIssuanceEncoding
       x-ticvai-consumed-by:
@@ -7602,6 +7748,11 @@ paths:
             schema:
               $ref: '#/components/schemas/MediaIssuanceEncodingProfileInput'
       parameters:
+      - name: encodingProfileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `encodingProfileId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -7616,6 +7767,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [media-type-retired, unknown-media-type]
           description: The media type is retired or does not exist
           content:
             application/problem+json:
@@ -7653,7 +7805,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Swap media (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `swapId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -7683,6 +7837,8 @@ paths:
   /rfid-nfc:
     put:
       operationId: setRfidNfc
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per RFID/NFC profile, the one the body''s `rfidNfcProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-180 RFID & NFC Configuration"
       x-ticvai-audience:
@@ -7837,6 +7993,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's external media integrations, set up by hand
+  /hotel-wallet-external/{integrationId}:
     put:
       operationId: setHotelWalletExternal
       x-ticvai-consumed-by:
@@ -7875,6 +8032,11 @@ paths:
             schema:
               $ref: '#/components/schemas/HotelWalletExternalMediaIntegrationInput'
       parameters:
+      - name: integrationId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `integrationId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -7889,6 +8051,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [connection-secret-required]
           description: Activating an integration that has no connectionSecretRef
           content:
             application/problem+json:
@@ -7899,6 +8062,8 @@ paths:
   /media-compatibility-testing:
     put:
       operationId: publishMediaCompatibilityTesting
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per media profile, the one the body''s `mediaProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-183 Media Compatibility, Testing & Publication"
       x-ticvai-audience:
@@ -7985,7 +8150,9 @@ paths:
         a summary; each row is one biometric profile (name, Face Pass or Face Tag, credential, venue, status).
         Counts are integers.
 
-        '
+        
+
+        **Order.** Sorted by `profileId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -8043,6 +8210,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBiometricVerificationProfile
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per biometric verification profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-185 Biometric Verification Profile Builder"
       x-ticvai-audience:
@@ -8127,6 +8296,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFacePassEnrollment
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-186 Face Pass Enrollment Configuration"
       x-ticvai-audience:
@@ -8222,7 +8393,9 @@ paths:
         there and in the venue''s consent form (`VenueSettings.biometrics.consentFormId`; DEC-128, DEC-549), so the
         action above now has its writes: `setVenueSettings` and `updateRegionSettings`.
 
-        '
+        
+
+        **Order.** Newest first, by `timestamp` descending, then by `consentRecordId`.'
       tags:
       - drafted
       x-ticvai-permission: SCOPE_VIEW
@@ -8333,6 +8506,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's Face Tag profiles, defined by hand
+  /face-tag-temporary/{profileId}:
     put:
       operationId: setFaceTagTemporaryEnrollment
       x-ticvai-consumed-by:
@@ -8385,6 +8559,11 @@ paths:
             schema:
               $ref: '#/components/schemas/FaceTagTemporaryEnrollmentInput'
       parameters:
+      - name: profileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `profileId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -8456,6 +8635,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's match threshold profiles, defined by hand
+  /face-matching-verification/{profileId}:
     put:
       operationId: setFaceMatchingVerification
       x-ticvai-consumed-by:
@@ -8494,6 +8674,11 @@ paths:
             schema:
               $ref: '#/components/schemas/FaceMatchingVerificationThresholdsInput'
       parameters:
+      - name: profileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `profileId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -8508,6 +8693,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [review-min-not-below-high-confidence]
           description: reviewRangeMin is not below highConfidenceMin
           content:
             application/problem+json:
@@ -8550,7 +8736,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** View audit history (no operation yet); Security/guest
         service review of a blocked change (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `attemptId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -8680,6 +8868,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: retention rules per biometric data category, defined by hand
+  /biometric-lifecycle-retention/{retentionSettingId}:
     put:
       operationId: setBiometricLifecycleRetention
       x-ticvai-read-via:
@@ -8735,6 +8924,11 @@ paths:
             schema:
               $ref: '#/components/schemas/BiometricLifecycleRetentionDeletionInput'
       parameters:
+      - name: retentionSettingId
+        in: path
+        required: true
+        description: 'Addresses the retention rule this write creates or replaces. The body''s `policyId`, when sent, must equal it.'
+        schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -8749,12 +8943,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [retention-rule-exists]
           description: A second rule for the same venue and data category
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [retention-exceeds-tenant-period]
           description: '`retentionDays` longer than the tenant''s effective `faceTagBiometric` or
             `facePassBiometric` period (tenancy `setDataRetentionSetting`); a rule here may only shorten it'
           content:
@@ -8794,7 +8990,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Run simulation (no operation yet); Submit for
         approval (`createApprovalRequest`); Emergency disable biometric verification (no operation yet).
 
-        '
+        
+
+        **Order.** Newest first, by `occurredAt` descending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -8901,7 +9099,9 @@ paths:
         and status next to its heartbeat and version columns. Device health is what the vendor reports; TICVAI
         does not detect it.
 
-        '
+        
+
+        **Order.** Sorted by `deviceId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: DEVICE_VIEW
@@ -9008,7 +9208,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Register device (no operation yet); Replace device
         (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `deviceId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: DEVICE_VIEW
@@ -9038,6 +9240,8 @@ paths:
   /turnstile-lane-behavior:
     put:
       operationId: setTurnstileLaneBehavior
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access point, the one the body''s `accessPointId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-197 Turnstile & Lane Behavior Configuration"
       x-ticvai-audience:
@@ -9098,6 +9302,8 @@ paths:
   /validation-outcome-guest:
     put:
       operationId: setValidationOutcomeGuest
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per outcome profile, the one the body''s `outcomeProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-198 Validation Outcome & Guest Feedback Designer"
       x-ticvai-audience:
@@ -9156,6 +9362,8 @@ paths:
   /reader-scanner-peripheral:
     put:
       operationId: setReaderScannerPeripheral
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access point, the one the body''s `accessPointId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-199 Reader, Scanner & Peripheral Configuration"
       x-ticvai-audience:
@@ -9211,6 +9419,8 @@ paths:
   /handheld-mobile-access:
     put:
       operationId: setHandheldMobileAccess
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per handheld device profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-200 Handheld & Mobile Access Device Configuration"
       x-ticvai-audience:
@@ -9321,6 +9531,8 @@ paths:
   /device-software-content:
     put:
       operationId: setDeviceSoftwareContent
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per device group, the one the body''s `deviceGroupId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-202 Device Software, Content & Remote Configuration"
       x-ticvai-audience:
@@ -9410,7 +9622,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Schedule Rollout (no operation yet); Rollback
         (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `deviceId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: DEVICE_VIEW
@@ -9469,7 +9683,9 @@ paths:
         the page; each row is one venue''s readiness with its checks as yes/no values. Counts are integers
         and the missing Sync Conflicts tile was added.
 
-        '
+        
+
+        **Order.** Sorted by `venueId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9501,6 +9717,8 @@ paths:
   /edge-node-local:
     put:
       operationId: setEdgeNodeLocal
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per edge node, the one the body''s `edgeNodeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-205 Edge Node & Local Processing Configuration"
       x-ticvai-audience:
@@ -9579,7 +9797,9 @@ paths:
         list, device count, size, validity window and the pre-activation checks as yes/no values. Only a package
         that passes all four checks may activate on a device.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `packageId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9678,7 +9898,9 @@ paths:
         so an entitlement cannot be consumed twice offline; the online-only or offline-maximum setting belongs
         to the entitlement''s risk policy, not the ledger.
 
-        '
+        
+
+        **Order.** Newest first, by `timestamp` descending, then by `ledgerEntryId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9777,7 +9999,9 @@ paths:
         reconciliation conflicts, each with its resolution policy. The remaining balance is an entitlement
         count, not money. An access transaction is never silently discarded.
 
-        '
+        
+
+        **Order.** Sorted by `conflictId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9813,6 +10037,8 @@ paths:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-212 Offline Simulation & Resilience Testing"
       x-ticvai-audience:
@@ -9889,7 +10115,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Rollback (no operation yet); Force Online-Only
         (no operation yet); Schedule Deployment (no operation yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `scheduledAt` ascending, then by `policyVersionId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9944,7 +10172,9 @@ paths:
         of journey profiles (journey, type, venue, credential, status). The list of exception kinds was prose,
         not row fields.
 
-        '
+        
+
+        **Order.** Sorted by `journeyProfileId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -9976,6 +10206,8 @@ paths:
   /group-admission-profile:
     put:
       operationId: setGroupAdmissionProfile
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per group admission profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-215 Group & B2B Admission Profile Builder"
       x-ticvai-audience:
@@ -10064,7 +10296,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Admit All (`validateGroupAccess`); Enter Actual
         Attendance / Confirm (`validateGroupAccess`); Load Group Booking (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `groupBookingId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10127,7 +10361,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Record Wave (`validateGroupAccess`).
 
-        '
+        
+
+        **Order.** Sorted by `waveId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10280,7 +10516,9 @@ paths:
         entry, re-entry or crossover so crossovers are counted separately. The crossover maximum is a rule
         set in Board 2 admission rules, not a journey field.
 
-        '
+        
+
+        **Order.** Newest first, by `occurredAt` descending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10436,7 +10674,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Open gate status (`getAccessPoint`).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `accessPointId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10568,7 +10808,9 @@ paths:
         **Overlaps `lookupTicket`,** which stays the operation of record for that write; this one serves the
         screen''s composite view of it.
 
-        '
+        
+
+        **Order.** Soonest first, by `visitDate` ascending, then by `ticketId`.'
       tags:
       - access
       x-ticvai-permission: TICKET_LOOKUP
@@ -10721,6 +10963,8 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 9.5 p.121; R228 (override keeps the denial
@@ -10815,7 +11059,9 @@ paths:
         **Overlaps `listBlacklist`,** which stays the operation of record for that write; this one serves
         the screen''s composite view of it.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10875,7 +11121,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Change mode (single or bulk) (`setTurnstileMode`);
         Emergency / Drop Arm (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `accessPointId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10930,7 +11178,9 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Apply Recommendation (`setTurnstileMode`).
 
-        '
+        
+
+        **Order.** Sorted by `accessPointId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -10962,6 +11212,8 @@ paths:
   /operational-incident-exception:
     put:
       operationId: setOperationalIncidentException
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per incident, the one the body''s `incidentId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-232 Operational Incident & Exception Workspace"
       x-ticvai-audience:
@@ -11054,7 +11306,9 @@ paths:
         Report (no operation yet); Override Report (no operation yet); Gate Mode Change Report (no operation
         yet); Incident Report (no operation yet); Exception Report (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `shiftId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: AUDIT_VIEW
@@ -11108,7 +11362,9 @@ paths:
         paged list of policies; each row now carries the policy table columns (name, scope, type, priority,
         status). Counts typed as text or yes/no are integers; AI recommendations stay a read-only count.
 
-        '
+        
+
+        **Order.** Sorted by `priority` ascending, then by `policyId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -11185,6 +11441,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: the governed attribute dictionary, defined by hand
+  /access-attribute-catalog/{attributeKey}:
     put:
       operationId: setAccessAttributeCatalog
       x-ticvai-consumed-by:
@@ -11218,6 +11475,11 @@ paths:
             schema:
               $ref: '#/components/schemas/AccessAttributeCatalogInput'
       parameters:
+      - name: attributeKey
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `attributeKey`, when sent, must equal it.'
+        schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -11230,12 +11492,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessAttributeCatalogView'
         '409':
+          x-ticvai-problem-types: [attribute-in-published-policy]
           description: Changing the data type of, or disabling, an attribute a published policy tests
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [allowed-values-required]
           description: dataType enum with no allowedValues
           content:
             application/problem+json:
@@ -11246,6 +11510,8 @@ paths:
   /visual-dynamic-policy:
     put:
       operationId: setVisualDynamicPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per dynamic policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-236 Visual Dynamic Policy Builder"
         - "P08 BO-238 Identity, Membership & Accreditation Policies"
@@ -11307,6 +11573,8 @@ paths:
   /context-time-event:
     put:
       operationId: setContextTimeEvent
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-237 Context, Time, Event & Capacity Policy Builder"
       x-ticvai-audience:
@@ -11454,6 +11722,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: policy scope assignments a tenant defines by hand
+  /policy-scope-hierarchy/{policyId}:
     put:
       operationId: setPolicyScopeHierarchy
       x-ticvai-consumed-by:
@@ -11489,6 +11758,11 @@ paths:
             schema:
               $ref: '#/components/schemas/PolicyScopeHierarchyInheritanceInput'
       parameters:
+      - name: policyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `policyId`, when sent, must equal it.'
+        schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -11541,7 +11815,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Request grant approval (`createApprovalRequest`);
         Revoke grant (no operation yet).
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `grantId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -11623,6 +11899,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
       x-ticvai-audience:
@@ -11695,7 +11973,9 @@ paths:
         a summary beside a paged list of security alerts; a sample alert was removed and counts typed as text
         are integers. The geographic drill-down is venue, park, zone and gate query parameters.
 
-        '
+        
+
+        **Order.** Newest first, by `detectedAt` descending, then by `alertId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -11796,6 +12076,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's configured fraud signals, defined by hand
+  /fraud-detection-rule/{ruleId}:
     put:
       operationId: setFraudDetectionRule
       x-ticvai-consumed-by:
@@ -11842,6 +12123,11 @@ paths:
             schema:
               $ref: '#/components/schemas/FraudDetectionRuleSignalLibraryInput'
       parameters:
+      - name: ruleId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
@@ -11888,7 +12174,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** View timeline (`getEntitlementHistory`); Lock
         credential (no operation yet).
 
-        '
+        
+
+        **Order.** Newest first, by `detectedAt` descending, then by `credentialId`.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -11948,7 +12236,9 @@ paths:
         **The screen''s actions are behaviour, not fields:** Lock (no operation yet); Unlock (permission,
         dual authorization for high-risk locks) (no operation yet).
 
-        '
+        
+
+        **Order.** Sorted by `identityId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -12006,7 +12296,9 @@ paths:
         date, location, operator, process, reason, approval). References are opaque; raw biometric templates
         are never returned.
 
-        '
+        
+
+        **Order.** Sorted by `anomalyId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -12126,6 +12418,8 @@ paths:
   /real-time-security:
     put:
       operationId: setRealTimeSecurity
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per security playbook, the one the body''s `playbookId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-251 Real-Time Security Response & Playbook Builder"
       x-ticvai-audience:
@@ -12182,6 +12476,8 @@ paths:
   /security-investigation-evidence:
     put:
       operationId: setSecurityInvestigationEvidence
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per investigation, the one the body''s `investigationId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-248 Biometric & Identity Integrity Monitoring"
         - "P08 BO-252 Security Investigation & Evidence Workspace"
@@ -12383,7 +12679,9 @@ paths:
         the venue comparison table (entries, in venue, rejected rate, throughput). Duplicate sample tiles
         were removed and the average validation time is seconds.
 
-        '
+        
+
+        **Order.** Sorted by `venueId` descending (a UUIDv7, so newest first).'
       tags:
       - access
       x-ticvai-permission: REPORT_VIEW_VENUE
@@ -13122,6 +13420,8 @@ paths:
         clearest case in the merge: their normalisation was taken because an array cannot carry
         per-row state. A point that is temporarily closed under one rule and open under another has
         nowhere to live in an array.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -13324,6 +13624,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [target-version-is-current, target-version-not-found]
           description: targetVersion is the current version, or does not exist for this policy
           content:
             application/problem+json:
@@ -13377,12 +13678,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/HardwareDeploymentView'
         '409':
+          x-ticvai-problem-types: [overlapping-deployment-in-progress]
           description: A deployment to an overlapping target set is still queued or in progress
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [target-scope-ids-missing]
           description: gateIds or deviceGroupId missing for the chosen targetScope
           content:
             application/problem+json:
@@ -13467,6 +13770,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCredentialIssuanceRetryPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-356 Credential Generation & Issuance Monitor"
       x-ticvai-audience:
@@ -13509,6 +13814,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CredentialIssuanceRetryPolicyView'
         '422':
+          x-ticvai-problem-types: [escalation-after-max-attempts]
           description: escalateAfterAttempts greater than maxAttempts
           content:
             application/problem+json:
@@ -13573,12 +13879,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [credential-exception-already-resolved]
           description: The exception is already resolved
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [owner-required, fallback-media-kind-required]
           description: ownerId missing for assignOwner or escalate, or fallbackMediaKind missing for useFallback
           content:
             application/problem+json:
@@ -13628,6 +13936,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CredentialGenerationRetryResult'
         '422':
+          x-ticvai-problem-types: [request-ids-required]
           description: scope selected with no requestIds
           content:
             application/problem+json:
@@ -13700,6 +14009,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [credential-revoked, credential-expired]
           description: The credential is revoked or expired
           content:
             application/problem+json:
@@ -13783,6 +14093,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [replacement-limit, replacement-approval-required, credential-revoked]
           description: replacement-limit, or approval-required, or the credential is revoked
           content:
             application/problem+json:
@@ -13793,7 +14104,61 @@ paths:
       x-ticvai-step-up: mfa
       x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Moves a paid ticket onto new media; the old one stops working.
-  /access-point-groups:
+  /access-point-groups/{groupId}:
+    parameters:
+    - name: groupId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: deleteAccessPointGroup
+      x-ticvai-consumed-by:
+        - "P08 BO-151 Access Location Grouping"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; writes the table listAccessLocationGrouping reads (pack ''Access
+        Control Module'' p.13 [Main Entrance], [Support nested groups]; our build plan)'
+      summary: Delete an access-point group
+      description: 'Deletes a group. **Refused `409 group-in-use`** while another group is nested under it or a gate
+        mode policy (`access.gate_mode_policy`) names it: move or delete those first, so no policy silently widens
+        to the whole venue.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
+        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
+        writers pass)
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Deleted
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [group-in-use]
+          description: '`group-in-use`: a nested group or a gate mode policy still names this group.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccessPointGroup
       x-ticvai-consumed-by:
@@ -13862,67 +14227,15 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [group-cycle]
           description: '`group-cycle`: the parent named would make the group its own ancestor.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [access-point-not-in-venue]
           description: A member access point is not in the group's venue.
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /access-point-groups/{groupId}:
-    parameters:
-    - name: groupId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    delete:
-      operationId: deleteAccessPointGroup
-      x-ticvai-consumed-by:
-        - "P08 BO-151 Access Location Grouping"
-      x-ticvai-audience:
-      - staff
-      x-ticvai-agreed: '29 September: writers pass; writes the table listAccessLocationGrouping reads (pack ''Access
-        Control Module'' p.13 [Main Entrance], [Support nested groups]; our build plan)'
-      summary: Delete an access-point group
-      description: 'Deletes a group. **Refused `409 group-in-use`** while another group is nested under it or a gate
-        mode policy (`access.gate_mode_policy`) names it: move or delete those first, so no policy silently widens
-        to the whole venue.
-
-        '
-      tags:
-      - access
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
-        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
-        writers pass)
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      responses:
-        '204':
-          headers:
-            X-Consistency-Token:
-              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
-          description: Deleted
-        '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
-        '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
-        '404':
-          $ref: ../shared/common.yaml#/components/responses/NotFound
-        '409':
-          description: '`group-in-use`: a nested group or a gate mode policy still names this group.'
           content:
             application/problem+json:
               schema:
@@ -13932,6 +14245,8 @@ paths:
   /offline-policies:
     put:
       operationId: setGateOfflinePolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-171 Offline Cryptographic Validation Profile"
         - "P08 BO-206 Offline Validation Policy Builder"
@@ -14003,6 +14318,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [edge-threshold-below-central]
           description: The edge threshold is shorter than the central one.
           content:
             application/problem+json:
@@ -14010,7 +14326,61 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /operating-calendar-entries:
+  /operating-calendar-entries/{entryId}:
+    parameters:
+    - name: entryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: deleteOperatingCalendarEntry
+      x-ticvai-consumed-by:
+        - "P08 BO-152 Operating Calendar & Special Access Days"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; writes the table listOperatingCalendarSpecial reads (pack ''Access
+        Control Module'' p.13 [Configure], [AI warns about conflicts]; MoM 2 Sep 2026 (validity/calendar rules, blockout
+        dates))'
+      summary: Delete an operating calendar entry
+      description: 'Deletes one calendar entry. An entry already started is refused `409 entry-in-progress`: shorten
+        it with `setOperatingCalendarEntry` instead, so a day in progress does not change its rules under the gates.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
+        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
+        writers pass)
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Deleted
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [entry-in-progress]
+          description: '`entry-in-progress`: the entry has already started.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setOperatingCalendarEntry
       x-ticvai-consumed-by:
@@ -14099,61 +14469,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /operating-calendar-entries/{entryId}:
-    parameters:
-    - name: entryId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    delete:
-      operationId: deleteOperatingCalendarEntry
-      x-ticvai-consumed-by:
-        - "P08 BO-152 Operating Calendar & Special Access Days"
-      x-ticvai-audience:
-      - staff
-      x-ticvai-agreed: '29 September: writers pass; writes the table listOperatingCalendarSpecial reads (pack ''Access
-        Control Module'' p.13 [Configure], [AI warns about conflicts]; MoM 2 Sep 2026 (validity/calendar rules, blockout
-        dates))'
-      summary: Delete an operating calendar entry
-      description: 'Deletes one calendar entry. An entry already started is refused `409 entry-in-progress`: shorten
-        it with `setOperatingCalendarEntry` instead, so a day in progress does not change its rules under the gates.
-
-        '
-      tags:
-      - access
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
-        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
-        writers pass)
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      responses:
-        '204':
-          headers:
-            X-Consistency-Token:
-              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
-          description: Deleted
-        '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
-        '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
-        '404':
-          $ref: ../shared/common.yaml#/components/responses/NotFound
-        '409':
-          description: '`entry-in-progress`: the entry has already started.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /hardware-models:
+  /hardware-models/{modelId}:
     put:
       operationId: setHardwareModel
       x-ticvai-consumed-by:
@@ -14191,6 +14507,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: modelId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -14473,7 +14794,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /gate-mode-policies:
+  /gate-mode-policies/{gateModePolicyId}:
     put:
       operationId: setGateModePolicy
       x-ticvai-consumed-by:
@@ -14507,6 +14828,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: gateModePolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -14600,6 +14926,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [not-pending]
           description: '`not-pending`: the change is already applied or cancelled.'
           content:
             application/problem+json:
@@ -14607,7 +14934,61 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /podiums:
+  /podiums/{podiumId}:
+    parameters:
+    - name: podiumId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: deletePodium
+      x-ticvai-consumed-by:
+        - "P08 BO-225 Podium Operations Console"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; writes the table listPodiumConsole reads (pack ''Access Control
+        Module'' 9.2 p.117; R221 (the podium sets the operating mode); MoM 2 Sep 2026 (manual override by security,
+        logged))'
+      summary: Delete a podium
+      description: 'Deletes a podium. Refused `409 shift-open` while an operator has an open shift on it. Its past
+        shifts (`access.podium_shift`) are kept for the handover summary.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: DEVICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
+        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
+        writers pass)
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Deleted
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [shift-open]
+          description: '`shift-open`: an operator is signed in to this podium.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPodium
       x-ticvai-consumed-by:
@@ -14677,61 +15058,8 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [access-point-not-in-venue]
           description: An access point is not in the podium's venue.
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /podiums/{podiumId}:
-    parameters:
-    - name: podiumId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    delete:
-      operationId: deletePodium
-      x-ticvai-consumed-by:
-        - "P08 BO-225 Podium Operations Console"
-      x-ticvai-audience:
-      - staff
-      x-ticvai-agreed: '29 September: writers pass; writes the table listPodiumConsole reads (pack ''Access Control
-        Module'' 9.2 p.117; R221 (the podium sets the operating mode); MoM 2 Sep 2026 (manual override by security,
-        logged))'
-      summary: Delete a podium
-      description: 'Deletes a podium. Refused `409 shift-open` while an operator has an open shift on it. Its past
-        shifts (`access.podium_shift`) are kept for the handover summary.
-
-        '
-      tags:
-      - access
-      x-ticvai-permission: DEVICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
-        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
-        writers pass)
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      responses:
-        '204':
-          headers:
-            X-Consistency-Token:
-              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
-          description: Deleted
-        '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
-        '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
-        '404':
-          $ref: ../shared/common.yaml#/components/responses/NotFound
-        '409':
-          description: '`shift-open`: an operator is signed in to this podium.'
           content:
             application/problem+json:
               schema:
@@ -14873,6 +15201,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [shift-ended]
           description: '`shift-ended`: the shift is already ended.'
           content:
             application/problem+json:
@@ -14880,7 +15209,60 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /reason-codes:
+  /reason-codes/{reasonCodeId}:
+    parameters:
+    - name: reasonCodeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: deleteReasonCode
+      x-ticvai-consumed-by:
+        - "P08 BO-227 Validation Exception & Reason Code Manager"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; writes the table listValidationExceptionReason reads (pack ''Access
+        Control Module'' 9.4 p.120; MoM 2 Sep 2026 (a successful scan is always used; genuine cases resolved by security))'
+      summary: Delete a validation reason code
+      description: 'Deletes a reason code no scan has used. **A code a scan event carries is refused `409 reason-code-in-use`**:
+        the scan history must keep resolving its reason, so change the messages instead.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
+        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
+        writers pass)
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Deleted
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [reason-code-in-use]
+          description: '`reason-code-in-use`: a scan event carries this code.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setReasonCode
       x-ticvai-consumed-by:
@@ -14953,62 +15335,11 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /reason-codes/{reasonCodeId}:
-    parameters:
-    - name: reasonCodeId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    delete:
-      operationId: deleteReasonCode
-      x-ticvai-consumed-by:
-        - "P08 BO-227 Validation Exception & Reason Code Manager"
-      x-ticvai-audience:
-      - staff
-      x-ticvai-agreed: '29 September: writers pass; writes the table listValidationExceptionReason reads (pack ''Access
-        Control Module'' 9.4 p.120; MoM 2 Sep 2026 (a successful scan is always used; genuine cases resolved by security))'
-      summary: Delete a validation reason code
-      description: 'Deletes a reason code no scan has used. **A code a scan event carries is refused `409 reason-code-in-use`**:
-        the scan history must keep resolving its reason, so change the messages instead.
-
-        '
-      tags:
-      - access
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
-        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
-        writers pass)
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      responses:
-        '204':
-          headers:
-            X-Consistency-Token:
-              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
-          description: Deleted
-        '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
-        '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
-        '404':
-          $ref: ../shared/common.yaml#/components/responses/NotFound
-        '409':
-          description: '`reason-code-in-use`: a scan event carries this code.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-event-propagation-rules:
     put:
       operationId: setCredentialEventPropagationRule
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket lifecycle event, the one the body''s `triggerEvent` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-170 Credential Revocation & Lifecycle Events"
         - "P08 BO-340 Entitlement & Cross-Media Synchronization Rules"
@@ -15078,7 +15409,54 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /media-binding-rules:
+  /media-binding-rules/{ruleId}:
+    parameters:
+    - name: ruleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: deleteMediaBindingRule
+      x-ticvai-consumed-by:
+        - "P08 BO-338 Multi-Media Binding & Association Rules"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; writes the table listMultiMediaBinding reads (pack ''Ticket Media
+        & Credential Management'' p.11 (15.1.5); MoM 2 Sep 2026 key decision (ticket is one virtual record, media
+        interchangeable); MoM 1 Sep 2026 §4.10 (media per business, multiple media per ticket))'
+      summary: Delete a multi-media binding rule
+      description: 'Deletes a binding rule. Media already bound under it stay bound; the next binding resolves against
+        the remaining rules.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
+        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
+        writers pass)
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Deleted
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMediaBindingRule
       x-ticvai-consumed-by:
@@ -15151,6 +15529,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [minimum-above-maximum, unknown-media-type]
           description: Minimum above maximum, or an unknown media type.
           content:
             application/problem+json:
@@ -15158,57 +15537,11 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /media-binding-rules/{ruleId}:
-    parameters:
-    - name: ruleId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    delete:
-      operationId: deleteMediaBindingRule
-      x-ticvai-consumed-by:
-        - "P08 BO-338 Multi-Media Binding & Association Rules"
-      x-ticvai-audience:
-      - staff
-      x-ticvai-agreed: '29 September: writers pass; writes the table listMultiMediaBinding reads (pack ''Ticket Media
-        & Credential Management'' p.11 (15.1.5); MoM 2 Sep 2026 key decision (ticket is one virtual record, media
-        interchangeable); MoM 1 Sep 2026 §4.10 (media per business, multiple media per ticket))'
-      summary: Delete a multi-media binding rule
-      description: 'Deletes a binding rule. Media already bound under it stay bound; the next binding resolves against
-        the remaining rules.
-
-        '
-      tags:
-      - access
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
-        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
-        writers pass)
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      responses:
-        '204':
-          headers:
-            X-Consistency-Token:
-              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
-          description: Deleted
-        '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
-        '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
-        '404':
-          $ref: ../shared/common.yaml#/components/responses/NotFound
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ticket-status-transitions:
     put:
       operationId: setTicketStatusTransition
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per status transition (fromStatus, toStatus), the one the body''s `fromStatus` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-336 Virtual Ticket Status & Lifecycle Model"
       x-ticvai-audience:
@@ -15273,6 +15606,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [transition-not-in-state-model]
           description: The transition is not in the entitlement state model.
           content:
             application/problem+json:
@@ -15287,6 +15621,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-177 Verification Method Selection & Locking"
       x-ticvai-audience:
@@ -15351,6 +15687,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [method-not-enabled-at-venue]
           description: A method named is not enabled at this venue.
           content:
             application/problem+json:
@@ -15361,6 +15698,8 @@ paths:
   /device-binding-policy:
     put:
       operationId: setDeviceBindingPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-167 Device Binding & Session Security"
       x-ticvai-audience:
@@ -15485,6 +15824,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [device-limit, device-change-needs-approval]
           description: '`device-limit` or `device-change-needs-approval` under the venue''s device binding policy.'
           content:
             application/problem+json:
@@ -15554,6 +15894,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [binding-released]
           description: '`binding-released`: the binding is already released.'
           content:
             application/problem+json:
@@ -15561,7 +15902,53 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /journey-sequence-rules:
+  /journey-sequence-rules/{ruleId}:
+    parameters:
+    - name: ruleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: deleteJourneySequenceRule
+      x-ticvai-consumed-by:
+        - "P08 BO-157 Anti-Passback & Journey Sequence"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass; writes the table listAntiPassbackJourney reads (pack ''Access
+        Control Module'' p.20 [Scope], [Configure required sequences], [If sequence is violated]; MoM 2 Sep 2026 (anti-passback
+        time window, exit-before-re-entry))'
+      summary: Delete a journey sequence rule
+      description: 'Deletes a journey sequence rule. Scans already judged against it keep their outcome.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
+        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
+        writers pass)
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Deleted
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setJourneySequenceRule
       x-ticvai-consumed-by:
@@ -15630,54 +16017,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /journey-sequence-rules/{ruleId}:
-    parameters:
-    - name: ruleId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    delete:
-      operationId: deleteJourneySequenceRule
-      x-ticvai-consumed-by:
-        - "P08 BO-157 Anti-Passback & Journey Sequence"
-      x-ticvai-audience:
-      - staff
-      x-ticvai-agreed: '29 September: writers pass; writes the table listAntiPassbackJourney reads (pack ''Access
-        Control Module'' p.20 [Scope], [Configure required sequences], [If sequence is violated]; MoM 2 Sep 2026 (anti-passback
-        time window, exit-before-re-entry))'
-      summary: Delete a journey sequence rule
-      description: 'Deletes a journey sequence rule. Scans already judged against it keep their outcome.
-
-        '
-      tags:
-      - access
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before
-        and after) in the same transaction; see "Configuration change log" in the contract header (decided 29 September,
-        writers pass)
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      responses:
-        '204':
-          headers:
-            X-Consistency-Token:
-              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
-          description: Deleted
-        '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
-        '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
-        '404':
-          $ref: ../shared/common.yaml#/components/responses/NotFound
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /journey-profiles:
+  /journey-profiles/{journeyProfileId}:
     put:
       operationId: setJourneyProfile
       x-ticvai-consumed-by:
@@ -15710,6 +16050,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: journeyProfileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15744,7 +16089,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /fast-pass-profiles:
+  /fast-pass-profiles/{fastPassProfileId}:
     put:
       operationId: setFastPassProfile
       x-ticvai-consumed-by:
@@ -15780,6 +16125,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: fastPassProfileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15813,6 +16163,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [total-uses-required]
           description: '`totalUses` missing on a limited profile.'
           content:
             application/problem+json:
@@ -15823,6 +16174,8 @@ paths:
   /policy-evaluation-settings:
     put:
       operationId: setPolicyEvaluationSetting
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per policy category, the one the body''s `policyCategory` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
       x-ticvai-audience:
@@ -15888,6 +16241,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [max-data-age-required]
           description: '`maxDataAgeMinutes` missing for conditional offline behaviour.'
           content:
             application/problem+json:
@@ -15898,6 +16252,8 @@ paths:
   /risk-scoring-config:
     put:
       operationId: setRiskScoringConfig
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-250 Access Risk Scoring & Decision Engine"
       x-ticvai-audience:
@@ -15949,6 +16305,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [thresholds-not-rising, threshold-out-of-range]
           description: Thresholds not rising, or out of 0 to 100.
           content:
             application/problem+json:
@@ -15959,6 +16316,8 @@ paths:
   /relationship-fraud-rules:
     put:
       operationId: setRelationshipFraudRule
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per relationship fraud rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-249 Relationship & Companion Fraud Monitoring"
       x-ticvai-audience:
@@ -16016,12 +16375,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [wrong-rule-kind]
           description: '`wrong-rule-kind`: the ruleId names a signal rule.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [access-denial-needs-human]
           description: '`accessDenial` without a person in the loop.'
           content:
             application/problem+json:
@@ -16099,12 +16460,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessPendingSecondApproval'
         '409':
+          x-ticvai-problem-types: [already-locked]
           description: '`already-locked`: an active lock covers this subject at this scope.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [lock-hours-required]
           description: '`lockHours` missing for an nHours lock.'
           content:
             application/problem+json:
@@ -16190,6 +16553,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [investigation-open, lock-released]
           description: '`investigation-open` or `lock-released`.'
           content:
             application/problem+json:
@@ -16274,6 +16638,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [security-alert-already-closed]
           description: The alert is already resolved or dismissed.
           content:
             application/problem+json:
@@ -16446,6 +16811,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [not-pending]
           description: '`not-pending`: the attempt is not awaiting review.'
           content:
             application/problem+json:
@@ -16516,6 +16882,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [template-in-flight]
           description: '`template-in-flight`: the template is awaiting approval or scheduled.'
           content:
             application/problem+json:
@@ -16592,6 +16959,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [not-active, no-previous-version]
           description: '`not-active` or `no-previous-version`.'
           content:
             application/problem+json:
@@ -16626,7 +16994,11 @@ paths:
         **Gate policies only.** Software-permission policies are identity''s `AuthorisationPolicy`, reported by
         `listAuthorisationPolicyEffectiveness`; see `AccessDynamicPolicy` for which engine governs what.
 
-        '
+        
+
+        **Order.** Sorted by `policyId` descending (a UUIDv7, so newest first).
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`, `inactive`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -16686,6 +17058,7 @@ paths:
                       items:
                         $ref: '#/components/schemas/AccessDynamicPolicyEffectiveness'
         '422':
+          x-ticvai-problem-types: [window-ends-before-start, date-range-too-long]
           description: '`to` is before `from`, or the range is longer than 366 days'
           content:
             application/problem+json:
@@ -16763,6 +17136,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [risk-subject-not-exactly-one]
           description: Not exactly one of subjectId, entitlementId and deviceId
           content:
             application/problem+json:
@@ -17960,6 +18334,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         triggerEvent:
@@ -18017,6 +18392,7 @@ components:
           nullable: true
           description: How the Virtual Ticket state change reaches every bound medium
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         createdAt:
@@ -18912,6 +19288,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         allowedMediaTypeIds:
@@ -19012,6 +19389,7 @@ components:
           maxLength: 100
           nullable: true
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         createdAt:
@@ -19563,6 +19941,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         fromStatus:
@@ -19621,6 +20000,7 @@ components:
             - api
             - scheduledProcess
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         createdAt:
@@ -19644,6 +20024,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: The policyId of listVerificationMethodSelection
@@ -19693,6 +20074,7 @@ components:
             `ticketCredentialFormat` (catalogue `SalesChannelProfile`), and that null, the platform''s signed QR.
             Wins over the channel when `issueOrderEntitlements` resolves the format.'
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         createdAt:
@@ -19858,6 +20240,7 @@ components:
         scopePath: &id001
           type: string
           description: ltree of the owning scope node (ADR-0005)
+          readOnly: true
         createdAt: &id002
           type: string
           format: date-time
@@ -19928,6 +20311,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -19977,6 +20361,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           $ref: ../shared/common.yaml#/components/schemas/Id
         venueId:
           type: string
@@ -20335,6 +20720,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -20458,6 +20844,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -20760,6 +21147,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         manufacturer:
@@ -20971,6 +21359,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -21152,6 +21541,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -21233,6 +21623,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -21900,6 +22291,7 @@ components:
       - scope
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -21907,6 +22299,7 @@ components:
           format: uuid
           nullable: true
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         name:
@@ -22300,6 +22693,7 @@ components:
       - status
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: The journeyProfileId
@@ -22309,6 +22703,7 @@ components:
           nullable: true
           description: Null is every park of the tenant
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         name:
@@ -22353,6 +22748,7 @@ components:
       - unlimited
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: The profileId the list shows
@@ -22361,6 +22757,7 @@ components:
           format: uuid
           nullable: true
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         name:
@@ -22868,9 +23265,11 @@ components:
       - evaluationMode
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         policyCategory:
@@ -23271,9 +23670,11 @@ components:
       - criticalThreshold
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node; one row per scope
         mediumThreshold:
@@ -25698,6 +26099,7 @@ components:
 
             '
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         perProductRules:
@@ -26554,6 +26956,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
         name:
           type: string

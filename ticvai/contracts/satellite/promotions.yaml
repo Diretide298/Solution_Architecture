@@ -323,6 +323,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/PromotionVariant'
         '400':
+          x-ticvai-problem-types: [traffic-percent-not-100]
           description: The variants' `trafficPercent` values do not sum to 100 (audit R101)
           content:
             application/problem+json:
@@ -479,6 +480,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Voucher'
+        '409':
+          description: 'The voucher is already `voided` (`voucher-already-voided`), or is `redeemed` or `expired` with nothing left to void (`voucher-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [voucher-already-voided, voucher-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions:
@@ -512,6 +520,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets live, published
         promotions, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.
       tags:
       - promotion
       x-ticvai-permission: PRICE_VIEW
@@ -751,6 +761,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Promotion'
         '409':
+          x-ticvai-problem-types: [live-promotion-terms-locked]
           description: Conditions or discount amended on a live promotion
           content:
             application/problem+json:
@@ -809,6 +820,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [promotion-not-live]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -868,6 +880,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [promotion-not-live-or-paused]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -914,6 +927,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [promotion-not-scheduled]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -1084,7 +1098,9 @@ paths:
       description: 'A campaign is the master definition. Individual codes are generated from it and carry
         their own redemption state.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - coupon
       x-ticvai-permission: PRICE_VIEW
@@ -1146,6 +1162,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CouponCampaign'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-campaigns/{campaignId}/codes:
@@ -1158,6 +1176,7 @@ paths:
         format: uuid
     get:
       operationId: listCouponCodes
+      description: '**Order.** Soonest first, by `validFrom` ascending, then by `assignedSubjectId`.'
       x-ticvai-consumed-by:
         - "P08 ADM-158 Coupon & Promo Code Command Center"
         - "P08 ADM-164 Code Distribution & Assignment Manager"
@@ -1265,6 +1284,7 @@ paths:
                     format: uuid
       responses:
         '400':
+          x-ticvai-problem-types: [assignees-exceed-quantity]
           description: More guests in `assignToSubjectIds` than `quantity` codes (audit R101)
           content:
             application/problem+json:
@@ -1435,6 +1455,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [coupon-code-not-issued]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -1495,6 +1516,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CouponCode'
         '409':
+          x-ticvai-problem-types: [coupon-already-redeemed]
           description: Already redeemed. A redeemed code cannot be voided
           content:
             application/problem+json:
@@ -1514,7 +1536,9 @@ paths:
       description: 'Vouchers carry monetary value and are sold or issued. Distinct from coupons, which
         modify the price of something else.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - voucher
       x-ticvai-permission: PRICE_VIEW
@@ -1626,6 +1650,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Voucher'
         '409':
+          x-ticvai-problem-types: [voucher-expired, voucher-fully-redeemed, redemption-exceeds-balance]
           description: Expired, already fully redeemed, or amount exceeds the balance
           content:
             application/problem+json:
@@ -1636,6 +1661,7 @@ paths:
   /bundles:
     get:
       operationId: listBundles
+      description: '**Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1727,6 +1753,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Bundle'
         '422':
+          x-ticvai-problem-types: [menu-item-id-missing, menu-item-variant-not-sold]
           description: A `fnbMenuItem` component with no `menuItemId`, or whose menu item does not sell the
             component's `variantId` (MOB-4, 29 September).
           content:
@@ -1734,6 +1761,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '400':
+          x-ticvai-problem-types: [allocation-not-100-percent, fixed-allocation-not-bundle-price]
           description: 'Allocation does not sum to 100 per cent, or fixed amounts do not sum to the bundle
             price.
 
@@ -1742,6 +1770,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundles/{bundleId}:
@@ -1859,6 +1889,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Bundle'
         '400':
+          x-ticvai-problem-types: [fixed-allocation-mismatch]
           description: The bundle's allocation is `fixedAmount` and the new price no longer equals the
             sum of the fixed amounts.
           content:
@@ -1877,7 +1908,9 @@ paths:
       description: 'How a bundled price divides across components. Consumed by the ledger at posting and
         at recognition.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - allocation
       x-ticvai-permission: LEDGER_VIEW
@@ -1960,6 +1993,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AllocationPreview'
         '400':
+          x-ticvai-problem-types: [weights-sum-to-zero, fixed-amounts-not-total]
           description: Weights sum to zero, or fixed amounts do not sum to the total
           content:
             application/problem+json:
@@ -1980,7 +2014,9 @@ paths:
       description: 'Read at venue: a venue sees the rules of the region above it. Rules are owned at region
         (decided 28 September, audit R183).
 
-        '
+        
+
+        **Order.** Sorted by `priority` ascending, then by `id`.'
       tags:
       - upsell
       x-ticvai-permission: PRODUCT_VIEW
@@ -3117,6 +3153,8 @@ paths:
   /rule-test-recommendation:
     put:
       operationId: setRuleTestRecommendation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.32; MoM 14 Aug (phase-one AI is a configuration assistant); shape fixed (26 non-field properties removed; added appliedRules, rejectedRules, discount, finalAmount, marginImpact, aiRecommendation)'
@@ -3350,6 +3388,8 @@ paths:
   /code-distribution-manager:
     put:
       operationId: setCodeDistributionManager
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per code batch, the one the body''s `batchId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-164 Code Distribution & Assignment Manager"
       x-ticvai-audience:
@@ -4378,6 +4418,8 @@ paths:
   /bundle-preview-recommendation:
     put:
       operationId: simulateBundlePreviewRecommendation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per bundle, the one the body''s `bundleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-187 Bundle Preview, Simulation & AI Recommendation"
       x-ticvai-audience:
@@ -5522,6 +5564,8 @@ paths:
   /promotion-stacking-rule:
     put:
       operationId: setPromotionStackingRule
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-148 Promotion Rule Builder"
         - "P08 ADM-210 Promotion Stacking Rule Builder"
@@ -5949,6 +5993,8 @@ paths:
   /campaign-budget-financial:
     put:
       operationId: setCampaignBudgetFinancial
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-219 Campaign Budget & Financial Limit Setup"
       x-ticvai-audience:
@@ -6133,6 +6179,8 @@ paths:
   /campaign-workflow:
     put:
       operationId: approveCampaignWorkflow
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-223 Campaign Approval Workflow Designer"
         - "P08 BO-770 Campaign Approval Workflow"
@@ -7223,6 +7271,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationStrategy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-strategies/{strategyId}:
@@ -7294,6 +7344,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationStrategy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-relationships:
@@ -7348,6 +7400,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductRelationships
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-642 Recommendation Type & Product Relationship Manager"
         - "P08 ADM-650 Upgrade Path & Product Ladder Builder"
@@ -7601,6 +7655,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationExperiment'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-experiments/{experimentId}/conclude:
@@ -7652,12 +7708,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/RecommendationExperiment'
         '400':
+          x-ticvai-problem-types: [winning-variant-not-in-experiment]
           description: '`winningVariant` does not name one of the experiment''s own variants.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [experiment-not-running]
           description: The experiment is not `running`. A draft never ran, and a concluded or abandoned
             experiment already has its outcome.
           content:
@@ -7733,6 +7791,8 @@ paths:
   /recommendation-suppressions:
     put:
       operationId: setRecommendationSuppression
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
         - "P08 ADM-677 Contextual Trigger, Frequency & Experience Controls"
@@ -7862,7 +7922,9 @@ paths:
         budget are not in these rows; the governance and budget screens work them out on read.
         (decided 29 September, writers pass)
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - promotion
       x-ticvai-permission: PRICE_VIEW
@@ -7957,12 +8019,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommercialCampaign'
         '400':
+          x-ticvai-problem-types: [invalid-window]
           description: '`validTo` at or before `validFrom`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: '`code` is already used by another campaign at the venue.'
           content:
             application/problem+json:
@@ -8053,6 +8117,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommercialCampaign'
         '400':
+          x-ticvai-problem-types: [campaign-ends-before-start]
           description: '`validTo` at or before `validFrom`.'
           content:
             application/problem+json:
@@ -8061,6 +8126,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [duplicate-code, campaign-dates-strand-items]
           description: The new code is already used at the venue, or the new dates would leave a scheduled
             or live promotion, coupon campaign or active bundle of the campaign outside them. The response
             names each one.
@@ -8093,7 +8159,9 @@ paths:
         partner where it differs. The live figures (reserved, remaining) are the catalogue''s and are
         shown by listCapacityPoolReservation and listBundleAvailabilityChannel, not here.
 
-        '
+        
+
+        **Order.** Sorted by `channel` ascending, then by `id`.'
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
@@ -8191,6 +8259,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [duplicate-policy-scope, default-policy-missing, policy-of-other-bundle]
           description: Two rows share a (channel, venueId, partnerId), there is no default row, or an `id`
             names a policy of another bundle.
           content:
@@ -8220,7 +8289,9 @@ paths:
         stands for which partner product, on what price, commission and terms, and the last connection
         reading the partner sync job wrote. The cross-bundle monitor is listPartnerExternalProduct.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
@@ -8319,6 +8390,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [component-not-in-bundle, component-mapped-twice, mapping-of-other-bundle]
           description: A `bundleComponentId` is not a component of this bundle, two rows map the same
             component, or an `id` names a mapping of another bundle.
           content:
@@ -8388,6 +8460,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -8790,6 +8863,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -10233,6 +10307,7 @@ components:
       - validFrom
       properties:
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -10891,6 +10966,7 @@ components:
       - allocation
       properties:
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -11183,6 +11259,7 @@ components:
       - suggestedVariantIds
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         regionId:

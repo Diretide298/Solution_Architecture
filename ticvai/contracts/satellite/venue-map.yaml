@@ -656,6 +656,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/VenueMapImportProblem' }
+        '409':
+          description: 'The map is `archived`; an archived map takes no import. No job is started.'
+          x-ticvai-problem-types: [map-archived]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1427,8 +1434,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/VenueMapLiveState'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bookable-venue-maps:
@@ -1815,6 +1821,8 @@ paths:
         venue of the tenant, so a swap cannot move a meal or a shop to a park the party is not in
         that day. `kind=shop` returns the venue's retail points, shops and retail kiosks alike;
         `kind=meal` its dining points, food kiosks included.
+
+        **Order.** Best first, by `matchedInterests` descending, then by `walkMinutes` ascending.
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
@@ -3713,3 +3721,22 @@ components:
                     nullable: true
                     enum: [outletId, productId, accessPointId]
                     description: For `brokenLink`, which link on the point is broken.
+    VenueMapLiveState:
+      type: object
+      x-ticvai-persistence: none — response only; live state over the published map, assembled at read time
+      description: '**The live operational state on the published map** (`getVenueMapLive`): one entry per point that has a live figure. Changes every few seconds, so it is read apart from the map itself (`getVenueMap`).'
+      required: [mapId, asOf, points]
+      properties:
+        mapId: { type: string, format: uuid }
+        asOf: { type: string, format: date-time }
+        points:
+          type: array
+          items:
+            type: object
+            required: [pointId]
+            properties:
+              pointId: { type: string, format: uuid }
+              isOpen: { type: boolean, nullable: true }
+              waitMinutes: { type: integer, minimum: 0, nullable: true }
+              queueLength: { type: integer, minimum: 0, nullable: true }
+              occupancyPercent: { type: number, minimum: 0, nullable: true }

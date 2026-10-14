@@ -154,6 +154,10 @@ paths:
         18.9.2. A supervisor sees the venue; a steward sees themselves. **The same operation,
         scoped by permission** — a steward without `WORKFORCE_VIEW` gets their own assignments
         and no one else's, which is what `EMP-022 My rota` renders.
+
+        **Order.** Soonest first, by `startsAt` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
       tags: [rota]
       x-ticvai-permission: WORKFORCE_VIEW
       x-ticvai-scope-level: venue
@@ -239,6 +243,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/RotaAssignment' }
         '409':
+          x-ticvai-problem-types: [rota-assignment-overlap, person-lacks-required-role]
           description: Overlaps an existing assignment, or the person lacks the required role
           content:
             application/problem+json:
@@ -325,8 +330,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/GuestBroadcastAccepted'
         '403':
           description: >
             The caller lacks `ANNOUNCEMENT_PUBLISH` at this venue, or sent `kind` `evacuation`
@@ -364,7 +368,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/RotaAssignment' }
+            schema: { $ref: '#/components/schemas/UpdateRotaAssignmentRequest' }
       responses:
         '200':
           headers:
@@ -561,6 +565,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AttendanceRecord' }
         '409':
+          x-ticvai-problem-types: [clock-out-without-clock-in, already-clocked-in]
           description: >
             Out of sequence — a clock-out with no clock-in, or a second clock-in. **Reported
             rather than silently corrected.**
@@ -894,6 +899,7 @@ paths:
                   $ref: '#/components/schemas/ShiftTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /shift-templates/{shiftTemplateId}:
     put:
       operationId: setShiftTemplate
       x-ticvai-consumed-by:
@@ -908,6 +914,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: shiftTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -930,6 +941,8 @@ paths:
   /staffing-rules:
     put:
       operationId: setStaffingRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-881 Overtime & Working-Hour Rules"
         - "P08 BO-885 Minimum Staffing & Coverage Rule Configuration"
@@ -1298,6 +1311,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/OpenShift'
         '409':
+          x-ticvai-problem-types: [open-shift-already-taken, shift-claimant-not-eligible, working-hour-rule-breach]
           description: Already taken, not eligible, or it would breach a working-hour rule
           content:
             application/problem+json:
@@ -1318,7 +1332,9 @@ paths:
         **`workforce.employee` had no operation of any kind until 20 September** — the rota, attendance
         and leave were all wired and the people they are about were not.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1394,6 +1410,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkforceEmployeeProfile'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such employee
           content:
             application/problem+json:
@@ -1426,6 +1443,7 @@ paths:
                   $ref: '#/components/schemas/WorkforceJobTitle'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /job-titles/{jobTitleId}:
     put:
       operationId: setJobTitle
       x-ticvai-consumed-by:
@@ -1443,6 +1461,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: jobTitleId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1490,6 +1513,7 @@ paths:
                   $ref: '#/components/schemas/WorkforceLeaveType'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /leave-types/{leaveTypeId}:
     put:
       operationId: setLeaveType
       x-ticvai-consumed-by:
@@ -1503,6 +1527,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: leaveTypeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1591,6 +1620,7 @@ paths:
                   $ref: '#/components/schemas/WorkforceShift'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /shift-patterns/{shiftPatternId}:
     put:
       operationId: setShiftPattern
       x-ticvai-consumed-by:
@@ -1604,6 +1634,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: shiftPatternId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1671,6 +1706,7 @@ paths:
                   $ref: '#/components/schemas/WorkforceWorkAssignment'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /work-assignments/{workAssignmentId}:
     put:
       operationId: setWorkAssignment
       x-ticvai-consumed-by:
@@ -1687,6 +1723,11 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       parameters:
+      - name: workAssignmentId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1742,6 +1783,7 @@ paths:
                   $ref: '#/components/schemas/WorkforceIntegrationSource'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /integration-sources/{sourceId}:
     put:
       operationId: setIntegrationSource
       x-ticvai-consumed-by:
@@ -1755,6 +1797,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - name: sourceId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1869,7 +1916,9 @@ paths:
       description: 'Resource board 10 asks the page to show successful records, failed records,
         warnings and mapping errors rather than *"integration failed"*.
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1955,6 +2004,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkforceSyncRun'
         '409':
+          x-ticvai-problem-types: [sync-run-in-progress]
           description: A run is already in progress for this source
           content:
             application/problem+json:
@@ -1975,7 +2025,9 @@ paths:
         **`affectedAssignmentIds` is a snapshot, not a live join** — what was at risk when the conflict
         was raised, which must not change when a roster does.
 
-        '
+        
+
+        **Order.** Newest first, by `raisedAt` descending, then by `id`.'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -2050,6 +2102,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkforceSyncConflict'
         '409':
+          x-ticvai-problem-types: [sync-conflict-already-resolved, resolution-not-for-kind]
           description: Already resolved, or the resolution is not available for this kind
           content:
             application/problem+json:
@@ -2069,7 +2122,9 @@ paths:
         writers pass). Filtered by venue and department, and by a date range that returns every budget whose
         period overlaps it.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -2118,6 +2173,7 @@ paths:
                         $ref: '#/components/schemas/LabourBudget'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /labour-budgets/{labourBudgetId}:
     put:
       operationId: setLabourBudget
       x-ticvai-consumed-by:
@@ -2141,6 +2197,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: labourBudgetId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2159,12 +2220,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/LabourBudget'
         '409':
+          x-ticvai-problem-types: [labour-budget-period-overlap]
           description: The period overlaps another budget for the same venue and department
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [period-ends-before-start]
           description: periodEnd is before periodStart
           content:
             application/problem+json:
@@ -2189,7 +2252,9 @@ paths:
         this list, whatever their permissions; a conversation is visible to its participants and no one
         else. Each row carries the caller''s unread count.
 
-        '
+        
+
+        **Order.** Newest activity first, by `lastMessageAt` descending, then by `id`.'
       tags:
       - announcements
       x-ticvai-permission: WORKFORCE_VIEW
@@ -2242,7 +2307,9 @@ paths:
         `404`, not a `403`**: whether a conversation exists between two other people is itself not the
         caller''s business.
 
-        '
+        
+
+        **Order.** Newest first, by `sentAt` descending, then by `id`.'
       tags:
       - announcements
       x-ticvai-permission: WORKFORCE_VIEW
@@ -2380,6 +2447,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [conversation-or-recipients-required, recipient-not-venue-staff, group-too-large]
           description: Neither conversationId nor recipientPrincipalIds, a recipient who is not staff of the
             caller's venue, or a group over 50 participants
           content:
@@ -2695,6 +2763,7 @@ components:
           format: date-time
           nullable: true
         status:
+          readOnly: true
           type: string
           enum: [active, degraded, suspended]
         scopePath:
@@ -2980,6 +3049,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         code:
@@ -2995,6 +3065,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
         updatedAt:
@@ -3054,6 +3125,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         code:
@@ -3069,6 +3141,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
     WorkforceShift:
@@ -3089,6 +3162,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         code:
@@ -3158,9 +3232,11 @@ components:
         isPrimary:
           type: boolean
         status:
+          readOnly: true
           type: string
           maxLength: 30
         createdAt:
+          readOnly: true
           type: string
           format: date-time
     ShiftTemplate:
@@ -3823,6 +3899,55 @@ components:
         status: { $ref: '#/components/schemas/RotaStatus' }
         breakMinutes: { type: integer, nullable: true }
         note: { type: string, nullable: true }
+    UpdateRotaAssignmentRequest:
+      type: object
+      x-ticvai-persistence: none — request only; a partial update of workforce.rota_assignment
+      description: '**A partial update of RotaAssignment** (the CR-089 pattern; CHG-SHP-008): `updateRotaAssignment` sends only what changes, and a field left out keeps its stored value. Nothing is required and nothing has a default, so a generated client never resends a value it did not mean to change. The server''s own fields (breachesWorkingHourLimit, displayName, id, overtimeMinutes) are not sendable.'
+      minProperties: 1
+      properties:
+        restPeriodBefore:
+          type: integer
+          nullable: true
+          description: >
+            Minutes since the previous shift ended. **The check that stops a closing shift followed
+            by an opening one**, which is legal in most places and unsafe in all of them.
+        labourCost:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            **Cost at the point of scheduling.** A manager building a rota without seeing its cost is
+            a manager who finds out from finance.
+        principalId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid }
+        departmentId: { type: string, format: uuid, nullable: true }
+        position:
+          type: string
+          description: >
+            What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most
+            positions never touch a till**, which is why a rota assignment is not a shift.
+
+            **A position code, not a label.** It is the same value as
+            `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and
+            `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an
+            assignment spelled differently from the rule it fills is counted against nothing and
+            the gap stays open. Tenant-defined, which is why it is not an enum here.
+        requiredRoleId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Checked on assignment. A rota naming someone unqualified is a rota that gets overridden.
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where the position needs a till. **The link between a rota and a cash session**,
+            without merging the two.
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        status: { $ref: '#/components/schemas/RotaStatus' }
+        breakMinutes: { type: integer, nullable: true }
+        note: { type: string, nullable: true }
 
     ShiftSwap:
       type: object
@@ -3982,3 +4107,13 @@ components:
               principalId: { type: string, format: uuid }
               displayName: { type: string }
               onShift: { type: boolean }
+    GuestBroadcastAccepted:
+      type: object
+      x-ticvai-persistence: none — response only; the dispatch rows are marketing.message_dispatch
+      description: '**The broadcast was accepted for sending** (`broadcastToGuests`). Sending runs on; the count is the guests with a live entitlement at the venue when it was accepted.'
+      required: [broadcastId, kind, acceptedAt, recipientCount]
+      properties:
+        broadcastId: { type: string, format: uuid }
+        kind: { type: string, enum: [evacuation, weather, rideClosure, lostChild, operational, allClear] }
+        acceptedAt: { type: string, format: date-time }
+        recipientCount: { type: integer, minimum: 0 }

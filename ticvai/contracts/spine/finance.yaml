@@ -923,6 +923,7 @@ paths:
   /accounts:
     get:
       operationId: listAccounts
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
       x-ticvai-audience:
@@ -1149,7 +1150,9 @@ paths:
       description: 'Maps revenue, tax, payment, refund, variance and breakage events to accounts. This
         is the table that makes posting deterministic rather than hard-coded.
 
-        '
+        
+
+        **Order.** Sorted by `creditAccountId` descending (a UUIDv7, so newest first).'
       tags:
       - accounts
       parameters:
@@ -1177,6 +1180,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccountMappings
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per region, the caller''s region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
       x-ticvai-audience:
@@ -1242,6 +1247,7 @@ paths:
   /cost-centers:
     get:
       operationId: listCostCenters
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
       x-ticvai-audience:
@@ -1320,11 +1326,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CostCenter'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-codes:
     get:
       operationId: listTaxCodes
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
       x-ticvai-audience:
@@ -1406,6 +1415,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-codes/{taxCodeId}:
@@ -1514,6 +1525,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: List tax exemptions
       description: Exemption by account, product class or channel — diplomatic, export, B2B.
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.
       tags:
       - tax
       parameters:
@@ -1626,6 +1639,7 @@ paths:
   /recognition-schedules:
     get:
       operationId: listRecognitionSchedules
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-076 Revenue Recognition"
       x-ticvai-audience:
@@ -1824,6 +1838,7 @@ paths:
   /journal-entries:
     get:
       operationId: listJournalEntries
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
       x-ticvai-audience:
@@ -2239,7 +2254,9 @@ paths:
         force, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
         found. `LEDGER_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
-        '
+        
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       tags:
       - ledger
       x-ticvai-permission: LEDGER_VIEW
@@ -2290,6 +2307,7 @@ paths:
                           $ref: '#/components/schemas/FxRate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /fx-rates/{rateId}:
     put:
       operationId: setFxRate
       x-ticvai-consumed-by:
@@ -2328,6 +2346,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: rateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2440,7 +2463,9 @@ paths:
         Neither entity ever holds a balance in a currency that is not its own. That is the whole of the
         policy, applied twice.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - ledger
       x-ticvai-permission: LEDGER_VIEW
@@ -2557,6 +2582,7 @@ paths:
   /ledger/entries:
     get:
       operationId: listLedgerEntries
+      description: '**Order.** Newest first, by `postedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-043 Daily Reconciliation"
       x-ticvai-audience:
@@ -2679,7 +2705,9 @@ paths:
         The threshold is `orders.RefundPolicy.varianceThreshold`, a venue setting with a tenant default
         (decided 28 September, audit R094; proposed default AED 5.00 per order line, client to correct).
 
-        '
+        
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
       tags:
       - variance
       x-ticvai-permission: LEDGER_VIEW
@@ -2802,6 +2830,7 @@ paths:
   /settlements:
     get:
       operationId: listSettlements
+      description: '**Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 ADM-623 Settlement & Payout Manager"
         - "P08 BO-025 Chargebacks & Disputes"
@@ -3027,7 +3056,9 @@ paths:
         **An unknown or out-of-scope `settlementId` is 404, not an empty page**: the path addresses the
         settlement. An empty page means a settlement that exists and has no exceptions.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - settlement
       x-ticvai-permission: SETTLEMENT_VIEW
@@ -3163,7 +3194,9 @@ paths:
       description: 'One per country of operation. Carries the country, currency, tax registration and
         fiscal calendar (12 Aug §14).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - fiscal
       parameters:
@@ -3221,11 +3254,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LegalEntity'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fiscal-periods:
     get:
       operationId: listFiscalPeriods
+      description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
         - "P08 BO-1170 Wallet Financial Period & Closing Controls"
@@ -3788,6 +3824,8 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per region, the caller''s region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Which provider serves which purpose
       description: '**Per purpose, per region.** A tender rate and a statutory reporting rate can come
         from different places and usually should — **`uaeCentralBank` for AED reporting because it is
@@ -3912,12 +3950,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [tax-exemption-expired, tax-exemption-not-required]
           description: The exemption is `expired`, or `notRequired`.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [evidence-document-required, rejection-note-required]
           description: '`verified` with no evidence document on the record or in the request, or `rejected`
             without a `note`.'
           content:
@@ -4402,6 +4442,7 @@ paths:
   /tax-invoice-templates:
     get:
       operationId: listTaxInvoiceTemplates
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
       x-ticvai-audience:
@@ -4439,6 +4480,7 @@ paths:
                         $ref: '#/components/schemas/FinTaxInvoiceTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tax-invoice-templates/{invoiceTemplateId}:
     put:
       operationId: setTaxInvoiceTemplate
       x-ticvai-consumed-by:
@@ -4464,6 +4506,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: invoiceTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4497,6 +4544,7 @@ paths:
   /e-invoicing/providers:
     get:
       operationId: listEInvoicingProviders
+      description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
         - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"
@@ -4530,6 +4578,7 @@ paths:
                         $ref: '#/components/schemas/FinEInvoicingProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /e-invoicing/providers/{providerId}:
     put:
       operationId: setEInvoicingProvider
       x-ticvai-consumed-by:
@@ -4557,6 +4606,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: providerId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4803,6 +4857,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [transmission-already-accepted]
           description: The transmission is already `accepted`.
           content:
             application/problem+json:
@@ -4875,6 +4930,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FinVatReturn'
         '422':
+          x-ticvai-problem-types: [period-not-whole-tax-months, legal-entity-not-tax-registered]
           description: The period is not whole tax months, or the legal entity has no tax registration number.
           content:
             application/problem+json:
@@ -6189,6 +6245,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -7581,6 +7638,7 @@ components:
           format: uuid
           readOnly: true
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:

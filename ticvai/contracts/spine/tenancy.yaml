@@ -422,6 +422,7 @@ paths:
   /org-units:
     get:
       operationId: listOrgUnits
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-055 Rota & Scheduling"
         - "P08 BO-064 Zones & Areas"
@@ -548,6 +549,8 @@ paths:
         fields this operation filters on, and the list is the shared `Page`. **Gated by
         `AUDIT_VIEW`, not `AI_AUDIT_VIEW`**: this is the platform trail of every principal's
         actions, and the AI key covers only what an assistant did.
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.
       tags: [tenancy]
       x-ticvai-permission: AUDIT_VIEW
       x-ticvai-audience: [staff]
@@ -781,6 +784,8 @@ paths:
 
         One row per profile, at its latest version. Earlier versions are read one at a time
         through `getConfigurationProfile` with `version`.
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
@@ -810,6 +815,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+
+  /configuration-profiles/{profileId}:
+    parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getConfigurationProfile
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: One profile, at its latest version or at a named one
+      description: >
+        26 September, pull audit R206. **A workstation still running v2.3 must be able to say what
+        v2.3 was** — the contract promised that and had no read that could answer it. `version`
+        omitted returns the latest.
+      tags: [tenancy]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: The profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfigurationProfile' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setConfigurationProfile
       x-ticvai-consumed-by:
@@ -871,41 +911,6 @@ paths:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-
-  /configuration-profiles/{profileId}:
-    parameters:
-      - name: profileId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
-    get:
-      operationId: getConfigurationProfile
-      x-ticvai-audience: [staff]
-      x-ticvai-read-routing: replica
-      summary: One profile, at its latest version or at a named one
-      description: >
-        26 September, pull audit R206. **A workstation still running v2.3 must be able to say what
-        v2.3 was** — the contract promised that and had no read that could answer it. `version`
-        omitted returns the latest.
-      tags: [tenancy]
-      x-ticvai-permission: TENANT_CONFIGURE
-      x-ticvai-scope-level: tenant
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - name: version
-          in: query
-          schema: { type: integer, minimum: 1 }
-      responses:
-        '200':
-          description: The profile
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/ConfigurationProfile' }
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1007,6 +1012,7 @@ paths:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
+          x-ticvai-problem-types: [profile-version-draft, profile-version-not-found]
           description: >
             **The named version is not deployable** — it is still a `draft`, or this profile has no
             such version. Names the version and its status.
@@ -1057,6 +1063,8 @@ paths:
 
     put:
       operationId: setOfflinePolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-130 Offline Policy & Rules Configuration"
@@ -1148,6 +1156,8 @@ paths:
 
     put:
       operationId: setConnectivityThresholds
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-131 Connectivity & Auto-Switch Settings"
       summary: When a workstation decides it is offline, and when it is back
@@ -1371,6 +1381,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setVenueSettingsDefaults
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1062 Tenant & Brand Context"
         - "P09 ADM-019 Global Configuration & Defaults"
@@ -1587,6 +1599,7 @@ paths:
   /workstations:
     get:
       operationId: listWorkstations
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
         - "P08 BO-037 Offline Package Status"
@@ -2171,6 +2184,8 @@ paths:
 
         **`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a
         credential, and a list at venue level is not where a credential is read back.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
       tags: [workstation]
       x-ticvai-permission: DEVICE_VIEW
       x-ticvai-scope-level: venue
@@ -2254,6 +2269,7 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
+          x-ticvai-problem-types: [identifier-bound-to-other-workstation, duplicate-serial]
           description: >
             Identifier already bound to another workstation, or `serialNumber` already registered in
             the tenant (`duplicate-serial`, moved here from access with the register, ADR-0067).
@@ -2261,6 +2277,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [workstation-id-required, workstation-id-not-allowed]
           description: >
             `workstationId` missing for a kind other than `mobileHandset`, or given for a
             `mobileHandset` (18.1.5).
@@ -2772,6 +2789,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: A release with this `deviceKind` and `version` already exists
           content:
             application/problem+json:
@@ -2887,6 +2905,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [firmware-transition-not-allowed]
           description: The move is not allowed from the release's current status (back to `draft`, out
             of `withdrawn`, or `deprecated` before `released`)
           content:
@@ -2894,6 +2913,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [reason-required]
           description: '`deprecated` or `withdrawn` without a `reason`.'
           content:
             application/problem+json:
@@ -2949,6 +2969,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [firmware-not-released]
           description: The firmware named by `firmwareId` is not `released`
           content:
             application/problem+json:
@@ -3018,6 +3039,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [previous-version-not-retained]
           description: The rollout kept no previous image (`previousVersionRetained` false), so there
             is nothing to roll back to
           content:
@@ -3256,7 +3278,9 @@ paths:
         from (`anchor`), what happens at expiry, and — where law sets a limit — the limit and its basis.
         See `TenantDataRetentionClass` for the classes and their defaults.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - tenancy
       x-ticvai-permission: TENANT_VIEW
@@ -3371,6 +3395,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [period-below-legal-minimum, period-above-legal-maximum, period-not-settable-for-class, follows-data-class-loop]
           description: A period below the class's legal minimum or above its legal maximum, a period sent
             for `aiMetadataIndex`, or a `followsDataClass` chain that loops
           content:
@@ -3784,6 +3809,7 @@ components:
           maxLength: 253
           x-ticvai-unique: tenant
         tenantId:
+          readOnly: true
           type: string
           format: uuid
           x-ticvai-references: control.tenant
@@ -4061,6 +4087,7 @@ components:
         deviceKind:
           type: string
         version:
+          readOnly: true
           type: string
         vendor:
           type: string
@@ -4400,7 +4427,7 @@ components:
         only reason to version a profile at all.
       required: [id, name, venueKindScope, version, status]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         name: { type: string }
         scopePath: { type: string }
         venueKindScope:
@@ -4448,6 +4475,7 @@ components:
           readOnly: true
           description: Taken from the path of `deployConfigurationProfile`.
         version:
+          readOnly: true
           type: integer
           description: The published version to deploy.
         targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
@@ -4497,6 +4525,7 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         scopePath:
+          readOnly: true
           type: string
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >
@@ -4560,6 +4589,7 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         scopePath:
+          readOnly: true
           type: string
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >

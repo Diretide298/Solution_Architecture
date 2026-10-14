@@ -1,0 +1,40 @@
+id: CHG-SHP-009
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'listReports ?search, listWaiverTemplateMaster ?q and searchCatalogue ?q say what they match.'
+decision:
+  what: 'contracts/reporting, marketing-crm, catalogue: a description on each parameter (fields matched,
+    case-insensitive).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-SEARCH-PARAM (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 3 members before, 0 after on this branch (CHG-SHP; ruling "go with your
+  recommendation", Chinmay, 14 October 2026). R182.'
+keys_touched:
+  operations:
+  - listReports
+  - listWaiverTemplateMaster
+  - searchCatalogue
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/spine/catalogue.yaml
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A18 API-CONVENTIONS
+tickets:
+  started: []
+  unstarted: ['27869', '28145', '28155', '28156', '28335', '28488', '28683', '28684', '28686', '28687', '28689',
+    '28737', '28738', '28739', '28740', '28741', '28744', '28746', '28748', '28752', '28997', '28998', '29006',
+    '29010']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

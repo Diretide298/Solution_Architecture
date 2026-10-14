@@ -1,0 +1,44 @@
+id: CHG-SHP-010
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Order.principalId, Product.createdByPrincipalId and Product.approvedByPrincipalId are marked
+  `x-ticvai-staff-only` (omitted when the caller is a guest); check-contract-shapes C-GUEST-INTERNAL accepts a field
+  so marked.'
+decision:
+  what: 'contracts/spine/orders.yaml, catalogue.yaml: `x-ticvai-staff-only` on the three properties (the shared
+    schemas still serve staff; the server leaves them out of a guest response). tools/check-contract-shapes.py:
+    C-GUEST-INTERNAL skips a property marked x-ticvai-staff-only.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-GUEST-INTERNAL (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 2 members before, 0 after on this branch (CHG-SHP; ruling "go with your
+  recommendation", Chinmay, 14 October 2026). R164. Non-breaking (none of the three is required). Lead to confirm the
+  marker over a separate guest view schema, which would change getOrder/getProduct''s response for every caller.'
+keys_touched:
+  operations:
+  - getOrder
+  - getProduct
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/orders.yaml
+  - tools/check-contract-shapes.py
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: ['27736', '27737', '27740', '27742', '27747', '28031', '28050', '28058', '28080', '28142', '28143',
+    '28147', '28158', '28165', '28166', '28222', '28229', '28234', '28239', '28256', '28259', '28260', '28339',
+    '28342', '28344', '28353', '28356', '28395', '28397', '28399', '28401', '28403', '28404', '28555', '28685',
+    '28686', '28688', '28689', '28727', '28728', '28757', '28759']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

@@ -237,6 +237,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletType'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-types/{walletTypeId}:
@@ -287,6 +289,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WalletType'
         '409':
+          x-ticvai-problem-types: [change-invalidates-live-wallets]
           description: Live wallets exist that the change would invalidate
           content:
             application/problem+json:
@@ -368,6 +371,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditType'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-types/{creditTypeId}:
@@ -421,6 +426,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditType'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-types/{creditTypeId}/eligibility:
@@ -503,6 +510,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCreditConsumptionPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1107 Consumption Priority Engine"
         - "P08 BO-1110 Split Tender & Multi-Credit Consumption"
@@ -771,6 +780,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletFundingRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per wallet type, the one the body''s `walletTypeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1094 Funding Method Configuration"
         - "P08 BO-1095 Top-Up Rule Configuration"
@@ -893,6 +904,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WalletAdjustment'
         '409':
+          x-ticvai-problem-types: [top-up-already-spent]
           description: Already spent below the reversal amount
           content:
             application/problem+json:
@@ -1114,9 +1126,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VoucherType'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /gift-card-products:
+  /gift-card-products/{giftCardProductId}:
     put:
       operationId: setGiftCardProduct
       x-ticvai-consumed-by:
@@ -1140,6 +1154,11 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       parameters:
+      - name: giftCardProductId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1165,6 +1184,8 @@ paths:
   /wallet-channel-rules:
     put:
       operationId: setWalletChannelRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1134 Wallet Channel Configuration"
         - "P08 BO-1135 Wallet Payment & Redemption Policy"
@@ -1258,6 +1279,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WalletCredential'
         '409':
+          x-ticvai-problem-types: [credential-bound-to-other-wallet]
           description: Already bound to another wallet
           content:
             application/problem+json:
@@ -1268,6 +1290,8 @@ paths:
   /wallet-transfer-rules:
     put:
       operationId: setWalletTransferRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1144 Peer-to-Peer Transfer Configuration"
         - "P08 BO-1145 Transfer Eligibility, Limits & Approval Rules"
@@ -1346,6 +1370,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletRefundPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-612 Refund Allocation & Original Tender Manager"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
@@ -1531,6 +1557,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletRiskRules
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1153 Wallet Security & Risk Command Center"
         - "P08 BO-1154 Wallet Risk Policy Configuration"
@@ -1583,6 +1611,8 @@ paths:
   /wallet-accounting:
     put:
       operationId: setWalletAccountingMapping
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1164 Wallet Financial Classification & Accounting Mapping"
         - "P08 BO-1169 Breakage & Revenue Recognition Policy"
@@ -2370,6 +2400,13 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Wallet' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: 'The wallet is `closed`; its balance is final and takes no adjustment. Nothing changes.'
+          x-ticvai-problem-types: [wallet-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-cards:
@@ -2412,6 +2449,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/GiftCard' }
         '409':
+          x-ticvai-problem-types: [gift-card-already-active, unknown-card-code]
           description: Card already activated, or the code is unknown
           content:
             application/problem+json:
@@ -2496,6 +2534,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/GiftCard' }
+        '409':
+          description: 'The card is already `blocked` (`gift-card-already-blocked`), or is `issued` and not yet activated, `redeemed` or `expired`, with no live balance to protect (`gift-card-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [gift-card-already-blocked, gift-card-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-cards/{giftCardId}/activate:
@@ -2782,6 +2827,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Wallet'
+        '409':
+          description: 'The card is `expired` (`game-card-expired`) or was `transferred` (`game-card-transferred`), or the guest wallet behind it is `closed` (`wallet-closed`); only an `active` or `blocked` card is adjusted. Nothing changes.'
+          x-ticvai-problem-types: [game-card-expired, game-card-transferred, wallet-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/balance:
@@ -3053,6 +3105,8 @@ paths:
   /wallet-authentication-policy:
     put:
       operationId: setWalletAuthenticationPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1139 Digital Key & Wallet Authentication Policy"
       x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
@@ -3103,6 +3157,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WalletAuthenticationPolicy'
         '422':
+          x-ticvai-problem-types: [authentication-tiers-overlap, tier-method-required]
           description: Two tiers with the same `aboveAmount` overlap on a channel and a transaction kind,
             or a tier lists no method.
           content:
@@ -3127,7 +3182,9 @@ paths:
         what `publishWalletConfiguration` recorded, plus drafts created by
         `restoreWalletConfigurationVersion` (`publishedAt` null).
 
-        '
+        
+
+        **Order.** Newest first, by `publishedAt` descending.'
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -3268,6 +3325,13 @@ paths:
                 $ref: '#/components/schemas/WalletConfigurationVersion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.'
+          x-ticvai-problem-types: [unpublished-changes]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-risk-rules/{ruleCode}/status:
@@ -3342,6 +3406,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [reason-required, until-only-for-suspended, until-in-past]
           description: No `reason` for `suspended` or `emergencyDisabled`, or `until` given with a status
             other than `suspended`, or `until` in the past.
           content:
@@ -3353,6 +3418,8 @@ paths:
   /wallet-reconciliation-sources:
     put:
       operationId: setWalletReconciliationSources
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1166 Multi-Source Reconciliation Configuration"
       x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
@@ -3399,6 +3466,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WalletReconciliationSources'
         '422':
+          x-ticvai-problem-types: [wallet-ledger-required, duplicate-source-kind]
           description: '`walletLedger` disabled or missing, or a source kind listed twice.'
           content:
             application/problem+json:
@@ -3409,6 +3477,8 @@ paths:
   /wallet-integration-mappings:
     put:
       operationId: setWalletIntegrationMapping
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per API client, the one the body''s `apiClientId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1175 Integration Profile & System Mapping"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
@@ -3456,6 +3526,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WalletIntegrationMapping'
         '422':
+          x-ticvai-problem-types: [unknown-credit-type, credit-type-retired, external-value-mapped-twice]
           description: A credit-type mapping names a credit type that does not exist or is retired, or an
             external value is mapped twice within one list.
           content:
@@ -3550,12 +3621,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [wallet-dispute-already-closed]
           description: The dispute is already closed (`upheld`, `rejected` or `withdrawn`).
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [outcome-required, resolution-note-required, escalation-role-required]
           description: '`resolve` without `outcome` or `resolutionNote`, or `escalate` without
             `escalateToRoleId`.'
           content:
@@ -3628,6 +3701,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [wallet-dispute-already-closed]
           description: The dispute is already closed (`upheld`, `rejected` or `withdrawn`).
           content:
             application/problem+json:
@@ -3722,6 +3796,7 @@ paths:
               schema: { $ref: '#/components/schemas/WalletAutoReloadSetting' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
+          x-ticvai-problem-types: [auto-reload-disabled, wallet-not-active]
           description: The venue has auto-reload disabled for this wallet type, or the wallet is suspended or
             closed.
           content:
@@ -3852,12 +3927,14 @@ paths:
               schema: { $ref: '#/components/schemas/WalletExitSettlement' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
+          x-ticvai-problem-types: [nothing-to-settle, settlement-action-mismatch, guest-cannot-waive]
           description: Nothing is due or refundable, or the action does not match the balance (`collect` on a
             wallet in credit), or `waive` by a guest.
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [payment-declined, reason-required]
           description: The card was declined, or `waive` without a reason.
           content:
             application/problem+json:
@@ -4358,6 +4435,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -4479,6 +4557,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -5022,6 +5101,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string

@@ -920,6 +920,8 @@ paths:
   /ai/suggestion-providers:
     put:
       operationId: setSuggestionProvider
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Point a question at a rule, a model, or both
       description: '**The swap, and it is a configuration change.** Per `SuggestionKind`: which producer
         answers it, at which version, and with what guard rails.
@@ -1089,6 +1091,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/WalkwayProposal'
         '409':
+          x-ticvai-problem-types: [map-has-vector-geometry]
           description: '**The map has vector geometry.** Refused deliberately — subtraction is available
             and better, and running a model where geometry exists is how a worse answer gets preferred
             because it arrived in a nicer format.
@@ -1595,7 +1598,9 @@ paths:
         assistant conversations; another guest''s conversation is refused exactly as one that does not exist,
         never returned. `AI_USE` is what a staff caller must hold to act for any guest (ADR-0025).
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - assist
       x-ticvai-permission: AI_USE
@@ -2303,6 +2308,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LayoutDraft'
         '422':
+          x-ticvai-problem-types: [plan-not-interpretable]
           description: The plan could not be interpreted. The reason is specific enough to act on
           content:
             application/problem+json:
@@ -2332,7 +2338,9 @@ paths:
         part of a governed decision, so ADM-004 opens the full trace (`getAiDecisionTrace`). A guest FAQ
         answer has no decision record, only this row (design 3.9).
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - governance
       x-ticvai-permission: AI_AUDIT_VIEW
@@ -2653,6 +2661,7 @@ paths:
                   $ref: '#/components/schemas/AiProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /providers/{providerId}:
     put:
       operationId: setAiProvider
       x-ticvai-consumed-by:
@@ -2731,6 +2740,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: providerId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2847,6 +2861,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAiPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-091 AI Policy & Spend"
       x-ticvai-audience:
@@ -3031,6 +3047,7 @@ paths:
                   $ref: '#/components/schemas/IndexSource'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /index-sources/{sourceId}:
     put:
       operationId: setIndexSource
       x-ticvai-audience:
@@ -3058,6 +3075,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: sourceId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -3177,6 +3199,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IndexJob'
         '409':
+          x-ticvai-problem-types: [reindex-in-progress]
           description: Already rebuilding
           content:
             application/problem+json:
@@ -3338,7 +3361,9 @@ paths:
         ADM-519..522). Owner, family, risk class, the autonomy level in force against its ceiling, data categories,
         lifecycle per environment and whether it is paused. The P09 governance area and ANL-060 read this first.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - governance
       x-ticvai-permission: AI_USE
@@ -3737,7 +3762,9 @@ paths:
       description: 'Every version of every governance policy at the scope, newest first (ADM-523, ADM-526..528).
         Filter by `policyId` for one policy''s history, or by `status` for what is in force.
 
-        '
+        
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
       tags:
       - governance
       x-ticvai-permission: AI_USE
@@ -4627,7 +4654,9 @@ paths:
       description: 'What the executor may call, and on what terms (AIC-088, AIC-089): target operation and version,
         effect, risk, permission, reversibility, compensation, timeout (ADM-523, ADM-530).
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - actions
       x-ticvai-permission: AI_USE
@@ -4808,7 +4837,9 @@ paths:
       summary: Configuration-assistant sessions
       description: 'Sessions at the scope with progress, last activity and status (ADM-469 home, ADM-497 history).
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - configure
       x-ticvai-permission: AI_USE
@@ -5060,7 +5091,9 @@ paths:
       description: 'Each attached document with its extraction status, how many questions it answered and what
         it could not read.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - configure
       x-ticvai-permission: AI_USE
@@ -5314,7 +5347,9 @@ paths:
         counted, newest first. Analytics questions outside the semantic model appear here too, as `kind: analytics`
         (design 5.7).
 
-        '
+        
+
+        **Order.** Newest first, by `lastAskedAt` descending, then by `id`.'
       tags:
       - knowledge
       x-ticvai-permission: AI_USE
@@ -5444,6 +5479,13 @@ paths:
                 $ref: '#/components/schemas/AiAnswerFeedback'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'This person has already labelled this answer; it takes one label per message per person (AIC-062). Nothing changes.'
+          x-ticvai-problem-types: [answer-feedback-already-recorded]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /assistant-profiles/{profileKey}:
@@ -5526,7 +5568,9 @@ paths:
       summary: Assistant profiles
       description: 'Guest concierge, support chatbot and staff profiles by role, at the scope.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - knowledge
       x-ticvai-permission: AI_USE
@@ -5581,7 +5625,9 @@ paths:
         and executive summaries with their lifecycle (AIP-181). One situation produces one insight through the correlation
         key (AIP-090).
 
-        '
+        
+
+        **Order.** Newest first, by `detectedAt` descending, then by `id`.'
       tags:
       - insights
       x-ticvai-permission: AI_USE
@@ -5819,7 +5865,9 @@ paths:
         measured like any other. **A person applies it** in marketing-crm (`updateCampaign`, `createJourney`, `activateJourney`);
         nothing here changes a campaign (autonomy L2, design 3.8).
 
-        '
+        
+
+        **Order.** Newest first, by `detectedAt` descending, then by `decisionRecordId`.'
       tags:
       - insights
       x-ticvai-permission: AI_USE
@@ -5952,7 +6000,9 @@ paths:
       summary: Anomaly detectors
       description: 'Detectors at the scope with their method and measured false-alarm rate.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - insights
       x-ticvai-permission: AI_USE
@@ -6002,7 +6052,9 @@ paths:
       description: 'Forecast definitions at the scope (ADM-500): subject, grain, horizon, cadence, the live producer
         and its shadow.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -6190,7 +6242,9 @@ paths:
       summary: Forecast versions
       description: 'Immutable versions (AIP-032) with basis, producer, data cut-off, quality checks and status (ADM-508).
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -6614,7 +6668,9 @@ paths:
         and interval coverage against the baseline rule, per producer. These are the figures the promotion gate
         reads.
 
-        '
+        
+
+        **Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -6666,7 +6722,9 @@ paths:
       summary: Forecast signals and their freshness
       description: 'Weather, holidays, calendars and events with coverage and freshness (AIP-199..203, ADM-501).
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -6789,7 +6847,9 @@ paths:
       description: '**Staff, POS, gates, F&B, stock and resources** derived from a published version with the tenant''s
         productivity standards (design 2.2 C step 6, AIP-067; ADM-509..518, BO-919, BO-925..927).
 
-        '
+        
+
+        **Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -7064,6 +7124,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AiTransactionRiskScore'
         '422':
+          x-ticvai-problem-types: [order-or-wallet-required]
           description: Neither `orderId` nor `walletId` was sent
           content:
             application/problem+json:
@@ -7117,6 +7178,8 @@ paths:
   /risk/strategy:
     put:
       operationId: configureRiskStrategy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk (setRiskStrategy), 8 decision 6; our build plan,
@@ -7861,6 +7924,13 @@ paths:
                 $ref: '#/components/schemas/AiApprovalRequestScore'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The request is no longer `pending` or `escalated` (decided, withdrawn, cancelled or expired); there is no reviewer left to inform. No score is written.'
+          x-ticvai-problem-types: [approval-request-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
@@ -8325,7 +8395,9 @@ paths:
       description: 'Platform and tenant models with capabilities, context size, tool calling, structured output,
         region, cost profile and lifecycle (AIC-013, AIC-026; ADM-037, ADM-544).
 
-        '
+        
+
+        **Order.** Sorted by `rank` ascending, then by `id`.'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -8456,7 +8528,9 @@ paths:
       summary: The prompt registry
       description: 'Prompt templates by task with their versions and status (AIC-022).
 
-        '
+        
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -8649,7 +8723,9 @@ paths:
       summary: Evaluation runs
       description: 'Runs with metrics and gate results, newest first.
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -8879,7 +8955,9 @@ paths:
         outcome, subject, trace id, policy or model version and period. Auditors scoped to a venue see only that
         venue''s records (design 3.1, RLS on the log database).
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - audit
       x-ticvai-permission: AI_AUDIT_VIEW
@@ -9168,7 +9246,9 @@ paths:
         including `promotionReady` when a shadow model passes its gate (design 3.12), which the P09 governance area
         shows as a tile.
 
-        '
+        
+
+        **Order.** Newest first, by `raisedAt` descending, then by `id`.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -9324,7 +9404,9 @@ paths:
       description: 'Governance incidents from detection to closure (ADM-549, ADM-556), linked to operational incidents
         where both apply (AIC-250).
 
-        '
+        
+
+        **Order.** Newest first, by `openedAt` descending, then by `id`.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -9619,7 +9701,9 @@ paths:
       summary: The AI risk register
       description: 'Ongoing AI risks with likelihood, impact, controls and residual rating (ADM-550, ADM-557, ADM-558).
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -9737,7 +9821,9 @@ paths:
       summary: Governance controls
       description: 'The control library with effectiveness and last test (AIC-219, ADM-551, ADM-557).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -10268,7 +10354,11 @@ paths:
       summary: The venue's history imports
       description: 'Imports of the venue''s own history, newest first, with the months each covered and its result.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`failed`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -10350,7 +10440,9 @@ paths:
         the next stage needs. Stages move by themselves from `starting` to `established` as data arrives, each move
         recorded; `learned` only when an admin promotes a trained model (AI-D16).
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -10405,7 +10497,9 @@ paths:
         promotion gate raises a `promotionReady` governance alert to the admin; **nothing switches by itself** (AI-D16).
         Runs are scheduled by the platform; this reads them.
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -10464,7 +10558,9 @@ paths:
         `getAiUsage` grouped by `agent`, which says which agents spend the most and on what. Computed from the gateway
         telemetry and `ai.activity` over the last hour; nothing is stored here.
 
-        '
+        
+
+        **Order.** Newest first, by `measuredAt` descending.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -15589,6 +15685,7 @@ components:
           format: uuid
           readOnly: true
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         enabled:
@@ -17163,6 +17260,7 @@ components:
       - decision
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         suggestionId:
@@ -17469,6 +17567,7 @@ components:
           - venue
           description: Tenant sets the default; a venue may narrow it and never widen it.
         scopePath:
+          readOnly: true
           type: string
           description: '**The node this row belongs to, and the key it is written under** — the tenant''s
             node where `scopeLevel` is `tenant`, a venue''s where it is `venue`. One row per `scopePath`;

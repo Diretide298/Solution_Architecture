@@ -190,13 +190,20 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/RolloutCell'
+        '409':
+          description: 'The cell is not `pending` (already `running`, `complete`, `failed`, `skipped` or `rolledBack`); only a cell the wave has not reached can be skipped. Nothing changes.'
+          x-ticvai-problem-types: [rollout-cell-not-pending]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases:
     get:
       operationId: listReleases
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
@@ -282,6 +289,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Release'
         '400':
+          x-ticvai-problem-types: [required-migration-missing, unknown-component-version]
           description: 'A required migration is absent, or a component version does not exist in the registry.
 
             '
@@ -370,6 +378,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [release-not-in-staging]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -421,6 +430,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [release-transition-not-allowed]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -492,6 +502,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Rollout'
         '403':
+          x-ticvai-problem-types: [approver-is-requester, step-up-token-missing, step-up-token-expired]
           description: Approver is the requester, or the step-up token is absent or expired
           content:
             application/problem+json:
@@ -556,7 +567,9 @@ paths:
       description: 'A rollout is one release reaching one environment across many cells. The deployment
         monitor reads this.
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - rollout
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
@@ -710,6 +723,7 @@ paths:
                     format: uuid
                     description: The pending `releasePromotion` request.
         '409':
+          x-ticvai-problem-types: [rollout-transition-not-allowed]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -767,6 +781,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RolloutDetail'
+        '409':
+          description: 'The rollout is already `paused` (`rollout-already-paused`), or is not `rolling` (`queued`, `canary`, or finished as `complete`, `failed` or `rolledBack`; `rollout-not-rolling`). Nothing changes.'
+          x-ticvai-problem-types: [rollout-already-paused, rollout-not-rolling]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}/rollback:
@@ -855,7 +876,9 @@ paths:
       description: 'Every migration, its module, whether it is reversible, and which cells have applied
         it. This is the migration console''s landing view.
 
-        '
+        
+
+        **Order.** Newest first, by `rollbackTestedAt` descending.'
       tags:
       - migration
       x-ticvai-permission: PLATFORM_MIGRATION_VIEW
@@ -946,6 +969,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MigrationPlan'
         '400':
+          x-ticvai-problem-types: [unknown-target-version, migration-path-not-contiguous]
           description: Target version unknown, or the path between versions is not contiguous
           content:
             application/problem+json:
@@ -1022,6 +1046,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MigrationRun'
         '409':
+          x-ticvai-problem-types: [migration-plan-stale]
           description: 'The plan is stale — cell state changed since it was computed. Re-plan and review
             before applying.
 
@@ -1470,6 +1495,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UpgradeSchedule'
         '400':
+          x-ticvai-problem-types: [deferral-window-exceeded]
           description: Deferral exceeds the maximum permitted window
           content:
             application/problem+json:
@@ -1919,6 +1945,7 @@ paths:
                   $ref: '#/components/schemas/WafRule'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waf-policies/{wafRuleId}:
     put:
       operationId: setWafPolicy
       x-ticvai-consumed-by:
@@ -1944,6 +1971,11 @@ paths:
             schema:
               $ref: '#/components/schemas/WafRule'
       parameters:
+        - name: wafRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -2045,6 +2077,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setScalingPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per cell and service, the one the body''s `cellId` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
       x-ticvai-audience:
@@ -2159,6 +2193,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         cellId:
@@ -2261,6 +2296,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         cellId:
@@ -3078,6 +3114,7 @@ components:
       - name
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         kind:
@@ -3111,6 +3148,7 @@ components:
       - scheduledFor
       properties:
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         tenantName:
@@ -3146,9 +3184,11 @@ components:
       - publishedAt
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         version:
+          readOnly: true
           type: string
         supportEndsAt:
           type: string

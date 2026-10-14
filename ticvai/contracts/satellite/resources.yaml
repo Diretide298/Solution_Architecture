@@ -146,12 +146,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Resource'
         '422':
+          x-ticvai-problem-types: [cleanings-per-day-missing, window-ends-before-start]
           description: A `cleaningPolicy` with `timesPerDay` and no `cleaningsPerDay`, or whose window ends before
             it starts (W10, 29 September).
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/availability:
@@ -900,6 +903,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceType'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-types/{resourceTypeId}:
@@ -1017,6 +1022,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceCategory'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-categories/{categoryId}:
@@ -1136,6 +1143,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceAttributeDefinition'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}:
@@ -1210,12 +1219,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Resource'
         '422':
+          x-ticvai-problem-types: [cleanings-per-day-required, window-ends-before-start]
           description: A `cleaningPolicy` with `timesPerDay` and no `cleaningsPerDay`, or whose window ends before
             it starts (W10, 29 September).
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/state:
@@ -1594,6 +1606,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourcePackage'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-packages/{packageId}:
@@ -1637,6 +1651,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourcePackage'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/venues:
@@ -2353,6 +2369,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceBooking'
+        '409':
+          description: 'The booking is `returned`, `cancelled` or `noShow`; there is no allocation left to replace. Nothing changes.'
+          x-ticvai-problem-types: [resource-booking-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-allocation-policy:
@@ -2383,6 +2406,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setResourceAllocationPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-900 Dynamic Resource Allocation Engine"
         - "P08 BO-901 Priority, Scoring & Allocation Policy"
@@ -2426,6 +2451,8 @@ paths:
   /resource-selection-policy:
     put:
       operationId: setResourceSelectionPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket type, the one the body''s `ticketTypeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-897 Customer Resource Selection Configuration"
       summary: Whether the guest may choose the resource, per ticket type
@@ -3018,7 +3045,9 @@ paths:
         and with `timesPerDay` every cleaning of the date must still be placeable once the window is taken.
         `freeCount` counts only rooms that pass all three.
 
-        '
+        
+
+        **Order.** Soonest first, by `startsAt` ascending.'
       x-ticvai-agreed: '29 September: W10 (cleaning policy) and W9 (date, start and duration checked together)'
       tags:
       - resources
@@ -3150,6 +3179,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [invalid-progress-step]
           description: '`invalidProgressStep`: `started` on a booking that is not `reserved`, or `completed` on
             one that is not `checkedOut` or `overdue`.'
           content:
@@ -3157,6 +3187,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [use-check-out-check-in]
           description: '`useCheckOutCheckIn`: the booked resource is not of kind `staff` or `instructor`.'
           content:
             application/problem+json:
@@ -3210,6 +3241,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ResourceRequest'
         '422':
+          x-ticvai-problem-types: [subject-required, unknown-subject]
           description: '`subjectRequired`: no `bookingId` or `resourceId` on a kind that needs one; or a
             `bookingId` / `resourceId` that does not exist at this venue (`unknownSubject`).'
           content:
@@ -3396,6 +3428,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ResourceCostEntry'
         '422':
+          x-ticvai-problem-types: [resource-not-at-venue, transfer-venue-missing, transfer-venues-identical, amount-not-positive]
           description: Unknown resource at this venue; a `transfer` without both venues or with the same
             venue twice; a non-positive amount.
           content:
@@ -3973,6 +4006,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -4051,6 +4085,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -4108,6 +4143,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         label:
           type: string
@@ -4284,6 +4320,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -4721,9 +4758,11 @@ components:
       - venueId
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
         name:
           type: string

@@ -143,6 +143,10 @@ paths:
       description: >
         Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets nothing
         references — the working set for a library clear-out.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`, `failed`); a screen that shows only live rows filters on `status` itself.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_VIEW
       x-ticvai-scope-level: venue
@@ -473,6 +477,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/UploadTicket' }
         '400':
+          x-ticvai-problem-types: [media-type-not-permitted, media-too-large]
           description: >
             Content type not permitted, or size beyond the limit for that kind. Checked here
             rather than after a guest has uploaded two hundred megabytes.
@@ -703,6 +708,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMediaTaxonomy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-065 Metadata & Taxonomy Management"
       summary: Define categories, fields and keyword vocabularies
@@ -788,6 +795,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/MediaTag'
         '400':
+          x-ticvai-problem-types: [tag-not-in-vocabulary]
           description: >
             A tag names a closed vocabulary (`MediaTaxonomy.keywordVocabularies[].closed`) and
             its value is not one of that vocabulary's terms. `errors[]` carries one entry per refused tag, with `field` set to
@@ -843,6 +851,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaTag'
+        '409':
+          description: 'The asset is still `processing`, or is `failed` or `quarantined`, so there is no usable file to analyse. Nothing is queued.'
+          x-ticvai-problem-types: [media-asset-not-ready]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/similar:
@@ -1187,7 +1202,7 @@ paths:
                 $ref: '#/components/schemas/MediaDistribution'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /media-distribution/channels:
+  /media-distribution/channels/{code}:
     put:
       operationId: setMediaDistributionChannels
       x-ticvai-consumed-by:
@@ -1208,6 +1223,11 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `code`, when sent, must equal it.'
+        schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true

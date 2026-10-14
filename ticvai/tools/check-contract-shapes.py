@@ -69,7 +69,8 @@ RULES = {
     "C-FIELD-TYPE-DRIFT": "one field typed two ways across an entity's schemas (R237 R227)",
     "C-ID-FORMAT": "an id field typed other than uuid (ADR-0056) (R074)",
     "C-APPEND-ONLY": "an append-only schema written by PUT/PATCH/DELETE (R185)",
-    "C-GUEST-INTERNAL": "a guest-callable read returns principal ids or internal fields (R164)",
+    "C-GUEST-INTERNAL": "a guest-callable read returns principal ids or internal fields not marked "
+                        "x-ticvai-staff-only (R164, CHG-SHP-010)",
     "C-CODE-409": "a create that takes a business code declares no 409 for a duplicate (R108, CHG-R4-015)",
     "C-CLONE-CODE": "a clone of an entity with a unique code takes no new code (R108, CHG-R4-016)",
     "C-NAME-LOCALISED": "an entity localises other text but not its name (CHG-R4-011)",
@@ -503,7 +504,10 @@ def extra_rules(guard, ops, docs):
                 if isinstance(node, dict) and isinstance(node.get("items"), dict):
                     node, _ = deref(node["items"], doc)
                 if isinstance(node, dict):
-                    leak = sorted(k for k in (node.get("properties") or {}) if INTERNAL.match(k))
+                    # A field the server omits for a guest caller says so with `x-ticvai-staff-only` (CHG-SHP-010):
+                    # the shared schema still serves staff, and the guest never receives it.
+                    leak = sorted(k for k, v in (node.get("properties") or {}).items() if INTERNAL.match(k)
+                                  and not (isinstance(v, dict) and v.get("x-ticvai-staff-only")))
                     if leak:
                         guard.add("C-GUEST-INTERNAL", oid, f"{oid}: a guest read returns {', '.join(leak)}")
     fam = {}

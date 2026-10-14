@@ -1,0 +1,145 @@
+id: CHG-SHP-005
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Server-owned fields (id, scopePath, createdAt, version, tenantId, a server-moved status) of a persisted
+  schema used as a write body are `readOnly: true`, so OpenAPI binds their `required` to the response only; 20
+  `status` fields the caller sets are kept.'
+decision:
+  what: 'contracts/*: readOnly on 97 property declarations, including access.yaml''s shared `scopePath` anchor
+    (&id001, used by 21 access schemas). Kept (the caller moves status): setChannelListing, setChannelProvider,
+    setConfigurationProfile, setConfigurationTemplate, setContactAutomation, setCurrencyRoundingRule,
+    setDataProcessingPurpose, setFeeDefinition, setJourneyProfile, setPackagePricingDefinition,
+    setPriceCalculationPolicy, setPrivacyNoticePolicyGovernance, setPrivacyRequestTypes, setQualityEvaluation,
+    setSenderIdentityDomain, setTenantDomainMapping, setTrackingTechnology, setWaiverAssociation, setWaiverException,
+    setWaiverTriggerRule.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-REQUEST-SERVER-FIELDS (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 96 members before, 20 after on this branch (CHG-SHP; ruling "go with
+  your recommendation", Chinmay, 14 October 2026). R079. Additive for check-contract-compat (a readOnly field is not
+  required of a request, CHG-R6G-002).'
+keys_touched:
+  operations:
+  - awardBadge
+  - buildProductionPlan
+  - configureQueueFeed
+  - createAccessReviewCampaign
+  - createCombo
+  - createDeviceFirmware
+  - createGame
+  - createInspectionTemplate
+  - createMaintenancePlan
+  - createModifierGroup
+  - createPartnerQuote
+  - createPartnerUser
+  - createPrize
+  - createResource
+  - createSupplier
+  - createTable
+  - createUpsellRule
+  - deployConfigurationProfile
+  - issueAccreditationBadge
+  - issueReward
+  - joinRestaurantWaitlist
+  - placeAccessDevice
+  - planProductionRun
+  - publishSupportNotice
+  - recordDepositActivity
+  - recordPrivacyIncident
+  - recordSuggestionOutcome
+  - recordTouchPoint
+  - registerEnvironment
+  - requestPricingRollback
+  - scheduleTenantUpgrade
+  - setAccessPointGroup
+  - setAiByokEnablement
+  - setAiPolicy
+  - setAlertRule
+  - setApiLicensing
+  - setBadge
+  - setCaseInternalRequest
+  - setConnectivityThresholds
+  - setCredentialEventPropagationRule
+  - setFastPassProfile
+  - setGateModePolicy
+  - setGateOfflinePolicy
+  - setHardwareModel
+  - setIntegrationSource
+  - setJobTitle
+  - setJourneySequenceRule
+  - setLeaveType
+  - setLoyaltyCampaign
+  - setMediaBindingRule
+  - setMembershipBenefit
+  - setMembershipProgramme
+  - setOfflinePolicy
+  - setOperatingCalendarEntry
+  - setOrderBookingTicket
+  - setPodium
+  - setPolicyEvaluationSetting
+  - setReaderProfile
+  - setReasonCode
+  - setRefundCompensationService
+  - setRiskScoringConfig
+  - setScalingPolicy
+  - setShiftPattern
+  - setSlaPolicy
+  - setSsoConfig
+  - setStoreRules
+  - setTemperatureCheckpoint
+  - setTicketStatusTransition
+  - setVerificationMethodPolicy
+  - setWafPolicy
+  - setWorkAssignment
+  - submitOnboardingApplication
+  - updateAccessDevicePlacement
+  - updateAccreditationHolder
+  - updateResource
+  - updateTable
+  files:
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/tenancy.yaml
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A18 API-CONVENTIONS
+tickets:
+  started: []
+  unstarted: ['27800', '27801', '27854', '27855', '27964', '27967', '27969', '27976', '27985', '27986', '28013',
+    '28014', '28056', '28080', '28084', '28130', '28139', '28140', '28247', '28262', '28386', '28388', '28423',
+    '28432', '28435', '28436', '28438', '28440', '28441', '28442', '28443', '28446', '28458', '28471', '28478',
+    '28522', '28523', '28556', '28559', '28563', '28564', '28599', '28606', '28634', '28635', '28673', '28674',
+    '28678', '28710', '28712', '28713', '28733', '28738', '28739', '28758', '28759', '28760', '28761', '28762',
+    '28765', '28768', '28785', '28793', '28796', '28834', '28840', '28842', '28882', '28883', '28885', '28906',
+    '28907', '28909', '28910', '28916', '28937', '28939', '28943', '28958', '28959', '28968', '28970', '28979',
+    '28994', '28995', '29006', '29010']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

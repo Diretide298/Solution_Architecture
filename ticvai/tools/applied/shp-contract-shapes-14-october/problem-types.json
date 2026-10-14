@@ -1,0 +1,1878 @@
+{
+ "acceptShiftVariance:409": [
+  "shift-not-pending-variance"
+ ],
+ "acceptWorkOrder:409": [
+  "work-order-not-assigned-to-caller",
+  "work-order-already-accepted"
+ ],
+ "acknowledgePurchaseOrder:409": [
+  "purchase-order-not-sent"
+ ],
+ "acquireInventoryHold:409": [
+  "no-capacity",
+  "seated-envelope-not-leasable"
+ ],
+ "actOnPartnerApplicationReview:404": [
+  "not-found"
+ ],
+ "actOnPartnerApplicationReview:409": [
+  "partner-application-transition-not-allowed"
+ ],
+ "actOnPartnerApplicationReview:422": [
+  "department-review-task-not-open",
+  "information-request-note-required"
+ ],
+ "actOnPartnerCase:404": [
+  "not-found"
+ ],
+ "actOnPartnerCase:409": [
+  "partner-case-transition-not-allowed",
+  "reopen-window-closed"
+ ],
+ "actOnPartnerCase:422": [
+  "action-field-missing"
+ ],
+ "actOnPartnerCommissionLine:404": [
+  "not-found"
+ ],
+ "actOnPartnerCommissionLine:409": [
+  "partner-commission-line-transition-not-allowed"
+ ],
+ "actOnPartnerCommissionLine:422": [
+  "reason-required",
+  "dispute-case-required"
+ ],
+ "actOnPartnerReconciliationException:404": [
+  "not-found"
+ ],
+ "actOnPartnerReconciliationException:409": [
+  "partner-reconciliation-exception-transition-not-allowed"
+ ],
+ "actOnPartnerReconciliationException:422": [
+  "assignee-required",
+  "adjustment-ref-required",
+  "write-off-note-required"
+ ],
+ "actOnPartnerSettlementBatch:404": [
+  "not-found"
+ ],
+ "actOnPartnerSettlementBatch:422": [
+  "schedule-date-required",
+  "reason-required",
+  "dispute-case-required"
+ ],
+ "actOnWorkflowInstance:409": [
+  "workflow-instance-ended",
+  "workflow-instance-transition-not-allowed",
+  "approval-node-not-skippable"
+ ],
+ "actOnWorkflowInstance:422": [
+  "action-field-missing",
+  "node-not-skippable",
+  "alternative-edge-not-allowed",
+  "assignee-is-requester"
+ ],
+ "activateAudience:409": [
+  "audience-consent-blocked",
+  "audience-volume-exceeded",
+  "audience-approval-required"
+ ],
+ "amendFnbOrder:409": [
+  "order-line-already-in-preparation"
+ ],
+ "applyMigration:409": [
+  "migration-plan-stale"
+ ],
+ "approveRequisition:400": [
+  "amended-quantity-exceeds-requested"
+ ],
+ "approveRequisition:409": [
+  "requisition-not-pending-approval",
+  "approver-is-requester"
+ ],
+ "approveShiftOpen:409": [
+  "shift-not-awaiting-approval"
+ ],
+ "approveWaiverTesting:409": [
+  "waiver-version-transition-not-allowed"
+ ],
+ "approveWaiverTesting:422": [
+  "critical-checklist-failure",
+  "waiver-approver-is-submitter"
+ ],
+ "archiveMediaTemplate:409": [
+  "template-in-flight"
+ ],
+ "assignCoupon:409": [
+  "coupon-code-not-issued"
+ ],
+ "attachModifierGroup:409": [
+  "modifier-group-adds-undeclared-allergen"
+ ],
+ "authoriseWalletSpend:402": [
+  "wallet-balance-insufficient"
+ ],
+ "authoriseWalletSpend:503": [
+  "home-cell-unreachable"
+ ],
+ "awardBadge:409": [
+  "badge-already-held"
+ ],
+ "bindCredentialDevice:409": [
+  "device-limit",
+  "device-change-needs-approval"
+ ],
+ "cancelDecommission:409": [
+  "cell-not-decommissioning"
+ ],
+ "cancelGateModeChange:409": [
+  "not-pending"
+ ],
+ "cancelInvoice:409": [
+  "invoice-not-cancellable"
+ ],
+ "cancelPerformance:409": [
+  "performance-not-cancellable"
+ ],
+ "cancelPricingRollback:409": [
+  "already-executing",
+  "already-finished"
+ ],
+ "cancelPurchaseOrder:409": [
+  "purchase-order-not-cancellable",
+  "purchase-order-goods-received"
+ ],
+ "cancelReportExecution:409": [
+  "report-execution-already-completed"
+ ],
+ "cancelRequisition:409": [
+  "requisition-transition-not-allowed"
+ ],
+ "cancelStockCount:409": [
+  "stock-count-not-open"
+ ],
+ "captureWalletAuthorisation:409": [
+  "wallet-hold-expired",
+  "already-captured",
+  "capture-exceeds-hold"
+ ],
+ "checkGuestCheckoutMatch:403": [
+  "contact-not-verified"
+ ],
+ "claimConversation:409": [
+  "already-claimed"
+ ],
+ "claimCustomDomain:409": [
+  "domain-already-claimed"
+ ],
+ "claimOpenShift:409": [
+  "open-shift-already-taken",
+  "shift-claimant-not-eligible",
+  "working-hour-rule-breach"
+ ],
+ "cloneAccreditationProgramme:409": [
+  "duplicate-code"
+ ],
+ "cloneGame:409": [
+  "duplicate-code"
+ ],
+ "cloneReaderConfiguration:422": [
+  "target-is-source-reader",
+  "target-reader-not-found",
+  "target-reader-in-other-venue"
+ ],
+ "closeDepositBoxes:422": [
+  "deposit-box-count-missing"
+ ],
+ "closePurchaseOrderShort:409": [
+  "purchase-order-not-partially-received"
+ ],
+ "closeShift:409": [
+  "shift-not-open",
+  "open-orders-remain"
+ ],
+ "closeShift:422": [
+  "unknown-denomination",
+  "duplicate-denomination",
+  "count-total-mismatch"
+ ],
+ "closeTransferShort:409": [
+  "stock-transfer-not-partially-received"
+ ],
+ "commitCatalogueImport:409": [
+  "catalogue-import-found-nothing",
+  "catalogue-import-already-committed"
+ ],
+ "completeProductionRun:409": [
+  "production-run-not-in-progress"
+ ],
+ "completeSsoAuthorization:403": [
+  "sso-group-not-mapped"
+ ],
+ "completeWorkOrder:400": [
+  "completion-photos-required"
+ ],
+ "concludeRecommendationExperiment:400": [
+  "winning-variant-not-in-experiment"
+ ],
+ "concludeRecommendationExperiment:409": [
+  "experiment-not-running"
+ ],
+ "configureQueueFeed:400": [
+  "unknown-adaptor",
+  "adaptor-credentials-missing"
+ ],
+ "configureQueueFeed:409": [
+  "feed-belongs-to-other-queue"
+ ],
+ "consumeCrossRegionEntitlement:409": [
+  "entitlement-entries-exhausted",
+  "entitlement-revoked",
+  "entitlement-outside-window"
+ ],
+ "convertInventoryHold:400": [
+  "units-exceed-hold"
+ ],
+ "createAccreditationApplication:422": [
+  "blocking-requirement-unsatisfied"
+ ],
+ "createBookingFlowDefinition:400": [
+  "unknown-flow-type",
+  "step-not-in-flow-type",
+  "duplicate-flow-step"
+ ],
+ "createBundle:400": [
+  "allocation-not-100-percent",
+  "fixed-allocation-not-bundle-price"
+ ],
+ "createBundle:422": [
+  "menu-item-id-missing",
+  "menu-item-variant-not-sold"
+ ],
+ "createCashMovement:409": [
+  "shift-not-open",
+  "lift-exceeds-float"
+ ],
+ "createCommercialCampaign:400": [
+  "invalid-window"
+ ],
+ "createCommercialCampaign:409": [
+  "duplicate-code"
+ ],
+ "createContentPage:409": [
+  "duplicate-code"
+ ],
+ "createDashboard:400": [
+  "refresh-budget-exceeded"
+ ],
+ "createDashboard:409": [
+  "module-not-licensed",
+  "module-permission-not-held"
+ ],
+ "createDelegatedAccess:400": [
+  "wildcard-on-allow",
+  "scope-outside-own-grants"
+ ],
+ "createDeliveryLocation:409": [
+  "duplicate-code"
+ ],
+ "createDeviceFirmware:409": [
+  "duplicate-code"
+ ],
+ "createGoodsReceipt:409": [
+  "over-receipt-tolerance-exceeded",
+  "purchase-order-closed"
+ ],
+ "createGuestLink:403": [
+  "link-consent-missing",
+  "link-consent-expired"
+ ],
+ "createGuestLink:409": [
+  "subject-linked-to-other-guest"
+ ],
+ "createGuidedChoice:400": [
+  "target-not-in-venue",
+  "target-id-missing",
+  "question-answer-count-out-of-bounds"
+ ],
+ "createInstalmentPlan:409": [
+  "order-already-has-plan",
+  "order-already-paid"
+ ],
+ "createJourney:422": [
+  "journey-graph-not-terminating",
+  "journey-step-target-missing"
+ ],
+ "createMaintenancePlan:400": [
+  "maintenance-trigger-missing"
+ ],
+ "createMessageTemplate:400": [
+  "unknown-merge-field",
+  "required-language-missing"
+ ],
+ "createModifierGroup:400": [
+  "modifier-constraints-unsatisfiable"
+ ],
+ "createParkingEntitlement:502": [
+  "parking-push-rejected"
+ ],
+ "createPartnerCase:422": [
+  "money-category-subject-missing",
+  "unknown-sla-policy"
+ ],
+ "createPartnerChangeRequest:422": [
+  "change-request-field-missing"
+ ],
+ "createPlan:422": [
+  "tenant-offer-on-standard-package",
+  "offered-tenant-not-found"
+ ],
+ "createPlanVersion:422": [
+  "tenant-offer-on-standard-package",
+  "offered-tenant-not-found"
+ ],
+ "createProduct:422": [
+  "asset-not-ready",
+  "media-kind-mismatch",
+  "consent-question-not-active",
+  "variant-has-no-duration",
+  "booking-flow-not-in-venue"
+ ],
+ "createRelease:400": [
+  "required-migration-missing",
+  "unknown-component-version"
+ ],
+ "createRentalBlackout:409": [
+  "blackout-window-has-bookings"
+ ],
+ "createRentalBooking:409": [
+  "no-availability"
+ ],
+ "createReport:400": [
+  "unknown-report-field",
+  "invalid-report-filter",
+  "report-cost-limit-exceeded"
+ ],
+ "createReport:403": [
+  "assigned-permission-not-held"
+ ],
+ "createReportSchedule:400": [
+  "invalid-cadence",
+  "schedule-recipients-missing"
+ ],
+ "createResource:422": [
+  "cleanings-per-day-missing",
+  "window-ends-before-start"
+ ],
+ "createResourceCost:422": [
+  "resource-not-at-venue",
+  "transfer-venue-missing",
+  "transfer-venues-identical",
+  "amount-not-positive"
+ ],
+ "createRotaAssignment:409": [
+  "rota-assignment-overlap",
+  "person-lacks-required-role"
+ ],
+ "createSegment:400": [
+  "segment-criteria-contradictory",
+  "unknown-segment-attribute"
+ ],
+ "createStockMovement:409": [
+  "insufficient-stock"
+ ],
+ "createStockTransfer:409": [
+  "insufficient-stock"
+ ],
+ "createSupplierContract:422": [
+  "window-ends-before-start",
+  "contract-document-reference-missing"
+ ],
+ "createTenant:409": [
+  "duplicate-code"
+ ],
+ "createUpload:400": [
+  "media-type-not-permitted",
+  "media-too-large"
+ ],
+ "createVendorServiceRequest:409": [
+  "work-order-already-closed"
+ ],
+ "createWebhookSubscription:422": [
+  "unknown-event-type"
+ ],
+ "decideAccessReviewItem:400": [
+  "revoke-reason-required",
+  "certify-override-reason-required"
+ ],
+ "decideAccessReviewItem:403": [
+  "reviewer-holds-grant",
+  "forbidden"
+ ],
+ "decideCatalogueAiFinding:409": [
+  "already-closed"
+ ],
+ "decideCatalogueAiFinding:422": [
+  "comment-required"
+ ],
+ "decideGuestCheckoutMatch:409": [
+  "profile-match-expired",
+  "already-decided"
+ ],
+ "decideGuestIdentityVerification:409": [
+  "already-decided"
+ ],
+ "decideGuestIdentityVerification:422": [
+  "reason-required"
+ ],
+ "decidePricingChangeRequest:403": [
+  "self-approval",
+  "outside-authority"
+ ],
+ "decidePricingChangeRequest:409": [
+  "not-pending-approval"
+ ],
+ "decidePricingChangeRequest:422": [
+  "comment-required"
+ ],
+ "decidePricingRecommendation:409": [
+  "already-decided",
+  "recommendation-expired"
+ ],
+ "decidePricingRecommendation:422": [
+  "rejection-reason-required",
+  "human-selected-price-required",
+  "guardrail-breached",
+  "scheduled-for-in-past"
+ ],
+ "decideProductionAccess:422": [
+  "reason-required"
+ ],
+ "decommissionCell:409": [
+  "cell-not-active"
+ ],
+ "deleteAccessPointGroup:409": [
+  "group-in-use"
+ ],
+ "deleteContentPage:409": [
+  "content-page-referenced"
+ ],
+ "deleteDashboard:409": [
+  "dashboard-shared"
+ ],
+ "deleteGuidedChoice:409": [
+  "guided-choice-published"
+ ],
+ "deleteOperatingCalendarEntry:409": [
+  "entry-in-progress"
+ ],
+ "deletePodium:409": [
+  "shift-open"
+ ],
+ "deleteReasonCode:409": [
+  "reason-code-in-use"
+ ],
+ "deliverAccreditationCredential:409": [
+  "credential-not-mobile-or-qr",
+  "credential-not-issued-or-active"
+ ],
+ "deliverAccreditationCredential:422": [
+  "holder-contact-missing"
+ ],
+ "deliverCredential:409": [
+  "credential-revoked",
+  "credential-expired"
+ ],
+ "deployConfigurationProfile:409": [
+  "profile-version-draft",
+  "profile-version-not-found"
+ ],
+ "disputeInvoice:409": [
+  "invoice-not-disputable"
+ ],
+ "endPodiumShift:409": [
+  "shift-ended"
+ ],
+ "endPromotion:409": [
+  "promotion-not-live-or-paused"
+ ],
+ "enrolFacePass:409": [
+  "face-on-another-pass"
+ ],
+ "enrolFaceTag:409": [
+  "biometrics-not-enabled",
+  "ticket-type-biometrics-disabled",
+  "consent-method-mismatch"
+ ],
+ "executeTenantMigration:409": [
+  "migration-plan-stale",
+  "tenant-traded-since-plan"
+ ],
+ "exportAccreditationData:403": [
+  "pii-export-not-permitted"
+ ],
+ "exportAccreditationData:422": [
+  "export-purpose-required"
+ ],
+ "exportReportResult:403": [
+  "pii-export-not-permitted"
+ ],
+ "extendRental:409": [
+  "equipment-reserved-for-later-booking"
+ ],
+ "generateCouponCodes:400": [
+  "assignees-exceed-quantity"
+ ],
+ "generateInvoice:409": [
+  "period-already-invoiced"
+ ],
+ "generateVenueLayout:422": [
+  "plan-not-interpretable"
+ ],
+ "getAccessRiskScore:422": [
+  "risk-subject-not-exactly-one"
+ ],
+ "getCountVariance:409": [
+  "stock-count-still-open"
+ ],
+ "getEmployee:404": [
+  "not-found"
+ ],
+ "getEntitlement:404": [
+  "not-found"
+ ],
+ "getGuestMenu:404": [
+  "no-menu-in-force"
+ ],
+ "getLoyaltyRules:404": [
+  "not-found"
+ ],
+ "getMembership:404": [
+  "not-found"
+ ],
+ "getReportResult:409": [
+  "report-execution-not-completed"
+ ],
+ "getVatReturn:422": [
+  "period-not-whole-tax-months",
+  "legal-entity-not-tax-registered"
+ ],
+ "grantDelegation:409": [
+  "delegation-cycle",
+  "minor-grants-adult-authority"
+ ],
+ "guestSocialLogin:401": [
+  "provider-token-invalid",
+  "provider-token-expired"
+ ],
+ "issueCreditNote:409": [
+  "invoice-not-creditable"
+ ],
+ "issueCreditNote:422": [
+  "credit-exceeds-invoice",
+  "line-not-on-invoice"
+ ],
+ "issueGameCard:409": [
+  "game-card-already-active",
+  "unknown-card-code"
+ ],
+ "issueGiftCard:409": [
+  "gift-card-already-active",
+  "unknown-card-code"
+ ],
+ "issueMyAccreditationWalletPass:403": [
+  "not-own-credential"
+ ],
+ "issueMyAccreditationWalletPass:409": [
+  "credential-not-mobile-or-qr",
+  "credential-not-issued-or-active"
+ ],
+ "issueReward:409": [
+  "insufficient-points",
+  "reward-not-available-at-venue"
+ ],
+ "joinWaitlist:409": [
+  "performance-not-sold-out"
+ ],
+ "launchCellCluster:409": [
+  "model-cell-mid-migration"
+ ],
+ "leaveQueue:409": [
+  "queue-entry-not-waiting"
+ ],
+ "leaveRestaurantWaitlist:409": [
+  "waitlist-entry-already-closed"
+ ],
+ "linkWalletCredential:409": [
+  "credential-bound-to-other-wallet"
+ ],
+ "listAuthorisationPolicyEffectiveness:422": [
+  "window-ends-before-start",
+  "date-range-too-long"
+ ],
+ "listDynamicPolicyEffectiveness:422": [
+  "window-ends-before-start",
+  "date-range-too-long"
+ ],
+ "listProducts:400": [
+  "category-not-in-venue",
+  "guided-answer-not-published"
+ ],
+ "listScheduledLifecycleActions:400": [
+  "date-range-too-long",
+  "invalid-window"
+ ],
+ "lockIdentity:409": [
+  "already-locked"
+ ],
+ "lockIdentity:422": [
+  "lock-hours-required"
+ ],
+ "login:409": [
+  "session-active-elsewhere",
+  "workstation-in-use"
+ ],
+ "lookupInventoryItem:400": [
+  "lookup-identifier-missing"
+ ],
+ "lookupRetailSale:400": [
+  "lookup-identifier-missing"
+ ],
+ "lookupShopAndDrop:400": [
+  "lookup-identifier-missing"
+ ],
+ "lookupTicket:400": [
+  "lookup-identifier-missing"
+ ],
+ "mergeTableVisits:409": [
+  "table-visit-already-closed"
+ ],
+ "moveTableVisit:409": [
+  "table-occupied"
+ ],
+ "openTableVisit:409": [
+  "table-occupied"
+ ],
+ "overrideAccess:409": [
+  "scan-not-denied",
+  "scan-already-overridden"
+ ],
+ "pausePromotion:409": [
+  "promotion-not-live"
+ ],
+ "planMigration:400": [
+  "unknown-target-version",
+  "migration-path-not-contiguous"
+ ],
+ "postStockCount:409": [
+  "unreviewed-variance-lines",
+  "count-approval-required"
+ ],
+ "previewAllocationSplit:400": [
+  "weights-sum-to-zero",
+  "fixed-amounts-not-total"
+ ],
+ "promoteRelease:403": [
+  "approver-is-requester",
+  "step-up-token-missing",
+  "step-up-token-expired"
+ ],
+ "propagateCrossRegionEntitlement:409": [
+  "entitlement-already-propagated"
+ ],
+ "proposeGuidedChoice:400": [
+  "target-not-in-venue",
+  "question-answer-count-out-of-bounds"
+ ],
+ "proposeWalkways:409": [
+  "map-has-vector-geometry"
+ ],
+ "provisionCell:400": [
+  "placement-outside-jurisdiction",
+  "no-cloud-region-in-country"
+ ],
+ "provisionCell:409": [
+  "region-cell-exists"
+ ],
+ "publishBundle:409": [
+  "bundle-publish-in-progress"
+ ],
+ "publishGuidedChoice:409": [
+  "guided-choice-published"
+ ],
+ "publishGuidedChoice:422": [
+  "answer-target-not-on-sale",
+  "answer-target-not-enabled",
+  "answer-filter-or-target-missing"
+ ],
+ "publishHardwareDeployment:409": [
+  "overlapping-deployment-in-progress"
+ ],
+ "publishHardwareDeployment:422": [
+  "target-scope-ids-missing"
+ ],
+ "publishRentalProduct:409": [
+  "blocking-findings-remain"
+ ],
+ "raiseResourceRequest:422": [
+  "subject-required",
+  "unknown-subject"
+ ],
+ "reactivateTenant:409": [
+  "tenant-terminated"
+ ],
+ "recallKitchenTicket:409": [
+  "recall-window-closed"
+ ],
+ "receiveStockTransfer:409": [
+  "stock-transfer-not-in-transit"
+ ],
+ "recommendSeats:404": [
+  "seat-selection-not-found"
+ ],
+ "recordAttendance:409": [
+  "clock-out-without-clock-in",
+  "already-clocked-in"
+ ],
+ "recordAuthorityNotification:409": [
+  "incident-not-reportable"
+ ],
+ "recordBenefitUsage:409": [
+  "benefit-exhausted",
+  "membership-not-active"
+ ],
+ "recordConsent:400": [
+  "unknown-notice-version",
+  "purpose-not-configured"
+ ],
+ "recordDeviceConsent:400": [
+  "banner-design-not-published",
+  "category-not-offered"
+ ],
+ "recordDeviceConsent:422": [
+  "strictly-necessary-declined",
+  "preference-categories-missing"
+ ],
+ "recordEInvoiceTransmissionStatus:409": [
+  "transmission-already-accepted"
+ ],
+ "recordExternalApprovalDecision:422": [
+  "outcome-not-mapped",
+  "reason-required"
+ ],
+ "recordGamePlay:409": [
+  "insufficient-credits",
+  "card-blocked",
+  "game-out-of-service"
+ ],
+ "recordInvoicePayment:409": [
+  "invoice-not-payable"
+ ],
+ "recordNoSale:409": [
+  "shift-not-open"
+ ],
+ "recordOrderHandover:409": [
+  "order-not-ready",
+  "order-already-closed"
+ ],
+ "recordOrderHandover:422": [
+  "outcome-not-for-service-mode",
+  "delivery-location-missing"
+ ],
+ "recordPaymentTerminalCertification:422": [
+  "expiry-before-approval",
+  "unknown-acquirer-connection"
+ ],
+ "recordStorefrontSessionEvents:400": [
+  "field-outside-batch-shape",
+  "too-many-interactions"
+ ],
+ "recordWorkOrderParts:409": [
+  "insufficient-stock"
+ ],
+ "recordWorkOrderTime:409": [
+  "timer-action-not-allowed"
+ ],
+ "recountStockCount:409": [
+  "stock-count-not-variance-pending"
+ ],
+ "redeemVoucher:409": [
+  "voucher-expired",
+  "voucher-fully-redeemed",
+  "redemption-exceeds-balance"
+ ],
+ "registerDevice:409": [
+  "identifier-bound-to-other-workstation",
+  "duplicate-serial"
+ ],
+ "registerDevice:422": [
+  "workstation-id-required",
+  "workstation-id-not-allowed"
+ ],
+ "registerGuest:409": [
+  "identifier-already-registered"
+ ],
+ "reindexSource:409": [
+  "reindex-in-progress"
+ ],
+ "rejectReceivedGoods:409": [
+  "rejection-exceeds-received",
+  "line-not-on-receipt"
+ ],
+ "rejectRelease:409": [
+  "release-not-in-staging"
+ ],
+ "rejectRequisition:409": [
+  "requisition-not-pending-approval"
+ ],
+ "releaseCredentialDevice:409": [
+  "binding-released"
+ ],
+ "releaseIdentityLock:409": [
+  "investigation-open",
+  "lock-released"
+ ],
+ "releaseStockReservation:409": [
+  "reservation-not-active"
+ ],
+ "relinquishCustomDomain:409": [
+  "only-active-domain-for-app"
+ ],
+ "relinquishInventoryHold:400": [
+  "consumed-exceeds-granted",
+  "consumed-below-reported"
+ ],
+ "relinquishInventoryHold:409": [
+  "hold-not-active"
+ ],
+ "removeMfaMethod:409": [
+  "last-required-mfa-method"
+ ],
+ "renewAccreditation:403": [
+  "not-own-accreditation"
+ ],
+ "renewAccreditation:409": [
+  "outside-renewal-window",
+  "holder-not-renewable",
+  "renewal-already-open"
+ ],
+ "renewInventoryHold:400": [
+  "consumed-exceeds-granted",
+  "consumed-below-reported"
+ ],
+ "renewInventoryHold:409": [
+  "hold-not-active"
+ ],
+ "reopenShift:409": [
+  "shift-not-closed",
+  "fiscal-period-closed"
+ ],
+ "replaceCredential:409": [
+  "replacement-limit",
+  "replacement-approval-required",
+  "credential-revoked"
+ ],
+ "reportReaderQueue:422": [
+  "oldest-pending-at-missing"
+ ],
+ "requestAppBuild:409": [
+  "store-account-missing",
+  "nothing-published",
+  "app-build-in-progress"
+ ],
+ "requestPricingRollback:422": [
+  "rollback-target-required",
+  "scheduled-at-in-past",
+  "incident-reference-required"
+ ],
+ "resolveApprovedActionExecution:409": [
+  "execution-not-failed"
+ ],
+ "resolveApprovedActionExecution:422": [
+  "assignee-required"
+ ],
+ "resolveCredentialException:409": [
+  "credential-exception-already-resolved"
+ ],
+ "resolveCredentialException:422": [
+  "owner-required",
+  "fallback-media-kind-required"
+ ],
+ "resolveGuestLink:404": [
+  "guest-link-not-found"
+ ],
+ "resolveIdentityConflict:409": [
+  "identity-conflict-already-resolved"
+ ],
+ "resolveIdentityConflict:422": [
+  "surviving-holder-required",
+  "surviving-holder-not-in-conflict"
+ ],
+ "resolveInvoiceDispute:409": [
+  "invoice-not-disputed"
+ ],
+ "resolveSyncConflict:409": [
+  "sync-conflict-already-resolved",
+  "resolution-not-for-kind"
+ ],
+ "resolveWalletDispute:409": [
+  "wallet-dispute-already-closed"
+ ],
+ "resolveWalletDispute:422": [
+  "outcome-required",
+  "resolution-note-required",
+  "escalation-role-required"
+ ],
+ "restoreAuthorisationPolicyVersion:409": [
+  "version-never-approved",
+  "version-already-current",
+  "policy-retired"
+ ],
+ "resubmitAccreditationApplication:403": [
+  "not-own-application"
+ ],
+ "resubmitAccreditationApplication:409": [
+  "accreditation-application-not-resubmittable",
+  "accreditation-window-closed"
+ ],
+ "resubmitAccreditationApplication:422": [
+  "blocking-requirement-unsatisfied"
+ ],
+ "resumeShift:403": [
+  "not-shift-holder"
+ ],
+ "retryChannelIncident:409": [
+  "not-retryable"
+ ],
+ "retryCredentialGeneration:422": [
+  "request-ids-required"
+ ],
+ "retryMyDunningPayment:409": [
+  "dunning-case-already-resolved",
+  "hard-decline-same-card"
+ ],
+ "retryMyDunningPayment:422": [
+  "payment-declined"
+ ],
+ "returnRequisition:409": [
+  "requisition-not-pending-approval"
+ ],
+ "reverseWalletFunding:409": [
+  "top-up-already-spent"
+ ],
+ "reviewFaceReenrolment:409": [
+  "not-pending"
+ ],
+ "revokeAllSessions:403": [
+  "step-up-token-missing",
+  "step-up-token-expired",
+  "step-up-token-wrong-action"
+ ],
+ "revokeCrossRegionEntitlement:409": [
+  "entitlement-already-consumed"
+ ],
+ "rollbackAccessPolicy:409": [
+  "target-version-is-current",
+  "target-version-not-found"
+ ],
+ "rollbackConfigurationVersion:409": [
+  "not-active",
+  "no-previous-version"
+ ],
+ "rollbackDeviceFirmware:409": [
+  "previous-version-not-retained"
+ ],
+ "rollbackTenantMigration:409": [
+  "tenant-migration-not-cutting-over"
+ ],
+ "runReport:400": [
+  "report-parameter-missing",
+  "date-range-too-long"
+ ],
+ "scheduleMenuPublish:409": [
+  "menu-schedule-already-exists"
+ ],
+ "scheduleTenantUpgrade:400": [
+  "deferral-window-exceeded"
+ ],
+ "scoreTransactionRisk:422": [
+  "order-or-wallet-required"
+ ],
+ "searchCatalogue:400": [
+  "unknown-guided-answer"
+ ],
+ "searchGuests:403": [
+  "forbidden",
+  "pii-search-not-permitted"
+ ],
+ "seatTableReservation:409": [
+  "table-reservation-not-seatable"
+ ],
+ "sendStaffMessage:422": [
+  "conversation-or-recipients-required",
+  "recipient-not-venue-staff",
+  "group-too-large"
+ ],
+ "sendTransactionalMessage:409": [
+  "address-suppressed",
+  "no-address-for-channel"
+ ],
+ "setAccessAttributeCatalog:409": [
+  "attribute-in-published-policy"
+ ],
+ "setAccessAttributeCatalog:422": [
+  "allowed-values-required"
+ ],
+ "setAccessPointGroup:409": [
+  "group-cycle"
+ ],
+ "setAccessPointGroup:422": [
+  "access-point-not-in-venue"
+ ],
+ "setAlternativeCodes:400": [
+  "variant-not-of-product",
+  "code-sent-twice"
+ ],
+ "setAlternativeCodes:409": [
+  "duplicate-code"
+ ],
+ "setAnalyticsProvider:422": [
+  "measurement-id-invalid",
+  "venue-not-active"
+ ],
+ "setApiClientStatus:409": [
+  "api-client-revoked"
+ ],
+ "setApiClientStatus:422": [
+  "reason-required"
+ ],
+ "setAppIcons:400": [
+  "icon-wrong-size",
+  "icon-has-transparency"
+ ],
+ "setApprovalExternalProvider:422": [
+  "endpoint-not-https",
+  "api-client-not-active",
+  "decision-mapping-incomplete"
+ ],
+ "setAssetStatus:409": [
+  "asset-inspection-required"
+ ],
+ "setBiometricLifecycleRetention:409": [
+  "retention-rule-exists"
+ ],
+ "setBiometricLifecycleRetention:422": [
+  "retention-exceeds-tenant-period"
+ ],
+ "setBrandIdentity:400": [
+  "media-too-large",
+  "media-type-not-permitted"
+ ],
+ "setBrandingLocalizationTemplate:422": [
+  "invalid-language-tag",
+  "parent-scope-not-above"
+ ],
+ "setBundleCapacityPolicy:422": [
+  "duplicate-policy-scope",
+  "default-policy-missing",
+  "policy-of-other-bundle"
+ ],
+ "setBundlePartnerProductMappings:422": [
+  "component-not-in-bundle",
+  "component-mapped-twice",
+  "mapping-of-other-bundle"
+ ],
+ "setBusinessEventMapping:422": [
+  "event-type-not-registered",
+  "template-channel-mismatch",
+  "template-not-platform-owned"
+ ],
+ "setCaseCategoryDefinition:409": [
+  "category-has-active-subcategories"
+ ],
+ "setCaseCategoryDefinition:422": [
+  "parent-not-top-level-category",
+  "category-is-own-parent"
+ ],
+ "setCaseInvestigationResolution:422": [
+  "linked-record-not-found",
+  "linked-record-out-of-scope"
+ ],
+ "setChannelAllocations:400": [
+  "allocations-exceed-capacity",
+  "duplicate-channel-allocation"
+ ],
+ "setChannelAllocations:409": [
+  "allocation-below-sold"
+ ],
+ "setChannelConnectionConfiguration:422": [
+  "secret-not-reference"
+ ],
+ "setChannelProvider:422": [
+  "provider-credentials-failed",
+  "provider-connection-failed",
+  "webhook-verification-failed",
+  "secret-reference-unresolved"
+ ],
+ "setChannelSalesRule:409": [
+  "rule-conflict"
+ ],
+ "setChannelSalesRule:422": [
+  "invalid-range",
+  "eligibility-incomplete"
+ ],
+ "setCommunicationPreferenceMarketing:422": [
+  "marketing-category-defaults-on",
+  "consent-purpose-missing"
+ ],
+ "setCommunicationRoutingRule:422": [
+  "unknown-provider",
+  "provider-not-on-channel",
+  "provider-listed-twice",
+  "fallback-includes-own-channel"
+ ],
+ "setConfigurationTemplate:422": [
+  "source-required"
+ ],
+ "setConsentCapturePoint:422": [
+  "consent-purpose-missing",
+  "policy-kind-missing"
+ ],
+ "setCookieBannerDesign:422": [
+  "reject-harder-than-accept",
+  "non-essential-pre-ticked",
+  "do-not-sell-button-missing"
+ ],
+ "setCookieScanPolicy:422": [
+  "day-of-week-required",
+  "day-of-month-required"
+ ],
+ "setCredentialActivationDisplay:422": [
+  "activation-trigger-required",
+  "display-options-contradict"
+ ],
+ "setCredentialIssuanceRetryPolicy:422": [
+  "escalation-after-max-attempts"
+ ],
+ "setCurrencyRoundingRule:422": [
+  "precision-below-decimals"
+ ],
+ "setCustomerServiceCopilot:422": [
+  "venue-widens-tenant-configuration",
+  "venue-widens-ai-policy"
+ ],
+ "setDataDiscoveryAccess:422": [
+  "request-kind-not-supported",
+  "request-not-in-progress",
+  "identity-not-verified",
+  "approver-is-generator"
+ ],
+ "setDataRetentionPolicy:422": [
+  "retention-exceeds-tenant-period"
+ ],
+ "setDataRetentionSetting:422": [
+  "period-below-legal-minimum",
+  "period-above-legal-maximum",
+  "period-not-settable-for-class",
+  "follows-data-class-loop"
+ ],
+ "setDemandSignalConfiguration:409": [
+  "feed-signal"
+ ],
+ "setDemandSignalConfiguration:422": [
+  "invalid-period"
+ ],
+ "setDenominations:422": [
+  "denomination-invalid",
+  "denomination-currency-out-of-scope"
+ ],
+ "setDeviceFirmwareStatus:409": [
+  "firmware-transition-not-allowed"
+ ],
+ "setDeviceFirmwareStatus:422": [
+  "reason-required"
+ ],
+ "setDigitalWaiverForm:409": [
+  "form-version-not-draft"
+ ],
+ "setDigitalWaiverForm:422": [
+  "block-field-unknown",
+  "block-content-missing"
+ ],
+ "setDunningPolicy:422": [
+  "attempts-exceed-maximum",
+  "attempts-too-close",
+  "terminal-action-not-permitted"
+ ],
+ "setDynamicFieldQuestion:409": [
+  "form-version-not-draft",
+  "field-used-by-layout-block"
+ ],
+ "setDynamicFieldQuestion:422": [
+  "field-condition-invalid",
+  "field-validation-invalid"
+ ],
+ "setDynamicPricingGuardrailPolicy:422": [
+  "invalid-range",
+  "scope-id-required"
+ ],
+ "setEntitlementConsumption:422": [
+  "quantity-or-unlimited-required"
+ ],
+ "setEventLifecycleState:409": [
+  "event-preconditions-not-met"
+ ],
+ "setFaceMatchingVerification:422": [
+  "review-min-not-below-high-confidence"
+ ],
+ "setFastPassProfile:422": [
+  "total-uses-required"
+ ],
+ "setFeeDefinition:409": [
+  "change-request-required"
+ ],
+ "setFeeDefinition:422": [
+  "value-required"
+ ],
+ "setFonts:400": [
+  "primary-arabic-font-required",
+  "secondary-arabic-font-required"
+ ],
+ "setGameCardLifecycle:409": [
+  "game-card-transition-not-allowed"
+ ],
+ "setGateOfflinePolicy:422": [
+  "edge-threshold-below-central"
+ ],
+ "setHomepageLayout:400": [
+  "module-disabled",
+  "content-block-missing"
+ ],
+ "setHotelWalletExternal:422": [
+  "connection-secret-required"
+ ],
+ "setKitchenTicketStatus:409": [
+  "kitchen-ticket-transition-not-allowed"
+ ],
+ "setLabourBudget:409": [
+  "labour-budget-period-overlap"
+ ],
+ "setLabourBudget:422": [
+  "period-ends-before-start"
+ ],
+ "setLanguages:400": [
+  "default-language-not-enabled"
+ ],
+ "setLegalHold:422": [
+  "hold-approved-by-placer",
+  "release-reason-required",
+  "hold-already-released"
+ ],
+ "setLocalizationBrandingCustomer:409": [
+  "published-version-languages-locked"
+ ],
+ "setLocalizationBrandingCustomer:422": [
+  "human-reviewer-required",
+  "approver-is-translator"
+ ],
+ "setMarketPricingConfiguration:422": [
+  "currency-not-venue-currency",
+  "invalid-parent"
+ ],
+ "setMediaAssetTags:400": [
+  "tag-not-in-vocabulary"
+ ],
+ "setMediaBindingRule:422": [
+  "minimum-above-maximum",
+  "unknown-media-type"
+ ],
+ "setMediaIssuanceEncoding:422": [
+  "media-type-retired",
+  "unknown-media-type"
+ ],
+ "setMediaTypeTechnology:409": [
+  "media-type-in-use"
+ ],
+ "setMembershipUsagePolicy:422": [
+  "cooldown-minutes-required",
+  "no-show-settings-required",
+  "limit-period-required"
+ ],
+ "setMessageTrigger:400": [
+  "optimised-send-not-allowed",
+  "unknown-event"
+ ],
+ "setMinorGuardianAge:422": [
+  "guardian-age-above-minor-age",
+  "verification-method-required"
+ ],
+ "setNavigation:400": [
+  "module-disabled",
+  "too-many-visible-items"
+ ],
+ "setOutletTemplate:422": [
+  "unknown-menu",
+  "unknown-delivery-policy"
+ ],
+ "setPackagePricingDefinition:409": [
+  "change-request-required"
+ ],
+ "setPackagePricingDefinition:422": [
+  "price-required",
+  "circular-component"
+ ],
+ "setPartnerAllocations:404": [
+  "not-found"
+ ],
+ "setPartnerAllocations:409": [
+  "allocation-below-sold"
+ ],
+ "setPartnerAllocations:422": [
+  "allocation-incomplete"
+ ],
+ "setPartnerCapabilityGrants:404": [
+  "not-found"
+ ],
+ "setPartnerCapabilityGrants:409": [
+  "partner-credit-not-enabled"
+ ],
+ "setPartnerCapabilityGrants:422": [
+  "grant-end-date-required",
+  "grant-event-required"
+ ],
+ "setPartnerCommissionRules:404": [
+  "not-found"
+ ],
+ "setPartnerCommissionRules:409": [
+  "commission-rules-overlap",
+  "commission-on-net-rate"
+ ],
+ "setPartnerCommissionRules:422": [
+  "commission-rule-incomplete",
+  "tiers-out-of-order"
+ ],
+ "setPartnerContact:404": [
+  "contact-not-found",
+  "partner-not-found"
+ ],
+ "setPartnerContact:409": [
+  "partner-contact-transition-not-allowed",
+  "last-primary-contact"
+ ],
+ "setPartnerCreditProfile:404": [
+  "not-found"
+ ],
+ "setPartnerCreditProfile:422": [
+  "thresholds-out-of-order",
+  "credit-status-read-only",
+  "temporary-limit-end-required"
+ ],
+ "setPartnerDistributionRights:404": [
+  "not-found"
+ ],
+ "setPartnerDistributionRights:409": [
+  "exclusive-right-overlap"
+ ],
+ "setPartnerDistributionRights:422": [
+  "dates-out-of-order",
+  "sub-agent-depth-required"
+ ],
+ "setPartnerSecurity:404": [
+  "not-found",
+  "security-not-found"
+ ],
+ "setPartnerSecurity:409": [
+  "verifier-is-recorder",
+  "supporting-document-required"
+ ],
+ "setPartnerSecurity:422": [
+  "expired-status-not-settable",
+  "dates-out-of-order"
+ ],
+ "setPaymentRoutingRules:409": [
+  "provider-lacks-capability"
+ ],
+ "setPodium:422": [
+  "access-point-not-in-venue"
+ ],
+ "setPolicy:400": [
+  "english-version-required",
+  "arabic-version-required"
+ ],
+ "setPolicyEvaluationSetting:422": [
+  "max-data-age-required"
+ ],
+ "setPriceCalculationPolicy:409": [
+  "version-in-use"
+ ],
+ "setPriceCalculationPolicy:422": [
+  "invalid-sequence",
+  "circular-dependency"
+ ],
+ "setPriceCategoryRateType:409": [
+  "in-use"
+ ],
+ "setPriceCategoryRateType:422": [
+  "invalid-parent"
+ ],
+ "setPriceLadderMatrix:409": [
+  "strategy-active"
+ ],
+ "setPriceLadderMatrix:422": [
+  "invalid-bands",
+  "guardrail-breached"
+ ],
+ "setPrices:400": [
+  "region-currency-mismatch",
+  "region-scale-mismatch"
+ ],
+ "setPrivacyAction:409": [
+  "privacy-action-not-decidable"
+ ],
+ "setPrivacyAction:422": [
+  "approval-out-of-order",
+  "same-approver-both-steps",
+  "legal-hold-blocks-action"
+ ],
+ "setPrivacyComplianceException:422": [
+  "root-cause-required",
+  "corrective-action-required",
+  "exception-closed"
+ ],
+ "setPrivacyNoticePolicyGovernance:409": [
+  "privacy-notice-transition-not-allowed",
+  "approval-fields-read-only",
+  "classification-locked-after-approval"
+ ],
+ "setPrivacyNoticePolicyGovernance:422": [
+  "change-classification-required"
+ ],
+ "setPrivacyRequest:409": [
+  "dsar-fan-out-incomplete",
+  "privacy-request-already-completed"
+ ],
+ "setPrivacyRequest:422": [
+  "identity-not-verified",
+  "outcome-required",
+  "unknown-request-type"
+ ],
+ "setPrivacyRequestTypes:409": [
+  "request-type-has-open-requests"
+ ],
+ "setProductAttributes:400": [
+  "duplicate-axis-code",
+  "duplicate-value-code"
+ ],
+ "setProductAttributes:409": [
+  "variant-ceiling-exceeded"
+ ],
+ "setProductCategories:400": [
+  "category-cycle",
+  "unknown-parent-category"
+ ],
+ "setProductCategories:422": [
+  "unknown-booking-flow"
+ ],
+ "setProductLinks:422": [
+  "circular-dependency",
+  "duplicate-link"
+ ],
+ "setPromotionVariants:400": [
+  "traffic-percent-not-100"
+ ],
+ "setRefundCompensationService:409": [
+  "refund-request-not-draft",
+  "exceeds-refundable"
+ ],
+ "setRelationshipFraudRule:409": [
+  "wrong-rule-kind"
+ ],
+ "setRelationshipFraudRule:422": [
+  "access-denial-needs-human"
+ ],
+ "setRentalInventoryModel:409": [
+  "inventory-model-has-bookings"
+ ],
+ "setResourceBookingProgress:409": [
+  "invalid-progress-step"
+ ],
+ "setResourceBookingProgress:422": [
+  "use-check-out-check-in"
+ ],
+ "setRiskScoringConfig:422": [
+  "thresholds-not-rising",
+  "threshold-out-of-range"
+ ],
+ "setRulePriorityConflict:409": [
+  "critical-conflict-open"
+ ],
+ "setRulePriorityConflict:422": [
+  "test-scenario-required",
+  "unknown-rule"
+ ],
+ "setSenderIdentityDomain:422": [
+  "sender-identity-not-verified",
+  "channel-fields-missing",
+  "provider-not-on-channel"
+ ],
+ "setServiceQueueDefinition:409": [
+  "queue-named-by-routing-rule",
+  "queue-has-waiting-cases"
+ ],
+ "setSignalRegistryPolicy:422": [
+  "trust-too-low"
+ ],
+ "setSignatorySignatureGuardian:409": [
+  "form-version-not-draft"
+ ],
+ "setSignatorySignatureGuardian:422": [
+  "signatory-mode-unsupported",
+  "group-mode-unsupported"
+ ],
+ "setSiteNormalisationBasis:422": [
+  "period-ends-before-start",
+  "basis-period-overlap"
+ ],
+ "setSiteSetupProgress:409": [
+  "nothing-published"
+ ],
+ "setSsoConfig:400": [
+  "sso-metadata-unreachable",
+  "group-mappings-required"
+ ],
+ "setStoreAccounts:400": [
+  "duns-number-invalid",
+  "duplicate-store",
+  "listing-language-missing"
+ ],
+ "setTicketStatusTransition:422": [
+  "transition-not-in-state-model"
+ ],
+ "setTrackingTechnology:422": [
+  "category-required",
+  "non-essential-without-consent"
+ ],
+ "setVerificationMethodPolicy:422": [
+  "method-not-enabled-at-venue"
+ ],
+ "setWaiverAssociation:409": [
+  "waiver-retired"
+ ],
+ "setWaiverAssociation:422": [
+  "condition-rule-required",
+  "target-type-mismatch"
+ ],
+ "setWaiverTemplateMaster:422": [
+  "form-kind-not-waiver",
+  "source-waiver-required"
+ ],
+ "setWaiverTriggerRule:422": [
+  "deadline-offset-required",
+  "deadline-after-trigger-point"
+ ],
+ "setWaiverVerificationValidation:422": [
+  "checks-failing",
+  "reason-required"
+ ],
+ "setWalletAuthenticationPolicy:422": [
+  "authentication-tiers-overlap",
+  "tier-method-required"
+ ],
+ "setWalletAutoReloadSetting:409": [
+  "auto-reload-disabled",
+  "wallet-not-active"
+ ],
+ "setWalletIntegrationMapping:422": [
+  "unknown-credit-type",
+  "credit-type-retired",
+  "external-value-mapped-twice"
+ ],
+ "setWalletReconciliationSources:422": [
+  "wallet-ledger-required",
+  "duplicate-source-kind"
+ ],
+ "setWalletRiskRuleStatus:422": [
+  "reason-required",
+  "until-only-for-suspended",
+  "until-in-past"
+ ],
+ "setWorkOrderPriorityPolicy:400": [
+  "weights-not-100",
+  "bands-not-descending"
+ ],
+ "settleAiUsage:409": [
+  "ai-usage-already-settled"
+ ],
+ "settleWalletAtExit:409": [
+  "nothing-to-settle",
+  "settlement-action-mismatch",
+  "guest-cannot-waive"
+ ],
+ "settleWalletAtExit:422": [
+  "payment-declined",
+  "reason-required"
+ ],
+ "signCorrectiveAction:409": [
+  "signer-is-raiser"
+ ],
+ "splitBill:400": [
+  "split-total-mismatch",
+  "line-assigned-twice"
+ ],
+ "splitBill:409": [
+  "visit-already-settled"
+ ],
+ "startDeviceFirmwareRollout:409": [
+  "firmware-not-released"
+ ],
+ "startRollout:409": [
+  "rollout-transition-not-allowed"
+ ],
+ "startStockCount:409": [
+  "stock-count-already-open"
+ ],
+ "startSync:409": [
+  "sync-run-in-progress"
+ ],
+ "submitAccreditationApplication:409": [
+  "accreditation-application-not-draft",
+  "accreditation-window-closed"
+ ],
+ "submitAccreditationApplication:422": [
+  "blocking-requirement-unsatisfied"
+ ],
+ "submitGuestIdentityDocument:409": [
+  "identity-verification-pending"
+ ],
+ "submitGuestIdentityDocument:422": [
+  "identity-document-expired",
+  "document-kind-not-accepted"
+ ],
+ "submitInspection:400": [
+  "required-item-unanswered"
+ ],
+ "submitPricingChangeRequest:409": [
+  "not-submittable"
+ ],
+ "submitPricingChangeRequest:422": [
+  "no-lines",
+  "retroactive-effective-date",
+  "unknown-object"
+ ],
+ "suggestRoleAssignment:400": [
+  "principal-or-job-title-required",
+  "principal-and-job-title-exclusive"
+ ],
+ "suspendShift:409": [
+  "shift-not-open"
+ ],
+ "terminateTenant:400": [
+  "confirmation-code-mismatch"
+ ],
+ "terminateTenant:409": [
+  "unsettled-ledger-balances"
+ ],
+ "testChannelConnection:409": [
+  "connection-disabled"
+ ],
+ "testChannelConnection:422": [
+  "order-test-in-production"
+ ],
+ "testPricingRule:422": [
+  "no-base-price",
+  "product-not-at-venue"
+ ],
+ "testWebhookSubscription:422": [
+  "event-type-not-subscribed"
+ ],
+ "transferGameCard:409": [
+  "target-card-has-balance",
+  "game-card-not-active"
+ ],
+ "transitionDynamicPricingStrategy:409": [
+  "illegal-transition"
+ ],
+ "transitionDynamicPricingStrategy:422": [
+  "strategy-incomplete"
+ ],
+ "unpublishGuidedChoice:409": [
+  "guided-choice-not-published"
+ ],
+ "unschedulePromotion:409": [
+  "promotion-not-scheduled"
+ ],
+ "updateAccreditationApplication:403": [
+  "not-own-application"
+ ],
+ "updateAccreditationApplication:409": [
+  "accreditation-application-not-editable"
+ ],
+ "updateAccreditationApplication:422": [
+  "subject-field-invalid"
+ ],
+ "updateAccreditationProgramme:409": [
+  "programme-is-template"
+ ],
+ "updateAdmissionRules:422": [
+  "entry-count-required",
+  "validity-days-required",
+  "validity-ends-before-start"
+ ],
+ "updateBookingFlowDefinition:400": [
+  "step-not-in-type",
+  "step-given-twice"
+ ],
+ "updateBundle:400": [
+  "fixed-allocation-mismatch"
+ ],
+ "updateCase:400": [
+  "case-resolution-note-required"
+ ],
+ "updateCellTier:400": [
+  "tier-unavailable-in-jurisdiction"
+ ],
+ "updateChannelCapacity:409": [
+  "capacity-below-sold-and-leased"
+ ],
+ "updateChannelIncident:409": [
+  "illegal-transition"
+ ],
+ "updateChannelIncident:422": [
+  "resolution-note-required"
+ ],
+ "updateCommercialCampaign:400": [
+  "campaign-ends-before-start"
+ ],
+ "updateCommercialCampaign:409": [
+  "duplicate-code",
+  "campaign-dates-strand-items"
+ ],
+ "updateDashboard:409": [
+  "module-not-entitled"
+ ],
+ "updateGame:409": [
+  "plays-in-flight",
+  "game-transition-not-allowed"
+ ],
+ "updateIncident:400": [
+  "closure-findings-required",
+  "closure-corrective-action-required"
+ ],
+ "updateInventoryItem:409": [
+  "item-has-movements"
+ ],
+ "updatePerformance:409": [
+  "performance-has-sold-tickets",
+  "performance-transition-not-allowed"
+ ],
+ "updateProduct:400": [
+  "primary-media-missing",
+  "multiple-primary-media",
+  "duplicate-media-asset"
+ ],
+ "updateProduct:422": [
+  "asset-not-ready",
+  "media-kind-mismatch",
+  "unknown-consent-question",
+  "variant-has-no-duration",
+  "unknown-booking-flow"
+ ],
+ "updateProductVariant:400": [
+  "description-too-long"
+ ],
+ "updateProductVariant:409": [
+  "variant-retired",
+  "variant-not-of-product"
+ ],
+ "updatePromotion:409": [
+  "live-promotion-terms-locked"
+ ],
+ "updateRequisitionLines:409": [
+  "requisition-already-approved",
+  "requisition-rejected-or-cancelled"
+ ],
+ "updateResource:422": [
+  "cleanings-per-day-required",
+  "window-ends-before-start"
+ ],
+ "updateSeatCategory:422": [
+  "duplicate-band-code",
+  "band-ends-before-start"
+ ],
+ "updateSeatMap:409": [
+  "seat-map-published"
+ ],
+ "updateSeats:409": [
+  "seat-map-published"
+ ],
+ "updateSecurityAlert:409": [
+  "security-alert-already-closed"
+ ],
+ "updateSupplierContract:409": [
+  "supplier-contract-ended"
+ ],
+ "updateTableVisit:409": [
+  "target-table-occupied"
+ ],
+ "updateVendorServiceRequest:409": [
+  "vendor-request-already-closed"
+ ],
+ "updateWalletType:409": [
+  "change-invalidates-live-wallets"
+ ],
+ "validateAccess:404": [
+  "media-not-found"
+ ],
+ "validateGroupAccess:409": [
+  "group-allowance-exceeded"
+ ],
+ "verifyAccreditationCredential:400": [
+  "identifier-required"
+ ],
+ "verifyGuestEmail:410": [
+  "verification-token-expired",
+  "verification-token-used"
+ ],
+ "verifyGuestOtp:401": [
+  "otp-code-invalid",
+  "otp-code-expired",
+  "otp-attempts-exceeded"
+ ],
+ "verifyIdentity:409": [
+  "no-enrolment-to-compare",
+  "biometrics-not-enabled"
+ ],
+ "verifyMfaEnrolment:401": [
+  "mfa-enrolment-code-invalid"
+ ],
+ "verifyTaxExemption:409": [
+  "tax-exemption-expired",
+  "tax-exemption-not-required"
+ ],
+ "verifyTaxExemption:422": [
+  "evidence-document-required",
+  "rejection-note-required"
+ ],
+ "verifyWorkOrder:403": [
+  "verifier-is-technician"
+ ],
+ "voidCouponCode:409": [
+  "coupon-already-redeemed"
+ ],
+ "withdrawAccreditationApplication:403": [
+  "not-own-application"
+ ],
+ "withdrawAccreditationApplication:409": [
+  "accreditation-application-already-closed"
+ ],
+ "withdrawFromDepositBox:409": [
+  "deposit-box-not-open"
+ ],
+ "withdrawRelease:409": [
+  "release-transition-not-allowed"
+ ],
+ "withdrawWalletDispute:409": [
+  "wallet-dispute-already-closed"
+ ]
+}

@@ -1,0 +1,112 @@
+id: CHG-SHP-006
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Every create taking a business `code` declares the shared DuplicateCode 409.'
+decision:
+  what: 'contracts/*: `''409'': $ref: ''../shared/common.yaml#/components/responses/DuplicateCode''` on 39 creates and
+    on the 9 updates that take the same body (check-business-rules BR-PAIR-REFUSAL), and `x-ticvai-unique` on the
+    `code` they take where it was missing (36 persisted schemas).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026, class check-contract-shapes/C-CODE-409 (evidence
+  audit/ticvai/runs/audit-1014/classes.json): 39 members before, 0 after on this branch (CHG-SHP; ruling "go with your
+  recommendation", Chinmay, 14 October 2026). R108, CHG-R4-015. The 409 promises a unique code, so
+  check-storage-promises SP-DUPLICATE-409 asks for the index: `x-ticvai-unique` added on the `code` of 36 persisted
+  schemas (tenant, the 28 September rule for configuration codes; venue for things placed at a venue: access points,
+  stock locations, queues, menus, modifier groups, resources, games). derive-ddl writes the unique indexes into the r6
+  forward migration V0104 at the refresh. Batch STO also works on keys: a merge conflict on the same `code` lines is
+  possible.'
+keys_touched:
+  operations:
+  - createAccessPoint
+  - createAccreditationProgramme
+  - createAdmissionRules
+  - createAuthorisationPolicy
+  - createBundle
+  - createCostCenter
+  - createCouponCampaign
+  - createCreditType
+  - createEntitlementTemplate
+  - createGame
+  - createGameEntitlement
+  - createInspectionTemplate
+  - createKpi
+  - createLegalEntity
+  - createMenu
+  - createMessageTemplate
+  - createModifierGroup
+  - createPaymentMethod
+  - createPaymentProviderConnection
+  - createPlan
+  - createPlanVersion
+  - createPriceList
+  - createQueue
+  - createRecommendationExperiment
+  - createRecommendationStrategy
+  - createReferral
+  - createRentalCategory
+  - createRentalPricingProfile
+  - createRentalProduct
+  - createResource
+  - createResourceAttribute
+  - createResourceCategory
+  - createResourcePackage
+  - createResourceType
+  - createSeatCategory
+  - createStockLocation
+  - createTaxCode
+  - createVoucherType
+  - createWalletType
+  - updateAdmissionRules
+  - updateAuthorisationPolicy
+  - updateCreditType
+  - updatePaymentMethod
+  - updateRecommendationStrategy
+  - updateRentalPricingProfile
+  - updateRentalProduct
+  - updateResource
+  - updateResourcePackage
+  files:
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/identity.yaml
+  - tools/applied/shp-contract-shapes-14-october/
+root_class: A19 ERRORS-AND-STATES
+tickets:
+  started: []
+  unstarted: ['27851', '27857', '27858', '27962', '27965', '27967', '28017', '28021', '28024', '28031', '28035',
+    '28043', '28046', '28048', '28051', '28053', '28056', '28080', '28104', '28143', '28198', '28203', '28247',
+    '28254', '28305', '28387', '28388', '28420', '28422', '28435', '28436', '28437', '28438', '28440', '28441',
+    '28442', '28443', '28444', '28446', '28462', '28468', '28478', '28481', '28484', '28487', '28496', '28499',
+    '28505', '28545', '28601', '28634', '28635', '28638', '28673', '28674', '28678', '28712', '28713', '28730',
+    '28733', '28739', '28741', '28743', '28745', '28746', '28750', '28752', '28758', '28759', '28760', '28761',
+    '28762', '28768', '28783', '28791', '28792', '28795', '28796', '28800', '28802', '28804', '28813', '28817',
+    '28823', '28879', '28885', '28899', '28916']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
+  changed, producers and the screens that call them; started/unstarted by their cached status in
+  handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

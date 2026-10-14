@@ -612,6 +612,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Sandbox' }
+        '409':
+          description: 'The sandbox is already `resetting` (`sandbox-already-resetting`), or is not `active` (`provisioning`, `expired` or `deleted`; `sandbox-not-active`). Nothing changes.'
+          x-ticvai-problem-types: [sandbox-already-resetting, sandbox-not-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -702,6 +709,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WebhookSubscription' }
         '422':
+          x-ticvai-problem-types: [unknown-event-type]
           description: An entry in `eventTypes` is not in the webhook event catalogue.
           content:
             application/problem+json:
@@ -733,6 +741,8 @@ paths:
         `publisher` narrows it to one context — `tenancy` for device events, `accreditation`,
         `approvals`, `seating`. The same list for every tenant and every partner; what a subscription
         then receives is still filtered to the caller's tenant and the subscription's `filters`.
+
+        **Order.** Sorted by `name` ascending.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -853,8 +863,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/WebhookReplayJob'
+        '409':
+          description: 'The subscription is `pendingVerification` (`webhook-subscription-not-verified`) or `disabled` (`webhook-subscription-disabled`); events are replayed only to a verified, enabled endpoint. Nothing is queued.'
+          x-ticvai-problem-types: [webhook-subscription-not-verified, webhook-subscription-disabled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -895,6 +911,7 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-quotas/{quotaId}:
     put:
       operationId: setApiQuota
       x-ticvai-consumed-by:
@@ -919,6 +936,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: quotaId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -1053,6 +1075,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ApiVersion' }
+        '409':
+          description: 'The version is not `current` (still `preview`, or already `deprecated` or `sunset`); only the current version is deprecated. Nothing changes and nobody is notified.'
+          x-ticvai-problem-types: [api-version-not-current]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1174,6 +1203,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/IntegrationListing' }
+        '409':
+          description: '`certify` or `reject` on a listing that is not `submitted` or `inReview` (`integration-listing-not-in-review`), or `revoke` on one that is not `certified` (`integration-listing-not-certified`). Nothing changes.'
+          x-ticvai-problem-types: [integration-listing-not-in-review, integration-listing-not-certified]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1213,6 +1249,7 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-licensing/{licenceId}:
     put:
       operationId: setApiLicensing
       x-ticvai-consumed-by:
@@ -1249,6 +1286,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: licenceId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -1332,11 +1374,13 @@ paths:
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
         '409':
+          x-ticvai-problem-types: [api-client-revoked]
           description: The client is `revoked`, which is terminal.
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [reason-required]
           description: '`suspended` without a `reason`.'
           content:
             application/problem+json:
@@ -1396,6 +1440,7 @@ paths:
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
         '422':
+          x-ticvai-problem-types: [event-type-not-subscribed]
           description: '`eventType` is not one this subscription takes.'
           content:
             application/problem+json:
@@ -1434,6 +1479,8 @@ paths:
         `partner`; approvals `core`). Sign-in and session operations (identity) and the developer
         portal's own client management (this contract) are not module data and carry no scope: a
         client reaches them by its credential, not by a grant.
+
+        **Order.** Sorted by `operationId` descending (a UUIDv7, so newest first).
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [public, staff, partner]
@@ -1565,6 +1612,8 @@ paths:
       description: >
         The approval queue for production keys (M17-06). A developer sees their own organisation's
         requests; TICVAI staff see every request.
+
+        **Order.** Pending first (by `status`), then newest first, by `requestedAt` descending, then by `id`.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -1659,6 +1708,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [reason-required]
           description: '`reject` without a `reason`.'
           content:
             application/problem+json:
@@ -1702,6 +1752,7 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-anomaly-rules/{anomalyRuleId}:
     put:
       operationId: setApiAnomalyRule
       x-ticvai-consumed-by:
@@ -1725,6 +1776,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: anomalyRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -1755,6 +1811,8 @@ paths:
         Anomalies flagged by the rules (M17-07), newest first. A developer sees their own clients'
         anomalies on DEV-006, so they learn about a runaway integration from TICVAI's panel before a
         venue calls them; TICVAI staff see every client's on ADM-015.
+
+        **Order.** Newest first, by `detectedAt` descending, then by `id`.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -2447,7 +2505,7 @@ components:
           readOnly: true
           description: >
             **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
-        tenantId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid, readOnly: true }
         licensedModules:
           type: array
           description: >
@@ -2483,3 +2541,15 @@ components:
         revenueSharePercent: { type: number, nullable: true }
         effectiveFrom: { type: string, format: date }
         effectiveTo: { type: string, format: date, nullable: true }
+    WebhookReplayJob:
+      type: object
+      x-ticvai-persistence: none — response only; the replayed deliveries are written as webhook deliveries marked as replays
+      description: '**A queued replay** (`replayEvents`): the window and event types it re-delivers. Each delivery it makes is marked as a replay in its payload.'
+      required: [replayId, subscriptionId, from, queuedAt]
+      properties:
+        replayId: { type: string, format: uuid }
+        subscriptionId: { type: string, format: uuid }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time, nullable: true }
+        eventTypes: { type: array, items: { $ref: '#/components/schemas/WebhookEventType' } }
+        queuedAt: { type: string, format: date-time }

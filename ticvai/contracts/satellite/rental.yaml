@@ -155,6 +155,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalProduct'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-products/{productId}:
@@ -223,6 +225,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalProduct'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-products/{productId}/validate:
@@ -341,6 +345,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalProduct'
         '409':
+          x-ticvai-problem-types: [blocking-findings-remain]
           description: Blocking findings remain; they are listed
           content:
             application/problem+json:
@@ -408,6 +413,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalCategory'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-products/{productId}/locations:
@@ -674,6 +681,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalInventoryModel'
         '409':
+          x-ticvai-problem-types: [inventory-model-has-bookings]
           description: Bookings exist under the current model
           content:
             application/problem+json:
@@ -899,6 +907,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalBlackout'
         '409':
+          x-ticvai-problem-types: [blackout-window-has-bookings]
           description: Bookings exist in the window; they are listed
           content:
             application/problem+json:
@@ -983,6 +992,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalPricingProfile'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-pricing-profiles/{profileId}:
@@ -1025,6 +1036,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalPricingProfile'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-price:
@@ -1117,6 +1130,8 @@ paths:
   /rental-deposit-policies:
     put:
       operationId: setRentalDepositPolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per rental product or category, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-529 Deposit & Security Hold Policy"
         - "P08 BO-530 Deposit Lifecycle & Settlement Rules"
@@ -1165,6 +1180,8 @@ paths:
   /rental-fee-policies:
     put:
       operationId: setRentalFeePolicy
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per rental product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-531 Late Fee, Grace Period & Extension Pricing"
         - "P08 BO-909 Deposit & Rental Financial Control"
@@ -1399,6 +1416,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalBooking'
         '409':
+          x-ticvai-problem-types: [no-availability]
           description: Not available for that window, quantity or location
           content:
             application/problem+json:
@@ -1571,6 +1589,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalAgreementSignature'
+        '409':
+          description: 'The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is signed.'
+          x-ticvai-problem-types: [rental-booking-cancelled, rental-booking-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/check-out:
@@ -1787,6 +1812,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalBooking'
         '409':
+          x-ticvai-problem-types: [equipment-reserved-for-later-booking]
           description: '**The equipment is reserved for a later booking.** The conflicting booking''s
             window is named, so the counter can offer a shorter extension instead of a refusal.
 
@@ -1864,6 +1890,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalBooking'
+        '409':
+          description: 'The booking is not out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`; `rental-booking-not-checked-out`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is swapped.'
+          x-ticvai-problem-types: [rental-booking-not-checked-out, rental-booking-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/return:
@@ -1933,6 +1966,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalSettlement'
+        '409':
+          description: 'The booking never went out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`; `rental-booking-not-checked-out`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is settled.'
+          x-ticvai-problem-types: [rental-booking-not-checked-out, rental-booking-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/inspection:
@@ -1984,6 +2024,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalInspection'
+        '409':
+          description: 'The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or the phase does not fit it: `preRental` once the equipment has gone out, or `postRental` before it has (`inspection-phase-mismatch`). Nothing is recorded.'
+          x-ticvai-problem-types: [rental-booking-cancelled, inspection-phase-mismatch]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/damage:
@@ -2033,6 +2080,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalDamageAssessment'
+        '409':
+          description: 'The booking never went out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`), so there is no equipment to assess. Nothing is recorded.'
+          x-ticvai-problem-types: [rental-booking-not-checked-out]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/overdue:
@@ -2134,6 +2188,8 @@ paths:
         **We held `agreement_rules` and `agreement_signature` and no agreement.** The signature
         referenced a participant and a version *string*, so it signed a version number rather than a
         document. Decision 1 took their `rental_agreement` for exactly this.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - rental
       x-ticvai-permission: RENTAL_VIEW
@@ -2448,6 +2504,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -2533,6 +2590,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -2994,6 +3052,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string

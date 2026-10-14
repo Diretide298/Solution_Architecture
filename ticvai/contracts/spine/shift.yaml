@@ -218,6 +218,7 @@ paths:
   /shifts:
     get:
       operationId: listShifts
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
@@ -480,6 +481,8 @@ paths:
       - query: tenancy#denominationRecords
         route: in-process
         for: 'its read of platform.denomination, Tenancy''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per currency, the one the body''s `currencyCode` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-1065 Currency, Timezone & Channels"
       summary: Set the notes and coins a region's tills count
@@ -537,6 +540,7 @@ paths:
         '403':
           $ref: '../shared/common.yaml#/components/responses/Forbidden'
         '422':
+          x-ticvai-problem-types: [denomination-invalid, denomination-currency-out-of-scope]
           description: >
             A zero or negative value, or two entries with the same value and kind (problem type
             `denomination-invalid`). The zero-valued coin in the original seed is exactly this. Or
@@ -568,6 +572,10 @@ paths:
 
         That separation is what makes a variance attributable to a person rather than to a
         counter.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
       tags: [shift]
       x-ticvai-permission: SHIFT_OPEN
       x-ticvai-scope-level: venue
@@ -818,6 +826,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
+          x-ticvai-problem-types: [deposit-box-not-open]
           description: >
             The box is being counted or has been counted — `closing`, `closed` or `reconciled`
             (problem type `deposit-box-not-open`). A box being counted takes nothing in or out
@@ -897,6 +906,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/DepositBox' }
         '422':
+          x-ticvai-problem-types: [deposit-box-count-missing]
           description: >
             A box being closed has no entry in `counts`, or its entry has neither a total nor a
             denomination count (problem type `deposit-box-count-missing`, audit R123 (4)).
@@ -1068,6 +1078,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '409':
+          x-ticvai-problem-types: [shift-not-awaiting-approval]
           description: Shift is not `pendingApproval` (problem type `shift-not-awaiting-approval`)
           content:
             application/problem+json:
@@ -1152,6 +1163,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
+          x-ticvai-problem-types: [shift-not-closed, fiscal-period-closed]
           description: >
             Shift is not closed (problem type `shift-not-closed`), or the fiscal period has closed
             over it (`fiscal-period-closed`)
@@ -1210,6 +1222,7 @@ paths:
               schema: { $ref: '#/components/schemas/Shift' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
+          x-ticvai-problem-types: [shift-not-open]
           description: Shift is not `open` (problem type `shift-not-open`)
           content:
             application/problem+json:
@@ -1263,6 +1276,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '403':
+          x-ticvai-problem-types: [not-shift-holder]
           description: >
             Not the principal who suspended it, and the caller does not hold
             SHIFT_CLOSE_OTHER (problem type `not-shift-holder`).
@@ -1410,6 +1424,7 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
+          x-ticvai-problem-types: [shift-not-open, open-orders-remain]
           description: >
             Shift is not `open` or `suspended` — already closing or closed (problem type
             `shift-not-open`) — or open orders remain (`open-orders-remain`)
@@ -1417,6 +1432,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [unknown-denomination, duplicate-denomination, count-total-mismatch]
           description: >
             A counted line names an unknown or inactive denomination (`unknown-denomination`), repeats
             one (`duplicate-denomination`), or sends a `total` that disagrees with count times face
@@ -1519,6 +1535,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
+          x-ticvai-problem-types: [shift-not-pending-variance]
           description: >
             Shift is not `pendingVariance` (problem type `shift-not-pending-variance`) — within
             tolerance, still open, or already accepted.
@@ -1997,6 +2014,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/NoSaleEvent' }
         '409':
+          x-ticvai-problem-types: [shift-not-open]
           description: Shift is not open (problem type `shift-not-open`)
           content:
             application/problem+json:
@@ -2012,6 +2030,7 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listCashMovements
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P04 POS-015 Cash Operations Dashboard"
@@ -2102,6 +2121,7 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
+          x-ticvai-problem-types: [shift-not-open, lift-exceeds-float]
           description: >
             Shift is not open (problem type `shift-not-open`), or the lift exceeds the float
             counted at the last count less lifts since (`lift-exceeds-float`, audit R123 (2))
