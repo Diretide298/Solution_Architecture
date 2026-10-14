@@ -3979,7 +3979,7 @@ paths:
       description: '**Sign out a device you left signed in** (door follow-ups, 2 October 2026; CHG-CSP-052). Ends one of
         the caller''s own sessions, revoking its tokens; a session that is not the caller''s is `404`, never `403`, so the
         call reveals nothing about anybody else''s. Ending the session in use is `logout`. A session holding an open shift
-        is ended and the shift is reported, as `revokeAllSessions` reports it, not closed.
+        is ended and the shift stays open, not closed (Orders'' `listShifts` shows it; CHG-R6G-006).
 
         '
       tags:
@@ -4028,22 +4028,17 @@ paths:
       description: 'Incident response. Requires step-up authentication and a reason, and is recorded against
         the acting principal.
 
-        **Open shifts are reported, not silently orphaned.** Revoking a cashier mid-shift leaves cash
-        unreconciled, and whoever pulls this needs to know that before they do.
-
-        **The open shifts are asked of Orders, which owns them** (decided 14 October 2026, Chinmay, ADAM
-        CR-083; CHG-TEN-004; ADR-0055 rule 2). Identity calls Orders'' declared query
-        `openShiftsInScope(scopePath)` in process for the venue (or every venue in the caller''s scope) and
-        never reads `orders.pos_shift`; open means every state before `closed` or `autoClosed`, as the
-        query''s rule in shift.yaml says. `openShiftsAffected` is what it returns.
+        **Open shifts are not left unseen, and Identity does not report them** (decided 14 October 2026,
+        Chinmay, CHG-R6G-006; ADR-0028 tiers, ADR-0055 rule 2). Revoking a cashier mid-shift leaves cash
+        unreconciled, and whoever pulls this needs to know that before they do, but Identity is the
+        foundation every request resolves through and reads nothing above it. So the console shows the open
+        shifts itself, beside this call: Orders'' `listShifts` with `status=open` for the venue in scope
+        (P08 BO-053, in the Sign everyone out confirmation). Revoking ends sessions only; every shift and its
+        float stay as they are (ADR-0004). `openShiftsAffected` is deprecated and returned empty.
 
         '
       tags:
       - session
-      x-ticvai-read-via:
-      - query: shift#openShiftsInScope
-        route: in-process
-        for: "openShiftsAffected in the 200"
       x-ticvai-permission: SESSION_FORCE_LOGOUT
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4087,7 +4082,12 @@ paths:
                     type: integer
                   openShiftsAffected:
                     type: array
-                    description: Shifts left open. Cash is unreconciled until someone closes them.
+                    deprecated: true
+                    description: '**Deprecated (14 October 2026, CHG-R6G-006): always empty.** Identity reads
+                      nothing above it (ADR-0028), so it no longer asks Orders which shifts are open; the console
+                      calls Orders'' `listShifts` (`status=open`, the venue in scope) beside this call. Kept so a
+                      client reading it does not break. Its former meaning: shifts left open, with cash
+                      unreconciled until someone closes them.'
                     items:
                       type: object
                       properties:
@@ -8446,6 +8446,9 @@ components:
     PasswordPolicy:
       type: object
       x-ticvai-persistence: identity.password_policy
+      # CHG-R6G-008: written at tenant, read beneath it: a venue's createPrincipal, forceLogout and
+      # resetPrincipalCredential hold the PIN and password they set or check to the tenant's policy.
+      x-ticvai-rls: read-beneath
       description: 'BL-144. **Written by `setPasswordPolicy`, which returns it**, at tenant scope. Before BL-144
         the package had no password policy, no lockout and no forced change at first logon anywhere.
 
@@ -9416,10 +9419,11 @@ components:
           format: date-time
         homeScopePath:
           type: string
-          description: 'The `platform.scope` path the person works from, stored as
-            `identity.principal.home_scope_id` (the row at this path). Omitted: the caller''s own home scope. At
-            or beneath a node where the caller holds `USER_MANAGE`, or `403` (14 October 2026, ADAM CR-077;
-            CHG-IDR-002).'
+          x-ticvai-persisted: false
+          description: 'The `platform.scope` path the person works from. **Resolved, not kept:** the path is
+            resolved to the `platform.scope` row at it, whose id is `identity.principal.home_scope_id`; the path
+            itself has no column (CHG-R6G-009). Omitted: the caller''s own home scope. At or beneath a node where
+            the caller holds `USER_MANAGE`, or `403` (14 October 2026, ADAM CR-077; CHG-IDR-002).'
         roleIds:
           type: array
           description: 'Roles granted at once. **Each becomes one `identity.delegated_access` row** (ALLOW, at

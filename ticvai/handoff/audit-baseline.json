@@ -3521,8 +3521,8 @@
   }
  },
  "check-glossary-terms": {
-  "updated": "2026-10-01",
-  "commit": "278cc437",
+  "updated": "2026-10-14",
+  "commit": "8ece8f11",
   "rules": {
    "G-BANNED-NAME": [
     "access.AccessAccessArea:area",
@@ -3575,6 +3575,7 @@
     "ai.AiBlueprintDecision.sourceId:source",
     "ai.AiSignalObservation.sourceId:source",
     "ai.AiSource:source",
+    "ai.IndexEntry.sourceId:source",
     "ai.IndexFailure.jobId:job",
     "ai.IndexFailure.sourceId:source",
     "ai.IndexJob.sourceId:source",
@@ -3628,6 +3629,7 @@
     "fnb.TableReservation.groupId:group",
     "fnb.TableReservationDeposit.variantId:variant",
     "games.GameCard.cardCode:card",
+    "games.GameCreditMovement.cardId:card",
     "games.GameplayAuthorisationRequest.cardId:card",
     "games.GameplayTransaction.cardId:card",
     "games.IssueGameCardRequest.cardCode:card",
@@ -3712,6 +3714,7 @@
     "subscription.Tenant.regionId:region",
     "subscription.TerritoryMarketDistributionRightsView.rightId:right",
     "tenancy.ProfileDeployment.profileId:profile",
+    "tenancy.SaleBoardTile.variantId:variant",
     "tenancy.Workstation.regionId:region",
     "transport.CreateTransportRouteRequest.lineCode:line",
     "transport.RouteMap.lineCode:line",
@@ -3724,8 +3727,7 @@
     "workforce.WorkforceSyncConflict.sourceId:source",
     "workforce.WorkforceSyncRun.sourceId:source"
    ]
-  },
-  "note": "union of the working tree on 2026-10-01 (with other agents' uncommitted contract edits) and HEAD 278cc437, so neither state fails"
+  }
  },
  "check-navigation": {
   "updated": "2026-10-03",
@@ -4043,7 +4045,7 @@
  },
  "check-rls-scope-fit": {
   "updated": "2026-10-14",
-  "commit": "cdf99012",
+  "commit": "8ece8f11",
   "rules": {
    "RF-OWNED-ABOVE": [
     "answerConfigurationQuestion:ai.policy",
@@ -4283,7 +4285,6 @@
     "createRentalAgreement:rental.agreement_item:write",
     "createRentalBooking:rental.participant:read",
     "createRentalBooking:rental.participant:write",
-    "createSaleBoard:platform.sale_board_tile:write",
     "createSeatCategory:seating.seat_price_band:read",
     "createSeatCategory:seating.seat_price_band:write",
     "createSharedWallet:wallet.shared_wallet_member:read",
@@ -4318,6 +4319,7 @@
     "expireCreditLots:wallet.wallet:write",
     "extendRental:rental.participant:read",
     "forceLogout:identity.principal_credential:read",
+    "forceLogout:identity.principal_credential:write",
     "generateConfiguration:seating.seat:read",
     "generateCouponCodes:promotions.coupon_code_batch:write",
     "getAllergenVerification:fnb.allergen_verdict:read",
@@ -4369,7 +4371,6 @@
     "getKitchenSla:fnb.kitchen_sla:read",
     "getLoyaltyRules:marketing.loyalty_rule:read",
     "getLoyaltyRules:marketing.points_redemption_rule:read",
-    "getMapResourceAvailability:venuemap.map_version:read",
     "getMediaEntitlements:pii.subject:read",
     "getMembership:identity.benefit_usage:read",
     "getMembership:identity.customer_membership:read",
@@ -4435,7 +4436,6 @@
     "listAuditRecords:platform.audit_read:write",
     "listAuditRecords:platform.audit_record:read",
     "listBadges:marketing.badge:read",
-    "listBookableVenueMaps:venuemap.map_version:read",
     "listBookingFlows:whitelabel.booking_flow_step:read",
     "listBundlePartnerProductMappings:promotions.partner_bundle_product:read",
     "listBusinessEventNotification:marketing.message_template:read",
@@ -4604,7 +4604,6 @@
     "listRulePriorityConflict:pricing.dynamic_price_action:read",
     "listRulePriorityConflict:pricing.dynamic_price_condition:read",
     "listRuleWorkflow:approvals.step_up_policy:read",
-    "listSaleBoards:platform.sale_board_tile:read",
     "listSeasonalCalendarDay:pricing.dynamic_price_action:read",
     "listSeasonalCalendarDay:pricing.dynamic_price_condition:read",
     "listSeatCategories:seating.seat_price_band:read",
@@ -4698,12 +4697,10 @@
     "proposeVenueLabels:venuemap.import_job:read",
     "proposeWalkways:venuemap.import_job:read",
     "publishAnnouncement:platform.device:read",
-    "publishBundle:platform.sale_board_tile:read",
     "publishTransportTimetable:transport.departure:write",
     "publishTransportTimetable:transport.timetable:read",
     "publishTransportTimetable:transport.timetable:write",
     "publishTransportTimetable:transport.timetable_run:read",
-    "publishVenueMap:venuemap.map_version:write",
     "quoteWaitTime:fnb.dining_table:read",
     "rebalanceStationLoad:fnb.kitchen_station:read",
     "rebalanceStationLoad:fnb.kitchen_station:write",
@@ -4749,8 +4746,10 @@
     "requestSuggestion:inventory.stock_batch:read",
     "resendPaymentLink:marketing.message_dispatch:write",
     "resendPaymentLink:pii.subject:read",
+    "resetPrincipalCredential:identity.principal:write",
     "resetPrincipalCredential:identity.principal_credential:read",
     "resetPrincipalCredential:identity.principal_credential:write",
+    "resetPrincipalCredential:identity.principal_credential_history:write",
     "resolveBookingConflict:fnb.dining_table:read",
     "resolveMembershipActivation:orders.membership_activation_action:read",
     "resolveMembershipActivation:orders.membership_activation_action:write",
@@ -4940,7 +4939,6 @@
     "updateMediaAsset:assets.media_collection_member:write",
     "updatePrincipal:identity.principal:write",
     "updateRentalBooking:rental.participant:read",
-    "updateSaleBoard:platform.sale_board_tile:write",
     "updateSeatCategory:seating.seat_price_band:read",
     "updateSeatCategory:seating.seat_price_band:write",
     "updateTable:fnb.dining_table:read",

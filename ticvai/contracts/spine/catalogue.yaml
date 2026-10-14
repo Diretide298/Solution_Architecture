@@ -3391,7 +3391,10 @@ paths:
         decided 28 September, audit R129 (4)). `tenancy.updateSaleBoard` promises its changes reach
         terminals with the next bundle, and this is where they do: the snapshot reads the venue''s
         sale boards with the catalogue, so a board edit is live at the till once a bundle is published
-        and applied.
+        and applied. Tenancy owns the boards and both modules run in `commerce`, so the snapshot reads them in
+        bulk through the views named for Catalogue (`platform.sale_board_for_catalogue`,
+        `platform.sale_board_page_for_catalogue`, `platform.sale_board_tile_for_catalogue`; ADR-0055 rule 2,
+        CHG-R6G-007), never the tables raw.
 
         **A tile whose product cannot be sold is left out of the bundle** (decided 14 October 2026, Chinmay,
         ADAM CR-081; CHG-TEN-002). The board was checked against `variantsSellableAt` when it was saved, but

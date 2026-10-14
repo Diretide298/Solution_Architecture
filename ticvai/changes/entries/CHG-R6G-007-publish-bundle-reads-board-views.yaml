@@ -1,0 +1,61 @@
+id: CHG-R6G-007
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'publishBundle reads the sale boards through the views named for Catalogue (platform.sale_board_for_catalogue,
+  sale_board_page_for_catalogue, sale_board_tile_for_catalogue), bulk data within commerce, and the lineage says so;
+  check-lineage and check-parameter-columns read a `<table>_for_<reader>` view as a read of its table.'
+decision:
+  what: 'Lineage (tools/applied/r6g-lineage-14-october.py): publishBundle''s reads of platform.sale_board,
+    sale_board_page and sale_board_tile become the three _for_catalogue views; tools/applied/tenancy-reads-14-october.py
+    adds the page''s view on a re-run, not the raw table. contracts/spine/catalogue.yaml publishBundle''s description
+    names the three views. tools/check-lineage.py rule 6: a read named `<table>_for_<reader>` exists when its table does
+    and the reader is the operation''s own module (never a write). tools/check-parameter-columns.py P-NAMED-TABLE: a
+    read through such a view reads its table.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'First full r6 gate (14 October 2026): check-cross-module-reads XR-UNCOVERED, "publishBundle (CatalogueService,
+  commerce) reads platform.sale_board_page, which TenancyService (commerce) owns, raw" (the page read CHG-TEN-001, ADAM
+  CR-080, added); the board and tile reads were baselined the same way. Lead''s decision: within commerce, bulk data,
+  publishBundle reads the boards through the views named for Catalogue (ADR-0055 rule 2 as amended 14 October,
+  CHG-GEN-009; DB-READ-VIEWS), recorded in its lineage the way the check accepts views, for page, tile and board.
+  Recording a view name made check-lineage (rule 6, a table in no schema) and P-NAMED-TABLE (description names
+  platform.sale_board) fail, so both learn the view convention check-cross-module-reads already uses.'
+keys_touched:
+  operations:
+  - publishBundle
+  tables:
+  - platform.sale_board
+  - platform.sale_board_page
+  - platform.sale_board_tile
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/applied/r6g-lineage-14-october.py
+  - tools/applied/tenancy-reads-14-october.py
+  - tools/check-lineage.py
+  - tools/check-parameter-columns.py
+  - handoff/api-data-lineage.json
+  tickets:
+  - SVC-CATALOGUE-BUNDLE-2
+root_class: A22 LINEAGE
+tickets:
+  started:
+  - '#30796 (CR-080/CR-081; a comment, never a rewrite)'
+  unstarted:
+  - SVC-CATALOGUE-BUNDLE-2 (#28023)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-080 (ADAM)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Verified in w609: check-cross-module-reads passes (5 baseline entries gone, the publishBundle
+  board and tile reads among them), check-lineage passes (it failed with 3 "in no schema" errors before its change),
+  check-parameter-columns passes, check-read-columns passes; derive-schema, derive-relationships and derive-ddl make
+  no table from the view names; derive-diagrams, build-schema-workbook, build-services-workbook, build-api-list,
+  build-linkage, derive-capabilities and derive-platform run clean. The views themselves are DB-READ-VIEWS (#27654)
+  work. ADAM''s viewer reads the lineage too and was not run here. SVC-CATALOGUE-BUNDLE-2''s status was not read from
+  OpenProject.'

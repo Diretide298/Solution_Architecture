@@ -1,0 +1,65 @@
+id: CHG-R6G-006
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'revokeAllSessions no longer asks Orders which shifts are open (Identity reads nothing above it): its read-via
+  and its read of orders.pos_shift go, openShiftsAffected is deprecated and returned empty, and the Staff Directory
+  (BO-053) shows the open shifts itself with Orders'' listShifts (status open) in the Sign everyone out confirmation.'
+decision:
+  what: 'contracts/spine/identity.yaml revokeAllSessions: x-ticvai-read-via (shift#openShiftsInScope, in-process)
+    removed; the description says the console shows open shifts by calling listShifts beside it and that revoking ends
+    sessions only (ADR-0004); 200 openShiftsAffected marked deprecated, always empty, kept so no client breaks.
+    endOwnSession''s description no longer says revokeAllSessions reports shifts. Lineage
+    (tools/applied/r6g-lineage-14-october.py): revokeAllSessions no longer reads orders.pos_shift, and
+    tools/applied/tenancy-reads-14-october.py no longer puts the read back on a second run. screens/P08 BO-053: a
+    "Shifts still open" dataTable bound to Shift (operation listShifts) inside the confirmation, listShifts in apis,
+    and revokeAllSessions invalidates it; contracts/spine/shift.yaml listShifts lists BO-053 as a consumer
+    (link-screens-contracts). openShiftsInScope stays declared: planTenantMigration asks it (tracker F5).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'First full r6 gate (14 October 2026): check-cross-module-reads XR-FOUNDATION, "revokeAllSessions (IdentityService,
+  foundation) asks shift#openShiftsInScope of OrderService (commerce) by in-process: Identity reads nothing above it but
+  a projection". CHG-TEN-004 (ADAM CR-083) had moved the open-shift report from a raw read to Orders'' query, which is
+  still a read above the foundation tier (ADR-0028 tiers; ADR-0055 rule 2 as amended 14 October, CHG-GEN-009). Lead''s
+  decision: Identity reads nothing above it; revokeAllSessions stops reporting open shifts; the console calls listShifts
+  (status open, scope) beside it; a response field that carried them is deprecated, not removed.'
+keys_touched:
+  operations:
+  - revokeAllSessions
+  - endOwnSession
+  - listShifts
+  screens:
+  - BO-053
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/shift.yaml
+  - screens/P08-venue-back-office.yaml
+  - tools/applied/r6g-lineage-14-october.py
+  - tools/applied/tenancy-reads-14-october.py
+  - handoff/api-data-lineage.json
+  tickets:
+  - VM-IDENTITY-SESSION-1
+  - VM-BO-053
+root_class: A23 AUTH-SCOPE
+tickets:
+  started:
+  - '#30794 (CR-082/CR-083; a comment, never a rewrite)'
+  unstarted:
+  - VM-IDENTITY-SESSION-1 (#29043)
+  - VM-BO-053 (#29045)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-083 (ADAM)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Contract impact additive: a removed vendor extension and a response field marked deprecated
+  (check-contract-compat output identical to the gate''s). Verified in w609 after derive-lineage --apply and the applied
+  script: check-cross-module-reads passes (944 known, 0 new), check-lineage, check-screens, check-screen-permissions,
+  check-screen-wiring, check-audience-match (as at the gate) and check-binding-ratchet unchanged or passing.
+  listShifts needs REPORT_VIEW_WORKSTATION; the table is absent for anyone without it, as BO-053''s session panel is for
+  SESSION_FORCE_LOGOUT. The VM-IDENTITY-SESSION-1 and VM-BO-053 statuses were not read from OpenProject; listed as
+  unstarted pointer bodies. Removing openShiftsAffected is for the next major version (tracker F26).'

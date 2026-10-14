@@ -1,0 +1,42 @@
+id: CHG-R6G-003
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'Three names the glossary bans that r6 schemas newly surface (ai IndexEntry.sourceId, games
+  GameCreditMovement.cardId, tenancy SaleBoardTile.variantId) were already columns or wire fields at r5, so they are
+  baselined in check-glossary-terms and their rename is deferred to a naming-and-style CR (tracker F23).'
+decision:
+  what: 'Baselined with the check''s own python tools/check-glossary-terms.py --update-baseline (G-BANNED-NAME 198 ->
+    201 known); only the check-glossary-terms section of handoff/audit-baseline.json changes. No rename in r6: each
+    name is the one the stored column or the r5 wire field already had.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'First full r6 gate (14 October 2026): check-glossary-terms G-BANNED-NAME found 3 new names. Lead''s decision: if
+  each existed at r5 as a column or wire field they are existing names newly surfaced by a schema; baseline them and
+  defer the rename. Evidence at the r5 tag: backend/tenant/010-ai.sql ai.index_entry has source_id uuid NOT NULL (the
+  stub CHG-CRD-007 filled); 010-games.sql games.credit_ledger has card_id uuid NOT NULL (CHG-CRD-008 gave it the
+  GameCreditMovement schema); contracts/spine/tenancy.yaml SaleBoard.pages[].tiles[] carried variantId (CHG-TEN-001
+  made the tile a named schema, SaleBoardTile).'
+keys_touched:
+  schemas:
+  - ai.IndexEntry
+  - games.GameCreditMovement
+  - tenancy.SaleBoardTile
+  files:
+  - handoff/audit-baseline.json
+root_class: A24 GLOSSARY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: defer
+prevention:
+  type: check
+  ref: tools/check-glossary-terms.py
+status: open
+notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". The rename (source -> channel, card -> tile, variant -> attribute, or a recorded exception
+  in naming-and-style) changes stored columns and wire fields, so it is a naming-and-style CR for later: tracker
+  Follow-ups F23. check-glossary-terms passes (201 known).'

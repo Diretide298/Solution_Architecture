@@ -16064,6 +16064,22 @@ screens:
           in the venues in scope, the caller's own unless they choose otherwise; the confirmation asks
           for the authentication code in place, because the request carries a `stepUpToken`.
         provenance: contract identity.yaml POST /auth/sessions/revoke-all
+      - kind: dataTable
+        label: Shifts still open
+        bindsTo: Shift
+        columns:
+        - Shift.principalDisplayName
+        - Shift.workstationId
+        - Shift.status
+        - Shift.openedAt
+        operation: listShifts
+        notes: '**Inside the Sign everyone out confirmation, before the code is asked** (14 October 2026,
+          CHG-R6G-006). Orders'' `listShifts` with `status=open` for the venue in scope: whose cash is
+          unreconciled once they are signed out. Signing out closes no shift and moves no float (ADR-0004).
+          Identity no longer reports open shifts in `revokeAllSessions` (it reads nothing above it, ADR-0028),
+          so the console asks Orders, which owns them. Shown to a holder of REPORT_VIEW_WORKSTATION; absent
+          for anyone else, and the confirmation says the shifts could not be listed.'
+        provenance: contract shift.yaml GET /shifts
       - kind: textField
         label: Authentication code
         operation: verifyMfaChallenge
@@ -16162,6 +16178,12 @@ screens:
     trigger: onAction
     invalidates:
     - listActiveSessions
+    - listShifts
+  - operationId: listShifts
+    contract: shift
+    purpose: 'The shifts still open in the venue in scope (`status=open`), shown in the Sign everyone out
+      confirmation beside revokeAllSessions, which no longer reports them (CHG-R6G-006)'
+    trigger: onAction
   - operationId: createMfaChallenge
     contract: identity
     purpose: The step-up challenge Sign everyone out asks for in place

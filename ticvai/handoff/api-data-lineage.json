@@ -535,9 +535,9 @@
    "catalogue.product",
    "catalogue.published_bundle",
    "catalogue.variant",
-   "platform.sale_board",
-   "platform.sale_board_page",
-   "platform.sale_board_tile"
+   "platform.sale_board_for_catalogue",
+   "platform.sale_board_page_for_catalogue",
+   "platform.sale_board_tile_for_catalogue"
   ],
   "writes": [
    "cache:idempotency",
@@ -557,7 +557,7 @@
   "audience": [
    "staff"
   ],
-  "fixNote": "4 October 2026 (CHG-FXC-004): the snapshot is built from the catalogue and the sale boards; 14 October 2026: reads platform.sale_board_page (CHG-TEN-001: the bundle carries every page of a board (ADAM CR-080))"
+  "fixNote": "4 October 2026 (CHG-FXC-004): the snapshot is built from the catalogue and the sale boards; 14 October 2026: reads platform.sale_board_page (CHG-TEN-001: the bundle carries every page of a board (ADAM CR-080)); 14 October 2026: platform.sale_board read as platform.sale_board_for_catalogue, platform.sale_board_page read as platform.sale_board_page_for_catalogue, platform.sale_board_tile read as platform.sale_board_tile_for_catalogue (CHG-R6G-007: the boards through the views named for Catalogue, bulk data within commerce (ADR-0055 rule 2))"
  },
  "getLatestBundle": {
   "contract": "catalogue",
@@ -5379,8 +5379,7 @@
   "path": "/auth/sessions/revoke-all",
   "reads": [
    "cache:idempotency",
-   "identity.session",
-   "orders.pos_shift"
+   "identity.session"
   ],
   "writes": [
    "cache:idempotency",
@@ -5400,7 +5399,7 @@
    "staff",
    "partner"
   ],
-  "fixNote": "14 October 2026: reads orders.pos_shift (CHG-TEN-004: through Orders' openShiftsInScope (x-ticvai-read-via; ADAM CR-083), in process)"
+  "fixNote": "14 October 2026: reads orders.pos_shift (CHG-TEN-004: through Orders' openShiftsInScope (x-ticvai-read-via; ADAM CR-083), in process); 14 October 2026: orders.pos_shift no longer read (CHG-R6G-006: Identity reads nothing above it (ADR-0028); the console asks Orders' listShifts beside it)"
  },
  "listAccounts": {
   "contract": "finance",

@@ -171,6 +171,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-043 Daily Reconciliation"
+        - "P08 BO-053 Staff Directory"
         - "P08 BO-100 Venue Home"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions

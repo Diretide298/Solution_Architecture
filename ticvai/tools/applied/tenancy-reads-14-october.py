@@ -37,11 +37,13 @@ LINEAGE = {
     "addToWishlist": (["catalogue.variant", "catalogue.product"], SELLABLE + ", by Catalogue's service route"),
     "configureWorkstation": (["orders.pos_shift"],
                              OPEN_SHIFT + "openShiftForWorkstation (x-ticvai-read-via; ADAM CR-083), in process"),
-    "revokeAllSessions": (["orders.pos_shift"],
-                          OPEN_SHIFT + "openShiftsInScope (x-ticvai-read-via; ADAM CR-083), in process"),
+    # revokeAllSessions no longer asks Orders (CHG-R6G-006, tools/applied/r6g-lineage-14-october.py): Identity reads
+    # nothing above it, so its entry is gone and a second run does not put the read back.
     "planTenantMigration": (["orders.pos_shift"],
                             OPEN_SHIFT + "openShiftsInScope (x-ticvai-read-via; ADAM CR-083), by Orders' service route"),
-    "publishBundle": (["platform.sale_board_page"], "CHG-TEN-001: the bundle carries every page of a board (ADAM CR-080)"),
+    # read through the view named for Catalogue since CHG-R6G-007 (tools/applied/r6g-lineage-14-october.py)
+    "publishBundle": (["platform.sale_board_page_for_catalogue"],
+                      "CHG-TEN-001: the bundle carries every page of a board (ADAM CR-080)"),
 }
 
 
