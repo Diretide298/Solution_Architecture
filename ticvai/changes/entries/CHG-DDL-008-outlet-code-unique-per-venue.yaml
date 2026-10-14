@@ -1,0 +1,58 @@
+id: CHG-DDL-008
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'An outlet''s code is unique per venue in the database: Outlet.code carries x-ticvai-unique: venue, derive-ddl
+  writes outlet_venue_id_code_uniq on platform.outlet (venue_id, code), and createOutlet''s 409 names duplicate-code; a
+  409 promising a unique code now needs the marker at the level it names.'
+decision:
+  what: 'contracts/spine/tenancy.yaml: Outlet.code `x-ticvai-unique: venue` with a description; createOutlet''s 409
+    "Code already in use in this venue" declares x-ticvai-problem-types [duplicate-code]. The handler maps a unique
+    violation to that 409, so two concurrent creates with one code get one 201 and one 409. Case: common.yaml says a
+    uniqueness rule compares case-insensitively; the lower() index form is batch GEN''s generator rule (CR-066,
+    CR-079), which this index takes with every other x-ticvai-unique. New rule check-storage-promises
+    SP-DUPLICATE-409: a create or update whose 409 says a code, SKU, number or name is already in use needs that request
+    field (or its resource''s) to carry x-ticvai-unique at the level the 409 names ("in this venue" is venue), and a
+    409 that is the shared DuplicateCode needs some field to carry one.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-074 (SVC-TENANCY-WORKSTATION-1#createOutlet, #30795). Audit: TRUE. createOutlet promises 409 "Code
+  already in use in this venue" (tenancy.yaml:1586-1590) and platform.outlet (010-platform.sql:258-276; 910 outlet_*_idx
+  only) has no unique index, so a look-up-then-insert races. The mechanism exists since audit R108 (x-ticvai-unique,
+  derive-ddl "unique per venue" with venue_id) and CHG-R6-006/017; Outlet simply never carried the marker. Same class
+  found (baselined for their owners): createMerchandise and updateMerchandise (barcode per venue), cloneGame,
+  createCommercialCampaign, createDeliveryLocation, createContentPage, createPrincipal (username), createTenant,
+  registerDevice (serialNumber), createSupplierContract and setReasonCode (DuplicateCode with no marker).'
+keys_touched:
+  operations:
+  - createOutlet
+  schemas:
+  - tenancy.Outlet
+  tables:
+  - platform.outlet
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/check-storage-promises.py
+  tickets:
+  - SVC-TENANCY-WORKSTATION-1
+  - MIG-PLATFORM
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - SVC-TENANCY-WORKSTATION-1#createOutlet (#30795)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-074 (ADAM)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Lead to confirm: case-insensitive comparison (common.yaml''s rule for every x-ticvai-unique;
+  GEN''s lower() rule makes the index (venue_id, lower(code))) against case-sensitive (option A as written). Contract
+  impact: additive (an x-ticvai extension and a problem type; check-contract-compat PASS). Migration effect:
+  MIG-PLATFORM; the generator writes CREATE UNIQUE INDEX outlet_venue_id_code_uniq into the next forward migration
+  (existing duplicates make it fail: check before applying). Check evidence: SP-DUPLICATE-409 fails on r5 (1eb1d063)
+  with "createOutlet: 409 ... promises code unique per venue; the field has no x-ticvai-unique" and passes here.'

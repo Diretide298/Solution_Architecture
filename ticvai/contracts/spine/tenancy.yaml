@@ -1584,7 +1584,8 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
-          description: Code already in use in this venue
+          description: Code already in use in this venue (`duplicate-code`; `Outlet.code` is `x-ticvai-unique` per venue, CHG-DDL-008)
+          x-ticvai-problem-types: [duplicate-code]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -4217,11 +4218,17 @@ components:
 
     Outlet:
       type: object
-      x-ticvai-persistence: "platform.outlet"
+      x-ticvai-persistence: "platform.outlet + platform.outlet_opening_hour"
       required: [id, code, name, venueId, kind]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        code: { type: string, maxLength: 64 }
+        code:
+          type: string
+          maxLength: 64
+          x-ticvai-unique: venue
+          description: >
+            Unique within the venue (`409 duplicate-code`; ADAM CR-074, CHG-DDL-008): the database holds it
+            with a unique index on (venue_id, code), so two concurrent creates cannot both keep one code.
         name:
           type: string
           maxLength: 200
@@ -4290,7 +4297,11 @@ components:
             uses this one, and `Workstation.saleBoardSource` says which applied.
         openingHours:
           type: array
-          description: The weekly pattern, one entry per window. Several windows on a day are allowed.
+          description: >
+            The weekly pattern, one entry per window. Several windows on a day are allowed. **Stored as
+            rows of `platform.outlet_opening_hour`, one per window, keyed to the outlet** (ADAM CR-073,
+            CHG-DDL-007): `createOutlet` writes them, `updateOutlet` replaces them all, `getOutlet` and
+            `listOutlets` read them back.
           items: { $ref: '#/components/schemas/OpeningHoursWindow' }
         isActive: { type: boolean }
 

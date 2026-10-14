@@ -1,0 +1,78 @@
+id: CHG-DDL-007
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'An outlet''s opening hours are stored: Outlet persists to platform.outlet + platform.outlet_opening_hour, one row
+  per OpeningHoursWindow (outlet_id NOT NULL key, day, from, to, ends_next_day), protected through its outlet; the outlet
+  operations'' lineage names the table; and an array of objects that a delivery-slice operation takes and nothing
+  stores now fails a check.'
+decision:
+  what: 'contracts/spine/tenancy.yaml Outlet `x-ticvai-persistence: "platform.outlet + platform.outlet_opening_hour"` and
+    openingHours'' description says where the rows live and which operations write and read them. derive-schema builds
+    the child from Outlet.openingHours (its rows), derive-ddl gives it a foreign key, an index and apply_parent_rls through
+    platform.outlet, and the next forward migration creates it. handoff/api-data-lineage.json: createOutlet and
+    updateOutlet read and write platform.outlet_opening_hour, getOutlet and listOutlets read it
+    (tools/applied/ddl-crs-14-october.py). New check tools/check-storage-promises.py SP-ARRAY-NOWHERE: a persisted
+    schema''s array of objects that no column and no child table holds; a member that a delivery-slice operation
+    (handoff/delivery-slice.json) takes or returns cannot be baselined, the rest are.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-073 (SVC-TENANCY-WORKSTATION-1#createOutlet, #30795), BLOCKING. Audit: TRUE on every point: Outlet
+  persists to platform.outlet (tenancy.yaml:4220) and carries openingHours (4291-4294, OpeningHoursWindow from R088,
+  3353); createOutlet''s 422 validates it (window-ends-before-start); 010-platform.sql:258-276 has 16 columns and none for
+  it. derive-schema.py:808-813 printed it every run among 167 "arrays stored nowhere" (audit R179 named it), and
+  check-contract-storage baselined it (ST-FIELD-NO-COLUMN tenancy.Outlet.openingHours, audit-baseline.json), so nothing
+  failed. A child table, not the CR''s jsonb (option A), because derive-schema''s rule is that an inline array of
+  objects is a child table''s rows unless the contract says otherwise (resolve_type, CHG-GTB-010), the package''s one
+  window table is a child (queue.queue_operating_window: day, from, to), and a guest''s "open now" reads
+  (listDiningOutlets) filter by day and time.'
+keys_touched:
+  operations:
+  - createOutlet
+  - updateOutlet
+  - getOutlet
+  - listOutlets
+  schemas:
+  - tenancy.Outlet
+  - tenancy.OpeningHoursWindow
+  tables:
+  - platform.outlet
+  - platform.outlet_opening_hour
+  files:
+  - contracts/spine/tenancy.yaml
+  - handoff/api-data-lineage.json
+  - tools/applied/ddl-crs-14-october.py
+  - tools/check-storage-promises.py
+  - tools/run-checks.py
+  - handoff/audit-baseline.json
+  tickets:
+  - SVC-TENANCY-WORKSTATION-1
+  - MIG-PLATFORM
+root_class: A15 STORAGE-GAP
+tickets:
+  started:
+  - SVC-TENANCY-WORKSTATION-1#createOutlet (#30795)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-073 (ADAM)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Lead to confirm: a child table (chosen) against the CR''s jsonb column; both are additive and
+  derivable (x-ticvai-persistence-column: jsonb on the property would give the column). Contract impact: none on the wire
+  (the persistence tag and a description); check-contract-compat PASS. Migration effect: MIG-PLATFORM; the generator
+  writes CREATE TABLE platform.outlet_opening_hour, its foreign key and index into the next forward migration
+  (V0104 on this branch''s trial run), and migration-review.md lists its apply_parent_rls statement to write by hand
+  (a statement touching platform.outlet). Not carried on the child''s columns, as on queue_operating_window: the day
+  enum CHECK and ends_next_day''s default false (derive-ddl takes CHECKs and defaults from top-level properties only),
+  so the handler validates them; a generator follow-up. Check evidence: check-storage-promises fails on r5 (1eb1d063)
+  with "tenancy.Outlet.openingHours ... createOutlet (delivery slice) takes or returns it" and passes here. Not fixed
+  here and listed in the check''s SLICE_DEBT for the lead: 37 more arrays stored nowhere that slice operations take or
+  return (e.g. resources.ResourceSchedule.windows, seating.AccessibleSeating.spaces, ai.AiVenueSettings.openingHours,
+  catalogue.EntitlementTemplate.validTimeWindows, wallet.WalletFundingRules.bonusRules, identity.Principal.roles);
+  each is a storage decision for its module''s owner. SLICE_DEBT lives in the check, not the baseline file, so
+  --update-baseline cannot add to it; the other 102 (outside the slice) are baselined.'

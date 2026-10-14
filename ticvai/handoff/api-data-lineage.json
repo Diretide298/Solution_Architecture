@@ -1477,7 +1477,8 @@
   "verb": "GET",
   "path": "/outlets",
   "reads": [
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "writes": [],
   "routing": "replica",
@@ -1500,11 +1501,13 @@
   "path": "/outlets",
   "reads": [
    "cache:idempotency",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "routing": "",
   "scope": "venue",
@@ -1527,11 +1530,13 @@
   "path": "/outlets/{outletId}",
   "reads": [
    "cache:idempotency",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "routing": "",
   "scope": "venue",
@@ -58141,7 +58146,8 @@
   "verb": "GET",
   "path": "/outlets/{outletId}",
   "reads": [
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "writes": [],
   "routing": "replica",
