@@ -7817,7 +7817,7 @@ components:
       required: [subjectId, passwordHash, failedAttempts]
       properties:
         subjectId: { type: string, format: uuid, x-ticvai-references: pii.subject }
-        passwordHash: { type: string, writeOnly: true, description: 'Argon2id, with its parameters, never the password: the self-describing PHC string (ADR-0071).' }
+        passwordHash: { type: string, writeOnly: true, description: 'Argon2id, with its parameters, never the password: the self-describing PHC string (ADR-0071).', x-ticvai-secret: argon2id-phc }
         failedAttempts: { type: integer, minimum: 0 }
         lockedUntil: { type: string, format: date-time, nullable: true }
         passwordSetAt: { type: string, format: date-time }
@@ -7853,6 +7853,7 @@ components:
           enum: [password, pin]
           description: Which secret this row holds. Card, RFID and SSO are not secrets the principal holds and have no row.
         credentialHash:
+          x-ticvai-secret: argon2id-phc
           type: string
           writeOnly: true
           description: '**A self-describing PHC string**, `$argon2id$v=19$m=<KiB>,t=<passes>,p=<lanes>$<salt>$<hash>`
@@ -7885,6 +7886,7 @@ components:
             required: [credentialHash, replacedAt]
             properties:
               credentialHash:
+                x-ticvai-secret: argon2id-phc
                 type: string
                 writeOnly: true
                 description: The replaced credential's PHC string (ADR-0071), never the credential.
@@ -8292,6 +8294,8 @@ components:
         scopePath:
           type: string
         matchedPolicies:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

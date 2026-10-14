@@ -10318,6 +10318,8 @@ components:
           minimum: 1
           nullable: true
         openingHours:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: The usual week. Exceptions come from the venue calendar.
           items:
@@ -10448,6 +10450,8 @@ components:
           type: integer
           readOnly: true
         findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           items:
@@ -11307,6 +11311,8 @@ components:
             $ref: ../shared/common.yaml#/components/schemas/AiResidencyClass
           description: The tenant residency classes whose calls this model may serve (CHG-CSA-002).
         taskFitness:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           description: '**Evaluated fitness per task** (21 September minutes, M21-09, our proposal): a score from
@@ -13014,6 +13020,8 @@ components:
           format: uuid
           x-ticvai-references: ai.forecast_version
         changes:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -13566,6 +13574,8 @@ components:
               maximum: 100
               nullable: true
         outcomeMap:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -13980,6 +13990,8 @@ components:
           - high
           - critical
         entities:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -14483,6 +14495,8 @@ components:
           - suggested
           description: '`approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit).'
         annotations:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -14740,6 +14754,8 @@ components:
           nullable: true
           description: The linked operational incident, where both apply (AIC-250).
         containment:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -15351,6 +15367,8 @@ components:
           minimum: 0
           readOnly: true
         questions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -16480,6 +16498,8 @@ components:
               nullable: true
           description: A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy.
         signals:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -17073,6 +17093,8 @@ components:
             model comes from TICVAI''s curated range** (`AiModel.curatedRange`, CHG-CSA-001): the client cannot pick
             a model outside it.'
         fitnessWarnings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           description: '**The model-fitness check at the last write** (21 September minutes, M21-09). For each task

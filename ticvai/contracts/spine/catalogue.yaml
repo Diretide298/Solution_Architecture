@@ -18723,6 +18723,8 @@ components:
           type: string
           format: uuid
         performances:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19085,6 +19087,8 @@ components:
           type: boolean
           default: true
         participantCategories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19136,6 +19140,8 @@ components:
           type: string
           format: uuid
         requirements:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19188,6 +19194,8 @@ components:
                   type: string
                   format: uuid
         contractors:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19244,6 +19252,8 @@ components:
         concurrentCapacity:
           type: integer
         bands:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19521,6 +19531,8 @@ components:
         updateCount:
           type: integer
         findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**What an operator sees before committing** — missing prices, duplicate codes,
             unknown categories, codes that do not match the tenant''s schema.
@@ -20139,6 +20151,8 @@ components:
         includedValue:
           $ref: ../shared/common.yaml#/components/schemas/Money
         validTimeWindows:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           nullable: true
           description: 'BL-036, 1.1.81 and 1.1.83. **A time-window entitlement needed a performance to
@@ -20445,6 +20459,7 @@ components:
         amountMode:
           $ref: '#/components/schemas/DonationAmountMode'
         fixedAmounts:
+          x-ticvai-persistence-column: 'numeric(18,4)[]'
           type: array
           description: 1.1.129. Predefined values, e.g. 5, 10, 25.
           items:
@@ -20990,6 +21005,8 @@ components:
 
             '
         displayTags:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           maxItems: 6
           items:
@@ -21291,6 +21308,8 @@ components:
           type: string
           maxLength: 200
         values:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:

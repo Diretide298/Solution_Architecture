@@ -5610,6 +5610,8 @@ components:
         actualCost:
           $ref: ../shared/common.yaml#/components/schemas/Money
         costLines:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

@@ -1049,7 +1049,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Invitation'
+                $ref: '#/components/schemas/CampaignInvitation'
         '409':
           description: Already answered, expired or revoked — the token is single-use — or an acceptance
             when the campaign's `quota` of places is taken.
@@ -18544,7 +18544,7 @@ components:
           - daily
           - weekly
           - monthly
-          - off
+          - 'off'
         dayOfWeek:
           type: integer
           minimum: 1
@@ -19895,6 +19895,8 @@ components:
         version:
           type: integer
         fieldGroups:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19906,6 +19908,8 @@ components:
               displayOrder:
                 type: integer
         attributes:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19956,6 +19960,8 @@ components:
                 type: boolean
                 default: false
         identifiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20188,6 +20194,8 @@ components:
       description: 'Board 2.2. **Three thresholds, and the middle band is the point.**'
       properties:
         matchers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20221,6 +20229,8 @@ components:
         possibleMatchThreshold:
           type: number
         survivorship:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20281,6 +20291,8 @@ components:
           items:
             type: string
         conflicts:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20680,6 +20692,7 @@ components:
           type: string
           description: Where the opt-in happened, because a regulator asks.
         unsubscribeToken:
+          x-ticvai-secret: blind-index
           writeOnly: true
           type: string
           description: '**Unsubscribe must work without a login.** The link in a message carries the token
@@ -20775,7 +20788,8 @@ components:
 
 
             **Operations write it at `venue` scope.**'
-    Invitation:
+    CampaignInvitation:
+      x-ticvai-retired-columns: [product_id, performance_id, offered_by_principal_id, issued_by_principal_id, cost_center_id]
       type: object
       x-ticvai-persistence: marketing.invitation
       description: '**Addressed and tokenised.** A guest accepting an invitation is claiming a specific
@@ -21593,6 +21607,7 @@ components:
         toPath:
           type: string
         statusCode:
+          x-ticvai-persistence-column: integer
           type: integer
           enum:
           - 301
@@ -22773,6 +22788,8 @@ components:
           - guest
           - timeout
         actionsTaken:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**Every action recorded as the staff member''s**, not the kiosk''s. A cashier
             completing a guest''s checkout remotely is a staff action on a guest cart.
@@ -25942,6 +25959,8 @@ components:
             - partner
             - employee
         providers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Tried in order; a provider below minimum health is skipped.
           items:
@@ -27103,6 +27122,8 @@ components:
           nullable: true
           description: The white-label theme it takes colours and fonts from.
         buttons:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -27124,6 +27145,8 @@ components:
           default: true
           description: Must be true.
         links:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -27140,6 +27163,8 @@ components:
                 - cookie
                 - termsAndConditions
         categories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:
@@ -27294,6 +27319,8 @@ components:
           - school
           nullable: true
         steps:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           maxItems: 20
@@ -27562,6 +27589,8 @@ components:
           - rolledBack
           - rejected
         items:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -27574,6 +27603,7 @@ components:
               version:
                 type: integer
         validationIssues:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -27600,6 +27630,7 @@ components:
               message:
                 type: string
         simulation:
+          x-ticvai-persisted: false
           type: array
           description: What the scenario's guest would be shown, step by step (from `simulate`; not stored).
           items:
@@ -27636,6 +27667,7 @@ components:
           format: date-time
           nullable: true
         audit:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -27975,6 +28007,8 @@ components:
           - other
           description: What fulfilment does; `deletion` and `dataExport` fan out through the cross-region DSAR.
         stages:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           description: Ordered workflow steps inside `inProgress`. Suggested default received, verifyIdentity,
@@ -28649,6 +28683,8 @@ components:
           format: date-time
           readOnly: true
         results:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Record counts per source; the records themselves go only into the export package.
           items:
@@ -28715,6 +28751,8 @@ components:
               nullable: true
               description: The cross-region fan-out that assembled it.
         corrections:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           items:
@@ -28764,6 +28802,8 @@ components:
           format: uuid
           description: The privacy request (`setPrivacyRequest`); the natural key.
         identifiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Extra identifiers to search by; the request's subject is always included.
           items:
@@ -28860,6 +28900,8 @@ components:
               - deliver
               description: Moves the package through generated -> privacyReview -> approved -> delivered.
         corrections:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Correction requests to route to the system of record.
           items:
@@ -28925,6 +28967,7 @@ components:
           type: boolean
           readOnly: true
         impact:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: Affected areas and what will happen to each, shown before execution.
@@ -28962,6 +29005,7 @@ components:
                 nullable: true
                 description: Required for `retain` and `hold`, e.g. the retention policy code.
         checks:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -28986,6 +29030,7 @@ components:
                 type: string
                 maxLength: 300
         approvals:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -29049,6 +29094,8 @@ components:
           - manualActionRequired
           - cancelled
         systemResults:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           description: The execution monitor, per system.
@@ -29366,6 +29413,7 @@ components:
             readOnly: true
             description: From the SLA policy for the severity (`setSlaPolicy`).
           timeline:
+            x-ticvai-persisted: false
             type: array
             readOnly: true
             items:
@@ -32191,6 +32239,8 @@ components:
           - scored
           - acknowledged
         criteria:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           maxItems: 30
           items:
@@ -32235,6 +32285,8 @@ components:
           readOnly: true
           description: Criteria score as a percentage; 0 when any critical failure is recorded.
         aiFindings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           items:
@@ -32264,6 +32316,8 @@ components:
           maxLength: 2000
           nullable: true
         coachingActions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -33308,6 +33362,8 @@ components:
           type: integer
           minimum: 1
         sections:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:
@@ -33696,6 +33752,8 @@ components:
           description: A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`.
             No default.
         guardianThresholdByCountry:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -33918,6 +33976,8 @@ components:
           - beforeMembershipActivation
           - beforeActivityStart
         eligibility:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: All must hold (AND). Empty means every participant the association reaches.
           items:
@@ -33991,6 +34051,8 @@ components:
           default: false
           description: An authorised operator may admit the participant anyway; the override is recorded.
         reminders:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -34181,6 +34243,8 @@ components:
           maxLength: 10
           description: The language the legal text is written and reviewed in.
         languages:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           description: Every language the version is offered in, the source language included. Arabic
@@ -34312,6 +34376,7 @@ components:
           - expired
           - archived
         checklist:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -34385,6 +34450,7 @@ components:
                 - access
               description: What a missing signature would block, when `missingSignature` was set.
         aiFindings:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -34491,6 +34557,8 @@ components:
               format: date-time
               nullable: true
         history:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Every action with its comment, oldest first.
           items:

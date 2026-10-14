@@ -2942,6 +2942,8 @@ components:
               type: array
               items: { type: string }
             timeEntries:
+              x-ticvai-persistence-column: jsonb
+              x-ticvai-persistence-kind: valueObject
               type: array
               items:
                 type: object
@@ -2951,6 +2953,8 @@ components:
                   pauseReason: { type: string, nullable: true }
                   recordedAt: { type: string, format: date-time }
             parts:
+              x-ticvai-persistence-column: jsonb
+              x-ticvai-persistence-kind: valueObject
               type: array
               items:
                 type: object
@@ -3036,6 +3040,8 @@ components:
             revenue: { type: integer, minimum: 0, maximum: 100 }
             criticality: { type: integer, minimum: 0, maximum: 100 }
         bands:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           maxItems: 5

@@ -4283,6 +4283,8 @@ components:
           type: string
           nullable: true
         policyVersions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**What the rules were at the time**, because they have changed since.'
           items:
@@ -4347,6 +4349,8 @@ components:
           format: uuid
           nullable: true
         reminders:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4478,6 +4482,7 @@ components:
           - mutualTls
           default: oauthClientCredentials
         outboundCredential:
+          x-ticvai-secret: vault-reference
           type: string
           format: password
           writeOnly: true
@@ -4486,6 +4491,7 @@ components:
             replace that omits it. **Held in Key Vault**; the row's `outbound_credential` column keeps the secret's
             reference, never the value (CHG-R1S-020).
         signingSecret:
+          x-ticvai-secret: vault-reference
           type: string
           format: password
           writeOnly: true
@@ -5348,6 +5354,7 @@ components:
         totalLevels:
           type: integer
         pendingApprovers:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object

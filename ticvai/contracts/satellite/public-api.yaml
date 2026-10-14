@@ -2219,6 +2219,7 @@ components:
           description: 13.3.22. Tenant, venue, or a business condition on the payload.
           additionalProperties: true
         signingSecret:
+          x-ticvai-secret: vault-reference
           type: string
           format: password
           writeOnly: true
@@ -2351,6 +2352,8 @@ components:
         migrationGuideUrl: { type: string, nullable: true }
         activeClientCount: { type: integer, readOnly: true }
         changes:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: >
             **The developer changelog for this version** (17 September minutes, M17-14): every operation

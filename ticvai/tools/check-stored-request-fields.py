@@ -138,6 +138,10 @@ def main() -> int:
                           f"{', '.join(writes)}" + (f" (x-ticvai-stored-as {stored_as})" if stored_as else ""))
             # A `...Ref` names a secret held elsewhere (Key Vault), not the secret itself.
             if spec.get("writeOnly") and SECRET.search(leaf) and not re.search(r"Refs?$", leaf):
+                # A credential TICVAI presents to a provider cannot be a hash: it is a Key Vault secret whose name the
+                # row keeps (ADR-0063 as amended 14 October 2026, `x-ticvai-secret: vault-reference`; CHG-STO-014).
+                if str(spec.get("x-ticvai-secret") or "") == "vault-reference":
+                    continue
                 if not (stored_as and stored_as.endswith("_hash") and reaches):
                     guard.add("SR-SECRET-UNHASHED", f"{oid}.{fname}",
                               f"{stem}.{oid}: {fname} is a writeOnly credential that is neither "

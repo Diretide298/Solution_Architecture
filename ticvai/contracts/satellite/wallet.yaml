@@ -3944,6 +3944,8 @@ components:
       - tiers
       properties:
         tiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           maxItems: 20
           items:
@@ -4042,6 +4044,8 @@ components:
       - sources
       properties:
         sources:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:
@@ -4689,6 +4693,7 @@ components:
         maximumTopUp:
           $ref: ../shared/common.yaml#/components/schemas/Money
         presetAmounts:
+          x-ticvai-persistence-column: 'numeric(18,4)[]'
           type: array
           items:
             $ref: ../shared/common.yaml#/components/schemas/Money
@@ -4708,6 +4713,8 @@ components:
             - corporateAccount
             - loyaltyConversion
         bonusRules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Board 2.3. *Top up 200, get 20.* **The bonus is a separate lot of a separate
             credit type**, which is how it can expire on different terms from the cash.
@@ -4991,6 +4998,7 @@ components:
         name:
           type: string
         denominations:
+          x-ticvai-persistence-column: 'numeric(18,4)[]'
           type: array
           items:
             $ref: ../shared/common.yaml#/components/schemas/Money
@@ -5408,6 +5416,8 @@ components:
       description: 'Boards 9.2 and 9.3. **Different credit types are different liabilities.**'
       properties:
         mappings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -5581,6 +5591,8 @@ components:
           type: string
           nullable: true
         findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

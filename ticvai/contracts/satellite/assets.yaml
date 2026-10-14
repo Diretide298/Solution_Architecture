@@ -1373,6 +1373,8 @@ components:
         '
       properties:
         categories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1393,6 +1395,8 @@ components:
                 items:
                   type: string
         fields:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1414,6 +1418,8 @@ components:
                 items:
                   type: string
         keywordVocabularies:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1565,6 +1571,7 @@ components:
         isCurrent:
           type: boolean
         usageImpact:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -1647,6 +1654,7 @@ components:
           - published
           - archived
         eligibility:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -2008,6 +2016,7 @@ components:
         - type: object
           properties:
             derivatives:
+              x-ticvai-persisted: false
               type: array
               description: >
                 Generated from the original, never uploaded separately. A new breakpoint is a
@@ -2025,6 +2034,7 @@ components:
               description: Every place this asset is referenced.
               items: { $ref: '#/components/schemas/MediaUsage' }
             collections:
+              x-ticvai-persisted: false
               type: array
               items:
                 type: object
@@ -2032,6 +2042,7 @@ components:
                   id: { type: string, format: uuid }
                   name: { type: string }
             previousVersions:
+              x-ticvai-persisted: false
               type: array
               items:
                 type: object

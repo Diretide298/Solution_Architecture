@@ -10761,6 +10761,8 @@ components:
         version:
           type: integer
         factors:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -10792,6 +10794,8 @@ components:
                     points:
                       type: number
         tiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -10932,6 +10936,8 @@ components:
           additionalProperties:
             type: integer
         overagePricing:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -11183,6 +11189,8 @@ components:
           - readyWithWarnings
           - ready
         groups:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -11246,6 +11254,8 @@ components:
           type: string
           format: uuid
         thresholds:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -16219,6 +16229,8 @@ components:
         canProceed:
           type: boolean
         blockers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

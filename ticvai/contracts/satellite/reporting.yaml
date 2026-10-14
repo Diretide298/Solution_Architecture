@@ -3328,6 +3328,8 @@ components:
           readOnly: true
           description: Assigned by the server on each publish.
         domains:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3377,6 +3379,8 @@ components:
                             type: string
                             nullable: true
         relationships:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3480,6 +3484,8 @@ components:
         severity:
           $ref: '#/components/schemas/AnomalySeverity'
         candidateCauses:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**The beginning of the question, not the end of it.**'
           items:
@@ -3517,6 +3523,8 @@ components:
           format: uuid
           nullable: true
         recipients:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

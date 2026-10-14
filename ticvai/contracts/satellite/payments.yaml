@@ -3152,6 +3152,7 @@ components:
         scopePath:
           type: string
         credentialRef:
+          x-ticvai-secret: vault-reference
           type: string
           writeOnly: true
           description: '**Where the provider credential is kept** (4 October 2026, CHG-FXC-010; ADM-570): the vault reference
@@ -3248,6 +3249,8 @@ components:
               items:
                 type: string
         targets:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3906,6 +3909,8 @@ components:
             type: string
           description: '**Across tender kinds.** `wallet` decides the order within stored value.'
         allowedCombinations:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4159,6 +4164,8 @@ components:
         '
       properties:
         rules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4195,6 +4202,8 @@ components:
                 - allowAndFlag
                 - raiseCase
         lists:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4233,6 +4242,8 @@ components:
           type: string
           nullable: true
         documents:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

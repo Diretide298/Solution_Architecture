@@ -144,7 +144,9 @@ def _target_of(ref: str, schemas: dict):
 
 
 # The scalar item types whose arrays keep their type as a column (R227); everything else is text[].
-_SCALAR_ARRAY = {"integer": "integer[]", "boolean": "boolean[]"}
+# CHG-STO-013 (check-contract-storage ST-TYPE-MISMATCH): a number array is `numeric[]`; the column type follows the
+# field type (the ruling of 14 October), and `MediaFingerprint.embedding` was the one number array left `text[]`.
+_SCALAR_ARRAY = {"integer": "integer[]", "boolean": "boolean[]", "number": "numeric[]"}
 
 
 def _array_type(items, schemas: dict, persisted: dict) -> str:
@@ -164,9 +166,9 @@ def _array_type(items, schemas: dict, persisted: dict) -> str:
     array fell through to `text[]`, so `ProductEligibilityRule.heightBandsCm` (`[120, 140]`)
     became `height_bands_cm text[]` and the band edges would compare as strings (`'90' > '140'`);
     six more integer arrays (`peakMonths`, `warnBeforeDays`, `attemptOffsetDays`, ...) with it.
-    Booleans keep their type the same way. Strings and enums stay `text[]`; a `number` array stays
-    `text[]` for now because the one in the package is `MediaFingerprint.embedding`, whose storage
-    is a vector-store question (ADR-0049), not a column type.
+    Booleans keep their type the same way, and a `number` array is `numeric[]` (CHG-STO-013, 14 October 2026:
+    `MediaFingerprint.embedding` had stayed `text[]` while its storage was a vector-store question; the column
+    type follows the field type). Strings and enums stay `text[]`.
     """
     if not isinstance(items, dict):
         return "text[]"

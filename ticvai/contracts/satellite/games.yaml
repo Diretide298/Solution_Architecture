@@ -2204,6 +2204,8 @@ components:
           type: integer
           nullable: true
         operatingHours:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           nullable: true
           description: 'Weekly opening windows, in venue local time, in the same window shape as
@@ -2604,6 +2606,8 @@ components:
           type: integer
           nullable: true
         trace:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2639,6 +2643,8 @@ components:
         vipPrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
         groupPricing:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2648,6 +2654,8 @@ components:
               pricePerPlayer:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         peakPricing:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2663,6 +2671,8 @@ components:
               price:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         calendarExceptions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2798,6 +2808,8 @@ components:
           format: uuid
           nullable: true
         earnRules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

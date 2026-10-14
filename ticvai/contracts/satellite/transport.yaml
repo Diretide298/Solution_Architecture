@@ -1868,6 +1868,8 @@ components:
             stopsToWrite: { type: integer, minimum: 0 }
             timetablesToCreate: { type: integer, minimum: 0 }
         findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           maxItems: 1000

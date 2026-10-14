@@ -228,8 +228,22 @@ def relaxed(coldef: str) -> str:
 SCOPE_OWNER_KEYS = ("org_unit_id", "scope_id", "region_id")
 
 
+# **A table whose rows followed a parent's policy before they had a scope_path of their own takes the parent's path**
+# (CHG-STO-011, 14 October 2026): `orders.invitation` was read through its product (apply_parent_rls on product_id)
+# until the contract's `Invitation.scopePath` reached it (Marketing's invitation had taken its name, so Orders' fields
+# never did); an existing invitation belongs where its product does. table -> (key column, parent table).
+SCOPE_FILL_FROM = {
+    "orders.invitation": ("product_id", "catalogue.product"),
+}
+
+
 def scope_path_backfill(t: str, cols) -> str | None:
     """The statements that fill and then close a scope_path added nullable to `t`, or None when the owner is unknown."""
+    if t in SCOPE_FILL_FROM and SCOPE_FILL_FROM[t][0] in cols:
+        key, parent = SCOPE_FILL_FROM[t]
+        return (f"UPDATE {t} x SET scope_path = p.scope_path FROM {parent} p WHERE p.id = x.{key} AND x.scope_path IS "
+                f"NULL; UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE "
+                f"scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
     owner = next((c for c in SCOPE_OWNER_KEYS if c in cols), None)
     if not owner:
         return None

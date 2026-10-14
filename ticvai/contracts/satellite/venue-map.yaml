@@ -2027,6 +2027,8 @@ components:
           x-ticvai-references: orders.cart
           description: The cart `bookVisitPlan` filled.
         excluded:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           description: >
@@ -2073,6 +2075,7 @@ components:
                 items: { type: string, format: uuid }
                 description: Other active venues of the tenant where the tag is matched. Empty when none is.
         days:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: One per date, in order. The items of the version read.
@@ -2794,6 +2797,8 @@ components:
             GST-006 merged), and it opens from the map pin, so the point carries the words rather
             than each kind borrowing them from a different module. Set on BO-094.
         media:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           maxItems: 12
           description: >
@@ -2961,6 +2966,8 @@ components:
             x: { type: number }
             y: { type: number }
         boundary:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           nullable: true
           description: The shape drawn, as a polygon in drawing coordinates. Null for a pin.
@@ -3233,6 +3240,8 @@ components:
             is the digit problem in §4, or a section code that differs by a space — and both look
             like success without this figure.
         findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: >
             **Named against the spec**, so a finding maps to a section of

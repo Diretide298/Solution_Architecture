@@ -77,21 +77,7 @@ CODEISH = re.compile(r"(code|sku|number|name|slug|label|key|reference|handle|ema
 # `x-ticvai-persistence-column`, or `x-ticvai-persisted: false`). Each of these is a storage decision for its
 # module's owner, listed for the lead with CHG-DDL-007; remove a line when it is decided. Only shrinks.
 SLICE_DEBT = frozenset(k + "@slice" for k in """
-ai.AiForecastScenario.changes ai.AiGuidedChoiceSuggestion.questions ai.AiHistoryImport.findings
-ai.AiIncident.containment ai.AiModel.taskFitness ai.AiProvider.fitnessWarnings ai.AiVenueSettings.openingHours
-approvals.ApprovalRequest.escalations approvals.ApprovalRequest.pendingApprovers assets.MediaAssetDetail.collections
-assets.MediaAssetDetail.derivatives assets.MediaAssetDetail.previousVersions catalogue.CatalogueImportJob.findings
-catalogue.EntitlementTemplate.validTimeWindows catalogue.Product.displayTags identity.Principal.roles
-marketing-crm.CookieBannerPreferenceCenterDesignerView.buttons
-marketing-crm.CookieBannerPreferenceCenterDesignerView.categories
-marketing-crm.CookieBannerPreferenceCenterDesignerView.links orders.Cart.conflicts orders.Cart.consentQuestions
-public-api.ApiVersion.changes reporting.SemanticModel.domains reporting.SemanticModel.relationships
-resources.ResourceSchedule.exceptions resources.ResourceSchedule.windows seating.AccessibleSeating.spaces
-seating.SeatRecommendationRules.profiles transport.TransportNetworkImport.findings venue-map.PlacedResource.boundary
-venue-map.VenueMapImportJob.findings venue-map.VenuePoint.media venue-map.VisitPlan.days venue-map.VisitPlan.excluded
-wallet.WalletConfigurationVersion.findings wallet.WalletFundingRules.bonusRules wallet.WalletFundingRules.presetAmounts
-white-label.ConfigVersion.pendingBuildTimeChanges
-""".split())
+""".split())   # emptied by CHG-STO-010: every member's storage is decided
 
 
 # **The tables a delivery-slice operation writes below tenant that an undeclared key left at the tenant root, on

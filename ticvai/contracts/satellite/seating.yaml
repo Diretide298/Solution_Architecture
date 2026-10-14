@@ -3378,6 +3378,8 @@ components:
           type: string
           format: uuid
         spaces:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3600,6 +3602,8 @@ components:
           format: uuid
           nullable: true
         profiles:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3991,6 +3995,8 @@ components:
         seatCount:
           type: integer
         boundary:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             $ref: '#/components/schemas/Point'
@@ -4475,6 +4481,7 @@ components:
           items:
             type: string
         findings:
+          x-ticvai-persisted: false
           type: array
           items:
             $ref: '#/components/schemas/ValidationFinding'

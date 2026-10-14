@@ -8388,6 +8388,8 @@ components:
           type: string
           nullable: true
         variants:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -8474,6 +8476,8 @@ components:
           type: integer
           nullable: true
         hardExclusions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

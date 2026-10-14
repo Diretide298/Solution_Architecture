@@ -2596,6 +2596,8 @@ components:
           nullable: true
           description: Pooled only. *150 lockers.*
         components:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**Hybrid only** — *one serialised kayak, two pooled paddles, two pooled life
             jackets.* One booking, two mechanisms.
@@ -2914,6 +2916,8 @@ components:
         '
       properties:
         operatingWindows:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3039,6 +3043,8 @@ components:
         basePrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
         durationTiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Board 4.3. *30 min AED 40, 60 min AED 60, 90 min AED 80, 120 min AED 95.*'
           items:
@@ -3064,6 +3070,8 @@ components:
           - roundUpHour
           default: exactUsage
         calendarRules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Board 4.4. *Peak 16:00–20:00 AED 90/hr; off-peak 09:00–12:00 AED 50/hr; peak
             season 1 Nov – 31 Mar.*
@@ -3374,6 +3382,8 @@ components:
         lateFeeAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         lateFeeTiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3606,6 +3616,7 @@ components:
         accruedLateFee:
           $ref: ../shared/common.yaml#/components/schemas/Money
         readiness:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: '**Computed, not stored** — agreement, requirements, deposit, equipment.'
@@ -3810,6 +3821,8 @@ components:
 
             '
         checklist:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

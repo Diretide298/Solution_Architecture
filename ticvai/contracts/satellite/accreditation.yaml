@@ -3008,6 +3008,8 @@ components:
             type: string
             format: uuid
         categories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3136,6 +3138,8 @@ components:
           type: string
           format: uuid
         rows:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3264,6 +3268,7 @@ components:
           additionalProperties: true
           description: Name, date of birth, nationality, contact — shaped by the requirements matrix.
         requirementStatus:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -3706,6 +3711,8 @@ components:
           type: integer
           readOnly: true
         failures:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3914,6 +3921,8 @@ components:
           type: string
           format: uuid
         rules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

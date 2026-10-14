@@ -1258,6 +1258,8 @@ components:
 
             '
         linkedCells:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1647,6 +1649,8 @@ components:
           format: date-time
           nullable: true
         cellResults:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

@@ -18256,6 +18256,7 @@ components:
 
             '
         token:
+          x-ticvai-secret: blind-index
           type: string
           format: password
           writeOnly: true
@@ -18913,6 +18914,7 @@ components:
         serialNumber:
           type: string
         authenticationToken:
+          x-ticvai-secret: blind-index
           type: string
           format: password
           writeOnly: true
@@ -20140,6 +20142,7 @@ components:
               type: boolean
               default: false
         credentialRef:
+          x-ticvai-secret: vault-reference
           type: string
           writeOnly: true
           description: 'A vault reference. **Never the credential**, never returned, and rotated without
@@ -20281,6 +20284,7 @@ components:
           type: string
           format: uuid
         token:
+          x-ticvai-secret: field-encrypted
           type: string
           format: password
           writeOnly: true
@@ -20591,6 +20595,7 @@ components:
           type: string
           nullable: true
         claimToken:
+          x-ticvai-secret: blind-index
           type: string
           format: password
           writeOnly: true
@@ -20800,7 +20805,7 @@ components:
       - surrendered
     EntitlementSummary:
       type: object
-      x-ticvai-persistence: catalogue.entitlement_template
+      x-ticvai-persistence: 'none — projection of access.entitlement and its product, as a guest or a steward sees it'
       description: 'One entitlement on a piece of media, as a guest or a steward sees it.
 
         '
@@ -21761,10 +21766,12 @@ components:
           items:
             $ref: '#/components/schemas/CartLine'
         conflicts:
+          x-ticvai-persisted: false
           type: array
           items:
             $ref: '#/components/schemas/CartConflict'
         consentQuestions:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: >

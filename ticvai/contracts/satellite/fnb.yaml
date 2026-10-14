@@ -8704,6 +8704,8 @@ components:
           minimum: 15
           description: The turn time when no party-size band matches.
         turnTimeBands:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**Turn time by party size** — a two-top and a table of eight do not turn at the
             same speed, and a single default is how a restaurant ends up double-booking its large
