@@ -76417,6 +76417,7 @@ screens:
   module: Games & Rides
   requiresModule: games
   wave: 3
+  permission: WALLET_VIEW
   source:
     pack: Game_and_Ride_Module.pdf
     board: '7'
@@ -76547,10 +76548,9 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: The filter narrowed it and the card lifecycle are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: 'No operation on this screen requires a permission, so no permission can be missing:
-      the state is reached only by a caller who is not signed in, or a tenant without the screen''s module,
-      and says which. **Never an empty table** — that reads as *there is no data* and sends somebody to
-      support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `WALLET_VIEW`, which `getGameCard` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question.
   apis:
   - operationId: getGameCard
     contract: games
@@ -76585,6 +76585,7 @@ screens:
   module: Games & Rides
   requiresModule: games
   wave: 3
+  permission: WALLET_VIEW
   source:
     pack: Game_and_Ride_Module.pdf
     board: '7'
@@ -76667,10 +76668,9 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
       be filtered to empty.'
-    emptyNoAccess: 'No operation on this screen requires a permission, so no permission can be missing:
-      the state is reached only by a caller who is not signed in, or a tenant without the screen''s module,
-      and says which. **Never an empty table** — that reads as *there is no data* and sends somebody to
-      support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `WALLET_VIEW`, which `getGameCard` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question.
   apis:
   - operationId: getGameCard
     contract: games
@@ -76777,6 +76777,7 @@ screens:
   module: Games & Rides
   requiresModule: games
   wave: 3
+  permission: WALLET_VIEW
   source:
     pack: Game_and_Ride_Module.pdf
     board: '7'
@@ -76835,10 +76836,9 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
       be filtered to empty.'
-    emptyNoAccess: 'No operation on this screen requires a permission, so no permission can be missing:
-      the state is reached only by a caller who is not signed in, or a tenant without the screen''s module,
-      and says which. **Never an empty table** — that reads as *there is no data* and sends somebody to
-      support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `WALLET_VIEW`, which `getGameCard` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question.
   apis:
   - operationId: getGameCard
     contract: games
@@ -77307,6 +77307,7 @@ screens:
   module: Games & Rides
   requiresModule: games
   wave: 3
+  permission: WALLET_VIEW
   source:
     pack: Game_and_Ride_Module.pdf
     board: '7'
@@ -77380,10 +77381,9 @@ screens:
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
       be filtered to empty.'
-    emptyNoAccess: 'No operation on this screen requires a permission, so no permission can be missing:
-      the state is reached only by a caller who is not signed in, or a tenant without the screen''s module,
-      and says which. **Never an empty table** — that reads as *there is no data* and sends somebody to
-      support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `WALLET_VIEW`, which `getGameCard` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question.
   apis:
   - operationId: getGameCard
     contract: games
@@ -80028,6 +80028,7 @@ screens:
   module: Games & Rides
   requiresModule: games
   wave: 3
+  permission: WALLET_VIEW
   source:
     pack: Game_and_Ride_Module.pdf
     board: '10'
@@ -80096,10 +80097,9 @@ screens:
       operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
       be filtered to empty.'
-    emptyNoAccess: 'No operation on this screen requires a permission, so no permission can be missing:
-      the state is reached only by a caller who is not signed in, or a tenant without the screen''s module,
-      and says which. **Never an empty table** — that reads as *there is no data* and sends somebody to
-      support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `WALLET_VIEW`, which `getGameCard` requires to show this
+      screen, and names that permission. **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question.
   apis:
   - operationId: getGameCard
     contract: games
