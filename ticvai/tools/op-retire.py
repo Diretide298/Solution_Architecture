@@ -93,7 +93,16 @@ OTHER = {
                         "listCampaigns, stopCampaign and updateCampaign are built on VM-MARKETING-CAMPAIGN-1 and "
                         "SVC-MARKETING-CAMPAIGN-1")
        for k in ("VM-MARKETING-CAMPAIGN-2", "VM-MARKETING-CAMPAIGN-3")},
+    # r6 kept r5's two setup screens in Block A (CHG-GT1-004), each as one whole-screen task, so the pushed "rest of
+    # the screen" tickets left the plan with no reason and would have stayed New with nothing linked (the r6 rehearsal
+    # pull, 15 October; CHG-GT3-003).
+    **{f"APP-SETUP-{sid}-REST": ("merge", f"APP-SETUP-{sid}", f"r6 keeps {sid} in Block A as r5 planned it, built "
+                                 "as one whole-screen task, so the rest of the screen is no longer a separate ticket "
+                                 "(CHG-GT1-004)")
+       for sid in ("ADM-603", "BO-1146")},
 }
+# The day an OTHER retirement was decided, where it is not the 28 September of the first ones (its note says so).
+OTHER_DECIDED = {"APP-SETUP-ADM-603-REST": "14 October 2026", "APP-SETUP-BO-1146-REST": "14 October 2026"}
 
 
 # **Replaced in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone in r2"; CHG-CLN-001, CHG-CLN-002). The
@@ -211,11 +220,12 @@ def build_plan(release=None, day=None):
     for key, (kind, into, why) in OTHER.items():
         if key not in mp or key in planned:
             continue
+        decided = OTHER_DECIDED.get(key, "28 September")
         if kind == "merge":
-            note = (f"**Merged into {into}** (decided 28 September): {why}. That ticket ({f'#{mp[into]}' if into in mp else into}) "
+            note = (f"**Merged into {into}** (decided {decided}): {why}. That ticket ({f'#{mp[into]}' if into in mp else into}) "
                     "carries the work now, so this ticket is closed.")
         else:
-            note = (f"**Out of the first release** (decided 28 September): {why}. The ticket is on hold and off "
+            note = (f"**Out of the first release** (decided {decided}): {why}. The ticket is on hold and off "
                     "the board; it comes back when its release is planned.")
         plan += [(x, kind, note) for x in [key] + [s_ for s_ in mp if s_.startswith(key + "#")]]
         covered.add(key)

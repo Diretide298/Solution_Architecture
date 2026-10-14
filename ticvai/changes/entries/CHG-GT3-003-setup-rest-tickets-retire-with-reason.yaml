@@ -1,0 +1,50 @@
+id: CHG-GT3-003
+date: '2026-10-15'
+source: audit
+kind: plan
+proposed: '2026-10-14'
+summary: The pushed rest-of-screen tickets of ADM-603 and BO-1146 close into the whole-screen tickets r6 kept, with a
+  reason, instead of staying New with nothing linked.
+decision:
+  what: 'tools/op-retire.py OTHER: APP-SETUP-ADM-603-REST (#28272) merges into APP-SETUP-ADM-603 (#28054) and
+    APP-SETUP-BO-1146-REST (#28726) into APP-SETUP-BO-1146 (#28037), with their build, wire and test sub-tasks
+    (Rejected, one comment naming the ticket that carries the screen). OTHER_DECIDED dates their note 14 October 2026
+    (the others keep 28 September).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'The r6 rehearsal pull of r6-candidate c56b9dc4 (audit/rehearsal/rehearsal-summary.md, lead workspace): both left
+  Block A with status New -> New and links 4 -> 0, because the plan had dropped them (CHG-GT1-004 kept the two setup
+  screens as one whole-screen task each) and op-retire.py had no reason for them, so the apply lists them as
+  unexplained and never touches them. Before: 2 unexplained in the r6 bundle''s retire input; after: both retired as
+  merge.'
+keys_touched:
+  files:
+  - tools/op-retire.py
+  tickets:
+  - '28272'
+  - '28726'
+  screens:
+  - ADM-603
+  - BO-1146
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted:
+  - '28272'
+  - '28726'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-14'
+    quote: go with your recommendation
+prevention:
+  type: check
+  ref: tools/check-ticket-links.py
+status: open
+notes: 'Batch GT3 (r6 fix round 3). Follows CHG-GT1-004, whose notes already said these two would be retired at the
+  apply. check-ticket-links notes the Block A tickets the last bundle cut that are no longer planned (op-retire closes
+  or parks them).'
