@@ -1,0 +1,79 @@
+id: CHG-PPL-001
+date: '2026-10-15'
+source: plan
+kind: plan
+proposed: '2026-10-15T00:40'
+summary: 'Tanmay Dukhande has left the team, and Narayan Gaonkar takes his place at the same role (Back end), pools,
+  pace (1.17) and position. Every task Tanmay owned, was accountable for, tested or reviewed moves to Narayan, and
+  nothing else in the plan changes.'
+decision:
+  what: 'docs/active/team.json: Narayan Gaonkar (OpenProject user 79) replaces Tanmay Dukhande (OpenProject user 108)
+    in areas.backend, onboard, pace and people, in the same positions, and a new `successors` map records
+    {"Tanmay Dukhande": "Narayan Gaonkar"}. docs/active/block-a-extra-tasks.json: the two moduleTestPeers pins and the
+    54 ownerMoves that named Tanmay now name Narayan, and each note gets a dated line. tools/sprint_plan.py:
+    pinned_owners gives the successor every ticket the last release (r5) pinned to the leaver, the scheduler breaks
+    ties as it did for the person replaced (people `sortAs`), and the default block-test pairs name Narayan.
+    tools/build-service-docs.py: module-test peers break ties the same way, and Narayan is onboarded on the pushed key
+    SETUP-ONBOARD-TANMAY-DUKHANDE (#27639, New), because a pushed key is never renamed. tools/op-descriptions.py
+    reads the back-end reviewers from team.json and leaves out anyone who left. tools/push-openproject.py and
+    tools/build-plan-deck.py name Narayan where they meant the current back-end developer.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'Lead decision, Chinmay, 15 October 2026, 00:40: "tanmay is leaving so shift all tasks to narayan. Check in pms his
+  exact name". The OpenProject (PMS) name is Narayan Gaonkar, user 79. Tanmay held a third of the back end, including
+  the work moved to him from Pallavi Sawant (CHG-R6-056) at pace 1.17 (CHG-R6-057). The generators placed work by name, so the change
+  had to make the load balancer see a different name and nothing else: the pins of release r5 still named Tanmay, and
+  the scheduler and the module-test peer choice broke ties alphabetically. A hard-coded reviewer list
+  (op-descriptions BE_CHECK) would also have kept him reviewing.'
+keys_touched:
+  files:
+  - docs/active/team.json
+  - docs/active/block-a-extra-tasks.json
+  - tools/sprint_plan.py
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/op-descriptions.py
+  - tools/push-openproject.py
+  - tools/build-plan-deck.py
+  - tools/check-plan-owners.py
+  tickets:
+  - '27639'
+  other:
+  - team.json successors
+  - CHG-R6-056
+  - CHG-R6-057
+  - CHG-R4-005
+root_class: 'new: person-leaves-the-team'
+tickets:
+  started:
+  - '27678'
+  - '27677'
+  - '27660'
+  - '27669'
+  - '27663'
+  - '27922'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-15'
+    quote: Waive off 24 hour period
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open
+notes: 'Measured on a re-derive (build-service-docs, derive-block-a-schedule, op-descriptions --schedule) against the
+  same derive of r6-integrate 8227a20b: tasks.csv 232 rows owned by Tanmay (200 tasks, 32 features) and 247 accountable
+  become exactly the same keys on Narayan; plan-tasks.csv 326 and 364 likewise; block-a-schedule.json 294 assignments,
+  and every start, end and sprint unchanged; no other person''s points move. 401 tasks.csv rows in all (330 in Blocks A
+  and A2), 395 pushed: by the cached OpenProject status in adam-links.json, the 229 he owns are New, and 6 where he is
+  only accountable are started (MIG-FNB, MIG-MARKETING, MIG-REPORTING, MIG-WALLET, MIG-WHITELABEL Ready for QA;
+  SVC-MARKETING-CONSENT-5 On hold), listed under started: their owner is Hrushikant Patkar or the person they were;
+  only the accountable changes. Narayan must be a member of OpenProject project 153 before the push can assign him.
+  check-plan-owners gains O-LEFT (work, a pin or a roster entry still on someone who left); on the plan derived before
+  this change it reported 908+ findings, after it 0. Historical text naming Tanmay (dated notes, past plans, minutes,
+  contracts/spine/shift.yaml''s 20 August review, the test fixture in tools/tests/test_op_release.py) is kept.'

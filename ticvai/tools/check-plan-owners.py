@@ -26,6 +26,13 @@ docs/active/ai-phase-plan.json):
                    schedule, by someone team.json `noTestTakeover` names (Surendra; CHG-R5-005)
   O-MOVE           a task block-a-extra-tasks.json `ownerMoves` moves (CHG-R5-003) still owned, in the plan or the
                    schedule, by the person it leaves, or by anyone but the person it goes to
+  O-LEFT           (15 October 2026, CHG-PPL-001: Tanmay Dukhande left, Narayan Gaonkar took his place) a task owned or
+                   accountable, in the plan or the schedule, by someone team.json `successors` says has left; a
+                   leaver still in team.json's areas, onboard, pace, people, helpers, serviceOwners or the
+                   block-a-extra-tasks.json pins (moduleTestPeers, ownerMoves `to`); or a successor not on the roster
+  O-SVC-OWNER      (15 October 2026, CHG-PPL-002: "keep hrushikant" for LedgerService) a back-end, database or setup
+                   task of a service team.json `serviceOwners` fixes whose accountable (its reviewing owner) is anyone
+                   but that owner
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -48,6 +55,8 @@ RULES = {
     "O-MOVE": "a task the lead's ownerMoves moves not owned by the person it goes to (CHG-R5-003)",
     "O-NO-CHECKER": "a module test owned by someone who never tests (team.json neverTests; CHG-R5-004)",
     "O-NO-TAKEOVER": "a module test given up by someone who never tests, taken by someone team.json noTestTakeover keeps off it (CHG-R5-005)",
+    "O-LEFT": "work or a pin still on someone who left the team (team.json successors; CHG-PPL-001)",
+    "O-SVC-OWNER": "a fixed service's back end reviewed by anyone but its fixed owner (team.json serviceOwners; CHG-PPL-002)",
 }
 SD = Path("handoff") / "service-docs"
 
@@ -135,9 +144,61 @@ def main() -> int:
                     guard.add("O-NO-TAKEOVER", f"{r['key']}:{where}",
                               f"{r['key']} is {who}'s in the {where}, given up by {pins[r['key']]}; "
                               f"noTestTakeover keeps {who} off it (CHG-R5-005)")
+    n_left = check_left(guard, team, extra, rows, assign)
+    n_svc = check_service_owners(guard, team, rows)
+    guard.note(f"{n_left} people left the team (successors), {n_svc} back-end tasks of fixed services checked")
     guard.note(f"{n_tests} module tests, {len(phase2)} phase 2 app-modules of the AI engine, "
                f"{n_mig} migration tasks ({mig_owner or 'no owner'}'s)")
     return guard.finish()
+
+
+def check_left(guard, team, extra, rows, assign) -> int:
+    """O-LEFT (CHG-PPL-001; Chinmay, 15 October 2026: "tanmay is leaving so shift all tasks to narayan"): nothing stays on
+    a person who left, in the plan, the schedule or the inputs that place work."""
+    succ = sp.successors(team)
+    if not succ:
+        return 0
+    for r in rows:
+        if r["type"] != "Task":
+            continue
+        for where, field, who in (("plan", "owner", r["assignee"]), ("plan", "accountable", r.get("accountable")),
+                                  ("schedule", "owner", assign.get(r["key"]))):
+            if who in succ:
+                guard.add("O-LEFT", f"{r['key']}:{where}:{field}",
+                          f"{r['key']}: {who} is its {field} in the {where} but left; {succ[who]} took their place")
+    places = [("areas." + a, set(ws)) for a, ws in (team.get("areas") or {}).items()]
+    places += [(f, set(team.get(f) or {})) for f in ("onboard", "pace", "helpers", "backendHelpers", "helperShare",
+                                                     "neverTests", "noTestTakeover")]
+    places += [("people", {p.get("name") for p in team.get("people") or []}),
+               ("serviceOwners", set((team.get("serviceOwners") or {}).values())),
+               ("migrations.owner", {(team.get("migrations") or {}).get("owner")}),
+               ("venueManagement.who", set((team.get("venueManagement") or {}).get("who") or [])),
+               ("ai.who", set((team.get("ai") or {}).get("who") or [])),
+               ("block-a-extra-tasks.json moduleTestPeers", set((extra.get("moduleTestPeers") or {}).values())),
+               ("block-a-extra-tasks.json ownerMoves to", {to for _, to in sp.owner_moves(extra).values()})]
+    roster = {p.get("name") for p in team.get("people") or []}
+    for who, new in sorted(succ.items()):
+        for name, held in places:
+            if who in held:
+                guard.add("O-LEFT", f"team:{who}:{name}", f"{who} left (successor {new}) but is still in {name}")
+        if new not in roster:
+            guard.add("O-LEFT", f"team:{who}:successor", f"{who}'s successor {new} is not in team.json people")
+    return len(succ)
+
+
+def check_service_owners(guard, team, rows) -> int:
+    """O-SVC-OWNER (CHG-PPL-002; Chinmay, 15 October 2026: "keep hrushikant"): a service the lead fixed is reviewed by
+    its fixed owner, whatever the load balancer would give it."""
+    fixed = sp.service_owners(team)
+    n = 0
+    for r in rows:
+        if r["type"] == "Task" and r["service"] in fixed and r["track"] in ("Backend", "Database", "DevOps", "Setup",
+                                                                             "Onboarding"):
+            n += 1
+            if r.get("accountable") != fixed[r["service"]]:
+                guard.add("O-SVC-OWNER", r["key"], f"{r['key']} ({r['service']}) is reviewed by "
+                          f"{r.get('accountable') or 'nobody'}, not {fixed[r['service']]} (serviceOwners, CHG-PPL-002)")
+    return n
 
 
 if __name__ == "__main__":

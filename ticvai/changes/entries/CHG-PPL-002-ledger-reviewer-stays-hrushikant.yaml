@@ -1,0 +1,51 @@
+id: CHG-PPL-002
+date: '2026-10-15'
+source: plan
+kind: plan
+proposed: '2026-10-15T00:40'
+summary: 'LedgerService keeps Hrushikant Patkar as its reviewing owner (accountable for its back end and migrations),
+  pinned in team.json serviceOwners, so the load balancer no longer moves it when service sizes change.'
+decision:
+  what: 'docs/active/team.json gains serviceOwners {"LedgerService": "Hrushikant Patkar"} with its note.
+    tools/build-service-docs.py gives a pinned service to its owner when its turn comes in the largest-first
+    balancing, so the other services balance as before; tools/derive-block-a-schedule.py uses the same owner;
+    tools/sprint_plan.py service_owners reads the pin (a successor takes a pinned owner''s place).'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'Lead decision, Chinmay, 15 October 2026, 00:40: "keep hrushikant", on the r6 audit''s tickets-and-plan finding
+  (the CHG-TKT batch: LedgerService''s reviewing owner moves between Hrushikant and Tanmay as a knock-on of the load
+  balancer; confirm or pin). The balancer gives whole services to the back-end developers by size. At r5
+  (tasks.csv at tag r5) LedgerService''s 25 back-end tasks were accountable to Tanmay Dukhande; the r6 derive
+  (23eb3d98 and 8227a20b) gives its 26 to Hrushikant Patkar. Without a pin, the next change in service sizes could move
+  it again, or hand it to Narayan Gaonkar with Tanmay''s place (CHG-PPL-001).'
+keys_touched:
+  files:
+  - docs/active/team.json
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/sprint_plan.py
+  - tools/check-plan-owners.py
+  other:
+  - LedgerService
+  - CHG-PPL-001
+root_class: 'new: service-owner-by-balance'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-15'
+    quote: Waive off 24 hour period
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open
+notes: 'After the re-derive, all 26 LedgerService back-end tasks in tasks.csv are accountable to Hrushikant Patkar,
+  as in the r6 derive before this change, so no one''s load moves. Who builds each Ledger task is unchanged (pins and
+  helpers; the 6 that were Tanmay''s are Narayan''s). check-plan-owners gains O-SVC-OWNER: with the pin set to another
+  person, it reports all 31 of the service''s back-end, database and setup tasks; with Hrushikant, 0.'
