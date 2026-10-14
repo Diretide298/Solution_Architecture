@@ -285,14 +285,17 @@ function addForeignKeys(tables, columns, problems, workbookName, migrations) {
   // is a level of platform.scope_node — and only the DDL knows that.
   const taught = new Map();
   const conflicting = new Set();
+  // a key into a table renamed after r1 teaches the table's name now (CR-067)
+  const renamedTo = new Map(tables.filter((t) => t.was).map((t) => [t.was, t.name]));
   for (const ddl of Object.values(migrations?.tables ?? {})) {
     for (const key of ddl.foreignKeys) {
       // a composite key here is an id plus a level discriminator, so the first
       // column is the one that names the thing — (venue_id, venue_level)
       const column = key.columns[0];
       if (!column) continue;
-      if (taught.has(column) && taught.get(column) !== key.toTable) conflicting.add(column);
-      else taught.set(column, key.toTable);
+      const toTable = renamedTo.get(key.toTable) ?? key.toTable;
+      if (taught.has(column) && taught.get(column) !== toTable) conflicting.add(column);
+      else taught.set(column, toTable);
     }
   }
   for (const column of conflicting) taught.delete(column);
@@ -357,8 +360,16 @@ function addForeignKeys(tables, columns, problems, workbookName, migrations) {
 function applyMigrations(tables, columns, migrations, problems) {
   if (!migrations.present) return;
   const byName = new Map(tables.map((t) => [t.name, t]));
+  // **A table renamed after r1 is still created under its old name** by the frozen SQL until a forward
+  // migration renames it (handoff/migration-review.md). Read here by its old name, so `seating.seat_reservation`
+  // gets `seating.seat_hold`'s DDL, and a key into a renamed table names the table as it is now:
+  // `retail.merchandise.inventory_item_id` keys `inventory.inventory_item`, not the retired `inventory.item`
+  // (ADAM CR-067, 14 October 2026).
+  const renamedTo = new Map(tables.filter((t) => t.was).map((t) => [t.was, t.name]));
+  const current = (name) => renamedTo.get(name) ?? name;
 
-  for (const [name, ddl] of Object.entries(migrations.tables)) {
+  for (const [ddlName, ddl] of Object.entries(migrations.tables)) {
+    const name = byName.has(ddlName) ? ddlName : current(ddlName);
     const table = byName.get(name);
     if (!table) {
       // a table in the DDL that the workbook has never heard of
@@ -382,13 +393,14 @@ function applyMigrations(tables, columns, migrations, problems) {
       columns: ddl.columns.length,
       generated: ddl.columns.filter((c) => c.generated).map((c) => c.name),
     };
+    if (name !== ddlName) table.ddl.createdAs = ddlName;
     table.keys = ddl.foreignKeys.map((key) => ({
       columns: key.columns,
-      toTable: key.toTable,
+      toTable: current(key.toTable),
       onDelete: key.onDelete,
       composite: key.composite,
-      crossSchema: key.toTable.split('.')[0] !== table.module,
-      self: key.toTable === table.name,
+      crossSchema: current(key.toTable).split('.')[0] !== table.module,
+      self: current(key.toTable) === table.name,
     }));
 
     // the DDL is the answer, so the guesses for this table go
@@ -396,7 +408,7 @@ function applyMigrations(tables, columns, migrations, problems) {
     for (const column of columns[name] ?? []) {
       delete column.foreignKeyTable;
       const key = ddl.foreignKeys.find((k) => k.columns.includes(column.name));
-      if (key) column.keyTable = key.toTable;
+      if (key) column.keyTable = current(key.toTable);
       const declared = ddl.columns.find((c) => c.name === column.name);
       if (declared?.generated) column.generated = true;
       // The DDL's type too: the workbook says `text` for scope_path where the DDL declares
@@ -409,7 +421,8 @@ function applyMigrations(tables, columns, migrations, problems) {
   }
 
   // columns the DDL has that the workbook does not
-  for (const [name, ddl] of Object.entries(migrations.tables)) {
+  for (const [ddlName, ddl] of Object.entries(migrations.tables)) {
+    const name = byName.has(ddlName) ? ddlName : current(ddlName);
     if (!byName.has(name) || !ddl.columns.length) continue;
     const known = new Set((columns[name] ?? []).map((c) => c.name));
     // audit columns are on nearly every table and are not worth 25 warnings
@@ -565,7 +578,7 @@ export async function buildBackend(root, contractSchemas = []) {
   // boundary rests on: the owner defines the row, a foreign writer may append.
   const tableRows = table(sheet('Tables'), ['Module', 'Table', ['Columns', 'Cols']],
     ['Child of', 'Derived from', 'Migration', 'Written', 'New', 'PII',
-      'Service', 'Foreign writers']).rows;
+      'Service', 'Foreign writers', 'Was']).rows;
   const columnRows = table(sheet('Columns'), ['Table', 'Column', 'Type'],
     ['Required', 'Source', 'Description']).rows;
   const scalingRows = table(sheet('Scaling'), ['Contract', 'Writes'],
@@ -701,6 +714,9 @@ export async function buildBackend(root, contractSchemas = []) {
         storageOnly,
         storageReason: storageOnly ? source : null,
         migration: r.Migration || null,
+        // The name the table had before a rename the forward migrations have not yet carried out (the
+        // workbook's `Was` column). The frozen r1 SQL still creates it under that name (CR-067).
+        was: r.Was || null,
         // the rebuild added this column; the SQL in backend/ is checked against it
         claimsWritten: /^(yes|y|true|✓|written)$/i.test(r.Written ?? ''),
         // What ships this table. Null on an older workbook, which is why every

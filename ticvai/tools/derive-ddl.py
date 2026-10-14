@@ -283,6 +283,12 @@ ROW_OWNER = {
     "inventory.movement": "item_id",              # CHG-R6-015
     "inventory.stock_earmark": "item_id",         # CHG-R6-015
     "inventory.goods_receipt": "purchase_order_id",   # CHG-R6-015
+    # CHG-DDL-004 (ADAM CR-069, 14 October 2026): declaring the Sprint 1 modules' keys gave these a second
+    # candidate. A placed resource is drawn on its map (the rows a map version publishes), and the resource it
+    # places names what is drawn: it follows the map, as map_version now does. A payment token is the guest's
+    # (subject policy, as at r1); `provider_id` names who issued it and must not make it the provider's row.
+    "venuemap.placed_resource": "map_id",         # CHG-DDL-004
+    "payments.token": "subject_id",               # CHG-DDL-004: no protected owner, so the subject rule applies
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------
@@ -1090,6 +1096,16 @@ def pg_type(t: str | None) -> str:
 # `table -> [columns]` from `x-ticvai-primary-key`, filled in `main` before any key is asked for.
 DECLARED_PK: dict = {}
 
+# **The type each column takes in the generated DDL** (ADAM CR-067, 14 October 2026, CHG-DDL-002), filled in `main`
+# and written to `handoff/ddl-column-types.json`. The schema reference keeps the contract's shape (`text` for an
+# id the wire sends as a string, `numeric` for a quantity), and this file applies ADR-0056's one id type and
+# `numeric(18,4)` on top. ADAM's table view and the workbook's Columns sheet took the type from the frozen r1
+# SQL where a CREATE TABLE of the same name existed and from the schema reference where none did -- so every
+# table renamed after r1 (`seating.seat_reservation`, `inventory.inventory_item`) showed `text` ids and bare
+# `numeric` quantities nobody intends, while the DDL generated for it says uuid and numeric(18,4).
+DDL_TYPES: dict = {}
+DDL_TYPES_FILE = ROOT / "handoff" / "ddl-column-types.json"
+
 
 def key_of(table: str, cols: dict) -> str | None:
     """The column a foreign key should point at.
@@ -1506,6 +1522,7 @@ def main() -> int:
                 # (naming-and-style 5.3), not at null.
                 if col == "scope_path" or col == part_col:
                     nn = " NOT NULL"
+                DDL_TYPES.setdefault(t, {})[col] = typ
                 pk = " PRIMARY KEY" if inline_pk and col == tkey else ""
                 # **Contract enums, maxLength and defaults become a CHECK and a DEFAULT.** Not on
                 # a path column: its contract type is a string and its column is an ltree.
@@ -1949,6 +1966,14 @@ def main() -> int:
             if dest.suffix == ".sh":
                 dest.chmod(0o755)
 
+    if a.apply:
+        DDL_TYPES_FILE.write_text(json.dumps({
+            "note": "Derived by tools/derive-ddl.py. Do not hand-edit. The type each column takes in the DDL this run "
+                    "generates (ADR-0056 one id type, numeric(18,4)), under the names the tables and columns have now, "
+                    "including those renamed after r1 whose rename is still a forward migration to write "
+                    "(handoff/migration-review.md). Read by build-schema-workbook.py for the Columns sheet (CR-067).",
+            "tables": {t: dict(sorted(c.items())) for t, c in sorted(DDL_TYPES.items())},
+        }, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"  {n_tables} tables · {n_cols} columns · {n_fk} foreign keys · {n_idx} indexes · "
           f"{n_chk} checks · {n_def} defaults · {n_uniq} unique indexes")
     if no_unique:

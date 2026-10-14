@@ -1,0 +1,61 @@
+id: CHG-DDL-002
+date: '2026-10-14'
+source: developer
+kind: spec
+summary: 'A table renamed after r1 keeps its DDL link, its migration and its DDL types in ADAM and the schema workbook:
+  derive-ddl writes the type every column takes in the generated DDL, the Columns sheet shows it, a renamed table finds
+  its migration under its old name, and ADAM reads its r1 SQL by the old name and points keys at the new names.'
+decision:
+  what: 'tools/derive-ddl.py fills DDL_TYPES (the column type after ADR-0056''s one id type and numeric(18,4)) and
+    writes handoff/ddl-column-types.json on --apply. tools/build-schema-workbook.py takes the Columns sheet''s Type from
+    it (the contract''s shape moves to a new last column, Contract type, where the two differ) and finds a renamed
+    table''s Migration under its Was name when the plan still lists the old one. viewer/lib/backend.mjs (ADAM) reads the
+    workbook''s Was column: a renamed table takes the DDL the frozen r1 SQL creates under its old name (ddl.createdAs),
+    and every key into a renamed table names it as it is now. No type changes: the DDL was right throughout.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-067 (MIG-SEATING, #27668). Audit: PARTLY TRUE. TRUE that ADAM showed seating.seat_reservation.id and
+  seat_reservation_item.seat_reservation_id as text, inventory_item quantities as numeric and retail.merchandise keyed
+  to inventory.item: schema-reference.json keeps the contract shape (seat_reservation.id "text", source
+  seating.SeatHold.id), and ADAM (viewer/lib/backend.mjs applyMigrations) overrode it only from a CREATE TABLE of the
+  same name, which for a table renamed by CHG-R6-010/018 (CR-011, CR-014) exists only under the old name in the frozen
+  r1 baseline. TRUE that r4''s workbook had no Migration for the renamed tables (build-schema-workbook reads the
+  previous refresh''s tasks.csv, which listed the old names); r5''s already had it. FALSE that "the next derive will
+  generate type changes nobody intends": derive-ddl applies ADR-0056 and numeric(18,4) itself (derive-ddl.py id_type,
+  TYPE_MAP) and migration-review.md lists no type change for these columns; MIG-059/061/064/070 following the DDL are
+  right.'
+keys_touched:
+  tables:
+  - seating.seat_reservation
+  - seating.seat_reservation_item
+  - inventory.inventory_item
+  - retail.merchandise
+  files:
+  - tools/derive-ddl.py
+  - tools/build-schema-workbook.py
+  - viewer/lib/backend.mjs
+  tickets:
+  - MIG-SEATING
+  - MIG-INVENTORY
+  - MIG-RETAIL
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - MIG-SEATING (#27668)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-067 (ADAM)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::DDL_TYPES
+status: open
+notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Contract impact: none. Migration effect: none (no DDL changes). Verified by loading ADAM''s
+  buildBackend on this tree after derive-ddl --apply and build-schema-workbook: seat_reservation id uuid (DDL from
+  seating.seat_hold), seat_reservation_item.seat_reservation_id uuid, inventory_item on_hand and reorder_point
+  numeric(18,4), retail.merchandise.inventory_item_id -> inventory.inventory_item, Migration V0019/V0024 filled. The
+  ADAM change ships with the viewer like any other viewer commit (it needs the ADAM build on the server updated).
+  ddl-column-types.json is a new derived file written by derive-ddl (step 64 of refresh.sh) before
+  build-schema-workbook (step 82) reads it; handoff/refresh-manifest.json does not list it until it is rebuilt.'
