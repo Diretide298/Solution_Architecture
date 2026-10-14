@@ -1,0 +1,51 @@
+id: CHG-TEN-005
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'A new check, tools/check-request-fields-stored.py, fails a configuration write (create, update, configure,
+  set) whose request field is not on its persisted resource, has no column in a table it writes and is not marked
+  x-ticvai-persisted: false, and a readOnly field on a request-only schema; today''s 69 other findings are its
+  baseline.'
+decision:
+  what: 'tools/check-request-fields-stored.py (audit_guard, baseline in handoff/audit-baseline.json under
+    check-request-fields-stored), registered in tools/run-checks.py. RF-REQUEST-NOT-STORED matches a field on the
+    resource by name (fooId and fooIds also as foo), a column by snake_case with _id, _ids, is_ or _amount, by
+    x-ticvai-column, by schema-reference source, by the same words with plurals ignored (paymentTermDays and
+    payment_terms_days), or as a qualified column for a field of two words or more (expiresAt as
+    credential_expires_at), an array as a written child table named for it, and a request schema that is itself the
+    value of a resource field (setAccessPointGeofence and AccessPoint.geofence) - the audit scan''s false positives.
+    RF-READONLY-REQUEST: a readOnly field on a request-only schema, unless deprecated and x-ticvai-persisted: false.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'The class of ADAM CR-082 (audit of 14 October 2026, CR-082 "Class" and Prevention): request-only fields on
+  create/update/configure/set writes, 32 operations and 52 fields by the audit scan (createPrincipal mustChangeCredential
+  and roleIds, updateMyProfile dietary and accessibility, setPathClosure isClosed and expectedReopenAt, createOrder
+  guestLinkId, setWalletAllocationPolicy fixedAmount and percentage, createPayment deviceId and walletHoldId,
+  setResourceLifecycleState, updatePriceList isActive, setAiCredential graceMinutes). check-contract-storage reads only
+  persisted schemas, so a request schema was out of its reach. Lead''s decision: baseline today''s findings.'
+keys_touched:
+  files:
+  - tools/check-request-fields-stored.py
+  - tools/run-checks.py
+  - handoff/audit-baseline.json
+  operations:
+  - configureWorkstation
+root_class: 'new: request-only-fields'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Run on the parent commit r5 (1eb1d063, its contracts, schema reference and lineage, with this branch''s baseline):
+  FAIL, 4 new (configureWorkstation.cashierInputMode, .guestDisplayContent, .loadedMediaStockId; RF-READONLY-REQUEST
+  tenancy.ConfigureWorkstationRequest.mediaStockRemaining), 69 known. On this branch: PASS, 0 new, 69 known.
+  configureWorkstation is not in the baseline. The 69 baselined fields (128 writes read) are the r6 debt: several are
+  action details (reason, note, recordedAt) that belong in an audit or history row the lineage does not name, and
+  each owner either stores the field or marks it x-ticvai-persisted: false; the list only shrinks.'

@@ -141,6 +141,9 @@ CHECKS = [
     "check-screen-permissions",
     # 12 October (CHG-R6-031..038): a promise has its operation, field, binding or reader; one business day.
     "check-promises-kept",
+    # 14 October (ADAM CR-082, CHG-TEN-005): a configuration write's request field is on its persisted resource,
+    # has a column in a table it writes, or says x-ticvai-persisted: false; no readOnly field on a request-only schema.
+    "check-request-fields-stored",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
