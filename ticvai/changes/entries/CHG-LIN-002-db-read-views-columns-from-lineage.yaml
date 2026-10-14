@@ -1,0 +1,49 @@
+id: CHG-LIN-002
+date: '2026-10-14'
+source: developer
+kind: plan
+proposed: '2026-10-14'
+summary: 'DB-READ-VIEWS says how a view''s columns are chosen: the union of its readers'' readColumns from the
+  lineage, every pii view a column list and never all columns.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json, DB-READ-VIEWS detail: after the view shape, "The columns are
+    generated, not chosen": each lineage entry carries readColumns (derived by tools/derive-read-columns.py from the
+    response schemas, the parameters, the join keys and docs/active/read-columns-override.yaml); a view''s columns
+    are the union of readColumns[table] over the reader module''s operations that read the table; a read with no
+    list keeps every column except over pii.*, where every cross-module read has a list (check-read-columns fails one
+    without), so a pii view is always narrow. Done-when gains "each exposing exactly the union of its readers''
+    readColumns (every pii view a column list, never all columns)".'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-004 (ticket #27654 DB-READ-VIEWS): the 12 October decision built all-column views except over pii.*,
+  narrowed by hand, until the lineage carried per-read column lists; CHG-LIN-001 makes the lineage carry them in r6,
+  so the task text names where the columns come from. ADR-0055 rule 2.'
+keys_touched:
+  tickets:
+  - DB-READ-VIEWS
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: A22 LINEAGE
+tickets:
+  started:
+  - DB-READ-VIEWS
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-004
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-14'
+    quote: 'Release today as an exception'
+prevention:
+  type: check
+  ref: tools/check-read-columns.py
+status: open
+notes: 'Batch LIN, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 October 2026:
+  "Release today as an exception." A plan input, so kind plan; the 24-hour cooling-off is waived under the same
+  words (the lead to confirm at merge). DB-READ-VIEWS is started (Hrushikant Patkar), so its text is not rewritten
+  on OpenProject: the change reaches him as the CR-004 resolution plus a linked delta, and ADAM keeps serving him
+  the tag he started on. Batch GEN amends the same detail string for ADR-0055 (views only within one deployable);
+  the two edits touch different sentences of one JSON line and merge by hand.'
