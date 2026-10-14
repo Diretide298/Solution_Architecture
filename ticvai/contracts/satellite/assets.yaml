@@ -251,6 +251,7 @@ paths:
                   type: array
                   items: { type: string }
                 collectionIds:
+                  x-ticvai-stored-as: assets.media_collection_member.collection_id
                   type: array
                   items: { type: string, format: uuid }
                   description: >

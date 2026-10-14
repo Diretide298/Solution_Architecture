@@ -436,6 +436,7 @@ paths:
                 isActive:
                   type: boolean
                 sectionViews:
+                  x-ticvai-stored-as: seating.section.view_asset_id
                   type: array
                   description: 'Set or clear the view photo of one or more sections (`Section.viewAssetId`,
                     decided 29 September, rev 3 23SEP-14). **Not a structural change**, so it is accepted
@@ -1183,6 +1184,7 @@ paths:
                   type: string
                   maxLength: 200
                 sourceSeatMapId:
+                  x-ticvai-persisted: false
                   type: string
                   format: uuid
                 description:

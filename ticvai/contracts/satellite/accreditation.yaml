@@ -1202,10 +1202,12 @@ paths:
                 reason:
                   type: string
                 effectiveFrom:
+                  x-ticvai-stored-as: accreditation.holder.status_effective_from
                   type: string
                   format: date-time
                   nullable: true
                 reviewAt:
+                  x-ticvai-stored-as: accreditation.holder.status_review_at
                   type: string
                   format: date
                   nullable: true
@@ -3424,6 +3426,18 @@ components:
           readOnly: true
         scopePath:
           type: string
+        statusEffectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the status `setAccreditationStatus` set takes effect.
+        statusReviewAt:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: When the status is due for review (`setAccreditationStatus`).
     AccreditationDocument:
       type: object
       x-ticvai-persistence: accreditation.document

@@ -6568,6 +6568,7 @@ components:
           type: string
           format: uuid
         postingDate:
+          x-ticvai-stored-as: ledger.journal_entry.posting_date
           type: string
           format: date
           description: A day in the region's time zone, local midnight to local midnight.
@@ -6676,6 +6677,12 @@ components:
           type: string
           format: date-time
           nullable: true
+        postingDate:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: The accounting day the entry posts on, in the region's time zone (`createJournalEntry`).
     Posting:
       x-ticvai-persistence: ledger.posting
       type: object

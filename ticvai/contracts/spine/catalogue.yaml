@@ -4555,6 +4555,7 @@ paths:
                 priority:
                   type: integer
                 isActive:
+                  x-ticvai-stored-as: catalogue.price_list.status
                   type: boolean
                 description:
                   type: string
@@ -14856,6 +14857,7 @@ paths:
                     type: string
                     format: date
                 reason:
+                  x-ticvai-stored-as: catalogue.audit_entry.reason
                   type: string
                   maxLength: 300
                   nullable: true
@@ -16927,6 +16929,7 @@ paths:
                   format: date-time
                   nullable: true
                 resolutionNote:
+                  x-ticvai-stored-as: catalogue.channel_incident.resolution_note
                   type: string
                   maxLength: 1000
                   nullable: true
@@ -39148,6 +39151,12 @@ components:
           type: string
           format: date-time
           readOnly: true
+        resolutionNote:
+          type: string
+          maxLength: 1000
+          nullable: true
+          readOnly: true
+          description: How the incident was resolved (`updateChannelIncident`).
     PriceCategory:
       type: object
       x-ticvai-persistence: catalogue.price_category

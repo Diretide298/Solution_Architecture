@@ -2651,6 +2651,7 @@ paths:
                   - deprecated
                   - withdrawn
                 reason:
+                  x-ticvai-stored-as: tenancy.device_firmware.status_reason
                   type: string
                   maxLength: 500
                   description: Required with `deprecated` and `withdrawn`.

@@ -1466,6 +1466,7 @@ paths:
               - action
               properties:
                 action:
+                  x-ticvai-stored-as: games.card.status
                   type: string
                   enum:
                   - block
@@ -1474,10 +1475,12 @@ paths:
                   - replace
                   - expire
                 replacementCardId:
+                  x-ticvai-persisted: false
                   type: string
                   format: uuid
                   nullable: true
                 reason:
+                  x-ticvai-stored-as: games.card.blocked_reason
                   type: string
                   nullable: true
       responses:

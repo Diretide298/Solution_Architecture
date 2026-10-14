@@ -1506,6 +1506,7 @@ paths:
                   type: integer
                   nullable: true
                 reason:
+                  x-ticvai-stored-as: rental.booking.change_reason
                   type: string
                   nullable: true
       responses:
@@ -3526,6 +3527,7 @@ components:
           items:
             $ref: '#/components/schemas/RentalParticipant'
         acceptedQuoteId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true
@@ -3636,6 +3638,11 @@ components:
             $ref: '#/components/schemas/RentalParticipant'
         scopePath:
           type: string
+        changeReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Why the booking was last changed (`updateRentalBooking`).
     RentalParticipant:
       type: object
       x-ticvai-persistence: rental.participant

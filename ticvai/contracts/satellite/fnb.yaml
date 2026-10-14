@@ -2004,6 +2004,7 @@ paths:
                   format: date-time
                   description: Device time of the act (offline-capable; replayed in this order).
                 stage:
+                  x-ticvai-stored-as: fnb.table_visit.service_stage
                   type: string
                   enum:
                   - seated
@@ -5544,6 +5545,7 @@ paths:
                 isAvailable:
                   type: boolean
                 reason:
+                  x-ticvai-stored-as: fnb.menu_item.unavailable_reason
                   type: string
                   enum:
                   - soldOut
@@ -5555,6 +5557,7 @@ paths:
                     audit R222). A reason of `other` with no note is refused `400`, and the notes are reviewed
                     quarterly so the common ones become real reasons.'
                 note:
+                  x-ticvai-stored-as: fnb.menu_item.unavailable_note
                   type: string
                   maxLength: 500
                   nullable: true
@@ -5564,6 +5567,7 @@ paths:
                   format: date-time
                   description: Automatic restore, typically at next service. Kept as `MenuItem.restoreAt`.
                 recordedAt:
+                  x-ticvai-persisted: false
                   type: string
                   format: date-time
                   description: Device time of the act (offline-capable; replayed in this order).
@@ -5631,6 +5635,7 @@ paths:
               - count
               properties:
                 count:
+                  x-ticvai-stored-as: fnb.menu_item.daily_count
                   type: integer
                   minimum: 0
                   nullable: true
@@ -6404,6 +6409,7 @@ paths:
                   type: string
                   format: uuid
                 note:
+                  x-ticvai-stored-as: fnb.table_visit.note
                   type: string
                   maxLength: 500
                 recordedAt:
@@ -6915,6 +6921,7 @@ paths:
                   type: string
                   format: uuid
                 recordedAt:
+                  x-ticvai-persisted: false
                   type: string
                   format: date-time
       responses:
@@ -8262,6 +8269,7 @@ paths:
                         type: string
                         format: uuid
                       servingOutletIds:
+                        x-ticvai-stored-as: fnb.delivery_location_outlet.outlet_id
                         type: array
                         items:
                           type: string
@@ -11011,6 +11019,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AllergenCode'
+        unavailableNote:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The free text with an `other` unavailable reason (`setItemAvailability`); reviewed quarterly so the common ones become reasons (audit R222).
     ModifierGroup:
       x-ticvai-persistence: fnb.modifier_group + fnb.modifier_option
       type: object
@@ -11518,6 +11532,12 @@ components:
           format: date-time
           nullable: true
           readOnly: true
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The server's note on the visit (`updateTableVisit`).
     Bill:
       x-ticvai-persistence: none — computed from visit orders
       type: object

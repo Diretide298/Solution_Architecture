@@ -4994,6 +4994,7 @@
   "writes": [
    "cache:idempotency",
    "orders.order_event",
+   "orders.order_line",
    "orders.sales_order",
    "platform.outbox"
   ],
@@ -13369,7 +13370,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.case"
+   "marketing.case",
+   "marketing.case_message"
   ],
   "routing": "",
   "scope": "venue",
@@ -39798,6 +39800,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.guest_preference",
    "marketing.guest_profile",
    "pii.subject"
   ],
@@ -73104,7 +73107,7 @@
    "identity.access_decision"
   ],
   "writes": [
-   "identity.authz_audit"
+   "identity.access_decision"
   ],
   "routing": "primary",
   "scope": "venue",
@@ -97443,6 +97446,7 @@
    "wallet.risk_rule_set"
   ],
   "writes": [
+   "wallet.risk_rule",
    "wallet.risk_rule_set"
   ],
   "routing": null,
@@ -119079,6 +119083,7 @@
    "catalogue.entitlement_template"
   ],
   "writes": [
+   "catalogue.audit_entry",
    "catalogue.entitlement_template"
   ],
   "routing": null,
@@ -119687,7 +119692,8 @@
    "maintenance.incident_involved_party"
   ],
   "writes": [
-   "maintenance.incident_involved_party"
+   "maintenance.incident_involved_party",
+   "pii.subject_contact"
   ],
   "routing": null,
   "scope": "venue",

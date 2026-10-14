@@ -2222,12 +2222,15 @@ paths:
                   - quarterly
                   - custom
                 instalmentCount:
+                  x-ticvai-persisted: false
                   type: integer
                   minimum: 2
                 firstDueDate:
+                  x-ticvai-stored-as: payments.instalment.due_date
                   type: string
                   format: date
                 customDueDates:
+                  x-ticvai-stored-as: payments.instalment.due_date
                   type: array
                   description: Required with `custom`; one per instalment after the first.
                   items:
@@ -2622,6 +2625,7 @@ components:
       description: Request only.
       properties:
         paymentTokenId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true

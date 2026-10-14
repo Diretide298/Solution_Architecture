@@ -1154,8 +1154,9 @@ paths:
               type: object
               required: [isClosed]
               properties:
-                isClosed: { type: boolean }
+                isClosed: { type: boolean, x-ticvai-stored-as: venuemap.path.is_closed }
                 reason:
+                  x-ticvai-stored-as: venuemap.path.closed_reason
                   type: string
                   enum: [maintenance, incident, event, weather, crowding, other]
                   description: >
@@ -1163,15 +1164,17 @@ paths:
                     28 September, audit R222); refused `400` without one, and the notes are reviewed
                     quarterly so the common ones become real reasons.
                 note:
+                  x-ticvai-stored-as: venuemap.path.closed_note
                   type: string
                   maxLength: 500
                   nullable: true
                   description: Free text. Required where the reason is `other` (audit R222).
                 force:
+                  x-ticvai-persisted: false
                   type: boolean
                   default: false
                   description: Close it even though something becomes unreachable.
-                expectedReopenAt: { type: string, format: date-time, nullable: true }
+                expectedReopenAt: { type: string, format: date-time, nullable: true, x-ticvai-stored-as: venuemap.path.expected_reopen_at }
       responses:
         '200':
           headers:
@@ -3066,6 +3069,23 @@ components:
           description: >
             Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the
             path**, so a guest sees why rather than wondering where it went.
+        isClosed:
+          type: boolean
+          readOnly: true
+          default: false
+          description: Closed by `setPathClosure`; routing does not use a closed path.
+        expectedReopenAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When a closed path is expected to reopen (`setPathClosure`).
+        closedNote:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The free text with an `other` closure reason (`setPathClosure`; audit R222).
 
     PointProposal:
       type: object

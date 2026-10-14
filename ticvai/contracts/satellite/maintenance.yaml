@@ -2073,6 +2073,7 @@ paths:
                   type: array
                   items: { type: string }
                 escalate:
+                  x-ticvai-stored-as: maintenance.incident.escalation
                   type: object
                   description: >
                     Escalate an incident under investigation (the optional Escalated step;
@@ -2082,6 +2083,7 @@ paths:
                     toPrincipalId: { type: string, format: uuid }
                     reason: { type: string, minLength: 3, maxLength: 1000 }
                 reason:
+                  x-ticvai-stored-as: maintenance.incident_history.note
                   type: string
                   minLength: 3
                   maxLength: 1000
@@ -3585,11 +3587,13 @@ components:
           writeOnly: true
           description: Written to the erasable store (`pii.subject`), never to the incident (ADR-0023).
         phone:
+          x-ticvai-stored-as: pii.subject_contact.value
           type: string
           maxLength: 32
           writeOnly: true
           description: Stored only with `contactConsent` true.
         email:
+          x-ticvai-stored-as: pii.subject_contact.value
           type: string
           format: email
           maxLength: 254

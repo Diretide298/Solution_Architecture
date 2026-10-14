@@ -486,6 +486,7 @@ paths:
 
                     '
                 recordedAt:
+                  x-ticvai-stored-as: resources.booking.checked_out_at
                   type: string
                   format: date-time
                   description: '**When the device handed it over**, not when the write reached the
@@ -577,6 +578,7 @@ paths:
                   - majorDamage
                   - notReturned
                 recordedAt:
+                  x-ticvai-stored-as: resources.booking.returned_at
                   type: string
                   format: date-time
                   description: '**When the device took it back**, not when the write reached the server.
@@ -1249,19 +1251,24 @@ paths:
               - state
               properties:
                 state:
+                  x-ticvai-stored-as: resources.resource.lifecycle_state
                   $ref: '#/components/schemas/ResourceLifecycleState'
                 reason:
+                  x-ticvai-stored-as: resources.resource.lifecycle_reason
                   type: string
                   nullable: true
                 effectiveFrom:
+                  x-ticvai-stored-as: resources.resource.lifecycle_effective_from
                   type: string
                   format: date-time
                   nullable: true
                 replacementResourceId:
+                  x-ticvai-stored-as: resources.resource.replacement_resource_id
                   type: string
                   format: uuid
                   nullable: true
                 disposal:
+                  x-ticvai-stored-as: resources.resource.disposal
                   type: object
                   nullable: true
                   additionalProperties: true
@@ -1962,6 +1969,7 @@ paths:
                   format: date-time
                   nullable: true
                 reason:
+                  x-ticvai-stored-as: resources.booking.change_reason
                   type: string
                   nullable: true
       responses:
@@ -4788,6 +4796,36 @@ components:
           description: '**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003).
             `kind` is the fixed family a type belongs to; this is the tenant''s own type within it, and the
             `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it.'
+        lifecycleState:
+          allOf:
+          - $ref: '#/components/schemas/ResourceLifecycleState'
+          nullable: true
+          readOnly: true
+          description: The lifecycle state `setResourceLifecycleState` set.
+        lifecycleEffectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the lifecycle state takes effect (`setResourceLifecycleState`).
+        lifecycleReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Why the lifecycle state changed (`setResourceLifecycleState`).
+        replacementResourceId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: resources.resource
+          description: The resource that replaces this one, where it was retired for a replacement.
+        disposal:
+          type: object
+          additionalProperties: true
+          nullable: true
+          readOnly: true
+          description: How a disposed resource left (`setResourceLifecycleState`), as given.
     ResourceCleaningPolicy:
       x-ticvai-persistence: none — columns on resources.resource
       type: object
@@ -4973,6 +5011,11 @@ components:
             this is the server''s half of the pair naming-and-style 5.2 requires. Null while pending.
 
             '
+        changeReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Why the booking was last changed (`updateResourceBooking`).
     Qualification:
       type: object
       x-ticvai-persistence: resources.qualification

@@ -2689,6 +2689,7 @@ paths:
                   - push
                   - none
                 dietary:
+                  x-ticvai-stored-as: marketing.guest_preference.dietary
                   type: array
                   description: '**Health-adjacent personal data, kept structured rather than as a tag**
                     (BL-134). `GuestProfile.tags` carries VIP-style markers adequately and is the wrong
@@ -2699,6 +2700,7 @@ paths:
                   items:
                     type: string
                 accessibility:
+                  x-ticvai-stored-as: marketing.guest_preference.accessibility
                   type: array
                   description: Same treatment, same reason. Stored as `GuestPreferences.accessibility`.
                   items:
@@ -3669,6 +3671,7 @@ paths:
               - nickname
               properties:
                 nickname:
+                  x-ticvai-stored-as: marketing.loyalty_position.leaderboard_nickname
                   type: string
                   minLength: 2
                   maxLength: 24
@@ -24753,6 +24756,7 @@ components:
         relatedOrderId:
           type: string
         attachmentRefs:
+          x-ticvai-stored-as: marketing.case_message.attachment_refs
           type: array
           description: Stored on the opening `CaseMessage`, not on the case.
           items:

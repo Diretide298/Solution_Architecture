@@ -508,7 +508,7 @@ paths:
               required: [status]
               properties:
                 status: { $ref: '#/components/schemas/TransportRouteStatus' }
-                reason: { type: string, maxLength: 500 }
+                reason: { type: string, maxLength: 500, x-ticvai-stored-as: transport.route.status_reason }
       responses:
         '200':
           headers:
@@ -2032,6 +2032,12 @@ components:
               description: >
                 The one-way trip product (kind `timedAdmission`); one variant per passenger type.
                 Created with the route.
+            statusReason:
+              type: string
+              maxLength: 500
+              nullable: true
+              readOnly: true
+              description: Why the route's status last changed (`setTransportRouteStatus`).
 
     RouteMap:
       x-ticvai-persistence: "none — projection"

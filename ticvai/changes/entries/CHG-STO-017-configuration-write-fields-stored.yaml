@@ -1,0 +1,42 @@
+id: CHG-STO-017
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: Every field a configuration write takes is stored as a named column, kept in a new readOnly field of the resource,
+  or marked as not stored.
+decision:
+  what: 'tools/applied/sto-request-fields-14-october.py FIELD and NEW_PROPS: 33 fields x-ticvai-stored-as an existing column
+    (a game card''s action is its status and its reason the blocked reason, a menu item''s daily count, a path''s closure
+    reason, a leaderboard nickname, a wallet risk rule''s status reason and end, an incident''s escalation and the reason
+    on its history row, a section''s view photo, a price list''s status, the AI provider''s Key Vault name); 25 new readOnly
+    resource fields that keep a value only the request had (a status''s reason, a closed path''s expected reopening and
+    note, a resource''s lifecycle state, date, reason, replacement and disposal, a journal entry''s posting date, an access
+    point''s pending direction and reason, an accreditation''s status dates, a channel incident''s resolution note, a security
+    alert''s note, a booking change''s reason, a table visit''s note, a supplier''s contacts, a menu item''s unavailability
+    note, a wallet allocation''s share percentage); 17 fields x-ticvai-persisted: false (inputs acted on and not kept).
+    tools/check-request-fields-stored.py reads x-ticvai-stored-as as check-stored-request-fields does.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit before r6, class check-request-fields-stored/RF-REQUEST-NOT-STORED (68 at audit-base b93b5a87, 0 after),
+  evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "A configuration field is stored, or marked x-ticvai-persisted:
+  false." Same class as ADAM CR-082 (CHG-TEN-005).'
+keys_touched:
+  files:
+  - contracts/
+  - handoff/api-data-lineage.json
+  - tools/applied/sto-request-fields-14-october.py
+  - tools/check-request-fields-stored.py
+root_class: A15 STORAGE-GAP
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open
+notes: 'Batch STO. Contract impact: additive (x-ticvai extensions and readOnly response fields). Migration effect: each
+  new field is a nullable ADD COLUMN in V0104.'

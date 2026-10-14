@@ -807,8 +807,10 @@ paths:
 
                     '
                 fixedAmount:
+                  x-ticvai-stored-as: sync.wallet_authorisation.allocated_amount
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 percentage:
+                  x-ticvai-stored-as: sync.wallet_authorisation.share_percentage
                   type: number
                   minimum: 0
                   maximum: 100
@@ -1297,17 +1299,21 @@ components:
         homeCellName:
           type: string
         homeSubjectId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           description: Local subject id in the home cell. Never leaves that cell beyond this call.
         targetCellName:
+          x-ticvai-stored-as: sync.guest_link.linked_cells
           type: string
         targetSubjectId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
         consentVersion:
           type: string
         consentedAt:
+          x-ticvai-stored-as: sync.guest_link.linked_at
           type: string
           format: date-time
     CrossRegionEntitlement:
@@ -1601,6 +1607,13 @@ components:
           description: '**The allocation is denominated in the home currency.** A ceiling set in AED does
             not become a different ceiling because the guest walked into a Saudi venue — converting the
             limit as well as the spend is how a policy silently loosens when a rate moves.'
+        sharePercentage:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          readOnly: true
+          description: The share of the wallet allocated, where the policy is a percentage (`setWalletAllocationPolicy`).
     DsarRequest:
       x-ticvai-persistence: sync.dsar_request
       type: object

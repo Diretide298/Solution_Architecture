@@ -1217,6 +1217,8 @@ paths:
               - secret
               properties:
                 secret:
+                  x-ticvai-stored-as: ai.provider.credential_ref
+                  x-ticvai-secret: vault-reference
                   type: string
                   format: password
                   description: '**Write-only, never returned, never logged, never in an `ai.activity`.**
@@ -1228,6 +1230,7 @@ paths:
                   format: date-time
                   nullable: true
                 graceMinutes:
+                  x-ticvai-persisted: false
                   type: integer
                   minimum: 0
                   maximum: 1440

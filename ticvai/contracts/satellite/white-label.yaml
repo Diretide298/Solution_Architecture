@@ -9147,6 +9147,7 @@ components:
           type: string
           pattern: ^#[0-9A-Fa-f]{6}$
         darkMode:
+          x-ticvai-persisted: false
           type: object
           deprecated: true
           description: '**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round;

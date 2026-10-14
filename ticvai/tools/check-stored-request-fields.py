@@ -95,6 +95,7 @@ def main() -> int:
     lin = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
     ref = g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}
     cols = {t: v for t, v in (ref.get("cols") or {}).items()}
+    store = ref.get("store") or {}
     by, _ = g.schemas()
     for oid, o in sorted(g.operations().items()):
         op = o["op"]
@@ -110,7 +111,9 @@ def main() -> int:
             continue
         names = {t: {c.get("column") for c in cols.get(t, [])} for t in writes}
         sources = {t: {str(c.get("source") or "").rsplit(".", 1)[-1] for c in cols.get(t, [])} for t in writes}
-        stub = [t for t in writes if names[t] and all(KEY_COL.match(c or "") for c in names[t])]
+        # A Redis registry is not a table with columns (`identity.guest_session`; CHG-STO-016): only Postgres stubs.
+        stub = [t for t in writes if names[t] and all(KEY_COL.match(c or "") for c in names[t])
+                and store.get(t, "postgres") in ("postgres", "postgres-analytical")]
         stem = o["contract"]
         missing = []
         for fname, spec, owner in fields(body, by, stem):

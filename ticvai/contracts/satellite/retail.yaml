@@ -1132,7 +1132,7 @@ paths:
                   description: >
                     Usually venue close. Uncollected goods after it become an exception, not
                     a permanent shelf occupant.
-                recordedAt: { type: string, format: date-time }
+                recordedAt: { type: string, format: date-time, x-ticvai-stored-as: retail.shop_and_drop.dropped_at }
       responses:
         '201':
           headers:

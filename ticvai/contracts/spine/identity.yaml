@@ -4433,6 +4433,7 @@ paths:
               - state
               properties:
                 state:
+                  x-ticvai-stored-as: identity.authorisation_policy.status
                   type: string
                   enum:
                   - draft
@@ -4441,6 +4442,7 @@ paths:
                   - suspended
                   - retired
                 reason:
+                  x-ticvai-stored-as: identity.authorisation_policy.status_reason
                   type: string
                   nullable: true
                 effectiveFrom:
@@ -7804,6 +7806,11 @@ components:
             tenant''s.
 
             '
+        statusReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Why the policy's state last changed (`setAuthorisationPolicyState`).
     GuestCredential:
       x-ticvai-persistence: identity.guest_credential
       type: object

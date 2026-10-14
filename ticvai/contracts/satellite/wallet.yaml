@@ -3247,10 +3247,12 @@ paths:
                   - suspended
                   - emergencyDisabled
                 reason:
+                  x-ticvai-stored-as: wallet.risk_rule.status_reason
                   type: string
                   maxLength: 500
                   description: Required unless `status` is `active`.
                 until:
+                  x-ticvai-stored-as: wallet.risk_rule.status_until
                   type: string
                   format: date-time
                   nullable: true

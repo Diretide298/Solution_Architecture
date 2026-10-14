@@ -429,6 +429,7 @@ paths:
               type: object
               properties:
                 note:
+                  x-ticvai-stored-as: reporting.alert.acknowledgement_note
                   type: string
                   maxLength: 300
                   description: Stored as `Alert.acknowledgementNote`.

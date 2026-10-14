@@ -18372,6 +18372,7 @@ components:
       - expectedSize
       properties:
         groupQuoteId:
+          x-ticvai-persisted: false
           x-ticvai-references: orders.group_quote
           type: string
           format: uuid
@@ -21300,10 +21301,12 @@ components:
           nullable: true
           description: Null for an anonymous sale. Identity and entitlement are separate.
         guestLinkId:
+          x-ticvai-persisted: false
           type: string
           nullable: true
           description: Present where the guest is linked across cells.
         catalogueBundleVersion:
+          x-ticvai-persisted: false
           type: string
           description: 'The bundle the client priced from. Lets the server explain a variance rather than
             merely report one.
@@ -22631,16 +22634,19 @@ components:
 
             '
         walletAuthorisationId:
+          x-ticvai-persisted: false
           type: string
           nullable: true
           description: Cross-cell wallet hold, where the guest's home cell is elsewhere.
         walletHoldId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true
           description: For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture
             debits it; the order service writes no wallet table.
         returnUrl:
+          x-ticvai-persisted: false
           type: string
           format: uri
           nullable: true
@@ -22652,6 +22658,7 @@ components:
           nullable: true
           description: The card terminal to instruct, for a card payment at a till (ECR flow, SD-034).
         deviceId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true

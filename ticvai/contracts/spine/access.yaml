@@ -2233,11 +2233,13 @@ paths:
                 direction:
                   $ref: '#/components/schemas/Direction'
                 reason:
+                  x-ticvai-stored-as: access.access_point.direction_change_reason
                   type: string
                   minLength: 3
                   maxLength: 200
                   description: Why the gate is turned round, kept on the log.
                 effectiveAt:
+                  x-ticvai-stored-as: access.access_point.direction_effective_at
                   type: string
                   format: date-time
                   nullable: true
@@ -5212,6 +5214,7 @@ paths:
                   type: integer
                   description: Added to entries minus exits for the current count.
                 reason:
+                  x-ticvai-stored-as: access.configuration_change.reason
                   type: string
                   maxLength: 200
                   description: Required when `operationalAdjustment` changes; refused 400 without it.
@@ -15846,6 +15849,7 @@ paths:
                   - resolved
                   - dismissed
                 note:
+                  x-ticvai-stored-as: access.security_alert.note
                   type: string
                   maxLength: 1000
                 securityInvestigationId:
@@ -19750,6 +19754,12 @@ components:
           type: string
           format: date-time
         scopePath: *id001
+        reason:
+          type: string
+          maxLength: 200
+          nullable: true
+          readOnly: true
+          description: Why the change was made, where the operation asks for one (`setAccessAreaCapacity`).
     AccessConfigurationVersion:
       type: object
       x-ticvai-persistence: access.configuration_version
@@ -21928,6 +21938,12 @@ components:
           type: string
           format: uuid
           nullable: true
+        note:
+          type: string
+          maxLength: 1000
+          nullable: true
+          readOnly: true
+          description: The latest note on the alert (`updateSecurityAlert`).
     AccessJourneyProfile:
       type: object
       x-ticvai-persistence: access.journey_profile
@@ -26349,6 +26365,18 @@ components:
           type: string
           format: date-time
           nullable: true
+        directionEffectiveAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When a direction change set by `setAccessPointDirection` takes effect; held `pending` until then.
+        directionChangeReason:
+          type: string
+          maxLength: 200
+          nullable: true
+          readOnly: true
+          description: Why the gate was last turned round (`setAccessPointDirection`).
     AccessPointGeofence:
       type: object
       x-ticvai-persistence-kind: valueObject

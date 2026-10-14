@@ -149,7 +149,8 @@ class Contracts:
         if m:                                          # a flow mapping on one line
             body = m.group(2)
             if re.search(r"(^|,)\s*" + re.escape(key) + r"\s*:", body):
-                new = re.sub(r"((?:^|,)\s*" + re.escape(key) + r"\s*:\s*)[^,]*", lambda x: x.group(1) + val, body)
+                new = re.sub(r"((?:^|,)\s*" + re.escape(key) + r"\s*:\s*)([^,]*?)(\s*)(?=,|$)",
+                             lambda x: x.group(1) + val + x.group(3), body)
                 if new == body:
                     return "="
                 lines[i] = "%s{%s}" % (m.group(1), new)
@@ -275,6 +276,53 @@ class Contracts:
         lines[s:e] = seg.replace(old, new).split("\n")
         f["dirty"] = True
         return "~"
+
+    def add_property(self, stem, schema, name, block):
+        """Append property `name` (its body as YAML text, indented as under the property) to the schema's own
+        `properties:` (the shallowest one in its text); "=" when the schema already has it."""
+        f = self.files[stem]
+        lines = f["lines"]
+        s, e = self.schema_span(stem, schema)
+        props = [i for i in range(s + 1, e) if lines[i].strip() == "properties:"]
+        if not props:
+            raise LookupError("%s.%s: no properties" % (stem, schema))
+        p = min(props, key=lambda i: _indent(lines[i]))
+        ind = _indent(lines[p]) + 2
+        pe = _span(lines, p, _indent(lines[p]))
+        if any(re.match(r"^\s{%d}%s:" % (ind, re.escape(name)), lines[i]) for i in range(p + 1, pe)):
+            return "="
+        while pe > p + 1 and not lines[pe - 1].strip():
+            pe -= 1
+        body = [" " * (ind + 2) + l if l.strip() else "" for l in block.strip("\n").split("\n")]
+        lines[pe:pe] = [" " * ind + name + ":"] + body
+        f["dirty"] = True
+        return "+"
+
+    def op_span(self, stem, op_id):
+        lines = self.files[stem]["lines"]
+        hits = [i for i, l in enumerate(lines) if l.strip() == "operationId: %s" % op_id]
+        if len(hits) != 1:
+            raise LookupError("operation %s: %d matches in %s" % (op_id, len(hits), stem))
+        k = hits[0]
+        ind = _indent(lines[k]) - 2
+        s = k
+        while _indent(lines[s]) != ind or not lines[s].strip():
+            s -= 1
+        return s, _span(lines, s, ind)
+
+    def set_body_marker(self, stem, op_id, prop, key, value):
+        """`key: value` on a property of an operation's inline request body (the first `prop:` after requestBody)."""
+        lines = self.files[stem]["lines"]
+        s, e = self.op_span(stem, op_id)
+        rb = next((i for i in range(s, e) if lines[i].strip() == "requestBody:"), None)
+        if rb is None:
+            raise LookupError("%s: no requestBody" % op_id)
+        rbe = _span(lines, rb, _indent(lines[rb]))
+        hits = [i for i in range(rb, rbe) if re.match(r"^\s+" + re.escape(prop) + r":(\s|$)", lines[i])]
+        if not hits:
+            raise LookupError("%s: no body property %s" % (op_id, prop))
+        i = min(hits, key=lambda k: (_indent(lines[k]), k))     # the body's own field, not a nested one's
+        return self._set(stem, i, key, value)
 
     def replace_text(self, stem, old, new):
         """One exact replacement anywhere in the file."""
