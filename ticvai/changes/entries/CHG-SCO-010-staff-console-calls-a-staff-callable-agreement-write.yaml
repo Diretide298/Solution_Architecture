@@ -1,0 +1,36 @@
+id: CHG-SCO-010
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'setAgreementContractTerm declares the staff audience beside partner and prospect, because the TICVAI
+  console''s ADM-415 calls it and its permission (PLATFORM_CELL_MANAGE) is a staff permission.'
+decision:
+  what: 'Add staff to x-ticvai-audience of subscription setAgreementContractTerm. Its bearerAuth security and its
+    staff permission already admit a staff caller; the audience said only partner and prospect, so the console screen
+    (ADM-415, the platform-staff view of a customer''s commercial agreement and acceptance, the twin of P17 SGN-023)
+    was calling an operation its audience refuses. Not a breaking change: request, response, security and
+    permission are unchanged. Same remedy as the till''s cart operations (CHG-SEED-006).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, classes check-screen-wiring S-STAFF-AUDIENCE (R254, CHG-WIR-001) and
+  check-audience-match AM-STAFF-OP (audit root class A31 SCREEN-WRONG-OP), evidence
+  audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with your recommendation"): staff
+  screens call the staff variant of a guest operation; S-STAFF-AUDIENCE as AM-STAFF-OP. On these platforms: 1 member
+  of each before, 0 after.'
+keys_touched:
+  screens: [ADM-415]
+  operations: [setAgreementContractTerm]
+  other: [S-STAFF-AUDIENCE, AM-STAFF-OP]
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: Batch SCO, 14 October 2026. ADM-415 is on no Block A ticket.

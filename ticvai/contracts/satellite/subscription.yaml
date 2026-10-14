@@ -6092,6 +6092,7 @@ paths:
       - bearerAuth: []
       - prospectAuth: []
       x-ticvai-audience:
+      - staff
       - partner
       - prospect
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.25-27
