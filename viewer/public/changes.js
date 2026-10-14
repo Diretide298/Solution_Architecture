@@ -138,11 +138,34 @@ function byUrgency(a, b) {
 
 const NEXT_STEP = {
   raised: (c) => (c.pickedBy ? 'Decide' : 'Take it on'),
-  decided: () => 'Schedule it',
+  decided: (c, info) => decidedStep(c, info),
   scheduled: () => 'Mark done when fixed',
   done: () => '',
   rejected: () => '',
 };
+
+/**
+ * Accepted, not yet scheduled: what is left depends on the ticket it came out
+ * of, which only OpenProject knows. Settling an open ticket already comments on
+ * it, so "Schedule it" was usually wrong: the agent had the decision and all
+ * that was left was marking it done. Until the ticket has been read the row
+ * says the neutral thing; `nextCell` reads it and puts the answer in.
+ */
+function decidedStep(c, info) {
+  if (!c.ticket) return 'Make a ticket';
+  if (!info?.read) return 'Schedule it';
+  if (info.onSettle?.accepted?.action === 'ticket') return 'Make a ticket';
+  if (info.told?.includes('accepted')) return 'Mark done when fixed';
+  return `Add the comment to #${c.ticket}`;
+}
+
+function nextCell(c, stage) {
+  const td = el('td', 'cr-c-next', NEXT_STEP[stage](c));
+  if (stage === 'decided' && c.ticket && (c.mayFileTicket || c.maySettle)) {
+    source(c).then((info) => { td.textContent = NEXT_STEP.decided(c, info); });
+  }
+  return td;
+}
 
 // ── the filter ──────────────────────────────────────────────────────
 
@@ -583,7 +606,7 @@ function drawTable(name) {
     const st = el('td', 'cr-c-state');
     st.append(badge(x.tone, x.word));
 
-    const nx = el('td', 'cr-c-next', NEXT_STEP[x.stage](c));
+    const nx = nextCell(c, x.stage);
 
     tr.append(req, side, raised, holder, ticket, wait, st, nx);
     tbody.append(tr);
