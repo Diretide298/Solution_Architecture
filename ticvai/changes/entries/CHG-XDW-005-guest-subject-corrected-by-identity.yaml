@@ -1,0 +1,61 @@
+id: CHG-XDW-005
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'A guest correcting their own name or language through updateMyProfile (Marketing, operations) no longer
+  writes pii.subject itself: it calls the new serviceAuth operation identity updateGuestSubjectDetails with the
+  guest''s own subject. Exception XDW-017 is removed.'
+decision:
+  what: 'contracts/spine/identity.yaml adds PATCH /internal/guest-subjects/{subjectId}/details
+    updateGuestSubjectDetails (audience service, serviceAuth, x-ticvai-permission null, scope subject; body
+    GuestSubjectDetailsUpdate: displayName, preferredLanguage, at least one, persistence none, landing on
+    pii.subject; 204, 400, 401, 404 for an unknown or erased subject). updateMyProfile in
+    contracts/satellite/marketing-crm.yaml declares x-ticvai-write-via {table: pii.subject, operation:
+    updateGuestSubjectDetails} and x-ticvai-calls, and says it sends those two fields when either is in the request and
+    writes the rest of the profile itself. Lineage: updateGuestSubjectDetails reads and writes pii.subject
+    (tools/applied/xdw-routes-14-october.py). The exception entry is deleted.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'r6 gate (w609, 14 October 2026): check-cross-deployable-writes X-EXPIRED on XDW-017 (CHG-R6-020, ADAM CR-002,
+  removal release r5, tagged), whose reason said it is removed "when Identity publishes that operation and
+  updateMyProfile calls it". Chinmay asked "Remove them now ?" on 14 October 2026. The values are personal data an
+  event would copy into platform.outbox, so the route is Identity''s service operation (ADR-0055 rule 4, amended 14
+  October, CHG-GEN-009).'
+keys_touched:
+  operations:
+  - updateGuestSubjectDetails
+  - updateMyProfile
+  tables:
+  - pii.subject
+  schemas:
+  - GuestSubjectDetailsUpdate
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/applied/xdw-routes-14-october.py
+  - handoff/api-data-lineage.json
+  - handoff/cross-deployable-writes.md
+  tickets:
+  - DB-ROLES
+  other:
+  - XDW-017 (removed)
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started:
+  - DB-ROLES (#27655, CR-002's ticket, built strict; a comment, never a rewrite)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'Batch XDW, 14 October 2026. The lead''s words: asked "Remove them now ?" on 14 October 2026. Released outside
+  the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Prevention is the existing
+  check-cross-deployable-writes (X-EXPIRED, X-UNROUTED, X-OPERATION); no new check. Triage blocker because the gate
+  fails without it. Only displayName and preferredLanguage are pii.subject columns (display_name,
+  preferred_language); the lineage never recorded the email or phone as pii writes, and that is not changed here.
+  Additive against r1. Verified in w609 with the checks listed in CHG-XDW-001.'

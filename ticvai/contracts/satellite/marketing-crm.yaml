@@ -2620,6 +2620,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateMyProfile
+      x-ticvai-write-via:
+      - table: pii.subject
+        operation: updateGuestSubjectDetails
+      x-ticvai-calls:
+      - identity.updateGuestSubjectDetails
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
@@ -2634,6 +2639,11 @@ paths:
 
         **A narrower field set than the staff operation.** A guest may correct their name, contact details,
         language and channel preference. They may not set their own tags, lifetime value or loyalty tier.
+
+        **The name and language are Identity''s.** `displayName` and `preferredLanguage` also live on the
+        guest''s `pii.subject`, which Identity owns in `commerce`; this calls identity
+        `updateGuestSubjectDetails` with the guest''s own subject and those two fields when either is sent
+        (ADR-0055 rule 4, CHG-XDW-005), and writes the rest of the profile itself.
 
         '
       tags:
@@ -16693,6 +16703,11 @@ paths:
   /consent/device:
     post:
       operationId: recordDeviceConsent
+      x-ticvai-write-via:
+      - table: pii.consent_identifier
+        operation: recordConsentIdentifier
+      x-ticvai-calls:
+      - identity.recordConsentIdentifier
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-024 Devices, Wishlist & Consent"
@@ -16725,7 +16740,8 @@ paths:
 
         **Personal data stays out of `marketing`** (ADR-0023, BL-073 §3): where the published banner
         design has `recordIpAddress` on, the request's IP address and user agent are written to
-        `pii.consent_identifier` against this row, never beside it. `country` is the edge's
+        `pii.consent_identifier` against this row, never beside it, by its owner: this calls identity
+        `recordConsentIdentifier` (in `commerce`; ADR-0055 rule 4, CHG-XDW-004). `country` is the edge's
         geolocation of the request, kept for the geographic consent statistics (2.6.63) without
         keeping the address. A key already claimed by a guest (`claimDeviceConsent`) is closed: a
         decision sent against it mints a new key.
@@ -28183,7 +28199,7 @@ components:
       type: object
       x-ticvai-persistence: marketing.privacy_request
       description: One customer privacy request (pack 17.2.4 Case Information). The case layer over the
-        cross-region `platform.dsar_request` fan-out, which it references when it raises one.
+        cross-region `sync.dsar_request` fan-out, which it references when it raises one.
       required:
       - subjectId
       - requestType

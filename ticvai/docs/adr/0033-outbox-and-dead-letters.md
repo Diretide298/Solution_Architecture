@@ -85,7 +85,7 @@ operator retrying the same poison message forty times should be able to see that
 **A financial posting.** `ledger.journal_entry` is append-only and a failed posting is an incident,
 not a queue item. **It halts and alerts.**
 
-**A DSAR.** `platform.dsar_request` carries a legal clock. A dead-lettered erasure that nobody works
+**A DSAR.** `sync.dsar_request` (in `platform` until 14 October 2026, CHG-XDW-001) carries a legal clock. A dead-lettered erasure that nobody works
 is a regulatory failure with a timestamp on it.
 
 **Both raise an alert and stop.** The distinction is whether silent accumulation is acceptable, and

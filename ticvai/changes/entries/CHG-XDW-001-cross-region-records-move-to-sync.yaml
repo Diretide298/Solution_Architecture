@@ -1,0 +1,114 @@
+id: CHG-XDW-001
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'CrossRegionService''s four records, guest_link, dsar_request, cross_region_entitlement and
+  wallet_authorisation, move from platform (TenancyService''s schema, in commerce) into sync, CrossRegionService''s
+  own schema in operations. Every operation that reads or writes them is CrossRegionService''s, so their writes no
+  longer cross a deployable and exceptions XDW-001 to XDW-011 are removed rather than extended.'
+decision:
+  what: 'contracts/spine/cross-region.yaml: x-ticvai-persistence of GuestLink, CrossRegionEntitlement, the two wallet
+    authorisation schemas and DsarRequest is sync.<table>; the prose naming the tables in identity.yaml,
+    marketing-crm.yaml, platform-ops.yaml, screens/P02-guest-mobile-app.yaml, ADR-0031 and ADR-0033 follows. The moves
+    are declared renames in tools/derive-schema-history.py (RENAMES, 2026-10-14; the wallet_authorisation column
+    rename is keyed by its new name), so derive-ddl lists them in handoff/migration-review.md as `ALTER TABLE
+    platform.<t> SET SCHEMA sync` instead of a new table beside a dropped one: tools/ddl_forward.py gains move_sql (a
+    rename into another schema is SET SCHEMA, then RENAME TO only if the name changes) and recognises a hand-written
+    SET SCHEMA. tools/derive-schema.py (the mistargeted ticket_id reference) and tools/derive-table-notes.py are keyed
+    by the new names. The lineage is renamed by tools/applied/xdw-routes-14-october.py (17 CrossRegionService
+    entries, reads, writes and readColumns). docs/active/schema-merge-decision-log.md decision 10 is marked
+    superseded. The 11 exception entries are deleted from docs/active/cross-deployable-writes.yaml.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'r6 gate (w609, 14 October 2026): tools/check-cross-deployable-writes.py failed 17 X-EXPIRED, every exception
+  CR-002 dated for removal at r5 (CHG-R6-020; docs/active/cross-deployable-writes.yaml XDW-001 to XDW-017), r5 being
+  tagged. Chinmay asked "Remove them now ?" on 14 October 2026: remove them in r6 by routing, not extend them. These 11
+  were kind misplaced-table: the writer is the real owner (schema-reference source cross-region.*) and the reason
+  offered moving the table into sync or a table-level grant; the ADR-0055 amendment of 14 October (CHG-GEN-009) rules
+  out the grant (across deployables only a service call or an event, never shared SQL), and routing CrossRegionService''s
+  own writes through a TenancyService operation would put its logic (the guarded consume, the wallet handshake under
+  its lock, ADR-0031) in a module that does not own it. The schema-merge decision of 20 September (decision 10) kept
+  guest_link and dsar_request in platform because both were TenancyService''s and "either both go or neither does";
+  both now belong to CrossRegionService and all four go together. CHG-GDL-001 (ADAM CR-084) had already closed the
+  Identity half of XDW-011: deleteGuestAccount and exportSubjectData no longer write dsar_request and call
+  createDsarRequest only for a linked guest; that call is a service call and needs no change.'
+keys_touched:
+  operations:
+  - createGuestLink
+  - revokeGuestLink
+  - getGuestLink
+  - resolveGuestLink
+  - consumeCrossRegionEntitlement
+  - propagateCrossRegionEntitlement
+  - reconcileRedemptions
+  - revokeCrossRegionEntitlement
+  - getCrossRegionEntitlement
+  - authoriseWalletSpend
+  - captureWalletAuthorisation
+  - relinquishWalletAuthorisation
+  - setWalletAllocationPolicy
+  - getWalletAllocation
+  - createDsarRequest
+  - getDsarRequest
+  tables:
+  - platform.guest_link
+  - platform.dsar_request
+  - platform.cross_region_entitlement
+  - platform.wallet_authorisation
+  - sync.guest_link
+  - sync.dsar_request
+  - sync.cross_region_entitlement
+  - sync.wallet_authorisation
+  files:
+  - contracts/spine/cross-region.yaml
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/platform-ops.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - docs/adr/0031-contention-and-locking.md
+  - docs/adr/0033-outbox-and-dead-letters.md
+  - docs/active/schema-merge-decision-log.md
+  - docs/active/cross-deployable-writes.yaml
+  - tools/derive-schema-history.py
+  - tools/ddl_forward.py
+  - tools/derive-schema.py
+  - tools/derive-table-notes.py
+  - tools/applied/xdw-routes-14-october.py
+  - handoff/api-data-lineage.json
+  - handoff/cross-deployable-writes.md
+  - handoff/audit-baseline.json
+  tickets:
+  - DB-ROLES
+  other:
+  - XDW-001 to XDW-011 (removed)
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started:
+  - DB-ROLES (#27655, CR-002's ticket, built strict; a comment, never a rewrite)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'Batch XDW, 14 October 2026. The lead''s words: asked "Remove them now ?" on 14 October 2026. Released outside
+  the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Prevention is the check that
+  already exists and found this: check-cross-deployable-writes fails X-EXPIRED on an exception whose removal release
+  is tagged, X-UNROUTED on a cross-deployable write with no route, so these cannot come back unseen; no new check.
+  Triage blocker because the gate fails without it. The move is DDL: derive-ddl lists the four tables in
+  handoff/migration-review.md as "table renamed" with `ALTER TABLE platform.<t> SET SCHEMA sync` (and, for
+  wallet_authorisation, the earlier RENAME COLUMN wallet_hold_id TO fund_reservation_id) plus the "after rename" rows,
+  for the backend developer''s forward migration; their row-level security is re-applied under the new name.
+  Verified in w609 (HEAD 8ece8f11 plus R6G and these authored files): derive-lineage, derive-schema (four renames
+  applied), derive-read-columns, derive-service-counts (TenancyService 110 -> 106 tables), derive-relationships,
+  derive-ddl, derive-table-notes, derive-schema-history (renames resolved), build-schema-workbook; then
+  check-cross-deployable-writes (67 writes, 0 on the exception list), check-lineage, check-write-lineage,
+  check-contract-compat, check-contract-shapes, check-cross-module-reads (21 baseline entries gone, the
+  CrossRegionService reads of platform among them), check-read-columns and check-storage-promises pass. The one
+  storage-promises baseline key naming platform.wallet_authorisation.authorisation_id is carried to its new name
+  (pre-existing debt, not this fix). The 20 September decision 10 is superseded on its own condition; if the lead
+  wants DSAR orchestration back in Tenancy, that is a contract move of createDsarRequest, not a table grant. ADAM CR
+  ids are pending: CR-002 is Done.'

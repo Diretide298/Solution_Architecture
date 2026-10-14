@@ -150,6 +150,18 @@ RENAMES = [
      "why": "CR-014: one spelling throughout; the package writes organisation (organisation_type, organisation_id beside it)"},
     {"from": "orders.group_customer_organization_contact", "to": "orders.group_customer_organisation_contact", "on": "2026-10-12",
      "why": "CR-014: moved with orders.group_customer_organisation"},
+    # CHG-XDW-001 (14 October 2026, the lead: "Remove them now ?"): CrossRegionService's four records leave the
+    # platform schema, which TenancyService owns in commerce, for sync, CrossRegionService's own schema in
+    # operations. Every operation that reads or writes them is CrossRegionService's, so no write crosses a
+    # deployable (ADR-0055 rule 4; XDW-001 to XDW-011 removed). The table names do not change, only the schema.
+    {"from": "platform.guest_link", "to": "sync.guest_link", "on": "2026-10-14",
+     "why": "CHG-XDW-001: a pseudonymous link between cells is CrossRegionService's record (createGuestLink, revokeGuestLink, resolveGuestLink); in platform, TenancyService's schema in commerce, its own writers in operations could not write it (DB-ROLES)"},
+    {"from": "platform.dsar_request", "to": "sync.dsar_request", "on": "2026-10-14",
+     "why": "CHG-XDW-001: moved with sync.guest_link, which its fan-out walks (schema-merge decision 10, 20 September: both go or neither does); createDsarRequest and getDsarRequest are CrossRegionService's"},
+    {"from": "platform.cross_region_entitlement", "to": "sync.cross_region_entitlement", "on": "2026-10-14",
+     "why": "CHG-XDW-001: CrossRegionService's record; every operation on it (consume, propagate, reconcile, revoke, get) is CrossRegionService's"},
+    {"from": "platform.wallet_authorisation", "to": "sync.wallet_authorisation", "on": "2026-10-14",
+     "why": "CHG-XDW-001: CrossRegionService's record of the cross-cell wallet handshake; every operation on it is CrossRegionService's"},
 ]
 
 # **A column rename is declared here too** (CHG-R6-010, 12 October 2026), by the table's name *now*. The contract
@@ -169,7 +181,7 @@ COLUMN_RENAMES = [
      "why": "CR-011: Hold is banned in DDL"},
     {"table": "wallet.wallet_transaction", "from": "wallet_hold_id", "to": "fund_reservation_id", "on": "2026-10-12",
      "why": "CR-011: a key names the table it references"},
-    {"table": "platform.wallet_authorisation", "from": "wallet_hold_id", "to": "fund_reservation_id", "on": "2026-10-12",
+    {"table": "sync.wallet_authorisation", "from": "wallet_hold_id", "to": "fund_reservation_id", "on": "2026-10-12",
      "why": "CR-011: a key names the table it references"},
     {"table": "orders.order_line", "from": "inventory_hold_id", "to": "inventory_reservation_id", "on": "2026-10-12",
      "why": "CR-011: a key names the table it references"},

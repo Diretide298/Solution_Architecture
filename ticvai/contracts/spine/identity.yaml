@@ -136,6 +136,113 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/consent-identifiers:
+    post:
+      operationId: recordConsentIdentifier
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Keep the IP address and user agent a cookie decision was made from
+      description: '**The owner''s write of `pii.consent_identifier`** (14 October 2026, CHG-XDW-004; ADR-0055 rule
+        4). The two values are personal data, so they live in `pii`, Identity''s schema in `commerce`, and an event
+        would copy them into `platform.outbox`. `marketing-crm.recordDeviceConsent` (in `operations`) calls this,
+        cell-internal over mTLS, after it has recorded the decision and only where the published banner design has
+        `recordIpAddress` on, with the `Idempotency-Key` it was called with. Erasure reaches the row with the rest
+        of `pii`; the decision itself (`marketing.device_consent`) survives as evidence without it.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentIdentifierCapture'
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Kept.
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/guest-subjects/{subjectId}/details:
+    parameters:
+    - name: subjectId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateGuestSubjectDetails
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Correct a guest's own name and language on their subject
+      description: '**The owner''s write of `pii.subject`** (14 October 2026, CHG-XDW-005; ADR-0055 rule 4). A guest
+        correcting their own details calls `marketing-crm.updateMyProfile` (in `operations`); the name and
+        language are personal data in `pii.subject`, Identity''s, in `commerce`, and an event would copy them into
+        `platform.outbox`. `updateMyProfile` calls this, cell-internal over mTLS, with the guest''s own
+        `subjectId` from their session and the `Idempotency-Key` it was called with, and writes the rest of the
+        profile itself. Only the fields sent change. An erased subject (`is_erased`) is not found.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: lastWriterWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestSubjectDetailsUpdate'
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated.
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/login:
     post:
       operationId: login
@@ -880,7 +987,7 @@ paths:
         3); the guest''s own export needs no human approval step and the tenant''s matrix may add one. Only
         where the guest is linked across cells (`GuestSession.guestLinkId`; ADR-0010) does the export job also
         call cross-region `createDsarRequest` (`kind: access`, `serviceAuth`), which raises the cross-cell
-        platform.dsar_request; an unlinked guest raises no DSAR record.
+        sync.dsar_request; an unlinked guest raises no DSAR record.
 
         '
       x-ticvai-read-via:
@@ -922,7 +1029,7 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Export started, as an Approvals request (and, for a guest linked across cells, a
-            cross-cell platform.dsar_request raised by `createDsarRequest`). The same shape
+            cross-cell sync.dsar_request raised by `createDsarRequest`). The same shape
             `deleteGuestAccount` returns for an erasure request, so a guest''s two privacy requests read
             alike.
 
@@ -2952,7 +3059,7 @@ paths:
         `pii.subject` row (`is_erased`, `erased_at`, and `erasure_request_id` = `requestId`; ADR-0047), for
         every guest. Only where the guest is linked across cells (the session's
         `GuestSession.guestLinkId` is set; ADR-0010) does it also call cross-region `createDsarRequest`
-        (`kind: erasure`, `serviceAuth`), which raises the cross-cell platform.dsar_request and fans out. A
+        (`kind: erasure`, `serviceAuth`), which raises the cross-cell sync.dsar_request and fans out. A
         guest who never transacted across regions has no link (cross-region.yaml) and raises no DSAR record.
 
       x-ticvai-read-via:
@@ -5156,7 +5263,7 @@ paths:
       operationId: getMembership
       summary: A membership with its history, usage and renewals
       description: '**Composed because of where the data lives.** A guest''s membership sits in their
-        home cell (`platform.guest_link.homeCellName`), so a venue in another cell reading the
+        home cell (`sync.guest_link.homeCellName`), so a venue in another cell reading the
         membership, its status history, its benefit usage and its renewal attempts as four calls
         makes **four cross-cell round trips at a counter**. One composed read is one.
 
@@ -6471,6 +6578,44 @@ components:
       bearerFormat: JWT
       description: Prospect sign-up session token (common.yaml prospectAuth), issued by verifyProspectSignupCode; DEC-167, CHG-CLN-019.
   schemas:
+    ConsentIdentifierCapture:
+      type: object
+      x-ticvai-persistence: none — request only; lands on pii.consent_identifier
+      description: What `marketing-crm.recordDeviceConsent` sends Identity (CHG-XDW-004); the row is
+        marketing-crm's `ConsentCaptureIdentifier`.
+      required:
+      - deviceConsentId
+      - capturedAt
+      properties:
+        deviceConsentId:
+          type: string
+          format: uuid
+        ipAddress:
+          type: string
+          maxLength: 45
+          nullable: true
+        userAgent:
+          type: string
+          maxLength: 500
+          nullable: true
+        capturedAt:
+          type: string
+          format: date-time
+    GuestSubjectDetailsUpdate:
+      type: object
+      x-ticvai-persistence: none — request only; lands on pii.subject
+      description: The part of `marketing-crm.updateMyProfile` that is the guest's subject (CHG-XDW-005).
+        At least one field.
+      minProperties: 1
+      properties:
+        displayName:
+          type: string
+          maxLength: 200
+        preferredLanguage:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: ISO 639-1, as `pii.subject.preferred_language`.
     StartProspectSignupRequest:
       type: object
       x-ticvai-persistence: none — request only (DEC-167; CHG-CLN-019)

@@ -3195,6 +3195,75 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/dead-letters/{deadLetterId}/replays:
+    parameters:
+    - name: deadLetterId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: requeueDeadLetter
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Put a dead-lettered event back on the outbox
+      description: '**The owner''s write of `platform.dead_letter`** (14 October 2026, CHG-XDW-003; ADR-0055 rule 4).
+        `platform` is TenancyService''s schema in `commerce`, beside `platform.outbox`, which the dead letters drain
+        from (ADR-0033); the operator''s `platform-ops.replayDeadLetter` runs in `operations` and calls this,
+        cell-internal over mTLS. In one transaction it writes the dead letter''s event back to `platform.outbox`
+        as a new row and adds one to `replay_count` (**a new attempt, never a reset**, ADR-0033). The caller''s
+        `Idempotency-Key` makes a retried call one replay, not two.
+
+        '
+      tags:
+      - tenancy
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Requeued.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - deadLetterId
+                - outboxId
+                - replayCount
+                properties:
+                  deadLetterId:
+                    type: string
+                    format: uuid
+                  outboxId:
+                    type: string
+                    format: uuid
+                    description: The new outbox row carrying the event again.
+                  replayCount:
+                    type: integer
+                    description: Replays so far, this one included.
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   # **Server-owned fields are `readOnly`, secrets are `writeOnly`** (pull audit R079, R164).
   # createOutlet, createSaleBoard, updateSaleBoard, registerDevice, deployConfigurationProfile,

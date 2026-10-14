@@ -124,7 +124,7 @@ WHAT = {
     "access.admission_rules": (
         "**What a gate checks before it opens** — how early, how late, how many times, and which "
         "credentials count. Renamed from `admission_rules`, because *profile* reads as a person."),
-    "platform.cross_region_entitlement": (
+    "sync.cross_region_entitlement": (
         "**Something bought in one jurisdiction and honoured in another.** ADR-0010: the guest does "
         "not move, a pseudonymous link does. Renamed from `cross_region_entitlement` — a right to redeem "
         "what, and where?"),
@@ -396,8 +396,8 @@ WHAT = {
     "games.prize": "**What credits can be redeemed for**, with its own stock.",
     "queue.reading": "**What a queue system reported at a moment.** The platform stores readings, not estimates.",
     "queue.feed": "**Where readings come from** — an adaptor to a venue\u2019s own system (ADR-0012).",
-    "platform.dsar_request": "**A data-subject request and its progress.** The reason `pii` is a schema of its own.",
-    "platform.guest_link": "**A pseudonymous link between cells** (ADR-0010). Carries no personal data, which is the point.",
+    "sync.dsar_request": "**A data-subject request and its progress.** The reason `pii` is a schema of its own.",
+    "sync.guest_link": "**A pseudonymous link between cells** (ADR-0010). Carries no personal data, which is the point.",
     "platform.sale_board": "**What a till shows and in what order.** Configured by the venue, not by code.",
     "platform.region_settings": "**Currency, scale, timezone, fiscal year.** Region-scoped and not overridable below.",
     "maintenance.incident": "**Something that happened and needs recording** \u2014 distinct from a work order, which is something to do.",
@@ -461,7 +461,7 @@ WHAT = {
     "pii.subject_contact": "**An email, a phone.** The thing a marketing suppression matches on.",
     "pii.subject_document": "**A passport or ID, and its verification state.**",
     "platform.sale_board_page": "**One page of a till board**, holding tiles in position.",
-    "platform.wallet_authorisation": "**A hold on a balance held in another jurisdiction**, with the rate it converted at fixed on authorisation rather than capture.",
+    "sync.wallet_authorisation": "**A hold on a balance held in another jurisdiction**, with the rate it converted at fixed on authorisation rather than capture.",
     "promotions.allocation_split": "**How a bundle price divides across its components.** What the ledger posts against.",
     "promotions.allocation_component": "**One component\u2019s share**, fixed or proportional.",
     "promotions.bundle_component": "**One product inside a bundle**, with its quantity.",

@@ -1508,11 +1508,21 @@ paths:
   /dead-letters/{deadLetterId}/replay:
     post:
       operationId: replayDeadLetter
+      x-ticvai-write-via:
+      - table: platform.dead_letter
+        operation: requeueDeadLetter
+      x-ticvai-calls:
+      - tenancy.requeueDeadLetter
       x-ticvai-consumed-by:
         - "P09 ADM-318 Dead Letters"
       summary: Re-enter the delivery path
       description: '**Records the replay as a new attempt rather than resetting the count** (ADR-0033).
-        An operator retrying the same poison message forty times should be able to see that they did.'
+        An operator retrying the same poison message forty times should be able to see that they did.
+
+        **The owner writes it.** `platform.dead_letter` sits beside `platform.outbox` in TenancyService''s
+        schema, in `commerce`; this checks the operator''s permission and calls tenancy `requeueDeadLetter`,
+        which puts the event back on the outbox and counts the replay in one transaction (ADR-0055 rule 4,
+        CHG-XDW-003).'
       tags:
       - platform-ops
       x-ticvai-permission: PLATFORM_CELL_MANAGE
@@ -3088,7 +3098,7 @@ components:
 
 
         **A financial posting is never dead-lettered** — `ledger.journal_entry` is append-only and a failed
-        posting is an incident. **Nor is a DSAR**: `platform.dsar_request` carries a legal clock, and
+        posting is an incident. **Nor is a DSAR**: `sync.dsar_request` carries a legal clock, and
         a dead-lettered erasure nobody works is a regulatory failure with a timestamp on it. Both halt
         and alert.'
       required:

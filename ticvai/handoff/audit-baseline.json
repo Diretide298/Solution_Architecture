@@ -16087,7 +16087,7 @@
     "platform.outbox.event_id",
     "platform.outbox.tenant_id",
     "platform.profile_deployment.profile_id",
-    "platform.wallet_authorisation.authorisation_id",
+    "sync.wallet_authorisation.authorisation_id",
     "pricing.dynamic_price_action.dynamic_price_rule_id",
     "pricing.dynamic_price_condition.dynamic_price_rule_id",
     "promotions.allocation_component.variant_id",

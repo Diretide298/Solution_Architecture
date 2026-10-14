@@ -1,0 +1,73 @@
+id: CHG-XDW-002
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'A refused offline entry is quarantined in sync.rejection by its owner, CrossRegionService: syncOrders
+  (commerce) and syncScans (access) call the new serviceAuth operation cross-region recordSyncRejection, and
+  resolveSyncRejection (commerce) calls the new recordSyncRejectionResolution. Exceptions XDW-013 to XDW-015 are
+  removed.'
+decision:
+  what: 'contracts/spine/cross-region.yaml adds POST /sync-rejections recordSyncRejection (body and 201 response the
+    orders SyncRejection schema; the caller chooses the id and sends it as the Idempotency-Key) and POST
+    /sync-rejections/{rejectionId}/resolution recordSyncRejectionResolution (body SyncRejectionResolution: resolution,
+    resolvedRecordId, resolvedByPrincipalId; 404 not-found, 409 sync-rejection-already-resolved). Both audience
+    service, serviceAuth, x-ticvai-permission null like the 26 other service-only operations, 400 BadRequest and 401
+    unauthenticated declared. syncOrders, syncScans and resolveSyncRejection declare x-ticvai-write-via {table:
+    sync.rejection, operation: ...} and x-ticvai-calls, and their descriptions say the owner writes the row (a failed
+    call is the batch''s transient failure, SD-028; resolveSyncRejection answers the 409 as its own alreadyResolved).
+    derive-lineage adds both operations and copies the routes into writeVia. The three exception entries are deleted.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'r6 gate (w609, 14 October 2026): check-cross-deployable-writes X-EXPIRED on XDW-013 to XDW-015 (CHG-R6-020, ADAM
+  CR-002, removal release r5, tagged). Chinmay asked "Remove them now ?" on 14 October 2026. sync.rejection is in sync,
+  which CrossRegionService owns in operations (handoff/service-decomposition.json), and CrossRegion published no
+  operation for it. ADR-0055 rule 4 (amended 14 October, CHG-GEN-009): across deployables a write is a service call
+  or an event. An event would copy the refused entry''s verbatim payload, which can hold a guest''s details, into
+  platform.outbox, and the replay answers the device with the rejectionId at once, so the route is the owner''s
+  service operation. Moving the table into orders instead would have made the access and operations replays
+  (syncScans, syncGamePlays, reconcileBurstEnvironment) and Access''s three readers cross-deployable in its place.'
+keys_touched:
+  operations:
+  - recordSyncRejection
+  - recordSyncRejectionResolution
+  - syncOrders
+  - syncScans
+  - resolveSyncRejection
+  tables:
+  - sync.rejection
+  schemas:
+  - SyncRejectionResolution
+  files:
+  - contracts/spine/cross-region.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/access.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - handoff/api-data-lineage.json
+  - handoff/cross-deployable-writes.md
+  tickets:
+  - DB-ROLES
+  other:
+  - XDW-013, XDW-014, XDW-015 (removed)
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started:
+  - DB-ROLES (#27655, CR-002's ticket, built strict; a comment, never a rewrite)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'Batch XDW, 14 October 2026. The lead''s words: asked "Remove them now ?" on 14 October 2026. Released outside
+  the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Prevention is the existing
+  check-cross-deployable-writes, which failed these X-EXPIRED and fails X-UNROUTED on any cross-deployable write
+  without a route and X-OPERATION on a route to an operation the owner does not serve; no new check. Triage blocker
+  because the gate fails without it. syncGamePlays and reconcileBurstEnvironment run in operations with
+  CrossRegionService and call the same write in-process (rule 3), so they need no route. The readers of
+  sync.rejection in commerce and access (listSyncRejections, listOrderLifecycleTimeline, listAccess,
+  listOfflineEdge, listReconnectionSynchronizationConflict) stay in check-cross-module-reads'' baseline, unchanged
+  here. Additive against r1 (check-contract-compat). Verified in w609 with the checks listed in CHG-XDW-001. ADAM CR
+  ids are pending: CR-002 is Done.'

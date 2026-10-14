@@ -39,6 +39,10 @@ constraint on a renamed column, are not generated; one "table renamed" or "colum
 the `ALTER TABLE ... RENAME` to write, and what follows from it. A foreign key that differs only because the
 table it points at was renamed is not listed: Postgres follows a renamed table. `ALTER TABLE ... RENAME TO` and
 `ALTER INDEX ... RENAME TO` written by hand in a forward migration are recognised, like `RENAME COLUMN`.
+**A rename into another schema is a move** (CHG-XDW-001, 14 October 2026: CrossRegionService's four records left
+`platform` for `sync`): its row says `ALTER TABLE ... SET SCHEMA` (then `RENAME TO` only if the name changes too),
+and a hand-written `ALTER TABLE ... SET SCHEMA` is recognised like `RENAME TO`. Postgres moves the table's
+indexes and constraints with it.
 
 This is not a SQL parser. It understands the statements `derive-ddl.py` emits and the handful a
 person writes in a forward migration; anything else it cannot place is listed for review rather than
@@ -286,6 +290,10 @@ class Model:
             if m and unq(m.group(1)) in self.tables:
                 self.rename_table(unq(m.group(1)), unq(m.group(1)).split(".")[0] + "." + unq(m.group(2)))
                 continue
+            m = re.match(rf"ALTER TABLE (?:ONLY )?(?:IF EXISTS )?({QNAME}) SET SCHEMA ({NAME})$", s, re.I)
+            if m and unq(m.group(1)) in self.tables:
+                self.rename_table(unq(m.group(1)), unq(m.group(2)) + "." + unq(m.group(1)).split(".", 1)[1])
+                continue
             m = re.match(rf"ALTER INDEX (?:IF EXISTS )?({QNAME}|{NAME}) RENAME TO ({NAME})$", s, re.I)
             if m:
                 name, to = unq(m.group(1)), unq(m.group(2))
@@ -377,6 +385,17 @@ def _cols_in_parens(stmt: str) -> set:
     return {unq(x.strip().split()[0]) for x in m.group(1).split(",") if x.strip()} if m else set()
 
 
+def move_sql(old: str, new: str) -> str:
+    """The SQL for a declared table rename: `RENAME TO` within a schema; `SET SCHEMA`, then `RENAME TO` if the
+    name changes too, into another (CHG-XDW-001)."""
+    os_, on = old.split(".", 1)
+    ns, nn = new.split(".", 1)
+    if os_ == ns:
+        return f"ALTER TABLE {old} RENAME TO {nn}"
+    sql = f"ALTER TABLE {old} SET SCHEMA {ns}"
+    return sql + (f"; ALTER TABLE {ns}.{on} RENAME TO {nn}" if on != nn else "")
+
+
 def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan:
     """`renames`: {"tables": {old: new}, "columns": {(table as named now, old column): new column}}, the
     declared renames (CHG-R6-010). Only a table that exists on the old side under its old name and on the new
@@ -422,7 +441,7 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
         o = rt[t]
         cr = sorted((oc, nc) for (tt, nc), oc in rc.items() if tt == t)
         review("table renamed", f"{o} -> {t}", "declared rename (derive-schema-history.py RENAMES)",
-               f"ALTER TABLE {o} RENAME TO {t.split('.', 1)[1]}"
+               move_sql(o, t)
                + "".join(f"; ALTER TABLE {t} RENAME COLUMN {oc} TO {nc}" for oc, nc in cr)
                + "; then rename its key, indexes, constraints and policies to the generated names and apply its "
                  "row-level security again (the \"after rename\" row for it)")

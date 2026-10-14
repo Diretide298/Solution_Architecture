@@ -1271,7 +1271,7 @@ def main() -> int:
         ("access.scan_event", "ticket_id"): "access.entitlement",
         ("queue.entry", "entitlement_id"): "access.entitlement",
         ("retail.shop_and_drop", "entitlement_id"): "access.entitlement",
-        ("platform.cross_region_entitlement", "ticket_id"): "access.entitlement",
+        ("sync.cross_region_entitlement", "ticket_id"): "access.entitlement",
         ("ledger.inter_entity_obligation", "entitlement_id"): "access.entitlement",
     }
     _repointed = 0

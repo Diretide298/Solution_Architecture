@@ -1,0 +1,64 @@
+id: CHG-XDW-003
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'An operator''s replayDeadLetter (operations) no longer writes platform.dead_letter and platform.outbox with
+  its own SQL: it calls the new serviceAuth operation tenancy requeueDeadLetter, which puts the event back on the
+  outbox and counts the replay in one transaction in TenancyService, the owner of platform. Exception XDW-012 is
+  removed.'
+decision:
+  what: 'contracts/spine/tenancy.yaml adds POST /internal/dead-letters/{deadLetterId}/replays requeueDeadLetter
+    (audience service, serviceAuth, x-ticvai-permission null; 200 {deadLetterId, outboxId, replayCount}; 401
+    unauthenticated, 404 not-found). Each call is a new replay attempt (ADR-0033: never a reset), so it is a POST to a
+    sub-collection with no wrong state to refuse. replayDeadLetter in contracts/satellite/platform-ops.yaml declares
+    x-ticvai-write-via {table: platform.dead_letter, operation: requeueDeadLetter} and x-ticvai-calls, and says so. The
+    lineage (tools/applied/xdw-routes-14-october.py): requeueDeadLetter reads platform.dead_letter and writes
+    platform.dead_letter and platform.outbox; replayDeadLetter no longer writes platform.outbox. The exception entry
+    is deleted.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'r6 gate (w609, 14 October 2026): check-cross-deployable-writes X-EXPIRED on XDW-012 (CHG-R6-020, ADAM CR-002,
+  removal release r5, tagged). Chinmay asked "Remove them now ?" on 14 October 2026. The exception proposed moving the
+  table to control, but control is a database of its own (ADR-0039) and dead letters drain from each tenant
+  database''s platform.outbox (ADR-0033, ADR-0058), so the table stays beside the outbox and its owner,
+  TenancyService, performs the write; ADR-0055 rule 4 (amended 14 October, CHG-GEN-009): across deployables a
+  service call or an event, never shared SQL.'
+keys_touched:
+  operations:
+  - requeueDeadLetter
+  - replayDeadLetter
+  tables:
+  - platform.dead_letter
+  - platform.outbox
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/platform-ops.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/applied/xdw-routes-14-october.py
+  - handoff/api-data-lineage.json
+  - handoff/cross-deployable-writes.md
+  tickets:
+  - DB-ROLES
+  other:
+  - XDW-012 (removed)
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started:
+  - DB-ROLES (#27655, CR-002's ticket, built strict; a comment, never a rewrite)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'Batch XDW, 14 October 2026. The lead''s words: asked "Remove them now ?" on 14 October 2026. Released outside
+  the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Prevention is the existing
+  check-cross-deployable-writes (X-EXPIRED, X-UNROUTED, X-OPERATION); no new check. Triage blocker because the gate
+  fails without it. The relay in workers keeps writing dead letters as it does (DB-ROLES gives workers the schemas
+  its consumers and relay touch). listDeadLetters'' read stays in check-cross-module-reads'' baseline. The path ends
+  in a plural noun (replays) because each call is a new attempt; check-contract-shapes C-ACTION-409 asked for a 409 on
+  the first draft (/requeue), and no state refuses a replay. Additive against r1. Verified in w609 with the checks
+  listed in CHG-XDW-001.'

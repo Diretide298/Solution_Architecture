@@ -1750,6 +1750,11 @@ paths:
   /access/scans:
     post:
       operationId: syncScans
+      x-ticvai-write-via:
+      - table: sync.rejection
+        operation: recordSyncRejection
+      x-ticvai-calls:
+      - cross-region.recordSyncRejection
       x-ticvai-consumed-by:
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
@@ -1770,6 +1775,10 @@ paths:
         **Workstation-scoped: the replaying scanner''s own session.** A caller whose session has no
         workstation — a back-office browser, a partner, a guest — is refused `403`. Back-office screens
         read what was replayed through `listScans`.
+
+        **A scan refused on its merits is quarantined by its owner**: the row in `sync.rejection` (`kind:
+        scan`) is written by cross-region `recordSyncRejection` (in `operations`), which this calls with the
+        rejection''s id as its `Idempotency-Key` (ADR-0055 rule 4, CHG-XDW-002).
 
         '
       tags:

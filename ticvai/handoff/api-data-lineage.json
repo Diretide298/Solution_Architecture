@@ -2394,7 +2394,13 @@
   "audience": [
    "staff"
   ],
-  "note": "ledger.price_variance is the variance account posting as named in the lineage elsewhere; if absent, ledger.journal_line"
+  "note": "ledger.price_variance is the variance account posting as named in the lineage elsewhere; if absent, ledger.journal_line",
+  "writeVia": [
+   {
+    "table": "sync.rejection",
+    "operation": "recordSyncRejection"
+   }
+  ]
  },
  "listSyncRejections": {
   "contract": "orders",
@@ -3052,7 +3058,13 @@
   "audience": [
    "staff"
   ],
-  "lineageNote": "a replayed offline deny, or a server downgrade of an offline admit, emits access.rejected"
+  "lineageNote": "a replayed offline deny, or a server downgrade of an offline admit, emits access.rejected",
+  "writeVia": [
+   {
+    "table": "sync.rejection",
+    "operation": "recordSyncRejection"
+   }
+  ]
  },
  "listScans": {
   "contract": "access",
@@ -3838,11 +3850,11 @@
   "path": "/guest-links",
   "reads": [
    "cache:idempotency",
-   "platform.guest_link"
+   "sync.guest_link"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.guest_link"
+   "sync.guest_link"
   ],
   "routing": "",
   "scope": "tenant",
@@ -3857,14 +3869,15 @@
   ],
   "audience": [
    "service"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "getGuestLink": {
   "contract": "cross-region",
   "verb": "GET",
   "path": "/guest-links/{guestLinkId}",
   "reads": [
-   "platform.guest_link"
+   "sync.guest_link"
   ],
   "writes": [],
   "routing": "replica",
@@ -3879,7 +3892,8 @@
   ],
   "audience": [
    "service"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "revokeGuestLink": {
   "contract": "cross-region",
@@ -3887,11 +3901,11 @@
   "path": "/guest-links/{guestLinkId}",
   "reads": [
    "cache:idempotency",
-   "platform.guest_link"
+   "sync.guest_link"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.guest_link"
+   "sync.guest_link"
   ],
   "routing": "",
   "scope": "tenant",
@@ -3906,14 +3920,15 @@
   ],
   "audience": [
    "service"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "resolveGuestLink": {
   "contract": "cross-region",
   "verb": "GET",
   "path": "/guest-links/resolve",
   "reads": [
-   "platform.guest_link"
+   "sync.guest_link"
   ],
   "writes": [],
   "routing": "replica",
@@ -3928,7 +3943,8 @@
   ],
   "audience": [
    "service"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "propagateCrossRegionEntitlement": {
   "contract": "cross-region",
@@ -3936,11 +3952,11 @@
   "path": "/cross-region-entitlements",
   "reads": [
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "routing": "",
   "scope": "tenant",
@@ -3955,14 +3971,15 @@
   ],
   "audience": [
    "service"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "getCrossRegionEntitlement": {
   "contract": "cross-region",
   "verb": "GET",
   "path": "/cross-region-entitlements/{rightId}",
   "reads": [
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "writes": [],
   "routing": "replica",
@@ -3977,7 +3994,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "revokeCrossRegionEntitlement": {
   "contract": "cross-region",
@@ -3985,11 +4003,11 @@
   "path": "/cross-region-entitlements/{rightId}",
   "reads": [
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4004,7 +4022,8 @@
   ],
   "audience": [
    "service"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "consumeCrossRegionEntitlement": {
   "contract": "cross-region",
@@ -4012,11 +4031,11 @@
   "path": "/cross-region-entitlements/{rightId}/consume",
   "reads": [
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "routing": "",
   "scope": "workstation",
@@ -4031,7 +4050,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "reconcileRedemptions": {
   "contract": "cross-region",
@@ -4040,11 +4060,11 @@
   "reads": [
    "access.scan_event",
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4059,7 +4079,8 @@
   ],
   "audience": [
    "service"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "authoriseWalletSpend": {
   "contract": "cross-region",
@@ -4067,11 +4088,11 @@
   "path": "/wallet-authorisations",
   "reads": [
    "cache:idempotency",
-   "platform.wallet_authorisation"
+   "sync.wallet_authorisation"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.wallet_authorisation"
+   "sync.wallet_authorisation"
   ],
   "routing": "",
   "scope": "workstation",
@@ -4086,7 +4107,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "captureWalletAuthorisation": {
   "contract": "cross-region",
@@ -4094,11 +4116,11 @@
   "path": "/wallet-authorisations/{authorisationId}/capture",
   "reads": [
    "cache:idempotency",
-   "platform.wallet_authorisation"
+   "sync.wallet_authorisation"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.wallet_authorisation"
+   "sync.wallet_authorisation"
   ],
   "routing": "",
   "scope": "workstation",
@@ -4113,14 +4135,15 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "getWalletAllocation": {
   "contract": "cross-region",
   "verb": "GET",
   "path": "/wallet-allocations",
   "reads": [
-   "platform.wallet_authorisation"
+   "sync.wallet_authorisation"
   ],
   "writes": [],
   "routing": "primary",
@@ -4135,7 +4158,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "setWalletAllocationPolicy": {
   "contract": "cross-region",
@@ -4143,11 +4167,11 @@
   "path": "/wallet-allocations",
   "reads": [
    "cache:idempotency",
-   "platform.wallet_authorisation"
+   "sync.wallet_authorisation"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.wallet_authorisation"
+   "sync.wallet_authorisation"
   ],
   "routing": "",
   "scope": "region",
@@ -4162,7 +4186,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "createDsarRequest": {
   "contract": "cross-region",
@@ -4170,11 +4195,11 @@
   "path": "/dsar/requests",
   "reads": [
    "cache:idempotency",
-   "platform.dsar_request"
+   "sync.dsar_request"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.dsar_request"
+   "sync.dsar_request"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4189,14 +4214,15 @@
   ],
   "audience": [
    "service"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "getDsarRequest": {
   "contract": "cross-region",
   "verb": "GET",
   "path": "/dsar/requests/{requestId}",
   "reads": [
-   "platform.dsar_request"
+   "sync.dsar_request"
   ],
   "writes": [],
   "routing": "replica",
@@ -4211,7 +4237,8 @@
   ],
   "audience": [
    "service"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "login": {
   "contract": "identity",
@@ -22058,7 +22085,13 @@
   "audience": [
    "guest"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "writeVia": [
+   {
+    "table": "pii.subject",
+    "operation": "updateGuestSubjectDetails"
+   }
+  ]
  },
  "accrueLoyaltyPoints": {
   "contract": "marketing-crm",
@@ -29065,8 +29098,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "platform.dead_letter",
-   "platform.outbox"
+   "platform.dead_letter"
   ],
   "routing": "",
   "scope": "platform",
@@ -29080,7 +29112,14 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "writeVia": [
+   {
+    "table": "platform.dead_letter",
+    "operation": "requeueDeadLetter"
+   }
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-003: platform.dead_letter is written by tenancy requeueDeadLetter (writeVia), which also writes the outbox row; this no longer writes platform.outbox itself"
  },
  "listBurstEnvironments": {
   "contract": "subscription",
@@ -45656,10 +45695,10 @@
   "verb": "POST",
   "path": "/wallet-authorisations/{authorisationId}/release",
   "reads": [
-   "platform.wallet_authorisation"
+   "sync.wallet_authorisation"
   ],
   "writes": [
-   "platform.wallet_authorisation"
+   "sync.wallet_authorisation"
   ],
   "routing": null,
   "scope": "workstation",
@@ -45675,7 +45714,8 @@
    "postgres",
    "redis"
   ],
-  "note": "Was writes []: it marks the authorisation released. Calls wallet.releaseWalletHold."
+  "note": "Was writes []: it marks the authorisation released. Calls wallet.releaseWalletHold.",
+  "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)"
  },
  "listStepUpPolicies": {
   "contract": "approvals",
@@ -58514,7 +58554,13 @@
    "postgres",
    "redis"
   ],
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "writeVia": [
+   {
+    "table": "sync.rejection",
+    "operation": "recordSyncRejectionResolution"
+   }
+  ]
  },
  "revokeEntitlementShare": {
   "contract": "orders",
@@ -70587,7 +70633,13 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "RB's lineage + outbox for consent.deviceConsentRecorded"
+  "lineageNote": "RB's lineage + outbox for consent.deviceConsentRecorded",
+  "writeVia": [
+   {
+    "table": "pii.consent_identifier",
+    "operation": "recordConsentIdentifier"
+   }
+  ]
  },
  "recordEInvoiceTransmissionStatus": {
   "contract": "finance",
@@ -77655,5 +77707,132 @@
    "redis"
   ],
   "fixNote": "14 October 2026 (CHG-CRD-004, ADAM CR-078): the PIN against its hash and lockout, the permission through live grants; a wrong PIN is counted"
+ },
+ "recordSyncRejection": {
+  "contract": "cross-region",
+  "verb": "POST",
+  "path": "/sync-rejections",
+  "reads": [
+   "sync.rejection"
+  ],
+  "writes": [
+   "sync.rejection"
+  ],
+  "routing": null,
+  "scope": "workstation",
+  "perm": null,
+  "offline": false,
+  "summary": "Quarantine an entry an offline device replayed and the server refused",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "CrossRegionService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "recordSyncRejectionResolution": {
+  "contract": "cross-region",
+  "verb": "POST",
+  "path": "/sync-rejections/{rejectionId}/resolution",
+  "reads": [
+   "sync.rejection"
+  ],
+  "writes": [
+   "sync.rejection"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Record what a supervisor did about a quarantined entry",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "CrossRegionService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "requeueDeadLetter": {
+  "contract": "tenancy",
+  "verb": "POST",
+  "path": "/internal/dead-letters/{deadLetterId}/replays",
+  "reads": [
+   "platform.dead_letter"
+  ],
+  "writes": [
+   "platform.dead_letter",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Put a dead-lettered event back on the outbox",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-003: the owner requeues a dead letter for replayDeadLetter (XDW-012 removed)"
+ },
+ "recordConsentIdentifier": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/internal/consent-identifiers",
+  "reads": [],
+  "writes": [
+   "pii.consent_identifier"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Keep the IP address and user agent a cookie decision was made from",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-004: Identity keeps the consent identifier for recordDeviceConsent (XDW-016 removed)"
+ },
+ "updateGuestSubjectDetails": {
+  "contract": "identity",
+  "verb": "PATCH",
+  "path": "/internal/guest-subjects/{subjectId}/details",
+  "reads": [
+   "pii.subject"
+  ],
+  "writes": [
+   "pii.subject"
+  ],
+  "routing": null,
+  "scope": "subject",
+  "perm": null,
+  "offline": false,
+  "summary": "Correct a guest's own name and language on their subject",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "14 October 2026: CHG-XDW-005: Identity corrects the guest's subject for updateMyProfile (XDW-017 removed)"
  }
 }
