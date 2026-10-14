@@ -371,8 +371,10 @@ export async function buildSearch(root, subjects = {}) {
       terms: 'domain lenses cross-cutting subjects ai flash sale' },
     { id: 'audit', name: 'Audit the delivery package', href: '/audit.html',
       terms: 'audit dump checks validators problems package' },
-    { id: 'validation', name: 'What has been signed off', href: '/validation.html',
-      terms: 'validation sign-off verdicts reviews approved' },
+    { id: 'reviews', name: 'Reviews', href: '/reviews.html#coverage',
+      sub: 'what has been signed off, what is asked for, and who is reviewing',
+      terms: 'reviews review activity validation sign-off signed off verdicts approved '
+        + 'needs work rejected asked for work disagreement reviewers mentions named' },
   ].filter(Boolean);
   for (const page of pages) {
     entries.push({
