@@ -1678,11 +1678,6 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
-  - operationId: verifyAccreditationCredential
-    contract: accreditation
-    purpose: 'Verify a presented accreditation: photo, name, category, zones allowed now, validity'
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - ScanEvent.id
@@ -4588,11 +4583,6 @@ screens:
     contract: ai
     purpose: A principal's conversation history
     trigger: onLoad
-  - operationId: recordAnswerFeedback
-    contract: ai
-    purpose: Say whether an answer helped
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: askReportingQuestion
     contract: reporting
     purpose: Answer a numeric question from the semantic layer
@@ -9145,8 +9135,8 @@ screens:
     trigger: onLoad
   - operationId: getVenueMapLive
     contract: venue-map
-    purpose: The map with live operational state on it
-    trigger: onLoad
+    purpose: 'The live operational state on the venue map, refreshed while the map is open'
+    trigger: onInterval
   entryState:
     params:
     - name: mapId
@@ -12582,26 +12572,6 @@ screens:
     contract: inventory
     purpose: The movement ledger
     trigger: onLoad
-  - operationId: getKpiValues
-    contract: reporting
-    purpose: Today's takings and revenue KPIs on the phone
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getDashboard
-    contract: reporting
-    purpose: Store manager's mobile dashboard
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listAlerts
-    contract: reporting
-    purpose: Daily revenue alerts (also pushed, deliverTo push)
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: acknowledgeAlert
-    contract: reporting
-    purpose: Acknowledge an alert
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId

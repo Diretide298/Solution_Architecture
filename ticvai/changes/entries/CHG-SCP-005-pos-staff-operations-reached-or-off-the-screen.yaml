@@ -1,0 +1,75 @@
+id: CHG-SCP-005
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Seventeen operations declared on POS and staff-app screens that no component reached: reads now name the
+  component they fill, calls the runtime makes say so in their trigger, and six the approved screens have no use
+  for (and another screen calls) are taken off. The members that would need a new control are kept and listed.'
+decision:
+  what: 'screens/P04-point-of-sale.yaml: POS-025 Till Home binds listSaleBoards to the sale-board cards, listDevices
+    to the peripheral-health cards and listAlerts to the alerts banner, and polls getWorkstationHealth (onInterval);
+    POS-028 Table Service binds getTableMap to the floor and listTableReservations to the reservations due; POS-000
+    reads getCurrentSession in the background after login. screens/P06-staff-app.yaml: EMP-030 polls getVenueMapLive
+    (onInterval); EMP-010 no longer declares verifyAccreditationCredential (the scanner''s SCN-003 verifies an
+    accreditation, and the employee app does no full scanning, DI-128); EMP-020 no longer declares
+    recordAnswerFeedback (no control rates an answer; the guest assistants keep it); EMP-061 no longer declares
+    getKpiValues, getDashboard, listAlerts and acknowledgeAlert (no tile, chart or alert list on it; EMP-060 reads
+    the KPIs and EMP-070 works the alerts on the staff app). Nothing visible changes. Kept, because reaching them
+    needs a control the client-approved screen does not have (the lead decides): EMP-031 requestSuggestion;
+    EMP-037 listStaffConversations, listStaffMessages, markStaffConversationRead, sendStaffMessage; EMP-053
+    setSectionLayout; EMP-057 addGuestNote; POS-005 enrolFaceTag; POS-011 issueCreditMemo; POS-026 issueTaxInvoice,
+    reprintOrder; POS-028 openTableVisit, seatTableReservation, closeTableVisit (each needs a body the screen does
+    not collect); and POS-026 getTaxInvoice and getTaxDocumentRendition, which the Tax invoices table reaches by
+    opening a row (a second operation on one component, which the record cannot say). EMP-072 to EMP-100 follow
+    their P08 twins (batch SCR).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+  S-OP-UNREACHED (R273) had 62 members on P04 and P06: 17 fixed here, 16 kept (client-approved UI), 29 on the rental
+  twins EMP-071 to EMP-100 (copies of BO-544 to BO-573, batch SCR). Ruling (the lead, 14 October 2026, "go with your
+  recommendation"): wire onLoad reads to the load; otherwise remove the operation from the screen. The approved UI
+  is fixed (the lead, 14 October 2026), so no control was added.'
+keys_touched:
+  screens:
+  - POS-000
+  - POS-025
+  - POS-028
+  - EMP-010
+  - EMP-020
+  - EMP-030
+  - EMP-061
+  operations:
+  - listSaleBoards
+  - listDevices
+  - listAlerts
+  - getWorkstationHealth
+  - getTableMap
+  - listTableReservations
+  - getCurrentSession
+  - getVenueMapLive
+  - verifyAccreditationCredential
+  - recordAnswerFeedback
+  - getKpiValues
+  - getDashboard
+  - acknowledgeAlert
+  other:
+  - S-OP-UNREACHED
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-000 (#27767)
+  - APP-POS-POS-025 (#28753)
+  - APP-POS-POS-028 (#28549)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCP, 14 October 2026. link-screens-contracts re-derives x-ticvai-consumed-by for the four contracts
+  this touches (accreditation, ai, reporting); the derived lines are not committed here. EMP-010, EMP-020, EMP-030
+  and EMP-061 are outside Block A. check-rfp-coverage, check-spec-coverage, check-traceability and check-ticket-scope
+  print the same before and after.'

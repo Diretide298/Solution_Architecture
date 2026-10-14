@@ -281,8 +281,9 @@ screens:
     trigger: onAction
   - operationId: getCurrentSession
     contract: identity
-    purpose: Read the session the login just created
-    trigger: onAction
+    purpose: 'Read the session the login just created (role, venue and workstation every other
+      screen reads), with no tap of its own'
+    trigger: background
   - operationId: createMfaChallenge
     contract: identity
     purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
@@ -8833,12 +8834,15 @@ screens:
       - kind: cardList
         label: Sale boards — tickets, F&B, retail
         bindsTo: SaleBoard
+        operation: listSaleBoards
       - kind: cardList
         label: Peripheral health
         bindsTo: DeviceBinding
+        operation: listDevices
       - kind: banner
         label: Alerts for this workstation
         bindsTo: Alert
+        operation: listAlerts
       - kind: detailPanel
         label: Last closed shift
         bindsTo: Shift
@@ -8890,8 +8894,9 @@ screens:
     trigger: onLoad
   - operationId: getWorkstationHealth
     contract: tenancy
-    purpose: Whether the till and its peripherals are well
-    trigger: onLoad
+    purpose: 'Whether the till and its peripherals are well, polled while the home is open; it feeds
+      the Peripheral health cards'' state'
+    trigger: onInterval
   - operationId: listAlerts
     contract: reporting
     purpose: Anything the cashier must see before selling
@@ -9439,6 +9444,7 @@ screens:
       - kind: cardList
         label: The floor
         bindsTo: TableMap.tables
+        operation: getTableMap
         notes: '**Table states in the client''s words** (DI-336; CHG-CSA-012): Available, Ordered, **Table
           closed** (the contract''s `needsClearing`, after the visit is paid) and Reserved; never "Cleaning".
           A closed table shows **Make available** (`clearTable`). A table shows **Reserved** when a booking
@@ -9450,6 +9456,7 @@ screens:
       - kind: dataTable
         label: Reservations due
         bindsTo: TableReservation
+        operation: listTableReservations
       - kind: primaryButton
         label: Close visit & charge
       - kind: detailPanel
