@@ -790,12 +790,34 @@ function heldEntry(key, info, type, body) {
   return entry;
 }
 
-/** A file from public/, read and compressed once until it changes on disk.
- *  `transform` turns the bytes on disk into the bytes served. */
-async function staticEntry(abs, info, transform = null) {
+/**
+ * The bytes served for a file, where they are not the bytes on disk.
+ *
+ * Decided here, by path, and not by whoever asks: the cache below is keyed by
+ * path alone, so a caller that read a file *without* its transform would cache
+ * the raw bytes for everybody. That is exactly what happened to the key-sequence
+ * loader — `moduleClosure` reads shortcuts.js while building a page's preload
+ * list, cached the placeholder, and the request for the script itself was then
+ * served the placeholder too, so the sequence matched nothing.
+ *
+ * shortcuts.js carries a placeholder where the word's hash goes, filled from the
+ * word this process was given. The committed file has only the placeholder, so
+ * the word stays out of the repository; with no word the fill is an empty
+ * string and the loader matches nothing.
+ */
+const SHORTCUTS_ABS = path.join(PUBLIC, 'shortcuts.js');
+function servedTransform(abs) {
+  return abs === SHORTCUTS_ABS
+    ? (body) => body.toString('utf8').replace('__ADAM_DROP_HASH__', DROP_HASH)
+    : null;
+}
+
+/** A file from public/, read, transformed and compressed once until it changes on disk. */
+async function staticEntry(abs, info) {
   const hit = staticHeld.get(abs);
   if (hit && hit.mtimeMs === info.mtimeMs && hit.size === info.size) return hit;
   let body = await readFile(abs);
+  const transform = servedTransform(abs);
   if (transform) body = Buffer.from(transform(body));
   return heldEntry(abs, info, MIME[path.extname(abs).toLowerCase()] ?? 'application/octet-stream', body);
 }
@@ -1757,15 +1779,9 @@ const server = http.createServer(async (req, res) => {
       return sendStatic(res, req, page, 'no-store');
     }
 
-    // The key-sequence loader carries a placeholder where the word's hash goes;
-    // fill it in as the file is served, from the word this process was given. The
-    // committed file has only the placeholder, so the word stays out of the
-    // repository; an installation with no word substitutes an empty string and the
-    // loader then matches nothing. Only this one file, only this token.
-    const fill = rel === '/shortcuts.js'
-      ? (body) => body.toString('utf8').replace('__ADAM_DROP_HASH__', DROP_HASH)
-      : null;
-    const entry = await staticEntry(file, info, fill);
+    // shortcuts.js is filled with the word's hash inside staticEntry; see
+    // servedTransform for why it is not done here.
+    const entry = await staticEntry(file, info);
     // Kept for a year only when asked for by the current stamp. An old stamp is
     // a page from before a deploy asking for a file that has changed since, and
     // it gets the new file on the same terms as an unstamped request.
