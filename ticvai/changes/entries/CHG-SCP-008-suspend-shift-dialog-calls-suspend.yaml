@@ -1,0 +1,35 @@
+id: CHG-SCP-008
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'EMP-009 End shift: the Suspend shift button opens the confirmSuspendShift dialog, which already says it
+  collects what suspendShift sends (recordedAt, an optional reason), but its confirm named no operation; it now
+  calls suspendShift.'
+decision:
+  what: 'screens/P06-staff-app.yaml, EMP-009 overlay confirmSuspendShift: `confirm: {operation: suspendShift}`. The
+    dialog, its trigger and its words are unchanged; no confirm label is added.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+  S-BUTTON-FORM (R264) had 1 member on P04 and P06, 0 after. Ruling (the lead, 14 October 2026, "go with your
+  recommendation"): a button whose operation needs a body opens the form or panel that collects it.'
+keys_touched:
+  screens:
+  - EMP-009
+  operations:
+  - suspendShift
+  other:
+  - S-BUTTON-FORM
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCP, 14 October 2026. EMP-009 has no Block A frontend ticket in adam-links.'

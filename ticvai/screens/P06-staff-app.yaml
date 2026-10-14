@@ -1373,6 +1373,8 @@ screens:
   - id: confirmSuspendShift
     component: confirmDialog
     trigger: Suspend shift
+    confirm:
+      operation: suspendShift
     body: '**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than
       the verb. A end shift this affects should be identified in the dialog, not just counted. **Collects
       what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.'
