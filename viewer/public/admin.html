@@ -13,7 +13,7 @@
         }
       } catch { /* storage can be denied outright; day is a fine fallback */ }
     </script>
-    <title>Adam — accounts</title>
+    <title>ADAM — People and projects</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,14 +22,15 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
-    <!-- Four rules for the date-range export, kept out of layers.css because
-         that sheet is loaded by every page in the viewer and none of the others
-         has this panel. -->
-    <link rel="stylesheet" href="/admin-export.css" />
-    <!-- And the panel that reads that same file back in. Its own sheet for the
-         same reason: a grouped list of rows nobody has agreed to yet means
-         nothing on any other page. -->
+    <!-- The sheet: Tasks' opening, filter, tables and states as shared parts. -->
+    <link rel="stylesheet" href="/sheet.css" />
+    <!-- The decision sheet's plan: a grouped list of rows nobody has agreed to
+         yet, which means nothing on any other page. -->
     <link rel="stylesheet" href="/admin-decisions.css" />
+    <!-- And the page itself: the "needs you" list, the tables and the forms.
+         The date-range export's own sheet folded into this one when its form
+         took the shared label-above-field shape. -->
+    <link rel="stylesheet" href="/admin.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <script>
       // The curtain's dead man's switch. A wrong loading screen is a bad page;
@@ -74,7 +75,7 @@
           <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
           <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
         </a>
-        <span class="brand-sub">admin</span>
+        <span class="brand-sub">people and projects</span>
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
@@ -91,816 +92,333 @@
       <div class="admin-panel">
         <h1 class="auth-title">Not for you</h1>
         <p class="auth-note">
-          This page manages accounts, which only an administrator can do. If you
-          think that should be you, ask one of them.
+          This page manages accounts, invites and which OpenProject project each
+          ADAM project reads, which only an administrator can do. If you think
+          that should be you, ask one of them. Your own password and tokens are
+          on <a href="/settings.html">your settings page</a>.
         </p>
         <a class="auth-button" href="/">Back to the viewer</a>
       </div>
     </main>
 
-    <!-- The settings page's shape: the sections on the left, one column of
-         panels on the right. This page had grown to seven panels in a single
-         scroll, where the only way to reach "Close from a spreadsheet" was to
-         know it was at the bottom. -->
-    <div id="admin" class="set-layout" hidden>
-      <nav class="set-nav" aria-label="Admin sections">
-        <h1 class="set-nav-title">Admin</h1>
+    <!-- One section at a time, chosen on the left, the way Tasks and Settings
+         work. This page had grown to eight panels in a single scroll, where the
+         only way to reach the spreadsheet uploads was to know they were at the
+         bottom, and it opened on the invite form whatever had brought you
+         here. It opens now on what needs an administrator. -->
+    <div id="admin" class="set-layout set-layout-wide" hidden>
+      <nav class="set-nav" aria-label="Sections">
+        <h1 class="set-nav-title">People and projects</h1>
         <div class="set-nav-list">
+          <a href="#attention" id="ad-nav-attention">Needs you</a>
           <div class="set-nav-group">People</div>
-          <a href="#invite">Invite someone</a>
-          <a href="#invites">Invites</a>
           <a href="#people">Accounts</a>
+          <a href="#invites">Invite someone</a>
           <div class="set-nav-group">Delivery</div>
           <a href="#projects">Projects</a>
           <a href="#platforms">Platforms</a>
-          <div class="set-nav-group">The register</div>
-          <a href="#export">Download a range</a>
-          <a href="#close-from-sheet">Close from a spreadsheet</a>
-          <a href="#settle-from-sheet">Settle change requests</a>
-          <div class="set-nav-group">You</div>
-          <a href="#password">Your password</a>
+          <div class="set-nav-group">Spreadsheets</div>
+          <a href="#export">Download a date range</a>
+          <a href="#upload">Upload a decision sheet</a>
         </div>
       </nav>
 
       <main class="set-content">
-      <!-- ── inviting ─────────────────────────────────────────────── -->
-      <section class="admin-panel set-section" id="invite">
-        <h2 class="admin-heading">Invite someone</h2>
-        <p class="auth-note">
-          The address is fixed here, by you, and cannot be changed by whoever
-          opens the link. That is what makes an invite count as having verified
-          it — so send the link however you already talk to them. It works once,
-          and only for that address.
-        </p>
-        <div class="invite-row">
-          <input id="invite-email" class="auth-input" type="email"
-                 placeholder="them@softlabsgroup.com" />
-          <select id="invite-role" class="scope-select">
-            <option value="reviewer">Reviewer</option>
-            <option value="admin">Admin</option>
-            <option value="client">Client</option>
-          </select>
-          <select id="invite-project" class="scope-select" aria-label="Project they get access to"></select>
-          <select id="invite-days" class="scope-select">
-            <option value="7">7 days</option>
-            <option value="1">1 day</option>
-            <option value="30">30 days</option>
-          </select>
-          <button id="invite-create" class="chip" type="button">Make a link</button>
-        </div>
-        <!-- A client is the one role whose rules differ, and both differences
-             are invisible until the invite is made: the address may be outside
-             the company, and the link is capped at three days however long is
-             asked for. Saying so here beats a surprise afterwards. -->
-        <p class="auth-note" id="invite-client-note" hidden>
-          <strong>A client is outside the company.</strong> They read
-          everything except <strong>Decisions</strong> — the ADRs, the
-          registers and the conflict log. They can record a verdict, kept as
-          the <strong>client review</strong> rather than the team's, and they
-          cannot close an item. The
-          <code>@softlabsgroup.com</code> rule does not apply, so the address
-          can be anywhere; you typing it is what vouches for it. The link
-          expires in <strong>three days</strong> whatever is chosen above.
-        </p>
-        <p class="auth-note auth-fine">
-          <b>Project</b> is the ADAM project the link opens. They see that
-          project and no other.
-        </p>
-        <p class="auth-error" id="invite-error" hidden></p>
-
-        <div id="invite-result" hidden>
-          <div class="journey-section-label">their link — shown once</div>
-          <div class="invite-link-row">
-            <input id="invite-link" class="auth-input" type="text" readonly />
-            <button id="invite-copy" class="chip" type="button">Copy</button>
+        <!-- ── what needs an administrator ───────────────────────────────
+             A tool page has no chart to open on, so it opens on the list of
+             things that are waiting for somebody with this page's powers: an
+             invite about to lapse, an account nobody has used in a month, a
+             project reading no work, a lead with no platform. Each one names
+             the section that fixes it. -->
+        <section class="admin-panel set-section sh-sheet" id="attention" aria-labelledby="ad-headline">
+          <div class="sh-verdict" id="ad-verdict">
+            <h2 class="sh-headline" id="ad-headline">Reading the accounts…</h2>
           </div>
-          <p class="auth-note auth-fine">
-            Not stored and not recoverable — only a hash of it is kept, so that
-            a copy of the database cannot be used to make accounts. If it is
-            lost, withdraw it and make another.
+          <ul class="ad-needs" id="ad-needs"></ul>
+          <p class="sh-next" id="ad-next"></p>
+        </section>
+
+        <!-- ── the people ───────────────────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="people" aria-labelledby="ad-people-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ad-people-title">Accounts <span id="account-count" class="admin-count"></span></h2>
+          </div>
+          <p class="sh-note">
+            An account is disabled rather than deleted, because a verdict points
+            at the person who gave it. <b>End sessions</b> signs somebody out of
+            every browser and stops there: the answer to a lost laptop, not to
+            somebody leaving. <b>Disable</b> also stops them signing back in.
+            Projects are the ADAM projects they can open; an administrator opens
+            every one.
           </p>
-        </div>
-      </section>
+          <div class="ad-filter">
+            <label class="sh-field" for="subsearch">
+              <span>Find an account</span>
+              <input id="subsearch" class="sh-input" type="search" autocomplete="off"
+                     placeholder="Name, address, role or project" />
+            </label>
+            <span class="sh-quiet" id="subsearch-count" aria-live="polite"></span>
+          </div>
+          <p class="auth-error" id="account-error" role="alert" hidden></p>
+          <div id="accounts"></div>
+        </section>
 
-      <!-- ── the invites ──────────────────────────────────────────── -->
-      <section class="admin-panel set-section" id="invites">
-        <h2 class="admin-heading">Invites <span id="invite-count" class="admin-count"></span></h2>
-        <!-- `invites-list`, not `invites`: the section around it is `#invites`,
-             which is what the list on the left points at. -->
-        <div id="invites-list" class="admin-table"></div>
-      </section>
+        <!-- ── inviting, and the invites ─────────────────────────────────
+             One section, because they are one job: the form makes a link, and
+             the list under it is where that link is seen again, withdrawn, or
+             found to have lapsed. -->
+        <section class="admin-panel set-section sh-sheet" id="invites" aria-labelledby="ad-invite-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ad-invite-title">Invite someone</h2>
+          </div>
+          <p class="sh-note">
+            The address is fixed here, by you, and cannot be changed by whoever
+            opens the link. That is what makes an invite count as having verified
+            it, so send the link however you already talk to them. It works once,
+            and only for that address. They see the project you choose and no
+            other; give them more from <a class="sh-link" href="#people">Accounts</a>
+            once they are in.
+          </p>
+          <div class="ad-form">
+            <label class="sh-field ad-grow" for="invite-email">
+              <span>Their e-mail address</span>
+              <input id="invite-email" class="sh-input" type="email" autocomplete="off"
+                     placeholder="them@softlabsgroup.com" />
+            </label>
+            <label class="sh-field" for="invite-role">
+              <span>Role</span>
+              <select id="invite-role" class="scope-select"></select>
+            </label>
+            <label class="sh-field" for="invite-project">
+              <span>Project</span>
+              <select id="invite-project" class="scope-select"></select>
+            </label>
+            <label class="sh-field" for="invite-days">
+              <span>Link lasts</span>
+              <select id="invite-days" class="scope-select">
+                <option value="7">7 days</option>
+                <option value="1">1 day</option>
+                <option value="30">30 days</option>
+              </select>
+            </label>
+            <button id="invite-create" class="chip ad-go" type="button">Make a link</button>
+          </div>
+          <!-- A client is the one role whose rules differ, and both differences
+               are invisible until the invite is made: the address may be outside
+               the company, and the link is capped at three days however long is
+               asked for. Saying so here beats a surprise afterwards. -->
+          <p class="sh-note" id="invite-client-note" hidden>
+            <b>A client is outside the company.</b> They read everything except
+            Decisions (the ADRs, the registers and the conflict log). They can
+            record a verdict, kept as the client review rather than the team's,
+            and they cannot close an item. The <code>@softlabsgroup.com</code>
+            rule does not apply, so the address can be anywhere; you typing it is
+            what vouches for it. The link expires in <b>three days</b> whatever is
+            chosen above.
+          </p>
+          <p class="sh-note" id="invite-role-note"></p>
+          <p class="auth-error" id="invite-error" role="alert" hidden></p>
 
-      <!-- ── the people ───────────────────────────────────────────── -->
-      <section class="admin-panel set-section" id="people">
-        <h2 class="admin-heading">Accounts <span id="account-count" class="admin-count"></span></h2>
-        <p class="auth-note auth-fine">
-          An account is disabled rather than deleted, because a verdict points
-          at the person who gave it. Deleting would either orphan the verdict or
-          take it with them, and both lose something worth keeping.
-        </p>
-        <!-- The two controls on a row look alike and are not alike, and the
-             cheaper one is the one wanted far more often. Saying which is
-             which here means the confirm on the row can be short. -->
-        <p class="auth-note auth-fine">
-          <b>End sessions</b> signs somebody out of every browser and stops
-          there. It is not <b>Disable</b>: the account still works, they can
-          sign back in, and nothing they have recorded moves. It is the answer
-          to a lost laptop or a shared machine, not to somebody leaving.
-        </p>
-        <div class="side-filter-row subsearch-row">
-          <input id="subsearch" class="auth-input subsearch-input" type="search"
-                 placeholder="Filter accounts…" autocomplete="off" />
-          <span class="pane-count" id="subsearch-count"></span>
-        </div>
-        <div id="accounts" class="admin-table"></div>
-        <p class="auth-error" id="account-error" hidden></p>
-      </section>
+          <div id="invite-result" class="ad-result" hidden>
+            <label class="sh-field" for="invite-link"><span>Their link, shown once</span></label>
+            <div class="invite-link-row">
+              <input id="invite-link" class="auth-input" type="text" readonly />
+              <button id="invite-copy" class="chip" type="button">Copy</button>
+            </div>
+            <p class="sh-quiet">
+              Not stored and not recoverable: only a hash of it is kept, so that a
+              copy of the database cannot be used to make accounts. If it is lost,
+              withdraw it below and make another.
+            </p>
+          </div>
 
-      <!-- ── which OpenProject project each package reads ─────────── -->
-      <section class="admin-panel set-section" id="projects">
-        <h2 class="admin-heading">Projects <span id="project-count" class="admin-count"></span></h2>
-        <p class="auth-note">
-          Which OpenProject project each ADAM project reads its work from. A
-          developer's board, a work package lookup and a new link only see work
-          in the project chosen here, so TICVAI tickets never mix with another
-          product's. A project with nothing chosen shows no work at all.
-        </p>
-        <p class="auth-note auth-fine">
-          The list comes from OpenProject using <b>your own token</b>, so it
-          shows the projects you can see there. No token stored yet? Add one on
-          <a href="/settings.html#openproject">your settings page</a>.
-        </p>
-        <div id="projects-list" class="admin-table"></div>
-        <p class="auth-error" id="project-error" hidden></p>
-        <p class="auth-ok" id="project-ok" hidden></p>
-      </section>
+          <div class="sh-part">
+            <div class="sh-part-head">
+              <h3 class="sh-part-title">Invites <span id="invite-count" class="admin-count"></span></h3>
+            </div>
+            <!-- `invites-list`, not `invites`: the section around it is
+                 `#invites`, which is what the rail points at. -->
+            <div id="invites-list"></div>
+          </div>
+        </section>
 
-      <!-- ── a date range, as a file ──────────────────────────────── -->
-      <!-- ── who owns which platform ───────────────────────────────── -->
-      <section class="admin-panel set-section" id="platforms">
-        <h2 class="admin-heading">Platforms</h2>
-        <p class="auth-note">
-          Which slice of the delivery each team lead owns: a side of the house,
-          and a platform within it — or <b>all platforms</b> on that side, which
-          is the grant that covers one added next month without anybody coming
-          back here.
-        </p>
-        <!-- The thing people get wrong about a permission control, said before
-             they use it rather than after. -->
-        <p class="auth-note auth-fine">
-          <b>This is not about what they can see.</b> A team lead reads every
-          change request and all of the activity on the project either way — a
-          lead who cannot see what is coming cannot prepare for it. What a
-          platform decides is narrower: which requests reach their bell, which
-          they may take on, and which they may settle.
-        </p>
-        <p class="auth-note auth-fine" id="platforms-readonly" hidden>
-          Only the super admin hands these out. You can see who holds what.
-        </p>
-        <div id="platforms-list" class="platform-list"></div>
-        <p class="auth-error" id="platforms-error" hidden></p>
-      </section>
+        <!-- ── which OpenProject project each package reads ─────────── -->
+        <section class="admin-panel set-section sh-sheet" id="projects" aria-labelledby="ad-projects-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ad-projects-title">Projects <span id="project-count" class="admin-count"></span></h2>
+          </div>
+          <p class="sh-note">
+            Which OpenProject project each ADAM project reads its work from. A
+            developer's board, a work package lookup and a new link only see work
+            in the project chosen here, so TICVAI tickets never mix with another
+            product's. A project with nothing chosen shows no work at all. The
+            list of choices comes from OpenProject with <b>your own token</b>; no
+            token stored yet? Add one on
+            <a class="sh-link" href="/settings.html#openproject">your settings page</a>.
+          </p>
+          <p class="auth-error" id="project-error" role="alert" hidden></p>
+          <p class="auth-ok" id="project-ok" role="status" hidden></p>
+          <div id="projects-list"></div>
+        </section>
 
-      <section class="admin-panel set-section" id="export">
-        <h2 class="admin-heading">Download a date range</h2>
-        <p class="auth-note">
-          A month of the register, as a CSV. The reviews page exports the rows
-          it is showing you; this one takes a span of dates whether or not
-          anybody has it on screen, which is what a report at the end of a
-          month is made of. Same columns, same wording, so the two files stack.
-        </p>
-        <div class="invite-row export-row">
-          <select id="export-what" class="scope-select export-what"></select>
-          <label class="auth-label export-label" for="export-from">From</label>
-          <input id="export-from" class="auth-input export-date" type="date" />
-          <label class="auth-label export-label" for="export-to">To</label>
-          <input id="export-to" class="auth-input export-date" type="date" />
-          <button id="export-go" class="chip" type="button">Download CSV</button>
-        </div>
-        <!-- Both ends inclusive, and said out loud. A range picker that
-             silently drops the last day's rows is the standard bug here, and it
-             hides well: the file is not empty, only short by a day, so nobody
-             finds it until the totals are already in a slide. -->
-        <p class="auth-note auth-fine">
-          <b>Both dates are included, whole.</b> A row recorded at any time on
-          the <b>To</b> day is in the file. Leave <b>From</b> empty for
-          everything from the beginning, or <b>To</b> empty for everything up to
-          now — the filename says which range you took either way. Dates are
-          read in <b>UTC</b>, which is the only clock anything here is stamped
-          with.
-        </p>
-        <p class="auth-error" id="export-error" hidden></p>
-        <p class="auth-ok" id="export-ok" hidden></p>
-      </section>
+        <!-- ── who owns which platform ───────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="platforms" aria-labelledby="ad-platforms-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ad-platforms-title">Platforms</h2>
+          </div>
+          <p class="sh-note">
+            Which slice of the delivery each team lead and developer owns: a side
+            of the house, and a platform within it, or <b>all platforms</b> on
+            that side, which is the grant that covers one added next month without
+            anybody coming back here.
+          </p>
+          <!-- The thing people get wrong about a permission control, said before
+               they use it rather than after. -->
+          <p class="sh-note">
+            <b>This is not about what they can see.</b> A team lead reads every
+            change request and all of the activity on the project either way. What
+            a platform decides is narrower: which requests reach their bell, which
+            they may take on, and which they may settle.
+          </p>
+          <p class="sh-note" id="platforms-readonly" hidden>
+            Only the System Architect hands these out. You can see who holds what.
+          </p>
+          <p class="auth-error" id="platforms-error" role="alert" hidden></p>
+          <div id="platforms-list" class="platform-list"></div>
+        </section>
 
-      <!-- ── and the same file, back again ────────────────────────── -->
-      <!-- Named, because the reviews page links straight at it: somebody who
-           has just taken an export is looking for this panel, not for the top
-           of a page with four sections above it. -->
-      <section class="admin-panel set-section" id="close-from-sheet">
-        <h2 class="admin-heading">Close items from a spreadsheet</h2>
-        <p class="auth-note">
-          The other end of the download above. Take the range, fill in the
-          <b>our verdict</b> column against the items that have been dealt
-          with — <b>Built</b>, <b>Wired</b>, <b>Answered</b>, <b>Accepted</b> or
-          <b>Approved — no action</b> — and upload it here. The CSV as it came,
-          or the same sheet saved as .xlsx; what the file is read as comes from
-          what is inside it, not from what it is called.
-        </p>
-        <!-- The two presses are the design, so the panel says so before either
-             of them rather than after. A bulk close is the one thing on this
-             page that uploading the right file afterwards cannot put back. -->
-        <p class="auth-note auth-fine">
-          <b>Nothing is written until the second press.</b> Checking the file
-          reports what it would do — what closes, what is already closed, what
-          disagrees with the register and what could not be read — and closes
-          nothing. A blank cell is <b>no decision</b>, not a close, so a sheet
-          full of empty cells does nothing at all. Items already closed are left
-          alone: closing them again would replace who closed them and when with
-          you and today. Rows are matched by the <b>id</b> column, so a file
-          exported before that column existed cannot be applied — take the
-          range again.
-        </p>
-        <div class="invite-row decide-row">
-          <input id="decide-file" class="auth-input decide-file" type="file"
-                 accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-          <button id="decide-check" class="chip" type="button">Check the file</button>
-        </div>
-        <p class="auth-error" id="decide-error" hidden></p>
-        <p class="auth-ok" id="decide-ok" hidden></p>
-        <div id="decide-plan" class="decide-plan" hidden></div>
-        <button id="decide-apply" class="chip decide-apply" type="button" hidden></button>
-      </section>
+        <!-- ── a date range, as a file ──────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="export" aria-labelledby="ad-export-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ad-export-title">Download a date range</h2>
+          </div>
+          <p class="sh-note">
+            A month of a register, as a CSV. The reviews page exports the rows it
+            is showing you; this one takes a span of dates whether or not anybody
+            has it on screen, which is what a report at the end of a month is made
+            of. Same columns, same wording, so the two files stack.
+          </p>
+          <div class="ad-form">
+            <label class="sh-field ad-grow" for="export-what">
+              <span>Register</span>
+              <select id="export-what" class="scope-select"></select>
+            </label>
+            <label class="sh-field" for="export-from">
+              <span>From</span>
+              <input id="export-from" class="sh-input ad-date" type="date" />
+            </label>
+            <label class="sh-field" for="export-to">
+              <span>To</span>
+              <input id="export-to" class="sh-input ad-date" type="date" />
+            </label>
+            <button id="export-go" class="chip ad-go" type="button">Download CSV</button>
+          </div>
+          <!-- Both ends inclusive, and said out loud. A range picker that
+               silently drops the last day's rows is the standard bug here, and it
+               hides well: the file is not empty, only short by a day, so nobody
+               finds it until the totals are already in a slide. -->
+          <p class="sh-note">
+            <b>Both dates are included, whole.</b> A row recorded at any time on
+            the <b>To</b> day is in the file. Leave <b>From</b> empty for
+            everything from the beginning, or <b>To</b> empty for everything up to
+            now; the filename says which range you took either way. Dates are read
+            in UTC, which is the only clock anything here is stamped with.
+          </p>
+          <p class="auth-error" id="export-error" role="alert" hidden></p>
+          <p class="auth-ok" id="export-ok" role="status" hidden></p>
+        </section>
 
-      <!-- ── change requests, out and back ─────────────────────────── -->
-      <!-- Named, because the changes page links straight at it, exactly as the
-           reviews page links at the panel above. -->
-      <section class="admin-panel set-section" id="settle-from-sheet">
-        <h2 class="admin-heading">Settle change requests from a spreadsheet</h2>
-        <p class="auth-note">
-          The same round trip over the other register. Take the range with
-          <b>Change requests</b> selected, fill in the <b>our decision</b>
-          column against the ones that have been settled — <b>Accepted</b>,
-          <b>Rejected</b> or <b>Done</b> — and upload it here. Put the reason in
-          <b>because</b> and the commit, ADR or contract version that settled it
-          in <b>reference</b>. The CSV as it came, or the same sheet saved as
-          .xlsx.
-        </p>
-        <p class="auth-note auth-fine">
-          <b>Nothing is written until the second press.</b> Checking the file
-          reports what it would do and settles nothing. The column is
-          <b>blank for every open request</b> when the file is downloaded, and a
-          blank cell is <b>no decision</b> — so a sheet you have not touched does
-          nothing at all. A <b>rejection needs a reason</b>, here or already
-          stored, because that is what the person who raised it reads. Rows are
-          matched by the <b>id</b> column, not by <b>CR-007</b>: that number is
-          counted per project, and two projects both have one.
-        </p>
-        <!-- The one thing a reader has to know before pressing anything, and it
-             is the difference from the panel above rather than a repeat of it.
-             A file may answer an open request and may complete an accepted one.
-             It may not reopen anything, and it may not overrule an answer
-             somebody already recorded — both of those throw away who settled it
-             and when, which re-uploading the right file afterwards cannot
-             restore. They are listed, not applied. -->
-        <p class="auth-note auth-fine">
-          A file can <b>answer an open request</b> and <b>complete an accepted
-          one</b>. It cannot reopen a settled request or overrule how one was
-          already answered — those are listed for you to look at and left
-          untouched, because they are decisions about a single request and are
-          made on it, on the changes page.
-        </p>
-        <div class="invite-row decide-row">
-          <input id="settle-file" class="auth-input decide-file" type="file"
-                 accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-          <button id="settle-check" class="chip" type="button">Check the file</button>
-        </div>
-        <p class="auth-error" id="settle-error" hidden></p>
-        <p class="auth-ok" id="settle-ok" hidden></p>
-        <div id="settle-plan" class="decide-plan" hidden></div>
-        <button id="settle-apply" class="chip decide-apply" type="button" hidden></button>
-      </section>
+        <!-- ── and a sheet, back again ──────────────────────────────────
+             One section for both uploads, with the register chosen first:
+             review items are closed from a sheet and change requests are
+             settled from one, and the two panels this replaced were the same
+             machine with different words. The reviews and changes pages still
+             link at their old names (#close-from-sheet, #settle-from-sheet);
+             admin.js sends those here with the right register picked. -->
+        <section class="admin-panel set-section sh-sheet" id="upload" aria-labelledby="ad-upload-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ad-upload-title">Upload a decision sheet</h2>
+          </div>
+          <p class="sh-note">
+            The other end of the download. Take a range, fill in the decision
+            column against the rows that have been dealt with, and upload it here:
+            the CSV as it came, or the same sheet saved as .xlsx. <b>Nothing is
+            written until the second press.</b> Checking the file reports what it
+            would do and changes nothing; a blank cell is no decision, so a sheet
+            you have not touched does nothing at all. Rows are matched by the
+            <b>id</b> column.
+          </p>
+          <div class="sh-field ad-register">
+            <span id="ad-register-label">Which register is the sheet from?</span>
+            <div class="sh-switch" role="group" aria-labelledby="ad-register-label">
+              <button type="button" data-register="verdicts" aria-pressed="true">Review items</button>
+              <button type="button" data-register="changes" aria-pressed="false">Change requests</button>
+            </div>
+          </div>
 
-      <!-- ── your own password ────────────────────────────────────── -->
-      <!-- Moved to the settings page, which everybody can open. Here it was
-           behind the admin gate, so a reviewer had no way to change their own
-           password at all. A pointer stays for whoever looks for it here. -->
-      <section class="admin-panel set-section" id="password">
-        <h2 class="admin-heading">Your password</h2>
-        <p class="auth-note">
-          Your own password, OpenProject token and sessions are on
-          <a href="/settings.html#password">your settings page</a>.
-        </p>
-      </section>
+          <div class="ad-register-panel" id="close-from-sheet" data-register="verdicts">
+            <p class="sh-note">
+              Fill in <b>our verdict</b> against the items that have been dealt
+              with: <b>Built</b>, <b>Wired</b>, <b>Answered</b>, <b>Accepted</b> or
+              <b>Approved, no action</b>. Items already closed are left alone:
+              closing them again would replace who closed them and when with you
+              and today. A file exported before the <b>id</b> column existed
+              cannot be applied; take the range again.
+            </p>
+            <div class="ad-form">
+              <label class="sh-field ad-grow" for="decide-file">
+                <span>The sheet</span>
+                <input id="decide-file" class="sh-input decide-file" type="file"
+                       accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+              </label>
+              <button id="decide-check" class="chip ad-go" type="button">Check the file</button>
+            </div>
+            <p class="auth-error" id="decide-error" role="alert" hidden></p>
+            <p class="auth-ok" id="decide-ok" role="status" hidden></p>
+            <div id="decide-plan" class="decide-plan" hidden></div>
+            <button id="decide-apply" class="chip decide-apply" type="button" hidden></button>
+          </div>
+
+          <div class="ad-register-panel" id="settle-from-sheet" data-register="changes" hidden>
+            <p class="sh-note">
+              Download the range with <b>Change requests</b> chosen, fill in
+              <b>our decision</b> against the ones that have been settled
+              (<b>Accepted</b>, <b>Rejected</b> or <b>Done</b>), the reason in
+              <b>because</b>, and the commit, ADR or contract version in
+              <b>reference</b>. A <b>rejection needs a reason</b>, here or already
+              stored, because that is what the person who raised it reads.
+            </p>
+            <!-- The one thing a reader has to know before pressing anything, and
+                 it is the difference from review items rather than a repeat. A
+                 file may answer an open request and may complete an accepted
+                 one. It may not reopen anything, and it may not overrule an
+                 answer somebody already recorded: both throw away who settled it
+                 and when, which re-uploading the right file afterwards cannot
+                 restore. They are listed, not applied. -->
+            <p class="sh-note">
+              A file can <b>answer an open request</b> and <b>complete an accepted
+              one</b>. It cannot reopen a settled request or overrule how one was
+              already answered; those are listed for you to look at and left
+              untouched, because they are decisions about a single request and are
+              made on it, on the changes page.
+            </p>
+            <div class="ad-form">
+              <label class="sh-field ad-grow" for="settle-file">
+                <span>The sheet</span>
+                <input id="settle-file" class="sh-input decide-file" type="file"
+                       accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+              </label>
+              <button id="settle-check" class="chip ad-go" type="button">Check the file</button>
+            </div>
+            <p class="auth-error" id="settle-error" role="alert" hidden></p>
+            <p class="auth-ok" id="settle-ok" role="status" hidden></p>
+            <div id="settle-plan" class="decide-plan" hidden></div>
+            <button id="settle-apply" class="chip decide-apply" type="button" hidden></button>
+          </div>
+        </section>
       </main>
     </div>
 
-    <script type="module">
-      // The viewer's top bar on a page that is not the viewer: the layer tabs,
-      // the bell and the account drawer. Eight pages had none of it.
-      import '/page-chrome.js';
-      import {
-        authState, listAccounts, setAccountActive, setAccountRole,
-        createInvite, listInvites, revokeInvite, logoutAccount,
-        makeReset,
-        listPmsProjects, availablePmsProjects, setPmsProject, clearPmsProject,
-        isAdmin, isOwner, roleLabel,
-      } from '/validation.js';
-      import { attachSubSearch } from '/subsearch.js';
-      // The list on the left, following what is on screen. Shared with the
-      // settings and tasks pages, which are the same page shape.
-      import { followSections } from '/sections.js';
-      import '/theme.js';                      // the saved day/night choice
-      import { hideLoader } from '/loader.js'; // and the curtain over the wait
-      // The CSV export lives in its own module rather than down here with the
-      // rest: it is the one panel that talks to the service without going
-      // through validation.js, because a file is a body to be saved rather than
-      // JSON to be read, and that difference is worth a page of reasoning it
-      // would be a shame to bury in the middle of the invites.
-      import { mountExport } from '/admin-export.js';
-      // And its other end, for the same reason: it posts a file rather than
-      // JSON, and the two presses that stand between an upload and two hundred
-      // settled items are worth explaining where they happen. Two panels out of
-      // one module, because the machinery is the same and only the register and
-      // the words differ.
-      import { mountDecisions, mountChangeImport } from '/admin-decisions.js';
-      // Who owns which platform. Its own module for the same reason as the two
-      // above: it reads the package for the platform list, which nothing else
-      // on this page does.
-      import { mountPlatforms } from '/admin-platforms.js';
-
-      const $ = (id) => document.getElementById(id);
-      const el = (tag, cls, text) => {
-        const n = document.createElement(tag);
-        if (cls) n.className = cls;
-        if (text instanceof Node) n.append(text);
-        else if (text != null) n.textContent = text;
-        return n;
-      };
-      const when = (iso) => {
-        if (!iso) return '—';
-        const d = new Date(iso);
-        return Number.isNaN(+d) ? iso
-          : d.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-      };
-
-      let me = null;
-
-      const state = await authState().catch(() => null);
-      if (!state || !state.signedIn) {
-        // Lowered before the navigation, not after: a curtain left up over a
-        // redirect reads as the redirect having stalled.
-        hideLoader();
-        location.href = `/login.html?next=${encodeURIComponent('/admin.html')}`;
-      } else if (!isAdmin(state.account)) {
-        $('denied').hidden = false;
-        $('whoami').textContent = state.account.email;
-        hideLoader();
-      } else {
-        me = state.account;
-        // The role, not the word "admin": an owner reading this page is not
-        // an admin and should not be told they are.
-        $('whoami').textContent = `${me.email} · ${roleLabel(me.role)}`;
-        $('admin').hidden = false;
-        followSections('invite');
-        // A link straight at a section - the reviews page sends people to
-        // #close-from-sheet - lands before the panels exist, so the browser has
-        // nothing to scroll to. Repeated here now that they do.
-        if (location.hash) $(location.hash.slice(1))?.scrollIntoView();
-        // Wired before the lists are fetched, because it needs neither of them
-        // — the export asks the service for its own rows when it is pressed.
-        mountExport();
-        // Same, and for the same reason: it asks the service about the file it
-        // is handed and needs nothing either list below has fetched. Nothing on
-        // this page shows a verdict, so an apply has nothing here to refresh —
-        // what it changed is on the reviews page, and the panel says what it
-        // did rather than sending anybody there to check.
-        mountDecisions();
-        // The same panel over the other register. Change requests are settled
-        // rather than closed and have one more bucket, which is a difference in
-        // the spec it is handed rather than in anything here.
-        mountChangeImport();
-        // Reads on its own, so it is not awaited with the lists below — and a
-        // failure in it leaves the rest of the page standing.
-        $('platforms-readonly').hidden = isOwner(me);
-        mountPlatforms();
-        // Both lists, because the page is not drawn until it has both — and
-        // allSettled rather than all, so one failing still shows the page it
-        // failed on rather than leaving the curtain up over it.
-        Promise.allSettled([refreshInvites(), refreshAccounts()]).then(hideLoader);
-        // Not awaited with the others: it waits on OpenProject, which is slower
-        // than this service and should not hold the curtain up.
-        refreshProjects();
-      }
-
-      // ── invites ────────────────────────────────────────────────
-      async function refreshInvites() {
-        const box = $('invites-list');
-        box.innerHTML = '';
-        let invites = [];
-        try { ({ invites } = await listInvites()); }
-        catch { box.append(el('p', 'pane-note', 'Could not read the invites.')); return; }
-
-        const open = invites.filter((i) => i.state === 'open').length;
-        $('invite-count').textContent = `${open} open of ${invites.length}`;
-        if (!invites.length) {
-          box.append(el('p', 'pane-note', 'Nobody has been invited yet.'));
-          return;
-        }
-        for (const invite of invites) {
-          const row = el('div', `admin-row invite-row-item ${invite.state}`);
-          row.append(el('span', 'invite-state', invite.state));
-          row.append(el('span', 'invite-who', invite.email));
-          row.append(el('span', 'invite-role',
-            `${roleLabel(invite.role)} · ${invite.project_name || invite.project_id || '—'}`));
-          row.append(el('span', 'admin-when',
-            invite.state === 'open' ? `expires ${when(invite.expires_at)}`
-              : invite.redeemed_at ? `used ${when(invite.redeemed_at)}`
-              : invite.revoked_at ? `withdrawn ${when(invite.revoked_at)}`
-              : `expired ${when(invite.expires_at)}`));
-          if (invite.state === 'open') {
-            const revoke = el('button', 'chip', 'Withdraw');
-            revoke.type = 'button';
-            revoke.onclick = async () => {
-              revoke.disabled = true;
-              try { await revokeInvite(invite.id); } catch { /* the refresh shows the truth */ }
-              refreshInvites();
-            };
-            row.append(revoke);
-          } else {
-            row.append(el('span'));
-          }
-          box.append(row);
-        }
-      }
-
-      // The placeholder and the note follow the role, because the address rule
-      // is the thing that changes and an @softlabsgroup.com placeholder above a
-      // guest invite reads as a refusal waiting to happen.
-      $('invite-role').onchange = () => {
-        const client = $('invite-role').value === 'client';
-        $('invite-client-note').hidden = !client;
-        $('invite-email').placeholder = client
-          ? 'them@theircompany.com'
-          : 'them@softlabsgroup.com';
-      };
-
-      $('invite-create').onclick = async () => {
-        $('invite-error').hidden = true;
-        $('invite-result').hidden = true;
-        $('invite-create').disabled = true;
-        try {
-          const invite = await createInvite(
-            $('invite-email').value.trim(),
-            $('invite-role').value,
-            Number($('invite-days').value),
-            $('invite-project').value,
-          );
-          $('invite-link').value = `${location.origin}${invite.link}`;
-          $('invite-result').hidden = false;
-          $('invite-email').value = '';
-          refreshInvites();
-        } catch (error) {
-          $('invite-error').textContent = error.message;
-          $('invite-error').hidden = false;
-        } finally {
-          $('invite-create').disabled = false;
-        }
-      };
-
-      $('invite-copy').onclick = async () => {
-        $('invite-link').select();
-        try {
-          await navigator.clipboard.writeText($('invite-link').value);
-          $('invite-copy').textContent = 'Copied';
-        } catch {
-          $('invite-copy').textContent = 'Press Ctrl+C';
-        }
-        setTimeout(() => { $('invite-copy').textContent = 'Copy'; }, 1600);
-      };
-
-      // The invite form's project picker. Open projects only; the choice made
-      // before a refresh is kept.
-      function fillInviteProjects(projects) {
-        const pick = $('invite-project');
-        const was = pick.value;
-        pick.innerHTML = '';
-        for (const project of projects.filter((p) => p.active)) {
-          const option = el('option', null, project.name || project.id);
-          option.value = project.id;
-          pick.append(option);
-        }
-        if (was && [...pick.options].some((o) => o.value === was)) pick.value = was;
-      }
-
-      // ── projects ───────────────────────────────────────────────
-      async function refreshProjects() {
-        const box = $('projects-list');
-        const say = (id, text) => { $(id).textContent = text; $(id).hidden = !text; };
-        box.innerHTML = '';
-        say('project-error', '');
-
-        let projects = [];
-        try { ({ projects } = await listPmsProjects()); }
-        catch (error) { box.append(el('p', 'pane-note', `Could not read the projects: ${error.message}`)); return; }
-        fillInviteProjects(projects);
-        const chosen = projects.filter((p) => p.openproject).length;
-        $('project-count').textContent = `${chosen} of ${projects.length} connected`;
-
-        // The choices. A missing token is a thing to go and fix, not a failure:
-        // the rows still draw, with what is chosen today, and no picker.
-        let options = null;
-        try { ({ projects: options } = await availablePmsProjects()); }
-        catch (error) {
-          say('project-error', error.status === 428
-            ? 'Store your OpenProject token on your settings page to choose projects here.'
-            : `Could not read the OpenProject projects: ${error.message}`);
-        }
-
-        for (const project of projects) {
-          const row = el('div', `admin-row project-row${project.active ? '' : ' disabled'}`);
-          const who = el('span', 'project-who');
-          who.append(el('b', null, project.name || project.id), el('span', 'admin-when', ` ${project.id}`));
-          row.append(who);
-
-          const now = el('span', 'project-now');
-          if (project.openproject) {
-            const link = el('a', null, `${project.openproject.name} (${project.openproject.identifier})`);
-            link.href = project.openproject.url;
-            link.target = '_blank';
-            link.rel = 'noopener';
-            now.append(link);
-          } else {
-            now.append(el('span', 'pane-note', 'nothing chosen'));
-          }
-          row.append(now);
-
-          if (options) {
-            const pick = el('select', 'scope-select project-pick');
-            pick.setAttribute('aria-label', `OpenProject project for ${project.name || project.id}`);
-            const blank = el('option', null, 'Choose an OpenProject project…');
-            blank.value = '';
-            pick.append(blank);
-            for (const option of options) {
-              const item = el('option', null, `${option.name} (${option.identifier})`);
-              item.value = String(option.id);
-              item.selected = option.id === project.openproject?.id;
-              pick.append(item);
-            }
-            const save = el('button', 'chip', 'Save');
-            save.type = 'button';
-            save.onclick = async () => {
-              if (!pick.value) { say('project-error', 'Choose a project first.'); return; }
-              save.disabled = true;
-              say('project-error', ''); say('project-ok', '');
-              try {
-                const { project: saved } = await setPmsProject(project.id, Number(pick.value));
-                say('project-ok', `${saved.name || saved.id} now reads ${saved.openproject.name}.`);
-                refreshProjects();
-              } catch (error) {
-                say('project-error', error.message);
-                save.disabled = false;
-              }
-            };
-            row.append(pick, save);
-          } else {
-            row.append(el('span'), el('span'));
-          }
-
-          const clear = el('button', 'chip', 'Clear');
-          clear.type = 'button';
-          // Kept in the row when there is nothing to clear, so the columns
-          // line up with the rows that have one.
-          if (!project.openproject) { clear.style.visibility = 'hidden'; clear.disabled = true; }
-          clear.onclick = async () => {
-            if (!confirm(`Stop ${project.name || project.id} reading any OpenProject project? Its boards go empty until one is chosen.`)) return;
-            clear.disabled = true;
-            try { await clearPmsProject(project.id); say('project-ok', `${project.name || project.id} reads no OpenProject project now.`); }
-            catch (error) { say('project-error', error.message); }
-            refreshProjects();
-          };
-          row.append(clear);
-          box.append(row);
-        }
-      }
-
-      // ── accounts ───────────────────────────────────────────────
-      async function refreshAccounts() {
-        const box = $('accounts');
-        box.innerHTML = '';
-        let accounts = [];
-        try { ({ accounts } = await listAccounts()); }
-        catch { box.append(el('p', 'pane-note', 'Could not read the accounts.')); return; }
-
-        const live = accounts.filter((a) => a.active).length;
-        $('account-count').textContent = `${live} active of ${accounts.length}`;
-
-        for (const person of accounts) {
-          const row = el('div', `admin-row account-row${person.active ? '' : ' disabled'}`);
-          row.append(el('span', 'account-name', person.name || '—'));
-          row.append(el('span', 'invite-who', person.email + (person.id === me.id ? ' (you)' : '')));
-
-          const role = el('select', 'scope-select admin-role');
-          // Every role the service will accept here. The System Architect is
-          // deliberately absent: /api/accounts/{id}/role refuses that role in
-          // both directions, so offering it would be offering a refusal. It is
-          // set on the machine, with `python -m api.cli owner <address>` — the
-          // CLI still spells it `owner`, which is the stored value everywhere.
-          for (const value of ['reviewer', 'dev', 'lead', 'pm', 'admin', 'client']) {
-            const option = el('option', null, roleLabel(value));
-            option.value = value;
-            if (person.role === value) option.selected = true;
-            role.append(option);
-          }
-          // The System Architect's row shows the role and offers nothing, rather
-          // than a picker whose every option is a 403.
-          if (isOwner(person)) {
-            const only = el('option', null, roleLabel('owner'));
-            only.value = 'owner';
-            only.selected = true;
-            role.replaceChildren(only);
-          }
-          role.disabled = person.id === me.id || isOwner(person);
-          role.onchange = async () => {
-            $('account-error').hidden = true;
-            try { await setAccountRole(person.id, role.value); }
-            catch (error) {
-              $('account-error').textContent = error.message;
-              $('account-error').hidden = false;
-            }
-            refreshAccounts();
-          };
-          row.append(role);
-
-          row.append(el('span', 'admin-when',
-            `${person.verdicts} verdict${person.verdicts === 1 ? '' : 's'}`));
-
-          if (person.id === me.id) {
-            row.append(el('span', 'admin-when', 'active'));
-          } else {
-            const toggle = el('button', 'chip', person.active ? 'Disable' : 'Enable');
-            toggle.type = 'button';
-            toggle.onclick = async () => {
-              $('account-error').hidden = true;
-              toggle.disabled = true;
-              try { await setAccountActive(person.id, !person.active); }
-              catch (error) {
-                $('account-error').textContent = error.message;
-                $('account-error').hidden = false;
-              }
-              refreshAccounts();
-            };
-            row.append(toggle);
-          }
-          // Your own row does not get one. The route would take the session
-          // this page is running on without clearing the cookie, so the page
-          // would carry on looking signed in while every call from it failed.
-          // Signing yourself out everywhere lives in the account panel in the
-          // viewer, which knows to go to the door afterwards.
-          row.append(resetControl(person, row));
-          row.append(person.id === me.id ? el('span') : endSessionsControl(person, row));
-          box.append(row);
-        }
-      }
-
-      /**
-       * End one person's sessions, from the row they are on.
-       *
-       * Opens rather than acts, like Send back on the reviews page. The press
-       * that matters is the second one, and what sits between them is a
-       * sentence about which of the two controls on this row was just
-       * reached for — Disable and End sessions read the same at a glance and
-       * one of them takes somebody's account away.
-       *
-       * The count comes back and is shown, because "ended 3 sessions" and
-       * "they had none open" are different answers and the difference is
-       * usually the thing being checked.
-       */
-      /**
-       * A link that lets one person set a new password.
-       *
-       * The admin makes the link and passes it on; the password itself is
-       * chosen behind it, by them, and is never seen here. An admin who could
-       * type somebody's password could sign in as them and leave verdicts under
-       * their name, and the review is only worth what its authorship is worth.
-       *
-       * Shown for every row including your own — losing your own password is
-       * the ordinary case, and a second admin making you a link is exactly the
-       * route the sign-in page tells people to ask for.
-       *
-       * The link is joined to this page's own origin rather than sent whole by
-       * the service, which is reachable on more than one name and cannot know
-       * which of them the person on the other end has to use.
-       */
-      function resetControl(person, row) {
-        const cell = el('span', 'account-reset');
-        const make = el('button', 'chip', 'Reset password');
-        make.type = 'button';
-        make.title = 'Make a link that lets them set a new password.';
-        cell.append(make);
-
-        make.onclick = async () => {
-          make.disabled = true;
-          $('account-error').hidden = true;
-          try {
-            const reset = await makeReset(person.id);
-            const url = `${location.origin}${reset.link}`;
-
-            const box = el('div', 'account-reset-link');
-            const field = el('input', 'auth-input');
-            field.readOnly = true;
-            field.value = url;
-            const copy = el('button', 'chip', 'Copy');
-            copy.type = 'button';
-            copy.onclick = async () => {
-              field.select();
-              try {
-                await navigator.clipboard.writeText(url);
-                copy.textContent = 'Copied';
-              } catch {
-                // clipboard access is refused outright in some browsers, and
-                // the field is already selected, so say what to press instead
-                copy.textContent = 'Press Ctrl+C';
-              }
-              setTimeout(() => { copy.textContent = 'Copy'; }, 1600);
-            };
-
-            box.append(field, copy);
-            box.append(el('p', 'auth-note auth-fine',
-              `Send this to ${person.email} however you already talk to them. It works `
-              + 'once, expires in a day, and ends every session they have open when '
-              + 'they use it. Making another link withdraws this one.'));
-            // Appended to the row, not the cell: it spans every column, the way
-            // the End sessions confirm below does.
-            row.append(box);
-            make.remove();
-          } catch (error) {
-            $('account-error').textContent = error.message;
-            $('account-error').hidden = false;
-            make.disabled = false;
-          }
-        };
-        return cell;
-      }
-
-      function endSessionsControl(person, row) {
-        const cell = el('span', 'account-sessions');
-        const open = el('button', 'chip', 'End sessions');
-        open.type = 'button';
-        open.title = 'Sign them out of every browser, without touching the account.';
-        cell.append(open);
-
-        open.onclick = () => {
-          open.disabled = true;
-          const ask = el('div', 'account-sessions-ask');
-          ask.append(el('p', 'auth-note auth-fine',
-            `Signs ${person.email} out of every browser and device. The account `
-            + 'stays enabled — they can sign straight back in — and the '
-            + `${person.verdicts} verdict${person.verdicts === 1 ? '' : 's'} they have `
-            + `recorded ${person.verdicts === 1 ? 'keeps' : 'keep'} their name. `
-            + 'This is not Disable.'));
-
-          const cancel = el('button', 'chip', 'Cancel');
-          cancel.type = 'button';
-          cancel.onclick = () => { ask.remove(); open.disabled = false; };
-
-          const go = el('button', 'chip', 'End their sessions');
-          go.type = 'button';
-          go.onclick = async () => {
-            go.disabled = true;
-            cancel.disabled = true;
-            $('account-error').hidden = true;
-            try {
-              const { dropped } = await logoutAccount(person.id);
-              open.remove();
-              ask.innerHTML = '';
-              ask.append(el('p', 'auth-note auth-fine', dropped
-                ? `Ended ${dropped} session${dropped === 1 ? '' : 's'}. `
-                  + 'The account is untouched.'
-                : 'They had no sessions open. Nothing to end.'));
-            } catch (error) {
-              $('account-error').textContent = error.message;
-              $('account-error').hidden = false;
-              go.disabled = false;
-              cancel.disabled = false;
-            }
-          };
-
-          ask.append(go, cancel);
-          row.append(ask);
-        };
-        return cell;
-      }
-
-      // Narrowing the accounts list. Ninety rows and no way to find one but
-      // Ctrl+F, which highlights the name and leaves the other eighty-nine on
-      // the screen around it. Re-applies as the list redraws — changing a role
-      // rebuilds every row.
-      attachSubSearch(
-        $('subsearch'),
-        [{ box: $('accounts'), rows: '.account-row' }],
-        { count: $('subsearch-count'), noun: 'accounts' },
-      );
-    </script>
+    <script type="module" src="/admin.js"></script>
   </body>
 </html>

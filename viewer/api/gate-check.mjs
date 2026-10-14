@@ -143,7 +143,9 @@ const second = await fetch(`${API}/api/auth/bootstrap`, {
 check('and a second one is refused outright', second.status === 409, `${second.status}`);
 
 // ── the accounts page ────────────────────────────────────────────────
-await page.goto(`${VIEWER}/admin.html`, { waitUntil: 'networkidle2' });
+// At the invite section, which is typed into below; the page shows one
+// section at a time, and the account rows are read whether shown or not.
+await page.goto(`${VIEWER}/admin.html#invites`, { waitUntil: 'networkidle2' });
 await wait(2000);
 const admin = await page.evaluate(() => ({
   shown: !document.querySelector('#admin').hidden,

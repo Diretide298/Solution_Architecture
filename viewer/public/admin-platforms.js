@@ -22,6 +22,7 @@ import {
   listScopes, listAccounts, grantScope, revokeScope, project, isOwner, account,
   roleLabel,
 } from '/validation.js';
+import { el, table, confirmStep, personLink } from '/sheet.js';
 
 /** Which platforms exist, from the package rather than from a list kept here.
  *
@@ -53,27 +54,31 @@ async function platformsOf(projectId) {
 
 const SIDES = [['frontend', 'Frontend'], ['backend', 'Backend']];
 
-export async function mountPlatforms() {
+/**
+ * Draws the platforms section. `onChange` is told after a grant or a
+ * revoke, so the page's "needs you" list can stop naming somebody who now
+ * holds one.
+ *
+ * `me` is the account the page signed in with. It is handed in rather than
+ * read from `account()`, because that is filled by whichever other module
+ * asked the service first, and on this page nothing had always asked by the
+ * time this ran: the System Architect was shown the read-only list.
+ */
+export async function mountPlatforms({ me, onChange } = {}) {
   const $ = (id) => document.getElementById(id);
   const host = $('platforms-list');
   if (!host) return;
 
-  const el = (tag, cls, text) => {
-    const n = document.createElement(tag);
-    if (cls) n.className = cls;
-    if (text != null) n.textContent = text;
-    return n;
-  };
   const error = $('platforms-error');
   const say = (message) => {
     error.textContent = message;
     error.hidden = !message;
   };
 
-  const mayEdit = isOwner(account());
+  const mayEdit = isOwner(me ?? account());
   // Which project, decided by the service rather than by the address. This page
   // names none, and asking for scopes with an empty id is how the service is
-  // told "the one this account reads" — so the id comes back with the answer
+  // told "the one this account reads", so the id comes back with the answer
   // and everything after it can be specific.
   let projectId = project() ?? '';
   let platforms = null;
@@ -88,7 +93,7 @@ export async function mountPlatforms() {
       projectId = mine.project ?? projectId;
       people = roster.accounts ?? [];
     } catch (failure) {
-      say(failure.message);
+      say(`Could not read who holds which platform: ${failure.message}. Reload the page to try again.`);
       return;
     }
     // Once, after the project is known. A failure here is survivable: the
@@ -96,9 +101,10 @@ export async function mountPlatforms() {
     // shape of anything typed anyway.
     if (platforms === null) platforms = await platformsOf(projectId);
 
-    // Only the roles a slice means anything for. An owner, an admin and a pm
-    // are whole rather than scoped, and the service refuses a grant on one —
-    // so listing them here would be listing rows whose every control is a 409.
+    // Only the roles a slice means anything for. A System Architect, an admin
+    // and a pm are whole rather than scoped, and the service refuses a grant on
+    // one, so listing them here would be listing rows whose every control is a
+    // refusal.
     const scopable = people.filter((p) => ['lead', 'dev'].includes(p.role) && p.active);
     const held = new Map();
     for (const s of scopes) {
@@ -106,73 +112,82 @@ export async function mountPlatforms() {
       held.get(s.account.id).push(s);
     }
 
-    host.innerHTML = '';
-    if (!scopable.length) {
-      host.append(el('p', 'auth-note auth-fine',
-        'Nobody holds a team lead or developer role yet. Set one on the Accounts '
-        + 'panel above, and they can be given a platform here.'));
-      return;
-    }
+    host.replaceChildren(table({
+      caption: 'Every active team lead and developer, and the platforms they own',
+      columns: [
+        {
+          key: 'name', label: 'Person',
+          render: (p) => (p.name ? personLink(p.name) : el('span', '', p.email)),
+          sort: (p) => (p.name || p.email).toLowerCase(),
+        },
+        { key: 'role', label: 'Role', render: (p) => roleLabel(p.role), sort: (p) => p.role },
+        { key: 'holds', label: 'Owns', render: (p) => chips(p, held.get(p.id) ?? []) },
+        ...(mayEdit ? [{ key: 'give', label: 'Give another', render: (p) => giver(p) }] : []),
+      ],
+      rows: scopable,
+      empty: 'Nobody holds a team lead or developer role yet. Set one under Accounts, '
+        + 'and they can be given a platform here.',
+    }));
+  }
 
-    for (const person of scopable) {
-      const row = el('div', 'admin-row platform-row');
-      row.append(el('span', 'account-name', person.name || '—'));
-      row.append(el('span', 'invite-who', `${person.email} · ${roleLabel(person.role)}`));
-
-      const chips = el('div', 'platform-chips');
-      const mine = held.get(person.id) ?? [];
-      if (!mine.length) {
-        chips.append(el('span', 'platform-none', 'no platforms yet'));
-      }
-      for (const s of mine) {
-        const chip = el('span', 'platform-chip', s.says);
-        if (mayEdit) {
-          const drop = el('button', 'platform-drop', '×');
-          drop.type = 'button';
-          drop.title = `Take back ${s.says}`;
-          drop.onclick = async () => {
-            drop.disabled = true;
-            try { await revokeScope(s.id); await draw(); }
-            catch (failure) { say(failure.message); drop.disabled = false; }
-          };
-          chip.append(drop);
-        }
-        chips.append(chip);
-      }
-      row.append(chips);
-
+  /** What somebody owns, each with a way to take it back. Taking one back
+   *  asks first: it moves their change requests out of their bell, and they
+   *  may stop being allowed to settle ones they had started on. */
+  function chips(person, mine) {
+    const box = el('div', 'platform-chips');
+    if (!mine.length) box.append(el('span', 'platform-none', 'No platform yet'));
+    const who = person.name || person.email;
+    for (const s of mine) {
+      const chip = el('span', 'platform-chip', s.says);
       if (mayEdit) {
-        const side = el('select', 'scope-select');
-        for (const [value, label] of SIDES) {
-          const option = el('option', null, label);
-          option.value = value;
-          side.append(option);
-        }
-        const where = el('select', 'scope-select');
-        // "All platforms" first and selected, because it is the grant that does
-        // not go stale: a lead who owns the whole side owns the platform added
-        // next month without anybody remembering to come back here.
-        const all = el('option', null, 'All platforms');
-        all.value = '';
-        where.append(all);
-        for (const p of platforms) {
-          const option = el('option', null, `${p.code} · ${p.name}`);
-          option.value = p.code;
-          where.append(option);
-        }
-        const add = el('button', 'chip', 'Give');
-        add.type = 'button';
-        add.onclick = async () => {
-          add.disabled = true;
-          try { await grantScope(person.id, projectId, side.value, where.value); await draw(); }
-          catch (failure) { say(failure.message); }
-          finally { add.disabled = false; }
+        const drop = el('button', 'platform-drop', '×');
+        drop.type = 'button';
+        drop.title = `Take back ${s.says}`;
+        drop.setAttribute('aria-label', `Take ${s.says} back from ${who}`);
+        drop.onclick = async () => {
+          const yes = await confirmStep(box, {
+            say: `Take ${s.says} back from ${who}? Its change requests stop reaching their bell, `
+              + 'and they can no longer settle them.',
+            action: 'Take it back',
+          });
+          if (!yes) return;
+          drop.disabled = true;
+          try { await revokeScope(s.id); await draw(); onChange?.(); }
+          catch (failure) { say(`${who} still owns ${s.says}: ${failure.message}`); drop.disabled = false; }
         };
-        row.append(side, where, add);
+        chip.append(drop);
       }
-
-      host.append(row);
+      box.append(chip);
     }
+    return box;
+  }
+
+  /** Side, platform, Give. Giving is not asked twice: it adds to somebody's
+   *  bell, and taking it back is one press away in the cell beside it. */
+  function giver(person) {
+    const who = person.name || person.email;
+    const box = el('div', 'platform-give');
+    const side = el('select', 'scope-select');
+    side.setAttribute('aria-label', `Side to give ${who}`);
+    for (const [value, label] of SIDES) side.append(new Option(label, value));
+    const where = el('select', 'scope-select');
+    where.setAttribute('aria-label', `Platform to give ${who}`);
+    // "All platforms" first and selected, because it is the grant that does
+    // not go stale: a lead who owns the whole side owns the platform added
+    // next month without anybody remembering to come back here.
+    where.append(new Option('All platforms', ''));
+    for (const p of platforms) where.append(new Option(`${p.code}: ${p.name}`, p.code));
+    const add = el('button', 'chip', 'Give');
+    add.type = 'button';
+    add.setAttribute('aria-label', `Give ${who} the chosen platform`);
+    add.onclick = async () => {
+      add.disabled = true;
+      try { await grantScope(person.id, projectId, side.value, where.value); await draw(); onChange?.(); }
+      catch (failure) { say(`${who} was not given it: ${failure.message}`); }
+      finally { add.disabled = false; }
+    };
+    box.append(side, where, add);
+    return box;
   }
 
   await draw();

@@ -765,7 +765,17 @@ def list_accounts(admin: dict = Depends(require_admin)):
                   (SELECT COUNT(*) FROM verdict v WHERE v.account_id = a.id) AS verdicts
              FROM account a ORDER BY a.id"""
     )
-    return {"accounts": [dict(r) for r in rows]}
+    # Which packages each one may open, so the page can say it beside the role
+    # rather than leave "who can see TICVAI" to a guess. An administrator reads
+    # every project whatever these rows say (see projects_for), and the page
+    # says that instead of listing them.
+    held: dict = {}
+    for r in db.all_rows(
+            "SELECT ap.account_id, ap.project_id, ap.role, p.name FROM account_project ap "
+            "JOIN project p ON p.id = ap.project_id ORDER BY ap.project_id"):
+        held.setdefault(r["account_id"], []).append(
+            {"id": r["project_id"], "name": r["name"], "role": r["role"]})
+    return {"accounts": [{**dict(r), "projects": held.get(r["id"], [])} for r in rows]}
 
 
 @app.post("/api/accounts/{account_id}/active")
@@ -829,6 +839,60 @@ def set_role(account_id: int, role: str, admin: dict = Depends(require_admin)):
         raise HTTPException(409, "That is the last admin.")
     db.write("UPDATE account SET role = ? WHERE id = ?", (role, account_id))
     return {"ok": True, "role": role}
+
+
+@app.put("/api/accounts/{account_id}/projects/{project_id}")
+def grant_project(account_id: int, project_id: str, admin: dict = Depends(require_admin)):
+    """Let an existing account open another project. Admin only.
+
+    Until this, the only thing that wrote `account_project` was redeeming an
+    invite, so somebody already on TICVAI who was needed on a second package
+    had no way in short of a second account under a second address — which
+    splits their verdicts across two names.
+
+    **The project role is derived, never chosen**, by the same rule redemption
+    uses: a client is a client on every project, and everybody else is a
+    reviewer there. A picker for it would offer a way to make a client a
+    reviewer on one package, which is a decision about the person and is made
+    with their account role.
+    """
+    row = db.one("SELECT id, role, active FROM account WHERE id = ?", (account_id,))
+    if not row:
+        raise HTTPException(404, "No such account.")
+    if security.is_admin(row["role"]):
+        # Not refused out of caution: the row would be inert, because an
+        # administrator already opens every project, and a grant that changes
+        # nothing reads as one that did something.
+        raise HTTPException(409, "An administrator already opens every project.")
+    project = db.one("SELECT id, name, active FROM project WHERE id = ?", (project_id,))
+    if not project or not project["active"]:
+        raise HTTPException(400, f"There is no open ADAM project called '{project_id}'.")
+    if db.one("SELECT 1 FROM account_project WHERE account_id = ? AND project_id = ?",
+              (account_id, project_id)):
+        raise HTTPException(409, f"They can already open {project['name'] or project_id}.")
+    role = "client" if row["role"] == "client" else "reviewer"
+    db.write(
+        "INSERT INTO account_project (account_id, project_id, role, created_at) "
+        "VALUES (?, ?, ?, ?)", (account_id, project_id, role, security.stamp()))
+    return {"ok": True, "project": {"id": project["id"], "name": project["name"], "role": role}}
+
+
+@app.delete("/api/accounts/{account_id}/projects/{project_id}")
+def revoke_project(account_id: int, project_id: str, admin: dict = Depends(require_admin)):
+    """Take a project away from an account. Admin only.
+
+    Nothing they recorded on it moves: verdicts and change requests keep their
+    author, as they do when an account is disabled. They simply stop being able
+    to open it. Taking away the last one is allowed — a missing row is no
+    access, and an account that should see nothing for a while is a real case —
+    but the page says so before it is done.
+    """
+    if not db.one("SELECT id FROM account WHERE id = ?", (account_id,)):
+        raise HTTPException(404, "No such account.")
+    if not db.change("DELETE FROM account_project WHERE account_id = ? AND project_id = ?",
+                     (account_id, project_id)):
+        raise HTTPException(404, "They could not open that project anyway.")
+    return {"ok": True}
 
 
 def _live_admin_count() -> int:

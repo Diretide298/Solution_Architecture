@@ -105,7 +105,7 @@ function mountSheetPanel(spec) {
   const group = ({ title, why, items, tail, tone }) => {
     if (!items?.length) return;
     const box = el('section', `decide-group ${tone}`);
-    box.append(el('h3', 'decide-group-title', `${title} — ${items.length}`));
+    box.append(el('h3', 'decide-group-title', `${title} (${items.length})`));
     box.append(el('p', 'auth-note auth-fine decide-why', why));
     const list = el('div', 'decide-list');
     for (const item of items.slice(0, SHOWN)) list.append(tail(item));
