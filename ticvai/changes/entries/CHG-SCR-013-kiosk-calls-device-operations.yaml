@@ -10,7 +10,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R167 R289): check-screen-wiring/S-GUEST-AUDIENCE had 1 member
-  (KSK-013 endKioskAssist; evidence docs/active/audit/audit-1014/classes.json). Default ruling (triage.py): "kiosk
+  (KSK-013 endKioskAssist; evidence docs/active/audit-runs/audit-1014/classes.json). Default ruling (triage.py): "kiosk
   assist goes through the device". The device is the kiosk (rule asked by the guest-screens batch). After: 0.'
 keys_touched:
   files:

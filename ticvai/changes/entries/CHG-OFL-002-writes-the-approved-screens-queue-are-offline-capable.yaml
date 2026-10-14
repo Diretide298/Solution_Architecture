@@ -16,7 +16,7 @@ decision:
     check-screen-wiring stops asking a screen to call the replay disabled.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit class check-screen-wiring/S-OFFLINE-QUEUED, 29 members before, 12 after (docs/active/audit/audit-1014/classes.json;
+why: 'Audit class check-screen-wiring/S-OFFLINE-QUEUED, 29 members before, 12 after (docs/active/audit-runs/audit-1014/classes.json;
   CHG-SWP-004). Retail stays online (ADR-0013), so reserveMerchandise and collectShopAndDrop are not made offline.'
 keys_touched:
   operations: [closeTableVisit, cancelWorkOrder, closeWorkOrder, verifyWorkOrder, recordWorkOrderParts,

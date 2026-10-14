@@ -17,7 +17,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit before r6, classes check-stored-request-fields/SR-STORED-NO-COLUMN (12 at audit-base b93b5a87, 2 after:
-  keeps) and SR-STUB-WRITE (7, 0 after), evidence docs/active/audit/audit-1014/classes.json; triage rulings "A field said
+  keeps) and SR-STUB-WRITE (7, 0 after), evidence docs/active/audit-runs/audit-1014/classes.json; triage rulings "A field said
   to be stored reaches a column the lineage writes." and "A write into a keys-only table carries its fields to columns."
   Same class as ADAM CR-078 (CHG-CRD-009).'
 keys_touched:

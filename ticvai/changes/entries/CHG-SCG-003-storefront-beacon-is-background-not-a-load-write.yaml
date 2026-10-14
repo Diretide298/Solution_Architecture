@@ -12,7 +12,7 @@ decision:
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, finding class check-screen-wiring S-ONLOAD-WRITE (R268; ruling "No write on
   load; move it to an action (analytics events go through the event sink)", lead: "go with your recommendation"). The
-  beacon is the event sink''s call, made by the runtime. Evidence: docs/active/audit/audit-1014/classes.json. Guest
+  beacon is the event sink''s call, made by the runtime. Evidence: docs/active/audit-runs/audit-1014/classes.json. Guest
   platforms: 2 findings before, 0 after (package-wide 3 -> 1). Also clears these two members of S-OP-UNREACHED.'
 keys_touched:
   screens: [WEB-001, GST-001]

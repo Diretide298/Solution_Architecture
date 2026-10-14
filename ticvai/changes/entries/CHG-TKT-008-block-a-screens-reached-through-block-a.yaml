@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit class check-plan-closure/C-REACH (CHG-RONEP-006): 17 Block A screens reached only through a hub outside Block
-  A, 18 tickets, 6 due by 28 October (docs/active/audit/audit-1014/classes.json); after the fix 8 (keeps for the lead).
+  A, 18 tickets, 6 due by 28 October (docs/active/audit-runs/audit-1014/classes.json); after the fix 8 (keeps for the lead).
   The triage ruling: pull the bridging screen into Block A, or record why not (lead: "go with your recommendation", 14 October).
   Audit finding, Block A audit on audit-base b93b5a87.'
 keys_touched:

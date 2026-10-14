@@ -11,7 +11,7 @@ decision:
     screen in its feature when a poll read is added, or the refund''s 202 is followed another way.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-screen-wiring
+why: 'Audit finding, Block A audit before r6 (docs/active/audit-runs/audit-1014/classes.json): check-screen-wiring
   S-ASYNC-POLL (R288), 1 member on P04 (POS-011:createRefund); still 1. With the read in place, build-service-docs
   regrouped SVC-INVENTORY-ITEM-1 under AM-ORDERS-RESERVATIONS-P04 and check-ticket-scope found 3 new
   S-FEATURE-OP-UNUSED (createInventoryItem, setInventoryKitDefinition, updateInventoryItem); the batch rule is 0 new.'

@@ -15,7 +15,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: Block A audit before r6, class check-storage-promises/SP-ARRAY-NOWHERE (138 at audit-base b93b5a87, 0 after; 35 of
-  them in the delivery slice), evidence docs/active/audit/audit-1014/classes.json; triage ruling "An array of objects gets
+  them in the delivery slice), evidence docs/active/audit-runs/audit-1014/classes.json; triage ruling "An array of objects gets
   a child table (or jsonb with a stated reason)." Same class as ADAM CR-073 (CHG-DDL-007) and R179.
 keys_touched:
   files:

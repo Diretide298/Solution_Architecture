@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R264): check-screen-wiring/S-BUTTON-FORM had 67 members
-  (evidence docs/active/audit/audit-1014/classes.json, 182 Block A tickets). Default ruling (triage.py): "A button
+  (evidence docs/active/audit-runs/audit-1014/classes.json, 182 Block A tickets). Default ruling (triage.py): "A button
   whose operation needs a body opens the form or panel that collects it"; the coordinator''s instruction: bind to what
   the approved UI collects, else keep. After: 55 package-wide, every one a keep listed by the deriver (the approved
   screen collects the body nowhere).'

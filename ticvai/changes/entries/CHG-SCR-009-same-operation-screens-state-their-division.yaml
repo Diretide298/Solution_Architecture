@@ -14,7 +14,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R276): check-screen-wiring/S-DUP-SCREEN had 74 groups
-  (evidence docs/active/audit/audit-1014/classes.json, 40 Block A tickets). Default ruling (triage.py): "Two screens
+  (evidence docs/active/audit-runs/audit-1014/classes.json, 40 Block A tickets). Default ruling (triage.py): "Two screens
   with the same operations state their division, or merge"; the coordinator''s instruction: record the division,
   never merge. After: 0 package-wide.'
 keys_touched:

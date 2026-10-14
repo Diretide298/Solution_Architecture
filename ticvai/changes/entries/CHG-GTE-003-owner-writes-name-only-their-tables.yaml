@@ -13,7 +13,7 @@ decision:
     platform.dead_letter, pii.consent_identifier and pii.subject only).'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit class check-parameter-columns P-NAMED-TABLE (docs/active/audit/audit-1014/classes.json: 61 found, 57
+why: 'Audit class check-parameter-columns P-NAMED-TABLE (docs/active/audit-runs/audit-1014/classes.json: 61 found, 57
   baselined, 4 new; the release gate run 20261014-180113-8116 the same): "recordConsentIdentifier''s description
   names marketing.device_consent / platform.outbox", "replayDeadLetter''s ... platform.outbox", "updateGuestSubjectDetails''s
   ... platform.outbox", and the lineage lists none of them. The prose came with CHG-XDW-003, CHG-XDW-004 and

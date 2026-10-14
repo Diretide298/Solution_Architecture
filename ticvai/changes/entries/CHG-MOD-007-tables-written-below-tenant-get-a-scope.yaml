@@ -23,7 +23,7 @@ decision:
     tools/check-rls-scope-fit.py knows the new helper.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit of 14 October 2026 (docs/active/audit/audit-1014/classes.json): class check-rls-scope-fit/RF-TENANT-ROOT,
+why: 'Audit of 14 October 2026 (docs/active/audit-runs/audit-1014/classes.json): class check-rls-scope-fit/RF-TENANT-ROOT,
   782 findings touching 511 Block A tickets (198 due by 28 October); ADAM CR-076 (CHG-GEN-010): a venue''s guest
   lookup, a till''s wallet read and a kitchen''s table map read nothing under the tenant-root policy. Default ruling
   (lead, 14 October): "A table written below tenant gets a scope (follows its parent); else the operation runs at

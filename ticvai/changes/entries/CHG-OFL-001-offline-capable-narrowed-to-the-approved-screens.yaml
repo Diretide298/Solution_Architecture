@@ -18,7 +18,7 @@ decision:
     SCN-011''s offline text is spec prose no approved frame shows, so it is rewritten to the contract.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit class check-screen-wiring/S-OFFLINE-REFUSED, 19 members before, 7 after (docs/active/audit/audit-1014/classes.json;
+why: 'Audit class check-screen-wiring/S-OFFLINE-REFUSED, 19 members before, 7 after (docs/active/audit-runs/audit-1014/classes.json;
   CHG-SWP-004 added the rule). GST-009, EMP-035 (createPayment, addTip): cash is the only offline tender and is refused
   off a till (createPayment, decided 2 October, DEC-200). GST-010 (reprintOrder), GST-034 (recordLostItem, audit R148),
   GST-035 (submitForm), GST-070 (joinRestaurantWaitlist): the approved guest app waits for the connection, as its

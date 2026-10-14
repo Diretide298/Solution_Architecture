@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit class check-ticket-scope/S-SCREEN-OP-UNBUILT: 6 findings (KSK-001, -002, -008, -010, -013, -014 on getPublishedKioskConfig),
-  4 due by 28 October (docs/active/audit/audit-1014/classes.json); after the fix 0. The triage''s default (add the dependency)
+  4 due by 28 October (docs/active/audit-runs/audit-1014/classes.json); after the fix 0. The triage''s default (add the dependency)
   contradicts the lead''s CHG-R4-003; the ticket already names the wiring task, which builds it. Audit finding, Block A
   audit on audit-base b93b5a87.'
 keys_touched:

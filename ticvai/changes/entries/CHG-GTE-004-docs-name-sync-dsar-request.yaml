@@ -13,7 +13,7 @@ decision:
 why: 'Release gate on audit-base (14 October 2026, run 20261014-180113-8116): check-doc-tables failed, 5 renamed names
   in 3 documents, 2 of them platform.dsar_request outside a quotation, moved to sync by CHG-XDW-001
   (derive-schema-history.py RENAMES). Class: check-doc-tables stale table name, 2 -> 0 failing (evidence
-  docs/active/audit/audit-1014/classes.json other_checks).'
+  docs/active/audit-runs/audit-1014/classes.json other_checks).'
 keys_touched:
   tables:
   - sync.dsar_request

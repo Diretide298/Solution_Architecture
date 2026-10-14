@@ -13,7 +13,7 @@ decision:
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, finding class check-wireframe-coverage W-INCOMING-UNLINKED (R258; ruling "A
   drawn frame in wireframes/incoming is named by its screen record", lead: "go with your recommendation"). Evidence:
-  docs/active/audit/audit-1014/classes.json. 17 findings before, 0 after (all on P02).'
+  docs/active/audit-runs/audit-1014/classes.json. 17 findings before, 0 after (all on P02).'
 keys_touched:
   screens: [GST-001, GST-002, GST-003, GST-004, GST-006, GST-007, GST-008, GST-012, GST-021, GST-022, GST-038, GST-041,
     GST-049, GST-051, GST-053, GST-054, GST-063]

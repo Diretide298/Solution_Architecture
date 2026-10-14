@@ -10,7 +10,7 @@ decision:
     `file` through adam_file, and viewer/lib/release-diff.mjs reads it from a release's tree.
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit class adam-pull/task: nothing linked: 29 Block A tasks (26 due by 28 October; docs/active/audit/audit-1014/classes.json),
+why: 'Audit class adam-pull/task: nothing linked: 29 Block A tasks (26 due by 28 October; docs/active/audit-runs/audit-1014/classes.json),
   e.g. SETUP-CLIENTS 27640, the 12 onboarding tickets and the ADR-only tasks (ADAM pulls files, not decisions). After the
   fix 0. Audit finding, Block A audit on audit-base b93b5a87.'
 keys_touched:

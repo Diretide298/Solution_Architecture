@@ -18,7 +18,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit before r6, class check-request-fields-stored/RF-REQUEST-NOT-STORED (68 at audit-base b93b5a87, 0 after),
-  evidence docs/active/audit/audit-1014/classes.json; triage ruling "A configuration field is stored, or marked x-ticvai-persisted:
+  evidence docs/active/audit-runs/audit-1014/classes.json; triage ruling "A configuration field is stored, or marked x-ticvai-persisted:
   false." Same class as ADAM CR-082 (CHG-TEN-005).'
 keys_touched:
   files:

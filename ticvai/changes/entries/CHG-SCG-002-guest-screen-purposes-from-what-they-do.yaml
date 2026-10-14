@@ -13,7 +13,7 @@ decision:
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, finding class check-screen-wiring S-PURPOSE-BOILERPLATE (CHG-WIR-003; ruling
   "Screen purpose written from what the screen does, not the template", lead: "go with your recommendation").
-  Evidence: docs/active/audit/audit-1014/classes.json. Guest platforms P01, P02, P05: 23 findings before, 0 after
+  Evidence: docs/active/audit-runs/audit-1014/classes.json. Guest platforms P01, P02, P05: 23 findings before, 0 after
   (package-wide 81 -> 58).'
 keys_touched:
   screens: [GST-005, GST-006, GST-012, GST-013, GST-014, GST-015, GST-016, GST-017, GST-018, GST-022, GST-030, GST-034,

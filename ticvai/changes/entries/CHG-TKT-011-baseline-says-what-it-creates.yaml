@@ -9,7 +9,7 @@ decision:
     ltree, btree_gist, pgcrypto; the register; the 920 helpers).'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit class check-ddl-conventions/D-MIG-ORDER (R056): 1 finding (MIG-BASELINE:contents), due by 28 October (docs/active/audit/audit-1014/classes.json);
+why: 'Audit class check-ddl-conventions/D-MIG-ORDER (R056): 1 finding (MIG-BASELINE:contents), due by 28 October (docs/active/audit-runs/audit-1014/classes.json);
   after the fix 0. Audit finding, Block A audit on audit-base b93b5a87.'
 keys_touched:
   files:

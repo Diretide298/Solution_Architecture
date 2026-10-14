@@ -11,7 +11,7 @@ decision:
     operation''s meaning for check-contract-compat does not change.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit of 14 October 2026 (docs/active/audit/audit-1014/classes.json): class check-error-sources/E-UNFED, 1
+why: 'Audit of 14 October 2026 (docs/active/audit-runs/audit-1014/classes.json): class check-error-sources/E-UNFED, 1
   finding touching 50 Block A tickets (25 due by 28 October): setCustomerGuestAccount writes orders.sales_order and
   touches pii.* without emitting any event the orders#openOrdersForSubject projection consumes (CHG-GDL-003, ADAM
   CR-084), so deleteGuestAccount could erase an account that holds an order. Default ruling (lead, 14 October): "A

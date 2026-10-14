@@ -20,7 +20,7 @@ decision:
     identity.guest_session to both operations'' lineage.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit of 14 October 2026 (docs/active/audit/audit-1014/classes.json, class check-screens/S-PANEL-ENTITY, the
+why: 'Audit of 14 October 2026 (docs/active/audit-runs/audit-1014/classes.json, class check-screens/S-PANEL-ENTITY, the
   GST-073 call): ticket 27741 problem 2 asked what revoking a guest device does, stop push only or also sign the
   device out. The lead decided on 14 October ("go with your recommendation", decision 1 in the audit fix rules):
   it also ends that device''s guest sessions and refresh tokens in Identity. Batch SCR changes GST-073''s screen to

@@ -12,7 +12,7 @@ decision:
     D-STUB-TABLE notes a retired stub whose drop migration-review lists.'
   by: Chinmay
   date: '2026-10-14'
-why: Block A audit before r6, class check-ddl-conventions/D-STUB-TABLE (4 at audit-base b93b5a87, 1 after), evidence docs/active/audit/audit-1014/classes.json;
+why: Block A audit before r6, class check-ddl-conventions/D-STUB-TABLE (4 at audit-base b93b5a87, 1 after), evidence docs/active/audit-runs/audit-1014/classes.json;
   triage ruling "A table holding only keys gets its columns from its schema, or is removed." (R087).
 keys_touched:
   operations:

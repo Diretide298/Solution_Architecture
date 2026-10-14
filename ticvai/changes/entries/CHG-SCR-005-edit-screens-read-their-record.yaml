@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R265): check-screen-wiring/S-NO-READ had 223 members (evidence
-  docs/active/audit/audit-1014/classes.json, 11 Block A tickets). Default ruling (triage.py): "A screen that edits a
+  docs/active/audit-runs/audit-1014/classes.json, 11 Block A tickets). Default ruling (triage.py): "A screen that edits a
   record reads it first". After: 223 package-wide, all reported: 159 edit a record the contract cannot read back (no
   GET on the PUT''s path: a contract gap for the module owners) and 64 have a read but no panel on the approved screen
   to show it.'

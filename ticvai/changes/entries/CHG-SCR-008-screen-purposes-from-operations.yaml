@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (CHG-WIR-003): check-screen-wiring/S-PURPOSE-BOILERPLATE had 81
-  members (evidence docs/active/audit/audit-1014/classes.json, 238 Block A tickets). Default ruling (triage.py):
+  members (evidence docs/active/audit-runs/audit-1014/classes.json, 238 Block A tickets). Default ruling (triage.py):
   "Screen purpose written from what the screen does, not the template". After: 0 package-wide. The screen tickets
   carry the purpose whole (T-PURPOSE-CUT): they pick the new text up when build-service-docs runs on the refresh
   (verified: check-ticket-text passes after build-service-docs and op-descriptions).'

@@ -16,7 +16,7 @@ decision:
     (ALTER TABLE ... SET SCHEMA sync).'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit class check-plan-closure C-GONE (docs/active/audit/audit-1014/classes.json: 4 found, 4 new, 7 tickets):
+why: 'Audit class check-plan-closure C-GONE (docs/active/audit-runs/audit-1014/classes.json: 4 found, 4 new, 7 tickets):
   "table platform.<t>: r5 built it (MIG-PLATFORM / MIG-PLATFORM-3); no task builds it now and
   block-a-extra-tasks.json departures gives no reason", for the four tables CHG-XDW-001 moved into sync. 4 -> 0.'
 keys_touched:

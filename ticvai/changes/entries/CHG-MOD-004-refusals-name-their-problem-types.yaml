@@ -13,7 +13,7 @@ decision:
     asset-under-maintenance, wrong-product). No response''s status, schema or wording changes.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit of 14 October 2026 (docs/active/audit/audit-1014/classes.json): class check-error-sources/E-PROBLEM-TYPE,
+why: 'Audit of 14 October 2026 (docs/active/audit-runs/audit-1014/classes.json): class check-error-sources/E-PROBLEM-TYPE,
   60 findings touching 138 Block A tickets (61 due by 28 October); ADAM CR-084: a refusal the client must tell apart
   names its causes. Default ruling (lead, 14 October): "As E-READ-VIA: and declares its problem types." Count before
   60, after 0 (11 of them left the class through the vocabulary fix of CHG-MOD-003, where the word was not another

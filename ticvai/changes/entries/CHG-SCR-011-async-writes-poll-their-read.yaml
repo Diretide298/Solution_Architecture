@@ -14,7 +14,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R288): check-screen-wiring/S-ASYNC-POLL had 44 members
-  (evidence docs/active/audit/audit-1014/classes.json, 125 Block A tickets). Default ruling (triage.py): "A 202
+  (evidence docs/active/audit-runs/audit-1014/classes.json, 125 Block A tickets). Default ruling (triage.py): "A 202
   operation''s screen reads the job or record that follows it". After: 13 package-wide, each a contract gap the
   deriver reports (no read of what the 202 starts: exportSubjectData, deleteGuestAccount, deployReaderConfiguration,
   proposeMarketingContent, createForecastScenario, submitChargebackEvidence, createApprovalEvidencePackage,

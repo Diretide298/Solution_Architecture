@@ -16,7 +16,7 @@ decision:
     askers take. derive-lineage copies the routes into the lineage as readVia.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit of 14 October 2026 (docs/active/audit/audit-1014/classes.json): class check-cross-module-reads/XR-UNCOVERED,
+why: 'Audit of 14 October 2026 (docs/active/audit-runs/audit-1014/classes.json): class check-cross-module-reads/XR-UNCOVERED,
   921 findings touching 758 Block A tickets (341 due by 28 October). ADR-0055 rule 2 as amended 14 October
   (CHG-GEN-009): another module''s table is read through the owner''s declared query, or a view named for the reader
   within one deployable; across deployables never by shared SQL (rule 4). Default ruling (lead, 14 October: "go with

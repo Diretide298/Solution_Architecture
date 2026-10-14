@@ -18,7 +18,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (council plan; R250): check-screen-wiring/S-STATE-BOILERPLATE
-  had 2,331 members (evidence docs/active/audit/audit-1014/classes.json, 180 Block A tickets). Default ruling
+  had 2,331 members (evidence docs/active/audit-runs/audit-1014/classes.json, 180 Block A tickets). Default ruling
   (triage.py, the lead''s "go with your recommendation"): "Empty-state text promises only what the screen has
   (generated from its operations)". After: 16 package-wide, every one a keep (a visible create control the
   client-approved UI shows with no create operation behind it: BO-317, BO-416, BO-1172, ADM-048, ADM-058, ADM-078,

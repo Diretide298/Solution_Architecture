@@ -18,7 +18,7 @@ decision:
     which an Identity that reads nothing above it cannot call; the attach could instead be Orders'' own operation).'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit of 14 October 2026 (docs/active/audit/audit-1014/classes.json): class check-cross-module-reads/XR-FOUNDATION,
+why: 'Audit of 14 October 2026 (docs/active/audit-runs/audit-1014/classes.json): class check-cross-module-reads/XR-FOUNDATION,
   7 findings touching 103 Block A tickets (60 due by 28 October). ADR-0055 amendment rule 4 and ADR-0028 tiers:
   Identity reads nothing above it but a projection. Default ruling (lead, 14 October): "Identity reads modules above
   it only through a projection". Count before 7, after 6 (all kept, listed in the batch hand-back with the decision

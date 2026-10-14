@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit class check-audience-match/AM-TICKET-OP (#27741; CHG-SWP-002): 142 findings, 196 tickets, 114 due by 28 October
-  (docs/active/audit/audit-1014/classes.json); after the fix 0. searchGuests (staff) on the guest app''s Identity & Security
+  (docs/active/audit-runs/audit-1014/classes.json); after the fix 0. searchGuests (staff) on the guest app''s Identity & Security
   was the case. Audit finding, Block A audit on audit-base b93b5a87.'
 keys_touched:
   files:

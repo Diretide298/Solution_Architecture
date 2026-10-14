@@ -16,7 +16,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit before r6, class check-parameter-columns/P-PARAM-NO-COLUMN (102 at audit-base b93b5a87, 14 after: keeps),
-  evidence docs/active/audit/audit-1014/classes.json; triage ruling "An <x>Id parameter matches a column in the operation''s
+  evidence docs/active/audit-runs/audit-1014/classes.json; triage ruling "An <x>Id parameter matches a column in the operation''s
   lineage." (Sprint 1-2 judging, CHG-FXC-003).'
 keys_touched:
   files:

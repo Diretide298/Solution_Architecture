@@ -14,7 +14,7 @@ decision:
     command centres) is SCR''s to add with the P08 twins.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-screen-wiring
+why: 'Audit finding, Block A audit before r6 (docs/active/audit-runs/audit-1014/classes.json): check-screen-wiring
   S-METRIC-NO-OP (R283) had 28 members on P04 and P06: 2 fixed here, 26 follow their P08 twins (batch SCR). Ruling
   (the lead, 14 October 2026, "go with your recommendation"): a metric tile binds the read that computes it, or is
   removed; the approved UI is fixed, so none is removed.'

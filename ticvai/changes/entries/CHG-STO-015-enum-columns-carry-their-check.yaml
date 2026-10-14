@@ -9,7 +9,7 @@ decision:
     enum value ''off'' quoted; tools/check-contract-storage.py reads an integer enum stored as an integer as an int.'
   by: Chinmay
   date: '2026-10-14'
-why: Block A audit before r6, class check-contract-storage/ST-ENUM-CHECK (2 at audit-base b93b5a87, 0 after), evidence docs/active/audit/audit-1014/classes.json;
+why: Block A audit before r6, class check-contract-storage/ST-ENUM-CHECK (2 at audit-base b93b5a87, 0 after), evidence docs/active/audit-runs/audit-1014/classes.json;
   triage ruling "An enum in a text column gets its CHECK." (R151).
 keys_touched:
   tables:

@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R251 R262): check-navigation/N-CARRIES-HELD had 7 members
-  (evidence docs/active/audit/audit-1014/classes.json, 51 Block A tickets). Default ruling (triage.py): "A transition
+  (evidence docs/active/audit-runs/audit-1014/classes.json, 51 Block A tickets). Default ruling (triage.py): "A transition
   carries only ids the source screen holds". After: 6, all POS-006 -> POS-002 (cart, cartHoldExpiresAt, discount,
   guest, orderType, table: the held sale''s state, not ids), which the POS and staff screens batch owns.'
 keys_touched:

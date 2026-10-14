@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit finding, Block A audit of 14 October 2026 (R283): check-screen-wiring/S-METRIC-NO-OP had 1,058 members
-  (evidence docs/active/audit/audit-1014/classes.json, 74 Block A tickets). Default ruling (triage.py): "A metric
+  (evidence docs/active/audit-runs/audit-1014/classes.json, 74 Block A tickets). Default ruling (triage.py): "A metric
   tile binds the read that computes it, or is removed"; under the client-approved UI rule a tile is never removed.
   After: 971 package-wide, every one reported by the deriver as needing a read or a KPI definition the contract does
   not have (a contract gap, not a screen fix). 87 tiles bound (61 to getKpiValues, 26 to a summary field).'

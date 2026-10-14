@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit before r6, class check-parameter-columns/P-NAMED-TABLE (61 at audit-base b93b5a87 with 4 new on the
-  base, 5 after: keeps), evidence docs/active/audit/audit-1014/classes.json; triage ruling "A table the description names
+  base, 5 after: keeps), evidence docs/active/audit-runs/audit-1014/classes.json; triage ruling "A table the description names
   is in the lineage, or the description stops naming it." Most names were explanations ("not `approvals.sla_policy`", "written
   by OrderService"): deleting them would cost the reader the explanation, so the operation says they are context, and the
   check holds the list to the text.'

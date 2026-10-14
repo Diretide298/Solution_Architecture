@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit of 14 October 2026, class check-contract-shapes/C-UNTYPED-BODY (evidence
-  docs/active/audit/audit-1014/classes.json): 8 members before, 0 after on this branch (CHG-SHP; ruling "go with your
+  docs/active/audit-runs/audit-1014/classes.json): 8 members before, 0 after on this branch (CHG-SHP; ruling "go with your
   recommendation", Chinmay, 14 October 2026). R088. Additive (a bare object had no fields to lose).'
 keys_touched:
   operations:

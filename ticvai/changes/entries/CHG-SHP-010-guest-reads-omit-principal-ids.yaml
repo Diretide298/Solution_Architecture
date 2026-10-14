@@ -12,7 +12,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Audit of 14 October 2026, class check-contract-shapes/C-GUEST-INTERNAL (evidence
-  docs/active/audit/audit-1014/classes.json): 2 members before, 0 after on this branch (CHG-SHP; ruling "go with your
+  docs/active/audit-runs/audit-1014/classes.json): 2 members before, 0 after on this branch (CHG-SHP; ruling "go with your
   recommendation", Chinmay, 14 October 2026). R164. Non-breaking (none of the three is required). Lead to confirm the
   marker over a separate guest view schema, which would change getOrder/getProduct''s response for every caller.'
 keys_touched:

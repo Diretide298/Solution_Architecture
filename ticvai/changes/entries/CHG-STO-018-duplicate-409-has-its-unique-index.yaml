@@ -13,7 +13,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: Block A audit before r6, class check-storage-promises/SP-DUPLICATE-409 (15 at audit-base b93b5a87, 0 after), evidence
-  docs/active/audit/audit-1014/classes.json; triage ruling "A 409 for a code in use has its x-ticvai-unique at the level
+  docs/active/audit-runs/audit-1014/classes.json; triage ruling "A 409 for a code in use has its x-ticvai-unique at the level
   it names." Same class as ADAM CR-068 and CR-074 (CHG-DDL-008).
 keys_touched:
   operations:

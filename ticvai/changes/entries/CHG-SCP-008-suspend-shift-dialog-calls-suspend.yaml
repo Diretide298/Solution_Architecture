@@ -10,7 +10,7 @@ decision:
     dialog, its trigger and its words are unchanged; no confirm label is added.'
   by: Chinmay
   date: '2026-10-14'
-why: 'Audit finding, Block A audit before r6 (docs/active/audit/audit-1014/classes.json): check-screen-wiring
+why: 'Audit finding, Block A audit before r6 (docs/active/audit-runs/audit-1014/classes.json): check-screen-wiring
   S-BUTTON-FORM (R264) had 1 member on P04 and P06, 0 after. Ruling (the lead, 14 October 2026, "go with your
   recommendation"): a button whose operation needs a body opens the form or panel that collects it.'
 keys_touched:

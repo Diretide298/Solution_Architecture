@@ -17,7 +17,7 @@ decision:
 why: 'Lead, 14 October 2026: "before pushing r6 can we simulate the results in the pulls?" (Block A audit plan, step
   11a and "Rehearsal before the push") and "With the pattern of errors we need to get them updated". The r5 pull found
   123 features and 29 tasks with nothing linked and 55 tickets with links ADAM could not find after the release was
-  out (docs/active/audit/audit-1014/classes.json). Finding count: TL-REHEARSAL finds 10 on the audit-base b93b5a87
+  out (docs/active/audit-runs/audit-1014/classes.json). Finding count: TL-REHEARSAL finds 10 on the audit-base b93b5a87
   runbook (none of it was there), 0 on this branch. Follows CHG-GTE-006 (the tag pushed by name, one closing pull).'
 keys_touched:
   files:
