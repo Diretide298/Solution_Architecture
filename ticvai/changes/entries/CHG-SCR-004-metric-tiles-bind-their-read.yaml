@@ -1,0 +1,43 @@
+id: CHG-SCR-004
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A metric tile the client''s board drew binds the read that computes it, by a deriver on the refresh: the
+  field of a summary the screen already reads, or the scorecard read it already calls. No tile is removed; a tile no
+  declared read computes is reported.'
+decision:
+  what: 'tools/derive-screen-wiring.py gains rule S-METRIC-NO-OP (fix_metrics). An unbound tile binds `operation` and
+    `bindsTo` Schema.field when a read the screen declares returns one object (a summary, view, health or analytics
+    record; never a row of a list) with a field naming every word of the tile''s measure; else `getKpiValues` where the
+    screen already calls it. Tiles stay as drawn (client-approved UI, Chinmay, 14 October 2026).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R283): check-screen-wiring/S-METRIC-NO-OP had 1,058 members
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 74 Block A tickets). Default ruling (triage.py): "A metric
+  tile binds the read that computes it, or is removed"; under the client-approved UI rule a tile is never removed.
+  After: 971 package-wide, every one reported by the deriver as needing a read or a KPI definition the contract does
+  not have (a contract gap, not a screen fix). 87 tiles bound (61 to getKpiValues, 26 to a summary field).'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - screens/P08-venue-back-office.yaml
+  screens:
+  - P08 on this branch; the other platforms at the refresh
+  other:
+  - S-METRIC-NO-OP
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-screen-wiring.py::fix_metrics
+status: open
+notes: 'Batch SCR, 14 October 2026. The 971 open tiles need a lead decision on the contract side: one KPI code per
+  measure in reporting''s ReportingSystemKpi read through getKpiValues (the hubs'' pattern), or summary reads per
+  module. Not done in this batch: it is contract work across every module.'

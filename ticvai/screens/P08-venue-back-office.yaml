@@ -1462,6 +1462,7 @@ screens:
       - kind: metricTile
         notes: Waiting, called, expired, average wait
         provenance: carried from the previous definition
+        operation: getKpiValues
       - kind: metricTile
         label: Takings and admissions today
         bindsTo: KpiValue
@@ -28288,6 +28289,7 @@ screens:
         notes: Open shifts today, from `listShifts`. **Items needing attention are dropped until a summary
           operation exists** (decided 28 September, audit R283).
         provenance: carried from the previous definition
+        operation: getKpiValues
       - kind: cardList
         bindsTo: sections
         notes: One card per section. **No attention counts** until a summary operation exists to supply
@@ -51632,6 +51634,8 @@ screens:
       - kind: metricTile
         label: Reject Rate
         provenance: pack Access Control Module_Reference.pdf, page 175 §Show
+        operation: listThroughputQueueValidation
+        bindsTo: ThroughputQueueValidationPerformanceAnalyticsView.rejectRate
       - kind: metricTile
         label: Manual Intervention Rate
         provenance: pack Access Control Module_Reference.pdf, page 175 §Show
@@ -72030,6 +72034,8 @@ screens:
       - kind: metricTile
         label: Total Bonus Balance
         provenance: pack Game_and_Ride_Module.pdf, page 23 §KPI Cards
+        operation: getWallet
+        bindsTo: Wallet.bonusBalance
       - kind: metricTile
         label: Free Game/Ride Credits
         provenance: pack Game_and_Ride_Module.pdf, page 23 §KPI Cards
@@ -90522,33 +90528,43 @@ screens:
       - kind: metricTile
         label: Gross Rental Revenue
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
       - kind: metricTile
         label: Net Rental Revenue
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
       - kind: metricTile
         label: Average Transaction Value
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
       - kind: metricTile
         label: Average Revenue per Rental Hour
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
       - kind: metricTile
         label: Extension Revenue
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
       - kind: metricTile
         label: Late-Fee Revenue
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
       - kind: metricTile
         label: Damage Charges
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
       - kind: metricTile
         label: Deposit Captures
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
       - kind: metricTile
         label: Discount Value
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
       - kind: metricTile
         label: Refund Value
         provenance: pack Rental_Management.pdf, page 126 §KPIs
+        operation: getKpiValues
   states:
     loading: The rental revenue commercial list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the rental revenue commercial untouched.
@@ -195080,6 +195096,8 @@ screens:
       - kind: metricTile
         label: Refund Rate
         provenance: pack Sales_Channel_Management_Reference.pdf, page 29 §Measure
+        operation: listChannelPerformanceCommercial
+        bindsTo: ChannelPerformanceCommercialAnalyticsView.refundRate
       - kind: metricTile
         label: Capacity Utilization
         provenance: pack Sales_Channel_Management_Reference.pdf, page 29 §Measure
@@ -199002,6 +199020,8 @@ screens:
       - kind: metricTile
         label: SOLD ✓
         provenance: pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show
+        operation: listResaleListingSeller
+        bindsTo: MyResaleListingsSellerDashboardView.sold
       - kind: metricTile
         label: 'Selling Price: AED 220'
         provenance: pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show
@@ -202111,6 +202131,8 @@ screens:
       - kind: metricTile
         label: Authorization Rate
         provenance: pack Payment_Payment_Orchestration.pdf, page 25 §KPI Cards
+        operation: getPaymentProviderHealth
+        bindsTo: ProviderHealth.authorisationRate
       - kind: metricTile
         label: Successful Captures
         provenance: pack Payment_Payment_Orchestration.pdf, page 25 §KPI Cards
@@ -202950,12 +202972,16 @@ screens:
       - kind: metricTile
         label: Authorization rate
         provenance: pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics
+        operation: getPaymentProviderHealth
+        bindsTo: ProviderHealth.authorisationRate
       - kind: metricTile
         label: Capture rate
         provenance: pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics
       - kind: metricTile
         label: Decline rate
         provenance: pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics
+        operation: getPaymentProviderHealth
+        bindsTo: ProviderHealth.declineRate
       - kind: metricTile
         label: Technical error rate
         provenance: pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics
@@ -210205,27 +210231,39 @@ screens:
       - kind: metricTile
         label: New Chargebacks
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards
+        operation: getChargebackAnalytics
+        bindsTo: OrdChargebackAnalytics.totals.chargebackCount
       - kind: metricTile
         label: Open Chargebacks
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards
       - kind: metricTile
         label: Chargeback Value
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards
+        operation: getChargebackAnalytics
+        bindsTo: OrdChargebackAnalytics.totals.chargebackRateByValue
       - kind: metricTile
         label: Chargeback Rate
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards
+        operation: getChargebackAnalytics
+        bindsTo: OrdChargebackAnalytics.totals.chargebackRateByCount
       - kind: metricTile
         label: Response Due
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards
       - kind: metricTile
         label: Won
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards
+        operation: getChargebackAnalytics
+        bindsTo: OrdChargebackAnalytics.totals.wonCount
       - kind: metricTile
         label: Lost
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards
+        operation: getChargebackAnalytics
+        bindsTo: OrdChargebackAnalytics.totals.lostCount
       - kind: metricTile
         label: Accepted
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards
+        operation: getChargebackAnalytics
+        bindsTo: OrdChargebackAnalytics.totals.acceptedCount
       - kind: metricTile
         label: Represented
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards
@@ -210711,6 +210749,8 @@ screens:
       - kind: metricTile
         label: Authorization Rate
         provenance: pack Payment_Payment_Orchestration.pdf, page 175 §Show
+        operation: getPaymentPerformance
+        bindsTo: PaymentPerformanceRow.authorisationRate
       - kind: metricTile
         label: Payment Cost
         provenance: pack Payment_Payment_Orchestration.pdf, page 175 §Show
@@ -212114,6 +212154,8 @@ screens:
       - kind: metricTile
         label: Acceptance Rate
         provenance: pack Upsell,CrossSellEngine.pdf, page 37 §KPI Cards
+        operation: getRecommendationPerformance
+        bindsTo: RecommendationPerformance.acceptanceRate
       - kind: metricTile
         label: Upgrade Conversion
         provenance: pack Upsell,CrossSellEngine.pdf, page 37 §KPI Cards
@@ -212123,6 +212165,8 @@ screens:
       - kind: metricTile
         label: Incremental Revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 37 §KPI Cards
+        operation: getRecommendationPerformance
+        bindsTo: RecommendationPerformance.incrementalRevenue
       - kind: metricTile
         label: Average Upgrade Value
         provenance: pack Upsell,CrossSellEngine.pdf, page 37 §KPI Cards
@@ -213222,21 +213266,29 @@ screens:
       - kind: metricTile
         label: Recommendations Accepted
         provenance: pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards
+        operation: listUpsellCrossSell
+        bindsTo: UpsellCrossSellAttachRateAnalyticsView.recommendedOfferAcceptance
       - kind: metricTile
         label: Cross-Sell Conversion
         provenance: pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards
       - kind: metricTile
         label: Cross-Sell Revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards
+        operation: listUpsellCrossSell
+        bindsTo: UpsellCrossSellAttachRateAnalyticsView.crossSellRevenue
       - kind: metricTile
         label: Estimated Incremental Revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards
       - kind: metricTile
         label: Attach Rate
         provenance: pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards
+        operation: listUpsellCrossSell
+        bindsTo: UpsellCrossSellAttachRateAnalyticsView.attachRate
       - kind: metricTile
         label: Items per Transaction
         provenance: pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards
+        operation: listUpsellCrossSell
+        bindsTo: UpsellCrossSellAttachRateAnalyticsView.itemsPerTransaction
       - kind: metricTile
         label: AOV Uplift
         provenance: pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards
@@ -214336,6 +214388,8 @@ screens:
       - kind: metricTile
         label: Acceptance Rate
         provenance: pack Upsell,CrossSellEngine.pdf, page 93 §KPI Cards
+        operation: getRecommendationPerformance
+        bindsTo: RecommendationPerformance.acceptanceRate
       - kind: metricTile
         label: Journey Conversion
         provenance: pack Upsell,CrossSellEngine.pdf, page 93 §KPI Cards
@@ -215444,6 +215498,8 @@ screens:
       - kind: metricTile
         label: Incremental Revenue
         provenance: pack Upsell,CrossSellEngine.pdf, page 124 §KPI Cards
+        operation: getRecommendationPerformance
+        bindsTo: RecommendationPerformance.incrementalRevenue
       - kind: metricTile
         label: Personalized AOV Uplift
         provenance: pack Upsell,CrossSellEngine.pdf, page 124 §KPI Cards
