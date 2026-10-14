@@ -367,8 +367,8 @@ export async function buildSearch(root, subjects = {}) {
       href: '/settings.html',
       terms: 'settings account profile password change openproject token pms git email identity '
         + 'claude connector mcp bridge sessions sign out everywhere preferences' },
-    { id: 'domains', name: 'Domain lenses', href: '/domains.html',
-      terms: 'domain lenses cross-cutting subjects ai flash sale' },
+    { id: 'domains', name: 'AI capabilities: who can use them', href: '/domains.html',
+      terms: 'ai capabilities assistant operations permissions screens reach domain lens' },
     { id: 'audit', name: 'Audit the delivery package', href: '/audit.html',
       terms: 'audit dump checks validators problems package' },
     { id: 'reviews', name: 'Reviews', href: '/reviews.html#coverage',
