@@ -1112,6 +1112,17 @@ screens:
     purpose: Where and when a credential was last used
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: exportAccreditationData
+    contract: accreditation
+    purpose: Hand the register to a security team before a performance; queues the export of the season's
+      credentials
+    trigger: onAction
+    provenance: audit fix S-EXPORT, 14 October 2026 (CHG-SCO-005)
+  - operationId: getAccreditationExport
+    contract: accreditation
+    purpose: Follows the queued export until it is ready, then gives its signed, expiring download link
+    trigger: onInterval
+    provenance: audit fix S-EXPORT, 14 October 2026 (CHG-SCO-005); the 202's pollExport link
   gaps:
   - operation: revokeAccreditationBadge
     why: 'The register offers **Revoke** and nothing performs it. `AccreditationBadge.state` and `revokedReason`
@@ -1174,6 +1185,7 @@ screens:
         permission: APPROVAL_DECIDE
       - kind: secondaryButton
         label: Export
+        operation: exportAccreditationData
         notes: The register is what a venue hands to a security team before a performance.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-008
   overlays:
