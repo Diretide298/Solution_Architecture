@@ -1130,6 +1130,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CostCenter'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-codes:
@@ -1217,6 +1219,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-codes/{taxCodeId}:
@@ -3024,6 +3028,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LegalEntity'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fiscal-periods:

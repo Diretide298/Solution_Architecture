@@ -1310,6 +1310,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatCategory'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-categories/{seatCategoryId}:

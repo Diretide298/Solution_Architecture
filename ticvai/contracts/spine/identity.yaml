@@ -4350,6 +4350,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthorisationPolicy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /authorisation-policies/{policyId}:
@@ -5562,7 +5564,9 @@ paths:
         **Ordered by `name` ascending, `policyId` as the tiebreak** (decided 14 October 2026, ADAM CR-077;
         CHG-IDR-002): BO-1066 reads the policies by name, and the counts beside each are what it compares.
 
-        '
+        
+
+        **Statuses.** Every `status` is returned, ended ones included (`retired`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - administration
       x-ticvai-permission: PERMISSION_VIEW

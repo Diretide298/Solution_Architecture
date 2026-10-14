@@ -104,7 +104,9 @@ paths:
 
         
 
-        **Order.** Newest first, by `createdAt` descending, then by `id`.'
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - marketing
       parameters:
@@ -1120,7 +1122,9 @@ paths:
 
         
 
-        **Order.** Sorted by `name` ascending, then by `id`.'
+        **Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`retired`, `superseded`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - marketing
       x-ticvai-permission: MARKETING_VIEW
@@ -1959,6 +1963,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Referral'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/disposition:
@@ -2121,7 +2127,9 @@ paths:
   /journeys:
     get:
       operationId: listJourneys
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
+      description: '**Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-consumed-by:
         - "P08 BO-120 Omnichannel Commerce & Journey Configuration"
         - "P08 BO-774 Journey Automation Center"
@@ -5898,6 +5906,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /messages:
@@ -6662,7 +6672,9 @@ paths:
   /reviews:
     get:
       operationId: listReviews
-      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`rejected`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-consumed-by:
         - "P08 BO-819 Review Collection & Rating Rules"
       x-ticvai-audience:
@@ -11362,6 +11374,8 @@ paths:
         customer's name is returned only to callers holding `GUEST_VIEW_PII`, as `Case.guestName` is.
         Ordered by `escalatedAt` descending then `caseId`; keyset cursor. (decided 29 September,
         readiness close-out)
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
       tags:
         - case
       x-ticvai-permission: CASE_VIEW
@@ -12202,6 +12216,8 @@ paths:
         check (products and venues that reference the waiver). `q` matches name and description, which
         is how the create dialog offers similar existing templates before a duplicate is made. Ordered by
         `waiverName` then `waiverId`; keyset cursor. (decided 29 September, readiness close-out)
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`, `expired`); a screen that shows only live rows filters on `status` itself.
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -12720,6 +12736,8 @@ paths:
         `includeImpact` fills `impact`, the pack's dependency check shown before an association is
         removed. Written by `setWaiverAssociation`. Ordered by `targetType`, `targetId`, `sequence`, then
         `id`; keyset cursor. (decided 29 September, readiness close-out)
+
+        **Statuses.** Every `status` is returned, ended ones included (`removed`); a screen that shows only live rows filters on `status` itself.
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -15115,7 +15133,9 @@ paths:
 
         
 
-        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
+
+        **Statuses.** Every `status` is returned, ended ones included (`rejected`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - guests
       x-ticvai-permission: GUEST_MANAGE
@@ -15420,7 +15440,9 @@ paths:
   /audience-activations:
     get:
       operationId: listAudienceActivations
-      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`, `failed`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-consumed-by:
         - "P08 BO-763 Activation & Governance"
       summary: Where audiences are being used, and whether they are still in sync

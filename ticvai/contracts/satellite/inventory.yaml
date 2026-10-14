@@ -533,7 +533,9 @@ paths:
 
         
 
-        **Order.** Soonest expiry first, by `expiresAt` ascending, then by `id`.'
+        **Order.** Soonest expiry first, by `expiresAt` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - inventory
       x-ticvai-permission: PRODUCT_VIEW
@@ -982,6 +984,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockLocation'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock/valuation:
@@ -1270,6 +1274,8 @@ paths:
         **Added 4 October 2026 (CHG-FXC-011; EMP-066: the count screen needs its pre-filled lines).** The count's `inventory.count_line` rows (CountLine), ordered by item. **A blind count hides what is expected**: while an `isBlind` count is open, `theoreticalQuantity`, `variance` and `variancePercent` are null; they appear once the count is submitted.
 
         **Order.** Sorted by `itemId` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`rejected`); a screen that shows only live rows filters on `status` itself.
       tags:
       - count
       x-ticvai-permission: PRODUCT_VIEW
@@ -3116,6 +3122,8 @@ paths:
         `expiresAt` is what stops a hold outliving the booking that made it.
 
         **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`); a screen that shows only live rows filters on `status` itself.
       tags:
       - inventory
       x-ticvai-permission: PRODUCT_VIEW

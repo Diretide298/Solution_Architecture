@@ -153,6 +153,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}/availability:
@@ -886,6 +888,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceType'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-types/{resourceTypeId}:
@@ -1003,6 +1007,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceCategory'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-categories/{categoryId}:
@@ -1122,6 +1128,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceAttributeDefinition'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resources/{resourceId}:
@@ -1581,6 +1589,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourcePackage'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-packages/{packageId}:

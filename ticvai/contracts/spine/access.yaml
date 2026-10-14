@@ -2197,6 +2197,8 @@ paths:
                 $ref: '#/components/schemas/AccessPoint'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-points/{accessPointId}/direction:
@@ -2488,6 +2490,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdmissionRules'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /admission-rules/{profileId}:
@@ -3286,7 +3290,9 @@ paths:
 
         
 
-        **Order.** Sorted by `credentialBindingId` descending (a UUIDv7, so newest first).'
+        **Order.** Sorted by `credentialBindingId` descending (a UUIDv7, so newest first).
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`, `revoked`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW
@@ -16583,7 +16589,9 @@ paths:
 
         
 
-        **Order.** Sorted by `policyId` descending (a UUIDv7, so newest first).'
+        **Order.** Sorted by `policyId` descending (a UUIDv7, so newest first).
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`, `inactive`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - access
       x-ticvai-permission: SCOPE_VIEW

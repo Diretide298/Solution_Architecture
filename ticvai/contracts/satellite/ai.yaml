@@ -10005,7 +10005,9 @@ paths:
 
         
 
-        **Order.** Newest first, by `createdAt` descending, then by `id`.'
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`failed`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE

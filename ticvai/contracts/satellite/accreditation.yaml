@@ -120,6 +120,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationProgramme'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-requirements:

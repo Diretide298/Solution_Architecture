@@ -439,6 +439,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentMethod'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-methods/{methodId}:
@@ -567,6 +569,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentProviderConnection'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-providers/{connectionId}/test:

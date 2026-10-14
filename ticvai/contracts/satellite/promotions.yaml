@@ -1045,6 +1045,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CouponCampaign'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-campaigns/{campaignId}/codes:
@@ -1647,6 +1649,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundles/{bundleId}:
@@ -6871,6 +6875,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationStrategy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-strategies/{strategyId}:
@@ -7244,6 +7250,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationExperiment'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-experiments/{experimentId}/conclude:

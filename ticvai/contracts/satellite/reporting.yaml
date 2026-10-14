@@ -2047,6 +2047,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KpiDefinition'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kpis/{kpiId}/targets:

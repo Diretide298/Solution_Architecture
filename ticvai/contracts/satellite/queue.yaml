@@ -141,6 +141,8 @@ paths:
         found. `QUEUE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
         **Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
       tags: [queue]
       x-ticvai-permission: QUEUE_VIEW
       x-ticvai-guest-callable: true
@@ -207,6 +209,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Queue' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

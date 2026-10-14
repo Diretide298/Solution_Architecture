@@ -2602,7 +2602,9 @@ paths:
 
         
 
-        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`superseded`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - menu
       x-ticvai-permission: PRODUCT_VIEW
@@ -4003,7 +4005,9 @@ paths:
 
         
 
-        **Order.** Newest first, by `createdAt` descending, then by `id`.'
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - fnb
       parameters:
@@ -5401,6 +5405,8 @@ paths:
                 $ref: '#/components/schemas/Menu'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /menus/{menuId}:
@@ -5792,6 +5798,8 @@ paths:
                     refusedReason:
                       enum:
                       - selectionConstraintsUnsatisfiable
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-orders:

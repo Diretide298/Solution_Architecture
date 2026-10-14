@@ -342,6 +342,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Game'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /games/{gameId}:
@@ -1109,6 +1111,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameEntitlement'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gameplay-validation-rules:

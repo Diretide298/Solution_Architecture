@@ -574,7 +574,9 @@ paths:
 
         
 
-        **Order.** Soonest first, by `validFrom` ascending, then by `entitlementId`.'
+        **Order.** Soonest first, by `validFrom` ascending, then by `entitlementId`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`cancelled`, `expired`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW
@@ -2785,6 +2787,8 @@ paths:
                 $ref: '#/components/schemas/PriceList'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-lists/{priceListId}/prices:
@@ -3015,6 +3019,8 @@ paths:
         `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
         **Order.** Soonest first, by `startsAt` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
       tags:
       - event
       x-ticvai-permission: PRODUCT_VIEW
@@ -5228,6 +5234,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntitlementTemplate'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/suspend:

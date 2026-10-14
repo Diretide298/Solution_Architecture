@@ -122,6 +122,8 @@ paths:
         references — the working set for a library clear-out.
 
         **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`, `failed`); a screen that shows only live rows filters on `status` itself.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_VIEW
       x-ticvai-scope-level: venue

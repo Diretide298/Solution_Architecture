@@ -93,6 +93,8 @@ paths:
         and no one else's, which is what `EMP-022 My rota` renders.
 
         **Order.** Soonest first, by `startsAt` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
       tags: [rota]
       x-ticvai-permission: WORKFORCE_VIEW
       x-ticvai-scope-level: venue
