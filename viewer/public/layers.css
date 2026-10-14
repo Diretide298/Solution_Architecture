@@ -2984,7 +2984,9 @@ textarea.rt-sendback-note {
 .set-nav a[hidden] { display: none; }
 .set-nav-group {
   margin: 14px 0 4px; padding: 0 12px;
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+  /* Sentence case, as the account menu's group titles are: a tracked-out
+     capital label above every list was template chrome, not information. */
+  font-size: 12px; font-weight: 600;
   color: var(--text-faint);
 }
 .set-nav-group[hidden] { display: none; }
