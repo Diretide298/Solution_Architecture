@@ -95,7 +95,7 @@ paths:
       - bearerAuth: []
       - prospectAuth: []
       x-ticvai-audience:
-      - public
+      - staff
       - prospect
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -138,7 +138,6 @@ paths:
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience:
       - staff
-      - public
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: false

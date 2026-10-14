@@ -1,0 +1,42 @@
+id: CHG-SCR-016
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Four authenticated operations stop declaring a `public` audience their security never allowed:
+  listApprovalRequests, decideApprovalRequest and listVenueTypeTemplates are staff only; submitOnboardingApplication
+  is for the prospect and for staff (bearerAuth or prospectAuth, as its security already says).'
+decision:
+  what: 'contracts/spine/approvals.yaml (listApprovalRequests, decideApprovalRequest) and
+    contracts/satellite/subscription.yaml (listVenueTypeTemplates; submitOnboardingApplication public -> staff):
+    x-ticvai-audience lines only. Security, permission and every consumer screen are unchanged (each consumer is a
+    staff or prospect screen); check-contract-compat reports no breaking change.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026: check-audience-match/AM-GUEST-SECURITY had 4 members (evidence
+  audit/ticvai/runs/audit-1014/classes.json, 6 Block A tickets). Default ruling (triage.py): "An operation''s audience
+  and its security agree". ADR-0025 (one audience field) is the vocabulary. After: 0.'
+keys_touched:
+  files:
+  - contracts/spine/approvals.yaml
+  - contracts/satellite/subscription.yaml
+  operations:
+  - listApprovalRequests
+  - decideApprovalRequest
+  - listVenueTypeTemplates
+  - submitOnboardingApplication
+  other:
+  - AM-GUEST-SECURITY
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - the producer tickets of the four operations (impact list)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: Batch SCR, 14 October 2026. The lineage's audience copies follow at the refresh (derive-lineage).
