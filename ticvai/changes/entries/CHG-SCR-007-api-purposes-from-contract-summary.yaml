@@ -1,0 +1,42 @@
+id: CHG-SCR-007
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'An api purpose that is empty, the operationId or template text ("Add something") is the operation''s
+  contract summary, by a deriver on the refresh; addCartLine''s own summary, "Add something", becomes "Add a line to the
+  cart".'
+decision:
+  what: 'tools/derive-screen-wiring.py gains rule S-PURPOSE-TEMPLATE (fix_api_purpose). contracts/spine/orders.yaml
+    addCartLine `summary` corrected (the template text came from the contract). Invisible: api purposes are spec
+    prose.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R260): check-screen-wiring/S-PURPOSE-TEMPLATE had 40 members
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 203 Block A tickets). Default ruling (triage.py): "Each api
+  purpose says what the call is for (from the contract summary)". After: 0 package-wide.'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - contracts/spine/orders.yaml
+  - screens/P08-venue-back-office.yaml
+  operations:
+  - addCartLine
+  screens:
+  - P08 (BO-036, BO-037, BO-044, BO-083, BO-114, BO-115, BO-123, BO-124, BO-126, BO-128, BO-129, BO-130, BO-131) on
+    this branch; the other platforms at the refresh
+  other:
+  - S-PURPOSE-TEMPLATE
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-screen-wiring.py::fix_api_purpose
+status: open
+notes: Batch SCR, 14 October 2026.

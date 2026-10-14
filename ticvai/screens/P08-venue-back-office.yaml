@@ -11314,7 +11314,7 @@ screens:
     trigger: onAction
   - operationId: getWorkstationHealth
     contract: tenancy
-    purpose: getWorkstationHealth
+    purpose: A score a manager can sort by, and what is dragging it down
     trigger: onAction
   - operationId: listWorkstations
     contract: tenancy
@@ -11580,7 +11580,7 @@ screens:
     trigger: onLoad
   - operationId: setOfflinePolicy
     contract: tenancy
-    purpose: setOfflinePolicy
+    purpose: What a workstation may do with no network, and for how long
     trigger: onAction
     invalidates:
     - listCatalogueBundles
@@ -13485,11 +13485,11 @@ screens:
     - listOutlets
   - operationId: getHaccpStatus
     contract: fnb
-    purpose: getHaccpStatus
+    purpose: Where this venue stands, right now
     trigger: onLoad
   - operationId: signCorrectiveAction
     contract: fnb
-    purpose: signCorrectiveAction
+    purpose: Say what was done, and put a name to it
     trigger: onAction
     invalidates:
     - listOutlets
@@ -23919,7 +23919,7 @@ screens:
     - listSuppliers
   - operationId: getSupplierPerformance
     contract: reporting
-    purpose: getSupplierPerformance
+    purpose: On-time, in-full, and what was rejected
     trigger: onAction
   - operationId: listSupplierContracts
     contract: inventory
@@ -31639,7 +31639,7 @@ screens:
   apis:
   - operationId: listSerialisedItems
     contract: inventory
-    purpose: listSerialisedItems
+    purpose: Where each individual item is
     trigger: onLoad
   - operationId: lookupMerchandise
     contract: retail
@@ -31788,11 +31788,11 @@ screens:
     provenance: decided 29 September, W12 (the 29 September pass)
   - operationId: listProductCategories
     contract: catalogue
-    purpose: listProductCategories
+    purpose: The merchandise hierarchy — categories, brands, collections
     trigger: onLoad
   - operationId: setProductCategories
     contract: catalogue
-    purpose: setProductCategories
+    purpose: Define the hierarchy, in the order a guest sees it
     trigger: onAction
     invalidates:
     - listProductCategories
@@ -33165,7 +33165,7 @@ screens:
   apis:
   - operationId: setConfigurationProfile
     contract: tenancy
-    purpose: setConfigurationProfile
+    purpose: What a class of workstation is configured to be
     trigger: onAction
     invalidates:
     - listSaleBoards
@@ -33346,7 +33346,7 @@ screens:
     trigger: onAction
   - operationId: deployConfigurationProfile
     contract: tenancy
-    purpose: deployConfigurationProfile
+    purpose: Push a version to a fleet, in stages
     trigger: onAction
   - operationId: listDevices
     contract: tenancy
@@ -33747,7 +33747,7 @@ screens:
   apis:
   - operationId: deployConfigurationProfile
     contract: tenancy
-    purpose: deployConfigurationProfile
+    purpose: Push a version to a fleet, in stages
     trigger: onAction
     invalidates:
     - listAuditRecords
@@ -33972,7 +33972,7 @@ screens:
   apis:
   - operationId: getWorkstationHealth
     contract: tenancy
-    purpose: getWorkstationHealth
+    purpose: A score a manager can sort by, and what is dragging it down
     trigger: onAction
   - operationId: listWorkstations
     contract: tenancy
@@ -34155,19 +34155,19 @@ screens:
   apis:
   - operationId: setConfigurationProfile
     contract: tenancy
-    purpose: setConfigurationProfile
+    purpose: What a class of workstation is configured to be
     trigger: onAction
     invalidates:
     - listWorkstations
   - operationId: deployConfigurationProfile
     contract: tenancy
-    purpose: deployConfigurationProfile
+    purpose: Push a version to a fleet, in stages
     trigger: onAction
     invalidates:
     - listWorkstations
   - operationId: getWorkstationHealth
     contract: tenancy
-    purpose: getWorkstationHealth
+    purpose: A score a manager can sort by, and what is dragging it down
     trigger: onAction
   - operationId: listWorkstations
     contract: tenancy
@@ -34438,7 +34438,7 @@ screens:
   apis:
   - operationId: setOfflinePolicy
     contract: tenancy
-    purpose: setOfflinePolicy
+    purpose: What a workstation may do with no network, and for how long
     trigger: onAction
     invalidates:
     - listSyncRejections
@@ -34629,7 +34629,7 @@ screens:
   apis:
   - operationId: setConnectivityThresholds
     contract: tenancy
-    purpose: setConnectivityThresholds
+    purpose: When a workstation decides it is offline, and when it is back
     trigger: onAction
   entryState:
     params:

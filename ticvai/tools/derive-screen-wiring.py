@@ -512,7 +512,66 @@ def fix_dup_regions(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
         log.append(f"{s['id']}: region {n} (slot {r.get('slot')}) renamed {cand}")
 
 
+# ── S-PURPOSE-BOILERPLATE and S-PURPOSE-TEMPLATE ────────────────────────────────────────────────
+# A screen's `purpose` and an api's `purpose` are spec prose for the designer and the developer, never shown. The
+# 18 August generator wrote "See X for this venue." where a screen had no purpose of its own, and board imports pasted
+# the board's title and date; an api purpose was sometimes the operationId or "Add something". Both are rewritten
+# from the contract: the screen's from its name and the summaries of what it reads and does, the api's from the
+# operation's summary.
+
+PURPOSE_BOILERPLATE = re.compile(
+    r"^(Work with|See|Find|Add) .{2,80} for this venue\.?$"
+    r"|Change how .{2,60} behaves here, and see which level the current value came from"
+    r"|from the client design board"
+    r"|^The screen this app sits on", re.I)
+
+
+def summary(ops: dict, op: str) -> str:
+    return " ".join(str(ops[op]["op"].get("summary") or "").split()).rstrip(".")
+
+
+def fix_screen_purpose(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    if not PURPOSE_BOILERPLATE.search(str(s.get("purpose") or "")):
+        return
+    known = [a for a in apis(s) if a["operationId"] in ops]
+    reads = [a["operationId"] for a in known if ops[a["operationId"]]["method"] == "get"]
+    reads.sort(key=lambda o: next((0 for a in known if a["operationId"] == o and a.get("trigger") == "onLoad"), 1))
+    acts = [a["operationId"] for a in known if ops[a["operationId"]]["method"] in WRITES]
+    name = str(s.get("name") or s["id"]).strip()
+    parts = []
+    if reads:
+        parts.append("shows " + "; ".join(f"{summary(ops, o)[:1].lower() + summary(ops, o)[1:]} (`{o}`)"
+                                         for o in reads[:2] if summary(ops, o)))
+    if acts:
+        parts.append("acts with " + "; ".join(f"{summary(ops, o)[:1].lower() + summary(ops, o)[1:]} (`{o}`)"
+                                             for o in acts[:3] if summary(ops, o)))
+    parts = [p for p in parts if not p.endswith(("shows ", "acts with "))]
+    merged = re.search(r"\(merged into ([A-Z]+-\d+)[^)]*\)", str(s.get("purpose") or ""))
+    if not parts and merged:
+        s["purpose"] = (f"{name}: merged into {merged.group(1)}; this id routes there and nothing on it is built "
+                        f"separately.")
+        log.append(f"{s['id']}: purpose names the screen it was merged into")
+        return
+    if not parts:
+        keeps.append((s["id"], "S-PURPOSE-BOILERPLATE", "the screen declares no operation to say what it does from; "
+                      "its purpose needs a person"))
+        return
+    s["purpose"] = f"{name}: " + ", and ".join(parts) + "."
+    log.append(f"{s['id']}: purpose written from its operations")
+
+
+def fix_api_purpose(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    for a in apis(s):
+        p = str(a.get("purpose") or "").strip()
+        o = a["operationId"]
+        if (not p or p == o or p.lower() in ("add something", "tbd", "todo")) and o in ops and summary(ops, o):
+            a["purpose"] = summary(ops, o)
+            log.append(f"{s['id']}: {o} purpose from the contract summary")
+
+
 STEPS = {
+    "S-PURPOSE-BOILERPLATE": fix_screen_purpose,
+    "S-PURPOSE-TEMPLATE": fix_api_purpose,
     "S-STATE-BOILERPLATE": fix_states,
     "S-SCREEN-PERMISSION": fix_permission,
     "S-METRIC-NO-OP": fix_metrics,
