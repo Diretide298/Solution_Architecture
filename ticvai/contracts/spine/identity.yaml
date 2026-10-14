@@ -147,10 +147,10 @@ paths:
       summary: Keep the IP address and user agent a cookie decision was made from
       description: '**The owner''s write of `pii.consent_identifier`** (14 October 2026, CHG-XDW-004; ADR-0055 rule
         4). The two values are personal data, so they live in `pii`, Identity''s schema in `commerce`, and an event
-        would copy them into `platform.outbox`. `marketing-crm.recordDeviceConsent` (in `operations`) calls this,
+        would copy them into the outbox; this writes no event. `marketing-crm.recordDeviceConsent` (in `operations`) calls this,
         cell-internal over mTLS, after it has recorded the decision and only where the published banner design has
         `recordIpAddress` on, with the `Idempotency-Key` it was called with. Erasure reaches the row with the rest
-        of `pii`; the decision itself (`marketing.device_consent`) survives as evidence without it.
+        of `pii`; the decision itself, which `recordDeviceConsent` keeps, survives as evidence without it.
 
         '
       tags:
@@ -204,7 +204,7 @@ paths:
       description: '**The owner''s write of `pii.subject`** (14 October 2026, CHG-XDW-005; ADR-0055 rule 4). A guest
         correcting their own details calls `marketing-crm.updateMyProfile` (in `operations`); the name and
         language are personal data in `pii.subject`, Identity''s, in `commerce`, and an event would copy them into
-        `platform.outbox`. `updateMyProfile` calls this, cell-internal over mTLS, with the guest''s own
+        the outbox; this writes no event. `updateMyProfile` calls this, cell-internal over mTLS, with the guest''s own
         `subjectId` from their session and the `Idempotency-Key` it was called with, and writes the rest of the
         profile itself. Only the fields sent change. An erased subject (`is_erased`) is not found.
 

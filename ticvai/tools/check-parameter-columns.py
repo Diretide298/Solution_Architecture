@@ -39,7 +39,6 @@ RULES = {
     "P-DRAFTED-UNMAPPED": "a drafted write whose request schema says no table stores it while its lineage writes one",
 }
 NAMED = re.compile(r"`([a-z][a-z0-9_]*\.[a-z][a-z0-9_]*)`")
-READ_VIEW = re.compile(r"^([a-z][a-z0-9_]*\.[a-z][a-z0-9_]*?)_for_[a-z0-9_]+$")
 UNMAPPED = "no existing table"
 SCOPE = {"venue", "region", "brand", "country", "scope", "org_unit", "tenant_scope"}
 
@@ -81,7 +80,7 @@ def main() -> int:
                 tables = [t for t in (e.get("reads") or []) + (e.get("writes") or []) if ":" not in t and "." in t]
                 # a read through the view named for the reader (`<table>_for_<reader>`, DB-READ-VIEWS) reads its
                 # table (CHG-R6G-007: publishBundle reads the sale boards through Catalogue's views)
-                tables += [m.group(1) for t in (e.get("reads") or []) for m in [READ_VIEW.match(t)] if m]
+                tables += [b for t in (e.get("reads") or []) for b in [g.viewed_table(t, cols)] if b]
                 if not tables:
                     continue
                 desc = str(op.get("description") or "")

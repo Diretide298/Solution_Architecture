@@ -1,0 +1,61 @@
+id: CHG-GTE-005
+date: '2026-10-14'
+source: audit
+kind: plan
+proposed: '2026-10-14'
+summary: 'The four cross-region tables r5 built in platform (MIG-PLATFORM, MIG-PLATFORM-3) carry their departure
+  reason: they moved into sync on 14 October (CHG-XDW-001), the lead reversing schema-merge decision 10, and are built
+  as sync tables by the sync migration tasks.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json departures gains "table platform.guest_link", "table
+    platform.dsar_request", "table platform.cross_region_entitlement" and "table platform.wallet_authorisation", each
+    saying: moved to sync.<table> on 14 October 2026 (CHG-XDW-001), every reader and writer being CrossRegionService''s;
+    the lead reversed schema-merge decision 10 (20 September, both or neither stay in platform), marked superseded in
+    docs/active/schema-merge-decision-log.md; the same table under its new schema, built by the sync migration task
+    (MIG-SYNC or MIG-SYNC-2 at audit-base); the move is the forward migration handoff/migration-review.md lists
+    (ALTER TABLE ... SET SCHEMA sync).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-plan-closure C-GONE (audit/ticvai/runs/audit-1014/classes.json: 4 found, 4 new, 7 tickets):
+  "table platform.<t>: r5 built it (MIG-PLATFORM / MIG-PLATFORM-3); no task builds it now and
+  block-a-extra-tasks.json departures gives no reason", for the four tables CHG-XDW-001 moved into sync. 4 -> 0.'
+keys_touched:
+  tables:
+  - platform.guest_link
+  - platform.dsar_request
+  - platform.cross_region_entitlement
+  - platform.wallet_authorisation
+  files:
+  - docs/active/block-a-extra-tasks.json
+  tickets:
+  - MIG-PLATFORM
+  - MIG-PLATFORM-3
+  - MIG-SYNC
+  - MIG-SYNC-2
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started:
+  - 'MIG-PLATFORM (#27665, Ready for QA)'
+  unstarted:
+  - 'MIG-PLATFORM-3 (#28358)'
+  - 'MIG-SYNC (#27662)'
+  - MIG-SYNC-2 (not yet pushed)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-14'
+    quote: "go with your recommendation"
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'Batch GTE (audit/release-gate), 14 October 2026. A plan input, so kind plan; it records a reason and moves no
+  task, and the 24-hour cooling-off is waived under the lead''s Block A audit decision of 14 October ("go with your
+  recommendation"; the lead to confirm at merge). MIG-PLATFORM is Ready for QA with the four tables in platform: the
+  move reaches it as a CR comment, never a rewrite. Batch TKT changes how a pushed table key follows a declared move
+  (build-service-docs); if it lets MIG-PLATFORM / MIG-PLATFORM-3 keep building the moved tables, check-plan-closure
+  will note these four entries as not needed, and they can then be removed.'

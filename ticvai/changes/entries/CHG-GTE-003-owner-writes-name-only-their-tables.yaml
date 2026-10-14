@@ -1,0 +1,45 @@
+id: CHG-GTE-003
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Three owner-write descriptions (CHG-XDW-003 to 005) stop naming tables their lineage does not touch:
+  replayDeadLetter, recordConsentIdentifier and updateGuestSubjectDetails say "the outbox" and "the decision
+  recordDeviceConsent keeps" instead of platform.outbox and marketing.device_consent. Wording only.'
+decision:
+  what: 'contracts/satellite/platform-ops.yaml replayDeadLetter: "sits beside the outbox". contracts/spine/identity.yaml
+    recordConsentIdentifier: "an event would copy them into the outbox; this writes no event" and "the decision
+    itself, which recordDeviceConsent keeps"; updateGuestSubjectDetails: "an event would copy them into the outbox;
+    this writes no event". The lineage is unchanged: none of the three writes an event (their lineage writes
+    platform.dead_letter, pii.consent_identifier and pii.subject only).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-parameter-columns P-NAMED-TABLE (audit/ticvai/runs/audit-1014/classes.json: 61 found, 57
+  baselined, 4 new; the release gate run 20261014-180113-8116 the same): "recordConsentIdentifier''s description
+  names marketing.device_consent / platform.outbox", "replayDeadLetter''s ... platform.outbox", "updateGuestSubjectDetails''s
+  ... platform.outbox", and the lineage lists none of them. The prose came with CHG-XDW-003, CHG-XDW-004 and
+  CHG-XDW-005. New 4 -> 0 (61 -> 57 found, the baselined 57 untouched).'
+keys_touched:
+  operations:
+  - replayDeadLetter
+  - recordConsentIdentifier
+  - updateGuestSubjectDetails
+  files:
+  - contracts/satellite/platform-ops.yaml
+  - contracts/spine/identity.yaml
+root_class: A25 PROSE-QUALITY
+tickets:
+  started: []
+  unstarted:
+  - SVC-IDENTITY-IDENTITY-13 (Block B)
+  - SVC-PLATFORM-PLATFORM-OPS-3 (Block B)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: 'Batch GTE (audit/release-gate), 14 October 2026, from the parked second-gate fix. Descriptions only: no
+  operation, field or response changes, so no breaking change. Both tickets are Block B; no Block A ticket is
+  affected.'

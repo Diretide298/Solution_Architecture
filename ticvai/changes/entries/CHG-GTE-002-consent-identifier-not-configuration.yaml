@@ -1,0 +1,37 @@
+id: CHG-GTE-002
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'check-config-scope reads identity.recordConsentIdentifier as an event, not a configuration operation: it
+  records the IP address and user agent one cookie decision was made from, so it declares no configuration level.'
+decision:
+  what: 'tools/check-config-scope.py NOT_CONFIG gains recordConsentIdentifier, beside recordCheckoutConsents and
+    recordDashboardView, with the reason: Identity''s service-only write, called by recordDeviceConsent after the
+    decision is recorded; the banner design it obeys (recordIpAddress) is the configuration, and that is scoped.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Release gate on audit-base (14 October 2026, run 20261014-180113-8116): check-config-scope failed 1, "identity.
+  recordConsentIdentifier: no x-ticvai-config-scope. Every configuration operation declares its level (ADR-0018)".
+  The operation is CHG-XDW-004''s owner write; its name matched the configuration pattern (Consent) and it configures
+  nothing. Class: check-config-scope missing level, 1 -> 0 (evidence audit/ticvai/runs/audit-1014/classes.json
+  other_checks).'
+keys_touched:
+  operations:
+  - recordConsentIdentifier
+  files:
+  - tools/check-config-scope.py
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted:
+  - SVC-IDENTITY-IDENTITY-13 (Block B, not yet pushed)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-config-scope.py
+status: open
+notes: 'Batch GTE (audit/release-gate), 14 October 2026, from the parked second-gate fix. No Block A ticket is
+  affected.'

@@ -1519,7 +1519,7 @@ paths:
       description: '**Records the replay as a new attempt rather than resetting the count** (ADR-0033).
         An operator retrying the same poison message forty times should be able to see that they did.
 
-        **The owner writes it.** `platform.dead_letter` sits beside `platform.outbox` in TenancyService''s
+        **The owner writes it.** `platform.dead_letter` sits beside the outbox in TenancyService''s
         schema, in `commerce`; this checks the operator''s permission and calls tenancy `requeueDeadLetter`,
         which puts the event back on the outbox and counts the replay in one transaction (ADR-0055 rule 4,
         CHG-XDW-003).'

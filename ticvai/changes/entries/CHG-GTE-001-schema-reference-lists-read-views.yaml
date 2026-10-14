@@ -1,0 +1,60 @@
+id: CHG-GTE-001
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'The schema reference lists the DB-READ-VIEWS views the lineage reads (a Read views sheet: view, table,
+  module, readers, columns), derived from the lineage; check-package resolves a lineage read against it, and
+  audit-links and check-parameter-columns read a `<table>_for_<reader>` view through one shared helper.'
+decision:
+  what: 'tools/audit_guard.py gains viewed_table (the table a `<table>_for_<reader>` name reads, each `_for_` split
+    tried) and read_views (every view the lineage reads, with its table, module, readers and readColumns).
+    tools/build-schema-workbook.py writes them on a new last sheet, Read views, of handoff/TICVAI_Schema_Reference.xlsx.
+    tools/check-package.py rule 2 reads that sheet: a lineage read names a table or a listed view; a write names a
+    table. tools/audit-links.py (operation -> table) and tools/check-parameter-columns.py (P-NAMED-TABLE, its
+    READ_VIEW regex replaced) ask audit_guard.viewed_table. check-lineage rule 6 keeps its own stricter test (the
+    reader is the operation''s module).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Release gate on audit-base (14 October 2026, run 20261014-180113-8116, checks.log): check-package failed 3
+  "lineage names table platform.sale_board_for_catalogue / sale_board_page_for_catalogue /
+  sale_board_tile_for_catalogue which the schema reference does not have", and audit-links 3 broken operation ->
+  table links, the same three. CHG-R6G-007 recorded publishBundle''s reads by the view and taught check-lineage and
+  check-parameter-columns the convention, not check-package or audit-links; tracker Follow-ups F27 (DB-READ-VIEWS must
+  publish the three views). Class: check-package lineage-table and audit-links operation -> table, 3 -> 0 each
+  (evidence audit/ticvai/runs/audit-1014/classes.json other_checks, check-package and audit-links rc 1). ADR-0055
+  rule 2.'
+keys_touched:
+  operations:
+  - publishBundle
+  tables:
+  - platform.sale_board_for_catalogue
+  - platform.sale_board_page_for_catalogue
+  - platform.sale_board_tile_for_catalogue
+  files:
+  - tools/audit_guard.py
+  - tools/build-schema-workbook.py
+  - tools/check-package.py
+  - tools/audit-links.py
+  - tools/check-parameter-columns.py
+  tickets:
+  - DB-READ-VIEWS
+  - SVC-CATALOGUE-BUNDLE-2
+root_class: A22 LINEAGE
+tickets:
+  started:
+  - 'DB-READ-VIEWS (#27654)'
+  unstarted:
+  - 'SVC-CATALOGUE-BUNDLE-2 (#28023)'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open
+notes: 'Batch GTE (audit/release-gate), 14 October 2026. Finishes the parked second-gate fix: the parked patch made
+  check-package skip a view read; the lead asked for the views to be derived into the schema reference instead, so a
+  developer meeting the name in the lineage can look it up. The Read views sheet has no readColumns for the three
+  (publishBundle''s reads carry none), so it says every column; narrowing them is DB-READ-VIEWS work (CHG-LIN-002).
+  ADAM''s viewer reading view names (F27''s second half) was not checked here.'
