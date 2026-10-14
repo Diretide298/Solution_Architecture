@@ -447,10 +447,77 @@ def fix_metrics(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
                           f"(needs a read or a KPI the contract does not have; the tile stays: client-approved UI)"))
 
 
+# ── S-NO-READ ───────────────────────────────────────────────────────────────────────────────────
+# A screen that edits a record (PUT or PATCH) and reads nothing opens its form blank over saved data. Where the
+# contract reads the record on the same path and the approved screen has a panel or table that can show it, the read
+# is declared on load and bound there (an invisible change). Otherwise it is reported: the contract has no read of
+# the record, or the approved screen has nothing to show it in.
+
+STAMP = "Block A audit, 14 October 2026"
+
+
+def fix_no_read(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    sid = s["id"]
+    facts = {a["operationId"]: ops.get(a["operationId"]) for a in apis(s)}
+    methods = {f["method"] for f in facts.values() if f}
+    if not (methods & {"put", "patch"}) or "get" in methods:
+        return
+    if any(re.match(r"^(search|evaluate|decide|resolve|preview|calculate|quote|check|validate|estimate|price|lookup|"
+                    r"identify|find|compute|simulate|match|suggest|run|list|get|query|render|verify|recommend)", o, re.I)
+           for o in facts):
+        return
+    by_path = {(f["path"], f["method"]): o for o, f in ops.items()}
+    edits = [o for o, f in facts.items() if f and f["method"] in ("put", "patch")]
+    read = next((by_path.get((facts[o]["path"], "get")) for o in edits if by_path.get((facts[o]["path"], "get"))), None)
+    if not read:
+        keeps.append((sid, "S-NO-READ", f"{edits[0]}: the contract has no read on its path (a contract gap)"))
+        return
+    names = {family(n) for n in returned(ops[read]["op"])}
+    slots = [c for _, c in comps(s) if not c.get("operation") and c.get("kind") in ("detailPanel", "dataTable")
+             and (not c.get("bindsTo") or family(str(c.get("bindsTo")).split(".")[0]) in names)]
+    if len(slots) != 1:
+        keeps.append((sid, "S-NO-READ", f"{read} would read the record, and the approved screen has no panel to show "
+                      f"it in (client-approved UI)"))
+        return
+    entry = {"operationId": read, "contract": ops[read]["contract"],
+             "purpose": " ".join(str(ops[read]["op"].get("summary") or read).split()), "trigger": "onLoad",
+             "provenance": f"{STAMP}: the record {edits[0]} edits, read before it is edited (CHG-SCR-005)"}
+    s.setdefault("apis", []).append(entry)
+    slots[0]["operation"] = read
+    log.append(f"{sid}: reads {read} on load into its {slots[0].get('kind')}")
+
+
+# ── S-DUP-REGION ────────────────────────────────────────────────────────────────────────────────
+# A region name is the region's internal id, and `derive-wireframes.py` keys regions by it: a second `contentBody`
+# replaced the first in every wireframe drawn from the screen. **The last keeps its name**, because it is the one the
+# wireframe draws today, so the drawn frame does not change; each earlier one takes its slot (`contentBody` in slot
+# `headline` becomes `contentBodyHeadline`), or a number. No title or component moves.
+
+def fix_dup_regions(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    regions = [r for r in ((s.get("layout") or {}).get("regions") or []) if isinstance(r, dict)]
+    taken = {r.get("name") for r in regions}
+    last = {r.get("name"): i for i, r in enumerate(regions)}
+    for i, r in enumerate(regions):
+        n = r.get("name")
+        if not n or last.get(n) == i:
+            continue
+        slot = re.sub(r"[^A-Za-z0-9]", "", str(r.get("slot") or ""))
+        cand = n + (slot[:1].upper() + slot[1:] if slot else "2")
+        k = 2
+        while cand in taken:
+            k += 1
+            cand = f"{n}{slot[:1].upper() + slot[1:] if slot else ''}{k}"
+        r["name"] = cand
+        taken.add(cand)
+        log.append(f"{s['id']}: region {n} (slot {r.get('slot')}) renamed {cand}")
+
+
 STEPS = {
     "S-STATE-BOILERPLATE": fix_states,
     "S-SCREEN-PERMISSION": fix_permission,
     "S-METRIC-NO-OP": fix_metrics,
+    "S-NO-READ": fix_no_read,
+    "S-DUP-REGION": fix_dup_regions,
     "S-OP-UNREACHED": fix_unreached,
 }
 
