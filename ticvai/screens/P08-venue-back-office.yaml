@@ -161862,7 +161862,7 @@ screens:
   - operationId: publishWalletConfiguration
     contract: wallet
     purpose: Configuration state
-    trigger: onLoad
+    trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates:
     - listWalletTypes

@@ -688,6 +688,31 @@ def fix_async(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
         log.append(f"{s['id']}: polls {poll} after {o}")
 
 
+# ── S-ONLOAD-WRITE ──────────────────────────────────────────────────────────────────────────────
+# A write declared `onLoad` changes state because a page opened. Where a control on the screen calls it, the
+# declaration was wrong and it fires on that action; a shell beacon runs in the background; any other is reported.
+
+READ_LIKE = re.compile(r"^(search|evaluate|decide|resolve|preview|calculate|quote|check|validate|estimate|price|lookup|"
+                       r"identify|find|compute|simulate|match|suggest|run|list|get|query|render|verify|recommend)", re.I)
+
+
+def fix_onload_write(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    refs = reached(s)
+    for a in apis(s):
+        o = a["operationId"]
+        f = ops.get(o)
+        if not f or a.get("trigger") != "onLoad" or f["method"] not in WRITES or READ_LIKE.match(o):
+            continue
+        if o in refs:
+            a["trigger"] = "onAction"
+            log.append(f"{s['id']}: {o} fires on the control that calls it, not on load")
+        elif BEACON.match(o):
+            a["trigger"] = "background"
+            log.append(f"{s['id']}: {o} runs in the background (a beacon no person triggers)")
+        else:
+            keeps.append((s["id"], "S-ONLOAD-WRITE", f"{o} is a write declared onLoad and no control calls it"))
+
+
 STEPS = {
     "S-PURPOSE-BOILERPLATE": fix_screen_purpose,
     "S-PURPOSE-TEMPLATE": fix_api_purpose,
@@ -697,6 +722,7 @@ STEPS = {
     "S-NO-READ": fix_no_read,
     "S-DUP-REGION": fix_dup_regions,
     "S-OP-UNREACHED": fix_unreached,
+    "S-ONLOAD-WRITE": fix_onload_write,
     "S-ASYNC-POLL": fix_async,
     "S-BUTTON-FORM": fix_button_form,
     "S-DUP-SCREEN": fix_division,
