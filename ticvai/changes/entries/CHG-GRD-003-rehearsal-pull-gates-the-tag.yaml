@@ -1,0 +1,41 @@
+id: CHG-GRD-003
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'The rehearsal pull is a gate step before the tag: a local ADAM on r<N>-rc with the stand-in OpenProject
+  loaded from r<N>''s bundle, every block ticket pulled with the shipped connector and compared with the last live
+  pull; it passes only with 0 pull errors, r<N> on every ticket, 0 tickets with nothing linked and 0 dead links.
+  check-ticket-links (TL-REHEARSAL) holds the runbook to it.'
+decision:
+  what: 'docs/active/release-runbook.md section 4 gains the two new gates (ticket links, approved UI), the instruction
+    to run adam-links.py after the full refresh and before the gate, and "The rehearsal pull: the last gate step
+    before the tag" (the four steps and the four zero criteria); section 5 tags only once the rehearsal pull is green.
+    tools/check-ticket-links.py TL-REHEARSAL fails when section 4 lacks any of the step, the candidate tag, the
+    stand-in OpenProject, the shipped connector, the last live pull, or one of the four criteria.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Lead, 14 October 2026: "before pushing r6 can we simulate the results in the pulls?" (Block A audit plan, step
+  11a and "Rehearsal before the push") and "With the pattern of errors we need to get them updated". The r5 pull found
+  123 features and 29 tasks with nothing linked and 55 tickets with links ADAM could not find after the release was
+  out (audit/ticvai/runs/audit-1014/classes.json). Finding count: TL-REHEARSAL finds 10 on the audit-base b93b5a87
+  runbook (none of it was there), 0 on this branch. Follows CHG-GTE-006 (the tag pushed by name, one closing pull).'
+keys_touched:
+  files:
+  - docs/active/release-runbook.md
+  - tools/check-ticket-links.py
+root_class: 'new: REHEARSAL-PULL'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-links.py
+status: open
+notes: 'Batch GRD (audit/gate-guards), 14 October 2026. A pull cannot run inside the offline gate, so the gate holds
+  the runbook text (as check-adam-latest-release LR-TAG-PUSH does for the tag push) and check-ticket-links holds the
+  package side of the same four criteria (links present and resolvable). The connector script the rehearsal runs is
+  the audit kit''s pull-direct.mjs on the lead''s workstation (outside git), named without a path.'

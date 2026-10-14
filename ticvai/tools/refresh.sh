@@ -360,6 +360,11 @@ echo
 # **The change log's index is derived** (council of 2 October): one entry file per change in changes/entries/,
 # so parallel branches never conflict, and the index is written here rather than committed from a branch.
 python3 tools/build-changelog-index.py
+# **What a pull serves is gated, not only what the package says** (14 October 2026, CHG-GRD-001..003): the run-checks
+# list includes check-ticket-links (reads adam-links.json, what ADAM loads; adam-links.py writes it per release, not
+# here, so the release gate runs adam-links.py first: docs/active/release-runbook.md section 4) and
+# check-approved-ui (screens/ against handoff/approved-ui.json; its --snapshot <ref> is an act, run by hand when the
+# client approves a new UI, never here).
 python3 tools/run-checks.py
 
 # **Coverage is a number that can quietly go down.** A regeneration that dropped transitions would

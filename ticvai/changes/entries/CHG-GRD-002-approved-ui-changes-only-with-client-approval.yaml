@@ -1,0 +1,58 @@
+id: CHG-GRD-002
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'A client-approved screen''s visible content does not change without a recorded client approval:
+  handoff/approved-ui.json holds the approved UI (per screen, a hash and the text of each visible field, taken from
+  audit-base b93b5a87), docs/active/approved-ui-changes.yaml records approvals, and tools/check-approved-ui.py fails
+  on any other difference; gating and strict.'
+decision:
+  what: 'tools/check-approved-ui.py (audit_guard Guard, self-tests first). Visible fields per screen: name; layout
+    (template, pattern, density, region order); each region''s slot and components in order (kind, label, tab, the
+    fields of table columns, nested components); every state''s text; each overlay''s component, trigger, confirm and
+    dismiss labels and targets; navigation (transition targets and triggers, exits); a step machine''s steps; and the
+    screen''s existence. Invisible metadata (permissions, bindings and apis, purposes, onLoad/poll reads, entry state
+    and carried ids, wireframe links, implementation paths and routes, gaps, notes, provenance, overlay bodies) is not
+    compared. Rules AU-SCREEN, AU-FIELD, AU-APPROVAL. `--snapshot <ref>` writes handoff/approved-ui.json (an act,
+    like --update-baseline). An approval names screen, field, the client approval reference and `to`, the hash of the
+    approved content, so it approves that content only. Registered gating in tools/run-checks.py; empty baseline.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Lead, 14 October 2026: "the UI is fixed. approved by client so dont change that" and "With the pattern of errors
+  we need to get them updated" (AUDIT-FIX-RULES, the approved UI is fixed; Block A audit plan, gate after the audit:
+  an approved-UI guard). Eleven audit batches edited screens/ in parallel and nothing checked that the visible UI
+  stayed as approved (audit/ticvai/runs/audit-1014/classes.json is the fix stage''s evidence). Finding counts: on
+  audit-base b93b5a87 0 (it is the snapshot); a snapshot of r5 (80390e75) against audit-base finds 6 (ADM-342, ADM-422,
+  POS-000 PIN fields, BO-053 open-shifts table, BO-054 no-access text, POS-001 shift trigger), so the check sees real
+  changes; on audit/gate-guards-base e7211da9 it finds 3, all from 185f7a28 (CHG-OFL-001..004): the offline state text
+  of EMP-041, EMP-070 and SCN-011. They are listed for the lead, not approved here.'
+keys_touched:
+  files:
+  - tools/check-approved-ui.py
+  - handoff/approved-ui.json
+  - docs/active/approved-ui-changes.yaml
+  - tools/run-checks.py
+  - tools/refresh.sh
+  - handoff/audit-baseline.json
+  - docs/active/release-runbook.md
+  screens:
+  - EMP-041
+  - EMP-070
+  - SCN-011
+root_class: 'new: APPROVED-UI'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'Batch GRD (audit/gate-guards), 14 October 2026. The three offline-state changes stay strict findings until
+  the lead decides: record the client''s approval in docs/active/approved-ui-changes.yaml (the check prints each
+  `to` hash) or restore the approved text. Every screen counts as client-approved (the lead''s ruling covers the
+  prototypes, design-r1 frames and wireframes). screens/ is not edited by this change; the screens listed are the
+  three the check finds.'
