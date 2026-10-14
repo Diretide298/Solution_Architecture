@@ -19,6 +19,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/sheet.css" />
     <link rel="stylesheet" href="/costing.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>
@@ -33,18 +34,29 @@
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
-        <button id="ct-refresh" class="chip" type="button" title="Reads OpenProject again, now">Refresh</button>
         <a class="chip" href="/tasks.html">Tasks</a>
         <a class="chip" href="/">Back to the viewer</a>
       </div>
     </header>
 
+    <!-- The three ways in that end before the sheet: signed out, not a reader
+         of the delivery, and no OpenProject to read. Each says which and where
+         it is fixed, so nobody is left looking at an empty page. -->
+    <main id="signed-out" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Sign in first</h1>
+        <p class="auth-note">Costing reads the delivery's logged hours from OpenProject, so there has to be an account.</p>
+        <a class="auth-button" href="/login.html?next=%2Fcosting.html">Sign in</a>
+      </div>
+    </main>
+
     <main id="denied" class="admin-main" hidden>
       <div class="admin-panel">
-        <h1 class="auth-title">Not for you</h1>
+        <h1 class="auth-title">Costing is for administrators and project managers</h1>
         <p class="auth-note">
           What the delivery is costing is read by an administrator or a project
-          manager. Your own work is on <a href="/board.html">your board</a>.
+          manager. Your own work is on <a href="/board.html">My work</a>, and the
+          team's on <a href="/tasks.html">Tasks</a>.
         </p>
         <a class="auth-button" href="/">Back to the viewer</a>
       </div>
@@ -54,7 +66,7 @@
       <div class="admin-panel">
         <h1 class="auth-title">OpenProject is not connected</h1>
         <p class="auth-note" id="unconnected-why"></p>
-        <a class="auth-button" href="/settings.html#openproject">Go to settings</a>
+        <a class="auth-button" id="unconnected-go" href="/settings.html#openproject">Go to settings</a>
       </div>
     </main>
 
@@ -62,74 +74,168 @@
       <nav class="set-nav" aria-label="Sections">
         <h1 class="set-nav-title">Costing</h1>
         <div class="set-nav-list">
-          <a href="#totals">What it has cost</a>
+          <a href="#overview">Overview</a>
+          <div class="set-nav-group">Where it went</div>
           <a href="#people">Per person</a>
+          <a href="#sprints">Per sprint</a>
           <div class="set-nav-group">What the numbers rest on</div>
-          <a href="#rates">Hourly rates</a>
+          <a href="#budget">Budget</a>
+          <a href="#rates">Rates</a>
           <a href="#gaps">What is missing</a>
         </div>
       </nav>
 
       <main class="set-content">
-        <section class="admin-panel set-section" id="totals">
-          <h2 class="admin-heading">What it has cost</h2>
-          <p class="auth-note set-lede">
-            <strong>Hours come from the tickets; rates are set here; the cost is
-            a multiplication done when you open the page.</strong> No total is
-            stored, so nothing here can go stale &mdash; and nothing here is an
-            invoice. The hours are the time people logged in OpenProject, which
-            is not the same as the time they worked.
-          </p>
-          <p class="auth-error" id="ct-error" hidden></p>
-          <section class="stat-strip" id="ct-stats"></section>
+        <!-- ── what is being read, and the filter every section obeys ───────
+             Above the sections, as on Tasks: the rail shows one section at a
+             time, and a filter that vanished with the overview would leave the
+             other sections narrowed by something nobody can see. -->
+        <div class="sh-top">
+          <div class="sh-top-line">
+            <label class="sh-field-inline ct-project" id="ct-project-field" hidden>
+              <span>Project</span>
+              <select class="scope-select" id="ct-project"></select>
+            </label>
+            <p class="sh-lede" id="ct-lede">Reading the logged hours…</p>
+            <div class="sh-top-actions">
+              <p class="sh-asof" id="ct-asof" role="status"></p>
+              <button id="ct-refresh" class="chip" type="button"
+                      title="Reads OpenProject again, now">Refresh</button>
+            </div>
+          </div>
+          <p class="auth-error" id="ct-error" role="alert" hidden></p>
+          <div class="sh-scope" id="ct-scope" role="group" aria-label="Filter the whole page"></div>
+        </div>
+
+        <!-- ── the overview: spend against the budget ─────────────────────
+             Opens on the question the page is opened for: are we inside the
+             budget, and will we stay inside it at the pace so far. -->
+        <section class="admin-panel set-section sh-sheet" id="overview" aria-labelledby="ct-headline">
+          <div class="sh-hero" id="ct-hero">
+            <div class="sh-verdict" id="ct-verdict">
+              <h2 class="sh-headline" id="ct-headline">…</h2>
+            </div>
+            <figure class="sh-figure" id="ct-figure" hidden>
+              <figcaption class="sh-figure-caption" id="ct-figure-caption"></figcaption>
+              <div class="ct-plot" id="ct-plot"></div>
+              <div id="ct-figure-key"></div>
+              <div id="ct-figure-twin"></div>
+            </figure>
+          </div>
+          <p class="sh-next" id="ct-next"></p>
+
+          <section class="sh-part" aria-labelledby="ct-rests-title">
+            <h3 class="sh-part-title" id="ct-rests-title">What this rests on</h3>
+            <ul class="ct-rests" id="ct-rests"></ul>
+          </section>
         </section>
 
-        <section class="admin-panel set-section" id="people">
-          <h2 class="admin-heading">Per person <span class="admin-count" id="ct-people-count"></span></h2>
-          <p class="auth-note set-lede">
+        <section class="admin-panel set-section sh-sheet" id="people" aria-labelledby="ct-people-title" hidden>
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ct-people-title">Per person</h2>
+          </div>
+          <p class="sh-note">
             Logged hours against the rate set for that name. Somebody with hours
-            and no rate shows a dash rather than a zero &mdash; a zero reads as
-            free.
+            and no rate shows a dash rather than a zero, because a zero reads as
+            free. A rate marked <em>at the default</em> is the project's stand-in,
+            not what that person costs.
           </p>
-          <div class="admin-table" id="ct-people"></div>
+          <div id="ct-people"></div>
         </section>
 
-        <section class="admin-panel set-section" id="rates">
-          <h2 class="admin-heading">Hourly rates <span class="admin-count" id="ct-rates-count"></span></h2>
-          <p class="auth-note set-lede">
-            Set against the name OpenProject uses, because that is what the hours
-            arrive attached to. A rate typed against a name the tickets do not
-            use matches nothing, so pick from the list.
+        <section class="admin-panel set-section sh-sheet" id="sprints" aria-labelledby="ct-sprints-title" hidden>
+          <h2 class="sh-part-title" id="ct-sprints-title">Per sprint</h2>
+          <p class="sh-note" id="ct-sprints-note"></p>
+          <div id="ct-sprints"></div>
+          <section class="sh-part" id="ct-weeks-part" aria-labelledby="ct-weeks-title">
+            <h3 class="sh-part-title" id="ct-weeks-title">Per week</h3>
+            <p class="sh-note" id="ct-weeks-note"></p>
+            <div id="ct-weeks"></div>
+          </section>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="budget" aria-labelledby="ct-budget-title" hidden>
+          <h2 class="sh-part-title" id="ct-budget-title">Budget</h2>
+          <p class="sh-note">
+            What the project was given to spend. A change is kept beside the one
+            it replaced, with who made it and when, because a budget that moved
+            without a trace makes every "over by" on this page meaningless.
           </p>
-          <p class="auth-error" id="ct-rate-error" hidden></p>
-          <form class="ct-add" id="ct-add" hidden>
-            <select id="ct-person" class="scope-select" aria-label="Who"></select>
-            <input id="ct-hourly" class="auth-input ct-money" type="number" min="0" step="0.01"
-                   placeholder="0.00" aria-label="Per hour" />
-            <input id="ct-currency" class="auth-input ct-currency" type="text" value="INR"
-                   maxlength="8" aria-label="Currency" />
-            <input id="ct-note" class="auth-input" type="text" placeholder="Note (optional)" />
-            <button class="chip" type="submit">Set</button>
+          <p class="ct-current" id="ct-budget-now"></p>
+          <form class="ct-form" id="ct-budget-form" hidden>
+            <label class="sh-field"><span>Amount</span>
+              <input id="ct-budget-amount" class="sh-input ct-money" type="number" min="1" step="1" inputmode="numeric" required /></label>
+            <label class="sh-field"><span>Currency</span>
+              <select id="ct-budget-currency" class="scope-select ct-currency"></select></label>
+            <label class="sh-field ct-grow"><span>Why it is this much (optional)</span>
+              <input id="ct-budget-note" class="sh-input" type="text" maxlength="300" /></label>
+            <button class="chip ct-submit" type="submit">Save budget</button>
           </form>
-          <p class="auth-note auth-fine" id="ct-readonly" hidden>
-            Rates are set by an administrator. You can read them.
-          </p>
-          <div class="admin-table" id="ct-rates"></div>
+          <p class="auth-error" id="ct-budget-error" role="alert" hidden></p>
+          <p class="sh-quiet" id="ct-budget-readonly" hidden>The budget is set by an administrator. You can read it and its history.</p>
+          <section class="sh-part" aria-labelledby="ct-budget-history-title">
+            <h3 class="sh-part-title" id="ct-budget-history-title">Every budget this project has had</h3>
+            <div id="ct-budget-history"></div>
+          </section>
         </section>
 
-        <section class="admin-panel set-section" id="gaps">
-          <h2 class="admin-heading">What is missing</h2>
-          <p class="auth-note set-lede">
-            Counted rather than absorbed, because each of these makes the total
-            above an understatement and they are three different problems.
+        <section class="admin-panel set-section sh-sheet" id="rates" aria-labelledby="ct-rates-title" hidden>
+          <h2 class="sh-part-title" id="ct-rates-title">Rates</h2>
+          <p class="sh-note">
+            Set against the name OpenProject uses, because that is what the hours
+            arrive attached to. Pick from the list: a rate typed against a name
+            the tickets do not use matches nothing.
           </p>
-          <div class="admin-table" id="ct-gaps"></div>
+          <form class="ct-form" id="ct-rate-form" hidden>
+            <label class="sh-field"><span>Person</span>
+              <select id="ct-rate-person" class="scope-select"></select></label>
+            <label class="sh-field"><span>Per hour</span>
+              <input id="ct-rate-hourly" class="sh-input ct-money" type="number" min="0" step="0.01" inputmode="decimal" required /></label>
+            <label class="sh-field"><span>Currency</span>
+              <select id="ct-rate-currency" class="scope-select ct-currency"></select></label>
+            <label class="sh-field ct-grow"><span>Note (optional)</span>
+              <input id="ct-rate-note" class="sh-input" type="text" maxlength="200" /></label>
+            <button class="chip ct-submit" type="submit">Set rate</button>
+          </form>
+          <p class="auth-error" id="ct-rate-error" role="alert" hidden></p>
+          <p class="sh-quiet" id="ct-rates-readonly" hidden>Rates are set by an administrator. You can read them.</p>
+          <div id="ct-rates"></div>
+
+          <section class="sh-part" aria-labelledby="ct-default-title">
+            <h3 class="sh-part-title" id="ct-default-title">Default rate</h3>
+            <p class="sh-note">
+              Optional. Used for anybody with logged hours and no rate of their
+              own, and every amount it produces is marked <em>at the default</em>,
+              so it is never mistaken for what that person costs.
+            </p>
+            <p class="ct-current" id="ct-default-now"></p>
+            <form class="ct-form" id="ct-default-form" hidden>
+              <label class="sh-field"><span>Per hour</span>
+                <input id="ct-default-hourly" class="sh-input ct-money" type="number" min="0.01" step="0.01" inputmode="decimal" required /></label>
+              <label class="sh-field"><span>Currency</span>
+                <select id="ct-default-currency" class="scope-select ct-currency"></select></label>
+              <label class="sh-field ct-grow"><span>Note (optional)</span>
+                <input id="ct-default-note" class="sh-input" type="text" maxlength="200" /></label>
+              <button class="chip ct-submit" type="submit">Save default</button>
+              <button class="chip" type="button" id="ct-default-drop" hidden>Remove default</button>
+            </form>
+            <p class="auth-error" id="ct-default-error" role="alert" hidden></p>
+          </section>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="gaps" aria-labelledby="ct-gaps-title" hidden>
+          <h2 class="sh-part-title" id="ct-gaps-title">What is missing</h2>
+          <p class="sh-note">
+            Counted rather than absorbed. Each of these makes the spend an
+            understatement or the projection a guess, and each is fixed by
+            somebody different.
+          </p>
+          <div id="ct-gaps"></div>
         </section>
       </main>
     </div>
 
     <script type="module" src="/theme.js"></script>
-    <script type="module" src="/account-drawer.js"></script>
     <script type="module" src="/costing.js"></script>
   </body>
 </html>

@@ -64,6 +64,8 @@ const PAGES = [
   // throws. What the chart *does* is in api/plan-check.mjs, where there is an
   // account with the role to see it.
   '/plan.html',
+  // Costing: the spend against the budget, and the rates and budget it rests on.
+  '/costing.html',
 ];
 
 let pass = 0, fail = 0;

@@ -1232,3 +1232,28 @@ export const changeReleaseNotes = (projectId, from = '', to = '') =>
   call(`/api/changes/release-notes?${new URLSearchParams({
     project_id: projectId ?? '', ...(from ? { from } : {}), ...(to ? { to } : {}),
   })}`);
+
+// ---- the Costing page: the sheet, the budget, the default rate -------------
+// Kept together at the end so the pages being rebuilt side by side each add a
+// block of their own rather than threading lines through each other's.
+//
+// `costingSheet` is `costing` above with the page's filter: person, sprint and
+// type narrow every figure on the service, which also says which hours it used
+// (`hoursSource`) and the facets the filter offers. Money everywhere here is in
+// the currency's smallest unit, as rates are.
+export const costingSheet = ({ projectId = '', refresh = false, person = '', sprint = '', type = '' } = {}) =>
+  call(`/api/costing?${new URLSearchParams({
+    project_id: projectId ?? '', ...(refresh ? { refresh: '1' } : {}),
+    ...(person ? { person } : {}), ...(sprint ? { sprint } : {}), ...(type ? { type } : {}),
+  })}`);
+/** The budget in force and every one before it, newest first. */
+export const getBudget = (projectId = '') =>
+  call(`/api/budget?${new URLSearchParams({ project_id: projectId ?? '' })}`);
+/** A new budget row; nothing is overwritten. Admin only. */
+export const setBudget = (amount, currency, note = '', projectId = '') =>
+  call('/api/budget', { method: 'PUT', body: { project_id: projectId ?? '', amount, currency, note } });
+/** The rate for anybody with hours and none of their own. Admin only. */
+export const setDefaultRate = (hourly, currency, note = '', projectId = '') =>
+  call('/api/rates/default', { method: 'PUT', body: { project_id: projectId ?? '', hourly, currency, note } });
+export const dropDefaultRate = (projectId = '') =>
+  call(`/api/rates/default?${new URLSearchParams({ project_id: projectId ?? '' })}`, { method: 'DELETE' });
