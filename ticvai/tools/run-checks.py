@@ -141,6 +141,10 @@ CHECKS = [
     "check-screen-permissions",
     # 12 October (CHG-R6-031..038): a promise has its operation, field, binding or reader; one business day.
     "check-promises-kept",
+    # 14 October (ADAM CR-078, CHG-CRD-009): a request field the contract says is stored reaches a column the
+    # lineage writes, a write into a key-only table brings its fields a column, and a credential is kept only as a
+    # hash (ADR-0071). A ratchet over the 22 known; reads the schema reference, so it runs after derive-schema.
+    "check-stored-request-fields",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
