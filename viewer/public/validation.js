@@ -1208,3 +1208,27 @@ export function verdictBlock(kind, id, label = id, { layer = '' } = {}) {
 export function verdictLabel(value) {
   return VERDICTS.find(([v]) => v === value)?.[1] ?? value;
 }
+
+// ── Change requests page (changes.html) ─────────────────────────────
+// What the ticket a request came out of says now, and what settling it would
+// do there — read before Accept is pressed, so the page can say it first.
+// Reads only; an OpenProject that cannot be reached comes back `read: false`.
+export const changeSource = (projectId, id) =>
+  call(`/api/changes/${encodeURIComponent(id)}/ticket/source?${new URLSearchParams({ project_id: projectId ?? '' })}`);
+// The comment a settled request owes its open ticket, for the developer's AI
+// agent. Two calls, like the ticket: the first words it and sends nothing.
+export const previewChangeComment = (projectId, id) =>
+  call(`/api/changes/${encodeURIComponent(id)}/comment/preview`,
+    { method: 'POST', body: { project_id: projectId ?? '' } });
+export const applyChangeComment = (projectId, id, proposal) =>
+  call(`/api/changes/${encodeURIComponent(id)}/comment/${encodeURIComponent(proposal)}/apply`,
+    { method: 'POST', body: { project_id: projectId ?? '' } });
+/** Complete or correct a request's intake. Fields left out are left alone. */
+export const changeIntake = (projectId, id, fields) =>
+  call(`/api/changes/${encodeURIComponent(id)}/intake`,
+    { method: 'POST', body: { project_id: projectId ?? '', ...fields } });
+/** The requests settled between two release tags; `to` defaults to the one served. */
+export const changeReleaseNotes = (projectId, from = '', to = '') =>
+  call(`/api/changes/release-notes?${new URLSearchParams({
+    project_id: projectId ?? '', ...(from ? { from } : {}), ...(to ? { to } : {}),
+  })}`);

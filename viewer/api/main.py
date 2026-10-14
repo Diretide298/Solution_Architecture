@@ -5267,6 +5267,10 @@ def _change_row(row) -> dict:
         # the instance address to build one, and a page that guesses it gets a
         # link that 404s for everybody on a different deployment.
         "childUrl": f"{DEFAULT_PMS}/work_packages/{row['child_key']}" if row["child_key"] else "",
+        # The ticket it came out of, as a link, for the same reason: the changes
+        # page names "#6046" on every row and a number nobody can open is a
+        # number somebody retypes into OpenProject's search.
+        "ticketUrl": f"{DEFAULT_PMS}/work_packages/{row['external_key']}" if row["external_key"] else "",
         "childAt": row["child_at"],
         "status": row["status"],
         "raisedBy": row["raised_by_name"] or row["raised_by_email"],
@@ -6358,6 +6362,202 @@ def _file_settlement_ticket(account: dict, project: str, row, endpoint: str, tok
         raise
     _record_child(project, row, made, account, claimed=_SETTLE_CLAIM)
     return made
+
+
+# ── what a request's ticket says, and telling it by hand (changes page) ──
+#
+# The settle above tells the ticket by itself. Two things it cannot do, and the
+# changes page needs both:
+#
+#   **Say beforehand what settling will do.** A lead pressing Accept should read
+#   "this adds a comment to #6046 for the developer's agent" or "#6046 is closed,
+#   so this files a new ticket under it" *before* pressing, not discover it in
+#   the answer. `ticket/source` reads the ticket and runs cr_notice.plan for each
+#   way the request could be settled. It writes nothing.
+#
+#   **Tell a ticket that was never told.** A request settled before 14 October,
+#   settled through the spreadsheet, or settled while its settler had no
+#   OpenProject token is accepted with an open ticket that has no comment on it.
+#   Its agent will build to the old description. `comment/preview` and
+#   `comment/{proposal}/apply` post the same comment the settle would have, in
+#   the propose-then-confirm shape every other write across this bridge has: the
+#   page shows the exact text, and only the second call sends it.
+#
+# Both follow the 14 October rule through cr_notice.plan rather than restating
+# it, so the page, the settle and settle_changes.py cannot disagree about which
+# ticket gets a comment and which gets a child.
+
+
+def _cr_ticket_target(row) -> tuple:
+    """(ticket, child, the one a settlement tells). The settle's claim marker is
+    not a ticket, so it reads as none."""
+    ticket = (row["external_key"] or "").strip()
+    child = (row["child_key"] or "").strip()
+    if child == _SETTLE_CLAIM:
+        child = ""
+    return ticket, child, child or ticket
+
+
+@app.get("/api/changes/{number}/ticket/source")
+def ticket_source(number: str, project_id: str = Query(default=""),
+                  account: dict = Depends(require_account)):
+    """The ticket a request would tell, as OpenProject has it now, and what each
+    settlement would do there. **Reads only.**
+
+    Never an error for OpenProject's sake: no token, an unreachable instance or a
+    ticket this person cannot see all come back as `read: false` with `why`, so
+    the page says that sentence where the plan would have been instead of
+    replacing the request with an error.
+    """
+    scope = _change_project(account, project_id)
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    cr = f"CR-{row['number']:03d}"
+    ticket, child, target = _cr_ticket_target(row)
+    out = {"change": cr, "status": row["status"], "ticket": ticket, "child": child,
+           "key": target, "read": False}
+    if not target:
+        out["why"] = "raised from no ticket, so there is none to tell"
+        out["onSettle"] = {s: cr_notice.plan(s, ticket, child, False) for s in cr_notice.SETTLED}
+        return out
+    try:
+        endpoint, token = _pms_for(account["id"])
+    except HTTPException as exc:
+        out["why"] = str(exc.detail)
+        return out
+    try:
+        found = openproject.work_package(endpoint, token, target)
+        closed = openproject.is_closed(endpoint, token, target)
+        said = openproject.comments(endpoint, token, target)
+    except (openproject.Blocked, openproject.Refused) as exc:
+        out["why"] = str(exc)
+        return out
+    out.update({
+        "read": True,
+        "subject": found.get("subject") or "",
+        "statusName": found.get("status") or "",
+        "closed": closed,
+        "url": found.get("url") or "",
+        # Which settlements the thread already carries, so the page offers
+        # "Add a comment" only where the agent has not been told.
+        "told": [s for s in cr_notice.SETTLED if cr_notice.already_told(said, cr, s)],
+        "onSettle": {s: cr_notice.plan(s, ticket, child, closed) for s in cr_notice.SETTLED},
+    })
+    return out
+
+
+def _comment_guard(number: str, account: dict, project_id: str):
+    """The checks the comment preview and its apply share: who, which status,
+    which ticket, and that it has not been told already. Returns what both need."""
+    scope = _change_project(account, project_id)
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    cr = f"CR-{row['number']:03d}"
+    scopes = _scopes_of(account["id"], scope["project"])
+    # The same people who schedule it, because telling the ticket is the other
+    # way of scheduling it (CHG-ADM-002): whoever may settle it, or its holder.
+    if not _may_file_ticket(account, scope["role"], scopes, row):
+        raise HTTPException(403, (
+            f"{cr} is not yours to tell its ticket about. Whoever can settle it, or "
+            f"whoever took it on, does that."))
+    if row["status"] not in cr_notice.SETTLED:
+        raise HTTPException(409, (
+            f"{cr} is still open. Settle it first: accepting or rejecting it tells its ticket."))
+    if (row["child_key"] or "") == _SETTLE_CLAIM:
+        raise HTTPException(409, f"A ticket for {cr} is being filed right now. Look again in a minute.")
+    ticket, child, target = _cr_ticket_target(row)
+    endpoint, token = _pms_for(account["id"])
+    try:
+        closed = openproject.is_closed(endpoint, token, target) if target else False
+        step = cr_notice.plan(row["status"], ticket, child, closed)
+        if step["action"] == "ticket":
+            raise HTTPException(409, (
+                f"#{target} is closed, so {cr} gets a new ticket under it rather than a "
+                f"comment nobody will pull. Make a ticket instead."))
+        if step["action"] != "comment":
+            raise HTTPException(409, f"Nothing to tell: {step['why']}.")
+        said = openproject.comments(endpoint, token, target)
+    except openproject.Blocked as exc:
+        raise HTTPException(502, str(exc))
+    except openproject.Refused as exc:
+        raise HTTPException(404 if exc.status == 404 else 502, str(exc))
+    return scope, row, cr, target, endpoint, token, said
+
+
+@app.post("/api/changes/{number}/comment/preview")
+def preview_comment(number: str, body: FileIn, account: dict = Depends(require_account)):
+    """Work out the comment a settled request owes its open ticket. **Sends nothing.**"""
+    scope, row, cr, target, _endpoint, _token, said = _comment_guard(number, account, body.project_id)
+    if cr_notice.already_told(said, cr, row["status"]):
+        raise HTTPException(409, (
+            f"#{target} already has {cr}'s {row['status']} comment. The agent reads it on its next pull."))
+    served = releases.served(scope["project"])
+    text = cr_notice.comment_text(cr, row["title"], row["status"], row["resolution"],
+                                  row["resolved_ref"], target, served["tag"] if served else "",
+                                  _json_list(row["artefact_ids"]))
+    proposal = security.new_token()
+    now = security.now()
+    # `status_name` holds the settlement the comment was worded for, so an apply
+    # after the request was settled differently is refused rather than posting
+    # a decision that is no longer the decision.
+    db.write(
+        "INSERT INTO wp_proposal (token_hash, account_id, project_id, kind, external_key, "
+        "change_number, status_name, comment, summary, created_at, expires_at) "
+        "VALUES (?, ?, ?, 'cr-comment', ?, ?, ?, ?, ?, ?, ?)",
+        (security.token_hash(proposal), account["id"], scope["project"], target, row["number"],
+         row["status"], text, f"comment on #{target}: {cr} {row['status']}",
+         security.stamp(now), security.stamp(now + timedelta(minutes=PROPOSAL_MINUTES))))
+    return {
+        "proposal": proposal,
+        "change": cr,
+        "key": target,
+        "url": f"{DEFAULT_PMS}/work_packages/{target}",
+        "text": text,
+        "expiresInMinutes": PROPOSAL_MINUTES,
+        "note": "Nothing has been posted yet. Show this to the person and apply only after they say yes.",
+    }
+
+
+@app.post("/api/changes/{number}/comment/{proposal}/apply")
+def apply_comment(number: str, proposal: str, body: FileIn,
+                  account: dict = Depends(require_account)):
+    """Post the comment the person has read. One use; their own token."""
+    scope, row, cr, target, endpoint, token, said = _comment_guard(number, account, body.project_id)
+    held = db.one("SELECT * FROM wp_proposal WHERE token_hash = ? AND kind = 'cr-comment'",
+                  (security.token_hash(proposal),))
+    if (not held or held["account_id"] != account["id"]
+            or held["project_id"] != scope["project"] or held["change_number"] != row["number"]):
+        raise HTTPException(404, f"No such proposal for {cr}. Preview it first.")
+    if held["applied_at"]:
+        raise HTTPException(409, f"That comment has already been posted on #{held['external_key']}.")
+    if security.expired(held["expires_at"]):
+        raise HTTPException(410, (
+            f"That preview is more than {PROPOSAL_MINUTES} minutes old. Look at it again and preview it again."))
+    if held["external_key"] != target or held["status_name"] != row["status"]:
+        raise HTTPException(409, (
+            f"{cr} has changed since that preview (it is now {row['status']}, telling #{target}). "
+            f"Preview it again."))
+    if cr_notice.already_told(said, cr, row["status"]):
+        # Told in the meantime, by a settle or another press: nothing to send,
+        # and nothing went wrong.
+        db.write("UPDATE wp_proposal SET applied_at = ?, result_key = ? WHERE id = ?",
+                 (security.stamp(), target, held["id"]))
+        return {"ok": True, "already": True, "key": target}
+    if not db.change("UPDATE wp_proposal SET applied_at = ? WHERE id = ? AND applied_at IS NULL",
+                     (security.stamp(), held["id"])):
+        raise HTTPException(409, "That comment has already been posted.")
+    try:
+        openproject.comment(endpoint, token, target, held["comment"], notify=False)
+    except (openproject.Blocked, openproject.Refused) as exc:
+        db.write("UPDATE wp_proposal SET applied_at = NULL WHERE id = ?", (held["id"],))
+        raise HTTPException(502, str(exc))
+    db.write("UPDATE wp_proposal SET result_key = ? WHERE id = ?", (target, held["id"]))
+    return {"ok": True, "already": False, "key": target,
+            "url": f"{DEFAULT_PMS}/work_packages/{target}"}
 
 
 # ── the plan: modules on a chart, dragged, then shipped ──────────────
