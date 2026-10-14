@@ -1,0 +1,53 @@
+id: CHG-SWP-002
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'check-audience-match holds every app''s feature ticket to that app''s audience (AM-TICKET-OP: a staff
+  operation on a guest app''s ticket, a guest- or partner-only one on a staff app''s), and gates: its baseline is
+  recorded and it leaves REPORT_ONLY.'
+decision:
+  what: 'tools/check-audience-match.py gains AM-TICKET-OP, read from handoff/service-docs/plan-tasks.csv through
+    tools/ticket_features.py and typed_props.callable_by (the same audience rule as AM-GUEST-OP and AM-STAFF-OP). Its
+    baseline is recorded (AM-STAFF-OP 6, AM-GUEST-SECURITY 4, AM-TICKET-OP 137) and tools/run-checks.py no longer lists
+    it in REPORT_ONLY; docs/active/release-runbook.md R11 says so. The #27741 finding (searchGuests on
+    AM-IDENTITY-SECURITY-P02) is strict, not baselined: batch GAP fixes it.'
+  by: Chinmay
+  date: '2026-10-14'
+why: '#27741 (AM-IDENTITY-SECURITY-P02, guest app) listed searchGuests, whose x-ticvai-audience is staff
+  (contracts/satellite/marketing-crm.yaml, permission GUEST_VIEW). No guest screen binds it, so AM-GUEST-OP and
+  check-screen-wiring S-GUEST-AUDIENCE, which read screens, never saw it. check-audience-match was report-only since
+  the council of 2 October ("gates once the guest fixes land and the lead records its baseline"; R11): the guest fixes
+  have landed, AM-GUEST-OP, AM-GUEST-FIELD and AM-GUEST-PERMISSION find nothing on r6, and the 10 remaining
+  findings are staff-screen and declaration debt, so the baseline can be recorded. Chinmay, 14 October 2026: "Once
+  done can we check rest of the things for similar patterns?"'
+keys_touched:
+  files:
+  - tools/check-audience-match.py
+  - tools/run-checks.py
+  - docs/active/release-runbook.md
+  - handoff/audit-baseline.json
+  tickets:
+  - AM-IDENTITY-SECURITY-P02
+  operations:
+  - searchGuests
+  other:
+  - AM-TICKET-OP
+root_class: A23 AUTH-SCOPE
+tickets:
+  started:
+  - AM-IDENTITY-SECURITY-P02 (#27741; batch GAP fixes it)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Run on the parent commit 594e51a2 (gate w146''s plan): 148 findings, none baselined, exit 1
+  (and report-only there); on this branch 147 known and the one strict #27741 finding fails until GAP merges.
+  AM-TICKET-OP by app and block: P01 A 93, P02 A 33, P04 A 1, P05 A 1, P08 A 4, P09 B 1, P13 A 5. Gating means a
+  contract or screen change from another r6 batch that adds an audience mismatch now fails the gate; the lead''s
+  merge gate shows it. check-preauth-session and check-subject stay report-only (the POS loyalty swap).'

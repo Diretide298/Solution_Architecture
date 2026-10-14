@@ -198,8 +198,9 @@ REPORT_ONLY = {
     # current findings are the guest fixes (public theme and policy reads, staff fields off guest screens)
     # and the POS loyalty swap, which are in flight. When those land, the lead records the baseline
     # (--update-baseline) and takes each out of this list; from then a new finding blocks.
-    "check-audience-match":
-        "gates once the guest fixes land and the lead records its baseline (council of 2 October)",
+    # check-audience-match gates since 14 October 2026 (CHG-SWP-002): the guest fixes have landed (AM-GUEST-OP,
+    # AM-GUEST-FIELD and AM-GUEST-PERMISSION find nothing on r6), its baseline is recorded, and it gained
+    # AM-TICKET-OP (a staff operation on a guest app's feature ticket, #27741).
     "check-preauth-session":
         "gates once the public theme and policy reads land and the lead records its baseline",
     "check-subject":

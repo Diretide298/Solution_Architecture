@@ -1,0 +1,41 @@
+id: CHG-SWP-005
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'tools/audit-screen-promises.py ranks, per app, the (screen, write operation) pairs whose screen text states
+  a consequence the operation''s contract never mentions, as candidates for an AI sample; it decides nothing and gates
+  nothing.'
+decision:
+  what: 'A report tool, not registered in run-checks.py: a keyword heuristic scoring a security consequence (sign out,
+    credentials, lost or stolen, lock, erase, revoke access, irreversible) the screen states for a write and its
+    summary, description and 2xx descriptions never mention (+3), any other such consequence (+1), and a label and
+    purpose naming different consequences for one operation (+2). The top 20 per app go to the AI sample.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding on r6 (594e51a2), the #27741 sweep, class C5: GST-073 offers "Sign a lost device out" on revokeGuestDevice, whose contract only
+  revokes a push-token registration ("Revoke a device registration"); the button beside it says "Stop notifications on
+  this device". Whether a sentence is a promise the operation keeps is a reading, not a rule. Chinmay, 14 October
+  2026: "Once done can we check rest of the things for similar patterns?"'
+keys_touched:
+  files:
+  - tools/audit-screen-promises.py
+  other:
+  - C5 screen-promise-vs-contract candidates
+root_class: A25 PROSE-QUALITY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Not checkable deterministically: a screen sentence and an operation description agree or not only on
+    reading. The heuristic ranks candidates for an AI sample (ticvai/CLAUDE.md rule 13: spend AI only where a check
+    cannot see); each confirmed one becomes a CR. The lead approves this at the r6 settlement.'
+status: open
+notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". On r6: 954 pairs score above 0 (P08 425, P09 174, P06 90, P04 76, P10 43, P02 36, P01 30,
+  P13 25, P12 17, P15 12, P07 9, P16 7, P14 4, P05 3, P17 3). GST-073 revokeGuestDevice ranks second on P02, after
+  GST-073 guestLogout.'
