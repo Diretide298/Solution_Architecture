@@ -21,7 +21,10 @@ The package seems wrong: $ARGUMENTS
    - `contractImpact`: `none`, `additive` or `breaking`. A breaking one needs an `approver`.
    - `effortPoints`: the change in effort, signed, if it changes the estimate.
 4. Show me the draft and stop. Run `adam_raise_change` only after I say yes.
-5. If it blocks a ticket, offer to `adam_propose` that ticket **On hold** with "Blocked by CR-<n>".
+5. If it blocks a ticket (`blocking: true` - a blocker is always a change request, never a workaround),
+   `adam_propose` that ticket **On hold** with "Blocked by CR-<n>" and show me; apply only after I say yes.
+   Then find the next ticket I can finish: `adam_board` with `only: "workable"`, the first in board order,
+   saying which CR holds back each ticket skipped.
 6. When it is settled, ADAM tells the ticket it came from: a comment for the agent while the ticket is
    open (the next `/ticket` also lists it under "Change requests on this ticket"), or a child task for
    the change when that ticket is closed. You are always on the latest release: nothing to re-pin.

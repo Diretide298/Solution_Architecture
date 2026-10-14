@@ -37,7 +37,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from . import cr_notice, db, decisions, llm, netaddr, openproject, releases, secrets, security
+from . import blockers, cr_notice, db, decisions, llm, netaddr, openproject, releases, secrets, security
 
 app = FastAPI(
     title="TICVAI viewer — accounts and validation",
@@ -2013,7 +2013,10 @@ def read_work_package(
         "AND external_system = 'openproject' AND project_id = ?",
         (number, scope["project"]),
     )
-    return {"workPackage": found, "touches": [_link_row(r)["target"] for r in rows]}
+    touches = [_link_row(r)["target"] for r in rows]
+    return {"workPackage": found, "touches": touches,
+            # The open blocking CRs that affect this ticket (CHG-ADM-004): the pull's "Blocked by".
+            "blockedBy": blockers.Board(scope["project"]).of(number, touches)}
 
 
 # ── which release a ticket is being built against ────────────────────
@@ -2183,6 +2186,9 @@ def _completion_order(items: list, by_key: dict) -> list:
 @app.get("/api/board/mine")
 def my_board(
     project_id: str = Query(default=""),
+    # `workable`: only the tickets no open blocking CR affects; `blocked`: only the ones one does
+    # (CHG-ADM-004). Blank is the whole board, each item carrying `blockedBy` either way.
+    only: str = Query(default=""),
     account: dict = Depends(require_account),
 ):
     """
@@ -2267,10 +2273,23 @@ def my_board(
             # Pulled whether or not anybody asked, because the round trip to
             # fetch them later costs more than carrying them now.
             "subtasks": _subtasks_of(item["key"], kids) if tree_read else [],
+            # The open blocking CRs that affect it, and how (CHG-ADM-004): what lets an agent
+            # that hit a blocker pick the next ticket it can finish by lookup, not by guess.
+            "blockedBy": blocked.of(item["key"], touching.get(item["key"], [])),
         }
+
+    only = only.strip().lower()
+    if only not in ("", "workable", "blocked"):
+        raise HTTPException(400, "only is workable or blocked.")
+    blocked = blockers.Board(scope["project"])
+    every = [dressed(item) for item in items]
+    shown = [i for i in every if not only or (only == "blocked") == bool(i["blockedBy"])]
 
     return {
         "total": len(items),
+        "workable": sum(1 for i in every if not i["blockedBy"]),
+        "blocked": sum(1 for i in every if i["blockedBy"]),
+        "only": only or None,
         "endpoint": endpoint,
         "project": scope["project"],
         # Said out loud when the tree could not be read, so a board where every
@@ -2284,7 +2303,7 @@ def my_board(
             "name": scope["pmsName"],
             "url": f"{endpoint}/projects/{scope['pmsIdentifier']}" if scope["pmsIdentifier"] else "",
         },
-        "items": [dressed(item) for item in items],
+        "items": shown,
         # The window is chosen here rather than asked of OpenProject: see
         # openproject.mine_finished for why a date filter is the wrong thing to
         # send to a 2019 instance.

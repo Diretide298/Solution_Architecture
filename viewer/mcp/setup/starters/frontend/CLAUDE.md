@@ -104,7 +104,8 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
    README.md says **What changed since your previous pull (rA -> rB)**, tell the person in one line
    (`spec-diff.md` has the diffs) and build against the files as they are now.
    **Read "Change requests on this ticket" too**, near the top of README.md: follow a settled
-   decision where it differs from the description, and wait on the part an open request covers.
+   decision where it differs from the description, and wait on the part an open non-blocking request
+   covers; a blocking one is "When the package is wrong", step 4.
 2. Build exactly what the ticket and its linked artefacts describe, in the repository for the
    ticket's platform (the table above), following its existing structure. Nothing outside the ticket.
 3. Add tests the way that repository already writes them. Its lint, typecheck and test commands
@@ -148,8 +149,12 @@ lacks something the ticket needs, **do not settle it in code** - not even with a
    `clientSignoff`; `triage` and `when` if known; other `artefacts` it touches; `contractImpact`
    (none, additive, breaking - breaking needs an `approver`); `effortPoints` if the estimate moves.
 3. Show the draft and **wait for a yes** before `adam_raise_change`.
-4. If it blocks the ticket, offer to propose the ticket **On hold** with "Blocked by CR-<n>".
-   Build whatever the question does not touch.
+4. **A blocker is always a change request** (CHG-ADM-004): set `blocking: true`, and once it is filed,
+   propose the ticket **On hold** with "Blocked by CR-<n>" (applied only after a yes). Never work around
+   it and never build a guess. Then find the next ticket you can finish: `adam_board` with
+   `only: "workable"` lists, in board order, the tickets no open blocking CR affects (a ticket's
+   `blocked` column and the "Blocked by" section of its README.md name the CRs). Propose the first one,
+   and say which CR holds back each ticket you skipped.
 
 Before building against an artefact, check `adam_changes` for an accepted request on it: the
 package may be about to change.
