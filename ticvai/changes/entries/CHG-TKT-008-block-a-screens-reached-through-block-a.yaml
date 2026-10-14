@@ -1,0 +1,51 @@
+id: CHG-TKT-008
+date: '2026-10-14'
+source: audit
+kind: plan
+proposed: '2026-10-14'
+summary: 'Three command centres that are the only way from Venue Management''s entry to Block A screens, and build only
+  Block A operations, are built in Block A: ADM-088, ADM-108, ADM-268.'
+decision:
+  what: docs/active/block-a-extra-tasks.json blockAScreens gains ADM-088, ADM-108 and ADM-268 (VM-ADM-088, -108, -268; 15
+    points), each with the Block A screens it opens. ADM-098, ADM-258 and BO-284 are not pulled (notes).
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-plan-closure/C-REACH (CHG-RONEP-006): 17 Block A screens reached only through a hub outside Block
+  A, 18 tickets, 6 due by 28 October (audit/ticvai/runs/audit-1014/classes.json); after the fix 8 (keeps for the lead).
+  The triage ruling: pull the bridging screen into Block A, or record why not (lead: "go with your recommendation", 14 October).
+  Audit finding, Block A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  screens:
+  - ADM-088
+  - ADM-108
+  - ADM-268
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted:
+  - VM-ADM-088
+  - VM-ADM-108
+  - VM-ADM-268
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-14'
+    quote: go with your recommendation
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'WHY NOT the other three (measured on this branch): BO-284 binds two Block B operations, and pulling it made a new
+  Subscription & Licensing Block A completion app-module of 83 points and 30 tables that took Block B work (VM-LEDGER-LEDGER-2,
+  MIG-CONTROL-19) and moved VM-LEDGER-FISCAL-1 off #28411 (In progress); ADM-098 (listPricing) and ADM-258 (listSaleChannel)
+  each bring a Block B pushed task whole (CHG-R6-054). Their 8 findings (ADM-106; ADM-259, -260, -261, -263, -266, -267;
+  BO-291) stay for the lead: accept that growth, or give the Block A screens a link from a Block A section home (lever A,
+  CHG-RONEP-007; a screen change for batch SCR). Plan change decided the day it was proposed: the lead''s words of 14 October
+  2026 on the audit''s rulings ("go with your recommendation"; r6 held so the audit''s fixes ship in it, BLOCK-A-AUDIT-PLAN-R6)
+  are recorded as the cooling-off waiver; the lead confirms it at the r6 settlement.'

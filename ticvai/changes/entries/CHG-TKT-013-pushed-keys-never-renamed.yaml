@@ -1,0 +1,44 @@
+id: CHG-TKT-013
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'No pushed key is renamed: pushed forward migrations keep their tables (renamed tables by their name now), and
+  a pushed task whose operation a Block A screen now needs follows into Block A whole.'
+decision:
+  what: 'tools/build-service-docs.py: the parked second-gate fixes (pushed_items/table_moves, the moved tables kept in their
+    pushed migration, pushed forward migrations kept apart, from r6h-wip), a pushed forward migration following its earliest
+    need whole, and held_elsewhere for any pushed task of an app-module (not only Block A ones), so CHG-R6-054 takes SVC-CATALOGUE-CATALOGUE-11
+    and SVC-CATALOGUE-DRAFTED-10 into Block A whole instead of cutting setFeeDefinition and publishChannelAvailability into
+    new tasks.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Gate failure check-key-stability: FAIL, 62 pushed keys renamed or unstable (MIG-CATALOGUE-4, -10, -12, -15, MIG-PLATFORM-3,
+  -4 left the plan; 8 pushed sub-tasks moved) (audit/ticvai/runs/audit-1014/classes.json, other_checks); after the fix PASS,
+  0. Audit finding, Block A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  tickets:
+  - MIG-CATALOGUE-4
+  - MIG-CATALOGUE-10
+  - MIG-CATALOGUE-12
+  - MIG-CATALOGUE-15
+  - MIG-PLATFORM-3
+  - MIG-PLATFORM-4
+  - SVC-CATALOGUE-CATALOGUE-11
+  - SVC-CATALOGUE-DRAFTED-10
+root_class: 'new: regroup-moves-pushed-subtask'
+tickets:
+  started: []
+  unstarted:
+  - the eight tickets above
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: open
+notes: SVC-CATALOGUE-CATALOGUE-11 (4 operations) and SVC-CATALOGUE-DRAFTED-10 (4) move from Block B to Block A under AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST
+  (the pushed task follows its earliest block, CHG-R6-054).

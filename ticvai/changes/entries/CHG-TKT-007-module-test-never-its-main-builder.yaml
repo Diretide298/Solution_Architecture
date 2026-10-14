@@ -1,0 +1,53 @@
+id: CHG-TKT-007
+date: '2026-10-14'
+source: audit
+kind: plan
+proposed: '2026-10-14'
+summary: 'A module test is never owned by the person who built most of its module, pushed or not: the 10 pushed Block A
+  module tests their main builder held go to the peer who built the next most.'
+decision:
+  what: 'tools/build-service-docs.py: a pushed module test owned by its app-module''s main builder moves like an unpushed
+    one (to the peer in its stack who built the next most of it); derive-block-a-schedule follows the plan''s owner.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'The lead''s decision 5 of the Block A audit (14 October 2026). Audit class check-plan-owners/O-SELF-TEST: 22 findings,
+  20 tickets, 8 due by 28 October (audit/ticvai/runs/audit-1014/classes.json); after the fix 0. Until then a pushed test
+  kept its owner unless moduleTestPeers named it (CHG-R4-005), and the 20 were baselined. Includes the parked second-gate
+  fix of r6h-wip (a test the lead moved never lands back on its main builder). Audit finding, Block A audit on audit-base
+  b93b5a87.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  tickets:
+  - TEST-AM-ADMISSION-ACCESS-P08-BLOCK-A
+  - TEST-AM-APPROVALS-P04
+  - TEST-AM-FOOD-BEVERAGE-P02
+  - TEST-AM-PAYMENTS-P01
+  - TEST-AM-PAYMENTS-P02
+  - TEST-AM-PRICING-PROMOTIONS-P01
+  - TEST-AM-PRICING-PROMOTIONS-P02
+  - TEST-AM-RESOURCES-CAPACITY-P02
+  - TEST-AM-SETUP-VENUE-OPERATIONS-P08
+  - TEST-AM-TENANCY-VENUES-P08-BLOCK-A
+root_class: 'new: pinned-owner-bypasses-a-rule'
+tickets:
+  started: []
+  unstarted:
+  - the 10 module tests above
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-14'
+    quote: go with your recommendation
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open
+notes: 'Peers follow skill: the peer is whoever built the next most of the module in its stack. Plan change decided the
+  day it was proposed: the lead''s words of 14 October 2026 on the audit''s rulings ("go with your recommendation"; r6 held
+  so the audit''s fixes ship in it, BLOCK-A-AUDIT-PLAN-R6) are recorded as the cooling-off waiver; the lead confirms it
+  at the r6 settlement.'
