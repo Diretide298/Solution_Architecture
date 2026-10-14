@@ -6833,7 +6833,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add what the assistant offers in the chat to the guest's cart
     trigger: onAction
   - operationId: checkoutCart
     contract: orders
@@ -9801,7 +9801,7 @@ screens:
   apis:
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add a suggested item to the cart the suggestions are for
     trigger: onAction
   - operationId: decideRecommendations
     contract: ai
@@ -10191,7 +10191,7 @@ screens:
   apis:
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add the chosen cabana and time to the cart
     trigger: onAction
     invalidates:
     - listProducts
@@ -11376,7 +11376,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add the bundle to the cart
     trigger: onAction
   entryState:
     params:
@@ -13713,7 +13713,8 @@ screens:
     trigger: onAction
   - operationId: getGroupBooking
     contract: orders
-    purpose: getGroupBooking
+    purpose: 'The group booking this guest belongs to: its leader, its name and who still has to give
+      their name'
     trigger: onLoad
   - operationId: respondToInvitation
     contract: marketing-crm

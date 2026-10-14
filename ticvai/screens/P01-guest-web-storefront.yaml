@@ -2166,7 +2166,7 @@ screens:
   apis:
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add a suggested add-on or the offered bundle to the cart
     trigger: onAction
   - operationId: getBundle
     contract: promotions
@@ -2608,7 +2608,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add a suggested item from Add to your visit to the cart
     trigger: onAction
   - operationId: updateCartLine
     contract: orders
@@ -7735,7 +7735,7 @@ screens:
     trigger: onAction
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add the chosen item to the cart, for collection on the way out
     trigger: onAction
     invalidates:
     - listMerchandise

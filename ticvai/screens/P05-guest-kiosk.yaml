@@ -2052,7 +2052,7 @@ screens:
     - listMerchandise
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add the chosen item to the kiosk basket
     trigger: onAction
     invalidates:
     - listMerchandise
