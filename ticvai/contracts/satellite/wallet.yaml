@@ -2749,6 +2749,7 @@ paths:
   /wallets/{walletId}/holds:
     get:
       operationId: listWalletHolds
+      x-ticvai-names-for-context: [control.rollout, seating.seat_reservation_item]
       summary: Funds held against a wallet
       description: >
         **A hold is the difference between a balance and a spendable balance**, and a guest refused

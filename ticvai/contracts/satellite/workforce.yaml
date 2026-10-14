@@ -482,6 +482,7 @@ paths:
   /attendance/{recordId}/amend:
     parameters:
       - name: recordId
+        x-ticvai-column: workforce.attendance.id
         in: path
         required: true
         schema: { type: string, format: uuid }
@@ -1444,6 +1445,7 @@ paths:
           type: string
           format: uuid
       - name: leaveTypeId
+        x-ticvai-column: workforce.leave_balance.type_id
         in: query
         schema:
           type: string

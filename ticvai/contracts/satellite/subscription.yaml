@@ -4840,6 +4840,7 @@ paths:
               - applied
           description: Approval status
         - name: membershipId
+          x-ticvai-column: access.entitlement.id
           in: query
           required: false
           schema:
@@ -4893,6 +4894,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
         - name: membershipId
+          x-ticvai-column: access.entitlement.id
           in: query
           required: false
           schema:
@@ -6898,6 +6900,7 @@ paths:
             type: string
           description: Partner Order Reference
         - name: ticvaiOrderId
+          x-ticvai-column: orders.payment.order_id
           in: query
           required: false
           schema:
@@ -15063,6 +15066,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string

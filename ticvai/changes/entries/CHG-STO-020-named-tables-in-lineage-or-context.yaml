@@ -1,0 +1,42 @@
+id: CHG-STO-020
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: A table an operation's description names is in its lineage, or the operation declares it named for context only
+  (x-ticvai-names-for-context), held to the text and the lineage.
+decision:
+  what: 'Lineage: approveDevice writes tenancy.device_audit, checkoutCart orders.deposit, recordAuthorityNotification maintenance.incident_authority_notification,
+    reportIncident maintenance.incident_involved_party, setAccessPointDirection access.configuration_change and access.gate_mode_change,
+    startSync workforce.employee. x-ticvai-names-for-context on 42 operations (a contrast, a history note, or the table
+    another module''s operation writes). tools/check-parameter-columns.py P-NAMED-TABLE reads the declaration and fails
+    one the text does not name or the lineage uses.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit before r6, class check-parameter-columns/P-NAMED-TABLE (61 at audit-base b93b5a87 with 4 new on the
+  base, 5 after: keeps), evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "A table the description names
+  is in the lineage, or the description stops naming it." Most names were explanations ("not `approvals.sla_policy`", "written
+  by OrderService"): deleting them would cost the reader the explanation, so the operation says they are context, and the
+  check holds the list to the text.'
+keys_touched:
+  files:
+  - contracts/
+  - handoff/api-data-lineage.json
+  - tools/applied/sto-parameters-14-october.py
+  - tools/check-parameter-columns.py
+root_class: A22 LINEAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: 'Batch STO. Detail left open by the ruling, taken as the package does for fields (x-ticvai-persisted: false says
+  a field is not stored where it is declared): the declaration is explicit and checked. Keeps (5), each a real cross-module
+  read or write the lineage needs through the owner''s query or route: addIncidentPerson and reportIncident -> pii.subject
+  (Identity), cancelPerformance -> access.entitlement, getKpiValues -> access.scan_event, listAgentWorkloadAvailability
+  -> workforce.shift (batch MOD).'

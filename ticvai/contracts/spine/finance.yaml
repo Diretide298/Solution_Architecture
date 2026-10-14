@@ -4098,6 +4098,7 @@ paths:
   /tax-documents/{documentId}/rendition:
     parameters:
     - name: documentId
+      x-ticvai-column: ledger.tax_invoice.id
       in: path
       required: true
       description: A tax invoice id or a credit memo id.

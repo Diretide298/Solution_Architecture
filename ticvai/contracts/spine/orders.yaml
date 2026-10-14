@@ -1365,6 +1365,7 @@ paths:
         type: string
         format: uuid
     - name: shareId
+      x-ticvai-column: identity.delegated_access.id
       in: path
       required: true
       schema:
@@ -1539,6 +1540,7 @@ paths:
   /resale-fee-policy:
     get:
       operationId: getResaleFeePolicy
+      x-ticvai-names-for-context: [orders.order_fee, orders.resale_listing, payments.fee_rule]
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
       summary: The commission and price cap a resale listing is created under
@@ -2425,6 +2427,7 @@ paths:
   /invitations:
     post:
       operationId: issueInvitation
+      x-ticvai-names-for-context: [orders.sales_order]
       x-ticvai-write-via:
       - table: access.entitlement
         event: invitation.issued
@@ -9098,6 +9101,7 @@ paths:
           type: string
         description: Mobile
       - name: membershipId
+        x-ticvai-column: orders.membership_renewal.customer_membership_id
         in: query
         required: false
         schema:
@@ -12556,6 +12560,7 @@ paths:
   /deposits:
     get:
       operationId: listDeposits
+      x-ticvai-names-for-context: [ledger.deposit]
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
       summary: Deposits and their authorisation state
@@ -13639,6 +13644,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setResaleMarketplaceConfig
+      x-ticvai-names-for-context: [orders.resale_eligibility_rule, orders.resale_fee_policy]
       x-ticvai-consumed-by:
         - "P08 ADM-280 Resale Policy & Marketplace Settings"
         - "P08 ADM-282 Resale Pricing & Price Guardrails"
@@ -27323,8 +27329,7 @@ components:
     CustomerGuestAccountAssignmentInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `orders.reservation` (with `orders.sales_order`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Customer, Guest & Account Assignment submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -29659,8 +29664,7 @@ components:
     ListingCreationSellerConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `orders.resale_listing`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Listing Creation & Seller Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'

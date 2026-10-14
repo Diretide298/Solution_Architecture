@@ -1,0 +1,35 @@
+id: CHG-STO-021
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: A drafted workspace request names the table its operation writes instead of "no existing table".
+decision:
+  what: 'x-ticvai-persistence of 65 drafted *Input schemas: ''none - request only; applied to <table> (with <tables>), the
+    table its operation writes; a field with no column there is a working input of the screen and is not kept'' (tools/applied/sto-parameters-14-october.py
+    DRAFTED).'
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-parameter-columns/P-DRAFTED-UNMAPPED (65 at audit-base b93b5a87, 0 after), evidence
+  audit/ticvai/runs/audit-1014/classes.json; triage ruling "A drafted write's request schema names the table that stores
+  it."
+keys_touched:
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/orders.yaml
+  - tools/applied/sto-parameters-14-october.py
+root_class: A22 LINEAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: 'Batch STO. Contract impact: x-ticvai extension text only (still `none - request only`, so derive-schema derives
+  no columns from the drafted shape). Migration effect: none.'

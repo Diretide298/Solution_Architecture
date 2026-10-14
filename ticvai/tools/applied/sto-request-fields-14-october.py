@@ -6,8 +6,8 @@ Already applied; kept as the record of what was changed and why. Idempotent.
   names the column that keeps it (`x-ticvai-stored-as`, and the lineage writes that table): an alert's
   acknowledgement note, a resource booking's check-out and return times, a case's opening attachments (on its
   first `CaseMessage`), an exchange line's recommendation (on its `orders.order_line`), a media asset's collections
-  (`MediaCollectionMember` rows), a guest's dietary and accessibility preferences (`marketing.guest_preference`), an
-  incident person's contact details (`pii.subject_contact`, with consent), a delivery location's serving outlets (one
+  (`MediaCollectionMember` rows), a guest's dietary and accessibility preferences (`marketing.guest_preference`), a
+  delivery location's serving outlets (one
   `fnb.delivery_location_outlet` row each). A field that is not kept says so: a deprecated, ignored `Theme.darkMode`,
   the saved card a dunning retry charges. `evaluateAccess` records its decision in `identity.access_decision` (the
   decision, the policy version and the attribute values it saw), which nothing wrote; the append-only
@@ -38,8 +38,6 @@ from sto_markers import Contracts  # noqa: E402
 FIELD = [
     # CHG-STO-016
     ("acknowledgeAlert", "note", "x-ticvai-stored-as", "reporting.alert.acknowledgement_note"),
-    ("addIncidentPerson", "email", "x-ticvai-stored-as", "pii.subject_contact.value"),
-    ("addIncidentPerson", "phone", "x-ticvai-stored-as", "pii.subject_contact.value"),
     ("checkInResource", "recordedAt", "x-ticvai-stored-as", "resources.booking.returned_at"),
     ("checkOutResource", "recordedAt", "x-ticvai-stored-as", "resources.booking.checked_out_at"),
     ("createCase", "attachmentRefs", "x-ticvai-stored-as", "marketing.case_message.attachment_refs"),
@@ -106,7 +104,7 @@ FIELD = [
     ("setAiCredential", "secret", "x-ticvai-stored-as", "ai.provider.credential_ref"),
     # CHG-STO-017: not stored
     ("createGroupBooking", "groupQuoteId", "x-ticvai-persisted", False),
-    ("createGuestLink", "homeSubjectId", "x-ticvai-persisted", False),
+    ("createGuestLink", "homeSubjectId", "x-ticvai-stored-as", "sync.guest_link.local_subject_id"),
     ("createGuestLink", "targetSubjectId", "x-ticvai-persisted", False),
     ("createInstalmentPlan", "instalmentCount", "x-ticvai-persisted", False),
     ("createOrder", "catalogueBundleVersion", "x-ticvai-persisted", False),
@@ -205,10 +203,12 @@ NEW_PROPS = [
 ]
 # operationId -> {"reads+": [...], "reads-": [...], "writes+": [...], "writes-": [...]}
 LINEAGE = {
-    "addIncidentPerson": {"writes+": ["pii.subject_contact"]},
     "createCase": {"writes+": ["marketing.case_message"]},
     "exchangeOrderLines": {"writes+": ["orders.order_line"]},
     "updateMyProfile": {"writes+": ["marketing.guest_preference"]},
+    # not this operation's write: the incident person's contact reaches pii through Identity, whose route is not
+    # declared yet (a keep of CHG-STO-016)
+    "addIncidentPerson": {"writes-": ["pii.subject_contact"]},
     "setEntitlementTemplateBlackoutDates": {"writes+": ["catalogue.audit_entry"]},
     "setWalletRiskRuleStatus": {"writes+": ["wallet.risk_rule"]},
     "updateIncident": {"writes+": ["maintenance.incident_history"]},

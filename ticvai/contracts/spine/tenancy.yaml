@@ -1928,6 +1928,7 @@ paths:
   /devices:
     get:
       operationId: listDevices
+      x-ticvai-names-for-context: [access.device_placement]
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
@@ -4643,6 +4644,7 @@ components:
             The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the
             library; this names a model in it.
         serialNumber:
+          x-ticvai-unique: tenant
           type: string
           nullable: true
           maxLength: 100

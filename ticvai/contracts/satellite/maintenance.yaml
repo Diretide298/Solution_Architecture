@@ -3587,13 +3587,11 @@ components:
           writeOnly: true
           description: Written to the erasable store (`pii.subject`), never to the incident (ADR-0023).
         phone:
-          x-ticvai-stored-as: pii.subject_contact.value
           type: string
           maxLength: 32
           writeOnly: true
           description: Stored only with `contactConsent` true.
         email:
-          x-ticvai-stored-as: pii.subject_contact.value
           type: string
           format: email
           maxLength: 254

@@ -5,25 +5,24 @@ kind: contract
 summary: A request field the contract says is stored names the column that keeps it, the lineage writes that table, and
   a field that is not kept says so; a write into a keys-only table carries its fields.
 decision:
-  what: 'tools/applied/sto-request-fields-14-october.py: x-ticvai-stored-as on acknowledgeAlert.note, addIncidentPerson.email
-    and phone (pii.subject_contact, with consent), checkInResource and checkOutResource recordedAt (the booking''s returned_at
-    and checked_out_at), createCase.attachmentRefs (its opening case_message), updateMediaAsset.collectionIds (media_collection_member
-    rows), updateMyProfile.dietary and accessibility (marketing.guest_preference), setDeliveryLocationOutletMapping servingOutletIds
-    (one fnb.delivery_location_outlet row each); x-ticvai-persisted: false on the deprecated Theme.darkMode and RetryDunningPaymentRequest.paymentTokenId;
-    the lineage of exchangeOrderLines, addIncidentPerson, createCase and updateMyProfile names the table. evaluateAccess
-    writes its decision to identity.access_decision (nothing did); identity.authz_audit is the authorisation layer''s append-only
-    trail on every call (CHG-R6-014), not this operation''s write. tools/check-stored-request-fields.py: a Redis registry
-    (identity.guest_session) is not a keys-only table.'
+  what: 'tools/applied/sto-request-fields-14-october.py: x-ticvai-stored-as on acknowledgeAlert.note, checkInResource and
+    checkOutResource recordedAt (the booking''s returned_at and checked_out_at), createCase.attachmentRefs (its opening
+    case_message), updateMediaAsset.collectionIds (media_collection_member rows), updateMyProfile.dietary and accessibility
+    (marketing.guest_preference), setDeliveryLocationOutletMapping servingOutletIds (one fnb.delivery_location_outlet row
+    each); x-ticvai-persisted: false on the deprecated Theme.darkMode and RetryDunningPaymentRequest.paymentTokenId; the
+    lineage of exchangeOrderLines, createCase and updateMyProfile names the table. evaluateAccess writes its decision to
+    identity.access_decision (nothing did); identity.authz_audit is the authorisation layer''s append-only trail on every
+    call (CHG-R6-014), not this operation''s write. tools/check-stored-request-fields.py: a Redis registry (identity.guest_session)
+    is not a keys-only table.'
   by: Chinmay
   date: '2026-10-14'
-why: Block A audit before r6, classes check-stored-request-fields/SR-STORED-NO-COLUMN (12 at audit-base b93b5a87, 0 after)
-  and SR-STUB-WRITE (7, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json; triage rulings "A field said to be
-  stored reaches a column the lineage writes." and "A write into a keys-only table carries its fields to columns." Same
-  class as ADAM CR-078 (CHG-CRD-009).
+why: 'Block A audit before r6, classes check-stored-request-fields/SR-STORED-NO-COLUMN (12 at audit-base b93b5a87, 2 after:
+  keeps) and SR-STUB-WRITE (7, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json; triage rulings "A field said
+  to be stored reaches a column the lineage writes." and "A write into a keys-only table carries its fields to columns."
+  Same class as ADAM CR-078 (CHG-CRD-009).'
 keys_touched:
   operations:
   - acknowledgeAlert
-  - addIncidentPerson
   - checkInResource
   - checkOutResource
   - createCase
@@ -52,4 +51,8 @@ prevention:
   type: check
   ref: tools/check-stored-request-fields.py
 status: open
-notes: 'Batch STO. Contract impact: x-ticvai extensions only. Migration effect: none (every column named exists).'
+notes: 'Batch STO. Keep (2): addIncidentPerson email and phone are kept, with consent, as the person''s PII subject contact
+  (ADR-0023), which Identity owns; no Identity operation or event that records another module''s person is declared, so
+  the write has no route (check-cross-deployable-writes): a cross-module route for the lead or batch MOD, with the same
+  operation''s pii.subject (CHG-STO-020). Contract impact: x-ticvai extensions only. Migration effect: none (every column
+  named exists).'

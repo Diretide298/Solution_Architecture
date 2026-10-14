@@ -1770,6 +1770,7 @@ paths:
   /payments/rules:
     get:
       operationId: getPaymentRules
+      x-ticvai-names-for-context: [whitelabel.policy]
       x-ticvai-consumed-by:
         - "P08 ADM-564 Currency & Payment Currency Configuration"
         - "P08 ADM-565 Payment Eligibility & Availability Rule Builder"
@@ -1845,6 +1846,7 @@ paths:
   /deposits/{depositId}/activity:
     get:
       operationId: listDepositActivity
+      x-ticvai-names-for-context: [ledger.deposit, orders.deposit]
       x-ticvai-consumed-by:
         - "P06 EMP-099 Deposit Release, Capture & Customer Confirmation"
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"

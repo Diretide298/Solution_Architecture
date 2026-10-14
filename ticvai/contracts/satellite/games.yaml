@@ -3407,6 +3407,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
           maxLength: 64
         name:

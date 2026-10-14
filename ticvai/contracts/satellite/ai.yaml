@@ -1167,6 +1167,7 @@ paths:
         format: uuid
     put:
       operationId: setAiCredential
+      x-ticvai-names-for-context: [ai.activity]
       x-ticvai-consumed-by:
         - "P09 ADM-037 AI Provider & Credentials"
       x-ticvai-audience:
@@ -2713,6 +2714,7 @@ paths:
   /index-sources:
     get:
       operationId: listIndexSources
+      x-ticvai-names-for-context: [catalogue.product]
       x-ticvai-audience:
       - staff
       summary: What is indexed, and how current it is
@@ -9343,6 +9345,7 @@ paths:
   /risk-register/{entryId}:
     parameters:
     - name: entryId
+      x-ticvai-column: ai.risk_register.id
       in: path
       required: true
       schema:

@@ -299,8 +299,15 @@ def main() -> int:
         desc = " ".join(str(r409.get("description") or "").split())
         if not DUPLICATE.search(desc):
             continue
-        named = [p for p in props if CODEISH.search(p) and re.search(r"\b" + re.escape(p) + r"\b|"
-                 + re.escape(" ".join(g.snake(p).split("_"))), desc, re.I)]
+        # **The problem types say what the 409 is** (CHG-STO-018): `verifyProspectSignupCode` answers `codeExpired`
+        # for a code "already used" once, which is a spent challenge, not a uniqueness promise. A 409 that names its
+        # problem types and none of them is a duplicate makes no promise this rule reads.
+        ptypes = [str(x) for x in (r409.get("x-ticvai-problem-types") or [])]
+        if ptypes and not any(re.search(r"taken|duplicate|in-?use|exists|conflict-code", x, re.I) for x in ptypes):
+            continue
+        # a field named in the text as a word, not inside another (`name` is not in "names each one", CHG-STO-018)
+        named = [p for p in props if CODEISH.search(p) and re.search(r"\b" + re.escape(p) + r"\b|\b"
+                 + re.escape(" ".join(g.snake(p).split("_"))) + r"\b", desc, re.I)]
         if not named:
             named = [p for p in props if re.fullmatch(r"(code|sku|\w+Code|\w+Number)", p)
                      and re.search(g.snake(p).split("_")[-1], desc, re.I)]

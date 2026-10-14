@@ -1508,6 +1508,7 @@ paths:
   /dead-letters/{deadLetterId}/replay:
     post:
       operationId: replayDeadLetter
+      x-ticvai-names-for-context: [platform.outbox]
       x-ticvai-consumed-by:
         - "P09 ADM-318 Dead Letters"
       x-ticvai-write-via:

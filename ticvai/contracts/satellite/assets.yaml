@@ -1637,6 +1637,13 @@ components:
           nullable: true
         scopePath:
           type: string
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: assets.media_asset
+          description: The media asset this is a rendition of, from the path of `requestMediaRendition`.
     MediaAssetApproval:
       type: object
       x-ticvai-persistence: assets.approval

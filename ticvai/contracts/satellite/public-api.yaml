@@ -634,6 +634,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createWebhookSubscription
+      x-ticvai-names-for-context: [platform.outbox]
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
         - "P08 BO-1074 Webhook Configuration"

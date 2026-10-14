@@ -1,0 +1,47 @@
+id: CHG-STO-019
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'An <x>Id parameter matches a column the operation''s lineage reads or writes: the parameter names it, the lineage
+  reads the table that holds it, or the table gets the key it lacked.'
+decision:
+  what: 'tools/applied/sto-parameters-14-october.py: x-ticvai-column on 42 parameters (a column of another name, or a path
+    id that is its row''s id) and none on 5 that select no row (a price simulation''s customer and membership, the customer
+    a segment''s rules are evaluated for, the device a policy bundle is signed for, the length variant whose duration is
+    the window); 24 same-module lineage reads or writes; new readOnly keys where a table had none (a rental damage assessment,
+    equipment assignment and inspection name their booking; a rendition its media asset; each rental rule set its product,
+    one per product; a resource venue assignment its resource; a guest link the local subject it resolves, which createGuestLink''s
+    homeSubjectId now stores). tools/check-parameter-columns.py reads the parameter''s x-ticvai-column and a scope id with
+    a role in front (effectiveForVenueId).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit before r6, class check-parameter-columns/P-PARAM-NO-COLUMN (102 at audit-base b93b5a87, 13 after: keeps),
+  evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "An <x>Id parameter matches a column in the operation''s
+  lineage." (Sprint 1-2 judging, CHG-FXC-003).'
+keys_touched:
+  files:
+  - contracts/
+  - handoff/api-data-lineage.json
+  - tools/applied/sto-parameters-14-october.py
+  - tools/applied/sto_markers.py
+  - tools/check-parameter-columns.py
+root_class: A22 LINEAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: 'Batch STO. Keeps (13), each a cross-module data path or an undecided store, in the hand-back: getBillingStatement.statementId
+  (no table holds a billing statement), listBookableVenueMaps.productId (the product''s variants are Catalogue''s), listCustomerSatisfactionFeedback
+  eventId and productId, listEscalationCriticalCase.eventId, listServiceRootCause compareId, eventId and productId, listPrivacyCompliance.productId
+  (each through the order''s lines, Orders'' tables), listPrivacyConsent.policyId (White label''s policies), listMembershipUpgradeDowngrade.bulkMigrationId
+  (orders.membership_migration), reconcileBurstEnvironment.burstEnvironmentId (sync.rejection keys a workstation, CF-162),
+  resolveProductByCode.partnerId (no partner SKU mapping is stored). A cross-module read needs the owner''s declared query
+  (batch MOD, XR-UNCOVERED). Migration effect: the new keys are nullable ADD COLUMNs in V0104 (with their indexes and, for
+  the rule sets, unique indexes).'

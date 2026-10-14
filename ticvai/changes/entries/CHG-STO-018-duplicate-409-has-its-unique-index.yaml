@@ -1,0 +1,52 @@
+id: CHG-STO-018
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: Every 409 for a code, slug, label, barcode, username, number or serial already in use has its x-ticvai-unique at
+  the level the 409 names, on the resource derive-ddl keys.
+decision:
+  what: x-ticvai-unique on AccreditationProgramme.code (tenant), Game.code (venue), CommercialCampaign.code (venue), ContentPage.slug
+    (tenant), DeliveryLocation.label (venue), MerchandiseItem.barcode (venue), Principal.username (tenant), InventorySupplierContract.number
+    (tenant), Tenant.code, RegisteredDevice.serialNumber (tenant), AccessReasonCode.code (tenant). tools/check-storage-promises.py
+    SP-DUPLICATE-409 reads a 409's declared problem types (a spent challenge, `codeExpired`, is no uniqueness promise) and
+    a field named as a word (`name` is not in "names each one").
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-storage-promises/SP-DUPLICATE-409 (15 at audit-base b93b5a87, 0 after), evidence
+  audit/ticvai/runs/audit-1014/classes.json; triage ruling "A 409 for a code in use has its x-ticvai-unique at the level
+  it names." Same class as ADAM CR-068 and CR-074 (CHG-DDL-008).
+keys_touched:
+  operations:
+  - cloneAccreditationProgramme
+  - cloneGame
+  - createCommercialCampaign
+  - updateCommercialCampaign
+  - createContentPage
+  - createDeliveryLocation
+  - createMerchandise
+  - updateMerchandise
+  - createPrincipal
+  - createSupplierContract
+  - createTenant
+  - registerDevice
+  - setReasonCode
+  files:
+  - contracts/
+  - tools/applied/sto-storage-14-october.py
+  - tools/check-storage-promises.py
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch STO. Contract impact: x-ticvai extensions only. Migration effect: one CREATE UNIQUE INDEX per keyable rule
+  in V0104 (lower(column), as common.yaml says); existing duplicates make it fail, which is the migration owner''s signal
+  to merge them. retail.merchandise.barcode (venue) cannot be keyed: the table has neither venue_id nor scope_path (derive-ddl
+  lists it), a follow-up for the lead.'

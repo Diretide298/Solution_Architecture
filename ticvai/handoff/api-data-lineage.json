@@ -15787,6 +15787,7 @@
   "verb": "GET",
   "path": "/outlets/{outletId}/guest-menu",
   "reads": [
+   "fnb.menu",
    "fnb.modifier_group",
    "fnb.modifier_option"
   ],
@@ -20572,6 +20573,7 @@
   "verb": "GET",
   "path": "/requisitions/suggested",
   "reads": [
+   "inventory.location",
    "inventory.requisition"
   ],
   "writes": [],
@@ -22152,7 +22154,8 @@
   "path": "/retail-returns",
   "reads": [
    "retail.return",
-   "retail.return_line"
+   "retail.return_line",
+   "retail.sale"
   ],
   "writes": [],
   "routing": "replica",
@@ -22710,7 +22713,8 @@
   "verb": "GET",
   "path": "/outlets/{outletId}/stock-check",
   "reads": [
-   "platform.outlet"
+   "platform.outlet",
+   "retail.merchandise"
   ],
   "writes": [],
   "routing": "primary",
@@ -24471,7 +24475,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.incident"
+   "maintenance.incident",
+   "maintenance.incident_involved_party"
   ],
   "routing": "",
   "scope": "venue",
@@ -24661,7 +24666,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.incident"
+   "maintenance.incident",
+   "maintenance.incident_authority_notification"
   ],
   "routing": "",
   "scope": "venue",
@@ -24707,7 +24713,8 @@
   "verb": "GET",
   "path": "/media",
   "reads": [
-   "assets.media_asset"
+   "assets.media_asset",
+   "assets.media_collection_member"
   ],
   "writes": [],
   "routing": "replica",
@@ -32028,6 +32035,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "whitelabel.banner",
    "whitelabel.tenant_config"
   ],
   "routing": "",
@@ -32325,6 +32333,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "whitelabel.content_page",
    "whitelabel.tenant_config"
   ],
   "routing": "",
@@ -35824,6 +35833,7 @@
   "writes": [
    "marketing.consent_record",
    "orders.cart",
+   "orders.deposit",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
@@ -37734,7 +37744,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.movement"
+   "inventory.movement",
+   "retail.reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -37761,7 +37772,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.movement"
+   "inventory.movement",
+   "retail.reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -37815,7 +37827,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.rollout"
+   "control.rollout",
+   "control.rollout_cell"
   ],
   "routing": "",
   "scope": "platform",
@@ -50728,6 +50741,7 @@
   "verb": "GET",
   "path": "/seat-map-imports/{importId}",
   "reads": [
+   "seating.import_job",
    "seating.seat_map"
   ],
   "writes": [],
@@ -54585,6 +54599,7 @@
   "verb": "GET",
   "path": "/change-propagation-dependency",
   "reads": [
+   "catalogue.change_request",
    "catalogue.product",
    "catalogue.product_link",
    "catalogue.variant"
@@ -54812,6 +54827,7 @@
   "path": "/channel-log-transaction",
   "reads": [
    "catalogue.audit_entry",
+   "catalogue.channel_incident",
    "orders.sales_order"
   ],
   "writes": [],
@@ -60558,6 +60574,7 @@
   "path": "/order-reservation",
   "reads": [
    "catalogue.inventory_reservation",
+   "orders.membership_renewal",
    "orders.order_line",
    "orders.payment",
    "orders.payment_link",
@@ -62091,6 +62108,7 @@
    "marketing.privacy_exception",
    "marketing.privacy_request",
    "marketing.retention_policy",
+   "marketing.segment",
    "marketing.tracking_technology"
   ],
   "writes": [],
@@ -64322,7 +64340,8 @@
   "verb": "GET",
   "path": "/site-waiver-exception",
   "reads": [
-   "marketing.waiver_exception"
+   "marketing.waiver_exception",
+   "marketing.waiver_requirement"
   ],
   "writes": [],
   "routing": "replica",
@@ -65062,6 +65081,7 @@
   "verb": "GET",
   "path": "/unified-interaction-communication",
   "reads": [
+   "marketing.case",
    "marketing.case_message",
    "marketing.conversation",
    "marketing.conversation_message",
@@ -74918,7 +74938,8 @@
    "seating.seat_category",
    "seating.seat_reservation",
    "seating.seat_reservation_item",
-   "seating.seat_rules"
+   "seating.seat_rules",
+   "seating.section_row"
   ],
   "writes": [],
   "routing": "replica",
@@ -77595,6 +77616,7 @@
   "verb": "GET",
   "path": "/rental-products",
   "reads": [
+   "rental.location_rule",
    "rental.product"
   ],
   "writes": [],
@@ -78182,7 +78204,8 @@
   "verb": "GET",
   "path": "/payment-terminals/{terminalId}/forwarded",
   "reads": [
-   "payments.stored_forward"
+   "payments.stored_forward",
+   "payments.terminal"
   ],
   "writes": [],
   "routing": "replica",
@@ -80985,6 +81008,7 @@
    "assets.tag"
   ],
   "writes": [
+   "assets.media_asset",
    "assets.tag"
   ],
   "routing": null,
@@ -82990,7 +83014,8 @@
   "verb": "POST",
   "path": "/rental-bookings/{bookingId}/agreement",
   "reads": [
-   "rental.agreement_signature"
+   "rental.agreement_signature",
+   "rental.booking"
   ],
   "writes": [
    "rental.agreement_signature"
@@ -84557,7 +84582,8 @@
   "verb": "GET",
   "path": "/employees",
   "reads": [
-   "workforce.employee"
+   "workforce.employee",
+   "workforce.work_assignment"
   ],
   "writes": [],
   "routing": "replica",
@@ -85094,6 +85120,7 @@
    "workforce.sync_run"
   ],
   "writes": [
+   "workforce.employee",
    "workforce.sync_run"
   ],
   "routing": null,
@@ -93525,6 +93552,7 @@
   "verb": "GET",
   "path": "/waiver-testing",
   "reads": [
+   "marketing.waiver_association",
    "marketing.waiver_version_control"
   ],
   "writes": [],
@@ -117009,7 +117037,8 @@
    "platform.device"
   ],
   "writes": [
-   "platform.device"
+   "platform.device",
+   "tenancy.device_audit"
   ],
   "routing": null,
   "scope": "venue",
@@ -118904,7 +118933,9 @@
    "access.gate_mode_change"
   ],
   "writes": [
-   "access.access_point"
+   "access.access_point",
+   "access.configuration_change",
+   "access.gate_mode_change"
   ],
   "routing": null,
   "scope": "venue",
@@ -119692,8 +119723,7 @@
    "maintenance.incident_involved_party"
   ],
   "writes": [
-   "maintenance.incident_involved_party",
-   "pii.subject_contact"
+   "maintenance.incident_involved_party"
   ],
   "routing": null,
   "scope": "venue",

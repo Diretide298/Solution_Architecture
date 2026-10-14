@@ -18,6 +18,7 @@ Already applied; kept as the record of what was changed and why. Idempotent.
   `ProductDisplayTag` and `TransportNetworkImportFinding` said "jsonb column on ..." and got none: the field now
   declares it.
 * CHG-STO-014 (ST-SECRET-FORM, SR-SECRET-UNHASHED): every stored write-only secret says how it is kept (SECRETS below).
+* CHG-STO-018 (SP-DUPLICATE-409): each "already in use" 409 has its x-ticvai-unique at the level it names (MARKERS).
 * CHG-STO-015 (ST-ENUM-CHECK): `UrlRedirect.statusCode` is stored as an integer and `CookieScanPolicy.frequency`
   quotes `off`, so derive-ddl gives each its CHECK.
 * CHG-STO-011 (ST-FIELD-NO-COLUMN): `orders.EntitlementSummary` is one entitlement as a guest sees it, assembled from
@@ -208,6 +209,19 @@ SECRETS = [
 MARKERS = [
     # CHG-STO-015 (ST-ENUM-CHECK): an HTTP status is a number; stored as one it carries its CHECK (as CHG-CRD-002)
     ("marketing-crm", "UrlRedirect", "statusCode", "x-ticvai-persistence-column", "integer"),
+    # CHG-STO-018 (SP-DUPLICATE-409): a 409 for a code in use is a unique index at the level it names, on the
+    # resource derive-ddl keys (the request and the update answer through it)
+    ("accreditation", "AccreditationProgramme", "code", "x-ticvai-unique", "tenant"),
+    ("games", "Game", "code", "x-ticvai-unique", "venue"),
+    ("promotions", "CommercialCampaign", "code", "x-ticvai-unique", "venue"),
+    ("white-label", "ContentPage", "slug", "x-ticvai-unique", "tenant"),
+    ("fnb", "DeliveryLocation", "label", "x-ticvai-unique", "venue"),
+    ("retail", "MerchandiseItem", "barcode", "x-ticvai-unique", "venue"),
+    ("identity", "Principal", "username", "x-ticvai-unique", "tenant"),
+    ("inventory", "InventorySupplierContract", "number", "x-ticvai-unique", "tenant"),
+    ("subscription", "Tenant", "code", "x-ticvai-unique", "tenant"),
+    ("tenancy", "RegisteredDevice", "serialNumber", "x-ticvai-unique", "tenant"),
+    ("access", "AccessReasonCode", "code", "x-ticvai-unique", "tenant"),
 ]
 SCHEMA_EDITS = [
     # CHG-STO-015 (ST-ENUM-CHECK): YAML read the bare `off` as the boolean false, so the enum was not all strings and

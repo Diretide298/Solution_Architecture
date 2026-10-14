@@ -1642,7 +1642,7 @@ components:
             '
         id: { type: string, format: uuid }
         sku: { type: string }
-        barcode: { type: string, nullable: true }
+        barcode: { type: string, nullable: true, x-ticvai-unique: venue }
         name: { type: string }
         outletId: { type: string, format: uuid }
         categoryId: { type: string, format: uuid, nullable: true }

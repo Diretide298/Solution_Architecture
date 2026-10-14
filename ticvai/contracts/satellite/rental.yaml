@@ -2158,6 +2158,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRentalAgreement
+      x-ticvai-names-for-context: [rental.agreement_signature]
       x-ticvai-conflict-policy: serverWins
       summary: Raise a rental agreement
       description: >
@@ -2634,6 +2635,14 @@ components:
           default: true
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product this model is for (one per product), from the path.
     RentalLocationRule:
       type: object
       x-ticvai-persistence: rental.location_rule
@@ -2676,6 +2685,13 @@ components:
           additionalProperties: true
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          description: The rental product offered at this location, from the path of `setRentalProductLocations`.
     RentalDurationRules:
       type: object
       x-ticvai-persistence: rental.duration_rules
@@ -2710,6 +2726,14 @@ components:
           default: false
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RentalOperationalRules:
       type: object
       x-ticvai-persistence: rental.operational_rules
@@ -2764,6 +2788,14 @@ components:
           default: false
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RuleRequirement:
       type: string
       enum:
@@ -2810,6 +2842,14 @@ components:
           default: perParticipant
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RentalConfigurationFinding:
       type: object
       description: 'Boards 1.10 and 4.10. **Severity travels with the finding**, so the publish gate can
@@ -2949,6 +2989,14 @@ components:
           default: 0
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RentalBlackout:
       type: object
       x-ticvai-persistence: rental.blackout
@@ -3790,6 +3838,13 @@ components:
           nullable: true
         scopePath:
           type: string
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.booking
+          description: The rental booking the equipment is assigned to, from the path of `assignRentalEquipment`.
     RentalInspection:
       type: object
       x-ticvai-persistence: rental.inspection
@@ -3857,6 +3912,13 @@ components:
           format: date-time
         scopePath:
           type: string
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.booking
+          description: The rental booking inspected, from the path of `recordRentalInspection`.
     RentalDamageAssessment:
       type: object
       x-ticvai-persistence: rental.damage_assessment
@@ -3901,6 +3963,13 @@ components:
           description: Raised in `maintenance`, so the repair is tracked where every other repair is.
         scopePath:
           type: string
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.booking
+          description: The rental booking assessed, from the path of `assessRentalDamage`.
     RentalReturn:
       type: object
       description: 'Board 8. **Late fee, damage and partial return all land on one deposit.**'

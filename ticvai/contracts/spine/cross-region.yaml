@@ -557,6 +557,7 @@ paths:
   /wallet-authorisations:
     post:
       operationId: authoriseWalletSpend
+      x-ticvai-names-for-context: [wallet.balance]
       x-ticvai-audience:
       - staff
       summary: Hold funds against the guest's home-cell balance
@@ -1287,6 +1288,13 @@ components:
           type: string
           format: date-time
           nullable: true
+        localSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The guest in this cell the link resolves to (`resolveGuestLink`); never sent to another cell.
     CreateGuestLinkRequest:
       type: object
       required:
@@ -1299,7 +1307,7 @@ components:
         homeCellName:
           type: string
         homeSubjectId:
-          x-ticvai-persisted: false
+          x-ticvai-stored-as: sync.guest_link.local_subject_id
           type: string
           format: uuid
           description: Local subject id in the home cell. Never leaves that cell beyond this call.

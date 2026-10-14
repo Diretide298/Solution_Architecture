@@ -1662,6 +1662,7 @@ paths:
   /reports/ask:
     post:
       operationId: askReportingQuestion
+      x-ticvai-names-for-context: [ai.knowledge_gap]
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P06 EMP-020 AI assistant — answer"
@@ -1859,6 +1860,7 @@ paths:
   /semantic-queries:
     post:
       operationId: runSemanticQuery
+      x-ticvai-names-for-context: [ai.knowledge_gap]
       x-ticvai-agreed: '29 September: AI system design 2.2 E and 5.7; shape follows askReportingQuestion'
       x-ticvai-audience:
       - service

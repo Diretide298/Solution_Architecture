@@ -2387,6 +2387,7 @@ paths:
   /accreditation-credentials/verify:
     get:
       operationId: verifyAccreditationCredential
+      x-ticvai-names-for-context: [access.accreditation_credential]
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P07 SCN-003 Ready to scan"
@@ -2996,6 +2997,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string

@@ -123,6 +123,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFnbReservationPolicy
+      x-ticvai-names-for-context: [fnb.service_charge_policy, orders.order_fee]
       summary: Set turn times and seating buffers
       description: '**The booking keeps its own duration as the snapshot.** A turn time revised in
         March must not shorten a reservation already made in February — the same rule-and-record
@@ -164,6 +165,7 @@ paths:
   /service-charge-policy:
     get:
       operationId: getFnbServiceChargePolicy
+      x-ticvai-names-for-context: [rental.fee_policy]
       x-ticvai-consumed-by:
         - "P08 BO-733 Service Channel Configuration"
       summary: The service charge a venue applies, and on what
@@ -2095,6 +2097,7 @@ paths:
         format: uuid
     post:
       operationId: transferOrderItems
+      x-ticvai-names-for-context: [orders.order_line]
       x-ticvai-consumed-by:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       summary: Move items to another table's bill
@@ -4016,6 +4019,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createTableReservation
+      x-ticvai-names-for-context: [orders.deposit]
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
@@ -10323,6 +10327,7 @@ components:
         kind:
           $ref: '#/components/schemas/DeliveryLocationKind'
         label:
+          x-ticvai-unique: venue
           type: string
           description: What a runner is told. "Cabana 12", "Row H Seat 4", "Lawn — north gate".
         zone:

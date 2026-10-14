@@ -210,6 +210,7 @@ paths:
         format: uuid
     post:
       operationId: verifyCustomDomain
+      x-ticvai-names-for-context: [control.tenant_domain]
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
@@ -9910,6 +9911,7 @@ components:
           format: uuid
           readOnly: true
         slug:
+          x-ticvai-unique: tenant
           type: string
           pattern: ^[a-z0-9-]+$
         title:

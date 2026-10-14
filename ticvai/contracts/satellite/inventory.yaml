@@ -3061,6 +3061,7 @@ paths:
   /stock-reservations:
     get:
       operationId: listStockReservations
+      x-ticvai-names-for-context: [rental.agreement_item]
       x-ticvai-consumed-by:
         - "P06 EMP-005 Task detail"
         - "P08 BO-579 Parts, Cost & Maintenance Expense Tracking"
@@ -3673,6 +3674,7 @@ components:
           type: string
           format: uuid
         number:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 100
         name:

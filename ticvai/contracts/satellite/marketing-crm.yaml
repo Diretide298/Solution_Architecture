@@ -994,6 +994,7 @@ paths:
         type: string
     post:
       operationId: respondToInvitation
+      x-ticvai-names-for-context: [access.entitlement]
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
         - "P02 GST-072 Share & Group Booking"
@@ -3631,6 +3632,7 @@ paths:
   /loyalty/leaderboard-nickname:
     put:
       operationId: setLeaderboardNickname
+      x-ticvai-names-for-context: [pii.subject]
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
@@ -4736,6 +4738,7 @@ paths:
         format: uuid
     get:
       operationId: listGuestDevices
+      x-ticvai-names-for-context: [platform.device]
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
@@ -9727,6 +9730,7 @@ paths:
             type: string
             format: uuid
         - name: requestId
+          x-ticvai-column: marketing.privacy_audit_event.related_request_id
           in: query
           required: false
           schema:
@@ -9907,6 +9911,7 @@ paths:
       parameters:
         - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: agentPrincipalId
+          x-ticvai-column: marketing.case.assigned_to_principal_id
           in: query
           required: false
           description: Whose workload; defaults to the caller. Another agent's needs a team-level CASE_VIEW grant.
@@ -10049,6 +10054,7 @@ paths:
               - internalNote
               - automatedNotification
         - name: agentPrincipalId
+          x-ticvai-column: marketing.conversation.assigned_principal_id
           in: query
           required: false
           schema:
@@ -10061,12 +10067,14 @@ paths:
             type: string
             format: uuid
         - name: orderId
+          x-ticvai-column: marketing.case.related_order_id
           in: query
           required: false
           schema:
             type: string
             format: uuid
         - name: ticketId
+          x-ticvai-column: marketing.case.id
           in: query
           required: false
           schema:
@@ -11536,6 +11544,7 @@ paths:
             type: string
             format: uuid
         - name: agentPrincipalId
+          x-ticvai-column: marketing.case.assigned_to_principal_id
           in: query
           required: false
           schema:
@@ -11829,12 +11838,14 @@ paths:
             type: string
             format: uuid
         - name: productId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
             type: string
             format: uuid
         - name: eventId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
@@ -13052,12 +13063,14 @@ paths:
             type: string
             pattern: ^[A-Z]{2}$
         - name: productId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
             type: string
             format: uuid
         - name: eventId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
@@ -14077,6 +14090,7 @@ paths:
             type: string
             format: uuid
         - name: customerSubjectId
+          x-ticvai-column: marketing.waiver_requirement.signatory_subject_id
           in: query
           required: false
           schema:
@@ -14095,6 +14109,7 @@ paths:
             type: string
             format: uuid
         - name: membershipId
+          x-ticvai-column: marketing.waiver_requirement.ticket_id
           in: query
           required: false
           schema:
@@ -15262,6 +15277,7 @@ paths:
   /loyalty/programmes/{programmeId}/rules:
     get:
       operationId: getLoyaltyRules
+      x-ticvai-names-for-context: [marketing.loyalty_programme]
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
         - "P08 BO-828 Milestones & Reward Rules"
@@ -15380,6 +15396,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
       - name: programmeId
+        x-ticvai-column: marketing.loyalty_campaign.program_id
         in: query
         schema:
           type: string
@@ -15444,6 +15461,7 @@ paths:
   /loyalty/points:
     get:
       operationId: listLoyaltyPointEntries
+      x-ticvai-names-for-context: [marketing.loyalty_position]
       summary: The ledger behind a points balance
       description: '**This is the point of decision 8.** The merge response says it plainly:
         *"`marketing.loyalty_position` is a balance with no ledger behind it. It cannot be audited or
@@ -15470,6 +15488,7 @@ paths:
           type: string
           format: uuid
       - name: programmeId
+        x-ticvai-column: marketing.loyalty_points.program_id
         in: query
         schema:
           type: string
@@ -15538,6 +15557,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
       - name: programmeId
+        x-ticvai-column: marketing.reward.loyalty_program_id
         in: query
         schema:
           type: string
@@ -16025,6 +16045,7 @@ paths:
   /sla-policies:
     get:
       operationId: listSlaPolicies
+      x-ticvai-names-for-context: [approvals.sla_policy]
       summary: Response and resolution targets for cases
       description: >
         **Not `approvals.sla_policy`, which times an approval request.** This times a guest case:
@@ -16317,6 +16338,7 @@ paths:
           type: string
           format: uuid
       - name: subjectId
+        x-ticvai-column: marketing.booking_consent_record.person_subject_id
         in: query
         schema:
           type: string
@@ -16897,6 +16919,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listDeviceConsents
+      x-ticvai-names-for-context: [pii.consent_identifier]
       x-ticvai-consumed-by:
         - "P13 CMS-033 Consent Evidence, History & Withdrawal Management"
         - "P13 CMS-039 Privacy Audit, Evidence & Compliance Reporting"

@@ -183,6 +183,22 @@ class Contracts:
         s, _e = self.schema_span(stem, schema)
         return self._set(stem, s, key, value)
 
+    def set_persistence(self, stem, schema, value):
+        """Replace the schema's own `x-ticvai-persistence` (with its continuation lines) by `value`, single-quoted."""
+        f = self.files[stem]
+        lines = f["lines"]
+        s, e = self.schema_span(stem, schema)
+        i = next((k for k in range(s + 1, e) if lines[k].startswith("      x-ticvai-persistence:")), None)
+        if i is None:
+            raise LookupError("%s.%s: no x-ticvai-persistence" % (stem, schema))
+        j = _span(lines, i, 6)
+        new = "      x-ticvai-persistence: '%s'" % value.replace("'", "''")
+        if lines[i:j] == [new]:
+            return "="
+        lines[i:j] = [new]
+        f["dirty"] = True
+        return "~"
+
     def add_retired(self, stem, schema, column):
         """Add a column name to the schema's `x-ticvai-retired-columns` (kept as a flow list), keeping any already there."""
         f = self.files[stem]
@@ -323,6 +339,62 @@ class Contracts:
             raise LookupError("%s: no body property %s" % (op_id, prop))
         i = min(hits, key=lambda k: (_indent(lines[k]), k))     # the body's own field, not a nested one's
         return self._set(stem, i, key, value)
+
+    def set_op_list(self, stem, op_id, key, values):
+        """`key: [a, b]` on the operation (after its operationId line); replaced where the operation has it."""
+        f = self.files[stem]
+        lines = f["lines"]
+        s, e = self.op_span(stem, op_id)
+        k = next(i for i in range(s, e) if lines[i].strip() == "operationId: %s" % op_id)
+        ind = _indent(lines[k])
+        new = " " * ind + "%s: [%s]" % (key, ", ".join(values))
+        for i in range(s + 1, e):
+            if _indent(lines[i]) == ind and re.match(r"^\s+" + re.escape(key) + r":", lines[i]):
+                j = _span(lines, i, ind)
+                if lines[i:j] == [new]:
+                    return "="
+                lines[i:j] = [new]
+                f["dirty"] = True
+                return "~"
+        lines.insert(k + 1, new)
+        f["dirty"] = True
+        return "+"
+
+    def set_param_marker(self, stem, op_id, name, key, value):
+        """`key: value` on the operation's parameter `name` (declared on the operation, else on its path item)."""
+        f = self.files[stem]
+        lines = f["lines"]
+        s, e = self.op_span(stem, op_id)
+        ps = s
+        while ps > 0 and not (_indent(lines[ps]) == 2 and lines[ps].strip().startswith("/")):
+            ps -= 1
+        pe = _span(lines, ps, 2)
+        pat = re.compile(r"^(\s*)-\s+(\{\s*)?name:\s*['\"]?" + re.escape(name) + r"['\"]?\s*(,|$)")
+        hits = [i for i in range(s, e) if pat.match(lines[i])] or [i for i in range(ps, pe) if pat.match(lines[i])
+                                                                    and not (s <= i < e)]
+        if not hits:
+            raise LookupError("%s: no parameter %s" % (op_id, name))
+        i = hits[0]
+        m = pat.match(lines[i])
+        val = value if isinstance(value, str) else ("true" if value is True else "false" if value is False else str(value))
+        if m.group(2):                                     # `- { name: x, in: query, ... }`
+            body = lines[i][lines[i].index("{") + 1:lines[i].rindex("}")]
+            if re.search(r"(^|,)\s*" + re.escape(key) + r"\s*:", body):
+                return "="
+            pad = " " if body.endswith(" ") else ""
+            lines[i] = lines[i][:lines[i].index("{") + 1] + body.rstrip() + ", %s: %s%s" % (key, val, pad) + "}"
+            f["dirty"] = True
+            return "+"
+        item_ind = len(m.group(1)) + 2                     # keys of the list item's mapping
+        j = i + 1
+        while j < len(lines) and lines[j].strip() and _indent(lines[j]) >= item_ind \
+                and not lines[j].lstrip().startswith("- "):
+            if _indent(lines[j]) == item_ind and re.match(r"^\s+" + re.escape(key) + r":", lines[j]):
+                return "="
+            j += 1
+        lines.insert(i + 1, " " * item_ind + "%s: %s" % (key, val))
+        f["dirty"] = True
+        return "+"
 
     def replace_text(self, stem, old, new):
         """One exact replacement anywhere in the file."""

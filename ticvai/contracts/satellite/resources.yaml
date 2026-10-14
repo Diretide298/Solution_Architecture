@@ -712,6 +712,7 @@ paths:
         format: uuid
     get:
       operationId: getPerformanceManifest
+      x-ticvai-names-for-context: [catalogue.performance]
       x-ticvai-consumed-by:
         - "P08 BO-099 Performance Manifest"
       summary: Who is in a performance, in what order
@@ -2530,6 +2531,7 @@ paths:
   /experiences/{experienceId}/resource-requirements:
     parameters:
     - name: experienceId
+      x-ticvai-column: resources.resource_requirement.product_id
       in: path
       required: true
       description: The experience's catalogue `Product.id` (4 October 2026, CHG-FXC-010; BO-877).
@@ -3024,6 +3026,7 @@ paths:
           type: string
           format: uuid
       - name: variantId
+        x-ticvai-column: none
         in: query
         required: true
         description: The length variant; its `length` value's `durationMinutes` is the window.
@@ -4419,6 +4422,13 @@ components:
           nullable: true
         scopePath:
           type: string
+        resourceId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: resources.resource
+          description: The resource assigned, from the path of `setResourceVenueAssignment`.
     ResourceSchedule:
       type: object
       x-ticvai-persistence: resources.resource_schedule

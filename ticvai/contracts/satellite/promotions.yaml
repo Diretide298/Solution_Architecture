@@ -821,6 +821,7 @@ paths:
         format: uuid
     post:
       operationId: publishPromotion
+      x-ticvai-names-for-context: [promotions.promotion_conflict]
       x-ticvai-consumed-by:
         - "P08 ADM-141 Promotion Lifecycle & Status Manager"
         - "P08 BO-010 Promotions & Coupons"
@@ -8899,6 +8900,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
           maxLength: 64
           nullable: true

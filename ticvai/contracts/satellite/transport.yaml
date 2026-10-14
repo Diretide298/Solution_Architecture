@@ -1247,6 +1247,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateTransportDeparture
+      x-ticvai-names-for-context: [catalogue.channel_capacity]
       x-ticvai-consumed-by:
         - "P08 BO-1187 Transport Departure Board"
       x-ticvai-audience: [staff]
