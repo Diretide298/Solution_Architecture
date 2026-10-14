@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 """Derive the invisible wiring of every screen from its operations: the Block A audit's generator rules (14 October 2026).
 
-**The screens' UI is fixed and approved by the client** (Chinmay, 14 October 2026). This deriver never adds, removes,
-moves or relabels a visible component, region title, overlay or screen, and never changes copy a person reads. It
-writes only what is invisible and follows from the operations a screen declares: the permission the screen is gated
-on, which declared operation a control binds to, an api's `purpose`, internal region ids, and the design notes of the
-rendering states where a generator's note promises something the approved screen does not have. A member it cannot
-fix without a visible change is left as it is and reported as a keep ("client-approved UI").
+**The screens' UI is fixed and approved by the client** (Chinmay, 14 October 2026). This deriver never changes a
+visible field: no state text, label, component, region content, banner, overlay label or screen existence
+(`tools/check-approved-ui.py` holds that against `handoff/approved-ui.json`). It writes only invisible metadata that
+follows from the operations a screen declares: the permission the screen is gated on, which declared operation a
+control binds to (`operation`, an overlay's `confirm.operation`), apis and their purposes and triggers, poll reads
+and the ids they need on entry, internal region ids, a screen's spec `purpose` and `division`, and wireframe links.
+A member it cannot fix without a visible change is left as it is and reported as a keep ("client-approved UI").
 
 The rules, one per audit class (`tools/check-screen-wiring.py`; evidence `audit/ticvai/runs/audit-1014/classes.json`;
 change entries CHG-SCR-nnn):
 
-  S-STATE-BOILERPLATE   The pack generator (9 September) wrote "Carries the create action", "The filter narrowed
-                        it" and "Names the missing permission" on every screen, whatever it had. They are design
-                        notes, not copy. Where the screen has no create operation and no visible create control, or no
-                        filter, the note says what the screen has. A visible create control with nothing behind it is
-                        the UI's promise and is reported, not rewritten.
+  (S-STATE-BOILERPLATE   **No rule** (CHG-SCR-021). The state texts are client-approved copy; a state promising a
+                        create action, filter or permission the screen lacks is a keep for the lead and the client.)
   S-SCREEN-PERMISSION   A staff screen whose operations need a permission declares the one its load needs
                         (`generate-screens-from-contracts.py::screen_permission`: the read it loads with first, then
                         any read, then its writes), or the one its no-access state already names. Guest surfaces
@@ -26,7 +24,7 @@ wrote, so a person's note or permission survives; idempotent, a second run write
 other screen derivers write them (PyYAML `safe_dump`, width 100), in the checkout's line endings: every screen file
 round-trips byte for byte, so the diff is the change and nothing else.
 
-    python tools/derive-screen-wiring.py [--only S-STATE-BOILERPLATE,...] [--platform P08] [--apply] [--verbose]
+    python tools/derive-screen-wiring.py [--only S-SCREEN-PERMISSION,...] [--platform P08] [--apply] [--verbose]
 """
 from __future__ import annotations
 
@@ -120,73 +118,6 @@ def put_after(s: dict, key: str, value, after: tuple) -> None:
             placed = True
     if not placed:
         s[key] = value
-
-
-# ── S-STATE-BOILERPLATE ─────────────────────────────────────────────────────────────────────────
-
-FIRST_RUN = re.compile(r"^No (?P<noun>.{1,80}?) (?P<cfg>yet|configured yet)\. Carries the create action"
-                       r"(; distinct from a filter that matched nothing| and says what the platform does in "
-                       r"the meantime)\.$")
-NO_RESULTS = re.compile(r"^The filter narrowed it and the (?P<noun>.{1,80}?) are still there\. ")
-NO_ACCESS = "Names the missing permission. **Never an empty table**"
-NO_ACCESS_NONE = ("No operation on this screen requires a permission, so no permission can be missing: the state is "
-                  "reached only by a caller who is not signed in, or a tenant without the screen's module, and says "
-                  "which. **Never an empty table** — that reads as *there is no data* and sends somebody to support "
-                  "with the wrong question.")
-CREATE_BUTTON = re.compile(r"^\s*(\+\s*)?(create|add|new|register|issue|raise|record|submit|book|enrol|invite|"
-                           r"upload|import)\b", re.I)
-
-
-def first_run_note(noun: str, configured: bool, writer: str | None) -> str:
-    """The first-run note of a screen that creates nothing (shared with `generate-screens-from-pack.py`)."""
-    if configured:
-        return (f"No {noun} configured. `{writer}` saves the first one; the state says what the platform does in the "
-                f"meantime." if writer else f"No {noun} configured, and this screen declares nothing that saves one.")
-    return (f"No {noun} yet. **Offers no create action** — this screen declares no operation that makes one — and "
-            f"says so rather than showing an empty table.")
-
-
-def no_results_note(lister: str | None) -> str:
-    """The no-results note of a screen with no filter (shared with `generate-screens-from-pack.py`)."""
-    if lister:
-        return f"Never shown: this screen offers no filter, so an empty `{lister}` is always the first-run state above."
-    return "Never shown: this screen has no list or filter to narrow, so nothing it shows can be filtered to empty."
-
-
-def fix_states(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
-    sid = s["id"]
-    states = s.get("states") or {}
-    facts = {a["operationId"]: ops.get(a["operationId"]) for a in apis(s)}
-    kinds = {c.get("kind") for _, c in comps(s)}
-    creates = [o for o, f in facts.items() if f and f["method"] == "post" and CREATE_LIKE.match(o)]
-    m = FIRST_RUN.match(str(states.get("emptyFirstRun") or ""))
-    if m and not creates:
-        visible = [c.get("label") for _, c in comps(s)
-                   if "Button" in str(c.get("kind")) and CREATE_BUTTON.match(str(c.get("label") or ""))]
-        if visible:
-            keeps.append((sid, "S-STATE-BOILERPLATE", f"emptyFirstRun: the approved screen shows {visible[0]!r} and no "
-                          f"operation on it creates; the note is the UI's promise (client-approved UI)"))
-        else:
-            writer = next((o for o, f in facts.items() if f and f["method"] in ("put", "patch", "post")), None)
-            states["emptyFirstRun"] = first_run_note(
-                m.group("noun"), m.group("cfg") == "configured yet" or s.get("pattern") == "configEditor", writer)
-            log.append(f"{sid}: emptyFirstRun names no create action")
-    perms = [f["op"].get("x-ticvai-permission") for f in facts.values() if f and f["op"].get("x-ticvai-permission")]
-    if str(states.get("emptyNoAccess") or "").startswith(NO_ACCESS) and not perms:
-        states["emptyNoAccess"] = NO_ACCESS_NONE
-        log.append(f"{sid}: emptyNoAccess names no permission")
-    elif states.get("emptyNoAccess") == NO_ACCESS_NONE and perms:
-        # Its own note, gone stale: an operation now needs a permission, so the state names it.
-        known = [o for o, f in facts.items() if f]
-        new = G.no_access_state(ops, known, {a["operationId"] for a in apis(s) if a.get("trigger") == "onLoad"})
-        if new:
-            states["emptyNoAccess"] = new
-            log.append(f"{sid}: emptyNoAccess names the permission its operations now need")
-    if NO_RESULTS.match(str(states.get("emptyNoResults") or "")) and not (kinds & FILTERS):
-        lister = next((o for o, f in facts.items() if f and f["method"] == "get" and o.startswith(("list", "search"))),
-                      None)
-        states["emptyNoResults"] = no_results_note(lister)
-        log.append(f"{sid}: emptyNoResults names no filter")
 
 
 # ── S-SCREEN-PERMISSION ─────────────────────────────────────────────────────────────────────────
@@ -762,7 +693,6 @@ def fix_incoming(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
 STEPS = {
     "S-PURPOSE-BOILERPLATE": fix_screen_purpose,
     "S-PURPOSE-TEMPLATE": fix_api_purpose,
-    "S-STATE-BOILERPLATE": fix_states,
     "S-SCREEN-PERMISSION": fix_permission,
     "S-METRIC-NO-OP": fix_metrics,
     "S-NO-READ": fix_no_read,

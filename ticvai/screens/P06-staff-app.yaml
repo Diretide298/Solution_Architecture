@@ -957,8 +957,8 @@ screens:
     - listIncidents
   - operationId: uploadIncidentMedia
     contract: maintenance
-    purpose: 'The signed upload for a photo or document the incident form attaches, requested when
-      the form is sent; no control of its own'
+    purpose: The signed upload for a photo or document the incident form attaches, requested when the
+      form is sent; no control of its own
     trigger: background
     provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
@@ -6872,8 +6872,8 @@ screens:
     - listIncidents
   - operationId: uploadIncidentMedia
     contract: maintenance
-    purpose: 'The signed upload for a photo or document the incident form attaches, requested when
-      the form is sent; no control of its own'
+    purpose: The signed upload for a photo or document the incident form attaches, requested when the
+      form is sent; no control of its own
     trigger: background
     provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
@@ -8251,8 +8251,8 @@ screens:
     provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
   - operationId: uploadIncidentMedia
     contract: maintenance
-    purpose: 'The signed upload for a photo or document the incident form attaches, requested when
-      the form is sent; no control of its own'
+    purpose: The signed upload for a photo or document the incident form attaches, requested when the
+      form is sent; no control of its own
     trigger: background
     provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
@@ -9160,7 +9160,7 @@ screens:
     trigger: onLoad
   - operationId: getVenueMapLive
     contract: venue-map
-    purpose: 'The live operational state on the venue map, refreshed while the map is open'
+    purpose: The live operational state on the venue map, refreshed while the map is open
     trigger: onInterval
   entryState:
     params:
@@ -10424,8 +10424,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTableReservations` reads the population and `getTableMap` reads one of them — list,
     select, act'
-  purpose: 'See a service period at a glance for one outlet: its table bookings, the F&B orders in
-    flight and the table map with each table''s live state.'
+  purpose: 'See a service period at a glance for one outlet: its table bookings, the F&B orders in flight
+    and the table map with each table''s live state.'
   layout:
     template: split
     regions:
@@ -10578,8 +10578,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getTableMap` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: 'Show the outlet''s floor as it is laid out, with each table''s live state, so a host can
-    see where to seat a party.'
+  purpose: Show the outlet's floor as it is laid out, with each table's live state, so a host can see
+    where to seat a party.
   layout:
     template: detail
     regions:
@@ -10686,8 +10686,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`setTableLayout`) and no read of a population — it is
     settings, not a list
-  purpose: 'Set out the outlet''s tables (label, capacity, zone, position and shape) and which
-    tables can be pushed together, and to what capacity.'
+  purpose: Set out the outlet's tables (label, capacity, zone, position and shape) and which tables can
+    be pushed together, and to what capacity.
   layout:
     template: form
     regions:
@@ -10847,8 +10847,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTableReservations` reads a population and nothing reads one of them; the detail
     is the row until a `get` exists'
-  purpose: 'See an outlet''s table bookings for a date, on a calendar and as a list, with the double
-    bookings still to resolve.'
+  purpose: See an outlet's table bookings for a date, on a calendar and as a list, with the double bookings
+    still to resolve.
   layout:
     template: split
     regions:
@@ -10985,9 +10985,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`createTableReservation`) and no read of a population
     — it is settings, not a list
-  purpose: 'Book a table for a guest at the host stand (party size, time, tables, seating preference
-    and occasion) after checking whether the guest already has a record, then send the
-    confirmation.'
+  purpose: Book a table for a guest at the host stand (party size, time, tables, seating preference and
+    occasion) after checking whether the guest already has a record, then send the confirmation.
   layout:
     template: form
     regions:
@@ -11210,8 +11209,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`joinRestaurantWaitlist`) and no read of a population
     — it is settings, not a list
-  purpose: 'Put a walk-in party on the outlet''s waitlist, quote them a wait, tell them when their
-    table is ready, or take them off the list.'
+  purpose: Put a walk-in party on the outlet's waitlist, quote them a wait, tell them when their table
+    is ready, or take them off the list.
   layout:
     template: form
     regions:
@@ -11391,8 +11390,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getGuestProfile` reads one of them — list, select,
     act'
-  purpose: 'Read a guest''s profile and their orders at the venue, and find and merge duplicate
-    records of the same person once somebody has decided.'
+  purpose: Read a guest's profile and their orders at the venue, and find and merge duplicate records
+    of the same person once somebody has decided.
   layout:
     template: split
     regions:
@@ -11660,8 +11659,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`openTableVisit`, `updateTableVisit`, `mergeTableVisits`)
     and no read of a population — it is settings, not a list
-  purpose: 'Run a table during service: open the visit or seat a booked party, change covers, server
-    or table, move the meal on a stage, place an order and fire or hold a course.'
+  purpose: 'Run a table during service: open the visit or seat a booked party, change covers, server or
+    table, move the meal on a stage, place an order and fire or hold a course.'
   layout:
     template: form
     regions:
@@ -12068,8 +12067,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getBill` reads one record and nothing reads a population — the screen is about that
     one thing'
-  purpose: 'Settle a table: read the bill, add an order, split the bill, comp or move items, take
-    payment and close the visit.'
+  purpose: 'Settle a table: read the bill, add an order, split the bill, comp or move items, take payment
+    and close the visit.'
   layout:
     template: detail
     regions:
@@ -12349,8 +12348,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTableReservations` reads the population and `getTableMap` reads one of them — list,
     select, act'
-  purpose: 'See how the outlet''s bookings and tables perform: turn time, no-shows, covers and
-    wait-quote accuracy, beside the bookings and the table map.'
+  purpose: 'See how the outlet''s bookings and tables perform: turn time, no-shows, covers and wait-quote
+    accuracy, beside the bookings and the table map.'
   layout:
     template: split
     regions:
@@ -12498,8 +12497,8 @@ screens:
   pattern: listDetail
   patternReason: '`listStockMovements` reads the population and `getStockPositions` reads one of them
     — list, select, act'
-  purpose: 'See a store''s stock on hand and the movements behind it, by item, location and kind,
-    from the floor.'
+  purpose: See a store's stock on hand and the movements behind it, by item, location and kind, from the
+    floor.
   layout:
     template: split
     regions:
@@ -12661,8 +12660,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getStockPositions` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: 'Check what an outlet has in stock, low stock first and beside its sibling outlets, and
-    scan an item for its price and stock.'
+  purpose: Check what an outlet has in stock, low stock first and beside its sibling outlets, and scan
+    an item for its price and stock.
   gaps:
   - operation: getHaccpStatus
     why: '**`getHaccpStatus` declares its response inline**, so the component that shows it names fields
@@ -12804,8 +12803,8 @@ screens:
   pattern: listDetail
   patternReason: '`listRequisitions` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: 'Raise a requisition for the store, starting from the suggested below-par items, and
-    change its lines before it is approved.'
+  purpose: Raise a requisition for the store, starting from the suggested below-par items, and change
+    its lines before it is approved.
   layout:
     template: split
     regions:
@@ -12997,8 +12996,7 @@ screens:
   pattern: listDetail
   patternReason: '`listStockLocations` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: 'Send stock to another store or the warehouse, and receive inbound transfers against
-    their manifest.'
+  purpose: Send stock to another store or the warehouse, and receive inbound transfers against their manifest.
   layout:
     template: split
     regions:
@@ -13207,8 +13205,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getStockTransfer` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: 'Receive the expected supplier deliveries and inbound transfers, log the temperature a
-    chilled delivery arrived at, and reject goods that fail.'
+  purpose: Receive the expected supplier deliveries and inbound transfers, log the temperature a chilled
+    delivery arrived at, and reject goods that fail.
   layout:
     template: detail
     regions:
@@ -13350,7 +13348,7 @@ screens:
     trigger: onAction
   - operationId: logColdChain
     contract: fnb
-    purpose: 'The temperature a chilled delivery arrived at, and what was decided about it'
+    purpose: The temperature a chilled delivery arrived at, and what was decided about it
     trigger: onAction
   - operationId: getStockTransfer
     contract: inventory
@@ -13439,8 +13437,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getCountVariance` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: 'Start a stock count, enter what is on the shelf line by line, and set which items are
-    counted every day.'
+  purpose: Start a stock count, enter what is on the shelf line by line, and set which items are counted
+    every day.
   layout:
     template: detail
     regions:
@@ -13656,8 +13654,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`recordWaste`, `createStockMovement`, `logTemperature`)
     and no read of a population — it is settings, not a list
-  purpose: 'Record waste and stock adjustments with a reason, log food-safety temperatures, and sign
-    the corrective actions waiting for a supervisor.'
+  purpose: Record waste and stock adjustments with a reason, log food-safety temperatures, and sign the
+    corrective actions waiting for a supervisor.
   layout:
     template: form
     regions:
@@ -13756,11 +13754,11 @@ screens:
     trigger: onAction
   - operationId: logTemperature
     contract: fnb
-    purpose: 'Record a food-safety temperature check, in range or not'
+    purpose: Record a food-safety temperature check, in range or not
     trigger: onAction
   - operationId: signCorrectiveAction
     contract: fnb
-    purpose: 'Say what was done about a food-safety finding, and put a name to it'
+    purpose: Say what was done about a food-safety finding, and put a name to it
     trigger: onAction
   - operationId: getHaccpStatus
     contract: fnb
@@ -13897,8 +13895,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getStockPositions` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: 'Hold an item for a guest to collect, see the stock it comes from, and mark the hold
-    collected or release it.'
+  purpose: Hold an item for a guest to collect, see the stock it comes from, and mark the hold collected
+    or release it.
   layout:
     template: detail
     regions:
@@ -14055,8 +14053,8 @@ screens:
   pattern: listDetail
   patternReason: '`listSerialisedItems` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: 'Find where each serialised item is, by serial or status, and scan a barcode for its
-    price and stock.'
+  purpose: Find where each serialised item is, by serial or status, and scan a barcode for its price and
+    stock.
   layout:
     template: split
     regions:
@@ -14128,7 +14126,7 @@ screens:
   apis:
   - operationId: listSerialisedItems
     contract: inventory
-    purpose: 'Where each serialised item is, found by serial or status'
+    purpose: Where each serialised item is, found by serial or status
     trigger: onLoad
   - operationId: lookupMerchandise
     contract: retail
@@ -14187,8 +14185,8 @@ screens:
   pattern: listDetail
   patternReason: '`listAlerts` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: 'Work the inventory alerts raised at the venue: acknowledge each one, and raise a
-    requisition where stock needs replenishing.'
+  purpose: 'Work the inventory alerts raised at the venue: acknowledge each one, and raise a requisition
+    where stock needs replenishing.'
   layout:
     template: split
     regions:
@@ -14437,8 +14435,8 @@ screens:
       slot: headline
     template: dashboard
   states:
-    emptyFirstRun: No rental checkout yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No rental checkout yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: The filter narrowed it and the rental checkout are still there. Names the active filter
@@ -14578,12 +14576,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No voucher scan reservation yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No voucher scan reservation yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the voucher scan reservation are still there. Names the
+      active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the voucher scan reservation untouched.
     loading: The voucher scan reservation list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -14666,12 +14664,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No checkout readiness validation yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No checkout readiness validation yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the checkout readiness validation are still there. Names
+      the active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the checkout readiness validation untouched.
     loading: The checkout readiness validation list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -14767,8 +14765,8 @@ screens:
     emptyFirstRun: No equipment yet. Carries the create action; distinct from a filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the equipment are still there. Names the active filter
+      and offers to clear it.
     error: Could not load. Names which read failed and leaves the equipment untouched.
     loading: The equipment list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -14978,8 +14976,8 @@ screens:
       filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the pre-rental condition inspection are still there. Names
+      the active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the pre-rental condition inspection untouched.
     loading: The pre-rental condition inspection list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15074,12 +15072,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No safety handover checklist yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No safety handover checklist yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the safety handover checklist are still there. Names the
+      active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the safety handover checklist untouched.
     loading: The safety handover checklist list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15177,12 +15175,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No deposit financial handover yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No deposit financial handover yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the deposit financial handover are still there. The pack's
+      own statuses are ✓ AUTHORIZED — the state names which is selected.
     error: Could not load. Names which read failed and leaves the deposit financial handover untouched.
     loading: The deposit financial handover list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15278,8 +15276,8 @@ screens:
       that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the group multi-item checkout are still there. Names the
+      active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the group multi-item checkout untouched.
     loading: The group multi-item checkout list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15365,8 +15363,8 @@ screens:
       slot: fields
     template: form
   states:
-    emptyFirstRun: No checkout confirmation rental configured. `checkOutRental` saves the first one; the
-      state says what the platform does in the meantime.
+    emptyFirstRun: No checkout confirmation rental configured yet. Carries the create action and says
+      what the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
@@ -15486,8 +15484,8 @@ screens:
       slot: headline
     template: dashboard
   states:
-    emptyFirstRun: No active rental operations yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No active rental operations yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: The filter narrowed it and the active rental operations are still there. Names the
@@ -15621,12 +15619,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No active rental detail yet. **Offers no create action** — this screen declares no
-      operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No active rental detail yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the active rental detail are still there. Names the active
+      filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the active rental detail untouched.
     loading: The active rental detail list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15755,8 +15753,8 @@ screens:
       slot: rowActions
     template: split
   states:
-    emptyFirstRun: No rental extension request yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No rental extension request yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: The filter narrowed it and the rental extension request are still there. Names the
@@ -15837,12 +15835,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No extension pricing confirmation yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No extension pricing confirmation yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the extension pricing confirmation are still there. Names
+      the active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the extension pricing confirmation untouched.
     loading: The extension pricing confirmation list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15937,12 +15935,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No equipment swap replacement yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No equipment swap replacement yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the equipment swap replacement are still there. Names the
+      active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the equipment swap replacement untouched.
     loading: The equipment swap replacement list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16031,12 +16029,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No rental incident operational yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No rental incident operational yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the rental incident operational are still there. Names
+      the active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the rental incident operational untouched.
     loading: The rental incident operational list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16115,12 +16113,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No due soon customer yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No due soon customer yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen offers no filter, so an empty `listOverdueRentals` is always
-      the first-run state above.'
+    emptyNoResults: The filter narrowed it and the due soon customer are still there. Names the active
+      filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the due soon customer untouched.
     loading: The due soon customer list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16202,8 +16200,8 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen offers no filter, so an empty `listOverdueRentals` is always
-      the first-run state above.'
+    emptyNoResults: The filter narrowed it and the overdue rental are still there. Names the active filter
+      and offers to clear it.
     error: Could not load. Names which read failed and leaves the overdue rental untouched.
     loading: The overdue rental list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16288,12 +16286,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No active group rental yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No active group rental yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the active group rental are still there. Names the active
+      filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the active group rental untouched.
     loading: The active group rental list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16395,12 +16393,12 @@ screens:
       slot: selection
     template: split
   states:
-    emptyFirstRun: No active rental intelligence yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No active rental intelligence yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen offers no filter, so an empty `listOverdueRentals` is always
-      the first-run state above.'
+    emptyNoResults: The filter narrowed it and the active rental intelligence are still there. Names the
+      active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the active rental intelligence untouched.
     loading: The active rental intelligence list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16529,8 +16527,8 @@ screens:
       slot: headline
     template: dashboard
   states:
-    emptyFirstRun: No rental return yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No rental return yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: The filter narrowed it and the rental return are still there. Names the active filter
@@ -16670,12 +16668,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No return scan rental yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No return scan rental yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the return scan rental are still there. Names the active
+      filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the return scan rental untouched.
     loading: The return scan rental list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16762,12 +16760,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No return summary actual yet. **Offers no create action** — this screen declares no
-      operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No return summary actual yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the return summary actual are still there. Names the active
+      filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the return summary actual untouched.
     loading: The return summary actual list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16862,8 +16860,8 @@ screens:
       filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the post-rental condition inspection are still there. Names
+      the active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the post-rental condition inspection untouched.
     loading: The post-rental condition inspection list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16957,8 +16955,8 @@ screens:
       matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the before after condition are still there. Names the active
+      filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the before after condition untouched.
     loading: The before after condition list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17051,12 +17049,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No damage assessment charge yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No damage assessment charge yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the damage assessment charge are still there. Names the
+      active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the damage assessment charge untouched.
     loading: The damage assessment charge list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17146,12 +17144,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No partial return missing yet. **Offers no create action** — this screen declares no
-      operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No partial return missing yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the partial return missing are still there. Names the active
+      filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the partial return missing untouched.
     loading: The partial return missing list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17249,12 +17247,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No late fees damage yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No late fees damage yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the late fees damage are still there. Names the active
+      filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the late fees damage untouched.
     loading: The late fees damage list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17352,12 +17350,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No deposit release capture yet. **Offers no create action** — this screen declares
-      no operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No deposit release capture yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen offers no filter, so an empty `listDepositActivity` is always
-      the first-run state above.'
+    emptyNoResults: The filter narrowed it and the deposit release capture are still there. Names the
+      active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the deposit release capture untouched.
     loading: The deposit release capture list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17461,8 +17459,8 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
-      be filtered to empty.'
+    emptyNoResults: The filter narrowed it and the return completion equipment are still there. Names
+      the active filter and offers to clear it.
     error: Could not load. Names which read failed and leaves the return completion equipment untouched.
     loading: The return completion equipment list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without

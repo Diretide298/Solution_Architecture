@@ -129,8 +129,8 @@ python3 tools/derive-entrystate-params.py --apply
 # script is a number nobody is keeping true.
 python3 tools/derive-components.py --apply
 # **The invisible wiring, derived from the operations** (Block A audit, 14 October 2026, CHG-SCR-*): the permission a
-# screen is gated on, which declared operation a control binds to, api purposes, internal region ids, and the state
-# notes a generator wrote that promise what the client-approved screen does not have. Never a visible change.
+# screen is gated on, which declared operation a control binds to, api purposes, poll reads, internal region ids and
+# wireframe links. Never a visible field (state text included, CHG-SCR-021): check-approved-ui holds that.
 python3 tools/derive-screen-wiring.py --apply
 
 # **Before the boards are drawn, so every screen knows where it was drawn.** Five P04 screens

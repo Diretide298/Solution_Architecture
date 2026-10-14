@@ -1003,7 +1003,6 @@ screens:
 
       '
     confirm:
-      label: Approve
       operation: decideAccreditationApplication
     provenance: frame claude-design/Accreditation Board.dc.html#acc-005
   states:

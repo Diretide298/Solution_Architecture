@@ -1,0 +1,50 @@
+id: CHG-SCR-021
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'The client-approved state texts are restored on P08 and its staff-app twins, and derive-screen-wiring no
+  longer rewrites any state text: S-STATE-BOILERPLATE is a client-approved-UI keep for the lead. Four overlay confirm
+  labels the approved UI never had are removed (their bound operations stay).'
+decision:
+  what: 'Undoes CHG-SCR-001''s state rewriting. tools/derive-screen-wiring.py loses the S-STATE-BOILERPLATE rule and
+    says it never changes a visible field; tools/generate-screens-from-pack.py is back to its audit-base text;
+    refresh.sh''s note says so. screens/P08-venue-back-office.yaml: 1,980 state texts back to the approved snapshot
+    (b93b5a87); screens/P06-staff-app.yaml EMP-071..EMP-100 re-synced by tools/applied/apply-rental-staff-app.py
+    --apply (46). screens/P09-platform-admin-console.yaml ADM-003, ADM-007, ADM-011 and
+    screens/P11-accreditation-portal.yaml ACC-007: the `confirm.label` added beside the bound `confirm.operation` is
+    removed (a visible label; the operation binding is invisible and stays).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding on r6-integrate 425d0417: tools/check-approved-ui.py (CHG-GRD-002, CHG-GRD-004) failed with 2,030
+  AU-FIELD findings: 2,026 state texts CHG-SCR-001 rewrote and 4 overlay confirm labels. The lead: "the UI is fixed.
+  approved by client so dont change that"; state text is visible copy. After: 0, with derive-screen-wiring run
+  package-wide as the refresh runs it. S-STATE-BOILERPLATE (R250) is back to 2,326 (all keeps, client-approved UI);
+  evidence audit/ticvai/runs/audit-1014/classes.json.'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - tools/generate-screens-from-pack.py
+  - tools/refresh.sh
+  - screens/P08-venue-back-office.yaml
+  - screens/P06-staff-app.yaml
+  - screens/P09-platform-admin-console.yaml
+  - screens/P11-accreditation-portal.yaml
+  screens:
+  - P08 (1,980 state texts), EMP-071..EMP-100, ADM-003, ADM-007, ADM-011, ACC-007
+  other:
+  - S-STATE-BOILERPLATE
+  - AU-FIELD
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in batch SCR's impact list
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'Batch SCR, 14 October 2026. CHG-SCR-001''s entry stays as the record of what was undone.'

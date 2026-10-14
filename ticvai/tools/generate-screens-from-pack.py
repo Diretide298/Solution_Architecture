@@ -92,14 +92,6 @@ import yaml
 # or 2 must not carry them, so the generator says them in exactly these words.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from screen_patterns import NEEDS_PERSON  # noqa: E402
-import importlib.util as _ilu  # noqa: E402
-
-# The state notes for a screen without a create action or a filter, shared with the deriver that corrects the
-# screens already written (CHG-SCR-001).
-_ws = _ilu.spec_from_file_location("derive_screen_wiring",
-                                   os.path.join(os.path.dirname(os.path.abspath(__file__)), "derive-screen-wiring.py"))
-_WIRING = _ilu.module_from_spec(_ws)
-_ws.loader.exec_module(_WIRING)
 
 # Provenance prefixes this generator owns; anything else on an overlay is somebody's
 # decision and is carried through a rebuild.
@@ -782,35 +774,22 @@ def build(screen: dict, entry: dict, ops: dict, schemas: dict, report: Counter,
                                    "queue means every request has been decided — this state "
                                    "offers no create action, because creating work is not what "
                                    "an empty inbox needs.")
-    # **The create action and the filter only where the screen has them** (Block A audit, 14 October 2026,
-    # CHG-SCR-001, S-STATE-BOILERPLATE): this generator wrote "Carries the create action" and "The filter narrowed
-    # it" on 2,331 screens that had neither. The notes for a screen without them are `derive-screen-wiring.py`'s,
-    # which corrects the screens already written.
-    creating = [o for o in op_ids if o in ops and str(ops[o].get("method", "")).lower() == "post"
-                and _WIRING.CREATE_LIKE.match(o)]
-    if pattern == "configEditor":
-        writer = next((o for o in op_ids if o in ops
-                       and str(ops[o].get("method", "")).lower() in ("put", "patch", "post")), None)
+    elif pattern == "configEditor":
         states["emptyFirstRun"] = (f"No {noun} configured yet. Carries the create action and says "
-                                   f"what the platform does in the meantime." if creating
-                                   else _WIRING.first_run_note(noun, True, writer))
+                                   f"what the platform does in the meantime.")
     else:
         states["emptyFirstRun"] = (f"No {noun} yet. Carries the create action; distinct from a "
-                                   f"filter that matched nothing." if creating
-                                   else _WIRING.first_run_note(noun, False, None))
+                                   f"filter that matched nothing.")
     # **A configuration editor with a filter is still filtering.** ADM-275 and ADM-296 are
     # `configEditor` screens whose packs give them a filter directory, and a screen that can
     # narrow its content has to say what narrowed-to-nothing looks like.
-    if filters_raw:
+    if pattern != "configEditor" or filters_raw:
         states["emptyNoResults"] = (
             (f"The filter narrowed it and the {noun} are still there. The pack's own statuses are "
              f"{', '.join(status_raw[:1])} — the state names which is selected."
              if status_raw else
              f"The filter narrowed it and the {noun} are still there. Names the active filter and "
              f"offers to clear it."))
-    elif pattern != "configEditor":
-        states["emptyNoResults"] = _WIRING.no_results_note(
-            next((o for o in op_ids if o.startswith(("list", "search"))), None))
     states["emptyNoAccess"] = ("Names the missing permission. **Never an empty table** — that "
                                "reads as *there is no data* and sends somebody to support with "
                                "the wrong question.")
