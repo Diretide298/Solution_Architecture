@@ -9,6 +9,8 @@ them from the package:
                              and the screens in this plan that call them
   database task / sub-task   its tables
   frontend task / sub-task   its screen and the operations the screen calls
+  app-module feature         what its Builds list: its screens and the operations they call (CHG-TKT-004)
+  a task building none       the files its description names and, for setup work, the setup standards (CHG-TKT-005)
   service epic or feature    its service
 
 Writes handoff/service-docs/adam-links.json, loaded on the ADAM server by viewer/api/load_links.py. With
@@ -76,16 +78,19 @@ def main() -> int:
     ticket_done.merge_bindings(screens)     # a merged screen's operations are built on its target (CHG-FXP-002)
     screen_ops = {sid: [a["operationId"] for a in s.get("apis") or [] if a.get("operationId")]
                   for sid, s in screens.items()}
-    touches = touches_from(rows, lineage, screen_ops)
+    known = package_index(screens)
+    touches = touches_from(rows, lineage, screen_ops, known)
     token = os.environ.get("TICVAI_OP_TOKEN", "")
     snap = snapshot(token) if token else {}
-    links, per_kind, bare = [], collections.Counter(), 0
+    links, per_kind, bare, bare_keys = [], collections.Counter(), 0, []
     for key, wp in mp.items():
         if key.startswith(("_", "VERSION")):
             continue
         seen = set()
         got = [t for t in touches(key) if not (t in seen or seen.add(t))]
         bare += not got
+        if not got and "#" not in key and key in rows:
+            bare_keys.append(key)
         for kind, target in got:
             per_kind[kind] += 1
             links.append({"key": str(wp), "kind": kind, "id": target, "url": f"{PMS}/work_packages/{wp}",
@@ -93,13 +98,132 @@ def main() -> int:
     out = {"project": "ticvai", "openproject": PMS, "cached": bool(snap), "links": links}
     (DOCS / "adam-links.json").write_text(json.dumps(out, indent=0), encoding="utf-8")
     tickets = len([k for k in mp if not k.startswith(("_", "VERSION"))])
-    print(f"{len(links)} links for {tickets - bare} of {tickets} tickets ({bare} with nothing to link: setup, "
-          f"onboarding and frontend/VM groupings); {dict(per_kind)}; cached columns: {bool(snap)}")
+    print(f"{len(links)} links for {tickets - bare} of {tickets} tickets ({bare} with nothing to link: out of the "
+          f"plan or sub-tasks of such); {dict(per_kind)}; cached columns: {bool(snap)}")
+    print(f"repointed to a table's name now: {sum(known['repointed'].values())} link(s) "
+          f"({', '.join(f'{a} -> {b}' for a, b in sorted(known['repointed'])[:8])}); dropped as not in the package: "
+          f"{sum(known['dropped'].values())} ({', '.join(f'{k} {i}' for k, i in sorted(known['dropped'])[:12])})")
+    if bare_keys:
+        print(f"planned tickets with nothing to link: {len(bare_keys)} ({', '.join(sorted(bare_keys)[:12])})")
     return 0
 
 
-def touches_from(rows, lineage, screen_ops):
-    """key -> [(kind, id)] for a ticket (a task, or "TASK#part" a sub-task). Imported by tools/check-ticket-builds.py."""
+# **Every link resolves, and every ticket links something** (14 October 2026, CHG-TKT-004, CHG-TKT-005, CHG-TKT-006;
+# the Block A pull of 14 October: 123 features and 29 tasks reached developers with nothing linked, and 55 tickets
+# carried links ADAM could not find). A table a declared rename or move retired (tools/derive-schema-history.py
+# RENAMES: catalogue.inventory_hold is catalogue.inventory_reservation) is linked under its name now; an id that is no
+# operation, table or screen of the package (a pushed sub-task's part "SETUP-HOSTS#commerce", a lineage view such as
+# platform.sale_board_for_catalogue, platform.schema_version, which the migration runner owns) is dropped, never
+# linked. An ADR a ticket builds is linked as its file too, because ADAM pulls files and not decisions; and a task
+# that builds no operation, table or screen links the package files its description names (a contract, a doc, a
+# setup standard) and, for a setup, DevOps or onboarding task, the setup standards it is built to
+# (repos/ticvai-docs/setup/, project-bible/setup/ in every repository). ADAM serves `file` links through adam_file
+# (viewer/mcp/tools.mjs lookupFor, same change).
+SETUP_DOCS = "repos/ticvai-docs/setup"
+FILE_REF = re.compile(r"(?<![\w/.-])((?:contracts|docs|handoff|screens|flows|states|events|setup|backend|"
+                      r"repos/ticvai-docs)/[\w./-]+\.(?:ya?ml|md|json|csv|sql))")
+STARTER = {"Onboarding": ["README.md", "quickstart.md"], "DevOps": ["README.md", "dependencies.md"],
+           "Setup": ["README.md", "dependencies.md"]}
+
+
+def package_index(screens: dict) -> dict:
+    """What ADAM can resolve: operations (contract#operationId), tables (the schema reference, the names ADAM's
+    adam_table knows), screens, ADR files; and the table renames, chains followed."""
+    ops = set()
+    for f in sorted((ROOT / "contracts").rglob("*.yaml")):
+        try:
+            d = yaml.safe_load(f.read_text(encoding="utf-8"))
+        except yaml.YAMLError:
+            continue
+        for item in ((d or {}).get("paths") or {}).values() if isinstance(d, dict) else []:
+            for op in (item or {}).values() if isinstance(item, dict) else []:
+                if isinstance(op, dict) and op.get("operationId"):
+                    ops.add(f"{f.stem}#{op['operationId']}")
+    ref = json.loads((ROOT / "handoff" / "schema-reference.json").read_text(encoding="utf-8"))
+    renames = {}
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("derive_schema_history", ROOT / "tools" / "derive-schema-history.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        step = {r["from"]: r["to"] for r in mod.RENAMES}
+    except Exception:                            # noqa: BLE001 -- no history: nothing was renamed
+        step = {}
+    for a in step:
+        b, seen = step[a], {a}
+        while b in step and b not in seen:
+            seen.add(b)
+            b = step[b]
+        renames[a] = b
+    adrs = {}
+    for f in sorted((ROOT / "docs" / "adr").glob("[0-9][0-9][0-9][0-9]-*.md")):
+        adrs.setdefault(f"ADR-{f.name[:4]}", f.relative_to(ROOT).as_posix())
+    return {"ops": ops, "tables": set(ref.get("cols") or {}), "renames": renames, "screens": set(screens),
+            "adrs": adrs, "repointed": collections.Counter(), "dropped": collections.Counter()}
+
+
+def resolve(t, known):
+    """(kind, id) as ADAM can find it, or None to drop it (counted in `known`)."""
+    kind, target = t
+    if known is None:
+        return t
+    if kind == "table":
+        now = known["renames"].get(target, target)
+        if now != target:
+            known["repointed"][(target, now)] += 1
+        target = now
+        ok = target in known["tables"]
+    elif kind == "operation":
+        ok = target in known["ops"]
+    elif kind == "screen":
+        ok = target in known["screens"]
+    elif kind == "file":
+        ok = (ROOT / target).is_file()
+    else:
+        ok = True
+    if not ok:
+        known["dropped"][(kind, target)] += 1
+        return None
+    return kind, target
+
+
+def touches_from(rows, lineage, screen_ops, known=None):
+    """key -> [(kind, id)] for a ticket (a task, or "TASK#part" a sub-task). Imported by tools/check-ticket-builds.py.
+    With `known` (package_index) every link is resolved: repointed to a table's name now, or dropped."""
+    inner = _touches_from(rows, lineage, screen_ops, known)
+    kids = collections.defaultdict(list)
+    for k_, r_ in rows.items():
+        if r_.get("type") == "Task" and r_.get("parent"):
+            kids[r_["parent"]].append(k_)
+
+    def touches(key):
+        out = [x for x in (resolve(t, known) for t in inner(key)) if x]
+        r = rows.get(key.partition("#")[0])
+        if known is None or not r or "#" in key:
+            return out
+        # a feature whose Builds name nothing (its tasks are hand-written: the foundation, the AI engine) links what
+        # its tasks link, as a feature with screens links what they call: CHG-TKT-004
+        if r["type"] == "Feature" and not any(k in ("operation", "table", "screen") for k, _ in out):
+            for c in kids.get(r["key"], []):
+                out += [x for x in touches(c) if x not in out and x[0] != "service"]
+        # an ADR is pulled as its file (ADAM pulls files, not decisions): CHG-TKT-005
+        out += [("file", known["adrs"][i]) for k, i in out if k == "adr" and i in known["adrs"]
+                and ("file", known["adrs"][i]) not in out]
+        if r["type"] == "Task" and not any(k in ("operation", "table", "screen") for k, _ in out):
+            named = []
+            for p in FILE_REF.findall(r.get("description") or ""):
+                p = p.rstrip(".")
+                if p.startswith("setup/"):
+                    p = f"{SETUP_DOCS}/{p[len('setup/'):]}"
+                named.append(p)
+            named += [f"{SETUP_DOCS}/{n}" for n in STARTER.get(r.get("track") or "", [])]
+            out += [x for x in (resolve(("file", p), known) for p in named) if x]
+        return out
+
+    return touches
+
+
+def _touches_from(rows, lineage, screen_ops, known=None):
     screen_of = {k: m.group(1) for k, r in rows.items()
                  if r["type"] == "Task" and r["track"] == "Frontend" and (m := SCREEN.search(k))}
     planned = set(screen_of.values())
@@ -144,6 +268,11 @@ def touches_from(rows, lineage, screen_ops):
                 done = listed(REST_OF, r["description"]) or []
                 ops = [o for o in ops if o not in done]
             return [("screen", sid)] + [("operation", op_id(op)) for op in ops]
+        if r["type"] == "Feature":
+            # an app-module links what its Builds list: its screens and the operations they call, or for an API-only
+            # one its operations and tables (CHG-TKT-004): before, it linked nothing, and an agent read the back-end
+            # tasks' operations as its scope (#27741)
+            return [tuple(b.split(" ", 1)) for b in ticket_done.builds_of(r, part, lineage) if " " in b]
         out = []
         for b in ticket_done.builds_of(r, part, lineage):
             kind, _, name = b.partition(" ")

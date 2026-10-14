@@ -1,0 +1,39 @@
+id: CHG-TKT-010
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: A later forward migration waits on a pushed forward migration the first release kept whole only where a key points
+  into its tables, so no migration waits on a higher-numbered file.
+decision:
+  what: 'tools/build-service-docs.py: `prior` (the schema''s first-release migrations a forward migration waits on) leaves
+    out a kept-whole forward migration (CHG-R6G-001) unless a key points into it.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-migration-tickets/M-FILE-ORDER (CHG-TBF-002): 7 findings, MIG-CATALOGUE-2, -3, -5 to -9 (V1091-V1122)
+  waited on MIG-CATALOGUE-11 (V1126), 4 tickets (audit/ticvai/runs/audit-1014/classes.json); after the fix 0. No file is
+  renumbered. Audit finding, Block A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  tickets:
+  - MIG-CATALOGUE-2
+  - MIG-CATALOGUE-3
+  - MIG-CATALOGUE-5
+  - MIG-CATALOGUE-6
+  - MIG-CATALOGUE-7
+  - MIG-CATALOGUE-8
+  - MIG-CATALOGUE-9
+  - MIG-CATALOGUE-11
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started: []
+  unstarted:
+  - MIG-CATALOGUE-2..9 (Hrushikant Patkar)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open

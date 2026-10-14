@@ -75,7 +75,14 @@ export function viewClient(view) {
       if (!found.ok) throw new Error(found.reason ?? `no ${set} ${name}`);
       return found;
     },
-    async file() { return { ok: false, status: 404, text: '' }; },
+    // A `file` link (an ADR's text, a setup standard; TICVAI CHG-TKT-005) is read from the release's own tree, so
+    // spec-diff.md compares it like any other artefact instead of calling it "found in neither release".
+    async file(rel) {
+      const abs = path.resolve(view.root ?? '', String(rel ?? ''));
+      if (!view.root || !abs.startsWith(path.resolve(view.root) + path.sep)) return { ok: false, status: 404, text: '' };
+      return readFile(abs, 'utf8').then((text) => ({ ok: true, status: 200, text }),
+        () => ({ ok: false, status: 404, text: '' }));
+    },
     async projectId() { return null; },
     async service() { throw new Error('a release view has no accounts service'); },
   };

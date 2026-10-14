@@ -1,0 +1,35 @@
+id: CHG-TKT-004
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: Every feature ticket links what its Builds list (its screens and the operations they call; an API-only one its
+  operations and tables; one of hand-written tasks what its tasks link).
+decision:
+  what: tools/adam-links.py links a Feature by ticket_done.builds_of (its backticked Builds), and a feature whose Builds
+    name nothing by the union of its tasks' links.
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class adam-pull/feature: nothing linked: 123 Block A features reached developers with nothing linked (34 due
+  by 28 October; audit/ticvai/runs/audit-1014/classes.json); on this branch adam-links.json links all 123. A feature linked
+  only `service` before, and app-module features have none. Audit finding, Block A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/adam-links.py
+  - tools/build-service-docs.py
+  - tools/ticket_done.py
+  other:
+  - handoff/service-docs/adam-links.json
+root_class: A14 TICKET-LINKS
+tickets:
+  started: []
+  unstarted:
+  - the 123 Block A feature tickets
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/adam-links.py::touches_from
+status: open
+notes: ADAM loads adam-links.json at the release (viewer/api/load_links.py); no ADAM change is needed for features.

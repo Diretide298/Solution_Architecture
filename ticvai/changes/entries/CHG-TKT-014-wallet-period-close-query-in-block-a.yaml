@@ -1,0 +1,53 @@
+id: CHG-TKT-014
+date: '2026-10-14'
+source: audit
+kind: plan
+proposed: '2026-10-14'
+summary: 'Wallet''s period-close query (wallet#periodCloseChecks: getWalletPreCloseChecks, getWalletMovementSummary) is
+  built in Block A, and closeFiscalPeriod (VM-LEDGER-FISCAL-1 under 28411) waits on it.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: blockAOperations gains getWalletPreCloseChecks and getWalletMovementSummary;
+    readViaBuiltWith (new) maps wallet#periodCloseChecks to them; tools/build-service-docs.py makes a task whose operation
+    asks a query (x-ticvai-read-via) wait on the tasks that build its readViaBuiltWith operations.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'The lead''s decision 6 of the Block A audit (14 October 2026), on ADAM CR-085 (CHG-FIN-012 notes, RESEQUENCING): the
+  Wallet query was in 30044 (Block C, done by 16 December) while 28411 is due 10 November. Audit finding, Block A audit
+  on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+  operations:
+  - getWalletPreCloseChecks
+  - getWalletMovementSummary
+  - closeFiscalPeriod
+  tickets:
+  - '28411'
+  - '28412'
+  - '30044'
+  other:
+  - x-ticvai-queries wallet#periodCloseChecks
+root_class: A22 LINEAGE
+tickets:
+  started:
+  - '28411'
+  unstarted:
+  - '28412'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-14'
+    quote: go with your recommendation
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py::readViaBuiltWith
+status: open
+notes: '28411 is started: it gets this as a CR comment (rule 7). shift#unclosedShiftsInPeriod and approvals#approvalRequirement
+  have no readViaBuiltWith entry yet (both owners are Block A already). Plan change decided the day it was proposed: the
+  lead''s words of 14 October 2026 on the audit''s rulings ("go with your recommendation"; r6 held so the audit''s fixes
+  ship in it, BLOCK-A-AUDIT-PLAN-R6) are recorded as the cooling-off waiver; the lead confirms it at the r6 settlement.'

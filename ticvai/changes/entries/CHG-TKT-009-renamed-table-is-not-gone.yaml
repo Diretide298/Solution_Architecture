@@ -1,0 +1,37 @@
+id: CHG-TKT-009
+date: '2026-10-14'
+source: audit
+kind: process
+summary: check-plan-closure reads a table the last release built under its name now when a declared rename or move retired
+  the old one, so the four tables CHG-XDW-001 moved into sync are not reported gone.
+decision:
+  what: tools/check-plan-closure.py table_renames (derive-schema-history.py RENAMES); the plan keeps them in the pushed
+    migrations that built them (build-service-docs.py, the parked second-gate fix of r6h-wip).
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-plan-closure/C-GONE (CHG-RONEP-002): 4 findings, 7 tickets, 4 due by 28 October (audit/ticvai/runs/audit-1014/classes.json):
+  platform.guest_link, dsar_request, cross_region_entitlement, wallet_authorisation (now sync.*); after 0. Audit finding,
+  Block A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/check-plan-closure.py
+  - tools/build-service-docs.py
+  tables:
+  - sync.guest_link
+  - sync.dsar_request
+  - sync.cross_region_entitlement
+  - sync.wallet_authorisation
+root_class: 'new: plan-departure-unrecorded'
+tickets:
+  started: []
+  unstarted:
+  - MIG-PLATFORM (27665)
+  - MIG-PLATFORM-3 (28358)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open

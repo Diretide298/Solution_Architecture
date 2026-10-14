@@ -1,0 +1,40 @@
+id: CHG-TKT-002
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: A feature ticket never lists an operation its app's audience may not call; such an operation is named only in the
+  back-end sentence, with the screens and the feature ticket of the app that calls it.
+decision:
+  what: ticket_done.screen_calls keeps only the operations a screen's platform may call (the audience rule of check-audience-match,
+    typed_props.callable_by, kept in step in ticket_done.platform_audience); the feature's back-end sentence names, for
+    an operation its screens do not call, the screens and app-module ticket that do.
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-audience-match/AM-TICKET-OP (#27741; CHG-SWP-002): 142 findings, 196 tickets, 114 due by 28 October
+  (audit/ticvai/runs/audit-1014/classes.json); after the fix 0. searchGuests (staff) on the guest app''s Identity & Security
+  was the case. Audit finding, Block A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+  - tools/check-audience-match.py
+  operations:
+  - searchGuests
+  other:
+  - AM-TICKET-OP
+root_class: A23 AUTH-SCOPE
+tickets:
+  started:
+  - 27741 (AM-IDENTITY-SECURITY-P02)
+  unstarted:
+  - every feature ticket with screens (294 in the plan)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Generator rule: tools/ticket_done.py::screen_calls. A screen that binds an operation outside its audience is a screen
+  defect for AM-STAFF-OP / AM-GUEST-OP (batch SCR), not ticket scope.'

@@ -779,13 +779,18 @@
   "verifyTaxExemption": "a BO-075 Account Mapping write (Chinmay, 3 October, r1 additions).",
   "setVenueMapArtwork": "Chinmay put the venue-map inputs in r1 (r1 additions, 3 October): built in Block A with BO-093 and BO-094 (the lead, CHG-RONEP-001); its contract lands from branch r1-contracts.",
   "getVenueNavigationFile": "Chinmay put the venue-map inputs in r1 (r1 additions, 3 October): built in Block A with BO-093 and BO-094 (the lead, CHG-RONEP-001); its contract lands from branch r1-contracts.",
-  "proposeWalkways": "the AI path proposal of the venue-map import (F26), built in Block A with BO-093 and BO-094 (the lead, 3 October, CHG-RONEP-001)."
+  "proposeWalkways": "the AI path proposal of the venue-map import (F26), built in Block A with BO-093 and BO-094 (the lead, 3 October, CHG-RONEP-001).",
+  "getWalletPreCloseChecks": "CR-085's period close (ADAM ticket 28411; CHG-FIN-012) asks Wallet wallet#periodCloseChecks in process, and Wallet answers it from this operation; the close is due in Block A, so Wallet's query is built in Block A before it (the lead's decision 6 of the Block A audit, 14 October 2026, CHG-TKT-014).",
+  "getWalletMovementSummary": "CR-085's period close (ADAM ticket 28411; CHG-FIN-012) asks Wallet wallet#periodCloseChecks in process, and Wallet answers it from this operation; the close is due in Block A, so Wallet's query is built in Block A before it (the lead's decision 6 of the Block A audit, 14 October 2026, CHG-TKT-014)."
  },
  "blockAScreens": {
   "BO-1111": "r2 built it in Block A as expireCreditLots' setup screen (APP-SETUP-BO-1111); that operation fell out of the slice with the fix round's lineage (see blockAOperations) and the screen with it, with no decision; restored to Block A with the operation (CHG-RFM-006).",
   "BO-346": "r2 built it in Block A (APP-SETUP-BO-346). The fix round moved the orders ticket-template operations off it (CHG-FXS-002: its designer edits access.media_template), which left it only later-block operations and moved it to Block C with no decision; restored to Block A as r2 planned it (CHG-RFM-006).",
   "BO-1065": "drawn and built whole in Block A with its AI residency section (Chinmay, 3 October, r1 additions).",
-  "EMP-002": "the staff app's venue and role selection after sign-in (F08, F64): the lead's r1 finding of 3 October, 'pull EMP-002 and EMP-003 into Block A' (CHG-RONEP-006)."
+  "EMP-002": "the staff app's venue and role selection after sign-in (F08, F64): the lead's r1 finding of 3 October, 'pull EMP-002 and EMP-003 into Block A' (CHG-RONEP-006).",
+  "ADM-088": "a Block A screen's way in from the app's entry is in Block A (Block A audit of 14 October 2026, check-plan-closure C-REACH; the lead: \"go with your recommendation\", CHG-TKT-008): it is the hub of its workshop board, the only way from BO-100 to ADM-089, ADM-090, ADM-091, ADM-094, ADM-095 and BO-441, which Block A builds, so Block A builds it too",
+  "ADM-108": "a Block A screen's way in from the app's entry is in Block A (Block A audit of 14 October 2026, check-plan-closure C-REACH; the lead: \"go with your recommendation\", CHG-TKT-008): it is the hub of its workshop board, the only way from BO-100 to ADM-109 and ADM-115, which Block A builds, so Block A builds it too",
+  "ADM-268": "a Block A screen's way in from the app's entry is in Block A (Block A audit of 14 October 2026, check-plan-closure C-REACH; the lead: \"go with your recommendation\", CHG-TKT-008): it is the hub of its workshop board, the only way from BO-100 to ADM-269, which Block A builds, so Block A builds it too"
  },
  "screenNotes": {
   "POS-003": "Built as step two of the POS-002 sale drawer (date and session), not as a page of its own: the 3 August workshop replaced the full-page navigation, so the component is the drawer step and the spec's route is not built (default, 4 October, CHG-FXP-002).",
@@ -1061,6 +1066,10 @@
   "table workforce.staff_conversation": "r2 created it in MIG-WORKFORCE-4 (Block B) because a migration takes every table its app-module reaches; only Block D operations reach it now (sendStaffMessage, listStaffConversations), so the Block D migration creates it (CHG-RONEP-002).",
   "table workforce.staff_conversation_participant": "r2 created it in MIG-WORKFORCE-4 (Block B) because a migration takes every table its app-module reaches; only Block D operations reach it now (sendStaffMessage, markStaffConversationRead), so the Block D migration creates it (CHG-RONEP-002).",
   "table workforce.staff_message": "r2 created it in MIG-WORKFORCE-4 (Block B) because a migration takes every table its app-module reaches; only Block D operations reach it now (sendStaffMessage, listStaffMessages), so the Block D migration creates it (CHG-RONEP-002)."
+ },
+ "readViaBuiltWithNote": "query (`<module>#<name>`, an x-ticvai-queries entry an operation's x-ticvai-read-via asks) -> the operations its module answers it from; tools/build-service-docs.py makes the asking operation's task wait on their tasks (CHG-TKT-014, ADAM CR-085: closeFiscalPeriod waits on Wallet's period-close query, built in Block A by the lead's decision 6 of 14 October 2026). A query with no entry adds no wait.",
+ "readViaBuiltWith": {
+  "wallet#periodCloseChecks": ["getWalletPreCloseChecks", "getWalletMovementSummary"]
  },
  "navHomes": {
   "BO-101": "a section home of Venue Management: lever A, Chinmay, 3 October (CHG-RONEP-007): the navigation closure pulls in app homes only, and the section homes link to their setup screens",

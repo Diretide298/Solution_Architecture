@@ -343,6 +343,9 @@ def read_operations() -> dict[str, dict]:
                     "stepUp": op.get("x-ticvai-step-up"),
                     "lock": op.get("x-ticvai-lock"),
                     "guestCallable": op.get("x-ticvai-guest-callable"),
+                    # who may call it: a feature ticket lists only the operations its screens may call (CHG-TKT-002)
+                    "audience": [op["x-ticvai-audience"]] if isinstance(op.get("x-ticvai-audience"), str)
+                    else list(op.get("x-ticvai-audience") or []),
                     # **held**: provisional, a stub whose shape is a proposal, or deprecated (CHG-FXP-003): not put on
                     # a build ticket. `provisional` stays the name every rule below reads.
                     "provisional": ticket_done.operation_hold(op) is not None,
@@ -699,11 +702,43 @@ def pushed_items(mp: dict) -> dict[str, set]:
             head, _, part = k.partition("#")
             if head in items and part not in ("build", "wire", "test"):
                 items[head].add(part)
+    moved = table_moves()
     for k in items:
         ident = key_identity(k)
         if ident and ident[0] == "screen":
             items[k] = {ident[1]}
+        elif ident and ident[0] == "tables" and moved:
+            # **A pushed table goes by its name now** (14 October 2026, CHG-TKT-013): the sub-task records the name
+            # it was pushed under, and a declared rename or move (CHG-XDW-001: platform.guest_link -> sync.guest_link)
+            # is the same table, built by the same ticket.
+            items[k] = {moved.get(x, x) for x in items[k]}
     return items
+
+
+_MOVES: dict = {}
+
+
+def table_moves() -> dict:
+    """Every table name a declared rename or move retired -> the table's name now (tools/derive-schema-history.py
+    RENAMES, chains followed: a table renamed twice answers to both old names)."""
+    if "m" not in _MOVES:
+        import importlib.util as _iu
+        out = {}
+        try:
+            sp_ = _iu.spec_from_file_location("derive_schema_history", ROOT / "tools" / "derive-schema-history.py")
+            mod_ = _iu.module_from_spec(sp_)
+            sp_.loader.exec_module(mod_)
+            step = {r["from"]: r["to"] for r in mod_.RENAMES}
+        except Exception:                   # noqa: BLE001 -- no history: nothing has moved
+            step = {}
+        for a in step:
+            b, seen = step[a], {a}
+            while b in step and b not in seen:
+                seen.add(b)
+                b = step[b]
+            out[a] = b
+        _MOVES["m"] = out
+    return _MOVES["m"]
 
 
 def reconcile_keys(plan: dict[str, set], fixed: set, mp: dict, closed: frozenset = frozenset()):
@@ -1525,8 +1560,7 @@ def main() -> int:
     def held_elsewhere(o, here) -> bool:
         p_ = pin.get(o)
         r_ = prior_rows.get(p_) or {}
-        out_ = bool(p_ in mates and r_.get("block") == "A" and str(r_.get("parent", "")).startswith("AM-")
-                    and mates[p_] - set(here))
+        out_ = bool(p_ in mates and str(r_.get("parent", "")).startswith("AM-") and mates[p_] - set(here))
         if out_:
             held_out.add(o)
         return out_
@@ -1586,6 +1620,26 @@ def main() -> int:
         if t in ddl and t not in rel:
             rel.add(t)
             why[t] = reason
+    # **A table moved after its first-release migration was pushed stays in that migration** (14 October 2026,
+    # CHG-TKT-013). CHG-XDW-001 moved platform.guest_link and platform.dsar_request into sync (derive-schema-history.py
+    # RENAMES); MIG-PLATFORM (#27665) built both at r1, in V0017__platform.sql, which is frozen and still creates them
+    # under the old names (the move is `ALTER TABLE ... SET SCHEMA sync`, handoff/migration-review.md). Grouped by their
+    # new schema they joined MIG-SYNC and a phase 2 MIG-SYNC-2, and check-plan-closure found the r5 tables built by no
+    # task. So a table whose old name a pushed, open first-release migration (MIG-<S>) built stays in that migration's
+    # group under its new name, and in the first release.
+    moved_ = table_moves()
+    grp_over = {}
+    for k_, items_ in sorted(pushed_work.items()):
+        ident_ = key_identity(k_)
+        if not ident_ or ident_[0] != "tables" or k_ in closed_now or k_ != f"MIG-{ident_[1].upper()}":
+            continue
+        for x in sorted(items_):
+            if x in ddl and x.split(".")[0] != ident_[1] and x in moved_.values():
+                grp_over[x] = ident_[1]
+                if x not in rel:
+                    rel.add(x)
+                    why[x] = (f"built by {k_} as " + ", ".join(sorted(a for a, b in moved_.items() if b == x))
+                              + ", before a declared move (CHG-TKT-013)")
     frontier = list(rel)
     while frontier:
         t = frontier.pop()
@@ -1594,6 +1648,10 @@ def main() -> int:
                 rel.add(x)
                 why[x] = f"referenced by {t}"
                 frontier.append(x)
+
+    def grp_of(x):
+        return ddl[x]["db"], grp_over.get(x, x.split(".")[0])
+
     # **A pushed forward migration the first release now needs whole keeps its key** (14 October 2026, CHG-R6G-001).
     # CR-078 made ApprovalRequest.escalations[] persist, so createApprovalRequest (first release) writes
     # approvals.escalation, the one table of VM-MIG-APPROVALS (#27826, V1005). The table joined MIG-APPROVALS, the
@@ -1617,13 +1675,13 @@ def main() -> int:
     groups = defaultdict(list)
     for t in sorted(rel):
         if t not in fwd_kept:
-            groups[(ddl[t]["db"], t.split(".")[0])].append(t)
+            groups[grp_of(t)].append(t)
     edges = {g: defaultdict(int) for g in groups}
     for g, ts in groups.items():
         for t in ts:
             for x in ddl[t]["fks"]:
                 if x in rel and x not in fwd_kept and ddl[x]["db"] == g[0]:
-                    edges[g][(g[0], x.split(".")[0])] += 1
+                    edges[g][grp_of(x)] += 1
     mig_order, deferred = [], {}
     for db in ("control", "tenant"):
         sub = {g: {h: n for h, n in e.items()} for g, e in edges.items() if g[0] == db}
@@ -1644,14 +1702,17 @@ def main() -> int:
          # with no migration.
          "Tables: platform.schema_version. Source DDL: backend/tenant/000-schemas.sql, 001-extensions.sql, 002-migration-register.sql, the helper "
          "functions at the top of 920-row-level-security.sql and 930-partitioning.sql; the control database's "
-         "own 000-002. Everything else in the MIG epic runs after this.", 1, pts=3, area="backend",
+         "own 000-002. It creates what every later migration assumes (14 October 2026, CHG-TKT-011; audit R056): "
+         "the schemas (000-schemas.sql), the ltree extension with btree_gist and pgcrypto (001-extensions.sql), the "
+         "migration register, and the row-level security helpers. Everything else in the MIG epic runs after "
+         "this.", 1, pts=3, area="backend",
          assignee=devops, depends=["SETUP-DB"])
     load[devops] += 3
     migrations.append([0, "MIG-BASELINE", "V0001__baseline.sql", "both", "(baseline)", 0, 0, "", devops, 3, ""])
     for i, g in enumerate(mig_order, 2):
         ts = groups[g]
         n_cols = sum(len(ddl[t]["columns"]) for t in ts)
-        refs = sorted({mig_key[(g[0], x.split(".")[0])] for t in ts for x in ddl[t]["fks"]
+        refs = sorted({mig_key[grp_of(x)] for t in ts for x in ddl[t]["fks"]
                        if x in rel and ddl[x]["db"] == g[0]} - {mig_key[g]})
         back = [r for r in refs if mig_order.index(next(h for h in groups if mig_key[h] == r)) < mig_order.index(g)]
         svc = schema_owner.get(g[1], "")
@@ -1728,8 +1789,7 @@ def main() -> int:
     MIG_COLS = ["Order", "File", "Task", "Database", "Schema", "Tables", "Columns", "References", "Assignee",
                 "Points"]
     tables_rows = []
-    for t in sorted(rel, key=lambda x: (mig_order.index((ddl[x]["db"], x.split(".")[0]))
-                                        if (ddl[x]["db"], x.split(".")[0]) in mig_order else len(mig_order), x)):
+    for t in sorted(rel, key=lambda x: (mig_order.index(grp_of(x)) if grp_of(x) in mig_order else len(mig_order), x)):
         tables_rows.append([table_mig[t], t, ddl[t]["db"], len(ddl[t]["columns"]), ddl[t]["policy_label"],
                             "yes" if ddl[t]["partitioned"] else "", len(used[t]["reads"]), len(used[t]["writes"]),
                             ", ".join(sorted(x for x in ddl[t]["fks"] if x in rel)), why[t],
@@ -2470,6 +2530,14 @@ def main() -> int:
         del am_ops[k_]
 
     # migrations, then back end, app-module by app-module in build order (the first that needs a table creates it)
+    fwd_home = {}                       # table -> the open pushed forward migration that holds it (CHG-TKT-013)
+    for k_, items_ in sorted(pushed_work.items()):
+        ident_ = key_identity(k_)
+        if ident_ and ident_[0] == "tables" and k_ not in closed_now and k_ != f"MIG-{ident_[1].upper()}":
+            for x in sorted(items_):
+                if x in ddl:
+                    fwd_home.setdefault(x, k_)
+
     def fresh_mig_key(schema):
         n = 2
         while True:
@@ -2485,30 +2553,67 @@ def main() -> int:
         frontier = list(need)
         while frontier:
             t = frontier.pop()
-            for x in sorted(ddl[t]["fks"]):
+            # **A pushed forward migration follows its earliest need whole** (14 October 2026, CHG-TKT-013), as a
+            # pushed operations task does (CHG-R6-054): when an app-module earlier in build order needs some of the
+            # tables pushed under one forward migration, it takes all of them. Cut where they were needed,
+            # control.partner_commission_* left MIG-CONTROL-7 (#27992, Ready for QA) for a new MIG-CONTROL-19.
+            more_ = [x for x in sorted(pushed_work.get(fwd_home.get(t), ())) if x in ddl and x not in mig_of
+                     and x not in need] if fwd_home.get(t) and fwd_home[t] not in closed_now else []
+            for x in sorted(ddl[t]["fks"]) + more_:
                 if x in ddl and x not in mig_of and x not in need:
                     need.add(x)
                     frontier.append(x)
         for sch in sorted({t.split(".")[0] for t in need}):
-            ts = sorted(t for t in need if t.split(".")[0] == sch)
-            mk = fresh_mig_key(sch)
-            n_cols = sum(len(ddl[t]["columns"]) for t in ts)
-            pts = points_of(1 + 0.5 * len(ts) + n_cols / 40 + 0.3 * sum(1 for t in ts if ddl[t]["rls"])
-                            + 0.5 * sum(ddl[t]["partitioned"] for t in ts))
+            ts_all = sorted(t for t in need if t.split(".")[0] == sch)
+            # **A pushed forward migration keeps its tables** (14 October 2026, CHG-TKT-013), as a pushed task keeps its
+            # operations (CHG-R6-052). One app-module's new tables of a schema were one task, and the reconciliation
+            # gives that task one pushed key: when CHG-XDW-003 put requeueDeadLetter in the Block A tenancy
+            # app-module, platform.dead_letter (MIG-PLATFORM-4, #29202) joined platform.cell_endpoint (MIG-PLATFORM-2)
+            # and MIG-PLATFORM-4 left the plan; when CHG-XDW-001 moved MIG-PLATFORM-3's two tables (#28358) into sync,
+            # no sync key could be matched to it at all. So where the tables come from two or more pushed forward
+            # migrations, or from one of another schema's family, each pushed migration keeps its own tables under its
+            # key; the tables nobody pushed join the largest of them. Otherwise nothing changes.
+            homes = defaultdict(list)
+            for t in ts_all:
+                h_ = fwd_home.get(t)
+                homes[h_ if h_ and h_ not in by_key else None].append(t)
+            keyed = sorted(h_ for h_ in homes if h_)
+            if len(keyed) >= 2 or any(key_identity(h_)[1] != sch for h_ in keyed):
+                parts = [(h_, homes[h_]) for h_ in keyed]
+                if homes.get(None):
+                    big = max(range(len(parts)), key=lambda i_: (len(parts[i_][1]), -i_))
+                    parts[big] = (parts[big][0], sorted(parts[big][1] + homes[None]))
+                print(f"pushed forward migrations kept apart: {', '.join(f'{h_} ({len(t_)})' for h_, t_ in parts)}")
+            else:
+                parts = [(fresh_mig_key(sch), ts_all)]
+            part_keys = {mk for mk, _ in parts}
             # A forward migration waits for the baseline, the first-release migration of its schema (if any) and the
             # migrations that create what its keys point into; two forward migrations of one schema with no key
             # between them do not wait on each other (their file numbers are given when they merge).
-            prior = sorted({m for t, m in mig_of.items() if t.split(".")[0] == sch and m not in later_mig.values()})
-            fk_into = sorted({mig_of[x] for t in ts for x in ddl[t]["fks"] if x in mig_of and x.split(".")[0] != sch})
-            task(mk, k, "Task", f"Forward migration: {sch} for {am_info[k]['name']} ({len(ts)} tables)",
-                 "Tables: " + ", ".join(ts) + f". Source DDL: {src_files(ddl, ts)} and the matching rows of "
-                 "900-foreign-keys, 910-indexes and 920-row-level-security. A forward migration after the r1 baseline "
-                 "(frozen, check-migration-freeze); applied forward by SqlMigrationRunner, and a second run applies "
-                 "nothing.", 3, service=schema_owner.get(sch, ""), pts=pts, area="backend",
-                 depends=["MIG-BASELINE"] + prior + fk_into)
-            for t in ts:
-                mig_of[t] = mk
-                later_mig[t] = mk
+            # **A pushed forward migration the first release kept whole is waited on only for a key into it** (14 October
+            # 2026, CHG-TKT-010; check-migration-tickets M-FILE-ORDER, 7): MIG-CATALOGUE-11 (V1126, kept whole by
+            # CHG-R6G-001) is in the first release but keeps its forward file, so making every later catalogue
+            # migration wait on it as "the schema's first-release migration" had V1091 to V1122 run before the file
+            # they waited on. It is a forward migration like them: a wait only where a key points into its tables.
+            keys_into = {x for t in ts_all for x in ddl[t]["fks"]}
+            prior = sorted({m for t, m in mig_of.items() if t.split(".")[0] == sch and m not in later_mig.values()
+                            and (t not in fwd_kept or t in keys_into)})
+            for mk, ts in parts:
+                for t in ts:
+                    mig_of[t] = mk
+                    later_mig[t] = mk
+            for mk, ts in parts:
+                n_cols = sum(len(ddl[t]["columns"]) for t in ts)
+                pts = points_of(1 + 0.5 * len(ts) + n_cols / 40 + 0.3 * sum(1 for t in ts if ddl[t]["rls"])
+                                + 0.5 * sum(ddl[t]["partitioned"] for t in ts))
+                fk_into = sorted({mig_of[x] for t in ts for x in ddl[t]["fks"] if x in mig_of
+                                  and (x.split(".")[0] != sch or mig_of[x] in part_keys - {mk})})
+                task(mk, k, "Task", f"Forward migration: {sch} for {am_info[k]['name']} ({len(ts)} tables)",
+                     "Tables: " + ", ".join(ts) + f". Source DDL: {src_files(ddl, ts)} and the matching rows of "
+                     "900-foreign-keys, 910-indexes and 920-row-level-security. A forward migration after the r1 "
+                     "baseline (frozen, check-migration-freeze); applied forward by SqlMigrationRunner, and a second "
+                     "run applies nothing.", 3, service=schema_owner.get(sch, ""), pts=pts, area="backend",
+                     depends=["MIG-BASELINE"] + prior + fk_into)
         groups_ = defaultdict(list)
         for o in olist:
             groups_[((lineage.get(o) or {}).get("service") or "PlatformService", ops[o]["tag"])].append(o)
@@ -2550,6 +2655,29 @@ def main() -> int:
             more = {later_op_task[o] for o in screen_op_ids(screens[sid_]) & held_out if o in later_op_task}
             if more - set(t_["dependsOn"].split()):
                 t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | more))
+    # **A task waits on the task that builds a query its operations ask** (14 October 2026, CHG-TKT-014; ADAM CR-085,
+    # the lead's decision 6 of the Block A audit). closeFiscalPeriod (VM-LEDGER-FISCAL-1, #28412 under #28411) asks
+    # Wallet `wallet#periodCloseChecks` in process (x-ticvai-read-via, CHG-FIN-012), which Wallet answers from
+    # getWalletPreCloseChecks and getWalletMovementSummary; those were in Block C (SVC-WALLET-WALLET-24) while the close
+    # is due 10 November. block-a-extra-tasks.json `blockAOperations` now builds them in Block A, and `readViaBuiltWith`
+    # names the operations a query is built with; an operation whose read-via asks such a query waits on their tasks.
+    # A query with no entry adds no wait (the lineage's readVia is printed, so the gap stays visible).
+    built_with = dict(json.loads(EXTRA.read_text(encoding="utf-8")).get("readViaBuiltWith") or {}) \
+        if EXTRA.exists() else {}
+    task_of_op = {**op_task, **vm_op_task, **later_op_task}
+    waits_added = []
+    for o_, ln_ in sorted(lineage.items()):
+        asker_ = task_of_op.get(o_)
+        if not asker_ or asker_ not in by_key:
+            continue
+        for rv_ in ln_.get("readVia") or []:
+            q_ = rv_.get("query") if isinstance(rv_, dict) else None
+            need_ = {task_of_op.get(b_) for b_ in built_with.get(q_) or []} - {None, asker_}
+            if need_ - set(by_key[asker_]["dependsOn"].split()):
+                by_key[asker_]["dependsOn"] = " ".join(sorted(set(by_key[asker_]["dependsOn"].split()) | need_))
+                waits_added.append(f"{asker_} ({o_}) waits on {', '.join(sorted(need_))} for {q_}")
+    print(f"tasks waiting on the task that builds a query they ask: {len(waits_added)}"
+          + (f" ({'; '.join(waits_added)})" if waits_added else ""))
     # the screens, each waiting on the tasks that build its operations (soft: built against the mock server)
     for key, sid, k, kind, pts in later_items:
         if kind == "ticketed":
@@ -3603,7 +3731,10 @@ def main() -> int:
     for t_ in fwd_tasks:
         sch = fwd_head.match(t_["subject"]).group(2)
         m = MIG_FILE.search(prior_files.get(t_["key"], ""))
-        if m and int(m.group(2)) >= FORWARD_TICKET_FIRST and int(m.group(2)) not in taken                 and m.group(1).endswith(f"__{sch}.sql"):
+        if m and int(m.group(2)) >= FORWARD_TICKET_FIRST and int(m.group(2)) not in taken                 and (m.group(1).endswith(f"__{sch}.sql")
+                     # a pushed migration whose tables a declared move took into another schema keeps its file
+                     # (CHG-TKT-013: MIG-PLATFORM-3 is V1031__platform.sql, its tables sync.* now)
+                     or m.group(1).endswith(f"__{(key_identity(t_['key']) or ('', ''))[1]}.sql")):
             taken.add(int(m.group(2)))
             fname_of[t_["key"]] = m.group(1)
     nxt = max(taken | {FORWARD_TICKET_FIRST - 1}) + 1
@@ -3835,15 +3966,67 @@ def main() -> int:
         return f"{d.strftime('%a')} {d.day} {d.strftime('%b %Y')}"
 
     lineage_c = {o: (lineage.get(o) or {}).get("contract") or ops.get(o, {}).get("contract") for o in ops}
+    # **A feature with screens lists what its screens call** (14 October 2026, CHG-TKT-001 and CHG-TKT-002; ADAM
+    # #27741; the Block A audit's S-FEATURE-OP-UNUSED, 741, and AM-TICKET-OP, 142): its Builds are its screens and the
+    # operations those screens call that the app's audience may call (ticket_done.screen_calls); the operations its
+    # back-end tasks build follow in a sentence of their own, each called-elsewhere one with the screens and the
+    # app-module tickets that call it. Until then the list was the back-end tasks' operations (a backend operations
+    # task is put under the first feature that needs any of its group's operations, so the feature carried the whole
+    # group): the guest app's Identity & Security listed searchGuests (staff only) and the wishlist, and none of the
+    # identity operations GST-042 and GST-073 call. The back-end tasks stay where they are: a pushed task keeps its
+    # operations and its parent (CHG-R6-052, CHG-R6-054), so check-key-stability holds. A feature with no screens (an
+    # API-only or back-end app-module) lists the operations and tables it builds. Every Builds item is in backticks,
+    # so ticket_done.builds_of reads it and tools/adam-links.py links a feature to what it lists (CHG-TKT-004).
+    audience_of = lambda o: (ops.get(o) or {}).get("audience") or ()
+    callers_all = defaultdict(list)                       # operation -> every screen that may call it, in id order
+    for sid_ in sorted(screens):
+        for o_ in ticket_done.screen_calls(screens[sid_], screens[sid_]["_platform"], audience_of):
+            callers_all[o_].append(sid_)
+    feat_of_screen = {}                                   # screen id -> the app-module feature whose task builds it
+    for x_ in tasks:
+        id_ = key_identity(x_["key"]) if x_["type"] == "Task" and x_["track"] == "Frontend" else None
+        if id_ and id_[0] == "screen" and by_key.get(x_["parent"], {}).get("type") == "Feature":
+            feat_of_screen.setdefault(id_[1], x_["parent"])
+
+    def op_name(o_):
+        return f"{lineage_c[o_]}#{o_}" if lineage_c.get(o_) else o_
+
+    def back_end_sentence(opl_, called_):
+        mine, other, nobody = [], defaultdict(list), []
+        for o_ in opl_:
+            if o_ in called_:
+                mine.append(op_name(o_))
+            elif callers_all.get(o_):
+                sc_ = callers_all[o_]
+                fs_ = sorted({feat_of_screen[s] for s in sc_ if s in feat_of_screen})
+                other[", ".join(sc_[:3]) + (" ..." if len(sc_) > 3 else "")
+                      + (f" (ticket {', '.join(fs_[:2])}{' ...' if len(fs_) > 2 else ''})" if fs_ else "")
+                      ].append(op_name(o_))
+            else:
+                nobody.append(f"{op_name(o_)} (audience {', '.join(audience_of(o_)) or 'undeclared'})")
+        parts_ = ([", ".join(mine) + " (its screens call them)"] if mine else []) + [
+            ", ".join(v) + f" (not called by this app's screens: called by {k})" for k, v in sorted(other.items())] + (
+            [", ".join(nobody) + " (no screen calls them)"] if nobody else [])
+        return (f" {ticket_done.BACK_END_SENTENCE} ({len(opl_)} operations; a pushed task keeps its operations, "
+                "CHG-R6-052; these are back-end work, not operations this app's screens call unless marked so): "
+                + "; ".join(parts_) + ".")
+
     block_end = {}
     for t_ in tasks:
         if t_["type"] != "Feature":
             continue
         ch = [x for x in kids[t_["key"]] if x["type"] == "Task"]
         a = am_info[t_["key"]]
-        scr = sorted({key_identity(x["key"])[1] for x in ch if x["track"] == "Frontend" and key_identity(x["key"])}
-                     | {re.sub(r"^.*?-([A-Z]+-\d{3,}[A-Z]?)-REST$", r"\1", x["key"]) for x in ch if x["key"].endswith("-REST")})
-        opl = sorted({o for x in ch for o in ops_of.get(x["key"], ())})
+        # what each task under it builds, read as a ticket reads it (ticket_done.builds_of): a Venue Management screen
+        # is on the backend track ("[BE] ADM-111 ..."), and a task's key may be its pushed one, which ops_of (keyed
+        # before the reconciliation) does not know; never its module test (CHG-TKT-001)
+        built_ = {x["key"]: ticket_done.builds_of(x, "", lineage) for x in ch if x["track"] != "Test"}
+        scr_of = {k_: [b.split(" ", 1)[1] for b in bs if b.startswith("screen ") and b.split(" ", 1)[1] in screens]
+                  for k_, bs in built_.items()}
+        scr = sorted({s_ for v_ in scr_of.values() for s_ in v_})
+        opl = sorted({o for x in ch for o in ops_of.get(x["key"], ())}
+                     | {b.split(" ", 1)[1].split("#")[-1] for bs in built_.values() for b in bs
+                        if b.startswith("operation ") and b.split(" ", 1)[1].split("#")[-1] in ops})
         tbl = sorted({tt for x in ch if x["track"] == "Database"
                       for tt in (re.search(r"Tables: (.+?)\. Source", x["description"]) or [None, ""])[1].split(", ") if tt})
         pts = sum(int(x["points"] or 0) for x in ch)
@@ -3854,13 +4037,28 @@ def main() -> int:
         t_["area"] = {"P08": "VM", "P01": "WEB", "P02": "MOB", "P04": "POS", "P15": "POS"}.get(a["platform"], a["platform"])
         when = (f"planned Sprint {sp_[0]}" + (f" to Sprint {sp_[1]}" if sp_[1] != sp_[0] else "")
                 + f", done by {fmt(sp.day(max(sp_[2] - 1e-6, 0)))}") if sp_ else "not scheduled"
-        builds = ([f"screen {s_}" for s_ in scr] + [f"operation {lineage_c.get(o) or '?'}#{o}" for o in opl]
-                  + [f"table {x}" for x in tbl])
+        called = []
+        for x in ch:
+            for s_ in scr_of.get(x["key"], ()):
+                mine_ = ticket_done.screen_calls(screens[s_], screens[s_]["_platform"], audience_of)
+                # a setup screen's Block A part calls its setup operations, the rest-of-the-screen ticket the others
+                if x["key"].startswith("APP-SETUP-") and not x["key"].endswith("-REST"):
+                    mine_ = [o_ for o_ in mine_ if o_ in setup_screens.get(s_, ())]
+                elif x["key"].endswith("-REST"):
+                    mine_ = [o_ for o_ in mine_ if o_ not in setup_screens.get(s_, ())]
+                called += [o_ for o_ in mine_ if o_ in ops and o_ not in called]
+        if scr:            # a frontend app-module: its screens and what they call (CHG-TKT-001)
+            # its tables are back-end work too: named with the back end below, not in what its screens build
+            builds = [f"`screen {s_}`" for s_ in scr] + [f"`operation {op_name(o)}`" for o in called]
+            scope_ops = f"{len(called)} operations its screens call"
+        else:              # a back-end app-module: the operations it builds
+            builds = [f"`operation {op_name(o)}`" for o in opl] + [f"`table {x}`" for x in tbl]
+            scope_ops = f"{len(opl)} operations"
         ticketed = a["block"] in settings["ticketBlocks"]
         t_["description"] = (
             f"{a['name']}: {a['module']} on {sp.PLATFORM_NAME.get(a['platform'], 'the platform')}. Block {a['block']}, "
             f"{when}. "
-            f"Scope: {len(scr)} screens, {len(opl)} operations, {len(tbl)} tables, {pts} points"
+            f"Scope: {len(scr)} screens, {scope_ops}, {len(tbl)} tables, {pts} points"
             + (f", {sum(float(x.get('days') or 0) for x in ch):g} AI-engineer days" if any(x.get('days') for x in ch) else "")
             + "." + ("" if ticketed else
                      f" Phase 2 of the AI engine (after 2 April 2027; Chinmay, 4 October, CHG-AIPH-001): not ticketed for "
@@ -3868,6 +4066,8 @@ def main() -> int:
                      else f" Block {a['block']} is ticketed at this level until it is planned; its "
                      f"{len(ch)} tasks are in plan-tasks.csv with the keys they will have.")
             + " Builds: " + ", ".join(builds) + "."
+            + (back_end_sentence(opl, set(called)) if scr and opl else "")
+            + (f" Tables its migrations create: {', '.join(tbl)}." if scr and tbl else "")
             # Last, so the pointer's done-when (ticket_done.done_when reads "Done when" to the end) is this sentence
             # alone: a Block C or D app-module is the ticket a developer works from until its tasks are ticketed, and
             # "Complete when" was no done-when to check-ticket-text (T-DONE-WHEN; CHG-GTR-002).
@@ -4069,14 +4269,23 @@ def main() -> int:
         if t_["assignee"] in never_:
             pass
         elif t_["key"] in kmap:
-            if peers_ok.get(t_["key"]) != t_["assignee"]:
+            # **A test the lead already moved does not land back on its main builder** (14 October 2026, CHG-TKT-007):
+            # the lead moved TEST-AM-PLATFORM-OPERATIONS-P07 from Surendra (moduleTestPeers); CHG-XDW-002's new
+            # CrossRegion task made its new owner, Pranay Shinde, the main builder. A test moduleTestPeers names moves
+            # on again when its owner builds most of it, never back to the owner the lead moved it from.
+            # **Nor does any pushed test stay with its main builder** (14 October 2026, CHG-TKT-007; the lead's decision 5
+            # of the Block A audit: "a module test is never owned by the person who built most of the module"). Until
+            # then a pushed test kept its owner unless moduleTestPeers named it, and 10 Block A module tests were
+            # tested by their own main builder (check-plan-owners O-SELF-TEST, baselined). Each goes to the peer in its
+            # stack who built the next most of it, as an unpushed one does.
+            if peers_ok.get(t_["key"]) != t_["assignee"] and not (b_ and t_["assignee"] == b_):
                 continue
         elif not b_ or t_["assignee"] != b_:
             continue
         ai_ = all(x["area"] == "ai" or x["track"] == "AI" for x in ch_)
         pool_ = "ai" if ai_ else (t_.get("pool") or "be")
         stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n not in (b_, t_["assignee"])
-                  and n not in never_]
+                  and n not in never_ and n != peers_ok.get(t_["key"])]
         c_ = Counter()
         for x in ch_:
             if x["assignee"] in stack_:

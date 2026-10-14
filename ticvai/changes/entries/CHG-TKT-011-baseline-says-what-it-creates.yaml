@@ -1,0 +1,32 @@
+id: CHG-TKT-011
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: MIG-BASELINE's text says it creates the schemas, the ltree extension and the row-level security helpers every later
+  migration assumes.
+decision:
+  what: 'tools/build-service-docs.py MIG-BASELINE description: one sentence naming them (000-schemas.sql, 001-extensions.sql:
+    ltree, btree_gist, pgcrypto; the register; the 920 helpers).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-ddl-conventions/D-MIG-ORDER (R056): 1 finding (MIG-BASELINE:contents), due by 28 October (audit/ticvai/runs/audit-1014/classes.json);
+  after the fix 0. Audit finding, Block A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  tickets:
+  - MIG-BASELINE
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started: []
+  unstarted:
+  - MIG-BASELINE (27646)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'A started ticket''s OpenProject text is never rewritten: if 27646 is started it gets this through its CR comment.'
