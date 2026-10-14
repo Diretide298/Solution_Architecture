@@ -422,6 +422,14 @@ paths:
         is refused with 409 naming the rule and the other capability — rather than appearing in a
         violation report a month later, which is the same finding arriving too late to act on.
 
+        **The grant-time check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003): every rule is
+        evaluated against everything the principal would then hold — this grant, its other module
+        access, and the permissions of every role its live grants attach (own and inherited) — and a
+        `scopeSensitive` rule conflicts only where the two scopes overlap (one path contains the other).
+        **Only `severity: block` refuses**, with `409 segregation-breach` (`common.yaml`), the one type
+        and status every segregation check answers with. `requireApproval` and `warn` are accepted and
+        surfaced: they appear in `listSegregationViolations` at once.
+
         **An `elevated` capability raises an approval rather than taking effect.** The response is
         202 with the request id when any tick is elevated, 200 when none is. Routed through
         `approvals` so that 11.1.24 — *a requester may never approve their own request* — applies
@@ -471,8 +479,10 @@ paths:
                     items:
                       type: string
         '409':
-          description: '**A tick would breach a segregation rule.** Names the rule and the
-            capability already held, so the person deciding can narrow one rather than guess.'
+          description: '**A tick would breach a segregation rule** whose severity is `block`. Names the rule and
+            the capability already held, so the person deciding can narrow one rather than guess.'
+          x-ticvai-problem-types:
+          - segregation-breach
           content:
             application/problem+json:
               schema:
@@ -662,6 +672,16 @@ paths:
         **Violations covered by `allowWithCompensatingControl` are flagged rather than filtered.**
         A queue that hides what has been excused stops measuring the thing it exists to measure.
 
+        **Where `requireApproval` and `warn` surface** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003).
+        Only a `block` rule refuses a role edit or a grant; the other two severities are accepted, and every
+        principal they leave holding both halves (through a role, its parent role, a direct grant or module
+        access) is listed here from the moment the grant is made. A pair held inside one role always overlaps,
+        because a role is granted at one scope.
+
+        **Ordered by `detectedAt` descending, then `ruleId` and `principalId` as the tiebreak** (decided
+        14 October 2026, ADAM CR-077; CHG-IDR-002): a violation is computed and has no id of its own, and
+        `detectedAt` is the latest moment that made the pair, so the newest exposure comes first.
+
         '
       tags:
       - identity
@@ -807,6 +827,10 @@ paths:
       summary: Who may act for this guest, and for whom they may act
       description: 'CF-132. **Both directions, because a guest is usually in both.** A parent holds authority
         over two children and is a member of a corporate account — one screen, one question.
+
+        **Ordered by `createdAt` descending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077;
+        CHG-IDR-002): the cursor pages the grants, and each of the two arrays keeps that order, so the newest
+        delegation is first in either direction.
 
         '
       tags:
@@ -1312,6 +1336,23 @@ paths:
       - partner
       x-ticvai-read-routing: replica
       summary: List principals
+      description: '**What a venue-scoped caller sees** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001).
+        `USER_MANAGE` is checked at the caller''s scope, as before. Any staff grant may read
+        `identity.principal` rows, so the database does not hide a venue''s staff from a venue manager; the
+        list is the principals whose home scope (`identity.principal.home_scope_id`, a `platform.scope` row)
+        is at or beneath a node where the caller''s `USER_MANAGE` holds, and `scopePath` narrows that
+        further. A `scopePath` outside the caller''s reach is `403`. A venue manager therefore lists the
+        venue''s people and those homed beneath it, never a sibling venue''s.
+
+
+        **Each item''s `roles`** are read with it from the principal''s live role grants
+        (`identity.delegated_access` joined to `identity.role`; see `Principal.roles`).
+
+
+        **Ordered by `displayName` ascending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077;
+        CHG-IDR-002): a directory is read by name.
+
+        '
       tags:
       - administration
       x-ticvai-permission: USER_MANAGE
@@ -1365,6 +1406,23 @@ paths:
       - staff
       - partner
       summary: Create a principal
+      description: '**Where the principal and its `roleIds` land** (decided 14 October 2026, ADAM CR-077;
+        CHG-IDR-002). The principal''s home scope (`identity.principal.home_scope_id`) is the `platform.scope`
+        row at `homeScopePath`, or the caller''s own home scope when it is omitted; it must be at or beneath a
+        node where the caller holds `USER_MANAGE`, or the call is `403`. Each of `roleIds` becomes one
+        `identity.delegated_access` row in the same transaction: `principal_id` the new principal, `role_id`
+        the role, `effect` ALLOW, `scope_path` the home scope''s path, `granted_by_principal_id` and
+        `created_by_principal_id` the caller, `valid_to` the request''s `validTo`, exactly as
+        `createDelegatedAccess` would write it. The first of `roleIds` is the `primaryRoleId`.
+
+
+        **The grants are checked as `createDelegatedAccess` checks them** (decided 14 October 2026, ADAM
+        CR-079; CHG-IDR-003): the permissions of all the roles together, own and inherited, are evaluated
+        against every `SegregationRule`; a `block` pair refuses the whole create with `409
+        segregation-breach` and nothing is written. `requireApproval` and `warn` are accepted and listed by
+        `listSegregationViolations`.
+
+        '
       tags:
       - administration
       x-ticvai-permission: USER_MANAGE
@@ -1391,8 +1449,15 @@ paths:
                 $ref: '#/components/schemas/Principal'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          description: Username already in use within this cell
+          description: Username already in use within this cell (`username-taken`), or the roles in `roleIds`
+            together breach a segregation rule whose severity is `block` (`segregation-breach`, naming the rule
+            and both permissions).
+          x-ticvai-problem-types:
+          - username-taken
+          - segregation-breach
           content:
             application/problem+json:
               schema:
@@ -1478,6 +1543,15 @@ paths:
       - partner
       x-ticvai-read-routing: replica
       summary: Read a principal
+      description: '**What a venue-scoped caller sees** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001).
+        Any staff grant may read `identity.principal` rows; `USER_MANAGE` is checked at the caller''s scope,
+        and a principal whose home scope (`home_scope_id`) is not at or beneath a node where the caller''s
+        `USER_MANAGE` holds is `404`, the same answer as one that does not exist (`common.yaml`
+        `not-found`). `roles` is read with the principal from its live role grants
+        (`identity.delegated_access` joined to `identity.role`; see `Principal.roles`; ADAM CR-077,
+        CHG-IDR-002).
+
+        '
       tags:
       - administration
       x-ticvai-permission: USER_MANAGE
@@ -1587,6 +1661,24 @@ paths:
         `Role.isSystem` stays on the wire for clients built at r1 and is false on every role a tenant
         creates from 2 October.
 
+
+        **Roles are tenant-wide; a venue-scoped caller reads them all, read-only** (decided 14 October 2026,
+        ADAM CR-076; CHG-IDR-001). A role is defined once for the tenant (`Role.code` is unique per tenant)
+        and granted anywhere in the tree, so a venue manager holding `ROLE_MANAGE` at the venue lists every
+        role of the tenant, with its own permissions, in order to grant it. Creating, renaming or changing
+        the permissions of a role (`createRole`, `updateRole`, `setRolePermissions`) needs `ROLE_MANAGE` at
+        the tenant scope; a screen shows those controls disabled to a caller whose `ROLE_MANAGE` is held
+        only beneath the tenant.
+
+
+        **`principalCount` and `grantCount` are computed on read under row-level security** (ADAM CR-077;
+        CHG-IDR-002): from the role''s live grants in `identity.delegated_access`, counting only the grants
+        and principals the caller''s grants let it read. A venue manager''s count is the venue''s, not the
+        tenant''s.
+
+
+        **Ordered by `name` ascending, `id` as the tiebreak** (ADAM CR-077; CHG-IDR-002).
+
         '
       tags:
       - administration
@@ -1631,15 +1723,30 @@ paths:
         CHG-CSP-003). `presetCodes` names one or more presets (`listCapabilityTemplates`); their permissions
         are copied into the new role, unioned with any `permissions` sent, and the copy binds to nothing:
         changing a preset later never widens a role made from it. With neither, the role starts empty and
-        the checklist is ticked by hand. The initial set is checked as `setRolePermissions` checks it: a set
-        that breaches a `SegregationRule` is refused `422 segregation-breach`, naming the rule. An unknown
-        preset code is `422 unknown-preset`.
+        the checklist is ticked by hand. An unknown preset code is `422 unknown-preset`.
+
+
+        **The role-time segregation check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). The initial
+        set is checked as `setRolePermissions` checks it: every `SegregationRule` is evaluated against the
+        role''s permissions, **whatever its `scopeSensitive`**, because every permission of one role is granted
+        together at one scope, so a pair inside a role always overlaps. Only a rule whose `severity` is
+        `block` refuses, with `409 segregation-breach` (`common.yaml`) naming the rule and both permissions;
+        `requireApproval` and `warn` are accepted, and surface when a grant attaches the role
+        (`createDelegatedAccess`, `createPrincipal`) and in `listSegregationViolations`. The status was `422`
+        until r6 (approved breaking change BC-079). **The create is audited**: one `platform.audit_record` row
+        in the same transaction, as `setRolePermissions` writes for a permission change.
+
+
+        **Tenant scope** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001): roles are tenant-wide (`code`
+        is unique per tenant, compared case-insensitively) and their rows are written only at the tenant root,
+        so the operation is called at the tenant scope, as `setRolePermissions` always was (approved breaking
+        change BC-076). A venue manager reads the roles (`listRoles`) and grants them; it does not create them.
 
         '
       tags:
       - administration
       x-ticvai-permission: ROLE_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1689,13 +1796,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Role'
         '409':
-          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+          description: The code is already used in the tenant, compared case-insensitively (`duplicate-code`), or
+            the initial permission set breaches a segregation rule whose severity is `block`
+            (`segregation-breach`, naming the rule and both permissions; `422` until r6, BC-079).
+          x-ticvai-problem-types:
+          - duplicate-code
+          - segregation-breach
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          description: A preset code that does not exist (`unknown-preset`), or an initial permission set that
-            breaches a segregation rule (`segregation-breach`, naming the rule and both permissions).
+          description: A preset code that does not exist (`unknown-preset`).
           x-ticvai-problem-types:
           - unknown-preset
-          - segregation-breach
           content:
             application/problem+json:
               schema:
@@ -1720,11 +1834,17 @@ paths:
         Until this operation a role''s name was fixed at `createRole`. `code` does not change: a grant and
         the audit log name the role by it. The permissions are `setRolePermissions`.
 
+
+        **Called at the tenant scope** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001; approved breaking
+        change BC-077), as `createRole` and `setRolePermissions` are: a role is tenant-wide and its row is
+        written only at the tenant root. **It changes no permission**, so it runs no segregation check
+        (ADAM CR-079): a rename never changes what anybody holds.
+
         '
       tags:
       - administration
       x-ticvai-permission: ROLE_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1768,6 +1888,10 @@ paths:
       - partner
       x-ticvai-read-routing: replica
       summary: List grants for a principal or role
+      description: '**Ordered by `createdAt` descending, `id` as the tiebreak** (decided 14 October 2026, ADAM
+        CR-077; CHG-IDR-002): the grant made last is the one somebody is asking about.
+
+        '
       tags:
       - administration
       x-ticvai-permission: PERMISSION_VIEW
@@ -1819,6 +1943,18 @@ paths:
 
         Wildcard is permitted on DENY only. A wildcard allow is an accident waiting to happen.
 
+
+        **Segregation is checked when a grant is made** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003).
+        An ALLOW to a principal is evaluated against every `SegregationRule` with everything the principal
+        would then hold: this grant (a single permission, or a role''s own and inherited permissions), its other
+        live grants and their roles, and its module access; a `scopeSensitive` rule conflicts only where the
+        two scopes overlap (one path contains the other), any other rule wherever both are held. An ALLOW to a
+        role is checked the same way for every principal holding the role. **Only `severity: block`
+        refuses**, with `409 segregation-breach` naming the rule and both permissions, and nothing is written;
+        `requireApproval` and `warn` are accepted and the pair appears in `listSegregationViolations` at once.
+        A DENY is never refused: it can only remove a conflict. The 409 is additive: until r6 this grant
+        declared no segregation answer.
+
         '
       tags:
       - administration
@@ -1851,6 +1987,15 @@ paths:
                 $ref: '#/components/schemas/DelegatedAccess'
         '400':
           description: Wildcard on an ALLOW, or scope outside the caller's own grants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The ALLOW would leave a principal holding both permissions of a segregation rule whose
+            severity is `block` (`segregation-breach`, naming the rule, both permissions and the principal).
+          x-ticvai-problem-types:
+          - segregation-breach
           content:
             application/problem+json:
               schema:
@@ -3415,6 +3560,11 @@ paths:
         it authorises this one call. With a session (BO-053 Staff Directory) the caller''s own
         `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
+
+        **Ordered by `startedAt` descending, `sessionId` as the tiebreak** (decided 14 October 2026, ADAM
+        CR-077; CHG-IDR-002): the session that began last is first, which on a till is the one somebody is
+        asking about.
+
         '
       tags:
       - session
@@ -4274,6 +4424,9 @@ paths:
         the permissions it carried and its window. What was done under a grant is in `listAuditRecords`,
         filtered on the grant (`AuditRecord.platformStaffGrantId`).
 
+        **Ordered by `openedAt` descending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077;
+        CHG-IDR-002): "most recent" is when the grant opened, not when it expires.
+
         '
       tags:
       - administration
@@ -4638,7 +4791,8 @@ paths:
         audit R098). Callable with `PLATFORM_TENANT_ACCESS`, the permission that opens a grant, so the
         operator needs no tenant grant to read it; `listPlatformStaffGrants` needs `AUDIT_VIEW`, which
         the operator only has if a grant carries it. Returns only grants whose `operatorPrincipalId` is
-        the caller, most recent first.
+        the caller, most recent first: **ordered by `openedAt` descending, `id` as the tiebreak** (decided
+        14 October 2026, ADAM CR-077; CHG-IDR-002).
 
         '
       tags:
@@ -4988,6 +5142,10 @@ paths:
         `AccessDynamicPolicy`, reported by `listDynamicPolicyEffectiveness`; see `AuthorisationPolicy` for which engine
         governs what.
 
+
+        **Ordered by `name` ascending, `policyId` as the tiebreak** (decided 14 October 2026, ADAM CR-077;
+        CHG-IDR-002): BO-1066 reads the policies by name, and the counts beside each are what it compares.
+
         '
       tags:
       - administration
@@ -5071,6 +5229,12 @@ paths:
 
         **Advisory.** Nothing is revoked or granted by this read; a change goes through `createDelegatedAccess`,
         the role, or a policy, with their approvals.
+
+
+        **Ordered by `kind` (`conflicting`, then `missing`, then `excessive`), then `permission` ascending, with
+        `principalId`, `roleId` and `scopePath` as the tiebreak** (decided 14 October 2026, ADAM CR-077;
+        CHG-IDR-002): a finding is computed and has no id of its own, and BO-054 and BO-1066 put the conflicts
+        a person must act on before the clean-up.
 
         '
       tags:
@@ -5502,6 +5666,11 @@ paths:
         **Advisory. A person grants** (`createDelegatedAccess`, with its approvals where the role needs them); nothing
         is written by this read. Fewer than `minPeers` peers answers an empty page with `insufficientPeers` true,
         because a suggestion from one colleague is a copy of that colleague''s access, not a pattern.
+
+
+        **Ordered by `peersHoldingPercent` descending, then `roleCode` ascending, with `roleId` and `scopePath`
+        as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the role most peers hold is the
+        strongest suggestion, and a suggestion is computed and has no id of its own.
 
         '
       tags:
@@ -7893,6 +8062,9 @@ components:
         detectedAt:
           type: string
           format: date-time
+          description: When the principal came to hold both halves, the latest of the moments that made the pair
+            (a grant's `createdAt`, a role permission's `grantedAt`, a module-access change); the list's order
+            (14 October 2026, ADAM CR-077; CHG-IDR-002).
 
     ModuleCapability:
       type: object
@@ -8104,6 +8276,19 @@ components:
           type: string
         severity:
           type: string
+          description: '**What each severity does** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). `block`
+            refuses, with `409 segregation-breach`, a role set (`createRole`, `setRolePermissions`, including a
+            parent role''s edit that would breach in a role inheriting it) and a grant (`createDelegatedAccess`,
+            `createPrincipal` with `roleIds`, `setPrincipalModuleAccess`) that would hold both permissions.
+            `requireApproval` and `warn` refuse nothing: the role or grant is saved, and every principal left
+            holding both appears in `listSegregationViolations` with this severity.
+
+
+            **Role time and grant time differ only in scope.** A role''s own and inherited permissions are one
+            set granted at one scope, so at role time every rule applies whatever `scopeSensitive` says; at grant
+            time a `scopeSensitive` rule conflicts only where the two grants'' scopes overlap.
+
+            '
           enum:
           - block
           - requireApproval
@@ -8517,6 +8702,13 @@ components:
             '
         roles:
           type: array
+          x-ticvai-persisted: false
+          description: '**Read with the principal, never stored on it** (decided 14 October 2026, ADAM CR-077;
+            CHG-IDR-002): one item per role the principal holds through a live grant, an
+            `identity.delegated_access` row with this `principal_id`, a `role_id`, `effect` ALLOW, `revoked_at`
+            null and now inside `valid_from`..`valid_to` (an open end is open), joined to `identity.role` for
+            `code` and `name`. A role granted at several scopes appears once. `isPrimary` is
+            `role.id = principal.primary_role_id`. Ordered by `name` ascending.'
           items:
             $ref: '#/components/schemas/RoleSummary'
         lastLoginAt:
@@ -8545,8 +8737,18 @@ components:
         validTo:
           type: string
           format: date-time
+        homeScopePath:
+          type: string
+          description: 'The `platform.scope` path the person works from, stored as
+            `identity.principal.home_scope_id` (the row at this path). Omitted: the caller''s own home scope. At
+            or beneath a node where the caller holds `USER_MANAGE`, or `403` (14 October 2026, ADAM CR-077;
+            CHG-IDR-002).'
         roleIds:
           type: array
+          description: 'Roles granted at once. **Each becomes one `identity.delegated_access` row** (ALLOW, at
+            the home scope''s path, granted by the caller), as `createDelegatedAccess` writes it and under the
+            same segregation check; the first is the principal''s `primaryRoleId` (14 October 2026, ADAM CR-077;
+            CHG-IDR-002).'
           items:
             type: string
             format: uuid
@@ -8568,6 +8770,10 @@ components:
             code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a
             role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.
 
+            **Compared case-insensitively** (`common.yaml`, `x-ticvai-unique`; ADAM CR-079, CHG-IDR-003):
+            `ADMIN` and `admin` are one code, and the second is the duplicate. The code is kept as it was
+            typed.
+
             '
         name:
           type: string
@@ -8583,6 +8789,12 @@ components:
             **The audit asked whether every table had columns, a relationship and an owner, and this table
             had all three.** What it did not ask is whether a table with one column can do the job its
             name claims.
+
+            **The role''s own set, not revoked** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the
+            `identity.role_permission` rows of this role with `is_active` true. A revoked row is history, not
+            a permission. **Inherited permissions are not merged in**: a client reads `inheritsFromRoleId` and
+            that role, the same shape `setRolePermissions` returns (`permissions` beside `inheritsFromRoleId`).
+            The segregation check is the one place the two are taken together (ADAM CR-079).
 
             '
           items:
@@ -8625,8 +8837,21 @@ components:
             '
         principalCount:
           type: integer
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002):
+            the distinct principals holding this role through a live grant (`identity.delegated_access` with
+            this `role_id`, a `principal_id`, `effect` ALLOW, `revoked_at` null, now inside its validity
+            window). **Counted under row-level security**, so only the grants the caller''s own grants let it
+            read are counted: a venue manager sees the venue''s holders, not the tenant''s.'
         grantCount:
           type: integer
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002):
+            the live grants of this role (the rows `principalCount` counts, one per grant, so a principal
+            granted the role at two scopes counts twice). Counted under row-level security, as
+            `principalCount`.'
     RolePermission:
       x-ticvai-persistence: identity.role_permission
       type: object
@@ -8964,6 +9189,8 @@ components:
           type: string
         isPrimary:
           type: boolean
+          description: True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`);
+            false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002).
     Session:
       type: object
       required:

@@ -4397,7 +4397,10 @@
   "verb": "GET",
   "path": "/principals",
   "reads": [
-   "identity.principal"
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.role",
+   "platform.scope"
   ],
   "writes": [],
   "routing": "replica",
@@ -4413,7 +4416,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "fixNote": "14 October 2026 (ADAM CR-076/077/079): Principal.roles from the live role grants joined to the role; the home scope's path filters the list (CHG-IDR-001, CHG-IDR-002)"
  },
  "createPrincipal": {
   "contract": "identity",
@@ -4421,10 +4425,17 @@
   "path": "/principals",
   "reads": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.role",
+   "identity.role_permission",
+   "identity.segregation_rule",
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
+   "cache:resolution",
+   "identity.delegated_access",
    "identity.principal",
    "identity.principal_credential"
   ],
@@ -4442,14 +4453,28 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "fixNote": "14 October 2026 (ADAM CR-076/077/079): each roleIds entry becomes one delegated_access row at the home scope, under the segregation check (CHG-IDR-002, CHG-IDR-003); 14 October 2026 (ADAM CR-076/077/079): each roleIds entry becomes one delegated_access row at the home scope, under the segregation check, and evicts the permissions resolution as createDelegatedAccess does (CHG-IDR-002, CHG-IDR-003)",
+  "cache": {
+   "store": "cache:resolution",
+   "role": "evicts",
+   "resolvers": [
+    "permissions"
+   ],
+   "key": "res:{tenantId}:{resolver}:{scopePath}",
+   "bump": "INCR resver:{tenantId}:{resolver}",
+   "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
+  }
  },
  "getPrincipal": {
   "contract": "identity",
   "verb": "GET",
   "path": "/principals/{principalId}",
   "reads": [
-   "identity.principal"
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.role",
+   "platform.scope"
   ],
   "writes": [],
   "routing": "replica",
@@ -4465,7 +4490,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "fixNote": "14 October 2026 (ADAM CR-076/077/079): Principal.roles from the live role grants joined to the role; the home scope decides visibility (CHG-IDR-001, CHG-IDR-002)"
  },
  "updatePrincipal": {
   "contract": "identity",
@@ -4500,6 +4526,7 @@
   "verb": "GET",
   "path": "/roles",
   "reads": [
+   "identity.delegated_access",
    "identity.role",
    "identity.role_permission"
   ],
@@ -4517,7 +4544,7 @@
   "audience": [
    "staff"
   ],
-  "fixNote": "4 October 2026 (CHG-FXC-004): each role's permissions"
+  "fixNote": "4 October 2026 (CHG-FXC-004): each role's permissions; 14 October 2026 (ADAM CR-076/077/079): principalCount and grantCount counted from the live grants under RLS (CHG-IDR-002)"
  },
  "createRole": {
   "contract": "identity",
@@ -4534,10 +4561,11 @@
    "cache:idempotency",
    "cache:resolution",
    "identity.role",
-   "identity.role_permission"
+   "identity.role_permission",
+   "platform.audit_record"
   ],
   "routing": "",
-  "scope": "venue",
+  "scope": "tenant",
   "perm": "ROLE_MANAGE",
   "offline": false,
   "summary": "Create a role",
@@ -4560,7 +4588,7 @@
    "bump": "INCR resver:{tenantId}:{resolver}",
    "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
   },
-  "fixNote": "4 October 2026 (CHG-FXC-004): the permissions, preset template and segregation rules"
+  "fixNote": "4 October 2026 (CHG-FXC-004): the permissions, preset template and segregation rules; 14 October 2026 (ADAM CR-076/077/079): the create is audited, as setRolePermissions is (CHG-IDR-003)"
  },
  "listDelegatedAccess": {
   "contract": "identity",
@@ -4591,7 +4619,11 @@
   "path": "/delegated-access",
   "reads": [
    "cache:idempotency",
-   "identity.delegated_access"
+   "identity.delegated_access",
+   "identity.module_access",
+   "identity.role",
+   "identity.role_permission",
+   "identity.segregation_rule"
   ],
   "writes": [
    "cache:idempotency",
@@ -4622,7 +4654,8 @@
    "key": "res:{tenantId}:{resolver}:{scopePath}",
    "bump": "INCR resver:{tenantId}:{resolver}",
    "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
-  }
+  },
+  "fixNote": "14 October 2026 (ADAM CR-076/077/079): the grant-time segregation check over everything the principal would hold (CHG-IDR-003)"
  },
  "deleteDelegatedAccess": {
   "contract": "identity",
@@ -56837,7 +56870,10 @@
   "verb": "PUT",
   "path": "/principals/{principalId}/module-access",
   "reads": [
-   "identity.module_access"
+   "identity.delegated_access",
+   "identity.module_access",
+   "identity.role_permission",
+   "identity.segregation_rule"
   ],
   "writes": [
    "identity.module_access"
@@ -56855,7 +56891,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "fixNote": "14 October 2026 (ADAM CR-076/077/079): the grant-time segregation check over everything the principal would hold (CHG-IDR-003)"
  },
  "getFnbServiceChargePolicy": {
   "contract": "fnb",
@@ -75827,7 +75864,7 @@
    "identity.role"
   ],
   "routing": null,
-  "scope": "venue",
+  "scope": "tenant",
   "perm": "ROLE_MANAGE",
   "offline": false,
   "summary": "Rename a role or change its description",

@@ -488,3 +488,44 @@ changes:
     tag: r4
     producer-tickets: [SVC-MARKETING-CONSENT-3]
     consumer-tickets: [APP-POS-POS-027, VM-BO-748, APP-WEB-WEB-020, APP-WEB-WEB-024, APP-MOB-GST-039, APP-MOB-GST-066]
+  # BC-076, BC-077 and BC-079 (CHG-IDR-001, CHG-IDR-003) are numbered after their ADAM CRs, apart from the BC entries
+  # other r6 batches add in parallel, so the branches merge as a union. All three are breaking in declaration only:
+  # check-contract-compat compares neither x-ticvai-scope-level nor 4xx codes, so it reports them as matching nothing.
+  - id: BC-076
+    contract: identity
+    operation: createRole
+    change: "x-ticvai-scope-level venue -> tenant"
+    reason: >-
+      ADAM CR-076 (ticket 27764): roles are tenant-wide (Role.code unique per tenant, audit R108) and identity.role /
+      identity.role_permission rows are written only at the tenant root, so a venue-scoped createRole could never
+      insert. The lead kept role writes at the tenant root and moved createRole to the tenant scope, matching
+      setRolePermissions, which was always tenant; venue grants read the roles (CHG-IDR-001). Breaking in
+      declaration: a caller holding ROLE_MANAGE only at a venue is now refused.
+    approved-by: 'Chinmay Parab, 14 October 2026 (r6 settlement of CR-076: "move createRole and updateRole to scope-level tenant")'
+    tag: r6
+    producer-tickets: [SVC-IDENTITY-ADMINISTRATION-1]
+    consumer-tickets: [APP-SETUP-BO-054, APP-SETUP-BO-054-REST, APP-CONSOLE-ADM-021]
+  - id: BC-077
+    contract: identity
+    operation: updateRole
+    change: "x-ticvai-scope-level venue -> tenant"
+    reason: >-
+      As BC-076 (ADAM CR-076; CHG-IDR-001): updateRole writes identity.role, a tenant-root row, so it is called at the
+      tenant scope like createRole and setRolePermissions.
+    approved-by: 'Chinmay Parab, 14 October 2026 (r6 settlement of CR-076)'
+    tag: r6
+    producer-tickets: [SVC-IDENTITY-ADMINISTRATION-2]
+    consumer-tickets: [APP-SETUP-BO-054-REST, APP-CONSOLE-ADM-021]
+  - id: BC-079
+    contract: identity
+    operation: createRole
+    change: "segregation-breach 422 -> 409"
+    reason: >-
+      ADAM CR-079 (ticket 27764): one segregation rule had two answers, 422 on createRole and 409 on
+      setRolePermissions and setPrincipalModuleAccess. The lead chose one problem type, segregation-breach, with
+      status 409 everywhere, catalogued in common.yaml (CHG-IDR-003). createRole's 409 now lists duplicate-code and
+      segregation-breach; its 422 keeps unknown-preset only. BO-054, the consumer, is not started.
+    approved-by: 'Chinmay Parab, 14 October 2026 (r6 settlement of CR-079: "status 409 everywhere (createRole moves 422->409)")'
+    tag: r6
+    producer-tickets: [SVC-IDENTITY-ADMINISTRATION-1]
+    consumer-tickets: [APP-SETUP-BO-054, APP-CONSOLE-ADM-021]

@@ -1,0 +1,110 @@
+id: CHG-IDR-002
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'Every baselined Identity list names its order and id tiebreak; Principal.roles, isPrimary and Role.permissions
+  say where they come from; principalCount and grantCount are computed under RLS, not stored; createPrincipal.roleIds
+  become delegated_access grants at the principal''s home scope; the lineage of listPrincipals, getPrincipal, listRoles
+  and createPrincipal lists what they read and write.'
+decision:
+  what: 'contracts/spine/identity.yaml, orders (each "Ordered by `<field>` ..., `id` as the tiebreak"):
+    listOwnPlatformStaffGrants and listPlatformStaffGrants openedAt desc; listRoles name asc; listPrincipals
+    displayName asc; listDelegatedAccess and listDelegations createdAt desc; listActiveSessions startedAt desc
+    (sessionId tiebreak); listSegregationViolations detectedAt desc (ruleId, principalId tiebreak; detectedAt defined
+    as the latest moment that made the pair); listPermissionFindings kind (conflicting, missing, excessive) then
+    permission; listAuthorisationPolicyEffectiveness name asc (policyId tiebreak); suggestRoleAssignment
+    peersHoldingPercent desc then roleCode. Sources: Principal.roles x-ticvai-persisted false, from live
+    identity.delegated_access role grants (ALLOW, not revoked, inside the validity window) joined to identity.role;
+    RoleSummary.isPrimary = role.id = principal.primary_role_id; Role.permissions = the role''s own is_active
+    role_permission rows, inherited not merged; Role.principalCount and grantCount readOnly, x-ticvai-persisted false,
+    computed from live grants under row-level security (a venue manager counts the venue''s holders).
+    createPrincipal: a description, homeScopePath (optional, default the caller''s home scope, stored as
+    identity.principal.home_scope_id), roleIds each written as one identity.delegated_access row at the home scope as
+    createDelegatedAccess writes it (the first is primaryRoleId), 403 declared, 409 problem types username-taken and
+    segregation-breach. Lineage (tools/applied/identity-roles-14-october.py, as CHG-FXC-004 did): listPrincipals and
+    getPrincipal read + identity.delegated_access, identity.role, platform.scope; listRoles + identity.delegated_access;
+    createPrincipal reads the roles, permissions, rules and scope and writes identity.delegated_access and
+    cache:resolution. handoff/audit-baseline.json: the nine fixed C-PAGED-ORDER members and createPrincipal:409 /
+    setPrincipalModuleAccess:409 / setRolePermissions:409 (C-ERROR-PROBLEM-TYPE) removed. BO-053''s create form lists
+    homeScopePath.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-077 (ticket 27764), audited 14 October 2026: listRoles and listPrincipals stated no order and the platform
+  grants said "most recent first" naming no column (identity.yaml:4273, 4641), while identity.platform_staff_grant has
+  opened_at and expires_at and PageCursor gives only the id tiebreak (common.yaml:46-50); C-PAGED-ORDER caught them
+  but they were baselined (R154). Principal.roles had no lineage behind it, principal_count and grant_count were
+  stored columns nothing maintained, Role.permissions did not settle revoked or inherited rows, and
+  createPrincipal.roleIds landed nowhere. The lead chose the CR''s Option A, the counts computed under RLS, the
+  lineage widened, roleIds defined, and the same order fix for every other baselined Identity list.'
+keys_touched:
+  screens:
+  - BO-053
+  operations:
+  - listOwnPlatformStaffGrants
+  - listPlatformStaffGrants
+  - listRoles
+  - listPrincipals
+  - getPrincipal
+  - createPrincipal
+  - listDelegatedAccess
+  - listDelegations
+  - listActiveSessions
+  - listSegregationViolations
+  - listPermissionFindings
+  - listAuthorisationPolicyEffectiveness
+  - suggestRoleAssignment
+  schemas:
+  - Principal
+  - RoleSummary
+  - Role
+  - CreatePrincipalRequest
+  - SegregationViolation
+  tables:
+  - identity.role
+  - identity.delegated_access
+  - identity.principal
+  files:
+  - contracts/spine/identity.yaml
+  - screens/P08-venue-back-office.yaml
+  - handoff/api-data-lineage.json
+  - handoff/audit-baseline.json
+  - tools/applied/identity-roles-14-october.py
+root_class: A18 API-CONVENTIONS
+tickets:
+  started:
+  - SVC-IDENTITY-ADMINISTRATION-1 (#27764)
+  unstarted:
+  - SVC-IDENTITY-ADMINISTRATION-2 (#27765)
+  - SVC-IDENTITY-ADMINISTRATION-5 (#29052)
+  - SVC-IDENTITY-ADMINISTRATION-8 (#29095)
+  - SVC-IDENTITY-ADMINISTRATION-9 (#28288)
+  - SVC-IDENTITY-IDENTITY-1 (#27750)
+  - SVC-IDENTITY-IDENTITY-2 (#27732)
+  - SVC-IDENTITY-IDENTITY-7 (#29096)
+  - SVC-IDENTITY-SESSION-1 (#27766)
+  - VM-IDENTITY-ADMINISTRATION-1 (#27949)
+  - VM-IDENTITY-ADMINISTRATION-2 (#28286)
+  - VM-BO-053 (#29045)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-077
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
+  IDR. Prevention: check-contract-shapes C-PAGED-ORDER, with this batch''s nine fixed members taken out of
+  handoff/audit-baseline.json (authored: only --update-baseline or a reviewed hand edit writes it, no deriver), so a
+  regression on any of them fails; batch GEN tightens the rule to require a named field. The derived DDL loses
+  identity.role.principal_count and grant_count at the next refresh (x-ticvai-persisted false); the forward migration
+  is the gate''s. The x-ticvai-rls extensions that make "counted under RLS" mean venue counts are batch GEN''s.
+  Details chosen where the decision left them open: the order field for each other list (as above, the field each
+  consuming screen reads first, a stored or per-request-stable key, a computed item tied by its natural key);
+  createPrincipal''s home scope (homeScopePath, an additive optional field, default the caller''s own, because the
+  decision says roleIds land at the principal''s home scope and nothing set it); the first roleIds entry as
+  primaryRoleId (CreatePrincipalRequest has no primaryRoleId and isPrimary needs one); createPrincipal runs the
+  grant-time segregation check (CHG-IDR-003), since its grants are createDelegatedAccess grants;
+  createPrincipal evicts the permissions resolution cache as createDelegatedAccess does (tools/resolution_cache.py).
+  check-problem-types counts 704, below its ceiling of 707: the lead lowers CEILING at the merge (other batches name
+  types too). 27764 is started: comment plus linked delta, per ticvai/CLAUDE.md rule 6.'
