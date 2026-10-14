@@ -135,6 +135,20 @@ check('the models now come from the provider rather than the table',
 check('and Google\'s list drops the model that cannot answer a question',
   by.google.models.join(',') === 'fake-pro', by.google.models.join(','));
 
+// **A first question never stops at "type a model".** The panel read a
+// `suggested` the service did not send; it sends one now, always a model the
+// provider actually listed (here the stand-in's, since none of the table's own
+// is on its list), and nothing for the escape hatch, which has no list.
+check('each configured provider suggests a model it actually offers',
+  ['openai', 'anthropic', 'google'].every((p) => by[p].suggested && by[p].models.includes(by[p].suggested)),
+  ['openai', 'anthropic', 'google'].map((p) => `${p}:${by[p].suggested}`).join(' '));
+check('before a key, the suggestion is the table\'s first pick',
+  (empty.data?.providers ?? []).filter((p) => p.models.length)
+    .every((p) => p.suggested === p.models[0]),
+  (empty.data?.providers ?? []).map((p) => `${p.id}:${p.suggested}`).join(' '));
+check('and the escape hatch suggests nothing rather than a guess',
+  (empty.data?.providers ?? []).find((p) => p.id === 'compatible')?.suggested === '');
+
 // **The key never comes back.** Not in the listing, not anywhere.
 check('no listing carries a key, only the last four characters',
   !/good-key/.test(JSON.stringify(stored.data)),

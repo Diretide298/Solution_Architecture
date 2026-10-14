@@ -19,6 +19,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/sheet.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>
   <body class="admin-page">
@@ -32,7 +33,6 @@
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
-        <a class="chip" href="/settings.html#connector">Your connector</a>
         <a class="chip" href="/">Back to the viewer</a>
       </div>
     </header>
@@ -47,12 +47,13 @@
                  screen reader gains nothing from being told there is a robot. -->
             <img class="up-mascot" src="/brand/mascot/02-working.png" alt="" aria-hidden="true"
                  width="256" height="204" />
-            <h2 class="admin-heading">What is new in ADAM</h2>
+            <h1 class="up-title">What is new in ADAM</h1>
           </div>
-          <!-- The build this ADAM is serving, so a question about whether a
-               change has arrived is answered on the page that describes it
-               rather than by asking somebody. -->
-          <p class="auth-note set-lede" id="up-build">&nbsp;</p>
+          <!-- Whether your own connector has caught up, from what each of your
+               machines last reported against the build this ADAM serves. The one
+               line on the page that is about right now rather than a record of
+               what happened, so it sits above the record. -->
+          <p class="up-fleet" id="up-fleet" role="status">&nbsp;</p>
           <p class="auth-error" id="up-error" hidden></p>
           <div id="up-body">
             <p class="auth-note auth-fine">Loading&hellip;</p>
@@ -67,8 +68,6 @@
       <a class="chip" href="/login.html">Sign in</a>
     </div>
 
-    <script type="module" src="/theme.js"></script>
-    <script type="module" src="/account-drawer.js"></script>
     <script type="module" src="/updates.js"></script>
   </body>
 </html>

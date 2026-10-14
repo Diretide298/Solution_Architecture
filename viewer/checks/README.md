@@ -17,17 +17,21 @@ on an empty database.
 |---|---|
 | `paging-check.mjs` | the boot payload is split and compressed, every held-back field comes back from `/api/detail`, and the long list is built a group and a page at a time without losing a row |
 | `contract-trace-check.mjs` | a schema names the tables it is stored as, an operation names the tables it reaches, and an operation the lineage never resolved says so rather than reading as "touches nothing" |
-| `signoff-check.mjs` | the overview counts against the whole population rather than what was judged, unreviewed artefacts sort first, and a row leads to the artefact — including the three kinds that had no deep link until it needed one |
+| `signoff-check.mjs` | Reviews' coverage counts against the whole population rather than what was judged, unreviewed artefacts sort first, a row leads to the artefact (including the three kinds that had no deep link until it needed one), an answered ask reads as fixed, a kind the reader could not serve is said, and `validation.html` lands on `reviews.html#coverage` with its query |
+| `reviews-check.mjs` | on Reviews, answering an ask records how and takes it off the worklist, Reopen and Send back (reason required) do what they say, Discard needs a second press, "Show everything" clears the whole filter, every control is labelled, the pace chart is drawn at its own size with a table twin, and the notes that name you are paged rather than capped |
 | `pages-check.mjs` | every page loads, every layer renders every one of its modes, and **nothing anywhere logs a console error** |
 | `landing-check.mjs` | the door sends people where it says — the lockup stays on the door rather than falling into a package, all 46 rail-panel links land on the layer *and* mode they name, Overview deselects, and sign out really ends the session |
 | `canvas-check.mjs` | the screen canvas holds the platform it says it holds, shelves it by module, lists only the journeys that touch it, draws the links that cross a module, mounts a board only when it is legible and lets go when it is not — and a screen leads back into the Frontend layer |
-| `audit-gate-check.mjs` | the delivery audit draws for an admin and refuses a reviewer with a sentence rather than a blank page. **Writes an account**, so it refuses to run unless `TICVAI_DB` points at a scratch copy |
+| `audit-gate-check.mjs` | the delivery audit draws for an admin and refuses a reviewer with a sentence rather than a blank page, and the server refuses that reviewer `/api/audit` too. **Writes an account**, so it refuses to run unless `TICVAI_DB` points at a scratch copy |
+| `audit-checks-json-check.mjs` | the checks run as JSON the Audit page reads: `run-checks.py --json` and `--from-log` write the verdicts, counts, first findings and fix file the table prints or drops; refresh-safe.sh's judge puts its baseline checkers back into `handoff/checks.json`; and `lib/audit.mjs` says which release a run was for. Runs against a made-up package in a temporary folder; needs no viewer |
 | `tip-facts-check.mjs` | every count a tip states is the count the payload holds — the tips write `{operations}` and are measured against `/pkg/<project>/lineage`, `journeys` and `decisions` |
 | `search-check.mjs` | search reaches the whole package and not only the contracts, every `file:line` it reports really is where that artefact is written, a result opens the artefact's page *and* the source at that line, and opening one **lands on the match rather than on the page** |
 | `subsearch-check.mjs` | every page that lists things can be narrowed, the count keeps its denominator, and a row drawn after the filter was typed is filtered too |
 | `er-drag-check.mjs` | a box you drop in an ER diagram is still there six seconds later, and a double-click hands it back to the simulation |
 | `uiux-check.mjs` | the board workbench holds every board on disk, not only the ones a screen points at; no board counts the same frame twice; every tile is one size; each board file and one frame out of each board with frames resolves; and the rail, the filters and all three middle views do what they say |
 | `tasks-unit-check.mjs` | the Tasks page's Count switch: in Tasks no number on the page is a ticket count and in Tickets none is a task count (every section, shown or not, except the testing gate, which is ten tickets in either view, and the plan's points line), the sprint verdict changes, switching asks the service for nothing, and the choice lands in `?count=` and the reader's storage; in Finished each day, days still to come are blank and a number lists exactly the tickets behind it; pass a person's name to run it on their page |
+| `agents-page-check.mjs` | Agent activity opens on its verdict, its sessions and failed figures are the service's whole-window counts rather than a capped list's length, the failure bars lead with the worst tool and have a legend and a table twin, the rail shows one section at a time, and `?days=` and `?person=` are the page's state |
+| `admin-page-check.mjs` | People and projects opens on "Needs you", the old `#close-from-sheet` and `#settle-from-sheet` links land on the right register, every field is labelled, a role change, Disable, taking a project away and Withdraw each ask first and Cancel changes nothing, and an existing account can be given another project. **Writes accounts**, so it refuses to run unless `TICVAI_DB` points at a scratch copy |
 
 `pages-check.mjs` is the cheap one to run after any edit to a module under
 `public/`. `node --check` proves a file parses; it says nothing about whether the
@@ -89,7 +93,11 @@ TICVAI_VIEWER=http://127.0.0.1:4620 TICVAI_API=http://127.0.0.1:4620 \
 
 `signoff-check.mjs` **records one real verdict per kind** — six of them now that
 state models and schemas are reviewable — against real artefacts, because checking
-the join against a fake population would check nothing.
+the join against a fake population would check nothing. `reviews-check.mjs` writes
+verdicts too (and answers, sends back and discards them). Both pick artefacts nobody
+has judged, so a store that already holds a review does not decide the result, and
+both read `TICVAI_VIEWER`/`TICVAI_API`; give both the viewer's address and the page
+reads the accounts service through the viewer.
 
 Point the service at a scratch store before running it —
 

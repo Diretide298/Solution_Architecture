@@ -1,19 +1,26 @@
 /**
- * One subject, seen across every layer at once.
+ * AI capabilities: who can use them.
  *
  * `lib/domains.mjs` says why the lens is derived rather than written down: the
  * package is organised by kind, the file that gathered AI into prose went stale
  * in six ways inside one dump, and prose cannot track a moving package. This is
  * the front of that. It asks one question and refuses to be a directory:
  *
- *   For each AI capability — who can invoke it, what does it touch, and who can
- *   stop it — and which of those three is missing?
+ *   For each AI capability — who may call it, which screen does, and what does
+ *   it change — and which of those is missing?
  *
- * "Where is the AI stuff" is the question `handoff/ai-index.md` already
- * answered, and a list of 77 things is not an answer anybody acts on. The three
- * columns above are the ones that produce an action, because a capability
- * missing any of them is a defect somebody has to fix rather than a fact
- * somebody has to remember.
+ * The page opens on the answer (how many AI operations no screen reaches, and
+ * how many permissions have never had one) and its body is the Reach table, one
+ * row per operation, every cell a way back into the viewer. How membership was
+ * worked out is the last section, for the reader who wants to check the join
+ * rather than take it.
+ *
+ * **It was "Domain lenses", and the flash sale was the second lens.** The page
+ * was written around the AI question, and the flash sale did not fit it: no
+ * services were shown, and the copy told a flash-sale reader that "the assistant
+ * is open to the public". The deployment map answers the flash sale, so the
+ * lens left this page (the viewer's lens chips still carry it, from the same
+ * /api/domains) and an old link that names it is sent to the map.
  *
  * /api/domains carries membership and the derived-versus-declared disagreement,
  * and nothing else — it is deliberately a lens over the other payloads, not a
@@ -28,33 +35,33 @@
  *   /api/detail     the contract's own prose, so the page can quote the rule an
  *                   operation is supposed to enforce instead of retyping it
  *
- * That is six requests for one page, which is more than any other standalone
- * view asks for. It is the honest cost of a cross-layer question: the answer
- * does not live in any single layer, and computing it in the browser is what
- * keeps it from going stale the way the prose did. They are served gzipped —
- * the whole set is a few hundred kilobytes — and fetched in parallel.
+ * Six requests for one page, more than any other standalone view asks for. It
+ * is the honest cost of a cross-layer question: the answer does not live in any
+ * single layer, and computing it in the browser is what keeps it from going
+ * stale the way the prose did. They are served gzipped and fetched in parallel.
  *
  * Every number on this page is counted from those payloads. Nothing is typed.
  * The prose is typed and says only things that stay true when the counts move.
  */
 
 // The viewer's top bar on a page that is not the viewer: the layer tabs, the
-// bell and the account drawer. Eight pages had none of it.
+// bell and the account drawer. It also stamps the saved theme.
 import '/page-chrome.js';
-import '/theme.js';   // the saved day/night choice, before anything paints
 import { hideLoader } from '/loader.js';
 import * as auth from '/validation.js';
-import { attachSubSearch } from '/subsearch.js';
+import { mountPanels } from '/panels.js';
+import {
+  el, fmt, plural, param, verdict, next, mountScope, legend, badge, stack, table,
+} from '/sheet.js';
 
 const $ = (id) => document.getElementById(id);
 
-const el = (tag, className, text) => {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text instanceof Node) node.append(text);
-  else if (text != null) node.textContent = text;
-  return node;
-};
+// ── a link that names the retired lens goes to the deployment map ────
+// Before anything is fetched: there is nothing on this page for that reader.
+const RETIRED = new Set(['burst', 'flash-sale', 'flashsale', 'flash']);
+if (RETIRED.has(param('lens').toLowerCase()) || RETIRED.has(location.hash.slice(1).toLowerCase())) {
+  location.replace('/burst.html');
+}
 
 const KIND_LABEL = {
   operation: 'Operations',
@@ -62,48 +69,42 @@ const KIND_LABEL = {
   event: 'Events',
   table: 'Tables',
   screen: 'Screens',
-  flow: 'Flows',
+  flow: 'Journeys',
   decision: 'Decisions',
 };
 
-/** The same words in the singular, for the sentences that count one of them. */
-const KIND_ONE = {
-  operation: 'operation',
-  state: 'state model',
-  event: 'event',
-  table: 'table',
-  screen: 'screen',
-  flow: 'flow',
-  decision: 'decision',
-};
-
 /** Contract outwards: what the API offers, what moves, what it stores, what a
- *  person sees, what path they walk, what was decided. Same order the sign-off
- *  page uses, extended to the kinds only a lens has. */
+ *  person sees, what path they walk, what was decided. */
 const KIND_ORDER = ['operation', 'state', 'event', 'table', 'screen', 'flow', 'decision'];
 
-const PANES = [
-  ['reach', 'Reach'],
-  ['members', 'Members'],
-  ['gaps', 'Gaps'],
-];
-
-const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
-
-/** 12 → "Twelve", so a headline can open on a word rather than a digit. Falls
- *  back to the digits above twenty, where the word is harder to read. */
-const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
-  'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen',
-  'eighteen', 'nineteen', 'twenty'];
-const spell = (n) => (WORDS[n] ? WORDS[n] : String(n));
-const Spell = (n) => { const w = spell(n); return w[0].toUpperCase() + w.slice(1); };
+/**
+ * Three states, and the first is the one this page was built to show.
+ *
+ *   unreachable  something says who may call it, and no screen does
+ *   ungoverned   a screen calls it, and nothing says who may
+ *   ok           a screen calls it, and something says who may
+ *
+ * A guest-callable operation counts as governed: being open to a guest is a
+ * decision written down, not the absence of one.
+ *
+ * The colours are the sheet's, one meaning each. No screen yet is "not
+ * started" (the work of building one has not begun), a missing permission is
+ * "waiting" (on a decision), and reachable and governed is "done". The words
+ * are always beside them.
+ */
+const STATUS = {
+  unreachable: { label: 'Reaches no screen', short: 'No screen', kind: 'fresh' },
+  ungoverned: { label: 'On a screen, no permission named', short: 'No permission named', kind: 'stalled' },
+  ok: { label: 'On a screen, with a permission', short: 'On a screen', kind: 'done' },
+};
+const STATUS_RANK = { unreachable: 0, ungoverned: 1, ok: 2 };
 
 const state = {
   lenses: [],
   lens: null,
   ctx: null,
-  pane: 'reach',
-  reachFilter: 'all',
+  rows: [],
+  scope: null,
 };
 
 // ── reading ──────────────────────────────────────────────────────────
@@ -189,28 +190,11 @@ function tally(tables) {
   return [...out.entries()].sort((a, b) => b[1] - a[1]);
 }
 
-/**
- * Three states, and the third is the one this page was built to show.
- *
- *   ok           somebody can call it and something says who may
- *   ungoverned   somebody can call it and nothing says who may
- *   unreachable  something says who may and nobody can call it
- *
- * A guest-callable operation counts as governed: being open to a guest is a
- * decision written down, not the absence of one.
- */
 function statusOf(row) {
   const governed = Boolean(row.permission) || row.guest;
   if (!row.screens.length) return 'unreachable';
   return governed ? 'ok' : 'ungoverned';
 }
-
-const STATUS = {
-  unreachable: 'Governed, and unreachable',
-  ungoverned: 'Reachable, and ungoverned',
-  ok: 'Reachable, and governed',
-};
-const STATUS_RANK = { unreachable: 0, ungoverned: 1, ok: 2 };
 
 function reachRows(lens, ctx) {
   const rows = (lens.byKind.operation ?? []).map((op) => {
@@ -235,15 +219,16 @@ function reachRows(lens, ctx) {
       machines: [...(ctx.movedBy.get(op.id)?.values() ?? [])],
       reads: line.reads ?? [],
       writes: line.writes ?? [],
-      routing: line.routing ?? null,
-      service: line.service ?? null,
       claim: claim(ctx.prose.get(op.id)),
     };
     row.status = statusOf(row);
+    // Everything the search box can match, said once.
+    row.hay = [row.id, row.title, row.permission, row.path, ...row.screens, ...row.flows,
+      ...row.machines.map((m) => m.id), ...row.writes, ...row.reads].join(' ').toLowerCase();
     return row;
   });
 
-  // Unreachable first: the whole point of the pane is the top of it.
+  // No screen first: the whole point of the table is the top of it.
   return rows.sort((a, b) =>
     STATUS_RANK[a.status] - STATUS_RANK[b.status] ||
     String(a.permission).localeCompare(String(b.permission)) ||
@@ -273,421 +258,377 @@ function claim(text) {
   return tidy(source).slice(0, 180);
 }
 
-// ── the finding ──────────────────────────────────────────────────────
-
 /**
- * A permission every one of whose operations is unreachable is not a gap in a
- * screen list — it is a control that exists in the contract, in the database
- * and in the permission register, and nowhere a person could use it. That is
- * worth the top of the page on its own, and it is computed rather than chosen,
- * so it will name a different permission the day one is wired up and a
- * different one goes dark.
+ * A permission every one of whose operations reaches no screen is not a gap in
+ * a screen list — it is a control that exists in the contract, in the database
+ * and in the permission register, and nowhere a person could use it. Computed
+ * rather than chosen, so it names a different permission the day one is wired
+ * up and another goes dark.
  */
-function renderFinding(rows) {
-  const box = $('finding');
-  box.innerHTML = '';
-  box.hidden = false;
-
-  const unreachable = rows.filter((r) => r.status === 'unreachable');
-  if (!unreachable.length) {
-    box.classList.add('finding-clear');
-    box.append(el('h2', 'finding-title',
-      `Every one of the ${plural(rows.length, 'operation')} in this lens is reachable from a screen.`));
-    box.append(el('p', 'finding-body',
-      'That was not true when this page was written. Whoever closed the last one, thank you.'));
-    return;
-  }
-  box.classList.remove('finding-clear');
-
-  // permissions where nothing at all can be invoked
+function darkPermissions(rows) {
   const byPermission = new Map();
   for (const row of rows) {
     if (!row.permission) continue;
     if (!byPermission.has(row.permission)) byPermission.set(row.permission, []);
     byPermission.get(row.permission).push(row);
   }
-  const dark = [...byPermission.entries()]
+  return [...byPermission.entries()]
     .filter(([, list]) => list.every((r) => r.status === 'unreachable'))
     .sort((a, b) => b[1].length - a[1].length);
+}
 
-  box.append(el('h2', 'finding-title',
-    `${Spell(unreachable.length)} of the ${plural(rows.length, 'operation')} in this lens ` +
-    'reach no screen at all.'));
+/**
+ * A state model whose every person-driven transition names an operation no
+ * screen reaches is the same defect seen from the data side, and the more
+ * convincing half: the states were drawn, the transitions were argued, and
+ * nothing can take the first step.
+ */
+function stuckModels(lens, ctx, rows) {
+  const unreachable = new Set(rows.filter((r) => r.status === 'unreachable').map((r) => r.id));
+  const stuck = [];
+  for (const member of lens.byKind.state ?? []) {
+    const machine = ctx.machines.get(member.id);
+    const driven = (machine?.transitions ?? []).filter((t) => t.operation);
+    if (driven.length && driven.every((t) => unreachable.has(t.operation))) {
+      stuck.push({ member, machine, drivers: [...new Set(driven.map((t) => t.operation))] });
+    }
+  }
+  return stuck;
+}
+
+// ── links back into the viewer ───────────────────────────────────────
+
+/** Where the viewer draws one artefact. The viewer keys an operation by its
+ *  file and name, so a link built from anything less lands on the graph. */
+function hrefFor(kind, id, file) {
+  const hash = {
+    operation: file ? `op:${file}#${id}` : null,
+    state: `machine:${id}`,
+    event: `event:${id}`,
+    table: `table:${id}`,
+    screen: `screen:${id}`,
+    flow: `flow:${id}`,
+    decision: `adr:${id}`,
+  }[kind];
+  return hash ? `/#${encodeURIComponent(hash)}` : null;
+}
+
+function link(kind, id, { file, text, title, className = 'sh-key' } = {}) {
+  const href = hrefFor(kind, id, file);
+  const node = el(href ? 'a' : 'span', className, text ?? id);
+  if (href) node.href = href;
+  if (title) node.title = title;
+  return node;
+}
+
+/** A short run of links, the rest counted rather than listed. */
+function links(items, max = 4) {
+  const box = el('span', 'ai-links');
+  for (const item of items.slice(0, max)) box.append(item);
+  if (items.length > max) box.append(el('span', 'sh-quiet', `and ${fmt(items.length - max)} more`));
+  return box;
+}
+
+// ── the filter ───────────────────────────────────────────────────────
+
+const matches = (text, q) => !q || String(text).toLowerCase().includes(q.toLowerCase());
+const shownRows = (s = state.scope?.state ?? {}) => state.rows.filter((r) =>
+  (!s.reach || r.status === s.reach) && matches(r.hay, s.q));
+
+function mountFilter() {
+  const counts = {};
+  for (const key of Object.keys(STATUS)) counts[key] = state.rows.filter((r) => r.status === key).length;
+  const fields = [];
+  // Only a choice when there is one. Today there is one lens, and a select
+  // with one option is a control that does nothing.
+  if (state.lenses.length > 1) {
+    fields.push({ key: 'lens', label: 'Subject', sticky: true,
+      options: state.lenses.map((l) => [l.key, l.label]) });
+  }
+  fields.push(
+    { key: 'reach', label: 'Show', all: `Every operation (${state.rows.length})`,
+      options: Object.entries(STATUS).map(([k, s]) => [k, `${s.label} (${counts[k]})`]) },
+    { key: 'q', label: 'Search this page', kind: 'search',
+      placeholder: 'an operation, permission, screen or table' },
+  );
+  $('ai-scope').hidden = false;
+  state.scope = mountScope({
+    root: $('ai-scope'),
+    fields,
+    says: (s) => {
+      const shown = shownRows(s).length;
+      if (!s.reach && !s.q) return '';
+      const what = {
+        unreachable: 'those no screen reaches',
+        ungoverned: 'those on a screen with no permission named',
+        ok: 'those on a screen with a permission',
+      }[s.reach] ?? '';
+      return `Showing ${shown} of ${plural(state.rows.length, 'operation')}`
+        + `${what ? `: ${what}` : ''}`
+        + `${s.q ? `${what ? ',' : ':'} matching “${s.q}”` : ''}. The opening counts every operation.`;
+    },
+    onChange: async (s) => {
+      if (s.lens && s.lens !== state.lens.key) {
+        state.lens = state.lenses.find((l) => l.key === s.lens) ?? state.lens;
+        await loadProse(state.lens, state.ctx);
+        state.rows = reachRows(state.lens, state.ctx);
+        drawOpening();
+      }
+      drawLists();
+      nameSearch();
+    },
+  });
+  nameSearch();
+}
+
+/** The search box gets a stable id, for the checks that type into it. The
+ *  scope redraws its controls on a change, so this runs after each one. */
+function nameSearch() {
+  const input = $('ai-scope').querySelector('input[type="search"]');
+  if (input) input.id = 'ai-search';
+}
+
+// ── the opening ──────────────────────────────────────────────────────
+
+function drawOpening() {
+  const lens = state.lens;
+  const rows = state.rows;
+  const n = rows.length;
+  const count = (key) => rows.filter((r) => r.status === key).length;
+  const unreachable = rows.filter((r) => r.status === 'unreachable');
+  const dark = darkPermissions(rows);
+  const stuck = stuckModels(lens, state.ctx, rows);
+  const guests = rows.filter((r) => r.guest);
+  const kinds = KIND_ORDER.filter((k) => (lens.byKind[k] ?? []).length);
+
+  $('ai-lede').textContent =
+    `Every ${lens.label} operation in the package: who may call it, which screens do, and what it changes. `
+    + `Counted from the contracts, screens, state models and lineage each time this page opens; `
+    + `${plural(lens.stats.total, 'artefact')} across ${plural(kinds.length, 'kind')}, `
+    + `reached from ${lens.seed.map((s) => `${s}.yaml`).join(', ')}.`;
 
   // Counted rather than asserted. The sentence has to survive an operation
   // losing its permission, and a claim about "every one of them" that nobody
   // recounts is how the prose this page replaced went wrong.
+  const some = (k, many, one) => `${fmt(k)} ${k === 1 ? one : many}`;
   const governed = unreachable.filter((r) => r.permission || r.guest).length;
   const writing = unreachable.filter((r) => r.writes.length).length;
   const moving = unreachable.filter((r) => r.machines.length).length;
-  const some = (n, verb, verbOne) => `${n} ${n === 1 ? verbOne : verb}`;
-  box.append(el('p', 'finding-body',
-    `${governed === unreachable.length ? 'Every one of them names a permission' : some(governed, 'name a permission', 'names a permission')}, ` +
-    `${some(writing, 'write at least one table', 'writes at least one table')}, and ` +
-    `${some(moving, 'are named on the transitions of a state model', 'is named on the transitions of a state model')}. ` +
-    'What none of them has is somewhere a person could stand. A rule that only exists in ' +
-    'the contract cannot be obeyed and cannot be broken, because nobody can get to it.'));
 
+  const headline = unreachable.length
+    ? `${fmt(unreachable.length)} of ${fmt(n)} ${lens.label} operations reach no screen`
+      + (dark.length
+        ? `; ${plural(dark.length, 'permission')} ${dark.length === 1 ? 'has' : 'have'} never had a screen.`
+        : '.')
+    : `All ${fmt(n)} ${lens.label} operations are reachable from a screen.`;
+
+  verdict($('ai-verdict'), {
+    headlineId: 'ai-headline',
+    when: [el('strong', '', lens.label), ` · ${plural(n, 'operation')} in the contract`],
+    headline,
+    pill: unreachable.length
+      ? { tone: 'bad', text: `${fmt(unreachable.length)} with no screen` }
+      : { tone: 'ok', text: 'Every one reachable' },
+    pace: unreachable.length
+      ? `${governed === unreachable.length ? 'Every one of them names a permission' : some(governed, 'name a permission', 'names a permission')}, `
+        + `${some(writing, 'write at least one table', 'writes at least one table')}, and `
+        + `${some(moving, 'are named on a state model\'s transitions', 'is named on a state model\'s transitions')}. `
+        + 'What none of them has is a screen, so the rule each one carries can be neither used nor broken.'
+      : 'Every operation in the lens has somewhere a person can call it from.',
+    ledger: [
+      { label: 'Operations', value: n },
+      { label: STATUS.unreachable.label, value: count('unreachable'), swatch: STATUS.unreachable.kind, bad: count('unreachable') > 0 },
+      // The middle state only when it holds something: its zero is in the key
+      // under the bar already, and a ledger of zeros buries the one that is not.
+      ...(count('ungoverned') ? [{ label: STATUS.ungoverned.label, value: count('ungoverned'), swatch: STATUS.ungoverned.kind }] : []),
+      { label: 'A guest may call', value: guests.length },
+      { label: 'Permissions never on a screen', value: dark.length },
+      { label: 'State models nobody can move', value: stuck.length },
+    ],
+    saying: guests.length
+      ? `${guests.map((g) => g.id).join(', ')} ${guests.length === 1 ? 'is' : 'are'} open to a guest: `
+        + 'anybody may call it, signed in or not.'
+      : 'Every operation here needs somebody signed in.',
+  });
+
+  // The one picture: the operations as one bar, by state, with its key and
+  // its table twin.
+  const parts = Object.entries(STATUS).map(([key, s]) => ({ kind: s.kind, value: count(key), label: s.label }));
+  const fig = $('ai-chart');
+  fig.replaceChildren(
+    stack(parts, true),
+    legend(parts.map((p) => ({ kind: p.kind, label: p.label, value: p.value }))),
+    table({
+      caption: 'Operations by whether a screen reaches them',
+      srOnly: true,
+      columns: [{ key: 'label', label: 'State' }, { key: 'value', label: 'Operations', num: true }],
+      rows: parts,
+    }),
+  );
+  $('ai-figure').hidden = !n;
+
+  const nextLine = $('ai-next');
   if (dark.length) {
-    box.append(el('p', 'finding-body finding-emphasis',
-      `${Spell(dark.length)} ${dark.length === 1 ? 'permission is' : 'permissions are'} ` +
-      'dark end to end — every operation they guard is unreachable, so the permission ' +
-      'itself has never had a user interface:'));
-
-    for (const [permission, list] of dark) {
-      const card = el('div', 'dark-perm');
-      const head = el('div', 'dark-perm-head');
-      head.append(el('span', 'perm-chip perm-chip-dark', permission));
-      head.append(el('span', 'dark-perm-count', list.length === 1
-        ? 'one operation, and no screen calls it'
-        : `${list.length} operations, and no screen calls any of them`));
-      card.append(head);
-
-      for (const row of list) {
-        const item = el('div', 'dark-op');
-        item.append(opLink(row, 'dark-op-name'));
-        if (row.title) item.append(el('span', 'dark-op-title', row.title));
-        // The contract's own words, not the page's. If the rule changes, the
-        // quote changes with it.
-        if (row.claim) item.append(el('blockquote', 'dark-op-claim', row.claim));
-        card.append(item);
-      }
-      box.append(card);
-    }
-  }
-
-  // A state model whose every human-driven transition names an unreachable
-  // operation is the same defect seen from the data side, and it is the more
-  // convincing half: the states were drawn, the transitions were argued, and
-  // nothing can take the first step.
-  const unreachableIds = new Set(unreachable.map((r) => r.id));
-  const stuck = [];
-  for (const member of state.lens.byKind.state ?? []) {
-    const machine = state.ctx.machines.get(member.id);
-    const driven = (machine?.transitions ?? []).filter((t) => t.operation);
-    if (!driven.length) continue;
-    if (driven.every((t) => unreachableIds.has(t.operation))) {
-      stuck.push({ member, machine, driven });
-    }
-  }
-
-  if (stuck.length) {
-    box.append(el('p', 'finding-body finding-emphasis',
-      `The same hole seen from the data: ${plural(stuck.length, 'state model')} in this lens ` +
-      `${stuck.length === 1 ? 'has' : 'have'} no transition a person can trigger, because ` +
-      'every operation named on one of their transitions is in the list above.'));
-
-    const list = el('div', 'stuck-list');
-    for (const { member, machine, driven } of stuck) {
-      const drivers = [...new Set(driven.map((t) => t.operation))];
-      const row = el('div', 'stuck-row');
-      row.append(el('span', 'stuck-name', member.id));
-      row.append(el('span', 'stuck-detail',
-        `${plural(machine.states?.length ?? 0, 'state')} · ` +
-        `${plural(machine.transitions?.length ?? 0, 'transition')} · ` +
-        `${plural(drivers.length, 'operation')} ${drivers.length === 1 ? 'drives' : 'drive'} it`));
-      row.append(el('span', 'stuck-ops', drivers.join(', ')));
-      list.append(row);
-    }
-    box.append(list);
+    const [permission, list] = dark[0];
+    const first = list[0];
+    next(nextLine, [
+      'Give ', el('strong', '', permission), ' a screen: no screen calls ',
+      list.length === 1 ? 'its one operation, ' : `any of its ${list.length} operations, starting with `,
+      link('operation', first.id, { file: first.file, className: 'sh-link' }), '.',
+    ]);
+  } else if (unreachable.length) {
+    const first = unreachable[0];
+    next(nextLine, ['Put ', link('operation', first.id, { file: first.file, className: 'sh-link' }),
+      ' on a screen: it is the first of the operations nobody can call.']);
+  } else if (count('ungoverned')) {
+    const first = rows.find((r) => r.status === 'ungoverned');
+    next(nextLine, ['Name a permission for ', link('operation', first.id, { file: first.file, className: 'sh-link' }),
+      ': a screen calls it and nothing says who may.']);
+  } else {
+    next(nextLine, 'Nothing to do here: every operation is on a screen and says who may call it.');
   }
 }
 
-// ── headline numbers ─────────────────────────────────────────────────
+// ── the reach table ──────────────────────────────────────────────────
 
-function renderHeadline(lens, rows) {
-  const box = $('headline');
-  box.innerHTML = '';
+function drawReach() {
+  const rows = shownRows();
+  $('ai-reach-note').textContent =
+    'One row per operation. Who may call it is the permission the contract names; the screens '
+    + 'are who actually does; the state model and the tables are what changes when they do. '
+    + 'An operation with no screen is a capability the package describes and nobody can use. '
+    + 'Every name is a link to it in the viewer.';
 
-  const stat = (value, label, hint) => {
-    const card = el('div', 'stat-card');
-    card.append(el('div', 'stat-value', String(value)));
-    card.append(el('div', 'stat-label', label));
-    if (hint) card.append(el('div', 'stat-hint', hint));
-    return card;
-  };
-
-  const kinds = KIND_ORDER.filter((k) => (lens.byKind[k] ?? []).length);
-  const unreachable = rows.filter((r) => r.status === 'unreachable').length;
-  const guests = rows.filter((r) => r.guest);
-  const declaredOnly = lens.members.filter((m) => m.declared && !m.derived).length;
-  const derivedOnly = lens.members.filter((m) => m.derived && !m.declared).length;
-
-  box.append(stat(lens.stats.total, 'artefacts in the lens',
-    `${plural(kinds.length, 'kind')}, reached from ${plural(lens.seed.length, 'seed contract')}`));
-
-  box.append(stat(`${unreachable} of ${rows.length}`, 'operations with no screen',
-    unreachable
-      ? 'Nobody can invoke them. Start on the Reach pane.'
-      : 'Every operation has somewhere a person could stand.'));
-
-  box.append(stat(`${guests.length} of ${rows.length}`, 'callable by a guest',
-    guests.length
-      ? `${guests.map((g) => g.id).join(', ')} — the assistant is open to the public here.`
-      : 'Everything in this lens needs a signed-in principal.'));
-
-  box.append(stat(declaredOnly, 'declared, and unreachable',
-    declaredOnly
-      ? `Somebody tagged these by hand. The other ${derivedOnly} the graph found on its own.`
-      : `Every tag is corroborated by the graph; ${derivedOnly} more went untagged.`));
+  const host = $('ai-reach');
+  host.replaceChildren(table({
+    caption: `${plural(rows.length, 'operation')}, those with no screen first. Select a heading to sort.`,
+    rowClass: (r) => `ai-op-row is-${r.status}`,
+    empty: state.rows.length
+      ? 'No operation matches this filter. Choose Show everything to see them all.'
+      : 'This lens has no operations yet.',
+    rows,
+    columns: [
+      { key: 'id', label: 'Operation', sort: (r) => r.id,
+        render: (r) => {
+          const box = el('div', 'ai-op');
+          box.append(link('operation', r.id, { file: r.file, title: `${r.method} ${r.path}` }));
+          if (r.title) box.append(el('span', 'ai-op-title', r.title));
+          return box;
+        } },
+      { key: 'status', label: 'State', sort: (r) => STATUS_RANK[r.status], nowrap: true,
+        render: (r) => badge(STATUS[r.status].kind, STATUS[r.status].short) },
+      { key: 'permission', label: 'Who may call it', sort: (r) => r.permission ?? '',
+        render: (r) => {
+          const box = el('div', 'ai-who');
+          box.append(r.permission ? el('code', 'ai-perm', r.permission) : el('span', 'sh-quiet', 'no permission named'));
+          if (r.scope) box.append(el('span', 'sh-quiet', `at ${r.scope} level`));
+          if (r.guest) box.append(el('span', 'ai-guest', 'a guest may call it'));
+          return box;
+        } },
+      { key: 'screens', label: 'Screens that call it', sort: (r) => r.screens.length,
+        render: (r) => (r.screens.length
+          ? links(r.screens.map((id) => {
+            const s = state.ctx.screens.get(id);
+            return link('screen', id, { title: s ? `${s.name} · ${s.platformName ?? s.platform ?? ''}` : '' });
+          }))
+          : el('span', 'ai-none', 'none')) },
+      { key: 'machines', label: 'State it moves',
+        render: (r) => (r.machines.length
+          ? links(r.machines.map((m) => link('state', m.id, { title: `${m.entity ?? ''} ${m.enum ?? ''}`.trim() })))
+          : el('span', 'sh-quiet', '—')) },
+      { key: 'writes', label: 'What it writes', sort: (r) => r.writes.length,
+        render: (r) => {
+          const box = el('div', 'ai-data');
+          const writes = el('span', r.writes.length ? '' : 'sh-quiet', r.writes.length
+            ? tally(r.writes).map(([store, k]) => `${k} ${store}`).join(', ')
+            : 'nothing');
+          if (r.writes.length) writes.title = `Writes ${r.writes.join(', ')}`;
+          const reads = el('span', 'sh-quiet', `reads ${fmt(r.reads.length)}`);
+          reads.title = r.reads.length ? `Reads ${r.reads.join(', ')}` : 'Reads nothing';
+          box.append(writes, reads);
+          return box;
+        } },
+      { key: 'flows', label: 'Journeys',
+        render: (r) => (r.flows.length
+          ? links(r.flows.map((id) => link('flow', id, { title: state.ctx.flows.get(id)?.name ?? '' })), 3)
+          : el('span', 'sh-quiet', '—')) },
+    ],
+  }));
 }
 
-// ── reach pane ───────────────────────────────────────────────────────
+// ── never had a screen ───────────────────────────────────────────────
 
-function opLink(row, className) {
-  // The viewer keys an operation node by its file and name, so a link built
-  // from anything less will land on the graph rather than the operation.
-  const link = el('a', className, row.id);
-  link.href = `/#${encodeURIComponent(`op:${row.file}#${row.id}`)}`;
-  link.title = `${row.method} ${row.path}`;
-  return link;
-}
+function drawDark() {
+  const q = state.scope.state.q;
+  const dark = darkPermissions(state.rows)
+    .map(([permission, list]) => [permission, list.filter((r) => matches(`${permission} ${r.hay}`, q))])
+    .filter(([, list]) => list.length);
+  const stuck = stuckModels(state.lens, state.ctx, state.rows)
+    .filter((s) => matches(`${s.member.id} ${s.drivers.join(' ')}`, q));
 
-function screenPill(id) {
-  const screen = state.ctx.screens.get(id);
-  const pill = el('a', 'nav-pill reach-pill', id);
-  pill.href = `/#${encodeURIComponent(`screen:${id}`)}`;
-  if (screen) pill.title = `${screen.name} · ${screen.platformName ?? screen.platform ?? ''}`.trim();
-  return pill;
-}
+  $('ai-dark-note').textContent =
+    'A permission whose every operation reaches no screen exists in the contract, the database and '
+    + 'the permission register, and nowhere a person could use it. Each operation is quoted in its '
+    + 'contract\'s own words, so if the rule changes the quote changes with it.';
 
-function renderReach(lens, rows) {
-  const host = $('reach');
-  host.innerHTML = '';
-
-  const counts = { all: rows.length };
-  for (const key of Object.keys(STATUS)) counts[key] = rows.filter((r) => r.status === key).length;
-
-  $('reach-note').textContent =
-    `${plural(rows.length, 'operation')} · sorted so the unreachable come first`;
-  $('reach-lead').textContent =
-    'One row per operation. The principal is who may call it, the screens are who does, ' +
-    'and the state model and the tables are what happens when they do. An operation ' +
-    'missing the middle column is a capability the package describes and nobody can use.';
-
-  // The filter names the three states rather than hiding them behind "all",
-  // so a state with nothing in it still says so — a zero here is a finding.
-  const filter = $('reach-filter');
-  filter.innerHTML = '';
-  for (const [key, label] of [['all', 'Every operation'], ...Object.entries(STATUS)]) {
-    const button = el('button', null, `${label} · ${counts[key]}`);
-    button.type = 'button';
-    if (state.reachFilter === key) button.classList.add('active');
-    button.onclick = () => { state.reachFilter = key; draw(); };
-    filter.append(button);
-  }
-
-  const legend = $('reach-legend');
-  legend.innerHTML = '';
-  for (const [key, label] of Object.entries(STATUS)) {
-    const item = el('span', 'reach-legend-item');
-    item.append(el('span', `reach-dot ${key}`));
-    item.append(el('span', null, `${label} — ${counts[key]}`));
-    if (!counts[key]) item.classList.add('reach-legend-empty');
-    legend.append(item);
-  }
-  // A zero on the middle state is worth a sentence rather than a blank. It is
-  // the answer to "is the governance missing?" and the answer is no — which is
-  // what makes the twelve on the left the finding rather than a symptom.
-  if (!counts.ungoverned) {
-    const ungoverned = rows.filter((r) => !r.permission && !r.guest).length;
-    legend.append(el('span', 'reach-legend-note',
-      (ungoverned
-        ? `Nothing reachable is ungoverned, though ${plural(ungoverned, 'operation')} names no permission at all. `
-        : 'Nothing here is ungoverned: every operation in the lens names a permission. ') +
-      'What is missing is not the rule — it is the screen.'));
-  }
-
-  const shown = state.reachFilter === 'all'
-    ? rows
-    : rows.filter((r) => r.status === state.reachFilter);
-
-  // Column headings over nothing are furniture, so the empty case gets the
-  // sentence instead.
-  if (!shown.length) {
-    host.append(el('p', 'pane-empty', 'No operation in this lens is in that state.'));
+  const host = $('ai-dark');
+  host.replaceChildren();
+  if (!dark.length && !stuck.length) {
+    host.append(el('p', 'sh-empty', q
+      ? 'Nothing here matches the search. Clear it to see every permission.'
+      : 'Every permission in the lens has at least one operation a screen calls, and every state model has a step a person can take.'));
     return;
   }
 
-  const head = el('div', 'reach-row reach-head');
-  for (const label of ['Operation', 'Principal', 'Screens that call it',
-    'State it moves', 'What it writes', 'Flow']) {
-    head.append(el('span', null, label));
+  for (const [permission, list] of dark) {
+    const part = el('section', 'sh-part ai-dark-part');
+    const head = el('h3', 'ai-dark-head');
+    head.append(el('code', 'ai-perm', permission), ' ',
+      el('span', 'sh-quiet', list.length === 1 ? 'one operation, and no screen calls it'
+        : `${list.length} operations, and no screen calls any of them`));
+    part.append(head);
+    const ul = el('ul', 'ai-dark-list');
+    for (const row of list) {
+      const li = el('li');
+      li.append(link('operation', row.id, { file: row.file }));
+      if (row.title) li.append(el('span', 'ai-op-title', row.title));
+      if (row.claim) li.append(el('blockquote', 'ai-claim', row.claim));
+      ul.append(li);
+    }
+    part.append(ul);
+    host.append(part);
   }
-  host.append(head);
 
-  for (const row of shown) host.append(reachRow(row));
+  if (stuck.length) {
+    const part = el('section', 'sh-part');
+    part.append(el('h3', 'sh-part-title', 'State models nobody can move'));
+    part.append(el('p', 'sh-note', `${plural(stuck.length, 'state model')} in the lens ${stuck.length === 1 ? 'has' : 'have'} `
+      + 'no transition a person can trigger: every operation named on one of their transitions reaches no screen.'));
+    part.append(table({
+      rows: stuck,
+      columns: [
+        { key: 'id', label: 'State model', render: (s) => link('state', s.member.id) },
+        { key: 'states', label: 'States', num: true, render: (s) => fmt(s.machine.states?.length ?? 0) },
+        { key: 'transitions', label: 'Transitions', num: true, render: (s) => fmt(s.machine.transitions?.length ?? 0) },
+        { key: 'drivers', label: 'Operations that would move it',
+          render: (s) => links(s.drivers.map((id) => {
+            const row = state.rows.find((r) => r.id === id);
+            return link('operation', id, { file: row?.file });
+          }), 6) },
+      ],
+    }));
+    host.append(part);
+  }
 }
 
-function reachRow(row) {
-  const node = el('div', `reach-row reach-${row.status}`);
-
-  const name = el('span', 'reach-op');
-  name.append(opLink(row, 'reach-op-name'));
-  if (row.title) name.append(el('span', 'reach-op-title', row.title));
-  node.append(name);
-
-  const principal = el('span', 'reach-principal');
-  if (row.permission) principal.append(el('span', 'perm-chip', row.permission));
-  else principal.append(el('span', 'perm-chip perm-chip-none', 'no permission'));
-  if (row.scope) principal.append(el('span', 'reach-scope', `${row.scope} scope`));
-  if (row.guest) principal.append(el('span', 'guest-chip', 'a guest may call this'));
-  node.append(principal);
-
-  const screens = el('span', 'reach-screens');
-  if (row.screens.length) {
-    for (const id of row.screens.slice(0, 4)) screens.append(screenPill(id));
-    if (row.screens.length > 4) {
-      screens.append(el('span', 'reach-more', `+${row.screens.length - 4}`));
-    }
-  } else {
-    screens.append(el('span', 'reach-none', 'no screen declares it'));
-  }
-  node.append(screens);
-
-  const machines = el('span', 'reach-machines');
-  if (row.machines.length) {
-    for (const m of row.machines) {
-      const pill = el('span', 'reach-machine', m.id);
-      pill.title = `${m.entity} · ${m.enum ?? ''}`.trim();
-      machines.append(pill);
-    }
-  } else {
-    machines.append(el('span', 'reach-quiet', '—'));
-  }
-  node.append(machines);
-
-  // Reads are a fact about the operation; writes are a fact about the blast
-  // radius, so the writes are the ones named and the reads trail behind.
-  const data = el('span', 'reach-data');
-  if (row.writes.length) {
-    const stores = tally(row.writes)
-      .map(([store, n]) => `${n} ${store}`)
-      .join(' · ');
-    const line = el('span', 'reach-writes', stores);
-    line.title = `writes ${row.writes.join(', ')}`;
-    data.append(line);
-  } else {
-    data.append(el('span', 'reach-quiet', 'writes nothing'));
-  }
-  const reads = el('span', 'reach-reads', `${row.reads.length} read`);
-  reads.title = row.reads.length ? `reads ${row.reads.join(', ')}` : 'reads nothing';
-  data.append(reads);
-  node.append(data);
-
-  const flows = el('span', 'reach-flows');
-  if (row.flows.length) {
-    for (const id of row.flows) {
-      const pill = el('span', 'reach-flow', id);
-      const flow = state.ctx.flows.get(id);
-      if (flow) pill.title = flow.name;
-      flows.append(pill);
-    }
-  } else {
-    flows.append(el('span', 'reach-quiet', '—'));
-  }
-  node.append(flows);
-
-  return node;
-}
-
-// ── members pane ─────────────────────────────────────────────────────
-
-/**
- * A heading that folds its own content away, the way every section heading in
- * the viewer does. The whole label is the target rather than a marker beside
- * it, which is what makes it usable with a thumb — and it takes the keyboard,
- * because a div that behaves like a button has to behave like one throughout.
- */
-function foldable(text) {
-  const label = el('div', 'journey-section-label', text);
-  const body = el('div', 'member-body');
-  label.tabIndex = 0;
-  label.setAttribute('role', 'button');
-  const fold = () => {
-    const closed = label.classList.toggle('collapsed');
-    body.hidden = closed;
-    label.setAttribute('aria-expanded', String(!closed));
-  };
-  label.setAttribute('aria-expanded', 'true');
-  label.onclick = fold;
-  label.onkeydown = (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fold(); }
-  };
-  return [label, body];
-}
+// ── how this was worked out ──────────────────────────────────────────
 
 const sourceOf = (m) => (m.derived && m.declared ? 'both' : m.derived ? 'derived' : 'declared');
-const SOURCE_LABEL = { both: 'both', derived: 'derived', declared: 'declared' };
-
-function renderMembers(lens) {
-  const host = $('members');
-  host.innerHTML = '';
-
-  $('members-note').textContent =
-    `${plural(lens.stats.total, 'artefact')} · ${lens.stats.derived} reached, ` +
-    `${lens.stats.declared} tagged, ${lens.stats.both} both`;
-  $('members-lead').textContent =
-    'Membership has two sources and neither is enough on its own. The graph reaches an ' +
-    'artefact by closure from the seed contract; a person reaches one by writing the tag. ' +
-    'Each row says which happened and why, so a reader can check the join rather than ' +
-    'take it.';
-
-  for (const kind of KIND_ORDER) {
-    const list = lens.byKind[kind] ?? [];
-    if (!list.length) continue;
-
-    const section = el('div', 'member-section');
-    const [label, body] = foldable(`${KIND_LABEL[kind]} · ${list.length}`);
-    // Operations are left open because they are the kind the whole page is
-    // about; the other six are reference, and 77 rows at once is a wall.
-    if (kind !== 'operation') label.click();
-
-    const sorted = [...list].sort((a, b) =>
-      (a.derived === b.derived ? 0 : a.derived ? 1 : -1) || a.id.localeCompare(b.id));
-
-    for (const member of sorted) {
-      const row = el('div', 'member-row');
-      const source = sourceOf(member);
-      row.append(el('span', `source-chip source-${source}`, SOURCE_LABEL[source]));
-
-      const main = el('span', 'member-main');
-      main.append(el('span', 'member-id', member.id));
-      if (member.label && member.label !== member.id) {
-        main.append(el('span', 'member-label', member.label));
-      }
-      row.append(main);
-
-      row.append(el('span', 'member-extra', extraOf(member)));
-      row.append(el('span', 'member-why', member.why ?? ''));
-      body.append(row);
-    }
-
-    section.append(label, body);
-    host.append(section);
-  }
-
-  if (lens.docs?.length) {
-    const section = el('div', 'member-section');
-    const [label, body] = foldable(
-      `Prose that belongs here and names no operation · ${lens.docs.length}`);
-    body.append(el('p', 'pane-note',
-      'Nothing reaches these by closure, because a page of prose calls no operation. ' +
-      'They are listed by hand in lib/domains.mjs, which is a cost worth paying: a ' +
-      'missing page is worse than a short list somebody has to maintain.'));
-    for (const doc of lens.docs) {
-      const row = el('div', 'member-row member-doc');
-      const link = el('a', 'member-id', doc);
-      link.href = `${auth.apiUrl('')}/api/file?path=${encodeURIComponent(doc)}`;
-      link.target = '_blank';
-      link.rel = 'noopener';
-      row.append(link);
-      body.append(row);
-    }
-    section.append(label, body);
-    host.append(section);
-  }
-}
+const SOURCE_WORDS = {
+  both: 'found and tagged',
+  derived: 'found by the graph',
+  declared: 'tagged by hand',
+};
 
 /** The one fact per kind that is worth a column. */
 function extraOf(member) {
@@ -696,193 +637,168 @@ function extraOf(member) {
   }
   if (member.kind === 'state') {
     if (!member.derived) return '';
-    return `${plural(member.states ?? 0, 'state')} · ${plural(member.transitions ?? 0, 'transition')}`;
+    return `${plural(member.states ?? 0, 'state')}, ${plural(member.transitions ?? 0, 'transition')}`;
   }
   if (member.kind === 'event') {
     if (!member.derived) return '';
-    return `published by ${member.publisher ?? '—'} · ${plural(member.consumers ?? 0, 'consumer')}`;
+    return `published by ${member.publisher ?? 'nobody named'}, ${plural(member.consumers ?? 0, 'consumer')}`;
   }
   if (member.kind === 'table') {
-    return `${storeOf(member.id)} · ${member.reads ?? 0} read, ${member.writes ?? 0} written`;
+    return `${storeOf(member.id)}, ${member.reads ?? 0} read, ${member.writes ?? 0} written`;
   }
   if (member.kind === 'screen') {
     const screen = state.ctx.screens.get(member.id);
     return screen ? `${screen.name} · ${screen.platformName ?? ''}`.trim() : '';
   }
-  if (member.kind === 'flow') {
-    return state.ctx.flows.get(member.id)?.name ?? '';
-  }
-  if (member.kind === 'decision') return member.status ?? '';
+  if (member.kind === 'flow') return state.ctx.flows.get(member.id)?.name ?? '';
+  if (member.kind === 'decision') return member.label && member.label !== member.id ? member.label : (member.status ?? '');
   return '';
 }
 
-// ── gaps pane ────────────────────────────────────────────────────────
+/** A folded part: a real <details>, so it opens with the keyboard and says so. */
+function fold(summary, body, open = false) {
+  const box = el('details', 'ai-fold');
+  box.open = open;
+  box.append(el('summary', '', summary), body);
+  return box;
+}
 
-/**
- * A view whose every row is a problem is a view nobody reads, and 53 rows all
- * called "gap" is exactly that. They are not one thing. Three are somebody's
- * intent that the graph cannot corroborate, which is a question that needs an
- * answer. The other fifty are the graph reaching something nobody bothered to
- * tag, which is mostly correct and mostly not worth doing anything about —
- * tagging a table the closure already found would only say it twice.
- *
- * So they are split, the small pile is opened, and the large one is offered
- * rather than presented.
- */
-function renderGaps(lens) {
-  const host = $('gaps');
-  host.innerHTML = '';
+function memberTable(list, { why = true } = {}) {
+  return table({
+    rows: list,
+    columns: [
+      { key: 'id', label: 'Artefact', sort: (m) => m.id,
+        render: (m) => link(m.kind, m.id, { file: m.file }) },
+      { key: 'extra', label: 'What it is', render: (m) => extraOf(m) || '—' },
+      { key: 'source', label: 'How it got here', sort: (m) => sourceOf(m), nowrap: true,
+        render: (m) => SOURCE_WORDS[sourceOf(m)] },
+      ...(why ? [{ key: 'why', label: 'Why', render: (m) => m.why ?? m.note ?? '' }] : []),
+    ],
+  });
+}
 
-  const declaredOnly = lens.gaps.filter((g) => g.gap === 'declared-not-derived');
-  const derivedOnly = lens.gaps.filter((g) => g.gap === 'derived-not-declared');
+function drawHow() {
+  const lens = state.lens;
+  const q = state.scope.state.q;
+  const hay = (m) => `${m.id} ${m.label ?? ''} ${extraOf(m)} ${m.why ?? ''} ${m.note ?? ''}`;
 
-  $('gaps-note').textContent =
-    `${lens.gaps.length} in total · ${declaredOnly.length} worth an answer`;
-  $('gaps-lead').textContent =
-    'The lens reports the disagreement rather than picking a side. The two halves are ' +
-    'not the same size and not the same problem, so they are not in the same list.';
+  $('ai-how-note').textContent =
+    'Membership has two sources and neither is enough on its own. The graph finds an artefact by '
+    + `following the joins out from ${lens.seed.map((s) => `${s}.yaml`).join(', ')}: an operation to the `
+    + 'state model it moves, the events that move publishes, the tables it writes, the screens that '
+    + 'call it. A person finds one by tagging it. Each row says which happened and why, so the join '
+    + 'can be checked rather than taken. Where the two disagree, both halves are listed below.';
 
-  // ── the interesting ones
-  const first = el('div', 'gap-block gap-block-warn');
-  first.append(el('h3', 'gap-title',
-    declaredOnly.length
-      ? `${Spell(declaredOnly.length)} ${declaredOnly.length === 1 ? 'artefact was' : 'artefacts were'} ` +
-        'tagged by hand, and nothing in the graph reaches them'
-      : 'Every tag in this lens is corroborated by the graph'));
-  first.append(el('p', 'gap-lead',
-    declaredOnly.length
-      ? 'Somebody decided these belong here and wrote it down. The closure disagrees. ' +
-        'Either the artefact has drifted out of the graph and the tag is the only thing ' +
-        'holding it, or the join is real and no rule can see it — which is the case the ' +
-        'declaration exists for. Each one is a question with a person attached to it.'
-      : 'Nothing was claimed for this lens that the closure could not also reach.'));
+  const host = $('ai-how');
+  host.replaceChildren();
 
-  if (declaredOnly.length) {
-    for (const gap of declaredOnly) {
-      const row = el('div', 'gap-row');
-      row.append(el('span', 'gap-kind', KIND_LABEL[gap.kind] ?? gap.kind));
-      row.append(el('span', 'gap-id', gap.id));
-      row.append(el('span', 'gap-note', gap.note));
-      first.append(row);
-    }
+  // ── what the lens gathered
+  const gathered = el('section', 'sh-part');
+  gathered.append(el('h3', 'sh-part-title', 'What the lens gathered'));
+  gathered.append(el('p', 'sh-note',
+    `${plural(lens.stats.total, 'artefact')}: ${fmt(lens.stats.derived)} found by the graph, `
+    + `${fmt(lens.stats.declared)} tagged by hand, ${fmt(lens.stats.both)} both.`));
+  let any = false;
+  for (const kind of KIND_ORDER) {
+    const list = (lens.byKind[kind] ?? []).filter((m) => matches(hay(m), q));
+    if (!list.length) continue;
+    any = true;
+    // Operations open, because they are the kind the page is about; the rest
+    // are reference, and every row of them at once is a wall. A search opens
+    // whatever it found something in.
+    gathered.append(fold(`${KIND_LABEL[kind]} (${fmt(list.length)})`, memberTable(list),
+      kind === 'operation' || !!q));
   }
-  host.append(first);
+  if (!any) gathered.append(el('p', 'sh-empty', 'Nothing the lens gathered matches the search.'));
+  host.append(gathered);
 
-  // ── the bulk
+  // ── the two halves of the disagreement
+  const declaredOnly = lens.gaps.filter((g) => g.gap === 'declared-not-derived' && matches(hay(g), q));
+  const derivedOnly = lens.gaps.filter((g) => g.gap === 'derived-not-declared' && matches(hay(g), q));
+
+  const tagged = el('section', 'sh-part');
+  tagged.append(el('h3', 'sh-part-title', 'Tagged by hand, and the graph does not reach them'));
+  tagged.append(el('p', 'sh-note', declaredOnly.length
+    ? 'Somebody decided these belong here and wrote it down; following the joins does not find them. '
+      + 'Either the artefact has drifted out of the graph and the tag is the only thing holding it, or '
+      + 'the join is real and no rule can see it, which is what tagging is for. Each is a question to '
+      + 'ask whoever tagged it.'
+    : q ? 'Nothing here matches the search.' : 'None: every tag in this lens is one the graph also finds.'));
+  if (declaredOnly.length) {
+    tagged.append(table({
+      rows: declaredOnly,
+      columns: [
+        { key: 'kind', label: 'Kind', render: (g) => KIND_LABEL[g.kind] ?? g.kind },
+        { key: 'id', label: 'Artefact', render: (g) => link(g.kind, g.id) },
+        { key: 'note', label: 'What is known', render: (g) => g.note },
+      ],
+    }));
+  }
+  host.append(tagged);
+
+  const found = el('section', 'sh-part');
+  found.append(el('h3', 'sh-part-title', `Found by the graph, and nobody tagged them (${fmt(derivedOnly.length)})`));
+  found.append(el('p', 'sh-note',
+    'Almost all of these are right: the graph found the table because an operation writes it and the '
+    + 'screen because it calls the operation, and a tag would only repeat what the join already shows. '
+    + 'Read the list for the one entry that surprises you, not for something to clear.'));
   const byKind = new Map();
   for (const gap of derivedOnly) {
     if (!byKind.has(gap.kind)) byKind.set(gap.kind, []);
     byKind.get(gap.kind).push(gap);
   }
-  const ordered = KIND_ORDER.filter((k) => byKind.has(k));
-
-  const second = el('div', 'gap-block');
-  second.append(el('h3', 'gap-title',
-    `${derivedOnly.length} the graph reached and nobody tagged`));
-
-  const shape = ordered
-    .map((k) => plural(byKind.get(k).length, KIND_ONE[k] ?? k, (KIND_LABEL[k] ?? k).toLowerCase()))
-    .join(', ');
-  second.append(el('p', 'gap-lead',
-    `These are ${shape}. Almost all of them are correct: the closure found the table ` +
-    'because an operation writes it and found the screen because a screen calls the ' +
-    'operation, and a tag would only repeat what the join already proves. Read this ' +
-    'list looking for the one entry that surprises you, not for something to clear.'));
-
-  for (const kind of ordered) {
-    const list = byKind.get(kind);
-    const [label, body] = foldable(`${KIND_LABEL[kind]} · ${list.length}`);
-    // Closed to start. The framing above says these are mostly fine, and
-    // opening fifty rows that say so would contradict it.
-    label.click();
-
-    for (const gap of list) {
-      const row = el('div', 'gap-row gap-row-quiet');
-      row.append(el('span', 'gap-id', gap.id));
-      row.append(el('span', 'gap-note', gap.note));
-      body.append(row);
-    }
-    second.append(label, body);
+  for (const kind of KIND_ORDER.filter((k) => byKind.has(k))) {
+    found.append(fold(`${KIND_LABEL[kind]} (${fmt(byKind.get(kind).length)})`, table({
+      rows: byKind.get(kind),
+      columns: [
+        { key: 'id', label: 'Artefact', render: (g) => link(g.kind, g.id) },
+        { key: 'note', label: 'How the graph reached it', render: (g) => g.note },
+      ],
+    }), !!q));
   }
-  host.append(second);
+  host.append(found);
+
+  // ── the prose that names no operation
+  if (lens.docs?.length) {
+    const docs = el('section', 'sh-part');
+    docs.append(el('h3', 'sh-part-title', 'Pages of prose that belong here'));
+    docs.append(el('p', 'sh-note',
+      'Nothing reaches these by following joins, because a page of prose calls no operation. They are '
+      + 'listed by hand in lib/domains.mjs: a missing page is worse than a short list somebody keeps.'));
+    const ul = el('ul', 'ai-docs');
+    for (const doc of lens.docs.filter((d) => matches(d, q))) {
+      const li = el('li');
+      const a = el('a', 'sh-key', doc);
+      a.href = `${auth.apiUrl('')}/api/file?path=${encodeURIComponent(doc)}`;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      li.append(a);
+      ul.append(li);
+    }
+    docs.append(ul);
+    host.append(docs);
+  }
+}
+
+function drawLists() {
+  drawReach();
+  drawDark();
+  drawHow();
 }
 
 // ── shell ────────────────────────────────────────────────────────────
 
-function renderLensHead(lens) {
-  $('lens-title').textContent = `${lens.label} across the package`;
-  $('lens-blurb').textContent = lens.blurb;
-
-  const meta = $('lens-meta');
-  meta.innerHTML = '';
-  meta.append(el('span', 'lens-meta-label', 'reached from'));
-  for (const seed of lens.seed) meta.append(el('span', 'lens-seed', `${seed}.yaml`));
-  meta.append(el('span', 'lens-meta-label', 'plus prose that names no operation'));
-  meta.append(el('span', 'lens-seed lens-seed-doc', plural(lens.docs?.length ?? 0, 'page')));
-}
-
-function renderPaneTabs() {
-  const tabs = $('pane-tabs');
-  tabs.innerHTML = '';
-  for (const [key, label] of PANES) {
-    const button = el('button', null, label);
-    button.type = 'button';
-    if (state.pane === key) button.classList.add('active');
-    button.onclick = () => { state.pane = key; location.hash = key; draw(); };
-    tabs.append(button);
-  }
-}
-
-/**
- * Only drawn when there is a choice. One lens behind a one-button segmented
- * control is a control that does nothing, and the page already names the lens
- * in its heading.
- */
-function renderLensTabs() {
-  const tabs = $('lens-tabs');
-  tabs.hidden = state.lenses.length < 2;
-  if (tabs.hidden) return;
-  tabs.innerHTML = '';
-  for (const lens of state.lenses) {
-    const button = el('button', null, lens.label);
-    button.type = 'button';
-    if (lens.key === state.lens.key) button.classList.add('active');
-    button.onclick = async () => {
-      state.lens = lens;
-      await loadProse(lens, state.ctx);
-      draw();
-    };
-    tabs.append(button);
-  }
-}
-
-function draw() {
-  const lens = state.lens;
-  const rows = reachRows(lens, state.ctx);
-
-  renderLensHead(lens);
-  renderLensTabs();
-  renderPaneTabs();
-  renderHeadline(lens, rows);
-  renderFinding(rows);
-
-  renderReach(lens, rows);
-  renderMembers(lens);
-  renderGaps(lens);
-
-  for (const [key] of PANES) $(`pane-${key}`).hidden = state.pane !== key;
-}
-
 function fail(message) {
-  const box = $('error');
-  box.textContent = message;
-  box.hidden = false;
-  $('lens-title').textContent = 'The lens could not be read';
+  $('ai-error').textContent = message;
+  $('ai-error').hidden = false;
+  $('ai-lede').textContent = '';
+  for (const id of ['reach', 'dark', 'how']) $(id).hidden = true;
 }
 
 (async () => {
-  const fromHash = location.hash.slice(1);
-  if (PANES.some(([key]) => key === fromHash)) state.pane = fromHash;
+  // The two panes this page used to have under other names land on the
+  // section that holds them now, so an old link opens on the right thing.
+  if (['#members', '#gaps'].includes(location.hash)) history.replaceState(null, '', `${location.search}#how`);
 
   try {
     const [domains, index, journeys, lineage, domain] = await Promise.all([
@@ -893,44 +809,30 @@ function fail(message) {
       json('/api/domain'),
     ]);
 
-    state.lenses = (domains.lenses ?? []).filter((l) => l.stats.total > 0);
+    // Every lens but the flash sale's, which the deployment map answers.
+    state.lenses = (domains.lenses ?? []).filter((l) => l.stats.total > 0 && !RETIRED.has(l.key));
     if (!domains.present || !state.lenses.length) {
-      return fail('No domain lens has anything in it yet. Nothing has been seeded.');
+      // The curtain comes down first: returning before it left a twelve-second
+      // loader over a page that had already decided it had nothing to show.
+      hideLoader();
+      fail('The package has no AI operations to show yet: nothing in it has been gathered into this view. '
+        + 'It fills in once a contract named ai.yaml is in the package.');
+      return;
     }
-    state.lens = state.lenses[0];
+    state.lens = state.lenses.find((l) => l.key === param('lens')) ?? state.lenses[0];
     state.ctx = buildContext({ index, journeys, lineage, domain });
     await loadProse(state.lens, state.ctx);
   } catch (error) {
     hideLoader();
-    return fail(`Could not read the package: ${error.message}`);
+    fail(`The package could not be read (${error.message}). Reload the page; if it keeps happening, `
+      + 'the viewer may still be reading the package after a restart.');
+    return;
   }
 
-  draw();
+  state.rows = reachRows(state.lens, state.ctx);
+  mountFilter();
+  drawOpening();
+  drawLists();
+  mountPanels({ nav: document.querySelector('.set-nav'), fallback: 'reach' });
   hideLoader();
-
-  window.addEventListener('hashchange', () => {
-    const key = location.hash.slice(1);
-    if (PANES.some(([k]) => k === key) && key !== state.pane) {
-      state.pane = key;
-      draw();
-    }
-  });
 })();
-
-// Narrowing what is already here, which is a different need from the palette's:
-// the palette leaves the page to find something, this stays on it. Attached
-// after the first render so the sections exist; it re-applies itself as the
-// lens redraws, because switching lens replaces every row underneath it.
-attachSubSearch(
-  document.getElementById('subsearch'),
-  // Three containers, not two. `#finding` holds the stuck-state finding and is
-  // easy to miss because it is usually two rows out of 237 — which is exactly
-  // the size of thing a filter has to catch, since two rows left standing under
-  // a filter that matched nothing read as two rows that *did* match.
-  [
-    { box: document.getElementById('members'), rows: '.member-row, .stuck-row' },
-    { box: document.getElementById('finding'), rows: '.stuck-row' },
-    { box: document.getElementById('gaps'), rows: '.gap-row' },
-  ],
-  { count: document.getElementById('subsearch-count'), noun: 'rows' },
-);

@@ -36,6 +36,7 @@ import { buildDomains } from './lib/domains.mjs';
 import { buildPlatforms } from './lib/platforms.mjs';
 import { buildCicd } from './lib/cicd.mjs';
 import { buildChronology } from './lib/build.mjs';
+import { CHECKS_FILE, readChecks, placeChecks, liveCounts } from './lib/audit.mjs';
 import { buildUiux } from './lib/uiux.mjs';
 import { buildSearch } from './lib/search.mjs';
 import { splitDetail } from './lib/detail.mjs';
@@ -115,7 +116,7 @@ const API_META = API_PUBLIC
  * `session` was in here and is the reason /api/session was 404ing.
  */
 const API_ROUTES =
-  /^\/(api\/(auth|accounts|invites|reset|settings|links|work-packages|board|pms|changes|validation|verdicts|mentions|mentionable|alerts|scopes|ips|rates|costing|test-batches|agent|chat|connector|diagram-versions|health)(\/|$)|docs|openapi\.json)/;
+  /^\/(api\/(auth|accounts|invites|reset|settings|links|work-packages|board|pms|changes|validation|verdicts|mentions|mentionable|alerts|scopes|ips|rates|budget|costing|test-batches|agent|chat|connector|diagram-versions|health)(\/|$)|docs|openapi\.json)/;
 // `api/connector` above is the accounts service — which build each install
 // reported. `/connector/version` and `/connector/bundle`, with no `/api/`, are
 // this server's own and are answered before the gate. Two similar names for two
@@ -1394,6 +1395,24 @@ const server = http.createServer(async (req, res) => {
     if (route === 'build') {
       if (!pkg.build) await refreshIndex(pkg, 'on demand');
       return sendCachedJson(res, req, pkg.packed, 'build', pkg.build);
+    }
+
+    // ── the Audit page: the last checks run, and which release it was for ──
+    // Read from the served root on every call rather than cached: it is a few
+    // kilobytes, and a refresh that lands a new one should not wait for a
+    // rebuild to be seen. Admin only, at the door (lib/audience.mjs).
+    if (route === 'audit') {
+      if (!pkg.backend) await refreshIndex(pkg, 'on demand');
+      const checks = await readChecks(pkg.root);
+      const release = describeRelease(pkg.release);
+      return send(res, 200, JSON.stringify({
+        project: pkg.id,
+        file: CHECKS_FILE,
+        release: { mode: release.mode, tag: release.tag, taggedAt: release.taggedAt },
+        place: placeChecks(checks, release),
+        checks,
+        live: liveCounts(pkg),
+      }), MIME['.json']);
     }
 
     if (route === 'platforms') {

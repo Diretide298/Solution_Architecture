@@ -51,7 +51,6 @@ const WIDTH = 1600, HEIGHT = 1000, SCALE = 2;
 // The standalone pages, in reading order rather than alphabetical.
 const PAGES = [
   ['home', '/home.html'],
-  ['validation', '/validation.html'],
   ['reviews', '/reviews.html'],
   ['changes', '/changes.html'],
   ['domains', '/domains.html'],

@@ -1,120 +1,198 @@
-/* Change requests page. Colours come from the shared tokens, so day and night follow the viewer. */
+/* Change requests. Built on the sheet (sheet.css): the opening, the filter,
+   the tables and the state colours are shared, and this file holds only what
+   is this page's own - the flow strip, the expandable rows and the forms.
 
-.changes-main { max-width: 1180px; }
-.cr-lede { margin: 6px 0 0; color: var(--text-dim); max-width: 78ch; line-height: 1.55; }
-.admin-heading .scope-select { margin-left: 12px; font-size: 13px; }
+   ── where the boldness goes ────────────────────────────────────────
+   The flow strip. Every request is a mark on its way from raised to done, and
+   the strip is the one thing on the page drawn large; everything around it is
+   type. Its colours are the sheet's state colours in their sheet meanings and
+   nothing else - which side of the house a request is on is said in words. */
 
-.cr-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
-.cr-filters .signoff-filter { flex: 1 1 220px; min-width: 0; }
-.cr-check { display: inline-flex; gap: 6px; align-items: center; color: var(--text-dim); font-size: 13px; }
-.cr-new-toggle { margin-left: auto; }
-
-.cr-form {
-  display: grid; gap: 10px; margin: 0 0 16px; padding: 14px;
-  border: 1px solid var(--border); border-radius: 10px; background: var(--bg-raised);
+/* The rail's group titles in sentence case, as every label on this page is. */
+.cr-page .set-nav-group { text-transform: none; letter-spacing: 0; font-size: 11.5px; font-weight: 600; }
+.cr-page .set-nav a { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.cr-page .sh-ledger { gap: 10px 22px; }
+.cr-nav-count {
+  flex: none; min-width: 20px; text-align: right;
+  font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--text-dim);
 }
-.cr-form label { display: grid; gap: 4px; font-size: 12px; color: var(--text-dim); }
-.cr-form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
-.cr-form-row .cr-grow { flex: 1 1 260px; }
-.cr-form textarea { resize: vertical; font-family: inherit; }
-.cr-narrow { width: 8ch; }
+.cr-nav-count:empty { display: none; }
+.cr-section-title { margin: 0; font-size: 20px; font-weight: 750; letter-spacing: -0.01em; color: var(--text); }
+.sh-top-line .scope-select[hidden] { display: none; }
 
-.cr-card {
-  border: 1px solid var(--border); border-left: 4px solid var(--text-faint);
-  border-radius: 8px; margin: 8px 0; background: var(--bg-panel);
+/* ── the flow strip ──────────────────────────────────────────────── */
+.cr-flow-strip {
+  list-style: none; margin: 4px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0;
+  border-top: 2px solid var(--border-strong);
 }
-.cr-card.cr-open { border-left-color: var(--warning); }
-.cr-card.cr-accepted { border-left-color: var(--accent); }
-.cr-card.cr-done { border-left-color: var(--ok); }
-.cr-card.cr-rejected { border-left-color: var(--error); }
-
-.cr-summary {
-  display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline;
-  padding: 10px 14px; cursor: pointer; list-style: none;
+.cr-flow-col { position: relative; padding: 10px 10px 4px 0; min-width: 0; }
+.cr-flow-col + .cr-flow-col { padding-left: 14px; border-left: 1px dashed var(--border); }
+/* The way it runs: a notch where each step hands on to the next. */
+.cr-flow-col + .cr-flow-col::before {
+  content: ''; position: absolute; top: -7px; left: -6px;
+  border: 6px solid transparent; border-left-color: var(--border-strong); border-right: 0;
 }
-.cr-summary::-webkit-details-marker { display: none; }
-.cr-id { font-family: var(--mono); font-weight: 600; color: var(--text); }
-.cr-title { font-weight: 600; color: var(--text); flex: 1 1 280px; min-width: 0; }
-.cr-meta { flex-basis: 100%; color: var(--text-faint); font-size: 12px; overflow-wrap: anywhere; }
-.cr-meta code { font-family: var(--mono); color: var(--text-dim); }
-
-.cr-badge {
-  font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px;
-  border: 1px solid currentColor;
+.cr-flow-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.cr-flow-count { font-size: 30px; font-weight: 800; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; }
+.cr-flow-label { font-size: 12.5px; color: var(--text-dim); font-weight: 600; }
+.cr-flow-marks { display: flex; flex-wrap: wrap; gap: 6px; }
+.cr-flow-none { font-size: 12px; color: var(--text-faint); }
+.cr-mark {
+  display: inline-grid; place-items: center; min-width: 38px; height: 30px; padding: 0 6px;
+  border-radius: 6px; font: 600 12.5px/1 var(--mono); text-decoration: none;
+  color: #fff;
 }
-.cr-badge-open { color: var(--warning); }
-.cr-badge-accepted { color: var(--accent); }
-.cr-badge-done { color: var(--ok); }
-.cr-badge-rejected { color: var(--error); }
-.cr-badge-blocking { color: var(--error); background: color-mix(in srgb, var(--error) 12%, transparent); }
+/* Text on each fill, chosen for contrast in each theme. */
+.cr-mark.sh-fill-fresh { color: var(--text); box-shadow: inset 0 0 0 1px var(--border-strong); }
+.cr-mark.sh-fill-going, .cr-mark.sh-fill-stalled { color: #10222b; }
+:root[data-theme="dark"] .cr-mark.sh-fill-going { color: #fff; }
+.cr-mark:hover { filter: brightness(1.1); }
+.cr-mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Blocks work: a ring, which is a shape and not one more colour. */
+.cr-mark.is-blocking, .cr-ring-key { box-shadow: 0 0 0 2px var(--bg-panel), 0 0 0 4px var(--text); }
+.cr-mark.is-blocking.sh-fill-fresh { box-shadow: inset 0 0 0 1px var(--border-strong), 0 0 0 2px var(--bg-panel), 0 0 0 4px var(--text); }
+.cr-ring-key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 9px 0 3px; vertical-align: -1px; }
+.cr-flow-aside, .cr-flow-ring { margin: 10px 0 0; font-size: 12px; color: var(--text-dim); }
+.cr-flow-legend { margin-top: 12px; }
 
-/* Whose queue a request is in. The two sides are the same two colours the rest
-   of the viewer gives frontend and backend work, so a reader who has seen one
-   board recognises them here. */
-.cr-badge-side { color: var(--text-faint); }
-.cr-side-frontend { color: var(--accent); }
-.cr-side-backend { color: var(--ok); }
-.cr-badge-platform { color: var(--text-faint); font-variant-numeric: tabular-nums; }
-.cr-badge-picked { color: var(--text-faint); border-style: dashed; }
-/* Nobody has said which side this is, so no lead owns it. Worth spotting. */
-.cr-badge-unrouted { color: var(--warning); border-style: dashed; }
-/* A count that is not zero and should be. */
-.cr-stat-late .stat-value { color: var(--error); }
+/* ── the tables ──────────────────────────────────────────────────── */
+.cr-table td, .cr-table th { vertical-align: top; }
+/* Clear of the sticky top bar when a link scrolls a row into view. */
+.cr-row { scroll-margin-top: 96px; }
+.cr-c-req { min-width: 240px; }
+.cr-c-wait { white-space: nowrap; }
+.cr-toggle {
+  display: grid; gap: 2px; width: 100%; padding: 0; margin: 0; border: 0; background: none;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
+.cr-toggle .sh-key { font-weight: 600; }
+.cr-toggle:hover .cr-title { text-decoration: underline; }
+.cr-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+.cr-title { font-weight: 600; color: var(--text); line-height: 1.4; }
+.cr-title-block { display: block; margin-top: 2px; }
+.cr-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 4px; font-weight: 400; }
+.cr-meta code { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); overflow-wrap: anywhere; }
+.cr-blocks { font-size: 11.5px; font-weight: 700; color: var(--text); white-space: nowrap; }
+.cr-blocks::before {
+  content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--text); vertical-align: 1px;
+}
+.cr-sub { display: block; font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
+.cr-sub-block { max-width: 52ch; color: var(--text-dim); }
+.cr-c-raised .sh-link, .cr-c-holder .sh-link { white-space: nowrap; }
+.cr-c-next { color: var(--text-dim); min-width: 84px; }
+.cr-unrouted { font-size: 11.5px; color: var(--text); font-style: italic; }
+.cr-tickets { display: inline-flex; flex-wrap: wrap; gap: 0 4px; }
+.cr-tickets .sh-quiet { font-size: 11.5px; }
+.cr-table tr.is-chosen > * { border-bottom-color: transparent; }
+.cr-detail-row > td { padding: 0 0 18px; background: var(--accent-soft); background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+.cr-table tbody tr.cr-detail-row:hover { background: none; }
 
-.cr-body { padding: 0 14px 12px; display: grid; gap: 10px; }
-.cr-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); margin-bottom: 2px; }
-.cr-text { margin: 0; color: var(--text); line-height: 1.55; white-space: pre-wrap; }
+/* ── one request, in full ────────────────────────────────────────── */
+.cr-detail { padding: 6px 14px 4px; display: grid; gap: 16px; }
+.cr-d-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 18px 30px; }
+.cr-d-main { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.cr-d-label { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--text-dim); }
+.cr-d-label .sh-link { font-weight: 600; }
+.cr-text { margin: 0; color: var(--text); line-height: 1.6; white-space: pre-wrap; max-width: 72ch; font-size: 13px; }
 .cr-pre {
   margin: 0; padding: 8px 10px; border-radius: 6px; background: var(--bg);
-  font-family: var(--mono); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-dim);
+  border: 1px solid var(--border);
+  font-family: var(--mono); font-size: 11.5px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-dim);
 }
-.cr-options { margin: 0; padding-left: 20px; color: var(--text); }
+.cr-options { margin: 0; padding-left: 20px; color: var(--text); font-size: 13px; line-height: 1.6; }
+.cr-d-facts { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.cr-dl { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 5px 12px; margin: 0; font-size: 12.5px; }
+.cr-dl dt { color: var(--text-faint); }
+.cr-dl dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
+.cr-dl dd .cr-sub { display: inline; }
+.cr-intake { display: grid; gap: 6px; padding-top: 12px; border-top: 1px solid var(--border); }
+.cr-intake-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cr-intake-head .cr-d-label { margin: 0; }
+.cr-intake-form { display: grid; gap: 8px; }
 
-.cr-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.cr-actions .auth-input { flex: 1 1 220px; min-width: 0; }
-.cr-accept { border-color: var(--ok); color: var(--ok); }
-.cr-reject { border-color: var(--error); color: var(--error); }
-.cr-hint { color: var(--text-faint); font-size: 12px; }
-.cr-empty { color: var(--text-faint); margin: 16px 0; }
-
-@media (max-width: 640px) {
-  .cr-new-toggle { margin-left: 0; }
-  .cr-summary { padding: 10px; }
-  .cr-body { padding: 0 10px 10px; }
+.cr-flash {
+  margin: 0; padding: 8px 12px; border-radius: 7px; font-size: 12.5px; color: var(--text);
+  border: 1px solid var(--accent-line); background: var(--bg-panel);
 }
+.cr-flash.is-bad { border-color: var(--st-late); background: color-mix(in srgb, var(--st-late) 8%, var(--bg-panel)); }
+.cr-detail-row .cr-flash:first-child { margin: 8px 14px 0; }
 
-/* ── scheduling a request as a ticket ──────────────────────────────── */
+/* ── acting on it ────────────────────────────────────────────────── */
+.cr-act {
+  display: grid; gap: 10px; padding: 14px 16px; border-radius: 9px;
+  border: 1px solid var(--border-strong); background: var(--bg-panel);
+}
+.cr-say { margin: 0; font-size: 13px; line-height: 1.55; color: var(--text); max-width: 76ch; }
+.cr-effect { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--text-dim); max-width: 76ch; }
+.cr-effect:empty { display: none; }
+.cr-hint { margin: 0; font-size: 12px; color: var(--text-faint); }
+.cr-decide, .cr-schedule { display: grid; gap: 10px; }
+.cr-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.cr-buttons .sh-confirm { flex-basis: 100%; }
+.auth-button.cr-primary { display: inline-block; width: auto; margin: 0; padding: 8px 18px; font-weight: 600; }
+.cr-act > .auth-button.cr-primary { justify-self: start; }
+.cr-quiet-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border); }
+.chip.cr-quiet { font-size: 12px; color: var(--text-dim); }
+.chip.cr-reject:hover { border-color: var(--st-late); }
+.cr-req { color: var(--text-dim); font-weight: 400; }
+.cr-field { display: grid; gap: 4px; font-size: 12px; color: var(--text-dim); min-width: 0; }
+.cr-field .sh-input, .cr-field .scope-select { font-size: 13px; padding: 7px 9px; width: 100%; box-sizing: border-box; }
+.cr-field textarea { resize: vertical; font-family: inherit; line-height: 1.5; }
+.cr-note[aria-invalid="true"] { border-color: var(--st-late); }
 
-.cr-ticketing { margin: 10px 0 0; }
-.cr-scheduled { display: flex; gap: 8px; align-items: baseline; font-size: 12.5px; }
-.cr-ticket-link { font-family: var(--mono); color: var(--accent); }
-
-/* The preview is the control, so it is a panel and not a tooltip: everything
-   that will be sent has to be readable without scrolling past it. */
+.cr-ticketing { display: grid; gap: 10px; justify-items: start; }
 .cr-preview {
-  margin-top: 10px; padding: 12px 14px;
+  width: 100%; box-sizing: border-box; padding: 12px 14px;
   border: 1px solid var(--border); border-radius: 8px; background: var(--bg-raised);
   display: grid; gap: 10px;
 }
 .cr-preview[hidden] { display: none; }
-.cr-preview-facts {
-  display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 4px 14px;
-  margin: 0; font-size: 12.5px;
-}
-.cr-preview-facts dt { color: var(--text-faint); }
-.cr-preview-facts dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
-.cr-field { display: grid; gap: 4px; }
 .cr-preview-text summary { cursor: pointer; font-size: 12px; color: var(--text-dim); }
 .cr-preview-body {
-  margin: 8px 0 0; padding: 10px; max-height: 260px; overflow: auto;
+  margin: 0; padding: 10px; max-height: 280px; overflow: auto;
   border: 1px solid var(--border); border-radius: 6px; background: var(--bg-panel);
   font-family: var(--mono); font-size: 11.5px; white-space: pre-wrap;
   overflow-wrap: anywhere; color: var(--text-dim);
 }
+.cr-preview-text .cr-preview-body { margin-top: 8px; }
 /* Said once, where the decision is made. A top-level ticket is not what
    "file it under the original" means. */
 .cr-warn {
-  margin: 0; padding: 8px 10px; border-radius: 6px;
-  border: 1px solid var(--warning); font-size: 12px; color: var(--text);
-  background: color-mix(in srgb, var(--warning) 10%, transparent);
+  margin: 0; padding: 8px 10px; border-radius: 6px; font-size: 12px; color: var(--text);
+  border: 1px solid var(--st-stalled); background: color-mix(in srgb, var(--st-stalled) 10%, transparent);
+}
+
+/* ── raising one ─────────────────────────────────────────────────── */
+.cr-form { display: grid; gap: 12px; margin-top: 14px; max-width: 860px; }
+.cr-form-row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; }
+.cr-form-row > .cr-field { flex: 0 1 auto; }
+.cr-form-row > .cr-grow { flex: 1 1 260px; }
+.cr-narrow { width: 10ch !important; }
+.cr-check { font-size: 13px; color: var(--text); padding-bottom: 7px; }
+.cr-filed {
+  display: grid; gap: 4px; margin-top: 12px; padding: 12px 14px; border-radius: 8px;
+  border: 1px solid var(--st-done); background: color-mix(in srgb, var(--st-done) 8%, transparent);
+}
+.cr-filed[hidden] { display: none; }
+.cr-filed p { margin: 0; font-size: 13px; }
+.cr-filed:focus { outline: none; }
+.cr-all-actions { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+/* ── narrow screens ──────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .cr-c-side, .cr-c-next { display: none; }
+}
+@media (max-width: 820px) {
+  .cr-c-raised, .cr-c-ticket, .cr-c-holder { display: none; }
+  .cr-c-req { min-width: 0; }
+  .cr-d-grid { grid-template-columns: minmax(0, 1fr); }
+  .cr-flow-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 8px; }
+  .cr-flow-col:nth-child(3) { border-left: 0; padding-left: 0; }
+  .cr-flow-col:nth-child(3)::before { display: none; }
+  .cr-detail { padding: 6px 4px 4px; }
+  .cr-act { padding: 12px; }
+  .cr-dl { grid-template-columns: 96px minmax(0, 1fr); }
+  .cr-row { scroll-margin-top: 150px; }
 }

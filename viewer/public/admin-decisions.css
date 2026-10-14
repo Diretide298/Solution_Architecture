@@ -1,7 +1,7 @@
-/* The "close items from a spreadsheet" panel on the admin page.
+/* The "upload a decision sheet" section on the admin page, for both registers.
  *
- * Its own file for the same reason admin-export.css is: layers.css is loaded by
- * every page in the viewer and none of the others has this panel. Everything
+ * Its own file because layers.css is loaded by every page in the viewer and
+ * none of the others has this section. Everything
  * here that already has a look — the panel, the note, the chip, the error and
  * the ok box — keeps it; what is said below is only the two things a plan
  * nobody has agreed to yet needs, which are a file field and a list of rows
@@ -41,9 +41,13 @@
   padding: 9px 0 9px 12px;
   border-left: 3px solid var(--border);
 }
-.decide-group.good { border-left-color: var(--ok); }
-.decide-group.warn { border-left-color: var(--accent); }
-.decide-group.bad  { border-left-color: var(--error); }
+/* The sheet's state colours, each in its one meaning: "would be closed" is
+   about to be done, "closed, but differently" is held for somebody to look at,
+   and "could not be used" is something that went wrong. The warning stripe was
+   the accent, which is the colour of a link on this page and said nothing. */
+.decide-group.good { border-left-color: var(--st-done); }
+.decide-group.warn { border-left-color: var(--st-stalled); }
+.decide-group.bad  { border-left-color: var(--st-late); }
 .decide-group.quiet { border-left-color: var(--border); opacity: .75; }
 
 .decide-group-title {
@@ -92,30 +96,4 @@
 @media (max-width: 640px) {
   .decide-line { grid-template-columns: auto auto; }
   .decide-what, .decide-tail { grid-column: 1 / -1; }
-}
-
-
-/* ── who owns which platform ──────────────────────────────────────────
-   One row per person who can hold one, their grants as chips, and the control
-   to give another. An owner sees the controls; an admin sees the chips. */
-.platform-list { display: grid; gap: 8px; }
-.platform-row {
-  display: grid; gap: 10px; align-items: center;
-  grid-template-columns: minmax(120px, 1fr) minmax(180px, 1.4fr) minmax(200px, 2fr) auto auto auto;
-}
-.platform-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.platform-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 11px; font-weight: 600; padding: 2px 4px 2px 9px;
-  border-radius: 999px; border: 1px solid var(--accent); color: var(--accent);
-}
-.platform-drop {
-  border: 0; background: none; cursor: pointer; padding: 0 4px;
-  color: inherit; font-size: 13px; line-height: 1; opacity: .65;
-}
-.platform-drop:hover { opacity: 1; color: var(--error); }
-.platform-none { font-size: 12px; color: var(--text-faint); font-style: italic; }
-
-@media (max-width: 720px) {
-  .platform-row { grid-template-columns: 1fr; }
 }

@@ -13,7 +13,7 @@
         }
       } catch { /* storage can be denied outright; day is a fine fallback */ }
     </script>
-    <title>Adam — dump audit</title>
+    <title>Adam — Audit the package</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,7 +22,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
-    <link rel="stylesheet" href="/domains.css" />
+    <link rel="stylesheet" href="/sheet.css" />
     <link rel="stylesheet" href="/audit.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <script>
@@ -47,11 +47,11 @@
       })();
     </script>
   </head>
-  <!-- No sign-in gate. Every other standalone page reads verdicts, which are
-       personal and belong to an account; this one reads only the package, so
-       putting a door in front of it would cost a reader something and protect
-       nothing. -->
-  <body class="admin-page domains-page">
+  <!-- Signed in, and an administrator. The page asks for a session first
+       (audit.js, requireSignIn) and draws for owners and admins only; the
+       server refuses /api/audit to anyone else as well (lib/audience.mjs), so
+       the panel below for everybody else is an explanation, not the lock. -->
+  <body class="admin-page au-page">
     <!-- The loading curtain. Inline, and first in the body, so it is
          painted by the first frame — a loader that arrives with the
          JavaScript misses the module fetch, which is the part of the
@@ -67,29 +67,120 @@
           <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
           <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
         </a>
-        <span class="brand-sub">dump audit</span>
+        <span class="brand-sub">audit the package</span>
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
-        <a class="chip" href="/burst.html">Deployment map</a>
         <a class="chip" href="/admin.html">Admin</a>
-        <a class="chip" href="/validation.html">Validation</a>
+        <a class="chip" href="/tasks.html">Tasks</a>
+        <a class="chip" href="/reviews.html#coverage">Reviews</a>
         <a class="chip" href="/">Back to the viewer</a>
       </div>
     </header>
 
-    <main class="admin-main au-main">
-      <section class="au-hero">
-        <p class="au-eyebrow">Delivery package · audit</p>
-        <h1 class="au-title">What the last dump brought, and what it broke</h1>
-        <p class="au-sub">
-          Half of this page is read from the package as it stands now. Half is the
-          result of running the package's own validators at a shell, on a stated
-          date, and says so. Nothing here runs Python.
+    <!-- Not an administrator. Said, not blanked: a page that renders an empty
+         shell to a reviewer looks broken. -->
+    <main id="denied" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Audit the package</h1>
+        <p class="auth-note">
+          This page is for administrators. It says whether the delivery package
+          passed its own checks when it was last refreshed, which is about how
+          the package is made rather than about the product. If you need it,
+          ask an administrator for the role.
         </p>
-      </section>
-      <div id="audit-body"></div>
+        <a class="auth-button" href="/">Back to the viewer</a>
+      </div>
     </main>
+
+    <div id="audit" class="set-layout set-layout-wide" hidden>
+      <nav class="set-nav" aria-label="Sections">
+        <h1 class="set-nav-title">Audit the package</h1>
+        <div class="set-nav-list">
+          <div class="set-nav-group">The last checks run</div>
+          <a href="#verdict">Verdict</a>
+          <a href="#checks">Checks</a>
+          <div class="set-nav-group">The package now</div>
+          <a href="#live">Live package counts</a>
+          <div class="set-nav-group">Before</div>
+          <a href="#history">History</a>
+        </div>
+      </nav>
+
+      <main class="set-content">
+        <!-- What is being read, and the one filter. Above the sections, like
+             Tasks, so a filter set on the verdict is still in sight on Checks. -->
+        <div class="sh-top">
+          <div class="sh-top-line">
+            <p class="sh-lede" id="au-lede">…</p>
+            <div class="sh-top-actions">
+              <p class="sh-asof" id="au-asof" role="status"></p>
+              <button id="au-reload" class="chip" type="button"
+                      title="Reads the checks file and the package again">Read again</button>
+            </div>
+          </div>
+          <p class="auth-error" id="au-error" role="alert" hidden></p>
+          <div class="sh-scope" id="au-scope" role="group" aria-label="Filter the checks"></div>
+        </div>
+
+        <!-- ── the verdict ──────────────────────────────────────────────
+             Opened after a release, to answer one question: does the package
+             pass its checks, and what did the last drop break. -->
+        <section class="admin-panel set-section sh-sheet" id="verdict" aria-labelledby="au-headline">
+          <p class="au-stale" id="au-stale" role="alert" hidden></p>
+          <div class="sh-hero">
+            <div class="sh-verdict" id="au-verdict"></div>
+            <figure class="sh-figure au-strip-figure" id="au-figure" hidden>
+              <figcaption class="sh-figure-caption" id="au-strip-caption">Every check in the run, in the order it runs</figcaption>
+              <div class="au-strip" id="au-strip"></div>
+              <div id="au-strip-key"></div>
+              <div id="au-strip-twin"></div>
+            </figure>
+          </div>
+          <p class="sh-next" id="au-next"></p>
+        </section>
+
+        <!-- ── every check ── -->
+        <section class="admin-panel set-section sh-sheet" id="checks" aria-labelledby="au-checks-title" hidden>
+          <div class="sh-part">
+            <div class="sh-part-head">
+              <h2 class="sh-part-title" id="au-checks-title">Every check in the run</h2>
+            </div>
+            <p class="sh-note" id="au-checks-note"></p>
+            <div id="au-checks-table"></div>
+          </div>
+        </section>
+
+        <!-- ── the package as it stands ── -->
+        <section class="admin-panel set-section sh-sheet" id="live" aria-labelledby="au-live-title" hidden>
+          <div class="sh-part">
+            <div class="sh-part-head">
+              <h2 class="sh-part-title" id="au-live-title">Live package counts</h2>
+            </div>
+            <p class="sh-note">
+              Counted from the release being served when this page opened, not
+              from the checks run. Where a figure is a symptom rather than a
+              fact, the last column says what it should be and why it matters.
+            </p>
+            <div id="au-live-table"></div>
+          </div>
+        </section>
+
+        <!-- ── what came before the checks were kept ── -->
+        <section class="admin-panel set-section sh-sheet" id="history" aria-labelledby="au-history-title" hidden>
+          <div class="sh-part">
+            <div class="sh-part-head">
+              <h2 class="sh-part-title" id="au-history-title">History</h2>
+            </div>
+            <p class="sh-note">
+              Earlier audits, kept as they were written. Each is dated and does
+              not update: the verdict above is the one to act on.
+            </p>
+            <div id="au-history"></div>
+          </div>
+        </section>
+      </main>
+    </div>
 
     <script type="module" src="/audit.js"></script>
   </body>

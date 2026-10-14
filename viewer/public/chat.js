@@ -4,14 +4,23 @@
  * **The page gathers the context; the service holds the key.** ADAM's accounts
  * service cannot read a delivery package — that is the viewer's job — so this
  * searches the package for what the question is about, sends those excerpts
- * with it, and the service composes the call. Neither half has both, which is
- * also why no key is ever sent back to this page.
+ * (the contract's own prose where there is some, not only names) with it, and
+ * the service composes the call. Neither half has both, which is also why no
+ * key is ever sent back to this page.
  *
- * **The picker is part of asking, not a setting.** Provider and model sit above
- * the question rather than in a preferences page, because trying a cheaper
- * model on a long question should cost one dropdown. The model field is a
- * combo: the list comes from the provider itself, and anything can be typed
- * into it, so a model released this morning needs no deploy here.
+ * **It opens on the question.** The box, then questions drawn from this
+ * package, and one line saying which model will answer, with "Change" beside
+ * it. Keys are a setup step and live in Settings, AI answers; this page only
+ * says when one is missing and where to add it.
+ *
+ * **An answer says where it came from.** The parts of the package sent with a
+ * question are listed under its answer as links into the viewer, so a reader
+ * can check the answer against the package instead of trusting it.
+ *
+ * **One question at a time.** Enter used to send a second question while the
+ * first was in flight, and a failed question was drawn again on every retry.
+ * There is one busy flag now, and a failure takes its own turn back off the
+ * page along with putting the words back in the box.
  *
  * What it will not do is file a change request by itself. When the answer says
  * the package is wrong, the page offers to draft one — through the same
@@ -19,115 +28,108 @@
  * somebody reads it before it is filed.
  */
 
+// The viewer's top bar on a page that is not the viewer, and the saved theme.
+import '/page-chrome.js';
 import * as auth from '/validation.js';
-import { gather } from '/chat-core.js';
+import {
+  gather, starters, choose, remember, takeThread, renderAnswer, sourceList,
+} from '/chat-core.js';
+import { el, confirmStep } from '/sheet.js';
 
 const $ = (id) => document.getElementById(id);
-
-function el(tag, cls, text) {
-  const node = document.createElement(tag);
-  if (cls) node.className = cls;
-  if (text != null) node.textContent = text;
-  return node;
-}
 
 const state = {
   providers: [],
   provider: null,
+  model: '',
   turns: [],          // { role, text } — what is sent back as history
-  search: null,       // the package's search index, fetched once
+  busy: false,
 };
 
-/** Which provider and model were last used, per browser. Not a server-side
- *  preference: two tabs on two packages may reasonably want different ones, and
- *  a stored default would have the second quietly retune the first. */
-const REMEMBERED = 'adam-chat-pick';
-const remember = (provider, model) => {
-  try { localStorage.setItem(REMEMBERED, JSON.stringify({ provider, model })); } catch { /* fine */ }
-};
-const recall = () => {
-  try { return JSON.parse(localStorage.getItem(REMEMBERED) ?? '{}'); } catch { return {}; }
-};
-
-function say(id, message) {
-  $(id).textContent = message ?? '';
-  if ($(id).hasAttribute('hidden') || message === '') $(id).hidden = !message;
+function fail(message) {
+  $('ch-error').textContent = message ?? '';
+  $('ch-error').hidden = !message;
 }
 
-// ── the picker ───────────────────────────────────────────────────────
+// ── which model answers ──────────────────────────────────────────────
+
+function drawModelLine() {
+  const line = $('ch-model-line');
+  const p = state.provider;
+  line.replaceChildren();
+  $('ch-change').hidden = !state.providers.some((x) => x.configured);
+  if (!p || !p.configured) {
+    // A setup step, not a failure, so it is said here rather than as an error.
+    const go = el('a', 'sh-link', 'Settings, AI answers');
+    go.href = '/settings.html#ai';
+    line.append('No AI key yet. ADAM asks on your own key, never a shared one: add one in ', go,
+      ', then come back.');
+    $('ch-send').disabled = true;
+    return;
+  }
+  line.append('Answering with ', el('strong', '', state.model || 'no model chosen'),
+    ` from ${p.label}`, el('span', 'chat-model-hint', ` · key ${p.hint}`));
+  $('ch-send').disabled = state.busy || !state.model;
+}
 
 function drawPicker() {
   const picker = $('ch-provider');
-  picker.replaceChildren(...state.providers.map((p) => {
-    const option = el('option', null, p.configured ? p.label : `${p.label} — no key`);
-    option.value = p.id;
-    return option;
-  }));
+  // Only providers with a key: choosing one without a key here could only
+  // fail, and adding a key is Settings' job.
+  const usable = state.providers.filter((p) => p.configured);
+  picker.replaceChildren(...usable.map((p) => new Option(p.label, p.id)));
   if (state.provider) picker.value = state.provider.id;
-  drawProvider();
-}
-
-function drawProvider() {
-  const p = state.provider;
-  if (!p) return;
-  $('ch-provider').value = p.id;
-
   const models = $('ch-models');
-  models.replaceChildren(...p.models.map((m) => {
-    const option = el('option');
-    option.value = m;
-    return option;
-  }));
-  const last = recall();
-  const wanted = (last.provider === p.id && last.model) || p.models[0] || '';
-  $('ch-model').value = wanted;
-  $('ch-model').placeholder = p.models.length
-    ? `${p.models.length} available, or type a name`
-    : 'type a model name';
-
-  $('ch-nokey').hidden = p.configured;
-  $('ch-nokey-who').textContent = p.label;
-  $('ch-endpoint').hidden = !p.needsEndpoint;
-  if (p.needsEndpoint) $('ch-endpoint').value = p.endpoint ?? '';
-  $('ch-keys-at').hidden = !p.keysAt;
-  if (p.keysAt) $('ch-keys-at').href = p.keysAt;
-
-  $('ch-keynote').textContent = p.configured
-    ? `key ${p.hint} · ${p.endpoint}`
-    : 'no key yet';
-  $('ch-send').disabled = !p.configured;
+  models.replaceChildren(...(state.provider?.models ?? []).map((m) => new Option(m, m)));
+  $('ch-model').value = state.model;
 }
 
-// ── context: what the question is about ──────────────────────────────
-
-// Choosing what to send with a question moved to `chat-core.js` on
-// 24 September, so the floating panel and this page ask the same way.
-
+async function loadProviders() {
+  const { providers } = await auth.chatProviders();
+  state.providers = providers ?? [];
+  const pick = choose(state.providers);
+  state.provider = pick.provider;
+  state.model = pick.model;
+  drawPicker();
+  drawModelLine();
+}
 
 // ── the conversation ─────────────────────────────────────────────────
 
 function drawTurn(turn) {
-  const box = el('div', `chat-turn chat-${turn.role}`);
-  box.append(el('div', 'chat-who', turn.role === 'user' ? 'You' : (turn.label ?? 'ADAM')));
-  box.append(el('div', 'chat-text', turn.text));
-  if (turn.meta) box.append(el('div', 'chat-meta', turn.meta));
+  const box = el('article', `chat-turn chat-${turn.role}`);
+  box.append(el('h2', 'chat-who', turn.role === 'user' ? 'You asked' : (turn.label ?? 'ADAM answered')));
+  if (turn.role === 'assistant') box.append(renderAnswer(turn.text));
+  else box.append(el('p', 'chat-text', turn.text));
 
-  // Offered on every answer rather than only when the model says the package is
-  // wrong: whether something is a defect is the reader's call, and a button
-  // that appeared only when the model volunteered it would be the model
-  // deciding what counts as a problem.
   if (turn.role === 'assistant') {
+    const sources = sourceList(turn.sources);
+    if (sources) box.append(sources);
+    if (turn.meta) box.append(el('p', 'chat-meta', turn.meta));
+    // Offered on every answer rather than only when the model says the package
+    // is wrong: whether something is a defect is the reader's call, and a
+    // button that appeared only when the model volunteered it would be the
+    // model deciding what counts as a problem.
     const bar = el('div', 'chat-actions');
     const raise = el('button', 'chip', 'Raise a change request from this');
     raise.type = 'button';
-    raise.onclick = () => draft(turn);
+    raise.onclick = () => draft(turn, box, raise);
     bar.append(raise);
     box.append(bar);
   }
   $('ch-log').append(box);
+  $('ch-clear').hidden = false;
+  $('ch-starters').hidden = true;
   box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   return box;
 }
+
+/** What a change request drafted from an answer is about: the first thing the
+ *  answer was given, in the change register's own kinds. */
+const CR_KIND = {
+  operation: 'operation', schema: 'schema', contract: 'contract', table: 'table',
+  screen: 'screen', flow: 'flow', state: 'state', event: 'event', adr: 'adr', platform: 'platform',
+};
 
 /**
  * Draft a change request from an answer, and show it before anything is filed.
@@ -136,52 +138,76 @@ function drawTurn(turn) {
  * is a claim that somebody else's work is wrong, and it goes out under the name
  * of whoever pressed the button.
  */
-async function draft(turn) {
-  say('ch-error', '');
+async function draft(turn, after, button) {
+  fail('');
+  button.disabled = true;
   const asked = turn.about ?? '';
+  const first = (turn.sources ?? []).find((s) => CR_KIND[s.kind]);
   try {
     const made = await auth.draftChange(auth.project(), {
-      target_kind: 'other',
-      target_id: 'from the chat',
+      // What it is about, when the answer was about something the register
+      // knows; "other" with the question's own words when it was not. It used
+      // to be the literal "from the chat", which named nothing.
+      target_kind: first ? CR_KIND[first.kind] : 'other',
+      target_id: first ? first.id : (asked.slice(0, 120) || 'the package'),
       title: asked.slice(0, 120) || 'Raised from a question about the package',
       problem: `Asked: ${asked}\n\nADAM answered:\n\n${turn.text}`,
-      evidence: (turn.excerpts ?? []).join(', '),
+      evidence: (turn.sources ?? []).map((s) => `${s.kind} ${s.id}${s.file ? ` (${s.file}${s.line ? `:${s.line}` : ''})` : ''}`).join(', '),
     });
-    showDraft(made);
+    showDraft(made, after);
   } catch (error) {
-    say('ch-error', error.message);
+    fail(`The change request could not be drafted: ${error.message}. Try again.`);
+  } finally {
+    button.disabled = false;
   }
 }
 
-function showDraft(made) {
-  const box = el('div', 'chat-draft');
-  box.append(el('div', 'chat-who', 'Nothing has been filed yet'));
-  box.append(el('div', 'chat-text',
-    'Check this, and change what it says before filing. It goes out under your name.'));
+let drafts = 0;
+function showDraft(made, after) {
+  drafts += 1;
+  const id = `ch-draft-${drafts}`;
+  const box = el('section', 'chat-draft');
+  box.setAttribute('aria-labelledby', `${id}-head`);
+  const head = el('h2', 'chat-who', 'A change request, not filed yet');
+  head.id = `${id}-head`;
+  box.append(head, el('p', 'chat-text',
+    'Check it and change what it says before filing. It goes out under your name.'));
 
-  const title = el('input', 'auth-input');
+  const titleLabel = el('label', 'chat-field-label', 'Title');
+  titleLabel.htmlFor = `${id}-title`;
+  const title = el('input', 'sh-input');
+  title.id = `${id}-title`;
   title.value = made.preview.title ?? '';
-  const problem = el('textarea', 'auth-input');
-  problem.rows = 5;
+  const problemLabel = el('label', 'chat-field-label', 'What is wrong');
+  problemLabel.htmlFor = `${id}-problem`;
+  const problem = el('textarea', 'sh-input');
+  problem.id = `${id}-problem`;
+  problem.rows = 6;
   problem.value = made.preview.problem ?? '';
-  box.append(el('div', 'auth-label', 'Title'), title,
-    el('div', 'auth-label', 'What is wrong'), problem);
+  box.append(titleLabel, title, problemLabel, problem);
 
   if ((made.alreadyOpen ?? []).length) {
-    box.append(el('p', 'chat-warn',
-      `Already open on the same thing: ${made.alreadyOpen.map((c) => c.id).join(', ')}. `
-      + 'Add to one of those instead if it says the same thing.'));
+    const warn = el('p', 'chat-warn', 'Already open on the same thing: ');
+    made.alreadyOpen.forEach((c, i) => {
+      const a = el('a', 'sh-link', c.id);
+      a.href = `/changes.html?cr=${encodeURIComponent(c.id)}`;
+      warn.append(i ? ', ' : '', a);
+    });
+    warn.append('. Add to one of those instead if it says the same thing.');
+    box.append(warn);
   }
 
   const bar = el('div', 'chat-actions');
-  const file = el('button', 'chip cr-accept', 'File it');
+  const file = el('button', 'auth-button chat-file', 'File it');
   file.type = 'button';
-  const drop = el('button', 'chip', 'Cancel');
+  const drop = el('button', 'chip', 'Discard the draft');
   drop.type = 'button';
   drop.onclick = () => box.remove();
-  const said = el('span', 'chat-meta');
+  const said = el('p', 'set-state');
+  said.setAttribute('role', 'status');
   file.onclick = async () => {
     file.disabled = true;
+    said.textContent = 'Filing…';
     try {
       // Re-drafted when either field was touched, so what is filed is what the
       // person last read rather than what the first draft held.
@@ -193,74 +219,87 @@ function showDraft(made) {
         code = redone.draft;
       }
       const filed = await auth.fileDraft(auth.project(), code);
-      box.replaceChildren(el('div', 'chat-who', 'Filed'));
-      const link = el('a', 'chat-link', `${filed.change.id} — ${filed.change.title}`);
-      link.href = `/changes.html?project=${encodeURIComponent(auth.project() ?? '')}`;
-      box.append(link);
+      box.replaceChildren(el('h2', 'chat-who', 'Filed'));
+      // To the request itself, not to the bare list it would have to be found in.
+      const link = el('a', 'sh-link', `${filed.change.id}: ${filed.change.title}`);
+      link.href = `/changes.html?cr=${encodeURIComponent(filed.change.id)}`
+        + `${auth.project() ? `&project=${encodeURIComponent(auth.project())}` : ''}`;
+      box.append(el('p', 'chat-text', 'It is on Change requests: '), link);
+      link.focus();
     } catch (error) {
-      said.textContent = error.message;
+      said.textContent = `It was not filed: ${error.message}. Change nothing and press File it again.`;
       file.disabled = false;
     }
   };
   bar.append(file, drop, said);
   box.append(bar);
-  $('ch-log').append(box);
-  box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  after.after(box);
+  title.focus();
 }
 
 async function ask(question) {
+  if (state.busy) return;
   const provider = state.provider;
-  const model = $('ch-model').value.trim();
-  if (!model) { say('ch-error', 'Choose or type a model.'); return; }
+  const model = state.model.trim();
+  if (!provider?.configured) { fail('Add an AI key in Settings, AI answers, first.'); return; }
+  if (!model) { fail('Choose a model first: press Change beside "Answering with".'); return; }
   remember(provider.id, model);
 
-  state.turns.push({ role: 'user', text: question });
-  drawTurn({ role: 'user', text: question });
-  $('ch-says').textContent = 'Reading the package…';
+  state.busy = true;
+  fail('');
   $('ch-send').disabled = true;
+  $('ch-question').value = '';
+  state.turns.push({ role: 'user', text: question });
+  const mine = drawTurn({ role: 'user', text: question });
+  $('ch-says').textContent = 'Reading the package…';
 
   try {
-    const context = await gather(question);
+    const { context, sources } = await gather(question);
     $('ch-says').textContent = `Asking ${model}…`;
     const said = await auth.askAdam({
       question, provider: provider.id, model, context,
       history: state.turns.slice(0, -1),
     });
+    const turn = {
+      role: 'assistant', text: said.answer, label: `${provider.label}, ${said.model}, answered`,
+      about: question, sources,
+      meta: `${said.excerpts} part${said.excerpts === 1 ? '' : 's'} of the package sent`
+        + (said.droppedExcerpts ? `, ${said.droppedExcerpts} left out as too long` : '')
+        + ` · ${said.usage.in.toLocaleString()} tokens in, ${said.usage.out.toLocaleString()} out, on your key`,
+    };
     state.turns.push({ role: 'assistant', text: said.answer });
-    drawTurn({
-      role: 'assistant', text: said.answer, label: `${provider.label} · ${said.model}`,
-      about: question,
-      excerpts: context.map((c) => c.title),
-      meta: `${said.excerpts} excerpt${said.excerpts === 1 ? '' : 's'} sent`
-        + (said.droppedExcerpts ? `, ${said.droppedExcerpts} too long to send` : '')
-        + ` · ${said.usage.in.toLocaleString()} in, ${said.usage.out.toLocaleString()} out`,
-    });
-    say('ch-error', '');
+    drawTurn(turn);
   } catch (error) {
-    // The last turn goes back on the box rather than being lost, because the
-    // usual reason to fail is a bad key or a quota and the question is still
-    // the one they wanted to ask.
+    // The turn comes off the page as well as out of the history, and the words
+    // go back in the box: the usual reason to fail is a key or a quota, and it
+    // is still the question they wanted to ask. Leaving the drawn turn was how
+    // a retry showed the same question twice.
     state.turns.pop();
+    mine.remove();
+    if (!state.turns.length) { $('ch-clear').hidden = true; $('ch-starters').hidden = false; }
     $('ch-question').value = question;
-    say('ch-error', error.message);
-    if (error.status === 428) { await loadProviders(); }
+    fail(`That was not answered: ${error.message}`);
+    if (error.status === 428) await loadProviders().catch(() => {});
   } finally {
+    state.busy = false;
     $('ch-says').textContent = '';
-    $('ch-send').disabled = !state.provider?.configured;
+    drawModelLine();
   }
 }
 
 // ── loading ──────────────────────────────────────────────────────────
 
-async function loadProviders() {
-  const { providers } = await auth.chatProviders();
-  state.providers = providers ?? [];
-  const last = recall();
-  state.provider =
-    state.providers.find((p) => p.id === last.provider)
-    ?? state.providers.find((p) => p.configured)
-    ?? state.providers[0];
-  drawPicker();
+async function drawStarters() {
+  const list = $('ch-starter-list');
+  let questions = [];
+  try { questions = await starters(); } catch { /* the box works without them */ }
+  list.replaceChildren(...questions.map((q) => {
+    const b = el('button', 'chat-starter', q);
+    b.type = 'button';
+    b.onclick = () => { if (!state.busy && !$('ch-send').disabled) ask(q); else $('ch-question').value = q; };
+    return b;
+  }));
+  $('ch-starters').hidden = !questions.length || state.turns.length > 0;
 }
 
 (async () => {
@@ -268,48 +307,72 @@ async function loadProviders() {
   const me = auth.account();
   $('whoami').textContent = me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '';
 
-  try { await loadProviders(); }
-  catch (error) { say('ch-error', error.message); return; }
+  auth.ensureProject().then(async (id) => {
+    let name = id ?? '';
+    try { name = ((await auth.listProjects())?.projects ?? []).find((p) => p.id === id)?.name ?? name; } catch { /* the id will do */ }
+    if (name) $('ch-project').textContent = name;
+  });
 
-  $('ch-provider').onchange = (e) => {
-    state.provider = state.providers.find((p) => p.id === e.target.value);
-    drawProvider();
+  // A thread the side panel handed over with "Open the full chat".
+  for (const turn of takeThread()) {
+    state.turns.push({ role: turn.role, text: turn.text });
+    drawTurn(turn);
+  }
+  drawStarters();
+
+  try { await loadProviders(); } catch (error) {
+    $('ch-model-line').textContent = '';
+    fail(`ADAM could not say which AI providers you have a key for (${error.message}). Reload the page to try again.`);
+  }
+
+  $('ch-change').onclick = () => {
+    const open = $('ch-picker').hidden;
+    $('ch-picker').hidden = !open;
+    $('ch-change').setAttribute('aria-expanded', String(open));
+    $('ch-change').textContent = open ? 'Done' : 'Change';
+    if (open) $('ch-provider').focus();
   };
-
-  $('ch-keyform').onsubmit = async (event) => {
-    event.preventDefault();
-    $('ch-key-says').textContent = 'Checking…';
-    try {
-      const said = await auth.setLlmKey(state.provider.id, $('ch-key').value,
-        $('ch-endpoint').value);
-      $('ch-key').value = '';
-      $('ch-key-says').textContent = `Saved — ${said.checked}.`;
-      await loadProviders();
-    } catch (error) {
-      $('ch-key-says').textContent = error.message;
-    }
+  $('ch-provider').onchange = (e) => {
+    const pick = choose(state.providers, { provider: e.target.value });
+    state.provider = pick.provider;
+    state.model = pick.model;
+    drawPicker();
+    drawModelLine();
+  };
+  $('ch-model').oninput = (e) => {
+    state.model = e.target.value.trim();
+    if (state.model) remember(state.provider.id, state.model);
+    drawModelLine();
   };
 
   $('ch-ask').onsubmit = (event) => {
     event.preventDefault();
     const question = $('ch-question').value.trim();
-    if (!question) return;
-    $('ch-question').value = '';
-    ask(question);
+    if (question) ask(question);
   };
 
-  // Enter sends, shift+Enter is a newline. A textarea that only sends on a
-  // button is a textarea people stop using.
+  // Enter sends, Shift+Enter is a newline. A textarea that only sends on a
+  // button is a textarea people stop using. Ignored while a question is in
+  // flight, which is the busy guard's other half.
   $('ch-question').onkeydown = (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
       event.preventDefault();
-      $('ch-ask').requestSubmit();
+      if (!state.busy) $('ch-ask').requestSubmit();
     }
   };
 
-  $('ch-clear').onclick = () => {
+  // The conversation is not kept anywhere, so clearing it cannot be undone.
+  $('ch-clear').onclick = async () => {
+    const sure = await confirmStep($('ch-clear').parentElement, {
+      say: 'This clears the conversation from the page. It is not kept anywhere, so it cannot be brought back.',
+      action: 'Clear the conversation',
+    });
+    if (!sure) return;
     state.turns = [];
     $('ch-log').replaceChildren();
-    say('ch-error', '');
+    $('ch-clear').hidden = true;
+    $('ch-starters').hidden = !$('ch-starter-list').childElementCount;
+    fail('');
+    $('ch-question').focus();
   };
 })();

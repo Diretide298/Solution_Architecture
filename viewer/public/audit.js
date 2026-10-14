@@ -1,251 +1,557 @@
 /**
- * The dump audit — what the last delivery brought, and what it broke.
+ * Audit the package: does the package pass its own checks, and what did the
+ * last drop break.
  *
- * **Half of this page is live and half of it is a dated record, and the two are
- * marked apart on the page rather than only here.** The figures the viewer can
- * read for itself — boards on disk, frames, tables with real DDL, rows on the
- * workbook's Scaling sheet — are fetched every time it opens, so they cannot go
- * quietly stale. The findings that came from running the package's own
- * validators by hand cannot be: nothing in the viewer runs Python, and a page
- * that presented a remembered checker run as a current one would be exactly the
- * kind of confident-and-wrong artefact this audit is about.
+ * **Opened after a release, by an administrator or the delivery lead.** So it
+ * opens on that answer for the release being served, in one sentence, with the
+ * figures under it and the first thing to fix. Everything else is further down
+ * the rail.
  *
- * So the checker results carry the date they were taken and say plainly that
- * they are a record. When the next dump lands they are history, and the live
- * block beside them will disagree with them, which is the correct behaviour.
+ * **The checks come from the pipeline, not from this page.** Until 14 October
+ * the lower half of this page was a checker run typed into its source by hand
+ * on 31 August, and five releases later it still said so: a record that cannot
+ * update is wrong from the next drop on, however carefully it was written. Now
+ * `tools/run-checks.py --json` writes `handoff/checks.json` on every refresh,
+ * the release carries it, and `/api/audit` hands it over with which release
+ * the run was for (lib/audit.mjs). The 31 August record is kept under History,
+ * dated, as what it is.
  *
- * **On the gate.** This is an admin page in the same sense `/admin.html` is: the
- * viewer only offers it to an admin, and it refuses to draw for anyone else.
- * That is a UI affordance, not a secret — every number the live block shows
- * comes from `/api/uiux`, `/api/backend` and `/api/journeys`, which any signed-in
- * reader may already call. Nothing here is hidden that is not hidden there. It
- * is admin-only because it is about the delivery process rather than about the
- * product, and a client opening it would learn nothing they wanted to know.
+ * **A run for an older release is said loudly, not quietly.** If nobody has
+ * refreshed through refresh-safe since r3, r5's export still holds r3's run; a
+ * page that showed it as r5's would be the confident-and-wrong artefact this
+ * audit exists to catch. So the banner above the verdict names both releases
+ * and says what to do.
+ *
+ * **On the gate.** The page draws for owners and admins. The server refuses
+ * `/api/audit` to everybody else as well (lib/audience.mjs), so the panel a
+ * reviewer sees is an explanation and the refusal is at the door.
  */
 
 // The viewer's top bar on a page that is not the viewer: the layer tabs, the
-// bell and the account drawer. Eight pages had none of it.
+// bell and the account drawer.
 import '/page-chrome.js';
 import '/theme.js';
 import { hideLoader } from '/loader.js';
 import * as auth from '/validation.js';
+import { mountPanels } from '/panels.js';
+import { el, fmt, plural, daysSince, verdict, next, mountScope, legend, badge, table } from '/sheet.js';
 
 const $ = (id) => document.getElementById(id);
 
-const el = (tag, className, text) => {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text instanceof Node) node.append(text);
-  else if (text != null) node.textContent = text;
-  return node;
+// ── words ───────────────────────────────────────────────────────────
+// One state colour per verdict, from the sheet's set: a pass is the finished
+// teal, a failure the late red, a report-only warning the held amber. Each is
+// always written beside its colour.
+const STATUS = {
+  pass: { kind: 'done', word: 'Pass', glyph: '' },
+  fail: { kind: 'late', word: 'Fail', glyph: '×' },
+  warn: { kind: 'stalled', word: 'Warning', glyph: '!' },
 };
 
-const json = (path) => auth.apiFetch(path).then((r) => {
-  if (!r.ok) throw new Error(`${path} answered ${r.status}`);
-  return r.json();
-});
+/** "check-authored-inputs" → "authored inputs": the name a sentence can carry. */
+const short = (name) => name.replace(/^(check|audit)-/, '').replace(/-/g, ' ');
 
-/** When the by-hand half of this page was taken. */
-const AUDITED = '31 August 2026';
+const day = (iso) => {
+  const t = Date.parse(iso ?? '');
+  return Number.isFinite(t) ? new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+};
 
-/**
- * A live figure: the number, what it counts, and — where it is a symptom — what
- * it should be.
- */
-function figure({ label, value, note, bad = false }) {
-  const box = el('div', `au-figure${bad ? ' is-bad' : ''}`);
-  box.append(el('p', 'au-figure-label', label));
-  box.append(el('p', 'au-figure-value', String(value)));
-  if (note) box.append(el('p', 'au-figure-note', note));
-  return box;
-}
+/** "today", "yesterday", "16 days ago": the sheet's `ago` turns into a date past
+ *  a fortnight, which beside the date it came from would say it twice. */
+const since = (iso) => {
+  const d = daysSince(iso);
+  if (d === null) return '';
+  return d === 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`;
+};
 
-function table(head, rows, className = '') {
-  const t = el('table', `au-table ${className}`.trim());
-  const thead = el('thead');
-  const hr = el('tr');
-  for (const h of head) hr.append(el('th', null, h));
-  thead.append(hr);
-  t.append(thead);
-  const tb = el('tbody');
-  for (const row of rows) {
-    const tr = el('tr');
-    for (const cell of row) {
-      const td = el('td');
-      if (cell instanceof Node) td.append(cell);
-      else td.textContent = cell ?? '';
-      tr.append(td);
-    }
-    tb.append(tr);
-  }
-  t.append(tb);
-  return t;
-}
+const took = (secs) => {
+  if (!Number.isFinite(secs)) return '';
+  if (secs < 60) return `${secs.toFixed(1)} s`;
+  const min = Math.round(secs / 60);
+  return min < 90 ? `${min} min` : `${(secs / 3600).toFixed(1)} h`;
+};
 
 const code = (text) => el('code', 'au-code', text);
 
+/** "states, package and authored inputs", or the first three and how many more. */
+function names(list) {
+  const words = list.map((c) => short(c.name));
+  if (words.length > 4) return `${words.slice(0, 3).join(', ')} and ${words.length - 3} more`;
+  return words.length > 1 ? `${words.slice(0, -1).join(', ')} and ${words.at(-1)}` : (words[0] ?? '');
+}
+
+/** The release a run was for, as a sentence's subject. */
+function runLabel(place) {
+  if (place.ranFor) return place.ranFor;
+  return place.servedTag ? `After ${place.servedTag}` : 'The working tree';
+}
+
+// ── reading ─────────────────────────────────────────────────────────
+async function load() {
+  const r = await auth.apiFetch('/api/audit');
+  if (r.status === 403) return { denied: true };
+  if (!r.ok) {
+    let why = '';
+    try { why = (await r.json()).error ?? ''; } catch { /* not JSON: the status says enough */ }
+    throw new Error(`/api/audit answered ${r.status}${why ? `: ${why}` : ''}`);
+  }
+  return r.json();
+}
+
+// ── the opening ─────────────────────────────────────────────────────
+function drawVerdict(data, scope) {
+  const { checks, place, release } = data;
+  const served = release.mode === 'tag' ? release.tag : 'the working tree';
+  const stale = $('au-stale');
+  stale.hidden = true;
+  $('au-figure').hidden = true;
+
+  if (!checks || checks.problem) {
+    verdict($('au-verdict'), {
+      when: `${release.mode === 'tag' ? `Release ${release.tag}` : 'The working tree'} is served`,
+      headline: checks?.problem
+        ? `The checks run kept with ${served} cannot be read.`
+        : `No checks run is kept with ${served}.`,
+      pill: { tone: 'warn', text: 'No record' },
+      pace: checks?.problem
+        ? `${checks.problem}. Nothing on this page can say whether the package passes until it is written again.`
+        : `Nothing has written ${data.file} into this release yet, so this page cannot say whether it passes its checks.`,
+    });
+    next($('au-next'), [
+      'Run the refresh with ', code('bash tools/refresh-safe.sh'),
+      `. It writes ${data.file} from the run it judges, and the next release carries it.`,
+    ]);
+    return;
+  }
+
+  const all = checks.checks;
+  const failing = all.filter((c) => c.status === 'fail');
+  const warning = all.filter((c) => c.status === 'warn');
+  const passing = all.filter((c) => c.status === 'pass');
+  const ran = day(checks.ranAt);
+
+  // Loud when the run is for an older release than the one served: the
+  // verdict below is then about something nobody is building against.
+  if (place.stale) {
+    stale.hidden = false;
+    stale.replaceChildren(
+      el('strong', '', place.how === 'git'
+        ? `These checks ran on ${place.ranFor}; ${served} is served.`
+        : `These checks ran on ${ran}, before ${place.ranFor} was tagged; ${served} is served.`),
+      ' Run the refresh (',
+      code('bash tools/refresh-safe.sh'),
+      ') and release it, so this page describes what people are building against.',
+    );
+  }
+
+  const label = runLabel(place);
+  const headline = failing.length
+    ? `${label}: ${failing.length} of ${plural(all.length, 'check')} fail (${names(failing)}).`
+    : `${label}: all ${plural(all.length, 'check')} pass.`;
+
+  const pace = [`Last run ${ran} (${since(checks.ranAt)}), ${plural(all.length, 'check')} in ${took(checks.seconds)}.`];
+  if (warning.length) {
+    pace.push(` ${plural(warning.length, 'report-only check')} answered with something for a person to judge (${names(warning)}); ${warning.length === 1 ? 'it does' : 'they do'} not stop a release.`);
+  }
+  if (place.newer) pace.push(` The run is newer than ${served}: it is of work not released yet.`);
+  if (checks.dirty) pace.push(' The run was taken with uncommitted changes in the package.');
+
+  const accepted = failing.filter((c) => c.baseline);
+  const sayings = [];
+  if (accepted.length) {
+    sayings.push(`${names(accepted)} ${accepted.length === 1 ? 'fails' : 'fail'} only with findings the refresh baseline already accepts, so the refresh merged anyway.`);
+  }
+  if (checks.source === 'log') {
+    sayings.push(`This run was read back from a printed table (${checks.log ?? 'a log'}), which keeps each check's last line only, so first findings and fix files are not known.`);
+  }
+
+  verdict($('au-verdict'), {
+    when: [
+      el('strong', '', release.mode === 'tag' ? `Release ${release.tag} is served` : 'The working tree is served'),
+      el('span', '', `· checks from ${data.file}`),
+    ],
+    headline,
+    headlineId: 'au-headline',
+    pill: failing.length
+      ? { tone: 'bad', text: `${fmt(failing.length)} failing` }
+      : { tone: 'ok', text: 'Passing' },
+    pace: pace.join(''),
+    ledger: [
+      { label: 'Pass', value: passing.length, swatch: 'done' },
+      { label: 'Fail', value: failing.length, swatch: 'late', bad: failing.length > 0 },
+      { label: 'Warnings', value: warning.length, swatch: 'stalled', title: 'Report-only checks that answered with something to judge; they never stop a release' },
+      { label: 'Run', value: ran || '—', unit: checks.source === 'log' ? 'from a log' : '' },
+      {
+        label: 'Release',
+        value: place.ranFor ?? (place.servedTag ? 'unreleased' : 'working tree'),
+        unit: place.current ? 'served' : (place.servedTag ? `${place.servedTag} served` : ''),
+        bad: place.stale,
+        title: place.how === 'date'
+          ? 'Worked out from the run date: the first release tagged after the run'
+          : 'Worked out from the commit the run sat on',
+      },
+    ],
+    saying: sayings.join(' '),
+  });
+
+  drawStrip(all, scope);
+
+  const first = failing[0];
+  if (first) {
+    const parts = [el('strong', '', first.name), ` fails with ${findingWords(first)}.`];
+    if (first.first?.length) parts.push(' The first: ', code(first.first[0].replace(/\s+/g, ' ')), '.');
+    if (first.fix) parts.push(' Fix it in ', code(first.fix), '.');
+    else parts.push(' Run ', code(`python3 tools/${first.name}.py`), ' to see its findings.');
+    next($('au-next'), parts);
+  } else {
+    next($('au-next'), place.stale
+      ? ['Nothing failed in that run, but it is not ', served, '’s. Run the refresh to check what is served.']
+      : 'Nothing to fix. The next run is the refresh before the next release.');
+  }
+}
+
+/** check-authored-inputs counts inputs gone stale, not errors, and says so. */
+const errorWord = (c) => (/\bstale\b/i.test(c.summary ?? '') ? 'stale input' : 'error');
+
+function findingWords(c) {
+  const bits = [];
+  if (c.errors) bits.push(plural(c.errors, errorWord(c)));
+  if (c.warnings && c.status !== 'pass') bits.push(plural(c.warnings, 'warning'));
+  return bits.join(' and ') || `exit code ${c.rc}`;
+}
+
+// ── the check strip: the page's one bold thing ─────────────────────
+/**
+ * One mark per check, in the order the run takes them, coloured and marked by
+ * its verdict. What the page filter leaves out is dimmed rather than removed,
+ * so the strip keeps its shape and still reads as the whole run.
+ */
+function drawStrip(all, scope) {
+  const strip = $('au-strip');
+  strip.replaceChildren();
+  strip.setAttribute('role', 'img');
+  const counts = { pass: 0, fail: 0, warn: 0 };
+  for (const c of all) {
+    counts[c.status] = (counts[c.status] ?? 0) + 1;
+    const s = STATUS[c.status] ?? STATUS.fail;
+    const mark = el('span', `au-mark sh-fill-${s.kind} is-${c.status}`, s.glyph);
+    mark.title = `${c.name}: ${s.word.toLowerCase()}${c.status !== 'pass' ? `, ${findingWords(c)}` : ''}`;
+    mark.dataset.name = c.name;
+    strip.append(mark);
+  }
+  strip.setAttribute('aria-label',
+    `${all.length} checks: ${counts.pass} pass, ${counts.fail} fail, ${counts.warn} warn`);
+
+  const key = $('au-strip-key');
+  key.replaceChildren(legend([
+    { kind: 'done', label: 'Pass', value: counts.pass },
+    { kind: 'late', label: 'Fail', value: counts.fail },
+    { kind: 'stalled', label: 'Warning (report only)', value: counts.warn },
+  ]));
+
+  // The marks that are not passing, by name: what a reader looks for in the
+  // strip, said in words, and a way into the table filtered to that check.
+  const named = all.filter((c) => c.status !== 'pass');
+  if (named.length) {
+    const list = el('ul', 'au-strip-names');
+    for (const c of named) {
+      const li = el('li');
+      const b = el('button', 'au-name', '');
+      b.type = 'button';
+      b.append(badge(STATUS[c.status].kind, STATUS[c.status].word), ` ${c.name}`);
+      b.title = `Show ${c.name} in the table of checks`;
+      b.onclick = () => { scope.set({ q: c.name, show: '' }); showSection('checks'); };
+      li.append(b);
+      list.append(li);
+    }
+    key.append(list);
+  }
+
+  $('au-strip-twin').replaceChildren(table({
+    caption: 'Every check and its verdict, the strip as a table',
+    srOnly: true,
+    columns: [
+      { key: 'name', label: 'Check' },
+      { key: 'status', label: 'Verdict', render: (c) => STATUS[c.status]?.word ?? c.status },
+    ],
+    rows: all,
+  }));
+  $('au-figure').hidden = false;
+  dimStrip(scope.state);
+}
+
+function dimStrip(state) {
+  const keep = new Set(filtered(state).map((c) => c.name));
+  for (const mark of $('au-strip').children) mark.classList.toggle('is-dim', !keep.has(mark.dataset.name));
+}
+
+// ── the page's filter ───────────────────────────────────────────────
+let DATA = null;
+let showSection = () => {};
+let checksTable = null;
+
+function filtered(state) {
+  const all = DATA?.checks?.checks ?? [];
+  const q = (state.q ?? '').toLowerCase();
+  return all.filter((c) => (!state.show || c.status === state.show) && (!q || c.name.toLowerCase().includes(q)));
+}
+
+function says(state) {
+  const all = DATA?.checks?.checks ?? [];
+  if (!all.length) return '';
+  const shown = filtered(state);
+  const what = { fail: 'failing ', warn: 'report-only ', pass: 'passing ' }[state.show] ?? '';
+  const named = state.q ? ` whose name has “${state.q}”` : '';
+  if (!state.show && !state.q) return `Showing all ${plural(all.length, 'check')} in the run.`;
+  if (!shown.length) return `No ${what}checks${named}, of ${fmt(all.length)}. Show everything to see the whole run.`;
+  return `Showing ${shown.length === 1 ? 'the one' : `the ${fmt(shown.length)}`} ${what}${shown.length === 1 ? 'check' : 'checks'}${named}, of ${fmt(all.length)}.`;
+}
+
+// ── every check ─────────────────────────────────────────────────────
+function drawChecks(data) {
+  const note = $('au-checks-note');
+  const host = $('au-checks-table');
+  const checks = data.checks;
+  if (!checks || checks.problem) {
+    note.textContent = '';
+    host.replaceChildren(el('p', 'sh-empty',
+      `There is no checks run to list. Run the refresh (bash tools/refresh-safe.sh); it writes ${data.file}, and the next release carries it.`));
+    checksTable = null;
+    return;
+  }
+  note.textContent = `In the order the run takes them. A failing check stops a release unless the refresh baseline already names its findings; a warning comes from a report-only check, which asks a person to judge and never stops one. ${checks.source === 'log' ? 'This run came from a printed table, so the first finding is its last line.' : ''}`.trim();
+
+  checksTable = table({
+    caption: `${plural(checks.checks.length, 'check')}, run ${day(checks.ranAt)}`,
+    empty: 'No check matches the filter. Show everything to see the whole run.',
+    columns: [
+      {
+        key: 'name', label: 'Check', sort: (c) => c.name,
+        render: (c) => {
+          const box = el('span', 'au-check');
+          box.append(el('span', 'au-check-name', c.name));
+          // The reason is a sentence or four; the column says what it is and
+          // the reason is a hover away, so the table stays a table.
+          if (c.reportOnly) {
+            const why = el('span', 'sh-quiet au-check-why', 'Report only');
+            why.title = `Report only: ${c.reportOnly}.`;
+            box.append(why);
+          }
+          return box;
+        },
+      },
+      {
+        key: 'status', label: 'Status', nowrap: true,
+        sort: (c) => ({ fail: 0, warn: 1, pass: 2 }[c.status] ?? 3),
+        render: (c) => {
+          const box = el('span', 'au-status');
+          box.append(badge(STATUS[c.status]?.kind ?? 'late', STATUS[c.status]?.word ?? c.status));
+          if (c.baseline) {
+            const b = el('span', 'sh-quiet', 'accepted by the baseline');
+            b.title = c.baseline;
+            box.append(b);
+          }
+          return box;
+        },
+      },
+      {
+        key: 'findings', label: 'Findings', num: true,
+        sort: (c) => (c.status === 'pass' ? (c.warnings ?? 0) : (c.errors ?? 0) * 1e6 + (c.warnings ?? 0)),
+        render: (c) => {
+          const box = el('span', 'au-findings');
+          if (c.status !== 'pass' && c.errors != null) box.append(el('span', '', plural(c.errors, errorWord(c))));
+          if (c.warnings) box.append(el('span', 'sh-quiet', plural(c.warnings, 'warning')));
+          if (!box.childElementCount) box.append(el('span', 'sh-quiet', c.status === 'pass' ? 'none' : `exit ${c.rc}`));
+          return box;
+        },
+      },
+      {
+        key: 'first', label: 'First finding',
+        render: (c) => {
+          if (c.first?.length) {
+            const box = el('span', 'au-first');
+            for (const line of c.first) box.append(el('code', 'au-code au-line', line.replace(/\s+/g, ' ')));
+            return box;
+          }
+          return el('span', c.status === 'pass' ? 'sh-quiet' : 'au-summary', c.summary || '');
+        },
+      },
+      {
+        key: 'fix', label: 'Fix file',
+        render: (c) => (c.fix ? code(c.fix) : el('span', 'sh-quiet', c.status === 'pass' ? '' : 'not named')),
+      },
+      { key: 'seconds', label: 'Took', num: true, sort: (c) => c.seconds ?? 0, render: (c) => took(c.seconds) },
+    ],
+    rows: [],
+    rowClass: (c) => `is-${c.status}`,
+  });
+  host.replaceChildren(checksTable);
+}
+
+function redrawFiltered(state) {
+  if (checksTable) checksTable.redraw(filtered(state));
+  if (DATA?.checks?.checks) dimStrip(state);
+}
+
+// ── the package as it stands ────────────────────────────────────────
+function drawLive(live) {
+  const half = live.tables / 2;
+  const rows = [
+    {
+      what: 'Design boards on disk', now: fmt(live.boards),
+      means: `${plural(live.frames, 'frame')}; ${plural(live.unwired, 'board')} no screen points at.`,
+    },
+    {
+      what: 'Screens the package declares', now: fmt(live.screens),
+      means: live.screensDrawn
+        ? `${fmt(live.screensDrawn)} drawn by a hand-made pack, the rest generated.`
+        : 'All generated; none is drawn by a hand-made pack.',
+    },
+    {
+      what: 'Rows on the workbook’s Scaling sheet', now: fmt(live.scalingRows), bad: live.scalingRows === 0,
+      means: live.scalingRows === 0
+        ? 'None, and there should be one per contract. The DB routing view has nothing to draw, so the read and write routing behind ADR-0016 goes unchecked.'
+        : 'The read and write routing behind ADR-0016.',
+    },
+    {
+      what: 'Tables with DDL in backend/', now: `${fmt(live.withDdl)} of ${fmt(live.tables)}`,
+      means: 'Read from the migrations, not from the workbook, so this figure is sound.',
+    },
+    {
+      what: 'Tables marked “Foreign writers”', now: `${fmt(live.foreignWriters)} of ${fmt(live.tables)}`,
+      bad: live.tables > 0 && live.foreignWriters > half,
+      means: live.foreignWriters > half
+        ? 'More than half, which is a symptom, not a fact: with no service map every writer looks foreign. It should be the few tables another service really appends to.'
+        : 'Tables another service may append to.',
+    },
+  ];
+  $('au-live-table').replaceChildren(table({
+    caption: 'Counted from the served release when the page opened',
+    columns: [
+      { key: 'what', label: 'Figure' },
+      { key: 'now', label: 'Now', num: true, cellClass: (r) => (r.bad ? 'is-late' : '') },
+      { key: 'means', label: 'What it means' },
+    ],
+    rows,
+  }));
+}
+
+// ── what came before ────────────────────────────────────────────────
+/**
+ * The 31 August record, kept whole and closed. It was the page's lower half
+ * for six weeks; it is history now, and dated as such, so nobody mistakes its
+ * findings for the current run.
+ */
+function drawHistory() {
+  const entry = el('details', 'au-entry');
+  const summary = el('summary');
+  summary.append(el('strong', '', '31 August 2026'), ' · validators run by hand, before the checks were kept');
+  entry.append(summary);
+  const body = el('div', 'au-entry-body');
+  const p = (text, cls = 'au-p') => { const n = el('p', cls); n.append(...[].concat(text)); return n; };
+  const h = (text) => el('h3', 'au-h3', text);
+  const t = (head, rows) => table({
+    columns: head.map((label, i) => ({ key: String(i), label, render: (r) => r[i] })),
+    rows,
+  });
+
+  body.append(
+    p('Run at a shell on the dump that landed that day, against the previous dump in git. Nothing in the viewer ran Python then, which is why this was written into the page by hand.', 'sh-note'),
+    h('The gate was shut, and that dump shut it harder'),
+    p(['tools/refresh.sh is set -euo pipefail. Line 59 was build-status.py, and it exited 1:']),
+    el('pre', 'au-pre', "metric 'State models' reports 124 of 122: the numerator and denominator are\ncounting different sets, and every figure derived from it is wrong"),
+    p('So the script stopped there, and everything after line 59 never ran: derive-overview.py, derive-mirrors.py, sync-counts.py and the loop that ran all ten validators. The previous dump read 123 of 122; this one added a state model and the denominator stayed.'),
+    p(['docs/active/renames-26-august.md said, in bold, ', el('strong', '', '“All nine validators pass.”'), ' They did not, and they did not run.']),
+    h('What the validators said when run by hand'),
+    t(['Validator', 'Previous dump', 'That dump', 'Change'], [
+      ['check-states', '1 error', '4 errors', '3 more, all redemption-right.yaml'],
+      ['check-package', '0 errors', '2 errors', '2 more, both rename leftovers'],
+      ['check-wireframes', '15 warnings', '42 warnings', '27 boards nothing points at'],
+      ['The other seven', 'unchanged', 'unchanged', ''],
+    ]),
+    p('Six “mirror is out of sync” errors from check-package are left out: the comparison copy excluded repos/, so they were not comparable. They were a symptom of derive-mirrors.py never running.', 'au-fine'),
+    h('Every new error was one cause: the rename deleted nothing'),
+    t(['Still on disk', 'The replacement that was added'], [
+      [code('states/redemption-right.yaml'), code('states/cross-region-entitlement.yaml')],
+      [code('diagrams/lld/lifecycles/redemption-right.yaml'), code('…/cross-region-entitlement.yaml')],
+      [code('diagrams/lld/services/CrossCellService.yaml'), code('…/CrossRegionService.yaml')],
+      [code('diagrams/lld/services/ControlService.yaml'), code('…/PlatformService.yaml')],
+    ]),
+    h('The workbook builder still read from /home/claude'),
+    p('Three globs in tools/build-schema-workbook.py pointed at a machine the workbook is not built on. They matched nothing and nothing failed: the tool carried on with empty sets and wrote a workbook that looked complete.'),
+    t(['Line', 'Path', 'What it silently produced'], [
+      ['50', code('/home/claude/…/Ticvai.Migrations/Scripts/V*.sql'), '0 of 379 tables marked Written'],
+      ['53', code('/home/claude/ticvai/ticvai-contracts/openapi'), 'A Scaling sheet with no contract rows'],
+      ['171', code('/home/claude/ticvai-pkg/handoff/service-decomposition.json'), '321 of 379 tables given “Foreign writers”'],
+    ]),
+    h('What that dump got right'),
+    p('35 new boards, five new source documents, three new tools, and a rename that was well reasoned and well documented: it was the cleanup that was missing, not the thinking. The two changes it asked for were written up as diffs in viewer/handoff/package-diffs-31aug.md.'),
+  );
+  entry.append(body);
+  $('au-history').replaceChildren(entry);
+}
+
+// ── the page ────────────────────────────────────────────────────────
+let scope = null;
+
+async function read() {
+  const error = $('au-error');
+  error.hidden = true;
+  $('au-asof').textContent = 'Reading…';
+  try {
+    const data = await load();
+    if (data.denied) return deny();
+    DATA = data;
+    const served = data.release.mode === 'tag' ? `${data.release.tag}, the release being served` : 'the working tree, which is being served';
+    $('au-lede').textContent = `Reads ${data.file} from ${served}. The refresh writes it after every checks run, and each release carries its own.`;
+    scope.redraw();
+    drawVerdict(data, scope);
+    drawChecks(data);
+    redrawFiltered(scope.state);
+    drawLive(data.live);
+    $('au-asof').textContent = `Read at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
+    $('au-asof').classList.remove('is-failed');
+  } catch (e) {
+    error.textContent = `Could not read the audit: ${e.message}. Read again in a moment; if it keeps failing, the viewer’s log says why.`;
+    error.hidden = false;
+    $('au-asof').textContent = 'Not read';
+    $('au-asof').classList.add('is-failed');
+  }
+}
+
+function deny() {
+  $('audit').hidden = true;
+  $('denied').hidden = false;
+}
+
 (async function start() {
-  await auth.requireSignIn();
+  // A session first: without one requireSignIn has already sent the reader
+  // to the sign-in page, and drawing anything here would flash under it.
+  if (!(await auth.requireSignIn())) return hideLoader();
   const me = auth.account();
   $('whoami').textContent = me ? `${me.name || me.email} · ${auth.roleLabel(me.role)}` : '';
 
   if (!auth.isAdmin(me)) {
-    // Said, not blanked. A page that renders an empty shell to a reviewer looks
-    // broken; this one tells them what it is and that it is not for them.
-    $('audit-body').replaceChildren(
-      el('p', 'auth-note',
-        'This page is for admins. It is a record of how the last delivery package was '
-        + 'built and what its own validators say about it — the delivery process rather '
-        + 'than the product.'));
-    hideLoader();
-    return;
+    deny();
+    return hideLoader();
   }
 
-  const body = $('audit-body');
-
-  try {
-    const [uiux, backend, journeys] = await Promise.all([
-      json('/api/uiux'), json('/api/backend'), json('/api/journeys'),
-    ]);
-
-    const stats = uiux.stats ?? {};
-    const tables = backend.tables ?? [];
-    const withDdl = tables.filter((t) => t.ddl).length;
-    const scalingRows = Array.isArray(backend.scaling) ? backend.scaling.length : 0;
-    const foreign = tables.filter((t) => (t.foreignWriters ?? []).length).length;
-
-    // ── live ──
-    body.append(el('h2', 'au-h2', 'Read from the package, now'));
-    body.append(el('p', 'au-lead',
-      'Every figure in this block is fetched when the page opens. If one of them '
-      + 'disagrees with the record below, the record is out of date and this is right.'));
-
-    const figures = el('div', 'au-figures');
-    figures.append(figure({
-      label: 'Design boards on disk',
-      value: stats.boards ?? 0,
-      note: `${stats.frames ?? 0} frames · ${stats.unwired ?? 0} boards no screen points at`,
-    }));
-    figures.append(figure({
-      label: 'Screens the package declares',
-      value: (journeys.screens ?? []).length,
-      note: `${stats.screensDrawn ?? 0} drawn by a hand-made pack, the rest generated`,
-    }));
-    figures.append(figure({
-      label: 'Rows on the workbook’s Scaling sheet',
-      value: scalingRows,
-      bad: scalingRows === 0,
-      note: scalingRows === 0
-        ? 'header and a TOTAL of zeros, no contract rows — the DB → Routing view has nothing to draw'
-        : 'the read/write routing behind ADR-0016',
-    }));
-    figures.append(figure({
-      label: 'Tables with DDL in backend/',
-      value: `${withDdl} of ${tables.length}`,
-      note: 'read from the migrations, not from the workbook — this figure is sound',
-    }));
-    figures.append(figure({
-      label: 'Tables marked “Foreign writers”',
-      value: `${foreign} of ${tables.length}`,
-      bad: foreign > tables.length / 2,
-      note: foreign > tables.length / 2
-        ? 'with no service map every writer looks foreign — see the workbook finding'
-        : 'tables another service may append to',
-    }));
-    body.append(figures);
-
-    // ── the record ──
-    body.append(el('h2', 'au-h2', `Run by hand, ${AUDITED}`));
-    const note = el('p', 'au-lead');
-    note.append('Nothing in the viewer runs Python, so the package’s own validators cannot be '
-      + 'run from this page. These are the results of running them at a shell on the dump that '
-      + 'landed that day, against the previous dump in git for comparison. ');
-    note.append(el('strong', null, 'This half is a record and does not update.'));
-    body.append(note);
-
-    body.append(el('h3', 'au-h3', 'The gate is shut, and this dump shut it harder'));
-    const gate = el('div', 'au-callout');
-    gate.append(el('p', null,
-      'tools/refresh.sh is set -euo pipefail. Line 59 is build-status.py, and it exits 1:'));
-    gate.append(el('pre', 'au-pre',
-      "metric 'State models' reports 124 of 122 — the numerator and denominator are\n"
-      + 'counting different sets, and every figure derived from it is wrong'));
-    gate.append(el('p', null,
-      'So the script stops there. Everything after line 59 never runs — derive-overview.py, '
-      + 'derive-mirrors.py, sync-counts.py, and the loop at the bottom that runs all ten '
-      + 'validators. The previous dump read 123 of 122; this one added a state model and the '
-      + 'denominator stayed, so the delivery deepened the failure that hides its own errors.'));
-    const claim = el('p');
-    claim.append('docs/active/renames-26-august.md states, in bold, ');
-    claim.append(el('strong', null, '“All nine validators pass.”'));
-    claim.append(' They do not, and they did not run — the line that would have printed their '
-      + 'output is below the line that stopped.');
-    gate.append(claim);
-    body.append(gate);
-
-    body.append(el('h3', 'au-h3', 'What the validators say when you run them yourself'));
-    body.append(table(
-      ['Validator', 'Previous dump', 'This dump', ''],
-      [
-        ['check-states', '1 error', '4 errors', '+3, all redemption-right.yaml'],
-        ['check-package', '0 errors', '2 errors', '+2, both rename leftovers'],
-        ['check-wireframes', '15 warnings', '42 warnings', '+27 boards nothing points at'],
-        ['the other seven', 'unchanged', 'unchanged', ''],
-      ]));
-    body.append(el('p', 'au-fine',
-      'The six “mirror is out of sync” errors check-package also reports are not in that table: '
-      + 'the comparison copy excluded repos/, so they are not comparable. They are a symptom of '
-      + 'derive-mirrors.py never running — it is line 63 — rather than a separate fault, and not '
-      + 'the parked repos/ policy question.'));
-
-    body.append(el('h3', 'au-h3', 'Every new error is one cause: the rename deleted nothing'));
-    body.append(table(
-      ['Still on disk', 'The replacement that was added'],
-      [
-        [code('states/redemption-right.yaml'), code('states/cross-region-entitlement.yaml')],
-        [code('diagrams/lld/lifecycles/redemption-right.yaml'), code('…/cross-region-entitlement.yaml')],
-        [code('diagrams/lld/services/CrossCellService.yaml'), code('…/CrossRegionService.yaml')],
-        [code('diagrams/lld/services/ControlService.yaml'), code('…/PlatformService.yaml')],
-      ]));
-    body.append(el('p', 'au-fine',
-      'The old state model still names cross-cell.RedemptionRight.status, consumeRedemptionRight '
-      + 'and revokeRedemptionRight — none of which are in contracts/ any more, because the rename '
-      + 'moved them. The new twin passes cleanly. Deleting the four files should clear all six '
-      + 'errors, and takes the metric’s numerator to 123.'));
-
-    body.append(el('h3', 'au-h3', 'The workbook builder still reads from /home/claude'));
-    body.append(el('p', 'au-lead',
-      'Three globs in tools/build-schema-workbook.py point at a machine the workbook is not '
-      + 'built on. They match nothing, and nothing fails — the tool carries on with empty sets '
-      + 'and writes a workbook that looks complete.'));
-    body.append(table(
-      ['Line', 'Path', 'What it silently produces'],
-      [
-        ['50', code('/home/claude/…/Ticvai.Migrations/Scripts/V*.sql'), '0 of 379 tables marked Written'],
-        ['53', code('/home/claude/ticvai/ticvai-contracts/openapi'), 'Scaling sheet with no contract rows'],
-        ['171', code('/home/claude/ticvai-pkg/handoff/service-decomposition.json'), '321 of 379 tables given “Foreign writers”'],
-      ]));
-    body.append(el('p', 'au-fine',
-      'That 321 is the same 321 the previous dump’s audit reported. The file already defines '
-      + '_ROOT and _pkg() at the top and uses them on line 33 — these three lines just do not. '
-      + 'The same absolute paths are in build-review-responses.py and build-services-workbook.py; '
-      + 'build-status.py and derive-domain.py have a fallback chain and are fine.'));
-
-    body.append(el('h3', 'au-h3', 'What the dump got right'));
-    body.append(el('p', 'au-lead',
-      '35 new boards, five new source documents, three new tools, and a rename that is '
-      + 'well-reasoned and well-documented — it is the cleanup that is missing, not the thinking. '
-      + 'The written-versus-planned distinction in the DB layer reads the real SQL in backend/ '
-      + 'rather than the workbook column, so it is unaffected by any of the above.'));
-
-    const diffs = el('p', 'au-lead');
-    diffs.append('The two changes this asks for are written up as diffs in ');
-    diffs.append(code('viewer/handoff/package-diffs-31aug.md'));
-    diffs.append(' — the viewer does not write to the package.');
-    body.append(diffs);
-  } catch (e) {
-    body.replaceChildren(el('p', 'auth-note', `Could not read the package: ${e.message}`));
-  } finally {
-    hideLoader();
-  }
+  $('audit').hidden = false;
+  showSection = mountPanels({ nav: document.querySelector('#audit .set-nav'), fallback: 'verdict' });
+  scope = mountScope({
+    root: $('au-scope'),
+    fields: [
+      {
+        key: 'show', label: 'Show', kind: 'switch',
+        options: [['', 'All'], ['fail', 'Failing'], ['warn', 'Warnings'], ['pass', 'Passing']],
+      },
+      { key: 'q', label: 'Check name', kind: 'search', placeholder: 'states, package…' },
+    ],
+    says,
+    onChange: redrawFiltered,
+  });
+  $('au-reload').onclick = read;
+  drawHistory();
+  await read();
+  hideLoader();
 })();

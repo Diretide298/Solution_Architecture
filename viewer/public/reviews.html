@@ -13,7 +13,7 @@
         }
       } catch { /* storage can be denied outright; day is a fine fallback */ }
     </script>
-    <title>Adam — review activity</title>
+    <title>Adam — reviews</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,6 +22,8 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/sheet.css" />
+    <link rel="stylesheet" href="/reviews.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <script>
       // The curtain's dead man's switch. A wrong loading screen is a bad page;
@@ -36,10 +38,6 @@
         };
         window.__adamLoader.timer = setTimeout(down, 12000);
         window.addEventListener('load', function () {
-          // A page with no script of its own has nothing to say when it is
-          // ready, so `load` is as good as it gets. One that imported loader.js
-          // is left alone: on the viewer, `load` fires long before the index
-          // has been read.
           setTimeout(function () { if (!window.__adamLoader.claimed) down(); }, 300);
         });
       })();
@@ -47,114 +45,170 @@
   </head>
   <body class="admin-page">
     <!-- The loading curtain. Inline, and first in the body, so it is
-         painted by the first frame — a loader that arrives with the
-         JavaScript misses the module fetch, which is the part of the
-         wait it exists to cover. `loader.js` takes it down; the guard in
+         painted by the first frame. `loader.js` takes it down; the guard in
          the head above is what happens if nothing ever does. -->
     <div class="adam-loader" id="adam-loader" role="status" aria-live="polite">
       <svg class="al-mark" viewBox="0 0 210 210" aria-hidden="true" focusable="false"><g class="al-links"><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="148.9" y2="28.9"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="177.6" y2="63.1"/><line class="al-link" style="--i:5" x1="177.6" y1="63.1" x2="192.9" y2="105.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="180.1" y2="148.4"/><line class="al-link" style="--i:9" x1="180.1" y1="148.4" x2="148.6" y2="180.5"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="105.0" y2="192.3"/><line class="al-link" style="--i:13" x1="105.0" y1="192.3" x2="62.1" y2="179.3"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="32.5" y2="146.8"/><line class="al-link" style="--i:17" x1="32.5" y1="146.8" x2="18.1" y2="105.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="32.9" y2="63.4"/><line class="al-link" style="--i:21" x1="32.9" y1="63.4" x2="62.9" y2="32.1"/><line class="al-link" style="--i:23" x1="62.9" y1="32.1" x2="105.0" y2="18.5"/><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="143.0" y2="75.0"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="143.0" y2="75.0"/><line class="al-link" style="--i:4" x1="177.6" y1="63.1" x2="143.0" y2="75.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="149.0" y2="139.0"/><line class="al-link" style="--i:8" x1="180.1" y1="148.4" x2="149.0" y2="139.0"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="107.0" y2="161.0"/><line class="al-link" style="--i:12" x1="105.0" y1="192.3" x2="107.0" y2="161.0"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="59.0" y2="135.0"/><line class="al-link" style="--i:16" x1="32.5" y1="146.8" x2="59.0" y2="135.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="71.0" y2="79.0"/><line class="al-link" style="--i:20" x1="32.9" y1="63.4" x2="71.0" y2="79.0"/><line class="al-link" style="--i:21" x1="62.9" y1="32.1" x2="71.0" y2="79.0"/><line class="al-link" style="--i:19" x1="71.0" y1="79.0" x2="89.0" y2="123.0"/><line class="al-link" style="--i:5" x1="143.0" y1="75.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:14" x1="59.0" y1="135.0" x2="107.0" y2="161.0"/><line class="al-link" style="--i:8" x1="149.0" y1="139.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:13" x1="89.0" y1="123.0" x2="107.0" y2="161.0"/></g><path class="al-glyph" d="M105,28 C110,64 124,116 151,161 C134,150 119,136 105,127 C91,136 76,150 59,161 C86,116 100,64 105,28 Z"/><path class="al-stand" d="M105,128 L105,176 M105,158 L90,171 M105,158 L120,171"/><g class="al-nodes"><circle class="al-node" style="--i:0" cx="105.0" cy="18.5" r="6.6"/><circle class="al-node" style="--i:2" cx="148.9" cy="28.9" r="6.1"/><circle class="al-node" style="--i:4" cx="177.6" cy="63.1" r="5.5"/><circle class="al-node" style="--i:6" cx="192.9" cy="105.0" r="6.5"/><circle class="al-node" style="--i:8" cx="180.1" cy="148.4" r="5.4"/><circle class="al-node" style="--i:10" cx="148.6" cy="180.5" r="5.6"/><circle class="al-node" style="--i:12" cx="105.0" cy="192.3" r="6.3"/><circle class="al-node" style="--i:14" cx="62.1" cy="179.3" r="5.3"/><circle class="al-node" style="--i:16" cx="32.5" cy="146.8" r="6.6"/><circle class="al-node" style="--i:18" cx="18.1" cy="105.0" r="6.7"/><circle class="al-node" style="--i:20" cx="32.9" cy="63.4" r="5.2"/><circle class="al-node" style="--i:22" cx="62.9" cy="32.1" r="5.4"/><circle class="al-node" style="--i:20" cx="71.0" cy="79.0" r="4.6"/><circle class="al-node" style="--i:3" cx="143.0" cy="75.0" r="5.2"/><circle class="al-node" style="--i:16" cx="59.0" cy="135.0" r="4.4"/><circle class="al-node" style="--i:9" cx="149.0" cy="139.0" r="4.8"/><circle class="al-node" style="--i:12" cx="107.0" cy="161.0" r="4.2"/><circle class="al-node" style="--i:15" cx="89.0" cy="123.0" r="3.6"/><circle class="al-node" style="--i:8" cx="127.0" cy="115.0" r="3.4"/></g></svg>
-      <p class="al-text">Reading the review activity…</p>
+      <p class="al-text">Reading the reviews…</p>
     </div>
     <header class="admin-bar">
-      <!-- The same lockup the viewer chrome carries, so a reader who
-           followed a link off the main view lands somewhere that looks
-           like where they came from. Two cuts because this bar is a light
-           surface in day and a dark one at night, and the white-ink lockup
-           is invisible on the first. -->
       <div class="brand">
         <a class="brand-home" href="/landing.html" aria-label="Adam — about Adam">
           <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
           <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
         </a>
-        <span class="brand-sub">review activity</span>
+        <span class="brand-sub">reviews</span>
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
-        <a class="chip" href="/validation.html">Sign-off</a>
         <a class="chip" href="/changes.html">Change requests</a>
         <a class="chip" href="/tasks.html">Tasks</a>
         <a class="chip" href="/">Back to the viewer</a>
       </div>
     </header>
 
-    <main class="admin-main reviews-main">
-      <!-- Above the numbers, because it is addressed to you personally and
-           everything below it is about everybody. Absent entirely when nobody
-           has named you, rather than an empty box saying so. -->
-      <section class="admin-panel mentions-panel" id="mentions-panel" hidden>
-        <h2 class="admin-heading">
-          Where you were named <span class="admin-count" id="mentions-note"></span>
-          <button class="chip mentions-read" id="mentions-seen" type="button">
-            Mark all read
-          </button>
-        </h2>
-        <div id="mentions"></div>
-      </section>
-
-      <!-- The four numbers worth knowing before any filter is touched. -->
-      <section class="stat-strip" id="headline"></section>
-
-      <section class="admin-panel subsearch-panel">
-        <div class="side-filter-row subsearch-row">
-          <input id="subsearch" class="auth-input subsearch-input" type="search"
-                 placeholder="Filter reviewers, artefacts and mentions…" autocomplete="off" />
-          <span class="pane-count" id="subsearch-count"></span>
+    <!-- One page for one store. "What has been signed off" read the newest
+         verdict per artefact and "Review activity" read every verdict ever
+         given; they were two pages with three names ("signed off", "Sign-off",
+         "Validation") for the same rows, and each could only answer half of
+         the question somebody opens either for: is the review keeping up, and
+         what is waiting on us. -->
+    <div id="reviews" class="set-layout set-layout-wide">
+      <nav class="set-nav" aria-label="Sections">
+        <h1 class="set-nav-title">Reviews</h1>
+        <div class="set-nav-list">
+          <a href="#coverage">Where it stands</a>
+          <!-- Second, not last: the worklist is the part of this page
+               somebody acts on, and it sat under four panels of counts. -->
+          <a href="#asked">Asked for work <span class="rv-nav-count" id="rv-nav-asked" hidden></span></a>
+          <a href="#disagreement">Disagreement</a>
+          <div class="set-nav-group">Who</div>
+          <a href="#reviewers">Reviewers</a>
+          <a href="#named">Named you <span class="rv-nav-count" id="rv-nav-named" hidden></span></a>
+          <div class="set-nav-group">Everything</div>
+          <a href="#artefacts">Every artefact</a>
+          <a href="#responses">Every response</a>
         </div>
-      </section>
+      </nav>
 
-      <section class="admin-panel">
-        <h2 class="admin-heading">Pace <span class="admin-count" id="pace-note"></span></h2>
-        <div id="pace"></div>
-      </section>
-
-      <!-- Disagreement is the reason this page exists rather than a list. Two
-           people reaching different verdicts on the same thing is the single
-           most useful signal a review produces, and a summary of current
-           verdicts has already discarded it. -->
-      <section class="admin-panel" id="contested-panel" hidden>
-        <h2 class="admin-heading">
-          Disagreement <span class="admin-count" id="contested-note"></span>
-        </h2>
-        <div id="contested"></div>
-      </section>
-
-      <section class="admin-panel">
-        <h2 class="admin-heading">Reviewers <span class="admin-count" id="people-note"></span></h2>
-        <div id="people"></div>
-      </section>
-
-      <section class="admin-panel">
-        <h2 class="admin-heading">Every response <span class="admin-count" id="rows-note"></span></h2>
-        <div class="signoff-controls reviews-filters">
-          <div class="seg" id="f-kind"></div>
-          <div class="seg" id="f-layer"></div>
-          <!-- Which side has to act, and whether anybody has. These two are the
-               reason the list is a table: they are the columns a delivery
-               meeting sorts by. -->
-          <!-- Whose review: the team's or the client's. Two reviews of one
-               package, kept apart so a count says approved by whom. -->
-          <div class="seg" id="f-audience"></div>
-          <div class="seg" id="f-tag"></div>
-          <div class="seg" id="f-done"></div>
-          <div class="seg" id="f-verdict"></div>
-          <select class="scope-select" id="f-person"></select>
-          <select class="scope-select" id="f-window"></select>
-          <input id="f-text" class="auth-input signoff-filter" type="text"
-                 placeholder="search notes, artefacts, people" />
-          <button class="chip" id="f-clear" type="button">Clear</button>
-          <button class="chip" id="f-export" type="button"
-                  title="Exports exactly the rows shown — every filter above applies">Export CSV</button>
-          <!-- The other half of that button. Shown to admins only, because the
-               route behind it is admin-only and a link that answers 403 is
-               worse than no link. -->
-          <a class="chip chip-link" id="f-close-link" href="/admin.html#close-from-sheet"
-             title="Fill in the 'our verdict' column and upload it there — admin only"
-             hidden>Close from a spreadsheet →</a>
+      <main class="set-content">
+        <!-- ── what is being read, and the filter every section obeys ───────
+             Above the sections, because the rail shows one at a time and a
+             filter that vanished with the first would leave the others
+             filtered by something nobody can see. -->
+        <div class="sh-top">
+          <div class="sh-top-line">
+            <p class="sh-lede" id="rv-lede">Reading the package and every verdict…</p>
+            <div class="sh-top-actions">
+              <p class="sh-asof" id="rv-asof" role="status"></p>
+            </div>
+          </div>
+          <p class="auth-error" id="rv-error" role="alert" hidden></p>
+          <div class="sh-scope" id="rv-scope" role="group" aria-label="Filter the whole page"></div>
         </div>
-        <p class="auth-error" id="error" hidden></p>
-        <div id="rows"></div>
-      </section>
-    </main>
+
+        <!-- ── where it stands ────────────────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="coverage" aria-labelledby="rv-headline">
+          <div class="sh-hero">
+            <div class="sh-verdict" id="rv-verdict"></div>
+            <figure class="sh-figure rv-cov-figure" id="rv-figure">
+              <figcaption class="sh-figure-caption" id="rv-figure-caption"></figcaption>
+              <div class="rv-cov" id="rv-cov"></div>
+              <div id="rv-cov-legend"></div>
+            </figure>
+          </div>
+          <p class="sh-next" id="rv-next"></p>
+
+          <section class="sh-part" aria-labelledby="rv-numbers-title">
+            <h3 class="sh-part-title" id="rv-numbers-title">Coverage, in numbers</h3>
+            <p class="sh-note" id="rv-numbers-note"></p>
+            <div id="rv-numbers"></div>
+          </section>
+        </section>
+
+        <!-- ── asked for work ─────────────────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="asked" aria-labelledby="rv-asked-title" hidden>
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="rv-asked-title">Asked for work</h2>
+          </div>
+          <p class="sh-note" id="rv-asked-note"></p>
+          <div id="rv-asked"></div>
+        </section>
+
+        <!-- ── disagreement ───────────────────────────────────────────────
+             Two people reaching different verdicts on the same thing is the
+             most useful signal a review produces, and a list of current
+             verdicts has already thrown it away. -->
+        <section class="admin-panel set-section sh-sheet" id="disagreement" aria-labelledby="rv-dis-title" hidden>
+          <h2 class="sh-part-title" id="rv-dis-title">Disagreement</h2>
+          <p class="sh-note" id="rv-dis-note"></p>
+          <div id="rv-dis"></div>
+        </section>
+
+        <!-- ── reviewers ──────────────────────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="reviewers" aria-labelledby="rv-people-title" hidden>
+          <section class="sh-part" aria-labelledby="rv-pace-title">
+            <h2 class="sh-part-title" id="rv-pace-title">Pace</h2>
+            <p class="sh-note" id="rv-pace-note"></p>
+            <figure class="sh-figure rv-pace">
+              <div id="rv-pace"></div>
+              <div id="rv-pace-legend"></div>
+            </figure>
+            <details class="rv-twin">
+              <summary>The numbers behind the chart</summary>
+              <div id="rv-pace-table"></div>
+            </details>
+          </section>
+          <section class="sh-part" aria-labelledby="rv-people-title">
+            <h2 class="sh-part-title" id="rv-people-title">Who reviews</h2>
+            <p class="sh-note" id="rv-people-note"></p>
+            <div id="rv-people"></div>
+            <div id="rv-people-warn"></div>
+          </section>
+        </section>
+
+        <!-- ── named you ──────────────────────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="named" aria-labelledby="rv-named-title" hidden>
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="rv-named-title">Where you were named</h2>
+            <button class="chip" id="rv-named-seen" type="button" hidden>Mark all read</button>
+          </div>
+          <p class="sh-note" id="rv-named-note"></p>
+          <div id="rv-named"></div>
+        </section>
+
+        <!-- ── every artefact ─────────────────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="artefacts" aria-labelledby="rv-art-title" hidden>
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="rv-art-title">Every artefact</h2>
+            <label class="sh-field-inline rv-local">
+              <input type="checkbox" id="rv-only-open" />
+              Only those with no verdict
+            </label>
+          </div>
+          <p class="sh-note" id="rv-art-note"></p>
+          <div id="rv-art"></div>
+        </section>
+
+        <!-- ── every response ─────────────────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="responses" aria-labelledby="rv-log-title" hidden>
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="rv-log-title">Every response</h2>
+            <div class="rv-log-actions">
+              <button class="chip" id="rv-export" type="button"
+                      title="Exports exactly the rows shown: every filter applies">Export CSV</button>
+              <!-- The other half of that button: fill in the "our verdict"
+                   column and upload it. Admin only, the same as the route it
+                   leads to, because a link that answers 403 is worse than none. -->
+              <a class="chip chip-link" id="rv-close-link" href="/admin.html#close-from-sheet" hidden>Close from a spreadsheet</a>
+            </div>
+          </div>
+          <p class="sh-note" id="rv-log-note"></p>
+          <div class="rv-log-filter" id="rv-log-filter" role="group" aria-label="Narrow the responses"></div>
+          <div id="rv-log"></div>
+        </section>
+      </main>
+    </div>
 
     <script type="module" src="/reviews.js"></script>
   </body>

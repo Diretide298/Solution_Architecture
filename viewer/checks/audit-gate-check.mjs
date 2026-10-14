@@ -1,16 +1,14 @@
 /**
- * The delivery audit draws for an admin and refuses everyone else.
+ * The audit draws for an admin and refuses everyone else, on the page and at
+ * the door.
  *
- * **What this is and is not.** `/audit.html` is admin-only in the same sense
- * `/admin.html` is: the viewer only offers it to an admin and the page refuses
- * to draw for anyone else. It is not a security boundary — every figure in its
- * live block comes from `/api/uiux`, `/api/backend` and `/api/journeys`, which
- * any signed-in reader may already call. The gate is there because the page is
- * about how the delivery was *built* rather than about what is in it.
- *
- * So this checks an affordance, and says so. What would go wrong without it is
- * not a leak, it is a reviewer opening a page of internal process notes that
- * reads like a list of things wrong with the work they are reviewing.
+ * **Two refusals, checked separately.** The page draws for owners and admins
+ * and tells anybody else what it is; that is an affordance. Since 14 October
+ * the page reads one payload, `/api/audit` (the last checks run and the live
+ * counts), and the server refuses that to anybody but an admin as well
+ * (lib/audience.mjs), which is the boundary. A page that hid itself while the
+ * payload answered 200 would pass the first half and leak the second, so both
+ * are asserted.
  *
  * **Both halves, or neither is worth having.** A gate that refuses everybody
  * passes "a reviewer sees no figures" perfectly, so the admin half is asserted
@@ -134,14 +132,23 @@ async function seenBy(email, password) {
 
   await page.goto(BASE + '/audit.html', { waitUntil: 'domcontentloaded' });
   await wait(7000);
-  const seen = await page.evaluate(() => ({
+  const seen = await page.evaluate(async () => ({
     role: document.getElementById('whoami')?.textContent ?? '',
-    figures: document.querySelectorAll('.au-figure').length,
-    tables: document.querySelectorAll('.au-table').length,
-    text: document.getElementById('audit-body')?.textContent?.trim() ?? '',
+    // What only an admin is drawn: the verdict's headline, the live counts'
+    // rows and the check strip's marks.
+    headline: document.getElementById('au-headline')?.textContent?.trim() ?? '',
+    figures: document.querySelectorAll('#au-live-table tbody tr').length,
+    marks: document.querySelectorAll('#au-strip .au-mark').length,
+    shown: !document.getElementById('audit')?.hidden,
+    text: (document.getElementById('denied')?.hidden ? '' : document.getElementById('denied')?.textContent?.trim()) ?? '',
   }));
+  // The page's own errors, taken before the probe below: a refused fetch is
+  // logged by the browser as an error, and that one is this check's, not the page's.
+  const pageErrors = [...errors];
+  // The door, asked directly: the page hiding itself is not the refusal.
+  const api = await page.evaluate(() => fetch('/api/audit', { credentials: 'include' }).then((r) => r.status, () => 0));
   await page.close();
-  return { ...seen, errors };
+  return { ...seen, api, errors: pageErrors };
 }
 
 try {
@@ -151,12 +158,13 @@ try {
   const admin = await seenBy(
     process.env.TICVAI_HARNESS_EMAIL ?? 'harness.admin@softlabsgroup.com',
     process.env.TICVAI_HARNESS_PASSWORD ?? PASSWORD);
-  check('an admin gets the audit', admin.figures >= 4 && admin.tables >= 2,
-    `${admin.figures} figures, ${admin.tables} tables — "${admin.role}"`);
-  note(`admin sees ${admin.figures} figures and ${admin.tables} tables as "${admin.role}"`);
+  check('an admin gets the audit', admin.shown && admin.figures >= 5 && admin.headline.length > 10,
+    `${admin.figures} live rows, headline "${admin.headline}" — "${admin.role}"`);
+  note(`admin sees "${admin.headline}", ${admin.marks} checks on the strip, ${admin.figures} live rows, as "${admin.role}"`);
+  check('and /api/audit answers an admin', admin.api === 200, `GET /api/audit → ${admin.api}`);
   check('and it comes up clean', admin.errors.length === 0, admin.errors.slice(0, 3).join(' | '));
 
-  if (admin.figures < 4) {
+  if (admin.figures < 5) {
     console.log('\nThe admin view is broken, so the refusal below would prove nothing. Stopping.');
     forget('after');
     await browser.close();
@@ -189,13 +197,14 @@ try {
 
   // ── the half this check exists for ──
   const reviewer = await seenBy(EMAIL, PASSWORD);
-  check('a reviewer is not shown the audit', reviewer.figures === 0 && reviewer.tables === 0,
-    `${reviewer.figures} figures, ${reviewer.tables} tables leaked to "${reviewer.role}"`);
+  check('a reviewer is not shown the audit', !reviewer.shown && reviewer.figures === 0 && reviewer.marks === 0,
+    `${reviewer.figures} live rows, ${reviewer.marks} marks leaked to "${reviewer.role}"`);
   note(`reviewer signed in as "${reviewer.role}" and got ${reviewer.figures} figures`);
+  check('and the server refuses them /api/audit', reviewer.api === 403, `GET /api/audit → ${reviewer.api}`);
   // Refused, not blank. A page that renders an empty shell reads as broken, and
   // a reviewer who thinks the tool is broken files a bug about the wrong thing.
   check('and is told what the page is instead',
-    /admins/i.test(reviewer.text) && reviewer.text.length > 60,
+    /administrators/i.test(reviewer.text) && reviewer.text.length > 60,
     `body was ${reviewer.text.length} chars: "${reviewer.text.slice(0, 80)}"`);
   check('with no errors on the way', reviewer.errors.length === 0,
     reviewer.errors.slice(0, 3).join(' | '));

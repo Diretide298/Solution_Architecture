@@ -35,7 +35,7 @@ const SIZES = [
 
 const PAGES = [
   ['/admin.html', '.admin-panel'],
-  ['/validation.html', '.signoff-card'],
+  ['/reviews.html', '.rv-cov-row'],
   ['/login.html', '.auth-card'],
   ['/invite.html', '.auth-card'],
 ];

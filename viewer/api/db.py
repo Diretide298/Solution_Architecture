@@ -745,6 +745,48 @@ CREATE TABLE IF NOT EXISTS rate (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS rate_once ON rate(project_id, person);
 
+-- ── what the delivery was given to spend ────────────────────────────
+--
+-- **Append-only, and the newest row is the budget.** A budget that is edited
+-- in place makes every "over by" on the costing page unanswerable: the figure
+-- moved, and nothing says from what, by whom or when. So a change is a new row
+-- and the old ones stay, which is the history the page shows beside the form.
+-- Nothing deletes from here; a budget is replaced, never unset.
+--
+-- Money as `rate` keeps it: the smallest unit, an integer, so comparing spend
+-- against it is integer maths and two readers never disagree by a paisa.
+CREATE TABLE IF NOT EXISTS budget (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  amount     INTEGER NOT NULL,
+  currency   TEXT    NOT NULL DEFAULT 'INR',
+  note       TEXT    NOT NULL DEFAULT '',
+  set_by     INTEGER NOT NULL REFERENCES account(id),
+  set_at     TEXT    NOT NULL
+);
+CREATE INDEX IF NOT EXISTS budget_latest ON budget(project_id, id DESC);
+
+-- ── the rate for somebody nobody has priced yet ─────────────────────
+--
+-- Optional, one per project. Used for anyone with logged hours and no row in
+-- `rate`, and every amount it produces is marked "at the default" on the page,
+-- so it is never read as what that person actually costs.
+--
+-- A table of its own rather than a row in `rate` under a made-up name: a
+-- sentinel person is a name a real OpenProject user could one day have, and a
+-- rate that silently matched them would be wrong in the way this whole page
+-- exists to prevent. Not a column on `budget` either, because changing it
+-- would append a budget row that did not change the budget, and the budget's
+-- history would then show moves that were never moves.
+CREATE TABLE IF NOT EXISTS default_rate (
+  project_id TEXT    PRIMARY KEY REFERENCES project(id) ON DELETE CASCADE,
+  hourly     INTEGER NOT NULL,
+  currency   TEXT    NOT NULL DEFAULT 'INR',
+  note       TEXT    NOT NULL DEFAULT '',
+  set_by     INTEGER NOT NULL REFERENCES account(id),
+  set_at     TEXT    NOT NULL
+);
+
 -- ── what the agent did, and what went wrong ─────────────────────────
 --
 -- Claude Code runs on the developer's machine and ADAM does not, so the only

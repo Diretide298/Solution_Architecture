@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer-core';
-const V='http://localhost:4173';
+// The viewer to read, so a second checkout's viewer on another port can be checked.
+const V=process.env.VIEWER ?? 'http://localhost:4173';
 const b=await puppeteer.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:'new',args:['--no-sandbox']});
 const p=await b.newPage(); const errs=[];
 p.on('pageerror',e=>errs.push('pageerror: '+e.message));
@@ -13,7 +14,12 @@ await p.evaluate(a=>localStorage.setItem('ticvai-api',a),API);
 const ok = await p.evaluate(async (a,e,pw)=>(await fetch(`${a}/api/auth/login`,{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({email:e,password:pw})})).ok,
   API, process.env.TICVAI_USER ?? 'chinmay.parab@softlabsgroup.com', process.env.TICVAI_PASS ?? 'the-first-administrator');
 if (!ok) console.log('note: not signed in — the tree may not render');
-await p.goto(V,{waitUntil:'domcontentloaded'});
+// `/index.html`, not `/`, and twice: a cold `/` goes to the landing page, and the gate
+// serves the first document after a fetch sign-in as a stranger (updates-check.mjs
+// says why). Neither is what this file tests.
+await p.goto(`${V}/index.html`,{waitUntil:'domcontentloaded'});
+await new Promise(r=>setTimeout(r,1500));
+await p.goto(`${V}/index.html`,{waitUntil:'domcontentloaded'});
 await p.waitForSelector('#layers button',{timeout:30000});
 await new Promise(r=>setTimeout(r,4500));
 const wait=ms=>new Promise(r=>setTimeout(r,ms));

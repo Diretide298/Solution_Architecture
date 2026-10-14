@@ -114,7 +114,9 @@ check('an admin is pointed at the accounts page',
   await page.evaluate(() => !document.querySelector('#account-admin').hidden));
 
 // ── inviting, from the accounts page ─────────────────────────
-await page.goto(`${VIEWER}/admin.html`, { waitUntil: 'networkidle2' });
+// Straight at the invite section: the page shows one section at a time and
+// opens on "Needs you", and a field in a hidden section cannot be typed into.
+await page.goto(`${VIEWER}/admin.html#invites`, { waitUntil: 'networkidle2' });
 await wait(2200);
 check('the accounts page opens for an admin',
   await page.evaluate(() => !document.querySelector('#admin').hidden));

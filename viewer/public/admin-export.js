@@ -31,10 +31,10 @@ import { apiBase } from '/validation.js';
  *  `label` is what the option says; the value is the dataset name the service
  *  knows. */
 const SETS = [
-  ['verdicts', 'Review activity — every verdict recorded'],
-  ['changes', 'Change requests — every one raised'],
-  ['invites', 'Invites — every link made'],
-  ['accounts', 'Accounts — everyone who has one'],
+  ['verdicts', 'Review activity: every verdict recorded'],
+  ['changes', 'Change requests: every one raised'],
+  ['invites', 'Invites: every link made'],
+  ['accounts', 'Accounts: everyone who has one'],
 ];
 
 /** The filename the service decided on. It comes back in Content-Disposition,

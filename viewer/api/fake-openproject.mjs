@@ -204,7 +204,31 @@ own(7203, { subject: 'Refund to gift card', status: 4, parent: 901, user: 9 });
 // "Ready for QA" rather than closed, a couple On hold, nothing Closed (the seed
 // script closes a few through ADAM for the testing gate). Seeded, so two runs
 // draw the same picture.
+// Time logged against each work package, by its number: [{spentOn, hours}].
+// What `/api/v3/time_entries` answers with. The team dataset fills it below;
+// a hand-written ticket with a `spentTime` and nothing here is answered with
+// that time split into working days from its start (see `loggedOn`).
+const LOGGED = new Map();
+// "PT4H30M", "P1DT1H" -> hours, with a day as eight, the way the service reads them.
+const durationHours = (text) => {
+  const m = /^P(?:(\d+(?:\.\d+)?)D)?(?:T(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?)?$/.exec(text ?? '');
+  if (!m) return null;
+  const [, d = 0, h = 0, mi = 0, s = 0] = m;
+  return Number(d) * 8 + Number(h) + Number(mi) / 60 + Number(s) / 3600;
+};
+const isoHours = (hours) => {
+  const whole = Math.floor(hours);
+  const minutes = Math.round((hours - whole) * 60);
+  return `PT${whole}H${minutes ? `${minutes}M` : ''}`;
+};
+
 const VERSIONS = [];
+// FAKE_SPRINTS_AGO=4 moves the whole plan four sprints into the past, so the
+// sprint under way is Sprint 5 and Sprints 1-4 are over and mostly finished.
+// For the costing page, whose cost-by-sprint line needs sprints behind it to
+// be a line at all. Off by default: with it unset every sprint, status and
+// date is exactly what it was, because every other check reads this dataset.
+const AGO = Math.max(0, Number(process.env.FAKE_SPRINTS_AGO ?? 0));
 if (TEAM) {
   let seed = 7;
   const rand = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
@@ -212,7 +236,7 @@ if (TEAM) {
   const iso = (d) => d.toISOString().slice(0, 10);
   const addDays = (d, n) => new Date(+d + n * 86400000);
   const now = new Date(); now.setUTCHours(0, 0, 0, 0);
-  const s1 = addDays(now, -7);
+  const s1 = addDays(now, -7 - 14 * AGO);
   s1.setUTCDate(s1.getUTCDate() - ((s1.getUTCDay() + 6) % 7));     // back to Monday
   for (let n = 1; n <= 8; n += 1) {
     VERSIONS.push({ id: 76 + n, name: `Sprint ${n}`, startDate: iso(addDays(s1, (n - 1) * 14)),
@@ -250,16 +274,24 @@ if (TEAM) {
     let status = 1;
     let updated = addDays(start, -3);
     const r = rand();
-    if (version === 'Sprint 1') {
+    // The sprint under way is Sprint 1 + AGO. Before it, the work is done; the
+    // branches below are the original ones, renumbered, and with AGO at 0 they
+    // are the original ones exactly. No extra draws from `rand`, so the rest of
+    // the dataset is the same tickets either way.
+    const nth = Number(version.split(' ')[1]) - AGO;
+    if (nth < 1) {
+      status = r < 0.8 ? 12 : r < 0.95 ? 15 : 1;
+    } else if (nth === 1) {
       status = r < pace * 0.42 ? 15 : r > 0.985 ? 13 : 1;
       if (user === 26 && r > 0.9) status = 13;        // the one with work on hold
-    } else if (version === 'Sprint 2') {
+    } else if (nth === 2) {
       status = r < pace * 0.04 ? 15 : 1;
     }
-    if (status === 15) {
-      // Moved to QA some time since the sprint began.
+    if (status === 15 || (status === 12 && nth < 1)) {
+      // Moved to QA (or, in a sprint that is over, closed) some time since the
+      // sprint began, and no later than its end.
       const lo = +start;
-      updated = new Date(lo + rand() * Math.max(0, +now - lo));
+      updated = new Date(lo + rand() * Math.max(0, Math.min(+now, +end) - lo));
     } else if (status !== 1) {
       updated = addDays(now, -Math.floor(rand() * 6));
     }
@@ -345,7 +377,73 @@ if (TEAM) {
       }
     }
   }
+
+  // Time logged, for the costing page: by the ticket's holder, on working days
+  // inside its sprint and never after today. Finished work has about its
+  // estimate logged (seventy to a hundred and forty per cent of it); about half
+  // of what is open in a sprint that has begun has some; nothing in a sprint
+  // still to come has any. Its own seeded sequence, so adding it moved no
+  // ticket, status or date above. Every team ticket with nothing logged says
+  // PT0S, which is "nobody logged any" and not "this token may not see it".
+  let tseed = 11;
+  const trand = () => { tseed = (tseed * 16807) % 2147483647; return (tseed - 1) / 2147483646; };
+  const weekdays = (from, to) => {
+    const out = [];
+    for (let d = new Date(from); d <= to; d = addDays(d, 1)) if (d.getUTCDay() % 6) out.push(new Date(d));
+    return out;
+  };
+  for (const wp of packages.values()) {
+    if (wp.id < 5000) continue;
+    const kind = wp._links?.type?.title;
+    const v = VERSIONS.find((x) => x.name === wp._links?.version?.title);
+    const start = v ? new Date(`${v.startDate}T00:00:00Z`) : null;
+    if ((kind !== 'Task' && kind !== 'Sub Task') || !v || !wp._links?.assignee || start > now) {
+      wp.spentTime = 'PT0S';
+      continue;
+    }
+    const end = new Date(Math.min(+new Date(`${v.endDate}T00:00:00Z`), +now));
+    const status = Number((wp._links.status.href.match(/(\d+)$/) ?? [])[1]);
+    const estimate = durationHours(wp.estimatedTime) ?? (kind === 'Sub Task' ? 4 : 8);
+    let total = 0;
+    if (status === 12 || status === 15) total = estimate * (0.7 + trand() * 0.7);
+    else if (trand() < 0.5) total = estimate * (0.15 + trand() * 0.5);
+    total = Math.round(total * 2) / 2;
+    const days = weekdays(start, end);
+    if (!total || !days.length) { wp.spentTime = 'PT0S'; continue; }
+    const list = [];
+    for (let left = total; left > 0;) {
+      const chunk = Math.min(left, 1 + Math.floor(trand() * 4) + (trand() < 0.5 ? 0.5 : 0));
+      list.push({ spentOn: iso(days[Math.floor(trand() * days.length)]), hours: chunk });
+      left -= chunk;
+    }
+    list.sort((a, b) => a.spentOn.localeCompare(b.spentOn));
+    LOGGED.set(String(wp.id), list);
+    wp.spentTime = isoHours(total);
+  }
 }
+
+/** A hand-written ticket's logged time as entries: its `spentTime` in days of
+ *  at most eight hours, one working day after another from its start. */
+function loggedOn(wp) {
+  if (LOGGED.has(String(wp.id))) return LOGGED.get(String(wp.id));
+  let left = durationHours(wp.spentTime) ?? 0;
+  const out = [];
+  let d = new Date(`${wp.startDate ?? '2026-09-01'}T00:00:00Z`);
+  while (left > 0) {
+    while (!(d.getUTCDay() % 6)) d = new Date(+d + 86400000);
+    const chunk = Math.min(8, left);
+    out.push({ spentOn: d.toISOString().slice(0, 10), hours: chunk });
+    left -= chunk;
+    d = new Date(+d + 86400000);
+  }
+  return out;
+}
+
+// FAKE_NO_TIME_ENTRIES=1 answers the time-entry list with OpenProject's 403,
+// as an instance does to a role without "View time entries"; the costing page
+// then falls back to each ticket's spentTime by sprint. `/_time-entries?refuse=`
+// turns it on and off while running, for a check that tests both paths.
+let REFUSE_TIME = process.env.FAKE_NO_TIME_ENTRIES === '1';
 
 // FAKE_PAGE_MS and FAKE_CALL_MS make this answer as slowly as the live
 // instance, for timing ADAM's pages against something honest. OpenProject 10
@@ -417,6 +515,10 @@ createServer(async (req, res) => {
   if (path === '/_comments') {
     return json(res, 200, { comments: Object.fromEntries([...comments].map(([k, list]) =>
       [k, list.map((c) => ({ text: c.comment.raw, notify: c.notify }))])) });
+  }
+  if (path === '/_time-entries') {
+    if (url.searchParams.has('refuse')) REFUSE_TIME = url.searchParams.get('refuse') === '1';
+    return json(res, 200, { refuse: REFUSE_TIME });
   }
   if (path === '/_slow') {
     if (url.searchParams.has('page')) PAGE_MS = Number(url.searchParams.get('page')) || 0;
@@ -518,6 +620,40 @@ createServer(async (req, res) => {
       ...(groups ? { groups } : {}),
       _embedded: { elements: page },
     });
+  }
+
+  // Time entries, filtered by project, paged like the work packages. Who logged
+  // the time is the ticket's holder; that is a simplification the live
+  // instance does not make, and the costing page reads `user` either way.
+  if (path === '/api/v3/time_entries' && req.method === 'GET') {
+    if (REFUSE_TIME) {
+      return json(res, 403, {
+        _type: 'Error', errorIdentifier: 'urn:openproject-org:api:v3:errors:MissingPermission',
+        message: 'You are not authorized to access this resource.',
+      });
+    }
+    let want = [];
+    try { want = JSON.parse(url.searchParams.get('filters') ?? '[]'); } catch { want = []; }
+    const project = want.map((f) => f.project?.values?.[0]).find(Boolean);
+    const rows = [];
+    for (const wp of packages.values()) {
+      if (project && !(wp._links?.project?.href ?? '').endsWith(`/${project}`)) continue;
+      loggedOn(wp).forEach((e, n) => rows.push({
+        _type: 'TimeEntry', id: wp.id * 100 + n, hours: isoHours(e.hours), spentOn: e.spentOn,
+        comment: { raw: '' },
+        _links: {
+          project: wp._links.project,
+          workPackage: { href: `/api/v3/work_packages/${wp.id}`, title: wp.subject },
+          user: wp._links.assignee ?? { href: '/api/v3/users/5', title: 'Harness Person' },
+        },
+      }));
+    }
+    rows.sort((a, b) => a.id - b.id);
+    const size = Number(url.searchParams.get('pageSize') ?? 100);
+    const from = (Math.max(1, Number(url.searchParams.get('offset') ?? 1)) - 1) * size;
+    const page = rows.slice(from, from + size);
+    return json(res, 200, { _type: 'Collection', total: rows.length, count: page.length,
+                            pageSize: size, _embedded: { elements: page } });
   }
 
   // A project's versions, with their dates. The harness milestones have none

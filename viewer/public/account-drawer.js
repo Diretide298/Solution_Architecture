@@ -65,7 +65,7 @@ const BELL_HTML = `
       Mark all read
     </button>
     <a class="auth-button auth-button-quiet" href="/reviews.html">
-      All review activity
+      Open Reviews
     </a>
   </div>
 </div>`;
@@ -138,33 +138,34 @@ const DRAWER_HTML = `
                stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5" /></svg>
         </a>
 
-        <nav class="drawer-group" aria-labelledby="drawer-mine">
-          <h3 class="drawer-group-title" id="drawer-mine">Your work</h3>
-          <a class="drawer-link" href="/board.html">My work, and the testing gate</a>
-          <a class="drawer-link" href="/agents.html">Agent activity</a>
-          <a class="drawer-link" href="/updates.html">What is new in ADAM</a>
-        </nav>
-
-        <nav class="drawer-group" aria-labelledby="drawer-reviews">
-          <h3 class="drawer-group-title" id="drawer-reviews">Reviews</h3>
-          <a class="drawer-link" href="/validation.html">What has been signed off</a>
-          <a class="drawer-link" id="mentions-link" href="/reviews.html">Review activity</a>
+        <!-- Grouped by when somebody reaches for them, not by what they are
+             built from: the pages opened every day first, then the ones that
+             read the package, then administration. Each link is the page's
+             short name; a count, when there is one, is a badge where the
+             chevron goes, so the name never changes length. -->
+        <nav class="drawer-group" aria-labelledby="drawer-daily">
+          <h3 class="drawer-group-title" id="drawer-daily">Every day</h3>
+          <a class="drawer-link" href="/board.html">My work</a>
+          <a class="drawer-link" href="/tasks.html">Tasks</a>
           <a class="drawer-link" id="changes-link" href="/changes.html">Change requests</a>
+          <a class="drawer-link" id="mentions-link" href="/reviews.html">Reviews</a>
+          <a class="drawer-link" href="/agents.html">Agent activity</a>
         </nav>
 
-        <nav class="drawer-group" aria-labelledby="drawer-explore">
-          <h3 class="drawer-group-title" id="drawer-explore">Explore</h3>
-          <a class="drawer-link" href="/tasks.html">Tasks: who is doing what</a>
+        <nav class="drawer-group" aria-labelledby="drawer-package">
+          <h3 class="drawer-group-title" id="drawer-package">The package</h3>
           <a class="drawer-link" href="/chat.html">Ask about the package</a>
           <a class="drawer-link" href="/document.html">Generate documentation</a>
-          <a class="drawer-link" href="/domains.html">Domain lenses</a>
+          <a class="drawer-link" href="/domains.html">AI capabilities</a>
+          <a class="drawer-link" href="/updates.html">What is new in ADAM</a>
         </nav>
 
         <nav class="drawer-group" id="account-admin" hidden aria-labelledby="drawer-admin">
           <h3 class="drawer-group-title" id="drawer-admin">Administration</h3>
-          <a class="drawer-link" href="/admin.html">Admin: accounts, invites and projects</a>
-          <a class="drawer-link" href="/costing.html">Costing: hours and what they cost</a>
-          <a class="drawer-link" href="/audit.html">Audit the delivery package</a>
+          <a class="drawer-link" href="/admin.html">People and projects</a>
+          <a class="drawer-link" href="/costing.html">Costing</a>
+          <a class="drawer-link" href="/audit.html">Audit the package</a>
+          <a class="drawer-link" id="networks-link" href="/ips.html" hidden>Networks</a>
         </nav>
 
         <!-- Its own group rather than a line in Administration, because it is
@@ -257,6 +258,7 @@ function renderAccountPanel() {
     $('account-role').dataset.role = who.role;
     $('account-admin').hidden = !auth.isAdmin(who);
     $('account-architect').hidden = !auth.isOwner(who);
+    $('networks-link').hidden = !auth.isOwner(who);
     // Never reopen already armed. This panel is opened and closed all day, and
     // a confirm left standing from a change of mind ten minutes ago would sit
     // one click from ending every session on the account.
@@ -344,16 +346,38 @@ async function showMentionCount() {
   count.textContent = waiting > 9 ? '9+' : String(waiting);
   count.hidden = waiting === 0;
 
-  if (link) {
-    link.textContent = unseen ? `Review activity - ${unseen} named you` : 'Review activity';
-    link.classList.toggle('auth-button-loud', unseen > 0);
-  }
+  // The count is a badge beside the name, never part of it: a link whose text
+  // grows by " - 3 waiting" reads as a different page to a screen reader and
+  // jumps the column for everybody else.
+  setBadge(link, unseen, `${unseen} note${unseen === 1 ? '' : 's'} named you`);
+  link?.classList.toggle('auth-button-loud', unseen > 0);
   const changes = $('changes-link');
-  if (changes) {
-    changes.textContent = standingCount
-      ? `Change requests - ${standingCount} waiting`
-      : 'Change requests';
-    changes.classList.toggle('auth-button-loud', loud);
+  setBadge(changes, standingCount, `${standingCount} waiting on somebody`);
+  changes?.classList.toggle('auth-button-loud', loud);
+}
+
+function setBadge(link, n, says) {
+  if (!link) return;
+  let badge = link.querySelector('.drawer-badge');
+  if (!n) { badge?.remove(); link.removeAttribute('aria-description'); return; }
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'drawer-badge';
+    badge.setAttribute('aria-hidden', 'true');
+    link.append(badge);
+  }
+  badge.textContent = n > 99 ? '99+' : String(n);
+  link.title = says;
+  link.setAttribute('aria-description', says);
+}
+
+/** The page you are on is marked in the menu, so the menu is also a "you are here". */
+function markCurrent(root) {
+  const here = location.pathname === '/' ? '/index.html' : location.pathname;
+  for (const a of root.querySelectorAll('a.drawer-link, a.drawer-primary')) {
+    const path = new URL(a.href, location.href).pathname;
+    if (path === here) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
   }
 }
 
@@ -581,6 +605,7 @@ export function mountAccountDrawer({ onTarget } = {}) {
 
   if (!$('bell-panel')) document.body.insertAdjacentHTML('beforeend', BELL_HTML);
   if (!$('account-panel')) document.body.insertAdjacentHTML('beforeend', DRAWER_HTML);
+  markCurrent($('account-panel'));
 
   const bell = $('bell-toggle');
   if (bell) {

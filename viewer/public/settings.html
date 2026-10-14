@@ -22,6 +22,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/sheet.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <style>
       /* Only the account card is drawn this way, so it lives here. The layout
@@ -55,6 +56,13 @@
         .set-facts { grid-template-columns: 1fr; gap: 2px; }
         .set-facts dd { margin-bottom: 8px; }
       }
+      /* The AI answers section's list of held keys: one line each, the
+         provider, the last four characters, and what can be done with it. */
+      .ai-keys { display: grid; gap: 6px; margin: 8px 0 16px; }
+      .ai-key-row { flex-wrap: wrap; align-items: baseline; }
+      .ai-key-name { font-weight: 600; color: var(--text); min-width: 160px; }
+      .ai-key-hint { font-family: var(--mono); font-size: 12px; color: var(--text-dim); flex: 1 1 auto; overflow-wrap: anywhere; }
+      .ai-add-title { margin: 6px 0 8px; font-size: 13.5px; font-weight: 600; color: var(--text); }
     </style>
   </head>
   <body class="admin-page">
@@ -99,6 +107,7 @@
         <button type="button" data-tab="password">Password</button>
         <button type="button" data-tab="openproject">OpenProject</button>
         <button type="button" data-tab="git">Git identity</button>
+        <button type="button" data-tab="ai">AI answers</button>
         <button type="button" data-tab="connector">Claude connector</button>
         <button type="button" data-tab="agents">Agent activity</button>
         <button type="button" data-tab="sessions">Sessions</button>
@@ -286,6 +295,54 @@
             <button id="git-save" class="chip" type="button">Save</button>
           </div>
           <p class="set-state" id="git-says" role="status"></p>
+        </section>
+
+        <!-- ── AI answers ───────────────────────────────────────────────
+             The keys Ask about the package answers on. They lived in a form on
+             the chat page, where a setup step sat between a person and their
+             question, and the chat's own "add your key" error already sent
+             people here, to a page that had nowhere to put one. -->
+        <section class="admin-panel set-section" id="ai">
+          <h2 class="admin-heading">
+            AI answers <span id="ai-state" class="set-badge" data-on="no">no key</span>
+          </h2>
+          <p class="auth-note set-lede">
+            <strong>Your own key, not a shared one.</strong> Ask about the package sends your
+            question to the AI provider you choose, on your key, so the questions are on your
+            bill and under your rate limit and nobody else&rsquo;s. ADAM checks a key with the
+            provider before keeping it, encrypts it, and never sends it back to a page: you see
+            its last four characters. You can hold a key for several providers and choose per
+            question.
+          </p>
+          <p class="auth-note" id="ai-nokey" hidden></p>
+
+          <div id="ai-keys" class="ai-keys"></div>
+
+          <h3 class="ai-add-title" id="ai-add-title">Add a key</h3>
+          <div class="set-grid" id="ai-form">
+            <label class="auth-label" for="ai-provider">Provider</label>
+            <div class="set-row">
+              <select id="ai-provider" class="scope-select"></select>
+              <a class="chip" id="ai-keys-at" href="#" target="_blank" rel="noreferrer" hidden>Get a key</a>
+            </div>
+            <label class="auth-label" for="ai-endpoint" id="ai-endpoint-label" hidden>Endpoint address</label>
+            <div class="set-row" id="ai-endpoint-row" hidden>
+              <input id="ai-endpoint" class="auth-input" type="url" autocomplete="off"
+                     placeholder="https://llm.example.com/v1" />
+            </div>
+            <label class="auth-label" for="ai-key">API key</label>
+            <div class="set-row">
+              <input id="ai-key" class="auth-input" type="password" autocomplete="off" />
+              <button id="ai-save" class="chip" type="button">Check and save</button>
+            </div>
+            <p class="set-state" id="ai-says" role="status"></p>
+          </div>
+
+          <p class="auth-note auth-fine">
+            Forgetting a key here does not revoke it with the provider; do that in their
+            console as well if the key should stop working everywhere. Ask on
+            <a href="/chat.html">Ask about the package</a>, or from Adam in the corner of the viewer.
+          </p>
         </section>
 
         <!-- ── the Claude connector ─────────────────────────────────── -->

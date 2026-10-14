@@ -1208,3 +1208,72 @@ export function verdictBlock(kind, id, label = id, { layer = '' } = {}) {
 export function verdictLabel(value) {
   return VERDICTS.find(([v]) => v === value)?.[1] ?? value;
 }
+
+// ── Change requests page (changes.html) ─────────────────────────────
+// What the ticket a request came out of says now, and what settling it would
+// do there — read before Accept is pressed, so the page can say it first.
+// Reads only; an OpenProject that cannot be reached comes back `read: false`.
+export const changeSource = (projectId, id) =>
+  call(`/api/changes/${encodeURIComponent(id)}/ticket/source?${new URLSearchParams({ project_id: projectId ?? '' })}`);
+// The comment a settled request owes its open ticket, for the developer's AI
+// agent. Two calls, like the ticket: the first words it and sends nothing.
+export const previewChangeComment = (projectId, id) =>
+  call(`/api/changes/${encodeURIComponent(id)}/comment/preview`,
+    { method: 'POST', body: { project_id: projectId ?? '' } });
+export const applyChangeComment = (projectId, id, proposal) =>
+  call(`/api/changes/${encodeURIComponent(id)}/comment/${encodeURIComponent(proposal)}/apply`,
+    { method: 'POST', body: { project_id: projectId ?? '' } });
+/** Complete or correct a request's intake. Fields left out are left alone. */
+export const changeIntake = (projectId, id, fields) =>
+  call(`/api/changes/${encodeURIComponent(id)}/intake`,
+    { method: 'POST', body: { project_id: projectId ?? '', ...fields } });
+/** The requests settled between two release tags; `to` defaults to the one served. */
+export const changeReleaseNotes = (projectId, from = '', to = '') =>
+  call(`/api/changes/release-notes?${new URLSearchParams({
+    project_id: projectId ?? '', ...(from ? { from } : {}), ...(to ? { to } : {}),
+  })}`);
+
+// ---- the Costing page: the sheet, the budget, the default rate -------------
+// Kept together at the end so the pages being rebuilt side by side each add a
+// block of their own rather than threading lines through each other's.
+//
+// `costingSheet` is `costing` above with the page's filter: person, sprint and
+// type narrow every figure on the service, which also says which hours it used
+// (`hoursSource`) and the facets the filter offers. Money everywhere here is in
+// the currency's smallest unit, as rates are.
+export const costingSheet = ({ projectId = '', refresh = false, person = '', sprint = '', type = '' } = {}) =>
+  call(`/api/costing?${new URLSearchParams({
+    project_id: projectId ?? '', ...(refresh ? { refresh: '1' } : {}),
+    ...(person ? { person } : {}), ...(sprint ? { sprint } : {}), ...(type ? { type } : {}),
+  })}`);
+/** The budget in force and every one before it, newest first. */
+export const getBudget = (projectId = '') =>
+  call(`/api/budget?${new URLSearchParams({ project_id: projectId ?? '' })}`);
+/** A new budget row; nothing is overwritten. Admin only. */
+export const setBudget = (amount, currency, note = '', projectId = '') =>
+  call('/api/budget', { method: 'PUT', body: { project_id: projectId ?? '', amount, currency, note } });
+/** The rate for anybody with hours and none of their own. Admin only. */
+export const setDefaultRate = (hourly, currency, note = '', projectId = '') =>
+  call('/api/rates/default', { method: 'PUT', body: { project_id: projectId ?? '', hourly, currency, note } });
+export const dropDefaultRate = (projectId = '') =>
+  call(`/api/rates/default?${new URLSearchParams({ project_id: projectId ?? '' })}`, { method: 'DELETE' });
+
+// ── Agent activity, and People and projects (admin.html) ─────────────
+//
+// Added together, in one block, because both pages were rebuilt at once and a
+// merge is easier over one block than over four scattered lines.
+//
+// `agentUsageFor` is `agentUsage` with a person: an administrator or a pm can
+// narrow the tools, the totals and the session list to one account. The
+// service ignores `person` for anybody who only reads their own.
+export const agentUsageFor = (days = 14, person = 0, projectId = '') =>
+  call(`/api/agent/usage?${new URLSearchParams({
+    days, project_id: projectId ?? '', ...(person ? { person } : {}),
+  })}`);
+
+// Give an existing account another project, or take one away. Until these,
+// only redeeming an invite could grant a project at all.
+export const grantProject = (accountId, projectId) =>
+  call(`/api/accounts/${accountId}/projects/${encodeURIComponent(projectId)}`, { method: 'PUT' });
+export const revokeProject = (accountId, projectId) =>
+  call(`/api/accounts/${accountId}/projects/${encodeURIComponent(projectId)}`, { method: 'DELETE' });

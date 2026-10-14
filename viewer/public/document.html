@@ -10,7 +10,7 @@
         }
       } catch { /* storage can be denied outright; day is a fine fallback */ }
     </script>
-    <title>Adam — documentation</title>
+    <title>Adam — generate documentation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -19,6 +19,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/sheet.css" />
     <link rel="stylesheet" href="/document.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>
@@ -38,41 +39,72 @@
     </header>
 
     <main class="admin-main doc-main">
-      <div class="admin-panel">
-        <h1 class="admin-heading">Generate documentation</h1>
-        <p class="auth-note set-lede">
+      <!-- One form. Not a dashboard: this page is a tool, so it opens on the
+           thing you do with it — pick, generate, take it away — and borrows from
+           the sheet only its type and its one place for an error. -->
+      <div class="admin-panel doc-panel">
+        <h1 class="doc-title">Generate documentation</h1>
+        <p class="sh-lede doc-lede">
           The package as one document you can hand to somebody: Markdown, so it
           pastes into Confluence, opens in Word, renders on GitHub and prints
-          from a browser. <strong>Every figure and every line of prose in it
-          comes from the package</strong> &mdash; nothing is written for the
-          document, and nothing is padded where the package says nothing.
+          from a browser, or the same sections as a spreadsheet. Every figure
+          and every line of prose in it comes from the package; nothing is
+          written for the document.
         </p>
-        <p class="auth-error" id="dc-error" hidden></p>
 
-        <div class="doc-sections" id="dc-sections"></div>
+        <form class="doc-form" id="dc-form">
+          <fieldset class="doc-fieldset">
+            <legend class="sh-part-title doc-legend">Document for <span id="dc-project">this project</span></legend>
+            <div class="doc-pick-bar">
+              <button class="chip" type="button" id="dc-all">Select all</button>
+              <button class="chip" type="button" id="dc-none">Select none</button>
+              <span class="sh-quiet" id="dc-count" aria-live="polite"></span>
+            </div>
+            <div class="doc-sections" id="dc-sections">
+              <p class="sh-quiet">Reading which sections you may have…</p>
+            </div>
+          </fieldset>
 
-        <div class="set-actions">
-          <button id="dc-build" class="auth-button" type="button">Generate</button>
-          <!-- Not hidden behind Generate: the workbook is built by the server
-               from the same sections, so there is nothing to generate first. -->
-          <button id="dc-excel" class="chip" type="button">Download .xlsx</button>
-          <button id="dc-download" class="chip" type="button" hidden>Download .md</button>
-          <button id="dc-copy" class="chip" type="button" hidden>Copy</button>
-          <button id="dc-print" class="chip" type="button" hidden>Print</button>
-          <p class="set-state" id="dc-says" role="status"></p>
+          <!-- The one place anything that went wrong is said. -->
+          <p class="auth-error" id="dc-error" role="alert" hidden></p>
+
+          <div class="set-actions doc-actions">
+            <button id="dc-build" class="auth-button" type="submit">Generate</button>
+            <!-- Not behind Generate: the workbook is built by the server from
+                 the same sections, so there is nothing to generate first. -->
+            <button id="dc-excel" class="chip" type="button">Download .xlsx</button>
+            <button id="dc-download" class="chip" type="button" hidden>Download .md</button>
+            <button id="dc-copy" class="chip" type="button" hidden>Copy Markdown</button>
+            <button id="dc-print" class="chip" type="button" hidden>Print</button>
+            <p class="set-state" id="dc-says" role="status"></p>
+          </div>
+
+          <p class="sh-note" id="dc-skipped" hidden></p>
+        </form>
+      </div>
+
+      <section class="admin-panel doc-panel" id="dc-preview-panel" aria-labelledby="dc-preview-title" hidden>
+        <div class="sh-part-head doc-preview-head">
+          <h2 class="sh-part-title" id="dc-preview-title">Preview <span class="sh-quiet" id="dc-words"></span></h2>
+          <div class="sh-field-inline">
+            <span id="dc-view-label">Show</span>
+            <div class="sh-switch" role="group" aria-labelledby="dc-view-label">
+              <button type="button" data-view="read" aria-pressed="true">As it reads</button>
+              <button type="button" data-view="markdown" aria-pressed="false">Markdown</button>
+            </div>
+          </div>
         </div>
-
-        <p class="auth-note auth-fine" id="dc-skipped" hidden></p>
-      </div>
-
-      <div class="admin-panel" id="dc-preview-panel" hidden>
-        <h2 class="admin-heading">Preview <span class="admin-count" id="dc-words"></span></h2>
-        <pre class="doc-preview" id="dc-preview"></pre>
-      </div>
+        <!-- Said when the ticks no longer match what was generated, so nobody
+             downloads last time's choice believing it is this one. -->
+        <p class="doc-stale" id="dc-stale" hidden>
+          This preview is for an earlier choice of sections. Generate again to
+          see the new one; Download, Copy and Print regenerate first.
+        </p>
+        <div class="doc-rendered" id="dc-rendered"></div>
+        <pre class="doc-preview" id="dc-preview" hidden></pre>
+      </section>
     </main>
 
-    <script type="module" src="/theme.js"></script>
-    <script type="module" src="/account-drawer.js"></script>
     <script type="module" src="/document.js"></script>
   </body>
 </html>

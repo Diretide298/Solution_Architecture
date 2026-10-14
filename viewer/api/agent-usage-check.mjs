@@ -57,7 +57,11 @@ async function recruit(handle, role) {
   return took.status === 200 ? { ok: true } : { ok: false, why: `redeem: ${took.status}` };
 }
 
-const T0 = Date.parse('2026-09-20T09:00:00Z');
+// Two days ago at nine, not a fixed date. This was 20 September, which fell out
+// of the default fortnight on 4 October and failed seven checks for a reason
+// that had nothing to do with the code: the window is "the last 14 days" of
+// the real clock, so the sessions have to be recent on the real clock too.
+const T0 = (() => { const d = new Date(Date.now() - 2 * 86_400_000); d.setUTCHours(9, 0, 0, 0); return d.getTime(); })();
 const at = (minutes) => new Date(T0 + minutes * 60_000).toISOString().replace(/\.\d+Z$/, 'Z');
 
 // ── the cast ─────────────────────────────────────────────────────────
@@ -215,6 +219,79 @@ check('but can read their own, event by event',
   `${own.status} ${(own.data?.events ?? []).length}`);
 check('which names the ticket, so the time is attached to something',
   own.data?.ticket === '6046', own.data?.ticket);
+
+// ── the counts are the window's, not the list's ──────────────────────
+//
+// The page's "sessions" figure used to be the length of a list capped at 100,
+// while the per-person totals summed a read capped at 500, so the two
+// disagreed past a hundred sessions and every total was quietly short past
+// five hundred. Enough sessions to cross both caps, then the counts again.
+
+check('a third developer is invited, who never runs the agent',
+  (await recruit('harness.dev3', 'dev')).ok);
+const MANY = 520;
+for (let i = 0; i < MANY; i += 26) {
+  await Promise.all(Array.from({ length: Math.min(26, MANY - i) }, (_, j) => {
+    const n = i + j;
+    return as('harness.dev2', 'POST', '/api/agent/flush', {
+      key: `bulk-${n}`, project_id: 'ticvai', external_key: String(7000 + (n % 30)),
+      started_at: at(400 + n), ended_at: at(400 + n),
+      events: [{ at: at(400 + n), kind: 'tool', tool: 'Grep', ok: n % 10 !== 0,
+        error_kind: n % 10 ? '' : 'not-found', ms: 50 }],
+    });
+  }));
+}
+const busy = await as('boss', 'GET', '/api/agent/usage');
+const listed = busy.data?.sessions ?? [];
+const second = (busy.data?.people ?? []).find((p) => p.name === 'harness.dev2');
+check('the list is still capped, because nobody scrolls a quarter of sessions',
+  listed.length === 100, String(listed.length));
+check('but the true count comes with it',
+  busy.data?.sessionCount === busy.data?.totals?.sessions && busy.data?.sessionCount > 500,
+  `${busy.data?.sessionCount} counted, ${busy.data?.totals?.sessions} in the totals`);
+check("and every person's sessions add up to it, past the old 500-row read",
+  (busy.data?.people ?? []).reduce((n, p) => n + p.sessions, 0) === busy.data?.sessionCount,
+  (busy.data?.people ?? []).map((p) => `${p.name} ${p.sessions}`).join(', '));
+check("one developer's five hundred and twenty-one sessions are all counted",
+  second?.sessions === MANY + 1, String(second?.sessions));
+const grep = (busy.data?.tools ?? []).find((t) => t.tool === 'Grep');
+check('and every one of their calls reaches the tool table',
+  grep?.calls === MANY && grep?.failed === MANY / 10 && grep?.why['not-found'] === MANY / 10,
+  JSON.stringify(grep ?? null));
+check('their tickets are named, newest first, and counted whole',
+  second?.tickets === 31 && second?.ticketKeys?.length === 12,
+  `${second?.tickets} tickets, ${second?.ticketKeys?.length} named`);
+check('the totals agree with the tools',
+  busy.data?.totals?.calls === (busy.data?.tools ?? []).reduce((n, t) => n + t.calls, 0)
+  && busy.data?.totals?.failed === (busy.data?.tools ?? []).reduce((n, t) => n + t.failed, 0),
+  JSON.stringify(busy.data?.totals));
+check('the developer who never ran it is named as not having used it',
+  (busy.data?.quiet ?? []).includes('harness.dev3') && !(busy.data?.quiet ?? []).includes('harness.dev'),
+  JSON.stringify(busy.data?.quiet));
+check('out of everybody who could have',
+  busy.data?.expected === 3, String(busy.data?.expected));
+
+// ── one person, for somebody who oversees ────────────────────────────
+
+const firstDev = (busy.data?.people ?? []).find((p) => p.name === 'harness.dev');
+const narrowed = await as('harness.pm', 'GET', `/api/agent/usage?person=${firstDev?.id}`);
+check('a pm can narrow the page to one person',
+  narrowed.data?.person === firstDev?.id
+  && (narrowed.data?.sessions ?? []).every((s) => s.who === 'harness.dev')
+  && !(narrowed.data?.tools ?? []).some((t) => t.tool === 'Grep'),
+  (narrowed.data?.tools ?? []).map((t) => t.tool).join(' '));
+check('and the roster stays whole, so the picker can be changed back',
+  (narrowed.data?.people ?? []).length === 2, String((narrowed.data?.people ?? []).length));
+check("the narrowed totals are that person's",
+  narrowed.data?.totals?.sessions === firstDev?.sessions, JSON.stringify(narrowed.data?.totals));
+const widened = await as('harness.dev', 'GET', `/api/agent/usage?person=${second?.id}`);
+check('a developer asking for somebody else still sees only themselves',
+  widened.data?.whole === false && widened.data?.person === 0
+  && (widened.data?.sessions ?? []).every((s) => s.who === 'harness.dev')
+  && (widened.data?.quiet ?? []).length === 0,
+  [...new Set((widened.data?.sessions ?? []).map((s) => s.who))].join(' '));
+check('the session list carries where it ran and when it ended',
+  listed.every((s) => 'host' in s && 'endedAt' in s && 'agent' in s), Object.keys(listed[0] ?? {}).join(' '));
 
 // ── and somebody who was never there ─────────────────────────────────
 

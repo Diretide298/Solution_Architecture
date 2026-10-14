@@ -19,6 +19,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/sheet.css" />
     <link rel="stylesheet" href="/board.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>
@@ -33,9 +34,6 @@
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
-        <button id="bd-refresh" class="chip" type="button" title="Reads OpenProject again, now">Refresh</button>
-        <a class="chip" href="/changes.html">Change requests</a>
-        <a class="chip" href="/">Back to the viewer</a>
       </div>
     </header>
 
@@ -50,119 +48,143 @@
       </div>
     </main>
 
-    <main id="board" class="admin-main board-main" hidden>
-      <p class="auth-error" id="bd-error" hidden></p>
-
-      <!-- The gate, where somebody will meet it rather than at the moment it
-           refuses them. A developer who learns on their eleventh close that
-           they should have tested ten closes ago has been ambushed by a rule
-           that was always visible to the service and never to them. -->
-      <section class="bd-gate" id="bd-gate" hidden>
-        <div class="bd-gate-text">
-          <strong id="bd-gate-title"></strong>
-          <span id="bd-gate-detail"></span>
+    <div id="board" class="set-layout set-layout-wide">
+      <nav class="set-nav" aria-label="Sections">
+        <h1 class="set-nav-title">My work</h1>
+        <div class="set-nav-list">
+          <a href="#week">This week</a>
+          <a href="#next">Next up</a>
+          <a href="#qa">Waiting for QA</a>
+          <a href="#finished">Finished</a>
+          <div class="set-nav-group">Testing</div>
+          <a href="#gate">Testing gate</a>
+          <a href="#check">Check a teammate&rsquo;s batch <span class="bd-nav-count" id="bd-nav-check"></span></a>
+          <div class="set-nav-group">Everything</div>
+          <a href="#all">Everything I hold</a>
         </div>
-        <a class="chip" href="#bd-testing" id="bd-gate-go">Go to testing</a>
-      </section>
+        <!-- Not a section of this page, so not a `#` link: mountPanels takes
+             every `a[href^="#"]` in the nav as a section to switch to. -->
+        <a class="bd-nav-out" id="bd-tasks-link" href="/tasks.html#person">Your page on Tasks</a>
+      </nav>
 
-      <section class="stat-strip" id="bd-stats"></section>
-
-      <section class="admin-panel">
-        <h2 class="admin-heading">
-          Overdue <span class="admin-count" id="bd-overdue-count"></span>
-        </h2>
-        <p class="auth-note set-lede">Past the date on the ticket. First, because nothing else on this page is.</p>
-        <div class="admin-table" id="bd-overdue"></div>
-      </section>
-
-      <section class="admin-panel">
-        <h2 class="admin-heading">
-          This week <span class="admin-count" id="bd-week-count"></span>
-        </h2>
-        <p class="auth-note set-lede">Due in the next seven days.</p>
-        <div class="admin-table" id="bd-week"></div>
-      </section>
-
-      <section class="admin-panel">
-        <h2 class="admin-heading">
-          Started <span class="admin-count" id="bd-started-count"></span>
-        </h2>
-        <p class="auth-note set-lede">
-          Something has been done on these &mdash; OpenProject says they are part
-          finished &mdash; and nothing is pressing on the date.
-        </p>
-        <div class="admin-table" id="bd-started"></div>
-      </section>
-
-      <section class="admin-panel">
-        <h2 class="admin-heading">
-          Backlog <span class="admin-count" id="bd-backlog-count"></span>
-        </h2>
-        <p class="auth-note set-lede">
-          Assigned to you, not started, no date pressing. What comes after the
-          rest of this page.
-        </p>
-        <div class="admin-table" id="bd-backlog"></div>
-      </section>
-
-      <section class="admin-panel">
-        <h2 class="admin-heading">
-          Finished this week <span class="admin-count" id="bd-done-count"></span>
-        </h2>
-        <p class="auth-note set-lede">
-          The other half of the same board. A page of only what is left reads as
-          a list of things you have not done.
-        </p>
-        <div class="admin-table" id="bd-done"></div>
-      </section>
-
-      <!-- ── testing ──────────────────────────────────────────────────
-           Here rather than on a page of its own, because this is where a
-           developer already is. It also closes a hole: the gate and the
-           maker-checker shipped with the connector as their only interface,
-           so anybody not using Claude Code could be stopped by a rule they
-           had no way to satisfy. -->
-      <section class="admin-panel" id="bd-testing">
-        <h2 class="admin-heading">Testing <span class="admin-count" id="bd-batch-count"></span></h2>
-        <p class="auth-note set-lede">
-          Every ten tickets you close, the next close is refused until that batch
-          has been tested and <strong>somebody else</strong> has said so. You
-          cannot check your own &mdash; that is the whole of what it is for.
-        </p>
-        <p class="auth-error" id="bd-batch-error" hidden></p>
-
-        <div id="bd-batch"></div>
-
-        <form class="bd-submit" id="bd-submit" hidden>
-          <label class="auth-label" for="bd-notes">What you ran, and what it showed</label>
-          <textarea id="bd-notes" class="auth-input" rows="3"
-            placeholder="Ran the contract suite and the POS smoke pack against staging: 412 passed, 2 failed on the receipt total, both traced to CR-001."></textarea>
-          <label class="auth-label" for="bd-evidence">Output worth keeping (optional)</label>
-          <textarea id="bd-evidence" class="auth-input" rows="2"
-            placeholder="pytest -q tests/contracts: 412 passed, 2 failed in 96s"></textarea>
-          <div class="set-actions">
-            <button class="auth-button" type="submit" id="bd-submit-go">Submit for checking</button>
-            <p class="set-state" id="bd-submit-says" role="status"></p>
+      <main class="set-content">
+        <!-- ── what is being read, and the filter every section obeys ───────
+             Above the sections, as on Tasks: the rail shows one section at a
+             time, and a filter that vanished with the first one would leave
+             the rest filtered by something nobody can see. The error line is
+             here too, outside every section, because a message inside a hidden
+             section is a blank page (it was, until 14 October). -->
+        <div class="sh-top">
+          <div class="sh-top-line">
+            <label class="bd-project" id="bd-project-wrap" hidden><span class="sh-sr">Project</span>
+              <select class="scope-select" id="bd-project"></select></label>
+            <p class="sh-lede" id="bd-lede">Reading your tickets from OpenProject…</p>
+            <div class="sh-top-actions">
+              <p class="sh-asof" id="bd-asof" role="status"></p>
+              <button id="bd-refresh" class="chip" type="button"
+                      title="Reads OpenProject again, now">Refresh</button>
+            </div>
           </div>
-        </form>
-      </section>
+          <p class="auth-error" id="bd-error" role="alert" hidden></p>
+          <div class="sh-scope" id="bd-scope" role="group" aria-label="Filter the whole page"></div>
+        </div>
 
-      <section class="admin-panel" id="bd-checking" hidden>
-        <h2 class="admin-heading">
-          Waiting on you to check <span class="admin-count" id="bd-waiting-count"></span>
-        </h2>
-        <p class="auth-note set-lede">
-          A teammate has tested a batch and cannot clear their own gate. Read
-          what they ran; pass it, or send it back with a reason.
-        </p>
-        <div id="bd-waiting"></div>
-      </section>
+        <!-- ── this week ─────────────────────────────────────────────────
+             What the page is opened for, every morning: where my sprint
+             stands, what I do next, and whether the testing gate is about to
+             stop me. The gate is the one bold thing on the page, because it
+             is the one thing here that refuses you. -->
+        <section class="admin-panel set-section sh-sheet" id="week" aria-labelledby="bd-headline">
+          <div class="sh-hero">
+            <div class="sh-verdict" id="bd-verdict">
+              <h2 class="sh-headline" id="bd-headline">Reading your tickets…</h2>
+            </div>
+            <figure class="sh-figure bd-gate-figure" id="bd-gate-figure" hidden>
+              <figcaption class="sh-figure-caption">Testing gate: tickets closed through ADAM since your last passed batch</figcaption>
+              <div id="bd-gate-hero"></div>
+            </figure>
+          </div>
+          <p class="sh-next" id="bd-next"></p>
 
-      <p class="auth-note auth-fine" id="bd-note"></p>
-    </main>
+          <section class="sh-part" aria-labelledby="bd-due-title">
+            <h3 class="sh-part-title" id="bd-due-title">Late and due this week</h3>
+            <p class="sh-note">Open work past its date or due in the next seven days. A ticket with no date of its own is due when its sprint ends. Waiting for QA is never late: you are done with it.</p>
+            <div id="bd-due"></div>
+          </section>
+        </section>
+
+        <!-- ── next up ───────────────────────────────────────────────────
+             In the service's build order (`position`), the order the
+             connector pulls "my next 15" in: what you started first, then the
+             plan's build order, sub-tasks straight after their parent. -->
+        <section class="admin-panel set-section sh-sheet" id="next" aria-labelledby="bd-next-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="bd-next-title">Next up</h2>
+          </div>
+          <p class="sh-note" id="bd-next-note"></p>
+          <ol class="bd-queue" id="bd-queue"></ol>
+          <button class="chip sh-more" id="bd-queue-more" type="button" hidden></button>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="qa" aria-labelledby="bd-qa-title">
+          <h2 class="sh-part-title" id="bd-qa-title">Waiting for QA</h2>
+          <p class="sh-note">Finished on your side and waiting for somebody to test and close, oldest first. The wait is counted from the ticket&rsquo;s last change, which a comment can move. None of these is late.</p>
+          <div id="bd-qa"></div>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="finished" aria-labelledby="bd-done-title">
+          <h2 class="sh-part-title" id="bd-done-title">Finished</h2>
+          <p class="sh-note" id="bd-done-note"></p>
+          <div id="bd-done"></div>
+        </section>
+
+        <!-- ── testing ──────────────────────────────────────────────────
+             Here rather than on a page of its own, because this is where a
+             developer already is. It also closes a hole: the gate and the
+             maker-checker shipped with the connector as their only interface,
+             so anybody not using Claude Code could be stopped by a rule they
+             had no way to satisfy. -->
+        <section class="admin-panel set-section sh-sheet" id="gate" aria-labelledby="bd-gate-title">
+          <h2 class="sh-part-title" id="bd-gate-title">Testing gate</h2>
+          <p class="sh-note" id="bd-gate-lede"></p>
+          <p class="auth-error" id="bd-batch-error" role="alert" hidden></p>
+          <div id="bd-batch"></div>
+
+          <form class="bd-submit" id="bd-submit" hidden>
+            <h3 class="sh-part-title">Submit this batch for checking</h3>
+            <label class="bd-field-label" for="bd-notes">What you ran, and what it showed</label>
+            <textarea id="bd-notes" class="auth-input" rows="3" aria-describedby="bd-notes-hint"></textarea>
+            <p class="sh-quiet" id="bd-notes-hint">For example: ran the contract suite and the POS smoke pack against staging, 412 passed, 2 failed on the receipt total, both traced to CR-001. A teammate has to be able to check it.</p>
+            <label class="bd-field-label" for="bd-evidence">Output worth keeping (optional)</label>
+            <textarea id="bd-evidence" class="auth-input" rows="2"></textarea>
+            <div class="set-actions">
+              <button class="auth-button" type="submit" id="bd-submit-go">Submit for checking</button>
+              <p class="set-state" id="bd-submit-says" role="status"></p>
+            </div>
+          </form>
+
+          <section class="sh-part" aria-labelledby="bd-past-title">
+            <h3 class="sh-part-title" id="bd-past-title">Your past batches</h3>
+            <div id="bd-past"></div>
+          </section>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="check" aria-labelledby="bd-check-title">
+          <h2 class="sh-part-title" id="bd-check-title">Check a teammate&rsquo;s batch</h2>
+          <p class="sh-note">A teammate has tested a batch and cannot clear their own gate. Open the tickets, read what they ran, then mark it passed or send it back with a reason. You can never check your own.</p>
+          <div id="bd-waiting"></div>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="all" aria-labelledby="bd-all-title">
+          <h2 class="sh-part-title" id="bd-all-title">Everything I hold</h2>
+          <p class="sh-note" id="bd-all-note"></p>
+          <div id="bd-all"></div>
+          <p class="sh-quiet" id="bd-note"></p>
+        </section>
+      </main>
+    </div>
 
     <script type="module" src="/theme.js"></script>
-    <script type="module" src="/account-drawer.js"></script>
     <script type="module" src="/board.js"></script>
   </body>
 </html>

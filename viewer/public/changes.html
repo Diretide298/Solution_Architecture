@@ -22,6 +22,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/sheet.css" />
     <link rel="stylesheet" href="/changes.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <script>
@@ -67,95 +68,165 @@
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
         <a class="chip" href="/tasks.html">Tasks</a>
-        <a class="chip" href="/reviews.html">Review activity</a>
+        <a class="chip" href="/reviews.html">Reviews</a>
         <a class="chip" href="/">Back to the viewer</a>
       </div>
     </header>
 
-    <main class="admin-main changes-main">
-      <!-- What a change request is, once, for somebody who has never seen one. -->
-      <section class="admin-panel">
-        <h2 class="admin-heading">
-          Change requests
-          <select class="scope-select" id="cr-project" aria-label="Project"></select>
-        </h2>
-        <p class="cr-lede">
-          Places where the package - a contract, table, screen, journey or decision - was found
-          wrong, contradictory or missing something a ticket needs. Raised by the team, often through
-          Claude while building. An admin or a reviewer on the project accepts or rejects each one;
-          it is done when the package has been fixed.
-        </p>
-      </section>
-
-      <section class="stat-strip" id="cr-headline"></section>
-
-      <section class="admin-panel">
-        <div class="signoff-controls cr-filters">
-          <div class="seg" id="cr-status"></div>
-          <label class="cr-check"><input type="checkbox" id="cr-blocking" /> Blocking only</label>
-          <!-- A lens, not a wall. A team lead reads every request on the
-               project — that is the point of the role — and this narrows what
-               is on screen to the platforms they own. Hidden for anybody who
-               owns no platform, where it would filter everything away. -->
-          <label class="cr-check" id="cr-mine-wrap" hidden>
-            <input type="checkbox" id="cr-mine" /> My platforms
-          </label>
-          <input id="cr-text" class="auth-input signoff-filter" type="search"
-                 placeholder="search titles, artefacts, tickets, people" autocomplete="off" />
-          <button class="chip" id="cr-export" type="button"
-                  title="Exports exactly the rows shown - every filter applies">Export CSV</button>
-          <!-- The other half of that button. Shown to admins only, because the
-               route behind it is admin-only and a link that answers 403 is
-               worse than no link. The same pair the reviews page has. -->
-          <a class="chip chip-link" id="cr-settle-link" href="/admin.html#settle-from-sheet"
-             title="Fill in the 'our decision' column and upload it there - admin only"
-             hidden>Settle from a spreadsheet &rarr;</a>
-          <button class="chip cr-new-toggle" id="cr-new-toggle" type="button">Raise a change request</button>
+    <!-- One section at a time, driven by the rail (panels.js), the same way
+         Tasks is. The page opens on "Needs a decision", because the question
+         it is opened for every morning is what is waiting on somebody; the
+         record of what was decided lives further down the rail. -->
+    <div id="cr-page" class="set-layout set-layout-wide cr-page">
+      <nav class="set-nav" aria-label="Sections">
+        <h1 class="set-nav-title">Change requests</h1>
+        <div class="set-nav-list">
+          <a href="#decide">Needs a decision <span class="cr-nav-count" id="cr-n-decide"></span></a>
+          <a href="#untaken">Not taken on <span class="cr-nav-count" id="cr-n-untaken"></span></a>
+          <a href="#unscheduled">Accepted, not scheduled <span class="cr-nav-count" id="cr-n-unscheduled"></span></a>
+          <a href="#fixing">Being fixed <span class="cr-nav-count" id="cr-n-fixing"></span></a>
+          <div class="set-nav-group">Add one</div>
+          <a href="#raise">Raise one</a>
+          <div class="set-nav-group">The record</div>
+          <a href="#release">Changed this release</a>
+          <a href="#all">Everything</a>
         </div>
-        <p class="auth-error" id="cr-error" hidden></p>
+      </nav>
 
-        <form class="cr-form" id="cr-form" hidden>
-          <div class="cr-form-row">
-            <label>About
-              <select class="scope-select" id="cr-f-kind" required></select>
-            </label>
-            <label class="cr-grow">Artefact
-              <input class="auth-input" id="cr-f-target" required maxlength="300"
-                     placeholder="identity#requestGuestCode, identity:GuestSession, WEB-001" />
-            </label>
-            <label>Ticket
-              <input class="auth-input cr-narrow" id="cr-f-ticket" inputmode="numeric" placeholder="6046" />
-            </label>
-            <label class="cr-check"><input type="checkbox" id="cr-f-blocking" /> Blocks the work</label>
+      <main class="set-content">
+        <!-- What is being read, and the one filter every section obeys. Above
+             the sections rather than inside one, because the rail shows one at
+             a time and a filter that vanished with a section would leave the
+             others narrowed by something nobody can see. -->
+        <div class="sh-top">
+          <div class="sh-top-line">
+            <select class="scope-select" id="cr-project" aria-label="Project" hidden></select>
+            <p class="sh-lede" id="cr-lede">…</p>
+            <div class="sh-top-actions">
+              <p class="sh-asof" id="cr-asof" role="status"></p>
+              <button class="chip" id="cr-refresh" type="button">Refresh</button>
+            </div>
           </div>
-          <label>Title
-            <input class="auth-input" id="cr-f-title" required minlength="5" maxlength="200"
-                   placeholder="One line: what is wrong" />
-          </label>
-          <label>Problem
-            <textarea class="auth-input" id="cr-f-problem" required minlength="10" rows="3"
-                      placeholder="What is wrong, and why it matters for the build"></textarea>
-          </label>
-          <label>Evidence
-            <textarea class="auth-input" id="cr-f-evidence" rows="3"
-                      placeholder="The passages that show it, quoted, with where each is"></textarea>
-          </label>
-          <label>Options, one per line
-            <textarea class="auth-input" id="cr-f-options" rows="3"
-                      placeholder="Unverified guests can buy&#10;Unverified guests can browse but not buy"></textarea>
-          </label>
-          <label>Recommendation
-            <input class="auth-input" id="cr-f-recommendation" maxlength="2000" />
-          </label>
-          <div class="cr-form-row">
-            <button class="auth-button" type="submit">Raise it</button>
-            <button class="auth-button auth-button-quiet" type="button" id="cr-f-cancel">Cancel</button>
-          </div>
-        </form>
+          <p class="auth-error" id="cr-error" role="alert" hidden></p>
+          <div class="sh-scope" id="cr-scope" role="group" aria-label="Filter the whole page"></div>
+        </div>
 
-        <div id="cr-list"></div>
-      </section>
-    </main>
+        <!-- ── needs a decision: the opening ──────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="decide" aria-labelledby="cr-headline">
+          <div class="sh-hero">
+            <div class="sh-verdict" id="cr-verdict"></div>
+            <figure class="sh-figure cr-flow" id="cr-flow"></figure>
+          </div>
+          <p class="sh-next" id="cr-next"></p>
+          <section class="sh-part" aria-labelledby="cr-decide-title">
+            <div class="sh-part-head"><h3 class="sh-part-title" id="cr-decide-title">Waiting for a decision</h3></div>
+            <p class="sh-note" id="cr-decide-note"></p>
+            <div id="cr-t-decide"></div>
+          </section>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="untaken" aria-labelledby="cr-untaken-title" hidden>
+          <h2 class="cr-section-title" id="cr-untaken-title">Not taken on</h2>
+          <p class="sh-note" id="cr-untaken-note"></p>
+          <div id="cr-t-untaken"></div>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="unscheduled" aria-labelledby="cr-unscheduled-title" hidden>
+          <h2 class="cr-section-title" id="cr-unscheduled-title">Accepted, not scheduled</h2>
+          <p class="sh-note" id="cr-unscheduled-note"></p>
+          <div id="cr-t-unscheduled"></div>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="fixing" aria-labelledby="cr-fixing-title" hidden>
+          <h2 class="cr-section-title" id="cr-fixing-title">Being fixed</h2>
+          <p class="sh-note" id="cr-fixing-note"></p>
+          <div id="cr-t-fixing"></div>
+        </section>
+
+        <!-- ── raising one ────────────────────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="raise" aria-labelledby="cr-raise-title" hidden>
+          <h2 class="cr-section-title" id="cr-raise-title">Raise a change request</h2>
+          <p class="sh-note">
+            Say where the package is wrong, contradictory or missing something a ticket needs.
+            It goes to the team lead whose side and platform it is; somebody other than you
+            accepts or rejects it.
+          </p>
+          <div id="cr-filed" class="cr-filed" role="status" hidden></div>
+          <form class="cr-form" id="cr-form" novalidate>
+            <div class="cr-form-row">
+              <label class="cr-field">About
+                <select class="scope-select" id="cr-f-kind" required></select>
+              </label>
+              <label class="cr-field cr-grow">Artefact
+                <input class="sh-input" id="cr-f-target" required maxlength="300" autocomplete="off"
+                       placeholder="for example identity#requestGuestCode or WEB-001" />
+              </label>
+              <label class="cr-field">Ticket it came up in
+                <input class="sh-input cr-narrow" id="cr-f-ticket" inputmode="numeric" autocomplete="off" placeholder="6046" />
+              </label>
+            </div>
+            <div class="cr-form-row">
+              <label class="cr-field">Side
+                <select class="scope-select" id="cr-f-tag">
+                  <option value="">Worked out from what it is about</option>
+                  <option value="frontend">Frontend</option>
+                  <option value="backend">Backend</option>
+                </select>
+              </label>
+              <label class="cr-field">Platform
+                <input class="sh-input cr-narrow" id="cr-f-platform" maxlength="20" autocomplete="off" placeholder="P04" />
+              </label>
+              <label class="sh-field-inline cr-check"><input type="checkbox" id="cr-f-blocking" /> It blocks the work</label>
+            </div>
+            <label class="cr-field">Title
+              <input class="sh-input" id="cr-f-title" required minlength="5" maxlength="200"
+                     placeholder="One line: what is wrong" />
+            </label>
+            <label class="cr-field">Problem
+              <textarea class="sh-input" id="cr-f-problem" required minlength="10" rows="4"
+                        placeholder="What is wrong, and why it matters for the build"></textarea>
+            </label>
+            <label class="cr-field">What was seen (optional)
+              <textarea class="sh-input" id="cr-f-evidence" rows="3"
+                        placeholder="The passages that show it, quoted, with where each is"></textarea>
+            </label>
+            <label class="cr-field">Options, one per line (optional)
+              <textarea class="sh-input" id="cr-f-options" rows="3"></textarea>
+            </label>
+            <label class="cr-field">What you recommend (optional)
+              <input class="sh-input" id="cr-f-recommendation" maxlength="2000" />
+            </label>
+            <p class="auth-error" id="cr-f-error" role="alert" hidden></p>
+            <div class="cr-buttons">
+              <button class="auth-button cr-primary" type="submit">Raise it</button>
+              <button class="chip" type="reset">Clear the form</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ── the record ─────────────────────────────────────────────── -->
+        <section class="admin-panel set-section sh-sheet" id="release" aria-labelledby="cr-release-title" hidden>
+          <h2 class="cr-section-title" id="cr-release-title">Changed this release</h2>
+          <p class="sh-note" id="cr-release-note"></p>
+          <div id="cr-release"></div>
+        </section>
+
+        <section class="admin-panel set-section sh-sheet" id="all" aria-labelledby="cr-all-title" hidden>
+          <div class="sh-part-head">
+            <h2 class="cr-section-title" id="cr-all-title">Everything</h2>
+            <div class="cr-all-actions">
+              <button class="chip" id="cr-export" type="button">Export these as CSV</button>
+              <!-- Admin only, because /api/changes/import/* is. Hidden rather
+                   than shown and refused: a link that answers 403 is worse
+                   than no link. -->
+              <a class="chip" id="cr-settle-link" href="/admin.html#settle-from-sheet" hidden>Settle from a spreadsheet</a>
+            </div>
+          </div>
+          <p class="sh-note" id="cr-all-note"></p>
+          <div id="cr-t-all"></div>
+        </section>
+      </main>
+    </div>
 
     <script type="module" src="/changes.js"></script>
   </body>

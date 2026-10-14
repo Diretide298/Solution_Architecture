@@ -367,12 +367,14 @@ export async function buildSearch(root, subjects = {}) {
       href: '/settings.html',
       terms: 'settings account profile password change openproject token pms git email identity '
         + 'claude connector mcp bridge sessions sign out everywhere preferences' },
-    { id: 'domains', name: 'Domain lenses', href: '/domains.html',
-      terms: 'domain lenses cross-cutting subjects ai flash sale' },
+    { id: 'domains', name: 'AI capabilities: who can use them', href: '/domains.html',
+      terms: 'ai capabilities assistant operations permissions screens reach domain lens' },
     { id: 'audit', name: 'Audit the delivery package', href: '/audit.html',
       terms: 'audit dump checks validators problems package' },
-    { id: 'validation', name: 'What has been signed off', href: '/validation.html',
-      terms: 'validation sign-off verdicts reviews approved' },
+    { id: 'reviews', name: 'Reviews', href: '/reviews.html#coverage',
+      sub: 'what has been signed off, what is asked for, and who is reviewing',
+      terms: 'reviews review activity validation sign-off signed off verdicts approved '
+        + 'needs work rejected asked for work disagreement reviewers mentions named' },
   ].filter(Boolean);
   for (const page of pages) {
     entries.push({

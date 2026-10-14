@@ -765,7 +765,17 @@ def list_accounts(admin: dict = Depends(require_admin)):
                   (SELECT COUNT(*) FROM verdict v WHERE v.account_id = a.id) AS verdicts
              FROM account a ORDER BY a.id"""
     )
-    return {"accounts": [dict(r) for r in rows]}
+    # Which packages each one may open, so the page can say it beside the role
+    # rather than leave "who can see TICVAI" to a guess. An administrator reads
+    # every project whatever these rows say (see projects_for), and the page
+    # says that instead of listing them.
+    held: dict = {}
+    for r in db.all_rows(
+            "SELECT ap.account_id, ap.project_id, ap.role, p.name FROM account_project ap "
+            "JOIN project p ON p.id = ap.project_id ORDER BY ap.project_id"):
+        held.setdefault(r["account_id"], []).append(
+            {"id": r["project_id"], "name": r["name"], "role": r["role"]})
+    return {"accounts": [{**dict(r), "projects": held.get(r["id"], [])} for r in rows]}
 
 
 @app.post("/api/accounts/{account_id}/active")
@@ -829,6 +839,60 @@ def set_role(account_id: int, role: str, admin: dict = Depends(require_admin)):
         raise HTTPException(409, "That is the last admin.")
     db.write("UPDATE account SET role = ? WHERE id = ?", (role, account_id))
     return {"ok": True, "role": role}
+
+
+@app.put("/api/accounts/{account_id}/projects/{project_id}")
+def grant_project(account_id: int, project_id: str, admin: dict = Depends(require_admin)):
+    """Let an existing account open another project. Admin only.
+
+    Until this, the only thing that wrote `account_project` was redeeming an
+    invite, so somebody already on TICVAI who was needed on a second package
+    had no way in short of a second account under a second address — which
+    splits their verdicts across two names.
+
+    **The project role is derived, never chosen**, by the same rule redemption
+    uses: a client is a client on every project, and everybody else is a
+    reviewer there. A picker for it would offer a way to make a client a
+    reviewer on one package, which is a decision about the person and is made
+    with their account role.
+    """
+    row = db.one("SELECT id, role, active FROM account WHERE id = ?", (account_id,))
+    if not row:
+        raise HTTPException(404, "No such account.")
+    if security.is_admin(row["role"]):
+        # Not refused out of caution: the row would be inert, because an
+        # administrator already opens every project, and a grant that changes
+        # nothing reads as one that did something.
+        raise HTTPException(409, "An administrator already opens every project.")
+    project = db.one("SELECT id, name, active FROM project WHERE id = ?", (project_id,))
+    if not project or not project["active"]:
+        raise HTTPException(400, f"There is no open ADAM project called '{project_id}'.")
+    if db.one("SELECT 1 FROM account_project WHERE account_id = ? AND project_id = ?",
+              (account_id, project_id)):
+        raise HTTPException(409, f"They can already open {project['name'] or project_id}.")
+    role = "client" if row["role"] == "client" else "reviewer"
+    db.write(
+        "INSERT INTO account_project (account_id, project_id, role, created_at) "
+        "VALUES (?, ?, ?, ?)", (account_id, project_id, role, security.stamp()))
+    return {"ok": True, "project": {"id": project["id"], "name": project["name"], "role": role}}
+
+
+@app.delete("/api/accounts/{account_id}/projects/{project_id}")
+def revoke_project(account_id: int, project_id: str, admin: dict = Depends(require_admin)):
+    """Take a project away from an account. Admin only.
+
+    Nothing they recorded on it moves: verdicts and change requests keep their
+    author, as they do when an account is disabled. They simply stop being able
+    to open it. Taking away the last one is allowed — a missing row is no
+    access, and an account that should see nothing for a while is a real case —
+    but the page says so before it is done.
+    """
+    if not db.one("SELECT id FROM account WHERE id = ?", (account_id,)):
+        raise HTTPException(404, "No such account.")
+    if not db.change("DELETE FROM account_project WHERE account_id = ? AND project_id = ?",
+                     (account_id, project_id)):
+        raise HTTPException(404, "They could not open that project anyway.")
+    return {"ok": True}
 
 
 def _live_admin_count() -> int:
@@ -2237,8 +2301,13 @@ def my_board(
     by_key: dict = {}
     kids: dict = {}
     tree_read = True
+    project_read: dict = {}
     try:
         by_key, kids = _project_tree(account, scope)
+        # The same held read, already in memory: the statuses and sprint dates
+        # the My work page needs to say "6 of your 14 finished" by the rules
+        # Tasks uses (ticket-kinds.js), which a list of open tickets cannot.
+        project_read = _project_read(account, scope)["payload"]
     except HTTPException:
         tree_read = False
 
@@ -2285,6 +2354,35 @@ def my_board(
     every = [dressed(item) for item in items]
     shown = [i for i in every if not only or (only == "blocked") == bool(i["blockedBy"])]
 
+    # **Who you are in OpenProject**, by the name on your own tickets: ADAM and
+    # OpenProject are two account systems and the assignee's name is the only
+    # thing joining them, which is also how Tasks finds a person. None when you
+    # hold nothing and closed nothing this week, and then there is no sprint of
+    # yours to count either.
+    me = next((i.get("assignee") for i in items + finished if i.get("assignee")), None)
+    recent = [item for item in finished
+              if (item.get("updatedAt") or "") >= security.stamp(security.now() - timedelta(days=7))]
+    live = {i["key"] for i in items} | {i["key"] for i in recent}
+    # Your closed tickets from the shared project read, at most its five minutes
+    # old: the open list is live but holds only open work, and a sprint's "6 of
+    # your 14" has to count the ones closed before this week too.
+    closed_earlier = [
+        {**item, "touches": touching.get(item["key"], [])}
+        for item in project_read.get("items", [])
+        if me and item.get("assignee") == me and item["key"] not in live
+        and item.get("status") in {s["name"] for s in project_read.get("statuses", []) if s.get("isClosed")}
+    ]
+    mine_keys = live | {i["key"] for i in closed_earlier}
+    # When a ticket was closed through ADAM: the real moment, where `updatedAt`
+    # is only the last change. The same answer the overview gives (`closes`).
+    closes = {
+        row["external_key"]: row["at"] for row in db.all_rows(
+            "SELECT i.external_key, MAX(i.closed_at) AS at FROM test_batch_item i "
+            "JOIN test_batch b ON b.id = i.batch_id WHERE b.project_id = ? "
+            "GROUP BY i.external_key", (scope["project"],))
+        if row["external_key"] in mine_keys
+    }
+
     return {
         "total": len(items),
         "workable": sum(1 for i in every if not i["blockedBy"]),
@@ -2307,11 +2405,17 @@ def my_board(
         # The window is chosen here rather than asked of OpenProject: see
         # openproject.mine_finished for why a date filter is the wrong thing to
         # send to a 2019 instance.
-        "finished": [
-            {**item, "touches": touching.get(item["key"], [])}
-            for item in finished
-            if (item.get("updatedAt") or "") >= security.stamp(security.now() - timedelta(days=7))
-        ],
+        "finished": [{**item, "touches": touching.get(item["key"], [])} for item in recent],
+        # What the page needs to count your sprint by Tasks' rules: the
+        # instance's statuses, the sprints' dates, your closed tickets from
+        # before this week, and when ADAM saw any of them closed. Empty lists
+        # when the project read could not be had; the page falls back to the
+        # sprint calendar and to "open" and "closed" as the two lists say.
+        "assignee": me,
+        "statuses": project_read.get("statuses", []),
+        "versions": project_read.get("versions", []),
+        "closedEarlier": closed_earlier,
+        "closes": closes,
         # What is standing against this person on the testing gate, so a board
         # that is about to refuse the next close says so on the board rather
         # than at the moment of closing.
@@ -3845,6 +3949,13 @@ def chat_providers(account: dict = Depends(require_account)):
                                        row["endpoint"] or "")
             except secrets.Unreadable:
                 pass
+        # The model a first question goes to when the person has not chosen one.
+        # The table's first pick when the provider still offers it (the table is
+        # ordered best first), else whatever the provider listed first, else
+        # nothing: the escape hatch has no list, and a guessed name would fail
+        # on somebody's own key. Both pages read this, so the first ask never
+        # stops at "type a model".
+        suggested = next((m for m in spec["models"] if m in models), models[0] if models else "")
         out.append({
             "id": name,
             "label": spec["label"],
@@ -3854,6 +3965,7 @@ def chat_providers(account: dict = Depends(require_account)):
             "endpoint": (row["endpoint"] if row else "") or spec["base"],
             "keysAt": spec["keysAt"],
             "models": models,
+            "suggested": suggested,
         })
     return {"providers": out}
 
@@ -4261,12 +4373,39 @@ class RateIn(BaseModel):
     note: str = Field(default="", max_length=200)
 
 
+# The currencies a rate, the default rate or a budget may be set in. A list
+# rather than free text, because free text is how "INR", "inr " and "Rs" become
+# three currencies that cannot be added, and the page then says it cannot total
+# a delivery that was only ever paid in one. Every one of these has two decimal
+# places, which is what "the smallest unit" means everywhere on this page; a
+# currency without (JPY) or with three (KWD) would need that rule rethought
+# before it is added here.
+CURRENCIES = ("INR", "USD", "EUR", "GBP", "AED", "SAR", "SGD")
+
+
+def _currency(value: str) -> str:
+    code = (value or "").strip().upper()
+    if code not in CURRENCIES:
+        raise HTTPException(
+            400, f"'{value}' is not a currency this page prices in. Pick one of "
+                 f"{', '.join(CURRENCIES)}.")
+    return code
+
+
 def _rate_row(row) -> dict:
     return {
         "id": row["id"], "person": row["person"],
         "hourly": row["hourly"], "currency": row["currency"],
         "note": row["note"], "setAt": row["set_at"],
     }
+
+
+def _default_rate(project: str) -> Optional[dict]:
+    row = db.one("SELECT * FROM default_rate WHERE project_id = ?", (project,))
+    if not row:
+        return None
+    return {"hourly": row["hourly"], "currency": row["currency"],
+            "note": row["note"], "setAt": row["set_at"]}
 
 
 @app.get("/api/rates")
@@ -4280,7 +4419,8 @@ def list_rates(project_id: str = Query(default=""),
     """
     project = _readable_project(reader, project_id)
     rows = db.all_rows("SELECT * FROM rate WHERE project_id = ? ORDER BY person", (project,))
-    return {"project": project, "rates": [_rate_row(r) for r in rows]}
+    return {"project": project, "rates": [_rate_row(r) for r in rows],
+            "default": _default_rate(project), "currencyChoices": list(CURRENCIES)}
 
 
 @app.put("/api/rates")
@@ -4290,12 +4430,13 @@ def set_rate(body: RateIn, admin: dict = Depends(require_admin)):
     person = body.person.strip()
     if not person:
         raise HTTPException(400, "Say whose rate this is.")
+    currency = _currency(body.currency)
     existing = db.one("SELECT id FROM rate WHERE project_id = ? AND person = ? COLLATE NOCASE",
                       (project, person))
     if existing:
         db.write("UPDATE rate SET hourly = ?, currency = ?, note = ?, set_by = ?, set_at = ? "
                  "WHERE id = ?",
-                 (body.hourly, body.currency.strip().upper(), body.note.strip(),
+                 (body.hourly, currency, body.note.strip(),
                   admin["id"], security.stamp(), existing["id"]))
         return {"ok": True, "id": existing["id"], "replaced": True}
     # Linked when an ADAM account plainly is this person. Display only: the
@@ -4306,9 +4447,50 @@ def set_rate(body: RateIn, admin: dict = Depends(require_admin)):
         "INSERT INTO rate (project_id, person, account_id, hourly, currency, note, set_by, set_at) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         (project, person, same["id"] if same else None,
-         body.hourly, body.currency.strip().upper(), body.note.strip(),
+         body.hourly, currency, body.note.strip(),
          admin["id"], security.stamp()))
     return {"ok": True, "replaced": False}
+
+
+class DefaultRateIn(BaseModel):
+    project_id: str = ""
+    hourly: int = Field(ge=0, le=100_000_00)
+    currency: str = Field(default="INR", max_length=8)
+    note: str = Field(default="", max_length=200)
+
+
+# Declared before `/api/rates/{rate_id}` on purpose: routes are matched in the
+# order they are written, and "default" would otherwise be taken for a rate id
+# and refused as not a number.
+@app.put("/api/rates/default")
+def set_default_rate(body: DefaultRateIn, admin: dict = Depends(require_admin)):
+    """The rate for anybody with hours and no rate of their own. Optional.
+
+    Zero is refused rather than stored: a default of nothing would turn every
+    unpriced person into a free one, which is the reading the page exists to
+    prevent. Removing the default is the way to say "no default".
+    """
+    project = _readable_project(admin, body.project_id)
+    if body.hourly <= 0:
+        raise HTTPException(400, "A default rate of nothing would price unpriced people "
+                                 "as free. Type an amount above zero, or remove the default.")
+    currency = _currency(body.currency)
+    db.write(
+        "INSERT INTO default_rate (project_id, hourly, currency, note, set_by, set_at) "
+        "VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(project_id) DO UPDATE SET "
+        "hourly = excluded.hourly, currency = excluded.currency, note = excluded.note, "
+        "set_by = excluded.set_by, set_at = excluded.set_at",
+        (project, body.hourly, currency, body.note.strip(), admin["id"], security.stamp()))
+    return {"ok": True, "default": _default_rate(project)}
+
+
+@app.delete("/api/rates/default")
+def drop_default_rate(project_id: str = Query(default=""),
+                      admin: dict = Depends(require_admin)):
+    project = _readable_project(admin, project_id)
+    if not db.change("DELETE FROM default_rate WHERE project_id = ?", (project,)):
+        raise HTTPException(404, "This project has no default rate to remove.")
+    return {"ok": True}
 
 
 @app.delete("/api/rates/{rate_id}")
@@ -4318,91 +4500,607 @@ def drop_rate(rate_id: int, admin: dict = Depends(require_admin)):
     return {"ok": True}
 
 
+# ── what the delivery was given to spend ─────────────────────────────
+#
+# Set on the costing page by an administrator, read by whoever reads the
+# costing. Append-only (see the table): a change is a new row and the history
+# is the answer to "was it always that much?", which is the first question
+# anybody asks of a page that says a delivery is over budget.
+
+
+class BudgetIn(BaseModel):
+    project_id: str = ""
+    # The smallest unit, as `rate.hourly`. Bounded only to keep a typo of a few
+    # extra zeros from being stored as a plan; ten trillion rupees is not one.
+    amount: int
+    currency: str = Field(default="INR", max_length=8)
+    note: str = Field(default="", max_length=300)
+
+
+BUDGET_CEILING = 10_000_000_000_000_00
+
+
+def _budget_history(project: str) -> list:
+    """Every budget this project has had, newest first, each with what it replaced."""
+    rows = db.all_rows(
+        "SELECT b.*, a.name AS by_name, a.email AS by_email FROM budget b "
+        "LEFT JOIN account a ON a.id = b.set_by WHERE b.project_id = ? ORDER BY b.id",
+        (project,))
+    out, before = [], None
+    for row in rows:
+        out.append({
+            "id": row["id"], "amount": row["amount"], "currency": row["currency"],
+            "note": row["note"], "setAt": row["set_at"],
+            "setBy": row["by_name"] or row["by_email"] or "",
+            "from": ({"amount": before["amount"], "currency": before["currency"]}
+                     if before else None),
+        })
+        before = row
+    out.reverse()
+    return out
+
+
+@app.get("/api/budget")
+def get_budget(project_id: str = Query(default=""),
+               reader: dict = Depends(require_reader)):
+    """The budget in force and every one before it. Read as the costing is read."""
+    project = _readable_project(reader, project_id)
+    history = _budget_history(project)
+    return {"project": project, "budget": history[0] if history else None,
+            "history": history, "currencyChoices": list(CURRENCIES)}
+
+
+@app.put("/api/budget")
+def set_budget(body: BudgetIn, admin: dict = Depends(require_admin)):
+    """Set the project's budget. A new row every time; nothing is overwritten."""
+    project = _readable_project(admin, body.project_id)
+    if body.amount <= 0:
+        raise HTTPException(400, "A budget has to be more than nothing. Type an amount above zero.")
+    if body.amount > BUDGET_CEILING:
+        raise HTTPException(400, "That budget is larger than any delivery this page was made "
+                                 "for; check for extra zeros.")
+    currency = _currency(body.currency)
+    db.write("INSERT INTO budget (project_id, amount, currency, note, set_by, set_at) "
+             "VALUES (?, ?, ?, ?, ?, ?)",
+             (project, body.amount, currency, body.note.strip(), admin["id"], security.stamp()))
+    history = _budget_history(project)
+    return {"ok": True, "budget": history[0], "history": history}
+
+
+# ── dated hours ──────────────────────────────────────────────────────
+#
+# **Time entries when the token may read them, the tickets when it may not.**
+# A time entry says who spent an hour and on which day, which is what a cost
+# by sprint and by week needs. OpenProject shows them only to a role with "View
+# time entries"; without it the read is a 403, and the costing falls back to
+# each ticket's `spentTime` grouped by the ticket's sprint. The reply says which
+# (`hoursSource`), because the two answer slightly different questions: the
+# entries put an hour in the sprint it was *spent* in and against the person
+# who *logged* it, the fallback in the sprint the ticket is *planned* in and
+# against whoever *holds* the ticket now.
+#
+# Held beside the project read and stamped with its `asOf`, so the hours and
+# the tickets on one page are always from the same read: a new project read
+# makes the held entries stale and the next costing request reads them again.
+# Behind the request, like the project read, and waited on only briefly.
+
+# {(adam project, openproject id): {"asOf", "entries" | None, "refused" | None}}
+_time_held: dict = {}
+# {(adam project, openproject id): threading.Event}: a time-entry read under way.
+_time_reading: dict = {}
+_time_guard = threading.Lock()
+
+
+def _dated_hours(account: dict, scope: dict, key: tuple, held: dict) -> tuple:
+    """The time entries for this project read, or the reason there are none.
+
+    Returns (held entries or None, still reading). A read stamped with an older
+    `asOf` is answered while the new one runs, and says so through the second
+    value, which the page treats exactly like `refreshing`.
+    """
+    have = _time_held.get(key)
+    if have and have["asOf"] == held["asOf"]:
+        return have, False
+    with _time_guard:
+        running = _time_reading.get(key)
+        if running is None:
+            running = threading.Event()
+            _time_reading[key] = running
+            as_of = held["asOf"]
+
+            def run() -> None:
+                try:
+                    endpoint, token = _pms_for(account["id"])
+                    entries = openproject.time_entries(endpoint, token, scope["pmsId"])
+                    _time_held[key] = {"asOf": as_of, "entries": entries, "refused": None}
+                except openproject.Refused as exc:
+                    _time_held[key] = {"asOf": as_of, "entries": None, "refused": (
+                        "This OpenProject account may not view time entries, so hours are "
+                        "each ticket's total, counted in the ticket's sprint."
+                        if exc.status in (401, 403) else
+                        f"Time entries could not be read ({exc}), so hours are each "
+                        f"ticket's total, counted in the ticket's sprint.")}
+                except Exception as exc:  # noqa: BLE001 — told on the page, never a failed costing
+                    _time_held[key] = {"asOf": as_of, "entries": None, "refused": (
+                        f"Time entries could not be read ({exc}), so hours are each "
+                        f"ticket's total, counted in the ticket's sprint.")}
+                finally:
+                    with _time_guard:
+                        _time_reading.pop(key, None)
+                    running.set()
+
+            threading.Thread(target=run, daemon=True).start()
+    running.wait(OVERVIEW_FIRST_WAIT_SECONDS)
+    have = _time_held.get(key)
+    return have, not (have and have["asOf"] == held["asOf"])
+
+
+def _working_days(start: date, end: date) -> int:
+    """Monday to Friday from `start` to `end`, both counted. Zero when end < start."""
+    if end < start:
+        return 0
+    days = (end - start).days + 1
+    weeks, rest = divmod(days, 7)
+    count = weeks * 5
+    for n in range(rest):
+        if (start.weekday() + n) % 7 < 5:
+            count += 1
+    return count
+
+
+def _on_day(value) -> Optional[date]:
+    """A YYYY-MM-DD (or the start of a timestamp) as a date, or None.
+
+    Not `_day`: that name is taken further down this file for a different
+    question, and Python keeps the later of two functions with one name.
+    """
+    try:
+        return date.fromisoformat(str(value)[:10]) if value else None
+    except ValueError:
+        return None
+
+
+# Money is carried as `rate × minutes`, an integer, and divided by sixty once,
+# for the figure shown. Summing figures already rounded to the unit makes the
+# sprints add up to a paisa more or less than the total; summing these does not,
+# so the last point of the cumulative line is the total exactly.
+def _minor(numerator: int) -> int:
+    return (numerator + 30) // 60
+
+
 @app.get("/api/costing")
 def costing(project_id: str = Query(default=""), refresh: int = Query(default=0),
+            person: str = Query(default=""), sprint: str = Query(default=""),
+            type: str = Query(default=""),  # noqa: A002 — the filter's name on the page
             reader: dict = Depends(require_reader)):
-    """Hours from the tickets, rates from here, cost multiplied on read.
+    """Hours from OpenProject, rates and the budget from here, cost multiplied on read.
 
     Reuses the overview's cached read of the project — the same five minutes,
     the same one call — because costing and the overview are the same question
     about the same rows and reading OpenProject twice to ask both would double
     the cost of a page somebody leaves open. Like the overview, a Refresh does
     not wait: the answer carries `refreshing` and the page asks again.
+
+    `person`, `sprint` and `type` narrow every figure to a slice, the way the
+    Tasks page's filter does. The budget is the whole project's whatever the
+    filter, and the projection is not made for a single sprint, where there is
+    no pace to carry forward.
     """
     scope = _pms_scope(reader, project_id)
+    key = (scope["project"], scope["pmsId"])
     held = _project_read(reader, scope, refresh=bool(refresh))
     payload = held["payload"]
+    today = security.now().date()
 
     rates = {r["person"].lower(): r for r in db.all_rows(
         "SELECT * FROM rate WHERE project_id = ?", (scope["project"],))}
+    default = _default_rate(scope["project"])
+    history = _budget_history(scope["project"])
+    budget = history[0] if history else None
+
+    items = payload["items"]
+    by_key = {item["key"]: item for item in items}
+    closed = {s["name"] for s in payload.get("statuses") or [] if s.get("isClosed")}
+
+    # The sprints, in the order they run. Only versions with dates can be placed
+    # on a calendar; the rest are named by the tickets and kept for the fallback,
+    # after the dated ones.
+    versions = payload.get("versions") or []
+    dated_sprints = sorted(
+        (v for v in versions if _on_day(v.get("startDate")) and _on_day(v.get("endDate"))),
+        key=lambda v: (_on_day(v["startDate"]), v["name"]))
+    undated = [v["name"] for v in versions if v not in dated_sprints]
+
+    dated, reading = _dated_hours(reader, scope, key, held)
+    entries_ok = bool(dated) and dated.get("entries") is not None
+    source = "time-entries" if entries_ok else "tickets-by-sprint"
+
+    def sprint_on(day: Optional[date]) -> str:
+        """The sprint a dated hour falls in: the last one begun by that day. The
+        gaps between sprints (a weekend, a planning day) belong to the sprint
+        before them, so no hour falls between two."""
+        found = ""
+        for v in dated_sprints:
+            if day and _on_day(v["startDate"]) <= day:
+                found = v["name"]
+        return found
+
+    # One row per hour logged, the same shape from either source:
+    # (person, hours, sprint, day or None, ticket or None).
+    logged: list = []
+    if entries_ok:
+        for entry in dated["entries"]:
+            day = _on_day(entry["spentOn"])
+            ticket = by_key.get(entry["workPackage"])
+            # With no sprint on a calendar there is nothing to date an hour
+            # into, so it goes where the fallback would put it: the ticket's.
+            where = sprint_on(day) if dated_sprints else (ticket or {}).get("version") or ""
+            logged.append((entry["user"] or "Nobody", entry["hours"], where, day, ticket))
+    else:
+        for item in items:
+            if item.get("spentHours"):
+                logged.append((item.get("assignee") or "Nobody", item["spentHours"],
+                               item.get("version") or "", None, item))
+
+    want_person = person.strip().lower()
+    want_type = type.strip()
+    want_sprint = sprint.strip()
+
+    def kept(who: str, sprint_name: str, ticket: Optional[dict]) -> bool:
+        if want_person and who.lower() != want_person:
+            return False
+        if want_sprint and sprint_name != want_sprint:
+            return False
+        if want_type and (ticket or {}).get("type") != want_type:
+            return False
+        return True
+
+    def priced(who: str) -> tuple:
+        """(hourly, currency, at the default) for a name, or (None, None, False)."""
+        rate = rates.get(who.lower())
+        if rate:
+            return rate["hourly"], rate["currency"], False
+        if default and who != "Nobody":
+            return default["hourly"], default["currency"], True
+        return None, None, False
 
     people: dict = {}
+
+    def person_row(name: str) -> dict:
+        return people.setdefault(name.lower(), {
+            "person": name, "tickets": 0, "minutes": 0, "estimated": 0.0,
+            "withoutHours": 0})
+
     # Counted apart from the hours, because they are three different facts and
     # adding them together is how a costing page comes to say a number nobody
     # can defend: work with no time logged, work whose time this token may not
     # read, and work by somebody with no rate set.
     no_hours = 0
     unreadable = 0
-    for item in payload["items"]:
+    remaining = {"hours": 0.0, "numerator": 0, "unpricedHours": 0.0, "withoutEstimate": 0,
+                 "currencies": set(), "atDefaultHours": 0.0}
+    for item in items:
         name = item.get("assignee") or "Nobody"
-        spent = item.get("spentHours")
-        who = people.setdefault(name.lower(), {
-            "person": name, "tickets": 0, "hours": 0.0, "estimated": 0.0,
-            "withoutHours": 0, "rate": None})
+        if not kept(name, item.get("version") or "", item):
+            continue
+        who = person_row(name)
         who["tickets"] += 1
         who["estimated"] += item.get("estimatedHours") or 0
+        spent = item.get("spentHours")
         if spent is None:
             unreadable += 1
             who["withoutHours"] += 1
         elif spent == 0:
             no_hours += 1
             who["withoutHours"] += 1
+        # What the open work is expected to cost still: its estimate less what
+        # is already logged against it, at the holder's rate. An estimate is a
+        # plan, not a cost, so it is reported apart and never added to spend.
+        if item.get("status") not in closed and item.get("type") not in ("Epic", "Feature"):
+            estimate = item.get("estimatedHours")
+            if estimate is None:
+                remaining["withoutEstimate"] += 1
+                continue
+            left = max(0.0, estimate - (spent or 0))
+            if not left:
+                continue
+            remaining["hours"] += left
+            hourly, currency, at_default = priced(name)
+            if hourly is None:
+                remaining["unpricedHours"] += left
+            else:
+                remaining["numerator"] += hourly * round(left * 60)
+                remaining["currencies"].add(currency)
+                if at_default:
+                    remaining["atDefaultHours"] += left
+
+    # The spend, at the finest grain the source gives: person × sprint × week.
+    sprints_seen: dict = {}
+    weeks: dict = {}
+    currencies: set = set()
+    for name, hours_logged, sprint_name, day, ticket in logged:
+        if not kept(name, sprint_name, ticket):
+            continue
+        minutes = round(hours_logged * 60)
+        who = person_row(name)
+        who["minutes"] += minutes
+        hourly, currency, at_default = priced(name)
+        cell = sprints_seen.setdefault(sprint_name, {
+            "minutes": 0, "numerator": 0, "unpricedMinutes": 0, "defaultNumerator": 0,
+            "currencies": set()})
+        cell["minutes"] += minutes
+        if hourly is None:
+            cell["unpricedMinutes"] += minutes
         else:
-            who["hours"] += spent
+            cell["numerator"] += hourly * minutes
+            cell["currencies"].add(currency)
+            currencies.add(currency)
+            if at_default:
+                cell["defaultNumerator"] += hourly * minutes
+        if day:
+            monday = day - timedelta(days=day.weekday())
+            week = weeks.setdefault(monday, {"minutes": 0, "numerator": 0, "unpricedMinutes": 0})
+            week["minutes"] += minutes
+            if hourly is None:
+                week["unpricedMinutes"] += minutes
+            else:
+                week["numerator"] += hourly * minutes
+
+    one_currency = len(currencies) <= 1
+    currency = next(iter(currencies)) if len(currencies) == 1 else None
 
     out = []
-    currencies = set()
-    unrated = []
+    unrated, at_default_people = [], []
     for entry in people.values():
-        rate = rates.get(entry["person"].lower())
+        hourly, rate_currency, at_default = priced(entry["person"])
+        hours_total = entry["minutes"] / 60
         cost = None
-        if rate and entry["hours"]:
+        if hourly is not None and entry["minutes"]:
             # Integer maths on the smallest unit, rounded once at the end. A
             # float rate times a float hour count, summed, is a total that
             # disagrees with itself between two readers.
-            cost = int(round(rate["hourly"] * entry["hours"]))
-            currencies.add(rate["currency"])
-        elif not rate and entry["hours"]:
+            cost = _minor(hourly * entry["minutes"])
+            if at_default:
+                at_default_people.append(entry["person"])
+        elif hourly is None and entry["minutes"]:
             unrated.append(entry["person"])
         out.append({
-            **entry,
-            "hours": round(entry["hours"], 2),
+            "person": entry["person"], "tickets": entry["tickets"],
+            "withoutHours": entry["withoutHours"],
+            "hours": round(hours_total, 2),
             "estimated": round(entry["estimated"], 2),
-            "hourly": rate["hourly"] if rate else None,
-            "currency": rate["currency"] if rate else None,
+            "hourly": hourly, "currency": rate_currency,
+            "atDefault": at_default and hourly is not None,
             "cost": cost,
         })
-    out.sort(key=lambda p: -(p["cost"] or 0) or -p["hours"])
+    out.sort(key=lambda p: (-(p["cost"] or 0), -p["hours"], p["person"].lower()))
+    total_numerator = sum(c["numerator"] for c in sprints_seen.values())
+    default_numerator = sum(c["defaultNumerator"] for c in sprints_seen.values())
+    total_cost = _minor(total_numerator) if currency else None
 
+    # ── by sprint, in the order they run, with the running total ──
+    order = [v["name"] for v in dated_sprints]
+    if not entries_ok or not dated_sprints:
+        # Undated versions only mean something in the fallback, where an hour
+        # belongs to the ticket's version whatever its dates.
+        order += [n for n in undated if n in sprints_seen]
+    # And any sprint the hours name that the versions read did not list (a token
+    # that may not read versions gets none), so no logged hour drops out of the
+    # table while still being in the total.
+    order += sorted((n for n in sprints_seen if n and n not in order), key=str.lower)
+    by_sprint = []
+    running = 0
+    running_minutes = 0
+    # Hours that belong to no sprint come first: before the first sprint began
+    # (time entries), or on tickets in no sprint (the fallback). Either way they
+    # are spent, so the running total starts from them rather than leaving them out.
+    if "" in sprints_seen and not want_sprint:
+        cell = sprints_seen[""]
+        running += cell["numerator"]
+        running_minutes += cell["minutes"]
+        by_sprint.append({
+            "name": "Before the first sprint" if entries_ok and dated_sprints else "In no sprint",
+            "outside": True, "startDate": None, "endDate": None, "state": "done",
+            "hours": round(cell["minutes"] / 60, 2),
+            "cost": _minor(cell["numerator"]) if one_currency and currency else None,
+            "costAtDefault": _minor(cell["defaultNumerator"]) if one_currency and currency else None,
+            "unpricedHours": round(cell["unpricedMinutes"] / 60, 2),
+            "cumulative": _minor(running) if one_currency and currency else None,
+            "cumulativeHours": round(running_minutes / 60, 2),
+        })
+    versions_by_name = {v["name"]: v for v in versions}
+    for name in order:
+        if want_sprint and name != want_sprint:
+            continue
+        cell = sprints_seen.get(name, {"minutes": 0, "numerator": 0, "unpricedMinutes": 0,
+                                       "defaultNumerator": 0})
+        running += cell["numerator"]
+        running_minutes += cell["minutes"]
+        v = versions_by_name.get(name, {})
+        start, end = _on_day(v.get("startDate")), _on_day(v.get("endDate"))
+        state = ("ahead" if start and start > today else
+                 "done" if end and end < today else
+                 "current" if start else "undated")
+        by_sprint.append({
+            "name": name, "outside": False,
+            "startDate": v.get("startDate"), "endDate": v.get("endDate"), "state": state,
+            "hours": round(cell["minutes"] / 60, 2),
+            "cost": _minor(cell["numerator"]) if currency else None,
+            "costAtDefault": _minor(cell["defaultNumerator"]) if currency else None,
+            "unpricedHours": round(cell["unpricedMinutes"] / 60, 2),
+            "cumulative": _minor(running) if currency else None,
+            "cumulativeHours": round(running_minutes / 60, 2),
+        })
+
+    by_week = []
+    if entries_ok:
+        running = 0
+        for monday in sorted(weeks):
+            cell = weeks[monday]
+            running += cell["numerator"]
+            by_week.append({
+                "week": monday.isoformat(),
+                "hours": round(cell["minutes"] / 60, 2),
+                "cost": _minor(cell["numerator"]) if currency else None,
+                "unpricedHours": round(cell["unpricedMinutes"] / 60, 2),
+                "cumulative": _minor(running) if currency else None,
+            })
+
+    projection = _projection(
+        dated_sprints, today, total_numerator, currency, entries_ok, want_sprint, budget)
+
+    rem_currency = next(iter(remaining["currencies"])) if len(remaining["currencies"]) == 1 else None
     return {
         "project": scope["project"],
-        "asOf": security.stamp(),
         "people": out,
         "totalHours": round(sum(p["hours"] for p in out), 2),
         # Only where a rate exists, and only when one currency is in play. Two
         # currencies cannot be added, and a page that added them would be
         # quietly wrong in the most expensive possible way.
-        "totalCost": (sum(p["cost"] or 0 for p in out) if len(currencies) == 1 else None),
-        "currency": next(iter(currencies)) if len(currencies) == 1 else None,
+        "totalCost": total_cost,
+        "currency": currency,
         "currencies": sorted(currencies),
+        # The part of the total priced at the default rate, so the page can say
+        # how much of the figure is a stand-in rather than a real rate.
+        "costAtDefault": _minor(default_numerator) if currency else None,
+        "peopleAtDefault": sorted(set(at_default_people)),
         "ticketsWithoutHours": no_hours,
         "ticketsHoursUnreadable": unreadable,
         "peopleWithoutRate": sorted(set(unrated)),
+        "defaultRate": default,
+        "budget": budget,
+        "hoursSource": source,
+        "hoursSays": (None if entries_ok else
+                      (dated or {}).get("refused") or
+                      "Time entries are still being read, so for now hours are each "
+                      "ticket's total, counted in the ticket's sprint."),
+        "bySprint": by_sprint,
+        "byWeek": by_week,
+        "projection": projection,
+        "estimateRemaining": {
+            "hours": round(remaining["hours"], 2),
+            "cost": _minor(remaining["numerator"]) if rem_currency else None,
+            "currency": rem_currency,
+            "unpricedHours": round(remaining["unpricedHours"], 2),
+            "atDefaultHours": round(remaining["atDefaultHours"], 2),
+            "ticketsWithoutEstimate": remaining["withoutEstimate"],
+        },
+        "filter": {"person": person.strip(), "sprint": want_sprint, "type": want_type},
+        # What the page's filter offers, from the whole read rather than the slice.
+        "facets": {
+            "people": sorted({row[0] for row in logged} | {i.get("assignee") or "Nobody"
+                                                          for i in items}, key=str.lower),
+            "sprints": [v["name"] for v in dated_sprints] + undated,
+            "types": sorted({i.get("type") for i in items if i.get("type")}, key=str.lower),
+        },
+        "today": today.isoformat(),
         "truncated": payload.get("truncated", False),
         "asOf": held["asOf"],
         "ageSeconds": int(time.monotonic() - held["at"]),
-        **_overview_state((scope["project"], scope["pmsId"]), held),
+        **_overview_state(key, held),
+        # Folded into `refreshing` so the page's one "ask again" loop covers it.
+        **({"refreshing": True} if reading else {}),
     }
+
+
+def _projection(sprints: list, today: date, numerator: int, currency: Optional[str],
+                dated: bool, one_sprint: str, budget: Optional[dict]) -> dict:
+    """Where the spend ends up at the end of the last sprint, at the pace so far.
+
+    Always an answer with `says`, never a bare number: either the projection and
+    what it rests on, or the sentence saying why there is none.
+
+    **Two paces, chosen by what the hours can carry.** Dated hours give a cost
+    per working day since the first sprint began, carried to the last sprint's
+    last day. Undated hours only know their sprint, so the pace is a cost per
+    sprint, with the sprint under way counted as the part of it that has gone.
+    """
+    def none(why: str) -> dict:
+        return {"projected": None, "says": why}
+
+    if one_sprint:
+        return none("One sprint is shown, so there is no pace to carry forward.")
+    if not currency:
+        return none("No cost to carry forward: nothing is priced, or more than one "
+                    "currency is in play.")
+    if not sprints:
+        return none("The sprints have no dates in OpenProject, so there is no pace to "
+                    "carry forward.")
+    first, last = _on_day(sprints[0]["startDate"]), _on_day(sprints[-1]["endDate"])
+    spent = _minor(numerator)
+    if today < first:
+        return none(f"{sprints[0]['name']} has not begun, so there is no pace yet.")
+    last_name = sprints[-1]["name"]
+    finished = today > last
+    if dated:
+        elapsed = _working_days(first, min(today, last))
+        total = _working_days(first, last)
+        if not elapsed:
+            return none("No working day has passed since the first sprint began.")
+        projected = spent if finished else (numerator * total + elapsed * 30) // (elapsed * 60)
+        per = (numerator + elapsed * 30) // (elapsed * 60)
+        basis, unit = "working-days", "working day"
+        says = (f"{_spell(spent, currency)} over {elapsed} working days since "
+                f"{sprints[0]['name']} began is {_spell(per, currency)} a working day; "
+                f"{total - elapsed} working days to the end of {last_name}.")
+        path = []
+        for v in sprints:
+            end = _on_day(v["endDate"])
+            if end < today:
+                continue
+            days = _working_days(first, end)
+            path.append({"name": v["name"],
+                         "cost": (numerator * days + elapsed * 30) // (elapsed * 60)})
+    else:
+        # Sprints begun, the one under way counted by the share of its working
+        # days that have passed: a third of the way into Sprint 5 is 4⅓ sprints.
+        gone = 0.0
+        for v in sprints:
+            start, end = _on_day(v["startDate"]), _on_day(v["endDate"])
+            if start > today:
+                continue
+            if end < today:
+                gone += 1
+            else:
+                whole = _working_days(start, end) or 1
+                gone += _working_days(start, today) / whole
+        if gone <= 0:
+            return none("No working day has passed since the first sprint began.")
+        # Hundredths of a sprint, so the arithmetic stays in integers.
+        elapsed = max(1, round(gone * 100))
+        total = len(sprints) * 100
+        projected = spent if finished else (numerator * total + elapsed * 30) // (elapsed * 60)
+        per = (numerator * 100 + elapsed * 30) // (elapsed * 60)
+        basis, unit = "sprints", "sprint"
+        says = (f"{_spell(spent, currency)} across {gone:.1f} sprints so far is "
+                f"{_spell(per, currency)} a sprint; {len(sprints)} sprints in all, "
+                f"to the end of {last_name}.")
+        path = []
+        for n, v in enumerate(sprints, 1):
+            if _on_day(v["endDate"]) < today:
+                continue
+            path.append({"name": v["name"],
+                         "cost": (numerator * n * 100 + elapsed * 30) // (elapsed * 60)})
+    if finished:
+        says = f"{last_name} has ended, so this is the whole cost, not a projection."
+        path = []
+    comparable = bool(budget) and budget["currency"] == currency
+    return {
+        "projected": max(projected, spent),
+        "basis": basis, "unit": unit, "per": per,
+        "elapsed": elapsed, "total": total,
+        "lastSprint": last_name, "finished": finished,
+        "path": path,
+        "says": says,
+        # Positive is over, negative is under. Only when the budget is in the
+        # same currency; otherwise there is nothing honest to subtract.
+        "overBudget": (max(projected, spent) - budget["amount"]) if comparable else None,
+    }
+
+
+def _spell(minor: int, currency: str) -> str:
+    """Money for a sentence the service writes: whole units, grouped by three."""
+    return f"{currency} {minor // 100:,}"
 
 
 # ── what the agent did ───────────────────────────────────────────────
@@ -4577,79 +5275,142 @@ def _may_read_agents(account: dict) -> bool:
 
 @app.get("/api/agent/usage")
 def agent_usage(project_id: str = Query(default=""), days: int = Query(default=14, ge=1, le=120),
+                person: int = Query(default=0, ge=0),
                 account: dict = Depends(require_account)):
     """How much the agent is being used, and where it keeps failing.
 
     Grouped three ways because three different questions get asked of it: by
     person (is this being used at all), by tool (what is broken), and by ticket
     (what did this one actually cost). Everything is computed on read.
+
+    **Every figure is counted over the whole window, in SQL.** This used to read
+    the latest 500 sessions into Python and add them up, and list the latest 100
+    — so the page's "sessions" said 100 while the per-person totals summed 500,
+    and a 90-day window on a busy team quietly lost everything past the 500th
+    session from every total. The list is still capped, because nobody scrolls
+    a quarter of sessions; the counts are not, and `sessionCount` says how many
+    there were so the page can say "the latest 100 of 312".
+
+    `person` narrows the tools, the totals and the list to one account, for an
+    administrator or a pm asking "how is it going for her". `people` stays the
+    whole window either way: it is what the page's person picker is built from,
+    and a picker that shrank to the one person picked could not be changed back.
+    A developer is never widened by it and never narrowed past themselves.
     """
     project = _readable_project(account, project_id)
     since = security.stamp(security.now() - timedelta(days=days))
     whole = _may_read_agents(account)
-    where = "s.project_id = ? AND s.started_at >= ?"
-    args: tuple = (project, since)
+    base = "s.project_id = ? AND s.started_at >= ?"
+    base_args: tuple = (project, since)
     if not whole:
+        base += " AND s.account_id = ?"
+        base_args = (*base_args, account["id"])
+    # The narrowed clause, for everything but the roster.
+    where, args = base, base_args
+    narrowed = whole and person > 0
+    if narrowed:
         where += " AND s.account_id = ?"
-        args = (*args, account["id"])
-
-    sessions = db.all_rows(
-        f"SELECT s.*, a.name, a.email FROM agent_session s JOIN account a ON a.id = s.account_id "
-        f"WHERE {where} ORDER BY s.started_at DESC LIMIT 500", args)
+        args = (*args, person)
 
     by_person: dict = {}
-    for row in sessions:
-        who = by_person.setdefault(row["account_id"], {
-            "name": row["name"] or row["email"], "sessions": 0, "activeMs": 0,
-            "tickets": set(), "failures": 0, "calls": 0})
-        who["sessions"] += 1
-        who["activeMs"] += row["active_ms"]
-        if row["external_key"]:
-            who["tickets"].add(row["external_key"])
+    for row in db.all_rows(
+            f"SELECT s.account_id, a.name, a.email, COUNT(*) AS sessions, "
+            f"SUM(s.active_ms) AS active, "
+            f"COUNT(DISTINCT NULLIF(s.external_key, '')) AS tickets "
+            f"FROM agent_session s JOIN account a ON a.id = s.account_id "
+            f"WHERE {base} GROUP BY s.account_id", base_args):
+        by_person[row["account_id"]] = {
+            "id": row["account_id"], "name": row["name"] or row["email"],
+            "sessions": row["sessions"], "activeMs": row["active"] or 0,
+            "tickets": row["tickets"], "ticketKeys": [], "failures": 0, "calls": 0}
+    # Which tickets, newest first. Twelve is enough to say what somebody has
+    # been on; the count beside it is the true one.
+    for row in db.all_rows(
+            f"SELECT s.account_id, s.external_key, MAX(s.started_at) AS last "
+            f"FROM agent_session s WHERE {base} AND s.external_key != '' "
+            f"GROUP BY s.account_id, s.external_key ORDER BY last DESC", base_args):
+        keys = by_person.get(row["account_id"], {}).get("ticketKeys")
+        if keys is not None and len(keys) < 12:
+            keys.append(row["external_key"])
+    # Back onto the people, so "is this working for them" and "is this working
+    # at all" come from one read rather than two that can disagree.
+    for row in db.all_rows(
+            f"SELECT s.account_id, COUNT(*) AS n, SUM(CASE WHEN e.ok = 0 THEN 1 ELSE 0 END) AS bad "
+            f"FROM agent_event e JOIN agent_session s ON s.id = e.session_id "
+            f"WHERE {base} AND e.kind = 'tool' GROUP BY s.account_id", base_args):
+        if row["account_id"] in by_person:
+            by_person[row["account_id"]]["calls"] = row["n"]
+            by_person[row["account_id"]]["failures"] = row["bad"] or 0
 
-    ids = [row["id"] for row in sessions]
     tools: dict = {}
-    if ids:
-        holes = ",".join("?" * len(ids))
-        for row in db.all_rows(
-                f"SELECT tool, ok, error_kind, COUNT(*) AS n, SUM(ms) AS total, MAX(ms) AS worst "
-                f"FROM agent_event WHERE session_id IN ({holes}) AND kind = 'tool' AND tool != '' "
-                f"GROUP BY tool, ok, error_kind", tuple(ids)):
-            entry = tools.setdefault(row["tool"], {
-                "tool": row["tool"], "calls": 0, "failed": 0, "totalMs": 0, "worstMs": 0,
-                "why": {}})
-            entry["calls"] += row["n"]
-            entry["totalMs"] += row["total"] or 0
-            entry["worstMs"] = max(entry["worstMs"], row["worst"] or 0)
-            if not row["ok"]:
-                entry["failed"] += row["n"]
-                entry["why"][row["error_kind"] or "error"] = row["n"]
-        # Back onto the people, so "is this working for them" and "is this
-        # working at all" come from one read rather than two that can disagree.
-        for row in db.all_rows(
-                f"SELECT s.account_id, COUNT(*) AS n, SUM(CASE WHEN e.ok = 0 THEN 1 ELSE 0 END) AS bad "
-                f"FROM agent_event e JOIN agent_session s ON s.id = e.session_id "
-                f"WHERE e.session_id IN ({holes}) AND e.kind = 'tool' GROUP BY s.account_id",
-                tuple(ids)):
-            if row["account_id"] in by_person:
-                by_person[row["account_id"]]["calls"] = row["n"]
-                by_person[row["account_id"]]["failures"] = row["bad"] or 0
+    for row in db.all_rows(
+            f"SELECT e.tool, e.ok, e.error_kind, COUNT(*) AS n, SUM(e.ms) AS total, MAX(e.ms) AS worst "
+            f"FROM agent_event e JOIN agent_session s ON s.id = e.session_id "
+            f"WHERE {where} AND e.kind = 'tool' AND e.tool != '' "
+            f"GROUP BY e.tool, e.ok, e.error_kind", args):
+        entry = tools.setdefault(row["tool"], {
+            "tool": row["tool"], "calls": 0, "failed": 0, "totalMs": 0, "worstMs": 0,
+            "why": {}})
+        entry["calls"] += row["n"]
+        entry["totalMs"] += row["total"] or 0
+        entry["worstMs"] = max(entry["worstMs"], row["worst"] or 0)
+        if not row["ok"]:
+            entry["failed"] += row["n"]
+            # Added, not assigned: a failure stored with no word and one stored
+            # as 'error' are both "error" here, and are two groups above.
+            word = row["error_kind"] or "error"
+            entry["why"][word] = entry["why"].get(word, 0) + row["n"]
 
+    count = db.one(
+        f"SELECT COUNT(*) AS n, COALESCE(SUM(s.active_ms), 0) AS active, "
+        f"COUNT(DISTINCT s.account_id) AS people, "
+        f"COUNT(DISTINCT NULLIF(s.external_key, '')) AS tickets "
+        f"FROM agent_session s WHERE {where}", args)
+    listed = db.all_rows(
+        f"SELECT s.*, a.name, a.email FROM agent_session s JOIN account a ON a.id = s.account_id "
+        f"WHERE {where} ORDER BY s.started_at DESC LIMIT 100", args)
+
+    # Who could have used it and has not. Developers and team leads on this
+    # project, active, with no session in the window — the other half of "9 of
+    # 11", and the half a pm actually wants named. Only for those who oversee:
+    # a developer is not told which colleagues have been quiet.
+    quiet = []
+    expected = 0
+    if whole:
+        holes = ",".join("?" * len(security.SCOPED))
+        crew = db.all_rows(
+            f"SELECT a.id, a.name, a.email FROM account a "
+            f"JOIN account_project ap ON ap.account_id = a.id AND ap.project_id = ? "
+            f"WHERE a.active = 1 AND a.role IN ({holes}) ORDER BY a.name, a.email",
+            (project, *security.SCOPED))
+        expected = len({r["id"] for r in crew} | set(by_person))
+        quiet = [r["name"] or r["email"] for r in crew if r["id"] not in by_person]
+
+    calls = sum(t["calls"] for t in tools.values())
+    failed = sum(t["failed"] for t in tools.values())
     return {
         "project": project,
         "days": days,
         "whole": whole,
-        "people": sorted(
-            [{**who, "tickets": len(who["tickets"])} for who in by_person.values()],
-            key=lambda p: -p["activeMs"]),
+        "person": person if narrowed else 0,
+        "people": sorted(by_person.values(), key=lambda p: -p["activeMs"]),
+        # The window's true figures, for whoever `person` narrowed it to.
+        "totals": {
+            "sessions": count["n"], "activeMs": count["active"], "people": count["people"],
+            "tickets": count["tickets"], "calls": calls, "failed": failed,
+        },
+        "expected": expected,
+        "quiet": quiet,
         # Sorted by what is going wrong rather than by what is used most: the
         # page exists to find the thing that keeps failing.
         "tools": sorted(tools.values(), key=lambda t: (-t["failed"], -t["calls"])),
+        "sessionCount": count["n"],
         "sessions": [{
             "id": row["id"], "who": row["name"] or row["email"], "repo": row["repo"],
             "ticket": row["external_key"], "startedAt": row["started_at"],
             "endedAt": row["ended_at"], "activeMs": row["active_ms"], "agent": row["agent"],
-        } for row in sessions[:100]],
+            "host": row["host"],
+        } for row in listed],
     }
 
 
@@ -4819,20 +5580,37 @@ def list_batches(project_id: str = Query(default=""),
     # Waiting on a checker, and not this person's own — the whole point is that
     # they cannot be the one. Left out rather than shown and refused: a list of
     # buttons that all say no is a worse explanation than not being on the list.
+    #
+    # **With their tickets** (14 October). They came back without, so a checker
+    # passed a batch having read the notes and never seen what was closed — a
+    # check of somebody's account of their work rather than of the work. Who may
+    # see them is who may check them, which is the rule just above: a teammate
+    # who writes on this project, never the author.
     waiting = []
     if security.may_write(account["role"]):
         waiting = [
-            _batch_row(row, items=False) for row in db.all_rows(
+            _batch_row(row) for row in db.all_rows(
                 "SELECT * FROM test_batch WHERE project_id = ? AND submitted_at IS NOT NULL "
                 "AND verdict = '' AND account_id != ? ORDER BY submitted_at",
                 (project, account["id"]))
         ]
 
+    # Each ticket as a link the reader can open, on the OpenProject they read.
+    # The endpoint column only: nothing here needs the token decrypted.
+    saved = db.one("SELECT endpoint FROM account_secret WHERE account_id = ? AND kind = ?",
+                   (account["id"], OPENPROJECT))
+    endpoint = ((saved["endpoint"] if saved else "") or DEFAULT_PMS).rstrip("/")
+
+    def linked(batch: Optional[dict]) -> Optional[dict]:
+        for ticket in (batch or {}).get("tickets", []):
+            ticket["url"] = f"{endpoint}/work_packages/{ticket['key']}"
+        return batch
+
     return {
         "project": project,
         "every": TEST_EVERY,
-        "mine": _batch_row(mine) if mine else None,
-        "waiting": waiting,
+        "mine": linked(_batch_row(mine)) if mine else None,
+        "waiting": [linked(b) for b in waiting],
         "past": [_batch_row(row, items=False) for row in db.all_rows(
             "SELECT * FROM test_batch WHERE project_id = ? AND account_id = ? "
             "AND verdict = 'passed' ORDER BY id DESC LIMIT 10",
@@ -5210,6 +5988,10 @@ def _change_row(row) -> dict:
         # the instance address to build one, and a page that guesses it gets a
         # link that 404s for everybody on a different deployment.
         "childUrl": f"{DEFAULT_PMS}/work_packages/{row['child_key']}" if row["child_key"] else "",
+        # The ticket it came out of, as a link, for the same reason: the changes
+        # page names "#6046" on every row and a number nobody can open is a
+        # number somebody retypes into OpenProject's search.
+        "ticketUrl": f"{DEFAULT_PMS}/work_packages/{row['external_key']}" if row["external_key"] else "",
         "childAt": row["child_at"],
         "status": row["status"],
         "raisedBy": row["raised_by_name"] or row["raised_by_email"],
@@ -6301,6 +7083,202 @@ def _file_settlement_ticket(account: dict, project: str, row, endpoint: str, tok
         raise
     _record_child(project, row, made, account, claimed=_SETTLE_CLAIM)
     return made
+
+
+# ── what a request's ticket says, and telling it by hand (changes page) ──
+#
+# The settle above tells the ticket by itself. Two things it cannot do, and the
+# changes page needs both:
+#
+#   **Say beforehand what settling will do.** A lead pressing Accept should read
+#   "this adds a comment to #6046 for the developer's agent" or "#6046 is closed,
+#   so this files a new ticket under it" *before* pressing, not discover it in
+#   the answer. `ticket/source` reads the ticket and runs cr_notice.plan for each
+#   way the request could be settled. It writes nothing.
+#
+#   **Tell a ticket that was never told.** A request settled before 14 October,
+#   settled through the spreadsheet, or settled while its settler had no
+#   OpenProject token is accepted with an open ticket that has no comment on it.
+#   Its agent will build to the old description. `comment/preview` and
+#   `comment/{proposal}/apply` post the same comment the settle would have, in
+#   the propose-then-confirm shape every other write across this bridge has: the
+#   page shows the exact text, and only the second call sends it.
+#
+# Both follow the 14 October rule through cr_notice.plan rather than restating
+# it, so the page, the settle and settle_changes.py cannot disagree about which
+# ticket gets a comment and which gets a child.
+
+
+def _cr_ticket_target(row) -> tuple:
+    """(ticket, child, the one a settlement tells). The settle's claim marker is
+    not a ticket, so it reads as none."""
+    ticket = (row["external_key"] or "").strip()
+    child = (row["child_key"] or "").strip()
+    if child == _SETTLE_CLAIM:
+        child = ""
+    return ticket, child, child or ticket
+
+
+@app.get("/api/changes/{number}/ticket/source")
+def ticket_source(number: str, project_id: str = Query(default=""),
+                  account: dict = Depends(require_account)):
+    """The ticket a request would tell, as OpenProject has it now, and what each
+    settlement would do there. **Reads only.**
+
+    Never an error for OpenProject's sake: no token, an unreachable instance or a
+    ticket this person cannot see all come back as `read: false` with `why`, so
+    the page says that sentence where the plan would have been instead of
+    replacing the request with an error.
+    """
+    scope = _change_project(account, project_id)
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    cr = f"CR-{row['number']:03d}"
+    ticket, child, target = _cr_ticket_target(row)
+    out = {"change": cr, "status": row["status"], "ticket": ticket, "child": child,
+           "key": target, "read": False}
+    if not target:
+        out["why"] = "raised from no ticket, so there is none to tell"
+        out["onSettle"] = {s: cr_notice.plan(s, ticket, child, False) for s in cr_notice.SETTLED}
+        return out
+    try:
+        endpoint, token = _pms_for(account["id"])
+    except HTTPException as exc:
+        out["why"] = str(exc.detail)
+        return out
+    try:
+        found = openproject.work_package(endpoint, token, target)
+        closed = openproject.is_closed(endpoint, token, target)
+        said = openproject.comments(endpoint, token, target)
+    except (openproject.Blocked, openproject.Refused) as exc:
+        out["why"] = str(exc)
+        return out
+    out.update({
+        "read": True,
+        "subject": found.get("subject") or "",
+        "statusName": found.get("status") or "",
+        "closed": closed,
+        "url": found.get("url") or "",
+        # Which settlements the thread already carries, so the page offers
+        # "Add a comment" only where the agent has not been told.
+        "told": [s for s in cr_notice.SETTLED if cr_notice.already_told(said, cr, s)],
+        "onSettle": {s: cr_notice.plan(s, ticket, child, closed) for s in cr_notice.SETTLED},
+    })
+    return out
+
+
+def _comment_guard(number: str, account: dict, project_id: str):
+    """The checks the comment preview and its apply share: who, which status,
+    which ticket, and that it has not been told already. Returns what both need."""
+    scope = _change_project(account, project_id)
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    cr = f"CR-{row['number']:03d}"
+    scopes = _scopes_of(account["id"], scope["project"])
+    # The same people who schedule it, because telling the ticket is the other
+    # way of scheduling it (CHG-ADM-002): whoever may settle it, or its holder.
+    if not _may_file_ticket(account, scope["role"], scopes, row):
+        raise HTTPException(403, (
+            f"{cr} is not yours to tell its ticket about. Whoever can settle it, or "
+            f"whoever took it on, does that."))
+    if row["status"] not in cr_notice.SETTLED:
+        raise HTTPException(409, (
+            f"{cr} is still open. Settle it first: accepting or rejecting it tells its ticket."))
+    if (row["child_key"] or "") == _SETTLE_CLAIM:
+        raise HTTPException(409, f"A ticket for {cr} is being filed right now. Look again in a minute.")
+    ticket, child, target = _cr_ticket_target(row)
+    endpoint, token = _pms_for(account["id"])
+    try:
+        closed = openproject.is_closed(endpoint, token, target) if target else False
+        step = cr_notice.plan(row["status"], ticket, child, closed)
+        if step["action"] == "ticket":
+            raise HTTPException(409, (
+                f"#{target} is closed, so {cr} gets a new ticket under it rather than a "
+                f"comment nobody will pull. Make a ticket instead."))
+        if step["action"] != "comment":
+            raise HTTPException(409, f"Nothing to tell: {step['why']}.")
+        said = openproject.comments(endpoint, token, target)
+    except openproject.Blocked as exc:
+        raise HTTPException(502, str(exc))
+    except openproject.Refused as exc:
+        raise HTTPException(404 if exc.status == 404 else 502, str(exc))
+    return scope, row, cr, target, endpoint, token, said
+
+
+@app.post("/api/changes/{number}/comment/preview")
+def preview_comment(number: str, body: FileIn, account: dict = Depends(require_account)):
+    """Work out the comment a settled request owes its open ticket. **Sends nothing.**"""
+    scope, row, cr, target, _endpoint, _token, said = _comment_guard(number, account, body.project_id)
+    if cr_notice.already_told(said, cr, row["status"]):
+        raise HTTPException(409, (
+            f"#{target} already has {cr}'s {row['status']} comment. The agent reads it on its next pull."))
+    served = releases.served(scope["project"])
+    text = cr_notice.comment_text(cr, row["title"], row["status"], row["resolution"],
+                                  row["resolved_ref"], target, served["tag"] if served else "",
+                                  _json_list(row["artefact_ids"]))
+    proposal = security.new_token()
+    now = security.now()
+    # `status_name` holds the settlement the comment was worded for, so an apply
+    # after the request was settled differently is refused rather than posting
+    # a decision that is no longer the decision.
+    db.write(
+        "INSERT INTO wp_proposal (token_hash, account_id, project_id, kind, external_key, "
+        "change_number, status_name, comment, summary, created_at, expires_at) "
+        "VALUES (?, ?, ?, 'cr-comment', ?, ?, ?, ?, ?, ?, ?)",
+        (security.token_hash(proposal), account["id"], scope["project"], target, row["number"],
+         row["status"], text, f"comment on #{target}: {cr} {row['status']}",
+         security.stamp(now), security.stamp(now + timedelta(minutes=PROPOSAL_MINUTES))))
+    return {
+        "proposal": proposal,
+        "change": cr,
+        "key": target,
+        "url": f"{DEFAULT_PMS}/work_packages/{target}",
+        "text": text,
+        "expiresInMinutes": PROPOSAL_MINUTES,
+        "note": "Nothing has been posted yet. Show this to the person and apply only after they say yes.",
+    }
+
+
+@app.post("/api/changes/{number}/comment/{proposal}/apply")
+def apply_comment(number: str, proposal: str, body: FileIn,
+                  account: dict = Depends(require_account)):
+    """Post the comment the person has read. One use; their own token."""
+    scope, row, cr, target, endpoint, token, said = _comment_guard(number, account, body.project_id)
+    held = db.one("SELECT * FROM wp_proposal WHERE token_hash = ? AND kind = 'cr-comment'",
+                  (security.token_hash(proposal),))
+    if (not held or held["account_id"] != account["id"]
+            or held["project_id"] != scope["project"] or held["change_number"] != row["number"]):
+        raise HTTPException(404, f"No such proposal for {cr}. Preview it first.")
+    if held["applied_at"]:
+        raise HTTPException(409, f"That comment has already been posted on #{held['external_key']}.")
+    if security.expired(held["expires_at"]):
+        raise HTTPException(410, (
+            f"That preview is more than {PROPOSAL_MINUTES} minutes old. Look at it again and preview it again."))
+    if held["external_key"] != target or held["status_name"] != row["status"]:
+        raise HTTPException(409, (
+            f"{cr} has changed since that preview (it is now {row['status']}, telling #{target}). "
+            f"Preview it again."))
+    if cr_notice.already_told(said, cr, row["status"]):
+        # Told in the meantime, by a settle or another press: nothing to send,
+        # and nothing went wrong.
+        db.write("UPDATE wp_proposal SET applied_at = ?, result_key = ? WHERE id = ?",
+                 (security.stamp(), target, held["id"]))
+        return {"ok": True, "already": True, "key": target}
+    if not db.change("UPDATE wp_proposal SET applied_at = ? WHERE id = ? AND applied_at IS NULL",
+                     (security.stamp(), held["id"])):
+        raise HTTPException(409, "That comment has already been posted.")
+    try:
+        openproject.comment(endpoint, token, target, held["comment"], notify=False)
+    except (openproject.Blocked, openproject.Refused) as exc:
+        db.write("UPDATE wp_proposal SET applied_at = NULL WHERE id = ?", (held["id"],))
+        raise HTTPException(502, str(exc))
+    db.write("UPDATE wp_proposal SET result_key = ? WHERE id = ?", (target, held["id"]))
+    return {"ok": True, "already": False, "key": target,
+            "url": f"{DEFAULT_PMS}/work_packages/{target}"}
 
 
 # ── the plan: modules on a chart, dragged, then shipped ──────────────

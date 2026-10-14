@@ -33,9 +33,25 @@ output apart, and prints each row only when every row above it has printed -- so
 exit code and every checker's output are the same as `--jobs 1`, which is the original loop and is
 kept. A checker in `SERIAL` runs alone, with nothing before it still running and nothing after it
 started, so whatever it writes is seen exactly as the sequential run saw it.
+
+    python3 tools/run-checks.py --json handoff/checks.json      # the table, and the run as JSON
+    python3 tools/run-checks.py --from-log LOG --json OUT       # an old table log, as JSON; runs nothing
+
+**The run as JSON is for ADAM's Audit page** (14 October). Until then the page carried a checker
+run typed into its source by hand on 31 August, and five releases later it still said so, because a
+table printed to a terminal is read once and never again. `--json` writes the same verdicts with
+what the table drops: each checker's first finding lines, the file the first finding names, its
+error and warning counts, and which commit and release tag the run sat on -- so the page can say
+"these checks ran before r3; r5 is served" rather than pass an old run off as the current one.
+The table and the exit code are unchanged. `refresh-safe.sh` writes `handoff/checks.json` from the
+judged run, which is the one a release is made from; `--from-log` is for the logs taken before this
+existed, which carry only the table, so their first findings are empty rather than guessed.
 """
+import datetime
 import io
+import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -247,8 +263,153 @@ def _run_one(t):
     return t, p.returncode, (p.stdout or "") + (p.stderr or ""), time.time() - t0
 
 
+# ---------------------------------------------------------------------------------------------
+# The run as JSON (--json). Read by ADAM's Audit page through the viewer's /api/audit.
+# ---------------------------------------------------------------------------------------------
+
+# A finding line, in the forms the checkers print: `  FAIL  <what>`, `  STALE  <path> ...`,
+# `  ISSUE <what>`, `  ERROR <what>`. The closing verdict (`FAIL - 7 stale, ...`) is not a finding,
+# which is the same exclusion refresh-safe.sh's judge makes.
+_FINDING = re.compile(r"^\s*(FAIL|STALE|ISSUE|ERROR)\s+(?!-)(.*\S)\s*$")
+_WARNING = re.compile(r"^\s*(WARN|WARNING)\s+(.*\S)\s*$")
+# A package path a finding names: the file somebody opens to fix it. Only a path with a folder or a
+# known extension counts, so a word like "e.g." is not mistaken for one.
+_PATH = re.compile(r"(?<![\w/.-])((?:[\w.-]+/)*[\w.-]+\.(?:ya?ml|json|md|py|sql|csv|mjs|js|ts|html|txt))\b")
+_COUNTS = {
+    "errors": re.compile(r"(\d[\d,]*)\s+(?:error|stale|issue|failure)", re.I),
+    "warnings": re.compile(r"(\d[\d,]*)\s+warning", re.I),
+}
+FIRST_LINES = 3
+
+
+def _count(pattern, text):
+    total, seen = 0, False
+    for m in pattern.finditer(text or ""):
+        total += int(m.group(1).replace(",", ""))
+        seen = True
+    return total if seen else None
+
+
+def record(name, rc, out, secs, last=None):
+    """One checker's verdict as the JSON carries it. `out` is its full output, or None when only
+    the table's last line is known (`--from-log`), and then `first` is empty rather than guessed."""
+    lines = [l for l in (out or "").split("\n") if l.strip()]
+    if last is None:
+        last = lines[-1].strip() if lines else ""
+    findings = [m.group(1) + "  " + m.group(2) for m in map(_FINDING.match, lines) if m]
+    warnings = [m.group(2) for m in map(_WARNING.match, lines) if m]
+    if rc == 127 and out is None and last in ("", "MISSING", "no such tool"):
+        status = "fail"
+    elif rc == 0:
+        status = "pass"
+    else:
+        status = "warn" if name in REPORT_ONLY else "fail"
+    errors = _count(_COUNTS["errors"], last)
+    warns = _count(_COUNTS["warnings"], last)
+    if errors is None and status != "pass" and out is not None:
+        errors = len(findings)
+    if warns is None and out is not None:
+        warns = len(warnings)
+    first = (findings if status != "pass" else []) or (warnings if status == "warn" else [])
+    first = [l[:240] for l in first[:FIRST_LINES]]
+    fix = None
+    for line in first:
+        m = _PATH.search(line)
+        if m and not m.group(1).startswith("tools/"):
+            fix = m.group(1)
+            break
+    return {
+        "name": name,
+        "status": status,
+        "gates": name not in REPORT_ONLY,
+        "rc": rc,
+        "seconds": round(secs, 1),
+        "errors": errors,
+        "warnings": warns,
+        "summary": last[:240],
+        "first": first,
+        "fix": fix,
+        **({"reportOnly": REPORT_ONLY[name]} if name in REPORT_ONLY else {}),
+    }
+
+
+def _git(*args):
+    try:
+        p = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=30)
+        return p.stdout.strip() if p.returncode == 0 else None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def where():
+    """The commit the run sat on and the release tag at or before it: `r5` with `ahead` 0 is a run
+    of the tag itself; `ahead` 3 is three commits past it, on the way to the next one."""
+    commit = _git("rev-parse", "HEAD")
+    dirty = _git("status", "--porcelain", "--untracked-files=no", "--", ".")
+    described = _git("describe", "--tags", "--match", "r[0-9]*", "--long", "HEAD")
+    m = re.match(r"^(r\d+)-(\d+)-g[0-9a-f]+$", described or "")
+    return {
+        "commit": commit,
+        "dirty": bool(dirty) if dirty is not None else None,
+        "base": m.group(1) if m else None,
+        "ahead": int(m.group(2)) if m else None,
+    }
+
+
+def _iso(t):
+    return datetime.datetime.fromtimestamp(t, datetime.timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def write_json(path, records, started, finished, source="run", at=None, extra=None):
+    """Written beside and renamed over, so a reader never sees half a file."""
+    order = {c: i for i, c in enumerate(CHECKS)}
+    records = sorted(records, key=lambda r: order.get(r["name"], len(order)))
+    totals = {"run": len(records)}
+    for s in ("pass", "fail", "warn"):
+        totals[s] = sum(1 for r in records if r["status"] == s)
+    doc = {
+        "schema": 1,
+        "about": "One run of tools/run-checks.py, for ADAM's Audit page. Written by the run; never by hand.",
+        "source": source,
+        "ranAt": _iso(started),
+        "finishedAt": _iso(finished),
+        "seconds": round(finished - started, 1),
+        **(at if at is not None else where()),
+        **(extra or {}),
+        "totals": totals,
+        "checks": records,
+    }
+    folder = os.path.dirname(os.path.abspath(path))
+    os.makedirs(folder, exist_ok=True)
+    temp = "%s.%d.tmp" % (path, os.getpid())
+    with open(temp, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(doc, fh, indent=1, ensure_ascii=False)
+        fh.write("\n")
+    os.replace(temp, path)
+    return doc
+
+
+_ROW = re.compile(r"^\s{2}(\S+)\s+(ok  |FAIL|rpt |MISSING)\s*(?:rc=(\d+)\s+([\d.]+)s\s{2}(.*))?$")
+
+
+def from_log(text):
+    """The rows of a printed table, as records. A log has no full output, so `first` stays empty."""
+    out = []
+    for line in text.splitlines():
+        m = _ROW.match(line.rstrip("\r"))
+        if not m:
+            continue
+        name, mark, rc, secs, last = m.groups()
+        if mark == "MISSING":
+            out.append(record(name, 127, None, 0.0, last="MISSING"))
+            continue
+        out.append(record(name, int(rc), None, float(secs), last=(last or "").strip()))
+    return out
+
+
 def _args(argv):
     gate, jobs, out_dir, only = True, 1, None, []
+    opts = {"json": None, "from_log": None}
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -265,14 +426,38 @@ def _args(argv):
             i += 0 if "=" in a else 1
             if not out_dir:
                 raise SystemExit("run-checks: --out-dir needs a directory")
+        elif a.split("=", 1)[0] in ("--json", "--from-log"):
+            key = a.split("=", 1)[0][2:].replace("-", "_")
+            opts[key] = a.split("=", 1)[1] if "=" in a else (argv[i + 1] if i + 1 < len(argv) else "")
+            i += 0 if "=" in a else 1
+            if not opts[key]:
+                raise SystemExit("run-checks: %s needs a file" % a.split("=", 1)[0])
         elif not a.startswith("-"):
             only.append(a)
         i += 1
-    return gate, jobs, out_dir, only
+    if opts["from_log"] and not opts["json"]:
+        raise SystemExit("run-checks: --from-log converts a log to --json FILE; name the file")
+    return gate, jobs, out_dir, only, opts
 
 
 def main():
-    gate, jobs, out_dir, only = _args(sys.argv[1:])
+    gate, jobs, out_dir, only, opts = _args(sys.argv[1:])
+    if opts["from_log"]:
+        # Nothing runs. The log's own date is the run's: it was written as the run finished.
+        log = opts["from_log"]
+        text = open(log, encoding="utf-8", errors="replace").read()
+        records = from_log(text)
+        if not records:
+            raise SystemExit("run-checks: %s has no rows of the checks table in it" % log)
+        finished = os.path.getmtime(log)
+        started = finished - sum(r["seconds"] for r in records)
+        doc = write_json(opts["json"], records, started, finished, source="log",
+                         at={"commit": None, "dirty": None, "base": None, "ahead": None},
+                         extra={"log": os.path.basename(log)})
+        print("  %d checker(s) from %s -> %s" % (doc["totals"]["run"], log, opts["json"]))
+        return 0
+    started = time.time()
+    records = []
     checks = [c for c in CHECKS if not only or c in only]
     if out_dir:
         os.makedirs(out_dir, exist_ok=True)
@@ -284,6 +469,7 @@ def main():
         if out is None:
             print("  %-26s MISSING" % t, flush=True)
             results.append((t, 127, "no such tool"))
+            records.append(record(t, 127, None, 0.0, last="MISSING"))
             return
         if out_dir:
             with open(os.path.join(out_dir, t + ".txt"), "w", encoding="utf-8", newline="") as fh:
@@ -297,6 +483,8 @@ def main():
             mark = "rpt "
         print("  %-26s %s rc=%-3d %5.1fs  %s" % (t, mark, rc, secs, last[:96]), flush=True)
         results.append((t, rc, last))
+        if opts["json"]:
+            records.append(record(t, rc, out, secs))
 
     if out_dir and os.path.exists(os.path.join(out_dir, "results.tsv")):
         os.remove(os.path.join(out_dir, "results.tsv"))
@@ -327,6 +515,11 @@ def main():
         print("    rpt  %-26s rc=%d — %s" % (t, rc, REPORT_ONLY[t]))
     for t, rc in bad:
         print("    FAIL %-26s rc=%d" % (t, rc))
+
+    if opts["json"]:
+        # After the table, so a run that cannot write its JSON has still printed its verdict.
+        write_json(opts["json"], records, started, time.time(), extra={"jobs": jobs})
+        print("  the run as JSON: %s" % opts["json"])
 
     if bad and gate:
         return 1

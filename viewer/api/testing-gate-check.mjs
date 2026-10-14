@@ -176,6 +176,35 @@ check('but submitting does not open the gate — that is the point',
 check('and it says it is now somebody else\'s move',
   /teammate has to look/.test(String(stillShut.data?.detail)), String(stillShut.data?.detail));
 
+// ── the checker sees what was closed ─────────────────────────────────
+//
+// A waiting batch used to come back without its tickets, so a teammate passed
+// it having read the notes and never seen what was closed (14 October). It
+// carries them now, each a link the checker can open — to the checker, and
+// still never offered to its own author.
+
+const toCheck = await as('harness.dev2', 'GET', '/api/test-batches');
+const waitingOne = (toCheck.data?.waiting ?? []).find((b) => b.id === batchId);
+check('the batch waits for a teammate to check', Boolean(waitingOne),
+  (toCheck.data?.waiting ?? []).map((b) => b.id).join(' ') || 'none');
+check('and comes with every ticket in it',
+  (waitingOne?.tickets ?? []).length === waitingOne?.closed && waitingOne?.closed >= 10,
+  `${(waitingOne?.tickets ?? []).length} tickets of ${waitingOne?.closed}`);
+check('each with its number, subject and when it was closed',
+  (waitingOne?.tickets ?? []).every((t) => t.key && 'subject' in t && t.closedAt),
+  JSON.stringify(waitingOne?.tickets?.[0] ?? null));
+check('and a link to it in OpenProject',
+  (waitingOne?.tickets ?? []).every((t) => t.url === `${PMS}/work_packages/${t.key}`),
+  waitingOne?.tickets?.[0]?.url);
+const ownView = await as('harness.dev', 'GET', '/api/test-batches');
+check('the author still is not offered their own batch to check',
+  !(ownView.data?.waiting ?? []).some((b) => b.id === batchId),
+  (ownView.data?.waiting ?? []).map((b) => b.id).join(' ') || 'none');
+check('and their own batch links its tickets too',
+  (ownView.data?.mine?.tickets ?? []).length > 0
+    && ownView.data.mine.tickets.every((t) => /\/work_packages\/\d+$/.test(t.url ?? '')),
+  ownView.data?.mine?.tickets?.[0]?.url);
+
 // ── the maker cannot be the checker ──────────────────────────────────
 
 const self = await as('harness.dev', 'POST', `/api/test-batches/${batchId}/check`,

@@ -33,16 +33,24 @@
  */
 
 /** Sections, in the order they are written. Each names the payload it needs, so
- *  a layer that has not been built yet is skipped rather than drawn empty. */
+ *  a layer that has not been built yet is skipped rather than drawn empty.
+ *
+ *  **The one place a section is named.** The page's picker, the document's own
+ *  headings and the workbook (which imports this list and adds its one extra)
+ *  all read the title from here. They used to be two lists that agreed on ids
+ *  and disagreed on words, so a reader ticked "Modules, tables and columns" and
+ *  got a document whose heading said "Data model". */
 export const SECTIONS = [
   { id: 'overview', title: 'Overview', needs: null },
-  { id: 'frontend', title: 'Screens and journeys', needs: 'journeys' },
+  { id: 'frontend', title: 'Platforms, screens and journeys', needs: 'journeys' },
   { id: 'contracts', title: 'Contracts and operations', needs: 'index' },
   { id: 'domain', title: 'State models and events', needs: 'domain' },
-  { id: 'backend', title: 'Data model', needs: 'backend' },
+  { id: 'backend', title: 'Modules, tables and columns', needs: 'backend' },
   { id: 'services', title: 'Services', needs: 'diagrams' },
   { id: 'decisions', title: 'Decisions', needs: 'decisions' },
 ];
+
+const titleOf = (id) => SECTIONS.find((s) => s.id === id)?.title ?? id;
 
 const esc = (s) => String(s ?? '').replace(/\r/g, '');
 
@@ -119,7 +127,7 @@ function frontend(pkg) {
   const screens = pkg.journeys?.screens ?? [];
   const flows = pkg.journeys?.flows ?? [];
   const platforms = pkg.journeys?.platforms ?? [];
-  const out = ['## Screens and journeys', ''];
+  const out = [`## ${titleOf('frontend')}`, ''];
 
   if (platforms.length) {
     out.push(`### Platforms (${platforms.length})`, '');
@@ -159,7 +167,7 @@ function contracts(pkg) {
   const nodes = pkg.index?.nodes ?? [];
   const files = nodes.filter((n) => n.type === 'file');
   const operations = nodes.filter((n) => n.type === 'operation');
-  const out = ['## Contracts and operations', '',
+  const out = [`## ${titleOf('contracts')}`, '',
     `${files.length} contracts carrying ${operations.length} operations.`, ''];
 
   for (const file of [...files].sort((a, b) => String(a.name).localeCompare(String(b.name)))) {
@@ -179,7 +187,7 @@ function contracts(pkg) {
 function domain(pkg) {
   const machines = pkg.domain?.machines ?? [];
   const events = pkg.domain?.events ?? [];
-  const out = ['## State models and events', '',
+  const out = [`## ${titleOf('domain')}`, '',
     `${machines.length} state models and ${events.length} events.`, ''];
 
   if (machines.length) {
@@ -219,7 +227,7 @@ function backend(pkg) {
   // An object keyed by table name, not a list. Guessing otherwise is what
   // threw `columns is not iterable` on the first request this file ever saw.
   const columns = pkg.backend?.columns ?? {};
-  const out = ['## Data model', '',
+  const out = [`## ${titleOf('backend')}`, '',
     `${tables.length} tables in ${modules.length} modules.`, ''];
 
   // Counted rather than glossed over. A table with no description is a real
@@ -254,7 +262,7 @@ function backend(pkg) {
 function services(pkg) {
   const list = pkg.diagrams?.services ?? [];
   const tiers = pkg.diagrams?.tiers ?? [];
-  const out = ['## Services', '', `${list.length} services.`, ''];
+  const out = [`## ${titleOf('services')}`, '', `${list.length} services.`, ''];
 
   if (tiers.length) {
     out.push(table(['Tier', 'What it means', 'Services'],
@@ -278,7 +286,7 @@ function services(pkg) {
 function decisions(pkg) {
   const adrs = pkg.decisions?.adrs ?? [];
   const docs = pkg.decisions?.documents ?? [];
-  const out = ['## Decisions', '', `${adrs.length} architecture decision records.`, ''];
+  const out = [`## ${titleOf('decisions')}`, '', `${adrs.length} architecture decision records.`, ''];
   out.push(table(['Id', 'Title', 'Status', 'Verdict', 'Date', 'Superseded by'],
     [...adrs].sort((a, b) => Number(a.number) - Number(b.number))
       .map((a) => [a.id, a.title, a.status, a.verdict, a.date, a.supersededBy])), '');

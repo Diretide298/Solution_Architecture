@@ -19,6 +19,8 @@
  * no section for because a board is a picture and a document cannot show it.
  */
 
+import { SECTIONS as DOCUMENT_SECTIONS } from './document.mjs';
+
 /** Prose in a cell. Newlines collapse: a cell with a paragraph in it makes the
  *  row taller than the screen, and the package has 25,000-character fields. */
 function cell(value, at = 500) {
@@ -281,16 +283,11 @@ const wireframes = (pkg) => {
 
 const BUILDERS = { overview, frontend, contracts, domain, backend, services, decisions, wireframes };
 
-/** The sections a workbook can carry. The first seven are document.mjs's, by
- *  the same ids, so one picker drives both. */
+/** The sections a workbook can carry: document.mjs's, ids and names both,
+ *  imported rather than copied so the picker and the document cannot name one
+ *  section two ways, and the one the document has no room for. */
 export const SECTIONS = [
-  { id: 'overview', title: 'Overview' },
-  { id: 'frontend', title: 'Platforms, journeys and screens' },
-  { id: 'contracts', title: 'Contracts and operations' },
-  { id: 'domain', title: 'State models and events' },
-  { id: 'backend', title: 'Modules, tables and columns' },
-  { id: 'services', title: 'Services' },
-  { id: 'decisions', title: 'Decisions' },
+  ...DOCUMENT_SECTIONS.map(({ id, title }) => ({ id, title })),
   { id: 'wireframes', title: 'Wireframe boards' },
 ];
 
