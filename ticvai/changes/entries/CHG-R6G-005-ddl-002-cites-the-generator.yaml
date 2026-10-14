@@ -1,0 +1,34 @@
+id: CHG-R6G-005
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'CHG-DDL-002 cites the generator symbol that writes the derived column-type file (tools/derive-ddl.py
+  DDL_TYPES_FILE) instead of the derived file''s path, which git does not track.'
+decision:
+  what: 'changes/entries/CHG-DDL-002-renamed-tables-keep-ddl-types.yaml decision.what: "writes <the handoff path of
+    ddl-column-types.json> on --apply" becomes "writes the derived ddl-column-types.json beside the other handoff files on --apply
+    (tools/derive-ddl.py::DDL_TYPES_FILE ...)". Nothing else in the entry changes; its keys_touched.files never listed
+    the derived file, and listing it there would be a citation check-cited-sources fails on.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'First full r6 gate (14 October 2026): check-cited-sources CS-MISSING, "changes/entries/CHG-DDL-002 cites
+  [the handoff path of] ddl-column-types.json, which git does not track". The file is derived by this release (derive-ddl --apply,
+  refresh.sh step 64) and is not committed (ticvai/CLAUDE.md rule 12: every source cited is inside git). Lead''s
+  decision: cite the generator that writes it (path::symbol) or the authored input instead.'
+keys_touched:
+  files:
+  - changes/entries/CHG-DDL-002-renamed-tables-keep-ddl-types.yaml
+root_class: A25 PROSE-QUALITY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cited-sources.py
+status: open
+notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". check-cited-sources passes (34 known, 0 new).'

@@ -1,0 +1,37 @@
+id: CHG-R6G-004
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'The New PIN field on the till''s sign-in (POS-000) is bound to ChangeCredentialRequest.newCredential, the field
+  changeOwnCredential stores, so the venue-pos binding count falls back instead of rising.'
+decision:
+  what: 'screens/P04-point-of-sale.yaml POS-000: the New PIN textField (operation changeOwnCredential) gains bindsTo:
+    ChangeCredentialRequest.newCredential. The ratchet baseline is not raised.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'First full r6 gate (14 October 2026): check-binding-ratchet venue-pos|A|unbound-control rose 26 -> 27, the New PIN
+  step CHG-CRD-001 (ADAM CR-078) added to POS-000 with an operation and no field. Lead''s decision: bind it to the right
+  operation in P04; do not raise the baseline (ticvai/CLAUDE.md rule 15: binding counts only fall).'
+keys_touched:
+  screens:
+  - POS-000
+  operations:
+  - changeOwnCredential
+  files:
+  - screens/P04-point-of-sale.yaml
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started:
+  - APP-POS-POS-000 (#27767)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-078 (ADAM)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Verified in w609: check-binding-ratchet passes, unbound-control 5196 -> 5195 overall,
+  venue-pos A back to 26 (no count rose; 9 fell). The BO-053 listShifts table of CHG-R6G-006 is bound and adds none.'

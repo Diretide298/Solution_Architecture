@@ -7,7 +7,8 @@ summary: 'A table renamed after r1 keeps its DDL link, its migration and its DDL
   its migration under its old name, and ADAM reads its r1 SQL by the old name and points keys at the new names.'
 decision:
   what: 'tools/derive-ddl.py fills DDL_TYPES (the column type after ADR-0056''s one id type and numeric(18,4)) and
-    writes handoff/ddl-column-types.json on --apply. tools/build-schema-workbook.py takes the Columns sheet''s Type from
+    writes the derived ddl-column-types.json beside the other handoff files on --apply
+    (tools/derive-ddl.py::DDL_TYPES_FILE; derived, so not cited by path, CHG-R6G-005). tools/build-schema-workbook.py takes the Columns sheet''s Type from
     it (the contract''s shape moves to a new last column, Contract type, where the two differ) and finds a renamed
     table''s Migration under its Was name when the plan still lists the old one. viewer/lib/backend.mjs (ADAM) reads the
     workbook''s Was column: a renamed table takes the DDL the frozen r1 SQL creates under its old name (ddl.createdAs),

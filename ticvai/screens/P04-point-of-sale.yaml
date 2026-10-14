@@ -188,6 +188,7 @@ screens:
       - kind: textField
         label: New PIN
         operation: changeOwnCredential
+        bindsTo: ChangeCredentialRequest.newCredential
         notes: 'Shown when `LoginResponse.mustChangeCredential` is true (a new or reset PIN is temporary; CHG-CRD-001):
           the new PIN twice, exactly the tenant''s PIN length, before anything else. Reuse follows the tenant''s
           `PasswordPolicy.pinReusePrevention` (none, last 3 or last 5); 422 `credential-reused`, `policy-not-met` or
