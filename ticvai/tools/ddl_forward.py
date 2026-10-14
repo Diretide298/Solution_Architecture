@@ -214,6 +214,26 @@ def relaxed(coldef: str) -> str:
     return norm(re.sub(r"\bNOT NULL\b", "", coldef, flags=re.I))
 
 
+# **The backfill a new scope_path needs, written out** (14 October 2026, CHG-R6G-002, tracker F15). The review row
+# for a scope_path added to a table that already has rows said "backfill each row's owning path", which left the
+# person to work out where the path comes from, and check-ddl-conventions D-SCOPE-NOTNULL could not tell a column on
+# its way to NOT NULL from one forgotten. A table that holds the key of its owning scope node (every `org_unit_id`,
+# `scope_id` and `region_id` in the package references platform.scope) takes the path of that node; a row with no
+# owner takes the tenant root's path (naming-and-style 5.3), and only then is the column set NOT NULL. A table with
+# none of these keeps the general row, and the check keeps failing until a person writes the backfill.
+SCOPE_OWNER_KEYS = ("org_unit_id", "scope_id", "region_id")
+
+
+def scope_path_backfill(t: str, cols) -> str | None:
+    """The statements that fill and then close a scope_path added nullable to `t`, or None when the owner is unknown."""
+    owner = next((c for c in SCOPE_OWNER_KEYS if c in cols), None)
+    if not owner:
+        return None
+    return (f"UPDATE {t} x SET scope_path = s.path FROM platform.scope s WHERE s.id = x.{owner} AND x.scope_path IS "
+            f"NULL; UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE "
+            f"scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
+
+
 class Model:
     """Every statement of one database's DDL, keyed so that the same object in two versions pairs up."""
 
@@ -457,11 +477,15 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                     new_cols.setdefault(t, set()).add(c)
                     if add != d and c == "scope_path":
                         # CHG-GEN-008: a row with no scope_path is invisible to every grant once the table's policy reads
-                        # it, so the backfill is due in the same release as the column, not later.
+                        # it, so the backfill is due in the same release as the column, not later. CHG-R6G-002: the
+                        # backfill is named when the table holds its owning scope's key, before the NOT NULL.
+                        fill = scope_path_backfill(t, b.cols)
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL, and row-"
-                               "level security reads it", "backfill each row's owning path in the forward migration "
-                               "that adds it (a row with a null scope_path is invisible to every grant), then ALTER "
-                               "COLUMN ... SET NOT NULL")
+                               "level security reads it",
+                               (f"in the forward migration that adds it, backfill first, then the NOT NULL: {fill}"
+                                if fill else
+                                "backfill each row's owning path in the forward migration that adds it (a row with "
+                                "a null scope_path is invisible to every grant), then ALTER COLUMN ... SET NOT NULL"))
                     elif add != d:
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL",
                                "backfill, then ALTER COLUMN ... SET NOT NULL in a forward migration")

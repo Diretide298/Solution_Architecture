@@ -10759,6 +10759,7 @@ components:
       type: object
       required:
       - id
+      - scopePath
       - name
       - placement
       - triggerVariantIds
@@ -10780,7 +10781,9 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005): the owning region''s path, set with `regionId` on create.
             Row-level security reads the rule at and beneath it (`x-ticvai-rls: read-beneath`, CHG-GEN-005), so a
-            venue reads its region''s rules, and only the region or above writes them.'
+            venue reads its region''s rules, and only the region or above writes them. **Always present, never
+            null** (CHG-R6G-002): the column is NOT NULL once the rules that predate it are backfilled from
+            `region_id` through `platform.scope.path` (handoff/migration-review.md).'
         name:
           type: string
           maxLength: 200

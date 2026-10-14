@@ -1,0 +1,64 @@
+id: CHG-R6G-002
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'RegionSettings.scopePath and UpsellRule.scopePath are required (server-set, never null), and the review row for
+  a scope_path added to a table with rows names its backfill from the owning scope''s key through platform.scope.path
+  before the NOT NULL; D-SCOPE-NOTNULL passes a forward-added scope_path only while that backfill is named or once a
+  forward migration sets it NOT NULL.'
+decision:
+  what: 'contracts/spine/tenancy.yaml RegionSettings and contracts/satellite/promotions.yaml UpsellRule list scopePath
+    in required (it stays readOnly: the server sets it, and OpenAPI binds a readOnly required field on the response
+    only). tools/ddl_forward.py scope_path_backfill: for a scope_path added nullable to a table holding its owning
+    scope node''s key (org_unit_id, scope_id or region_id; every one references platform.scope), the migration-review
+    row says, in order: UPDATE ... SET scope_path = s.path FROM platform.scope s WHERE s.id = <key>; rows with no owner
+    take the tenant root''s path; then ALTER COLUMN scope_path SET NOT NULL. tools/check-ddl-conventions.py
+    D-SCOPE-NOTNULL counts a forward migration''s ALTER COLUMN scope_path SET NOT NULL as NOT NULL, and notes (does not
+    fail) a nullable forward-added scope_path whose review row names that backfill before the NOT NULL; with neither it
+    still fails. tools/check-contract-compat.py: a readOnly field is never required of a request, so the two required
+    readOnly fields are not new required request fields.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'First full r6 gate (14 October 2026): check-ddl-conventions D-SCOPE-NOTNULL failed on platform.region_settings and
+  promotions.upsell_rule, whose scope_path CHG-GEN-008 and CHG-GEN-005 (ADAM CR-075, R183) added in V0104 nullable, as
+  frozen mode adds every column to a table with rows (ddl_forward relaxed). Lead''s decision: make both required / NOT
+  NULL (server-set) in the contract; the backfill from org_unit_id via platform.scope.path must be listed in
+  migration-review before the NOT NULL (tracker F15). The generic review row asked for "each row''s owning path"
+  without saying where it comes from (R180: a null scope_path row is invisible to every grant).'
+keys_touched:
+  schemas:
+  - tenancy.RegionSettings
+  - promotions.UpsellRule
+  tables:
+  - platform.region_settings
+  - promotions.upsell_rule
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/promotions.yaml
+  - tools/ddl_forward.py
+  - tools/check-ddl-conventions.py
+  - tools/check-contract-compat.py
+  tickets:
+  - MIG-PLATFORM
+  - MIG-PROMOTIONS
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - MIG-PLATFORM (#27665)
+  - MIG-PROMOTIONS (#27674)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-075 (ADAM)
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::scope_path_backfill
+status: open
+notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Verified in w609 (derive-schema, derive-ddl --apply with V0104 regenerated): V0104 still
+  adds both columns nullable (a NOT NULL column cannot be added to a table with rows), migration-review.md names
+  UPDATE platform.region_settings ... s.id = x.org_unit_id and UPDATE promotions.upsell_rule ... s.id = x.region_id,
+  the tenant root for the rest, then SET NOT NULL; check-ddl-conventions passes (240 known, the two noted).
+  check-contract-compat passes with output identical to the gate''s. The backfill itself is Hrushikant''s, in V0104
+  with the read-beneath policy (tracker F15, migration child tasks F8); once written, ddl_forward stops listing it.'

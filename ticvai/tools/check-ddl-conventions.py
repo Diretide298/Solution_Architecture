@@ -487,12 +487,34 @@ def main() -> int:
                 guard.add("D-DOUBLE-KEY", f"{t}->{target}",
                           f"{t}: {own} beside {', '.join(others)}, all keys to {target}")
 
+    # **A scope_path a forward migration adds is NOT NULL once it is backfilled** (14 October 2026, CHG-R6G-002, tracker
+    # F15). Frozen mode adds a new column nullable (a NOT NULL one fails on the first table with rows), so the column
+    # counts as NOT NULL when a forward migration sets it (`ALTER COLUMN scope_path SET NOT NULL`, the person's
+    # migration), and is waiting, not forgotten, while handoff/migration-review.md names its backfill before the NOT
+    # NULL (tools/ddl_forward.py::scope_path_backfill writes it when the table holds its owning scope's key). A
+    # nullable scope_path with neither still fails.
+    set_nn, pending = set(), set()
+    for db in ("tenant", "control"):
+        for f in sorted((backend / db).glob("V*.sql")):
+            set_nn |= set(re.findall(r'ALTER TABLE ([a-z_]+\.[a-z_0-9]+) ALTER COLUMN "?scope_path"? SET NOT NULL',
+                                     f.read_text(encoding="utf-8")))
+    review = g.ROOT / "handoff" / "migration-review.md"
+    if review.exists():
+        for rline in review.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"\| not null \| \w+ \| `([a-z_]+\.[a-z_0-9]+)\.scope_path` \|", rline)
+            fill = f"UPDATE {m.group(1)} " if m else ""
+            if m and fill in rline and "SET NOT NULL" in rline and rline.find(fill) < rline.find("SET NOT NULL"):
+                pending.add(m.group(1))
     for t, cols in sorted(tables.items()):
         if "scope_path" in cols:
             line = cols["scope_path"]
             if not re.match(r"scope_path\s+ltree\b", line):
                 guard.add("D-SCOPE-LTREE", t, f"{t}.scope_path is not ltree: {line[:60]!r}")
-            if t in rls and "NOT NULL" not in line and "shared" not in line.lower():
+            if t in rls and "NOT NULL" not in line and "shared" not in line.lower() and t not in set_nn:
+                if t in pending:
+                    guard.note(f"{t}.scope_path: added nullable; its backfill, then the NOT NULL, named in "
+                               "handoff/migration-review.md for a person's forward migration")
+                    continue
                 guard.add("D-SCOPE-NOTNULL", t, f"{t}.scope_path is nullable under row-level security")
     check_stub_tables(guard, backend)
 
