@@ -59,6 +59,14 @@ import '/page-chrome.js';
 import * as auth from '/validation.js';
 import { hideLoader, loaderSays } from '/loader.js';
 import { mountPanels } from '/panels.js';
+// What a ticket is, its sprint and the pace, shared with My work (board.js)
+// so the two pages cannot disagree. See ticket-kinds.js.
+import {
+  DAY, today, asDate, asDay, addDays, days, isWorkday,
+  learnStatuses, isClosed, isRejected, isDone, isAwaiting, isFinished, isOpenWork, isStalled, isFresh,
+  KINDS, kindOf, dueOn, isLate, isDueSoon,
+  buildSprints, sprintOf, datedSprints, currentSprint, nextSprint, clock, count, paceFor,
+} from '/ticket-kinds.js';
 
 // **The tickets are asked for before anything else on the page is** (13
 // October). They are the page, and they were the last thing asked for: the
@@ -100,8 +108,6 @@ const state = {
   me: null,
   project: '',
   data: null,
-  closedByName: new Map(),   // status name -> isClosed, from OpenProject
-  defaultStatus: new Set(),  // the status(es) a new ticket starts in
   // The filter every section obeys. Kept in the address (?who=&sprint=&type=)
   // so a link to "Hrushikant's Sprint 1" is a link somebody can send.
   scope: { person: '', sprint: '', type: '' },
@@ -150,34 +156,8 @@ function counted() {
   return unitMemo.list;
 }
 
-// Open states that mean the work has stopped. A guess: OpenProject has no
-// "blocked" flag, so the name is all there is. The service makes the same
-// guess when it reads the reason (main.py `_HELD`).
-const STALLED = /hold|block|wait|pend/i;
-// Closed states that mean the work was not done.
-const DROPPED = /reject|cancel|duplicate|won.?t|invalid|obsolete/i;
-// Used only when the instance does not say which status is the default.
-const FRESH = /^(new|to ?do|backlog|open|not started)$/i;
-// Open states that mean the developer has finished and somebody else is next,
-// and the ones among them that mean it came back ("Test failed", "Reopened").
-const AWAITING = /\bqa\b|review|testing|tested|verif/i;
-const BOUNCED = /fail|reopen/i;
-
 // ── days ────────────────────────────────────────────────────────────
 
-const DAY = 86_400_000;
-const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
-const asDate = (iso) => { const d = iso ? new Date(iso) : null; return d && !Number.isNaN(+d) ? d : null; };
-/** A date-only field ("2026-10-05") as local midnight. `new Date()` reads it as
- *  UTC, which in India puts the first day of a sprint at 05:30 — after today's
- *  midnight, so on its first morning the sprint had not started. */
-const asDay = (iso) => {
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso ?? '');
-  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
-};
-const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
-const days = (from, to) => Math.round((to - from) / DAY);
-const isWorkday = (d) => d.getDay() !== 0 && d.getDay() !== 6;
 const fmtDay = (d) => {
   const at = d instanceof Date ? d : asDate(d);
   return at ? at.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
@@ -200,110 +180,21 @@ const share = (part, whole) => {
 
 // ── what a ticket is ────────────────────────────────────────────────
 //
-// Every question the page asks about one ticket, asked once here so the
-// sections cannot disagree about what "finished" or "late" means.
+// Every question the page asks about one ticket is asked once, in
+// ticket-kinds.js, so the sections cannot disagree about what "finished" or
+// "late" means, and nor can My work. What is left here is this page's own.
 
-const isClosed = (t) => state.closedByName.get(t.status) === true;
-const isRejected = (t) => isClosed(t) && DROPPED.test(t.status || '');
-const isDone = (t) => isClosed(t) && !isRejected(t);
-const isAwaiting = (t) => !isClosed(t) && AWAITING.test(t.status || '') && !BOUNCED.test(t.status || '');
-const isFinished = (t) => isDone(t) || isAwaiting(t);
-/** Still the developer's to do: open, and not waiting on QA. */
-const isOpenWork = (t) => !isClosed(t) && !isAwaiting(t);
-const isStalled = (t) => isOpenWork(t) && STALLED.test(t.status || '');
-const isFresh = (t) => isOpenWork(t) && !isStalled(t)
-  && (state.defaultStatus.size ? state.defaultStatus.has(t.status) : FRESH.test(t.status || ''));
-
-/** The five kinds a bar draws, in the order it draws them. */
-const KINDS = [
-  { id: 'done', label: 'Closed' },
-  { id: 'qa', label: 'Waiting for QA' },
-  { id: 'going', label: 'In progress' },
-  { id: 'stalled', label: 'On hold' },
-  { id: 'fresh', label: 'Not started' },
-];
-const kindOf = (t) => (isRejected(t) ? 'rejected' : isDone(t) ? 'done' : isAwaiting(t) ? 'qa'
-  : isStalled(t) ? 'stalled' : isFresh(t) ? 'fresh' : 'going');
-
-/** When a ticket is due: its own date, or failing that its sprint's last day.
- *  TICVAI's tickets carry no dates of their own; the sprint is the deadline. */
-const dueOn = (t) => asDay(t.dueDate) ?? sprintOf(t.version)?.end ?? null;
-const isLate = (t) => { const d = dueOn(t); return isOpenWork(t) && d != null && d < today(); };
-const isDueSoon = (t) => {
-  const d = dueOn(t);
-  return isOpenWork(t) && d != null && d >= today() && d <= addDays(today(), 7);
-};
 /** When it was finished: ADAM's own record where a close went through ADAM,
  *  otherwise OpenProject's last change — see the header. */
 const finishedAt = (t) => (isDone(t) ? asDate(state.data.closes?.[t.key] ?? t.updatedAt)
   : isAwaiting(t) ? asDate(t.updatedAt) : null);
 const who = (t) => t.assignee || 'Unassigned';
 
-// ── sprints ─────────────────────────────────────────────────────────
-//
-// A ticket names its version and nothing else. The service sends each
-// version's dates where OpenProject has them; a "Sprint N" without dates falls
-// back to TICVAI's calendar — two-week sprints from Monday 5 October 2026,
-// Monday to the Friday of the second week.
-
-const SPRINT_ONE = new Date(2026, 9, 5);
-let sprintTable = new Map();
-
-function buildSprints() {
-  sprintTable = new Map();
-  for (const v of state.data.versions ?? []) {
-    sprintTable.set(v.name, { name: v.name, start: asDay(v.startDate), end: asDay(v.endDate), fromCalendar: false });
-  }
-  for (const t of state.data.items ?? []) {
-    if (t.version && !sprintTable.has(t.version)) {
-      sprintTable.set(t.version, { name: t.version, start: null, end: null, fromCalendar: false });
-    }
-  }
-  for (const s of sprintTable.values()) {
-    const n = /^sprint\s+(\d+)$/i.exec(s.name)?.[1];
-    s.number = n ? Number(n) : null;
-    if (n && !s.start && !s.end) {
-      s.start = addDays(SPRINT_ONE, (Number(n) - 1) * 14);
-      s.end = addDays(s.start, 11);
-      s.fromCalendar = true;
-    }
-  }
-}
-const sprintOf = (name) => (name ? sprintTable.get(name) : null);
-/** The dated sprints, in calendar order: the plan's columns. */
-const datedSprints = () => [...sprintTable.values()].filter((s) => s.start && s.end).sort((a, b) => a.start - b.start);
-
-/** The sprint today is in: the latest one that has started and not ended more
- *  than a weekend ago. */
-function currentSprint() {
-  const now = today();
-  return datedSprints().filter((s) => s.start <= now && +s.end + 3 * DAY >= +now).at(-1) ?? null;
-}
-const nextSprint = (s) => datedSprints().find((x) => s && x.start > s.start) ?? null;
-
 /** The sprint the top of the page is about: the one chosen in the filter, or
  *  the current one, or the first that has not started. */
 function focusSprint() {
   if (state.scope.sprint) { const s = sprintOf(state.scope.sprint); return s?.start ? s : null; }
   return currentSprint() ?? datedSprints().find((s) => s.start > today()) ?? datedSprints().at(-1) ?? null;
-}
-
-/** Where a sprint stands in its own working days. `through` counts today. */
-function clock(s) {
-  const now = today();
-  const list = [];
-  for (let d = new Date(s.start); d <= s.end; d = addDays(d, 1)) if (isWorkday(d)) list.push(d);
-  const n = Math.max(1, list.length);
-  const phase = now < s.start ? 'ahead' : now > s.end ? 'over' : 'running';
-  const before = list.filter((d) => d < now).length;
-  const todayAt = list.findIndex((d) => +d === +now);
-  const through = phase === 'over' ? n : phase === 'ahead' ? 0 : before + (todayAt >= 0 ? 1 : 0);
-  return {
-    days: list, n, phase, through,
-    left: list.filter((d) => d > now).length,
-    dayNo: todayAt >= 0 ? todayAt + 1 : null,
-    frac: through / n,
-  };
 }
 
 // ── the scope ───────────────────────────────────────────────────────
@@ -325,18 +216,6 @@ const inFocus = (focus, { everyone = false } = {}) => (focus
     && (everyone || !state.scope.person || who(t) === state.scope.person)
     && typeOk(t))
   : []);
-
-function count(items) {
-  const c = { total: items.length, done: 0, qa: 0, going: 0, stalled: 0, fresh: 0, rejected: 0, late: 0 };
-  for (const t of items) {
-    c[kindOf(t)] += 1;
-    if (isLate(t)) c.late += 1;
-  }
-  c.live = c.total - c.rejected;     // what a share of finished is a share of
-  c.finished = c.done + c.qa;
-  c.open = c.going + c.stalled + c.fresh;
-  return c;
-}
 
 function setScope(change) {
   Object.assign(state.scope, change);
@@ -440,9 +319,8 @@ async function load({ refresh = false, answer = null } = {}) {
   if (!state.data || data.asOf !== state.data.asOf || data.total !== state.data.total
       || !state.data.items) {
     state.data = data;
-    state.closedByName = new Map((data.statuses ?? []).map((s) => [s.name, !!s.isClosed]));
-    state.defaultStatus = new Set((data.statuses ?? []).filter((s) => s.isDefault).map((s) => s.name));
-    buildSprints();
+    learnStatuses(data.statuses);
+    buildSprints(data.versions, data.items);
     buildTree();
     draw();
   } else {
@@ -1432,22 +1310,6 @@ const ordinal = (n) => {
   const v = n % 100;
   return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`;
 };
-
-/** How a set of sprint tickets stands against an even pace: the one place the
- *  sprint section and the person page both take their verdict from. */
-function paceFor(focus, items) {
-  const c = count(items);
-  const k = clock(focus);
-  const expected = Math.round(c.live * k.frac);
-  let tone = 'ok';
-  if (k.phase === 'ahead') tone = 'idle';
-  else if (k.phase === 'over') tone = c.finished >= c.live ? 'ok' : 'over';
-  else if (expected > 0) {
-    const ratio = c.finished / expected;
-    tone = ratio >= 0.9 ? 'ok' : ratio >= 0.6 ? 'warn' : 'bad';
-  }
-  return { c, k, expected, behind: Math.max(0, expected - c.finished), tone };
-}
 
 function drawPerson(focus) {
   const name = state.scope.person;
