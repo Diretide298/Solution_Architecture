@@ -1801,6 +1801,13 @@ screens:
     purpose: Record which AI draft or proposal was used, or why it was refused
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listProposedActions
+    contract: ai
+    purpose: 'Follows the drafts proposeMarketingContent queued and the decisions decideProposedAction
+      routed: each is an ai.proposed_action, polled while the screen is open until it is applied or
+      refused'
+    trigger: onInterval
+    provenance: 'audit fix S-ASYNC-POLL, 14 October 2026 (CHG-SCO-011)'
   entryState:
     preloaded:
     - PromoBlock.id
