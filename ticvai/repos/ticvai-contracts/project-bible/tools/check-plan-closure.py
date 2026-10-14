@@ -21,6 +21,10 @@ ticketed block must still be built in one, or carry its reason in `docs/active/b
                  is wired twice, its slice by the setup task and the rest by the rest-of-the-screen task
   C-FLOW         an operation a step of a flow through a Block A app (team.json sprintPlan.blockAApps) names, or a
                  branch of it is resolved by, is built by no Block A task (F02's extendSeatHold, CHG-RONEP-002)
+  C-CALLS        an operation a Block A operation calls (`x-ticvai-calls`) or writes through (`x-ticvai-write-via`) is
+                 built by no task of the caller's drop or an earlier one: revokeGuestDevice (A) called Identity's
+                 endGuestDeviceSessions, built in Block B (CHG-GT1-009, r6 gate, 14 October 2026); the fix is a
+                 `blockAOperations` entry naming the caller
   C-REACH        a Block A screen is reached from its app's entry (`navigation.isEntryPoint`) only through a screen
                  outside its drop or an earlier one (EMP-003, the staff home, was in no block; CHG-RONEP-006). The plan
                  pulls in app homes only (`navHomes`, lever A, CHG-RONEP-007); a screen behind a command centre gets a
@@ -61,6 +65,7 @@ import ticket_done as td  # noqa: E402
 RULES = {
     "C-BOUND": "a Block A screen binds an operation no Block A task builds (CHG-RONEP-001)",
     "C-FLOW": "an operation a step or branch of a Block A app's flow needs is built by no Block A task (CHG-RONEP-002)",
+    "C-CALLS": "an operation a Block A operation calls or writes through is built by no Block A task (CHG-GT1-009)",
     "C-REACH": "a Block A screen is reached from its app's entry only through screens outside Block A (CHG-RONEP-006)",
     "C-NO-PATH": "a Block A screen no navigation from its app's entry reaches at all (CHG-RONEP-006)",
     "C-DECIDED": "a decided Block A operation, screen or AI engine operation is not built in Block A (CHG-RONEP-001)",
@@ -216,6 +221,26 @@ def main() -> int:
                 continue
             guard.add("C-FLOW", f"{fd.get('id')}:{o}", f"{fd.get('id')} runs through a Block A app and needs {o}, which "
                       + (f"Block {first_block(where)} builds" if where else "no task builds"))
+
+    # C-CALLS: what a Block A operation calls or writes through is built in its drop or an earlier one (CHG-GT1-009)
+    for o, x in sorted(ops.items()):
+        where_o = now.get(f"operation {o}") or {}
+        if not FAMILY & set(where_o):
+            continue
+        op_ = x.get("op") or {}
+        targets = {str(c).split(".")[-1] for c in op_.get("x-ticvai-calls") or [] if isinstance(c, str)}
+        targets |= {str(w.get("operation")).split(".")[-1] for w in op_.get("x-ticvai-write-via") or []
+                    if isinstance(w, dict) and w.get("operation")}
+        for t in sorted(targets & set(ops) - {o}):
+            where_t = now.get(f"operation {t}") or {}
+            if rank_of(where_t) <= rank_of(where_o):
+                continue
+            if t in provisional:
+                excused.add(t)
+                continue
+            guard.add("C-CALLS", f"{o}:{t}", f"{o} (Block {sp.block_label(first_block(where_o))}) calls {t}, which "
+                      + (f"Block {first_block(where_t)} builds ({', '.join(where_t[first_block(where_t)][:2])})"
+                         if where_t else "no task builds"))
 
     # C-REACH, C-NO-PATH: each Block A screen is reached from its app's entry through Block A screens
     plat = {s["id"]: stem.split("-")[0] for stem, s in g.screens()}

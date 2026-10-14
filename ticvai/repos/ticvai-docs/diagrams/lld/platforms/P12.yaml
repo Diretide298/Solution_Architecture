@@ -444,7 +444,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - serviceActionId<-navigation
   goesTo:
   - SUP-009
   boardFrames: null
@@ -466,7 +467,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - compensationRequestId<-navigation
   goesTo:
   - SUP-009
   boardFrames: null
@@ -587,7 +589,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - queueId<-navigation
   goesTo:
   - SUP-019
   boardFrames: null
@@ -611,7 +614,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - routingRuleId<-navigation
   goesTo:
   - SUP-019
   boardFrames: null
@@ -633,7 +637,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - slaPolicyId<-navigation
   goesTo:
   - SUP-019
   boardFrames: null

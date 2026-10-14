@@ -2183,7 +2183,7 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 **Form: Save alert rule** (modal, opened by *Save alert rule*; *Save alert rule* calls `setAlertRule`, *Cancel* sends nothing)
 
-**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setAlertRule` sends before it is called.** Required: `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2483,7 +2483,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Record suggestion outcome** (modal, opened by *Record suggestion outcome*; *Record suggestion outcome* calls `recordSuggestionOutcome`, *Cancel* sends nothing)
 
-**Collects what `recordSuggestionOutcome` sends before it is called.** Required: `id`, `suggestionId`, `decision`. Optional: `actualValue`, `decidedByPrincipalId`, `decidedAt`, `realisedOutcome`, `note`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `recordSuggestionOutcome` sends before it is called.** Required: `suggestionId`, `decision`. Optional: `actualValue`, `decidedByPrincipalId`, `decidedAt`, `realisedOutcome`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

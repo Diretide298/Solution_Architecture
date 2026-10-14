@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-088` | Dynamic Pricing Strategy Command Center | B | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-088` | Dynamic Pricing Strategy Command Center | A | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-089` | Dynamic Pricing Strategy Builder | A | 24 | 20 | 5 | 2 | 1 | 0 | — | notStarted (generated) |
 | `ADM-090` | Demand, Occupancy & Availability Rule Builder | A | 0 | 20 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 | `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | A | 0 | 20 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block B · ticket #29840 (VM-ADM-088) |
+| Block | Block A · ticket #29840 (VM-ADM-088) |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each strategy should show) — counts over a population, then the population |

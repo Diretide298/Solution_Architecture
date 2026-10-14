@@ -181,8 +181,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-701` Venue Master Configuration: *Venue Master Configuration*
-- → `BO-702` Space Access Rules Configuration: *Space Access Rules Configuration*
+- → `BO-701` Venue Master Configuration: *Venue Master Configuration*; carries `spaceId`
+- → `BO-702` Space Access Rules Configuration: *Space Access Rules Configuration*; carries `spaceId`
 
 #### States
 

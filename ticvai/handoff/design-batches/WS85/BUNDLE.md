@@ -1428,7 +1428,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Set maximum offline duration** (modal, opened by *Set maximum offline duration*; *Set maximum offline duration* calls `setGateOfflinePolicy`, *Cancel* sends nothing)
 
-**Collects what `setGateOfflinePolicy` sends before it is called.** Required: `venueId`. Optional: `maxOfflineDurationHours`, `offlineChecks`, `afterThresholdBehavior`, `revocationTriggerEvents`, `revocationMaxAllowedAgeMinutes`, `revocationStalenessAction`, `operatingModes`, `centralUnavailableAfterSeconds`, `edgeUnavailableAfterSeconds`, `automaticSwitch`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setGateOfflinePolicy` sends before it is called.** Required: `venueId`. Optional: `maxOfflineDurationHours`, `offlineChecks`, `afterThresholdBehavior`, `revocationTriggerEvents`, `revocationMaxAllowedAgeMinutes`, `revocationStalenessAction`, `operatingModes`, `centralUnavailableAfterSeconds`, `edgeUnavailableAfterSeconds`, `automaticSwitch`. is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

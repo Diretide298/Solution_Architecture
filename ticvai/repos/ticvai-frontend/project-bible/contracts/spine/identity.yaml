@@ -308,7 +308,6 @@ paths:
   /internal/consent-identifiers:
     post:
       operationId: recordConsentIdentifier
-      x-ticvai-names-for-context: [marketing.device_consent, platform.outbox]
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -365,7 +364,6 @@ paths:
         format: uuid
     patch:
       operationId: updateGuestSubjectDetails
-      x-ticvai-names-for-context: [platform.outbox]
       security:
       - serviceAuth: []
       x-ticvai-audience:

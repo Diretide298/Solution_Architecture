@@ -176,12 +176,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-338` AI Routing Advisor & Matrix Optimization: *AI Routing Advisor & Matrix Optimization*
-- → `ADM-330` Approval Authority Matrix: *Approval Authority Matrix*
-- → `ADM-331` Organizational Hierarchy Routing: *Organizational Hierarchy Routing*
-- → `ADM-332` Department-Based Approval Matrix: *Department-Based Approval Matrix*
-- → `ADM-333` Venue & Tenant Approval Matrix: *Venue & Tenant Approval Matrix*
-- → `ADM-334` Value & Threshold Routing: *Value & Threshold Routing*
-- → `ADM-335` Risk-Based & Conditional Routing: *Risk-Based & Conditional Routing*
+- → `ADM-330` Approval Authority Matrix: *Approval Authority Matrix*; carries `matrixId`
+- → `ADM-331` Organizational Hierarchy Routing: *Organizational Hierarchy Routing*; carries `matrixId`
+- → `ADM-332` Department-Based Approval Matrix: *Department-Based Approval Matrix*; carries `matrixId`
+- → `ADM-333` Venue & Tenant Approval Matrix: *Venue & Tenant Approval Matrix*; carries `matrixId`
+- → `ADM-334` Value & Threshold Routing: *Value & Threshold Routing*; carries `matrixId`
+- → `ADM-335` Risk-Based & Conditional Routing: *Risk-Based & Conditional Routing*; carries `matrixId`
 - → `ADM-336` Approver Group & Decision Policy: *Approver Group & Decision Policy*
 - → `ADM-337` Routing Simulator & Conflict Detection: *Routing Simulator & Conflict Detection*
 

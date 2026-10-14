@@ -215,14 +215,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-1004` Hold Type Master: *Hold Type Master*
+- → `BO-1004` Hold Type Master: *Hold Type Master*; carries `holdTypeId`
 - → `BO-1005` Hold Pool Creation: *Hold Pool Creation*
-- → `BO-1006` Hold Rule Assignment: *Hold Rule Assignment*
-- → `BO-1007` Expiration Rules: *Expiration Rules*
+- → `BO-1006` Hold Rule Assignment: *Hold Rule Assignment*; carries `holdTypeId`
+- → `BO-1007` Expiration Rules: *Expiration Rules*; carries `holdTypeId`
 - → `BO-1008` Automatic Hold Release: *Automatic Hold Release*; carries `poolId`
 - → `BO-1009` Release, Convert & Reassign: *Release, Convert & Reassign*; carries `poolId`
 - → `BO-1010` Hold Approval Workflow: *Hold Approval Workflow*
-- → `BO-1011` Priority & Conflict Resolution: *Priority & Conflict Resolution*
+- → `BO-1011` Priority & Conflict Resolution: *Priority & Conflict Resolution*; carries `holdTypeId`
 - → `BO-1012` Hold Utilization & Audit: *Hold Utilization & Audit*
 
 #### States

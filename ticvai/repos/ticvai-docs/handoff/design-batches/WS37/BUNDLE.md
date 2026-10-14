@@ -1690,7 +1690,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Request pricing rollback** (modal, opened by *Request pricing rollback*; *Request pricing rollback* calls `requestPricingRollback`, *Cancel* sends nothing)
 
-**Collects what `requestPricingRollback` sends before it is called.** Required: `subject`, `actionType`, `reason`, `status`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `requestedAt`, `requestedByPrincipalId`, `scopePath` (3 October 2026, CHG-SPF-001).
+**Collects what `requestPricingRollback` sends before it is called.** Required: `subject`, `actionType`, `reason`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `requestedAt`, `requestedByPrincipalId`, `scopePath` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `status` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

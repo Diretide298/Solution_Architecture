@@ -198,6 +198,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - → `BO-084` Approval Inbox: *Approval Inbox*
 - → `BO-085` Approval Request: *Approval Request*
+- → `BO-086` Approval Matrix: *Approval Matrix*
 
 #### States
 
@@ -268,7 +269,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 - [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-088?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-084`, `BO-085`.
+- [ ] Every transition is wired: `BO-084`, `BO-085`, `BO-086`.
 - [ ] Every gated control is gated: `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 edge case(s) from the process notes are drawn.
@@ -400,6 +401,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 - → `BO-085` Approval Request: *Approval Request*
 - → `BO-087` Approval Delegations: *Approval Delegations*
 - → `BO-054` Role Assignment: *Role Assignment*; carries `roleId`
+- → `BO-086` Approval Matrix: *Approval Matrix*
 
 #### States
 
@@ -482,7 +484,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-106?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-053`, `BO-055`, `BO-056`, `BO-066`, `BO-084`, `BO-085`, `BO-087`, `BO-054`.
+- [ ] Every transition is wired: `BO-053`, `BO-055`, `BO-056`, `BO-066`, `BO-084`, `BO-085`, `BO-087`, `BO-054`, `BO-086`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`, `ROLE_MANAGE`, `TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 edge case(s) from the process notes are drawn.

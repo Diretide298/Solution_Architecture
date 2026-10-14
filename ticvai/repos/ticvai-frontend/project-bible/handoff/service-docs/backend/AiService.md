@@ -2867,7 +2867,7 @@ Every version of every governance policy at the scope, newest first (ADM-523, AD
 | Read routing | primary |
 | Reads | `ai.proposed_action` |
 | Writes | - |
-| Called by | ADM-529, ADM-534, ANL-009, BO-093, BO-762, BO-793, BO-928, BO-929, CMS-008 |
+| Called by | ADM-529, ADM-534, ANL-009, BO-093, BO-762, BO-793, BO-928, BO-929, CMS-007, CMS-008 |
 
 **Responses**
 

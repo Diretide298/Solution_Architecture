@@ -493,7 +493,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - providerId<-navigation
   goesTo:
   - SGN-020
   - SGN-022

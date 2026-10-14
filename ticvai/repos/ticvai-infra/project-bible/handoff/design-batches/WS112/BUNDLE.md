@@ -205,11 +205,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-655` Access Profile Management: *Access Profile Management*
-- → `BO-656` Venue & Zone Access Matrix: *Venue & Zone Access Matrix*
-- → `BO-657` Operational Area Permission Management: *Operational Area Permission Management*
-- → `BO-658` Date & Time Access Rules: *Date & Time Access Rules*
-- → `BO-659` Access Schedule Management: *Access Schedule Management*
+- → `BO-655` Access Profile Management: *Access Profile Management*; carries `accessProfileId`
+- → `BO-656` Venue & Zone Access Matrix: *Venue & Zone Access Matrix*; carries `accessProfileId`
+- → `BO-657` Operational Area Permission Management: *Operational Area Permission Management*; carries `accessProfileId`
+- → `BO-658` Date & Time Access Rules: *Date & Time Access Rules*; carries `accessProfileId`
+- → `BO-659` Access Schedule Management: *Access Schedule Management*; carries `accessProfileId`
 - → `BO-660` Holder Access Assignment: *Holder Access Assignment*
 - → `BO-661` Temporary Access & Exception Management: *Temporary Access & Exception Management*
 - → `BO-662` Access Revocation & Suspension: *Access Revocation & Suspension*

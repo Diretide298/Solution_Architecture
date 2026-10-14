@@ -466,7 +466,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save waf policy** (modal, opened by *Save waf policy*; *Save waf policy* calls `setWafPolicy`, *Cancel* sends nothing)
 
-**Collects what `setWafPolicy` sends before it is called.** Nothing in the body is required. Optional: `name`, `action`, `matchOn`, `pattern`, `enabled`, `hitCount24h`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setWafPolicy` sends before it is called.** Nothing in the body is required. Optional: `name`, `action`, `matchOn`, `pattern`, `enabled`, `hitCount24h`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

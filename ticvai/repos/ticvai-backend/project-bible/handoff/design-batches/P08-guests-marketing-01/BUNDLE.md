@@ -590,7 +590,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save AI policy** (modal, opened by *Save AI policy*; *Save AI policy* calls `setAiPolicy`, *Cancel* sends nothing)
 
-**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `scopePath` (from the session, not typed), `enabledCapabilities`. Optional: `allowedRoleIds`, `maskedFields`, `requiresApprovalFor`, `ceilingBehaviour`, `ceilingWarningPercent`, `guestCapabilityScope`, `cacheAnswers`, `cacheTtlMinutes`. **Not drawn:** `retainInteractionsDays` (deprecated 29 September, AI-D05; retention is a tenant setting per data class) and the engine tuning (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`, `negativeCacheTtlSeconds`, chunking, quantisation, hnsw, cascade), which is platform tuning left to the console, not a venue manager's decision. The money ceiling is set with Save …
+**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `enabledCapabilities`. Optional: `allowedRoleIds`, `maskedFields`, `requiresApprovalFor`, `ceilingBehaviour`, `ceilingWarningPercent`, `guestCapabilityScope`, `cacheAnswers`, `cacheTtlMinutes`. **Not drawn:** `retainInteractionsDays` (deprecated 29 September, AI-D05; retention is a tenant setting per data class) and the engine tuning (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`, `negativeCacheTtlSeconds`, chunking, quantisation, hnsw, cascade), which is platform tuning left to the console, not a venue manager's decision. The money ceiling is set with Save spend ceiling. Dismissing sends nothing …
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

@@ -103,8 +103,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-484` | Promotion, Bundle & Upsell Configuration | D | 9 | 26 | 7 | 1 | 0 | 2 | — | notStarted (—) |
 | `ADM-485` | Seating, Access & Operational Configuration | D | 9 | 26 | 7 | 1 | 0 | 6 | — | notStarted (—) |
 | `ADM-486` | Channel, Media & Fulfillment Configuration | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-487` | Cross-Module Conflict & Dependency Validation | D | 6 | 126 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-488` | Configuration Preview & Impact Analysis | D | 24 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-487` | Cross-Module Conflict & Dependency Validation | B | 6 | 126 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-488` | Configuration Preview & Impact Analysis | B | 24 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ---
 
@@ -1853,7 +1853,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-487 |
+| Block | Block B · task APP-CONSOLE-ADM-487 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -2167,7 +2167,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-488 |
+| Block | Block B · task APP-CONSOLE-ADM-488 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Critical AI Configuration Object Model; Three Sources of Configuration; AI Configuration Builder & Validation) and no display directory — it is … |

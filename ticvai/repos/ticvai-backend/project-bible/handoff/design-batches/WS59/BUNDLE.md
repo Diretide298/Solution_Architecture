@@ -625,7 +625,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save ticket status transition** (modal, opened by *Save ticket status transition*; *Save ticket status transition* calls `setTicketStatusTransition`, *Cancel* sends nothing)
 
-**Collects what `setTicketStatusTransition` sends before it is called.** Required: `id`, `fromStatus`, `toStatus`, `allowed`, `requiresAuthorizedException`, `scopePath`. Optional: `originatingSources`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setTicketStatusTransition` sends before it is called.** Required: `fromStatus`, `toStatus`, `allowed`, `requiresAuthorizedException`. Optional: `originatingSources`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1001,7 +1001,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save media binding rule** (modal, opened by *Save media binding rule*; *Save media binding rule* calls `setMediaBindingRule`, *Cancel* sends nothing)
 
-**Collects what `setMediaBindingRule` sends before it is called.** Required: `id`, `scopePath`. Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`, `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`, `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setMediaBindingRule` sends before it is called.** Nothing in the body is required. Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`, `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`, `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1359,7 +1359,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save credential event propagation rule** (modal, opened by *Save credential event propagation rule*; *Save credential event propagation rule* calls `setCredentialEventPropagationRule`, *Cancel* sends nothing)
 
-**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

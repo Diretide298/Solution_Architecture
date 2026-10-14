@@ -1456,7 +1456,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save access point group** (modal, opened by *Save access point group*; *Save access point group* calls `setAccessPointGroup`, *Cancel* sends nothing)
 
-**Collects what `setAccessPointGroup` sends before it is called.** Required: `id`, `venueId`, `name`, `scopePath`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setAccessPointGroup` sends before it is called.** Required: `venueId`, `name`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1647,7 +1647,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save operating calendar entry** (modal, opened by *Save operating calendar entry*; *Save operating calendar entry* calls `setOperatingCalendarEntry`, *Cancel* sends nothing)
 
-**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `venueId`, `dayType`, `startsAt`, `endsAt`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

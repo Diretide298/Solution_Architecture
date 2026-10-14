@@ -6153,7 +6153,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | Read routing | replica |
 | Reads | `orders.refund` |
 | Writes | - |
-| Called by | ADM-609, ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147, EMP-014, EMP-034, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | ADM-609, ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147, EMP-014, EMP-034, POS-006, POS-011, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 

@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-088` | Dynamic Pricing Strategy Command Center | B | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-088` | Dynamic Pricing Strategy Command Center | A | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-089` | Dynamic Pricing Strategy Builder | A | 24 | 20 | 5 | 2 | 1 | 0 | — | notStarted (generated) |
 | `ADM-090` | Demand, Occupancy & Availability Rule Builder | A | 0 | 20 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 | `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | A | 0 | 20 | 6 | 1 | 0 | 6 | — | notStarted (generated) |

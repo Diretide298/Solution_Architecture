@@ -213,7 +213,7 @@ Errors to draw in the form: 400 Placement is outside the region's jurisdiction, 
 
 **Form: Save SSO config** (modal, opened by *Save SSO config*; *Save SSO config* calls `setSsoConfig`, *Cancel* sends nothing)
 
-**Collects what `setSsoConfig` sends before it is called.** Required: `displayName`, `protocol`, `groupMappings`. Optional: `metadataUrl`, `issuer`, `clientId`, `clientSecretRef`, `autoProvisionPrincipals`, `isEnforced`, `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setSsoConfig` sends before it is called.** Required: `displayName`, `protocol`, `groupMappings`. Optional: `metadataUrl`, `issuer`, `clientId`, `clientSecretRef`, `autoProvisionPrincipals`, `isEnforced`, `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

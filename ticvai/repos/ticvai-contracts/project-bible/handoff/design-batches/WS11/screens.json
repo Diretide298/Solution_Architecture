@@ -1497,7 +1497,7 @@
     "id": "formSetRiskScoringConfig",
     "component": "modal",
     "trigger": "Save risk scoring config",
-    "body": "**Collects what `setRiskScoringConfig` sends before it is called.** Required: `id`, `scopePath`, `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setRiskScoringConfig` sends before it is called.** Required: `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessRiskScoringConfig",
     "confirm": {
      "label": "Save risk scoring config",
@@ -1506,8 +1506,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "mediumThreshold",
       "highThreshold",
       "criticalThreshold",

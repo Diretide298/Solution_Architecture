@@ -277,7 +277,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys; references `catalogue.event`, `p"
+   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys. **Reached by**: 4 operations rea"
   },
   {
    "table": "access.entitlement",
@@ -665,7 +665,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Who was asked, when, and why it moved up. The original approver stays in the record **Hangs off**: reaches `approvals.request` through its keys; references `approvals.request`. **Reached by**: 18 operations read it and 4"
+   "note": "Who was asked, when, and why it moved up. The original approver stays in the record **Hangs off**: a child of `approvals.request`; reaches `approvals.request` through its keys; references `approvals.request`, `identity.p"
   },
   {
    "table": "approvals.request",

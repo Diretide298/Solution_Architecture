@@ -121,7 +121,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-002` | Platform Dashboard | A | 2 | 33 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
 | `ADM-003` | Cross-Tenant Health Dashboard | A | 4 | 43 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-004` | Platform Audit Log | D | 9 | 30 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
+| `ADM-004` | Platform Audit Log | B | 9 | 30 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
 | `ADM-013` | Tenant Performance Monitor | B | 0 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-029` | Deployment Monitor | B | 5 | 53 | 7 | 0 | 0 | 0 | — | notStarted (generated) |
 

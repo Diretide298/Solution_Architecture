@@ -200,7 +200,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 - → `BO-385` Delegation Management: *Delegation Management*; carries `delegationId`
 - → `BO-386` Temporary Delegation & Availability Calendar: *Temporary Delegation & Availability Calendar*
 - → `BO-387` Out-of-Office & Substitute Routing: *Out-of-Office & Substitute Routing*
-- → `BO-388` Approval SLA Policy Configuration: *Approval SLA Policy Configuration*
+- → `BO-388` Approval SLA Policy Configuration: *Approval SLA Policy Configuration*; carries `slaPolicyId`
 - → `BO-389` Reminder & Breach Notification Rules: *Reminder & Breach Notification Rules*
 - → `BO-390` Escalation Policy Builder: *Escalation Policy Builder*
 - → `BO-391` Live Escalation Operations Center: *Live Escalation Operations Center*; carries `instanceId`

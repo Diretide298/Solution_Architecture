@@ -49,32 +49,50 @@
     {
      "to": "ADM-330",
      "trigger": "Approval Authority Matrix",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "matrixId"
+     ]
     },
     {
      "to": "ADM-331",
      "trigger": "Organizational Hierarchy Routing",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "matrixId"
+     ]
     },
     {
      "to": "ADM-332",
      "trigger": "Department-Based Approval Matrix",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "matrixId"
+     ]
     },
     {
      "to": "ADM-333",
      "trigger": "Venue & Tenant Approval Matrix",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "matrixId"
+     ]
     },
     {
      "to": "ADM-334",
      "trigger": "Value & Threshold Routing",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "matrixId"
+     ]
     },
     {
      "to": "ADM-335",
      "trigger": "Risk-Based & Conditional Routing",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "matrixId"
+     ]
     },
     {
      "to": "ADM-336",

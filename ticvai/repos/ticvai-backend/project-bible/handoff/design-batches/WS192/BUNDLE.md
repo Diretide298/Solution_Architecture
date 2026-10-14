@@ -109,7 +109,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1143` | Wallet Operations Command Center | C | 2 | 46 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-1144` | Peer-to-Peer Transfer Configuration | C | 21 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1145` | Transfer Eligibility, Limits & Approval Rules | C | 19 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-1146` | Refund-to-Wallet Policy Configuration | A | 28 | 9 | 6 | 0 | 3 | 6 | — | notStarted (—) |
+| `BO-1146` | Refund-to-Wallet Policy Configuration | C | 28 | 9 | 6 | 0 | 3 | 6 | — | notStarted (—) |
 | `BO-1147` | Refund Routing & Credit Restoration Engine | C | 6 | 40 | 6 | 6 | 0 | 6 | — | notStarted (—) |
 | `BO-1148` | Reversal & Transaction Correction Management | C | 11 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-1149` | Administrative Balance Adjustment Studio | C | 9 | 35 | 6 | 77 | 1 | 0 | — | notStarted (—) |
@@ -604,7 +604,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · ticket #28037 (APP-SETUP-BO-1146) |
+| Block | Block C · ticket #28037 (APP-SETUP-BO-1146) |
 | Who uses it | venue staff holding `ORDER_VIEW`, `REGION_CONFIGURE`, `WALLET_CONFIGURE`, `WALLET_VIEW` (2 read, 2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Refund policy can define) and no display directory — it is settings, not a population |

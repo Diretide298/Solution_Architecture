@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-473` | Product & Admission Model Discovery | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-474` | Operational Requirement Discovery | D | 6 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-475` | Commercial Requirement Discovery | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-476` | Required, Recommended & Optional Decisions | D | 10 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-476` | Required, Recommended & Optional Decisions | B | 10 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-477` | Missing Information & Clarification Center | D | 6 | 106 | 7 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-478` | Configuration Blueprint & Dependency Map | D | 6 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 

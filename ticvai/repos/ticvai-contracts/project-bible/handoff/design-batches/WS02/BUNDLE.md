@@ -255,7 +255,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-155` Visual Access Rule Builder: *Works in Visual Access Rule Builder*; calls `listAccessRule`
 - → `BO-156` Entry, Exit & Re-entry Rules: *Works in Entry, Exit & Re-entry Rules*; calls `listAccessRule`
 - → `BO-158` Access Validity & Time Rules: *Works in Access Validity & Time Rules*; calls `listAccessRule`
-- → `BO-159` Entitlement Consumption Engine: *Works in Entitlement Consumption Engine*; calls `listAccessRule`
+- → `BO-159` Entitlement Consumption Engine: *Works in Entitlement Consumption Engine*; carries `ruleId`; calls `listAccessRule`
 - → `BO-160` Multi-Park & Crossover Rules: *Works in Multi-Park & Crossover Rules*; calls `listAccessRule`
 - → `BO-162` Group Admission & Quantity Validation: *Works in Group Admission & Quantity Validation*; calls `listAccessRule`
 - → `BO-163` Rule Simulation, Conflict Check & Publication: *Works in Rule Simulation, Conflict Check & Publication*; calls `listAccessRule`
@@ -848,7 +848,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save journey sequence rule** (modal, opened by *Save journey sequence rule*; *Save journey sequence rule* calls `setJourneySequenceRule`, *Cancel* sends nothing)
 
-**Collects what `setJourneySequenceRule` sends before it is called.** Required: `id`, `scopePath`, `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setJourneySequenceRule` sends before it is called.** Required: `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

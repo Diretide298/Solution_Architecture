@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-268` | Channel Operations Command Center | B | 0 | 24 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
+| `ADM-268` | Channel Operations Command Center | A | 0 | 24 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
 | `ADM-269` | Channel Connection & Integration Manager | A | 33 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-270` | Product, Price & Availability Synchronization | B | 6 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-271` | Real-Time Channel Availability & Inventory Monitor | B | 0 | 14 | 6 | 0 | 0 | 4 | — | notStarted (generated) |

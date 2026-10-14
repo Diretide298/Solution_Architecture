@@ -199,7 +199,7 @@ Errors to draw in the form: 409 The queue is `paused` or `closed`; parties are c
 
 **Form: Configure queue feed** (modal, opened by *Configure queue feed*; *Configure queue feed* calls `configureQueueFeed`, *Cancel* sends nothing)
 
-**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).
+**Collects what `configureQueueFeed` sends before it is called.** Required: `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -928,7 +928,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Configure queue feed** (modal, opened by *Configure queue feed*; *Configure queue feed* calls `configureQueueFeed`, *Cancel* sends nothing)
 
-**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).
+**Collects what `configureQueueFeed` sends before it is called.** Required: `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

@@ -1253,7 +1253,7 @@
     "id": "formCreateMaintenancePlan",
     "component": "modal",
     "trigger": "Create maintenance plan",
-    "body": "**Collects what `createMaintenancePlan` sends before it is called.** Required: `id`, `name`, `assetId`, `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`, `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createMaintenancePlan` sends before it is called.** Required: `name`, `assetId`, `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`, `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "MaintenancePlan",
     "confirm": {
      "label": "Create maintenance plan",
@@ -1262,7 +1262,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "assetId",
       "taskTemplate",
@@ -2941,7 +2940,7 @@
     "id": "formCreateResource",
     "component": "modal",
     "trigger": "Create resource",
-    "body": "**Collects what `createResource` sends before it is called.** Required: `id`, `code`, `name`, `kind`, `venueId`. Optional: `scopePath`, `parentResourceId`, `principalId`, `attributes`, `setupMinutes`, `teardownMinutes`, `requiresQualification`, `depositAmount`, `status`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createResource` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `scopePath`, `parentResourceId`, `principalId`, `attributes`, `setupMinutes`, `teardownMinutes`, `requiresQualification`, `depositAmount`, `status`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "Resource",
     "confirm": {
      "label": "Create resource",
@@ -2950,7 +2949,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "kind",

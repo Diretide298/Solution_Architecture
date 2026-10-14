@@ -14,9 +14,9 @@
 
 | | writes |
 |---|---:|
-| Cross-deployable writes in the lineage (58 operations) | 67 |
+| Cross-deployable writes in the lineage (59 operations) | 68 |
 | by event | 29 |
-| by the owner's operation | 38 |
+| by the owner's operation | 39 |
 | on the exception list | 0 |
 
 ## The kernel tables every deployable is granted directly
@@ -65,6 +65,7 @@ Sorted by the owning deployable, then the table.
 | `bookVisitPlan` | operations / VenueOpsService | `catalogue.inventory_reservation` | commerce / CatalogueService | operation `acquireInventoryHold` |
 | `bulkUpdateProducts` | operations / InventoryService | `catalogue.price` | commerce / CatalogueService | operation `bulkUpdateCatalogueProducts` |
 | `bulkUpdateProducts` | operations / InventoryService | `catalogue.product` | commerce / CatalogueService | operation `bulkUpdateCatalogueProducts` |
+| `revokeGuestDevice` | operations / MarketingService | `identity.guest_session` | commerce / IdentityService | operation `endGuestDeviceSessions` |
 | `bookVisitPlan` | operations / VenueOpsService | `orders.cart` | commerce / OrderService | operation `createCart` |
 | `decideGuestCheckoutMatch` | operations / MarketingService | `orders.cart` | commerce / OrderService | operation `claimCart` |
 | `bookVisitPlan` | operations / VenueOpsService | `orders.cart_line` | commerce / OrderService | operation `addCartLine` |

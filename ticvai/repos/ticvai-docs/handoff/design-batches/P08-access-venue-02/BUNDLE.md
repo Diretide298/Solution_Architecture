@@ -1071,7 +1071,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Create maintenance plan** (modal, opened by *Create maintenance plan*; *Create maintenance plan* calls `createMaintenancePlan`, *Cancel* sends nothing)
 
-**Collects what `createMaintenancePlan` sends before it is called.** Required: `id`, `name`, `assetId`, `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`, `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createMaintenancePlan` sends before it is called.** Required: `name`, `assetId`, `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`, `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2542,7 +2542,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Create resource** (modal, opened by *Create resource*; *Create resource* calls `createResource`, *Cancel* sends nothing)
 
-**Collects what `createResource` sends before it is called.** Required: `id`, `code`, `name`, `kind`, `venueId`. Optional: `scopePath`, `parentResourceId`, `principalId`, `attributes`, `setupMinutes`, `teardownMinutes`, `requiresQualification`, `depositAmount`, `status`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createResource` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `scopePath`, `parentResourceId`, `principalId`, `attributes`, `setupMinutes`, `teardownMinutes`, `requiresQualification`, `depositAmount`, `status`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

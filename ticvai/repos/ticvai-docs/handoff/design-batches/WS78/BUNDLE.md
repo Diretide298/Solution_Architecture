@@ -489,7 +489,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Create** (modal, opened by *Create*; *Create* calls `createGame`, *Cancel* sends nothing)
 
-**Collects what `createGame` sends before it is called.** Required: `code`, `name`, `venueId`, `creditCost`, `status`. Optional: `zone`, `assetId`, `readerId`, `minPointsAwarded`, `maxPointsAwarded`, `heightRequirementCm`, `playsToday`, `creditsTakenToday`, `pointsAwardedToday`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createGame` sends before it is called.** Required: `code`, `name`, `venueId`, `creditCost`. Optional: `zone`, `assetId`, `readerId`, `minPointsAwarded`, `maxPointsAwarded`, `heightRequirementCm`, `playsToday`, `creditsTakenToday`, `pointsAwardedToday`. is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `status` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

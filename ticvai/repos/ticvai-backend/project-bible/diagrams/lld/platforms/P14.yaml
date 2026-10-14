@@ -255,6 +255,9 @@ screens:
   - listingId<-deepLink
   - version<-deepLink
   - requestId<-navigation
+  - anomalyRuleId<-navigation
+  - licenceId<-navigation
+  - quotaId<-navigation
   goesTo:
   - DEV-001
   - DEV-003

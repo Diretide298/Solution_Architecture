@@ -181,7 +181,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Form: Save journey profile** (modal, opened by *Save journey profile*; *Save journey profile* calls `setJourneyProfile`, *Cancel* sends nothing)
 
-**Collects what `setJourneyProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setJourneyProfile` sends before it is called.** Required: `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1718,7 +1718,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Form: Save fast pass profile** (modal, opened by *Save fast pass profile*; *Save fast pass profile* calls `setFastPassProfile`, *Cancel* sends nothing)
 
-**Collects what `setFastPassProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`, `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setFastPassProfile` sends before it is called.** Required: `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`, `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1924,7 +1924,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Form: Save operating calendar entry** (modal, opened by *Save operating calendar entry*; *Save operating calendar entry* calls `setOperatingCalendarEntry`, *Cancel* sends nothing)
 
-**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `venueId`, `dayType`, `startsAt`, `endsAt`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2143,6 +2143,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Data it reads**: `listGuestJourney` (onLoad, The access journey profiles to simulate)
 
+**Where the user goes next**
+
+- → `BO-214` Guest Journey Command Center: *Guest Journey Command Center*; carries `journeyProfileId`
+
 #### States
 
 | State | What it shows |
@@ -2216,7 +2220,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-223?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Free View Day, Run journey simulation.
-- [ ] No transition is declared; back returns where the user came from.
+- [ ] Every transition is wired: `BO-214`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).

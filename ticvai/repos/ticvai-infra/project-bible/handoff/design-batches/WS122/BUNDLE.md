@@ -119,16 +119,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-529` | AI Human Oversight Command Center | D | 8 | 186 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-530` | AI Approval Requirement & Routing Configuration | D | 42 | 26 | 7 | 56 | 1 | 3 | — | notStarted (—) |
-| `ADM-531` | AI Approval Review Workspace | D | 8 | 6 | 7 | 1 | 2 | 3 | — | notStarted (—) |
+| `ADM-529` | AI Human Oversight Command Center | B | 8 | 186 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-530` | AI Approval Requirement & Routing Configuration | B | 42 | 26 | 7 | 56 | 1 | 3 | — | notStarted (—) |
+| `ADM-531` | AI Approval Review Workspace | B | 8 | 6 | 7 | 1 | 2 | 3 | — | notStarted (—) |
 | `ADM-532` | Conditional Approval & Approval Conditions | D | 8 | 66 | 7 | 8 | 2 | 3 | — | notStarted (—) |
-| `ADM-533` | Human Review, Challenge & AI Clarification Workspace | D | 6 | 22 | 7 | 1 | 1 | 0 | — | notStarted (—) |
+| `ADM-533` | Human Review, Challenge & AI Clarification Workspace | B | 6 | 22 | 7 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-534` | Escalation, Delegation & Approval SLA Management | B | 34 | 56 | 7 | 5 | 2 | 3 | — | notStarted (—) |
 | `ADM-535` | Live AI Execution Oversight & Human Intervention | D | 11 | 26 | 7 | 1 | 3 | 0 | — | notStarted (—) |
 | `ADM-536` | Human Override & Manual Control Center | D | 12 | 38 | 7 | 5 | 1 | 0 | — | notStarted (—) |
 | `ADM-537` | Approval & Intervention History / Decision Timeline | D | 8 | 6 | 7 | 5 | 1 | 3 | — | notStarted (—) |
-| `ADM-538` | Human Oversight Workflow Simulator & Readiness Center | D | 13 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-538` | Human Oversight Workflow Simulator & Readiness Center | B | 13 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ---
 
@@ -144,7 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-529 |
+| Block | Block B · task APP-CONSOLE-ADM-529 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -552,7 +552,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-530 |
+| Block | Block B · task APP-CONSOLE-ADM-530 |
 | Who uses it | ticvai staff holding `APPROVAL_CONFIGURE`, `APPROVAL_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -827,7 +827,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-531 |
+| Block | Block B · task APP-CONSOLE-ADM-531 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration Current Proposed) and no display directory — it is settings, not a population |
@@ -1261,7 +1261,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-533 |
+| Block | Block B · task APP-CONSOLE-ADM-533 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -2470,7 +2470,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-538 |
+| Block | Block B · task APP-CONSOLE-ADM-538 |
 | Who uses it | ticvai staff holding `AI_CONFIGURE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Board 1 defines) and no display directory — it is settings, not a population |

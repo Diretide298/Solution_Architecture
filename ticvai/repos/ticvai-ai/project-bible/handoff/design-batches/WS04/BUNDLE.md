@@ -987,7 +987,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save verification method policy** (modal, opened by *Save verification method policy*; *Save verification method policy* calls `setVerificationMethodPolicy`, *Cancel* sends nothing)
 
-**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`, `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`. Optional: `reasonCodes`, and `credentialFormatOverride`, drawn as "Ticket credential for this product" (Channel default, Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP invitation or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`. Optional: `reasonCodes`, and `credentialFormatOverride`, drawn as "Ticket credential for this product" (Channel default, Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP invitation or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

@@ -382,6 +382,7 @@ screens:
   - reportId<-deepLink
   - actionId<-deepLink
   - planId<-navigation
+  - alertRuleId<-navigation
   goesTo:
   - ANL-001
   boardFrames:

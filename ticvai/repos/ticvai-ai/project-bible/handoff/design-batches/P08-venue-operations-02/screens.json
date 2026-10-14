@@ -308,7 +308,7 @@
     "id": "formSetConfigurationProfile",
     "component": "modal",
     "trigger": "Save configuration profile",
-    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "ConfigurationProfile",
     "confirm": {
      "label": "Save configuration profile",
@@ -607,7 +607,7 @@
     "id": "formSetOfflinePolicy",
     "component": "modal",
     "trigger": "Save offline policy",
-    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Nothing in the body is required. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).",
     "bindsTo": "OfflinePolicy",
     "confirm": {
      "label": "Save offline policy",
@@ -616,7 +616,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "scopePath",
       "maxOfflineHours",
       "allowedOffline",
       "offlineValueCeiling",
@@ -1382,7 +1381,7 @@
     "id": "formSetAlertRule",
     "component": "modal",
     "trigger": "Save alert rule",
-    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AlertRule",
     "confirm": {
      "label": "Save alert rule",
@@ -1391,14 +1390,12 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "metric",
       "comparator",
       "threshold",
       "severity",
       "isActive",
-      "scopePath",
       "thresholdUpper",
       "windowMinutes",
       "deliverTo",

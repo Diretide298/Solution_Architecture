@@ -251,7 +251,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-1124` Gift Card Product Configuration: *Gift Card Product Configuration*
+- → `BO-1124` Gift Card Product Configuration: *Gift Card Product Configuration*; carries `giftCardProductId`
 - → `BO-1125` Gift Card Issuance, Activation & Distribution: *Gift Card Issuance, Activation & Distribution*; carries `cardCode`
 - → `BO-1126` Voucher & Coupon Type Configuration: *Voucher & Coupon Type Configuration*
 - → `BO-1127` Voucher Eligibility & Redemption Rule Studio: *Voucher Eligibility & Redemption Rule Studio*
@@ -466,7 +466,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-1123` Gift Card & Digital Benefit Command Center: *Back to Gift Card & Digital Benefit Command Center*
+- → `BO-1123` Gift Card & Digital Benefit Command Center: *Back to Gift Card & Digital Benefit Command Center*; carries `giftCardProductId`
 
 #### States
 

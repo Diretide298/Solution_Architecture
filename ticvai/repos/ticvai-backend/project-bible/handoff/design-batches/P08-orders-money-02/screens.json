@@ -3133,7 +3133,7 @@
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "provenance": "derived — BO-077 declares entryState.params varianceId and BO-074 holds none of them. The edge carries nothing: varianceId only pre-selects (deep link or optional), and BO-077 opens on its own"
+     "provenance": "derived — BO-077 declares entryState.params rateId, varianceId and BO-074 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional), and BO-077 opens on its own"
     }
    ],
    "entryFrom": [

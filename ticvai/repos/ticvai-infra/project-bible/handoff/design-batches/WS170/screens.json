@@ -44,7 +44,10 @@
     {
      "to": "BO-1004",
      "trigger": "Hold Type Master",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "holdTypeId"
+     ]
     },
     {
      "to": "BO-1005",
@@ -54,12 +57,18 @@
     {
      "to": "BO-1006",
      "trigger": "Hold Rule Assignment",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "holdTypeId"
+     ]
     },
     {
      "to": "BO-1007",
      "trigger": "Expiration Rules",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "holdTypeId"
+     ]
     },
     {
      "to": "BO-1008",
@@ -85,7 +94,10 @@
     {
      "to": "BO-1011",
      "trigger": "Priority & Conflict Resolution",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "holdTypeId"
+     ]
     },
     {
      "to": "BO-1012",

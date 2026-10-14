@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-522` | AI Autonomy Level Configuration | D | 15 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-523` | AI Action & Permission Policy Builder | A | 30 | 19 | 7 | 1 | 0 | 5 | — | notStarted (—) |
 | `ADM-524` | AI Data Access & Usage Policy | D | 22 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-525` | Environment, Tenant & Scope Governance | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-525` | Environment, Tenant & Scope Governance | B | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-526` | AI Policy Conflict, Exception & Override Management | D | 13 | 33 | 7 | 1 | 2 | 0 | — | notStarted (—) |
 | `ADM-527` | AI Policy Testing & Governance Simulation | A | 9 | 11 | 7 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-528` | AI Governance Policy Publication & Effective Policy Map | A | 6 | 22 | 7 | 1 | 0 | 0 | — | notStarted (—) |
@@ -1752,7 +1752,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-525 |
+| Block | Block B · task APP-CONSOLE-ADM-525 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

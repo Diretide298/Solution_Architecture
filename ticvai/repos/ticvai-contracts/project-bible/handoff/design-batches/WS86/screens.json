@@ -49,7 +49,10 @@
     {
      "to": "BO-476",
      "trigger": "Communication Protocol Configuration",
-     "provenance": "structural — pack board 9 wiring, 11 September 2026"
+     "provenance": "structural — pack board 9 wiring, 11 September 2026",
+     "carries": [
+      "readerProfileId"
+     ]
     },
     {
      "to": "BO-477",

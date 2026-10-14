@@ -1152,7 +1152,10 @@
     {
      "to": "BO-388",
      "trigger": "Open Approval SLA Policy Configuration",
-     "provenance": "a section of BO-388 since 2 October 2026 (CHG-MOV-002)"
+     "provenance": "a section of BO-388 since 2 October 2026 (CHG-MOV-002)",
+     "carries": [
+      "slaPolicyId"
+     ]
     }
    ]
   },

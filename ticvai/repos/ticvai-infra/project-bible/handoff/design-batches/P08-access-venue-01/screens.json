@@ -50,7 +50,7 @@
     {
      "to": "BO-006",
      "trigger": "Parking Configuration",
-     "provenance": "derived — BO-006 declares entryState.params  and BO-001 holds none of them. The edge carries nothing: BO-006 needs nothing to open"
+     "provenance": "derived — BO-006 declares entryState.params parkingFacilityId and BO-001 holds none of them. The edge carries nothing: parkingFacilityId only pre-selects (deep link or optional), and BO-006 opens on its own"
     },
     {
      "to": "BO-002",
@@ -415,7 +415,7 @@
     "id": "formConfigureQueueFeed",
     "component": "modal",
     "trigger": "Configure queue feed",
-    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "QueueFeed",
     "confirm": {
      "label": "Configure queue feed",
@@ -424,7 +424,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "queueId",
       "adaptor",
       "isEnabled",
@@ -1309,7 +1308,7 @@
     "id": "formConfigureQueueFeed",
     "component": "modal",
     "trigger": "Configure queue feed",
-    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "QueueFeed",
     "confirm": {
      "label": "Configure queue feed",
@@ -1318,7 +1317,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "queueId",
       "adaptor",
       "isEnabled",

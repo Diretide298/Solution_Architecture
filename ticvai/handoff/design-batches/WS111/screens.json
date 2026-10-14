@@ -54,7 +54,10 @@
     {
      "to": "BO-647",
      "trigger": "Badge Template Designer",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "carries": [
+      "badgeTemplateId"
+     ]
     },
     {
      "to": "BO-648",

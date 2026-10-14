@@ -408,7 +408,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-236` Visual Dynamic Policy Builder: *Works in Visual Dynamic Policy Builder*; calls `listDynamicAccessPolicy`
 - → `BO-237` Context, Time, Event & Capacity Policy Builder: *Works in Context, Time, Event & Capacity Policy Builder*; calls `listDynamicAccessPolicy`
 - → `BO-238` Identity, Membership & Accreditation Policies: *Works in Identity, Membership & Accreditation Policies*; calls `listDynamicAccessPolicy`
-- → `BO-239` Policy Scope, Hierarchy & Inheritance: *Works in Policy Scope, Hierarchy & Inheritance*; calls `listDynamicAccessPolicy`
+- → `BO-239` Policy Scope, Hierarchy & Inheritance: *Works in Policy Scope, Hierarchy & Inheritance*; carries `policyId`; calls `listDynamicAccessPolicy`
 - → `BO-240` Authorization Governance & Temporary Access: *Works in Authorization Governance & Temporary Access*; calls `listDynamicAccessPolicy`
 - → `BO-241` Policy Evaluation Architecture & Offline Distribution: *Works in Policy Evaluation Architecture & Offline Distribution*; calls `listDynamicAccessPolicy`
 - → `BO-242` Policy Simulation, Conflict & Impact Analysis: *Works in Policy Simulation, Conflict & Impact Analysis*; calls `listDynamicAccessPolicy`
@@ -1553,7 +1553,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save policy evaluation setting** (modal, opened by *Save policy evaluation setting*; *Save policy evaluation setting* calls `setPolicyEvaluationSetting`, *Cancel* sends nothing)
 
-**Collects what `setPolicyEvaluationSetting` sends before it is called.** Required: `id`, `scopePath`, `policyCategory`, `evaluationMode`. Optional: `supportedLocations`, `offlineBehaviour`, `maxDataAgeMinutes`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setPolicyEvaluationSetting` sends before it is called.** Required: `policyCategory`, `evaluationMode`. Optional: `supportedLocations`, `offlineBehaviour`, `maxDataAgeMinutes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

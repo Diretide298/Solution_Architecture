@@ -64,13 +64,19 @@
      "to": "BO-188",
      "trigger": "Works in Face Tag Temporary Enrollment",
      "provenance": "flow F115 step 7→8",
-     "operation": "listBiometricAccess"
+     "operation": "listBiometricAccess",
+     "carries": [
+      "profileId"
+     ]
     },
     {
      "to": "BO-189",
      "trigger": "Works in Face Matching & Verification Thresholds",
      "provenance": "flow F115 step 9→10",
-     "operation": "listBiometricAccess"
+     "operation": "listBiometricAccess",
+     "carries": [
+      "profileId"
+     ]
     },
     {
      "to": "BO-190",

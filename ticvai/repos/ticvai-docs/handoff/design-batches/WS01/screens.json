@@ -1383,7 +1383,7 @@
     "id": "formSetAccessPointGroup",
     "component": "modal",
     "trigger": "Save access point group",
-    "body": "**Collects what `setAccessPointGroup` sends before it is called.** Required: `id`, `venueId`, `name`, `scopePath`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setAccessPointGroup` sends before it is called.** Required: `venueId`, `name`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessAccessPointGroup",
     "confirm": {
      "label": "Save access point group",
@@ -1392,10 +1392,8 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "name",
-      "scopePath",
       "parentGroupId",
       "accessPointIds"
      ]
@@ -1620,7 +1618,7 @@
     "id": "formSetOperatingCalendarEntry",
     "component": "modal",
     "trigger": "Save operating calendar entry",
-    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `venueId`, `dayType`, `startsAt`, `endsAt`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessOperatingCalendarEntry",
     "confirm": {
      "label": "Save operating calendar entry",
@@ -1629,12 +1627,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "dayType",
       "startsAt",
       "endsAt",
-      "scopePath",
       "name",
       "ticketValidationRequired",
       "admissionType",

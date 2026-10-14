@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-108` | Revenue Optimization Command Center | B | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-108` | Revenue Optimization Command Center | A | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-109` | Pricing Simulation Studio | A | 0 | 12 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
 | `ADM-110` | Scenario Modeling & What-If Analysis | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-111` | A/B Pricing Experiment Studio | B | 0 | 8 | 6 | 1 | 0 | 0 | — | notStarted (generated) |

@@ -4945,7 +4945,7 @@
     {
      "to": "BO-133",
      "trigger": "Offline Alerts, Limits & Audit",
-     "provenance": "derived — BO-133 declares entryState.params rejectionId, reportId, requestId and BO-108 holds none of them. The edge carries nothing: reportId, requestId, rejectionId only pre-select (deep link or optional), and BO-133 opens on its own"
+     "provenance": "derived — BO-133 declares entryState.params alertRuleId, rejectionId, reportId, requestId and BO-108 holds none of them. The edge carries nothing: reportId, requestId, rejectionId, alertRuleId only pre-select (deep link or optional), and BO-133 opens on its own"
     },
     {
      "to": "BO-1184",

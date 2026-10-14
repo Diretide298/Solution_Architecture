@@ -226,7 +226,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `BO-475` Reader Manufacturer & Model Profile: *Reader Manufacturer & Model Profile*
-- → `BO-476` Communication Protocol Configuration: *Communication Protocol Configuration*
+- → `BO-476` Communication Protocol Configuration: *Communication Protocol Configuration*; carries `readerProfileId`
 - → `BO-477` Reader Command & Event Mapping: *Reader Command & Event Mapping*
 - → `BO-478` Reader Configuration Deployment & Synchronization: *Reader Configuration Deployment & Synchronization*
 - → `BO-479` Game Trigger & I/O Control Mapping: *Game Trigger & I/O Control Mapping*

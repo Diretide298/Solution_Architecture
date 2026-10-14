@@ -918,7 +918,7 @@
     {
      "to": "BO-006",
      "trigger": "Parking Configuration",
-     "provenance": "derived — BO-006 declares entryState.params  and BO-103 holds none of them. The edge carries nothing: BO-006 needs nothing to open"
+     "provenance": "derived — BO-006 declares entryState.params parkingFacilityId and BO-103 holds none of them. The edge carries nothing: parkingFacilityId only pre-selects (deep link or optional), and BO-006 opens on its own"
     },
     {
      "to": "BO-030",

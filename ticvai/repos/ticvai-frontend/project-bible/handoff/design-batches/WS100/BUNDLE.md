@@ -301,10 +301,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `ADM-390` VSI Model Builder: *VSI Model Builder*
 - → `ADM-391` VSI Scoring & Tier Threshold Configuration: *VSI Scoring & Tier Threshold Configuration*
 - → `ADM-392` Subscription Tier Configuration: *Subscription Tier Configuration*
-- → `ADM-393` Tier Included Allowances: *Tier Included Allowances*
-- → `ADM-394` Commercial & Licensing Model Configuration: *Commercial & Licensing Model Configuration*
-- → `ADM-395` Billable Unit, Minimum Guarantee & Enforcement Rules: *Billable Unit, Minimum Guarantee & Enforcement Rules*
-- → `ADM-396` Overage Pricing & Capacity Packs: *Overage Pricing & Capacity Packs*
+- → `ADM-393` Tier Included Allowances: *Tier Included Allowances*; carries `licensingModelId`
+- → `ADM-394` Commercial & Licensing Model Configuration: *Commercial & Licensing Model Configuration*; carries `licensingModelId`
+- → `ADM-395` Billable Unit, Minimum Guarantee & Enforcement Rules: *Billable Unit, Minimum Guarantee & Enforcement Rules*; carries `licensingModelId`
+- → `ADM-396` Overage Pricing & Capacity Packs: *Overage Pricing & Capacity Packs*; carries `licensingModelId`
 - → `ADM-397` Commercial Model & Rule Simulation: *Commercial Model & Rule Simulation*
 - → `ADM-398` Rule Versioning, Approval & Publication: *Rule Versioning, Approval & Publication*
 

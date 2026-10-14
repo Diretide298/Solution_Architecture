@@ -37,12 +37,18 @@
     {
      "to": "BO-701",
      "trigger": "Venue Master Configuration",
-     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "spaceId"
+     ]
     },
     {
      "to": "BO-702",
      "trigger": "Space Access Rules Configuration",
-     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "spaceId"
+     ]
     }
    ]
   },
