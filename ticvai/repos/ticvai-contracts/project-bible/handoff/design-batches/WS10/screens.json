@@ -67,15 +67,6 @@
      "operation": "listDynamicAccessPolicy"
     },
     {
-     "to": "BO-239",
-     "trigger": "Works in Policy Scope, Hierarchy & Inheritance",
-     "provenance": "flow F120 step 9→10",
-     "operation": "listDynamicAccessPolicy",
-     "carries": [
-      "policyId"
-     ]
-    },
-    {
      "to": "BO-240",
      "trigger": "Works in Authorization Governance & Temporary Access",
      "provenance": "flow F120 step 11→12",
@@ -92,6 +83,15 @@
      "trigger": "Works in Policy Simulation, Conflict & Impact Analysis",
      "provenance": "flow F120 step 15→16",
      "operation": "listDynamicAccessPolicy"
+    },
+    {
+     "to": "BO-239",
+     "trigger": "Works in Policy Scope, Hierarchy & Inheritance",
+     "provenance": "flow F120 step 9→10",
+     "operation": "listDynamicAccessPolicy",
+     "carries": [
+      "policyId"
+     ]
     },
     {
      "to": "BO-243",

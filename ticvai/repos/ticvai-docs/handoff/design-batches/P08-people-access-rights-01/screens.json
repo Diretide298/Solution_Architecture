@@ -1792,11 +1792,6 @@
      "carries": [
       "requestId"
      ]
-    },
-    {
-     "to": "BO-086",
-     "trigger": "Approval Matrix",
-     "provenance": "derived — BO-086 declares entryState.params matrixId and BO-084 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
     }
    ],
    "entryFrom": [
@@ -2083,11 +2078,6 @@
      "operation": "decideApprovalRequest",
      "crossesDevice": true,
      "back": false
-    },
-    {
-     "to": "BO-086",
-     "trigger": "Approval Matrix",
-     "provenance": "derived — BO-086 declares entryState.params matrixId and BO-085 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
     }
    ]
   },
@@ -2575,14 +2565,6 @@
      "to": "ADM-238",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F164 step 10→11"
-    },
-    {
-     "to": "BO-086",
-     "trigger": "Approval Matrix",
-     "carries": [
-      "matrixId"
-     ],
-     "provenance": "derived — BO-086 declares entryState.params matrixId and BO-087 holds matrixId, so an edge into it carries them"
     }
    ],
    "entryFrom": [

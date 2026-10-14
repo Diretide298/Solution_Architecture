@@ -1618,7 +1618,6 @@ Errors to draw in the form: 409 The request is already `escalated` (`approval-re
 - → `BO-364` Approval Command Center Dashboard: *Back to the approval command centre*
 - → `ADM-248` Workflow Operations Command Center: *Returns to the board's landing screen*
 - → `BO-085` Approval Request: *Approves it*; carries `requestId`; calls `listApprovalRequests`
-- → `BO-086` Approval Matrix: *Approval Matrix*
 
 #### States
 
@@ -1732,7 +1731,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 - [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-084?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Decide approval request, Escalate approval request.
-- [ ] Every transition is wired: `BO-052`, `BO-087`, `BO-364`, `ADM-248`, `BO-085`, `BO-086`.
+- [ ] Every transition is wired: `BO-052`, `BO-087`, `BO-364`, `ADM-248`, `BO-085`.
 - [ ] Every gated control is gated: `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 6 edge case(s) from the process notes are drawn.
@@ -1865,7 +1864,6 @@ Errors to draw in the form: 409 The request is not `rejected`; only a rejected r
 - → `BO-084` Approval Inbox: *Approval Inbox*; carries `approvalRequestId`, `requestId`
 - → `BO-087` Approval Delegations: *Approval Delegations*
 - → `POS-005` Payment: *The till applies it and completes the sale*; calls `decideApprovalRequest`
-- → `BO-086` Approval Matrix: *Approval Matrix*
 
 **What opens over it**
 
@@ -1972,7 +1970,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 - [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-085?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Decide approval request, Resubmit approval request, Withdraw approval request.
-- [ ] Every transition is wired: `BO-084`, `BO-087`, `POS-005`, `BO-086`.
+- [ ] Every transition is wired: `BO-084`, `BO-087`, `POS-005`.
 - [ ] Every gated control is gated: `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 7 edge case(s) from the process notes are drawn.
@@ -2377,7 +2375,6 @@ Errors to draw in the form: 400 Validation failed. Includes a `scopeLevel` that 
 - → `BO-084` Approval Inbox: *Approval Inbox*
 - → `BO-085` Approval Request: *Approval Request*
 - → `ADM-238` Rules & Workflow Command Center: *Returns to the board's landing screen*
-- → `BO-086` Approval Matrix: *Approval Matrix*; carries `matrixId`
 
 **What opens over it**
 
@@ -2480,7 +2477,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 - [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-087?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create approval delegation, Revoke approval delegation, Save approval limits.
-- [ ] Every transition is wired: `BO-084`, `BO-085`, `ADM-238`, `BO-086`.
+- [ ] Every transition is wired: `BO-084`, `BO-085`, `ADM-238`.
 - [ ] Every gated control is gated: `APPROVAL_CONFIGURE`, `APPROVAL_DECIDE`, `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 4 edge case(s) from the process notes are drawn.

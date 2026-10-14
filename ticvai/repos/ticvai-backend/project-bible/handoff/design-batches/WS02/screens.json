@@ -61,15 +61,6 @@
      "operation": "listAccessRule"
     },
     {
-     "to": "BO-159",
-     "trigger": "Works in Entitlement Consumption Engine",
-     "provenance": "flow F112 step 9→10",
-     "operation": "listAccessRule",
-     "carries": [
-      "ruleId"
-     ]
-    },
-    {
      "to": "BO-160",
      "trigger": "Works in Multi-Park & Crossover Rules",
      "provenance": "flow F112 step 11→12",
@@ -91,6 +82,15 @@
      "to": "BO-157",
      "trigger": "Works in Anti-Passback & Journey Sequence",
      "provenance": "flow F112 step 5→6",
+     "operation": "listAccessRule",
+     "carries": [
+      "ruleId"
+     ]
+    },
+    {
+     "to": "BO-159",
+     "trigger": "Works in Entitlement Consumption Engine",
+     "provenance": "flow F112 step 9→10",
      "operation": "listAccessRule",
      "carries": [
       "ruleId"

@@ -467,12 +467,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-185` Biometric Verification Profile Builder: *Works in Biometric Verification Profile Builder*; calls `listBiometricAccess`
 - → `BO-186` Face Pass Enrollment Configuration: *Works in Face Pass Enrollment Configuration*; calls `listBiometricAccess`
 - → `BO-187` Biometric Consent & Guardian Management: *Works in Biometric Consent & Guardian Management*; calls `listBiometricAccess`
-- → `BO-188` Face Tag Temporary Enrollment: *Works in Face Tag Temporary Enrollment*; carries `profileId`; calls `listBiometricAccess`
-- → `BO-189` Face Matching & Verification Thresholds: *Works in Face Matching & Verification Thresholds*; carries `profileId`; calls `listBiometricAccess`
 - → `BO-190` Face Change, Re-enrollment & Identity Protection: *Works in Face Change, Re-enrollment & Identity Protection*; calls `listBiometricAccess`
 - → `BO-191` Biometric Validation at Gate: *Works in Biometric Validation at Gate*; calls `listBiometricAccess`
 - → `BO-192` Biometric Lifecycle, Retention & Deletion: *Works in Biometric Lifecycle, Retention & Deletion*; calls `listBiometricAccess`
 - → `BO-193` Biometric Simulation, Audit & Publication: *Works in Biometric Simulation, Audit & Publication*; calls `listBiometricAccess`
+- → `BO-188` Face Tag Temporary Enrollment: *Works in Face Tag Temporary Enrollment*; carries `profileId`; calls `listBiometricAccess`
+- → `BO-189` Face Matching & Verification Thresholds: *Works in Face Matching & Verification Thresholds*; carries `profileId`; calls `listBiometricAccess`
 
 #### States
 
@@ -565,7 +565,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every output is drawn (240 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-184?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-100`, `BO-185`, `BO-186`, `BO-187`, `BO-188`, `BO-189`, `BO-190`, `BO-191`, `BO-192`, `BO-193`.
+- [ ] Every transition is wired: `BO-100`, `BO-185`, `BO-186`, `BO-187`, `BO-190`, `BO-191`, `BO-192`, `BO-193`, `BO-188`, `BO-189`.
 - [ ] Every gated control is gated: `SCOPE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 edge case(s) from the process notes are drawn.

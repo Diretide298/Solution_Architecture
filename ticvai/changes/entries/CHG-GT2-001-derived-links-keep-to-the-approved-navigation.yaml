@@ -14,7 +14,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'check-approved-ui/AU-FIELD at the r6 release gate on r6-gate2 (e2195db7, every r6 batch merged and fully derived):
-  6 new, 0 after (evidence audit/ticvai/runs/audit-1014/classes.json; gate log scratchpad audit/fix/gate2-checks.log).
+  6 new, 0 after (evidence docs/active/audit-runs/audit-1014/classes.json; gate log scratchpad the gate 2 check log (lead workspace)).
   No authored screen edit made them: CHG-SHP-003 gave setApprovalMatrix and setJourneyProfile keyed paths
   (/approval-matrices/{matrixId}, /journey-profiles/{journeyProfileId}); derive-entrystate-params then declared an
   optional matrixId on BO-086 (and BO-087) and journeyProfileId on BO-214, and derive-carries pass 3 added an owned

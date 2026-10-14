@@ -23,7 +23,7 @@ keys_touched:
   - seating.seat_block_item
   files:
   - tools/derive-ddl.py
-  - backend/tenant/V0104__after_r1_20261014.sql
+  - the r6 forward migration V0104 (tenant)
 root_class: A16 STORAGE-SHAPE
 tickets:
   started:

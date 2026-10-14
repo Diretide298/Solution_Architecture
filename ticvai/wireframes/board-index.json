@@ -3397,8 +3397,8 @@
   {
    "file": "APP venue-management.dc.html",
    "provenance": "clientPack",
-   "bytes": 5705284,
-   "sha256": "24604748e7b48b4d",
+   "bytes": 5705009,
+   "sha256": "54e834c779510178",
    "frames": 1866,
    "screensFramed": 1866,
    "screens": [
@@ -8176,8 +8176,8 @@
   {
    "file": "P08 Venue Management.dc.html",
    "provenance": "generated",
-   "bytes": 5076477,
-   "sha256": "3376abd3747dc3fb",
+   "bytes": 5076202,
+   "sha256": "e63cf1b9c48b6af5",
    "frames": 1663,
    "screensFramed": 1663,
    "screens": [

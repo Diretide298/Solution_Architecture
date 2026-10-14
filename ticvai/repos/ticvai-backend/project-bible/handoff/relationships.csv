@@ -1991,7 +1991,7 @@ marketing.guest_profile,via runDataRetention,marketing.privacy_action,ambient,li
 marketing.guest_profile,via runDataRetention,marketing.privacy_audit_event,ambient,lineage,,
 marketing.guest_profile,via updateGuestProfile,marketing.loyalty_position,ambient,lineage,,
 marketing.guest_relationship,related_subject_id,pii.subject,reference,convention,yes,
-marketing.invitation,campaign_id,marketing.invitation_campaign,reference,convention,,
+marketing.invitation,campaign_id,marketing.invitation_campaign,reference,declared,,yes
 marketing.invitation,subject_id,pii.subject,reference,convention,yes,
 marketing.invitation_campaign,product_id,catalogue.product,reference,declared,yes,
 marketing.journey,via createJourney,marketing.journey_step,ambient,lineage,,

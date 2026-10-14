@@ -255,11 +255,15 @@ def load_team(team=None):
     """The roster and its rules from docs/active/team.json: [{name, role, pools, pace, from, fromIndex}], caps."""
     team = team or json.loads((ROOT / "docs" / "active" / "team.json").read_text(encoding="utf-8"))
     pace = team.get("pace") or {}
+    # a successor is ordered where the person they replaced was (`sortAs`), so the scheduler's ties fall as before and
+    # only the name changes (team.json successors, CHG-PPL-001)
+    replaced = {new: old for old, new in successors(team).items()}
     people = []
     for p in team.get("people") or []:
         frm = dt.date.fromisoformat(p.get("from") or START.isoformat())
         people.append({"name": p["name"], "role": p.get("role", ""), "pools": list(p.get("pools") or []),
-                       "pace": float(pace.get(p["name"], 1.0)), "from": frm, "fromIndex": float(index_of(frm))})
+                       "pace": float(pace.get(p["name"], 1.0)), "from": frm, "fromIndex": float(index_of(frm)),
+                       "sortAs": replaced.get(p["name"], p["name"])})
     caps = defaultdict(dict)                     # pool -> person -> largest task (points) they take there
     for who, cap in (team.get("backendHelpers") or {}).items():
         caps["be"][who] = cap
@@ -366,11 +370,40 @@ def pinned_owners(team, rebalance=False, bundle_path=None):
             pushed |= {k for k in json.loads(kmap.read_text(encoding="utf-8")) if "#" not in k}
         except Exception:
             pass
-    pins = {}
+    # **A person who left hands every pinned ticket to their successor** (team.json `successors`, CHG-PPL-001; Chinmay,
+    # 15 October 2026: "tanmay is leaving so shift all tasks to narayan"): the bundle names the owner the last release
+    # gave, so the pin follows the successor and only the name changes.
+    succ = successors(team)
+    pins, handed = {}, 0
     for t in b.get("tickets") or []:
         if t.get("type") == "Task" and t.get("assignee") and t["key"] in pushed:
-            pins[t["key"]] = back.get(t["assignee"], t["assignee"])
-    return pins, f"{len(pins)} pushed tickets keep the owner release {rel} gave them"
+            who = back.get(t["assignee"], t["assignee"])
+            if who in succ:
+                who, handed = succ[who], handed + 1
+            pins[t["key"]] = who
+    return pins, (f"{len(pins)} pushed tickets keep the owner release {rel} gave them"
+                  + (f" ({handed} handed to the successor of someone who left: team.json successors)" if handed else ""))
+
+
+def successors(team):
+    """team.json `successors` (CHG-PPL-001, 15 October 2026): a person who left -> the person who took their place,
+    followed to the end of a chain (A left for B, then B for C: A's work is C's)."""
+    raw = dict(team.get("successors") or {})
+    out = {}
+    for who in raw:
+        nxt, seen = raw[who], {who}
+        while nxt in raw and nxt not in seen:
+            seen.add(nxt)
+            nxt = raw[nxt]
+        out[who] = nxt
+    return out
+
+
+def service_owners(team):
+    """team.json `serviceOwners` (CHG-PPL-002, 15 October 2026: "keep hrushikant"): service -> the owner the lead fixed
+    over the load balancer; a successor takes the place of a fixed owner who left."""
+    succ = successors(team)
+    return {s: succ.get(w, w) for s, w in (team.get("serviceOwners") or {}).items()}
 
 
 def migration_owner(team):
@@ -421,8 +454,11 @@ BLOCK_TEST_DAYS = 3
 
 def test_settings(team):
     bt = (team.get("sprintPlan") or {}).get("blockTests") or {}
-    pairs = bt.get("pairs") or [["Pranay Shinde", "Chitrangi Mestry"], ["Tanmay Dukhande", "Chinmay Patkar"],
-                                ["Pranay Shinde", "Pallavi Sawant"], ["Tanmay Dukhande", "Pradnya Yeram"]]
+    pairs = bt.get("pairs") or [["Pranay Shinde", "Chitrangi Mestry"], ["Narayan Gaonkar", "Chinmay Patkar"],
+                                ["Pranay Shinde", "Pallavi Sawant"], ["Narayan Gaonkar", "Pradnya Yeram"]]
+    # a person who left is replaced in a pair by their successor (team.json successors, CHG-PPL-001)
+    succ = successors(team)
+    pairs = [[succ.get(w, w) for w in pr] for pr in pairs]
     return {"days": float(bt.get("days") or BLOCK_TEST_DAYS), "pairs": pairs, "lead": bt.get("lead") or "Chinmay Parab",
             "share": float(bt.get("moduleTestShare") or TEST_SHARE),
             "minPoints": int(bt.get("moduleTestMinPoints") or TEST_MIN_POINTS)}
@@ -609,6 +645,7 @@ def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper
     freeze = freeze or {}
     rank_b = {b: i for i, b in enumerate(BLOCKS)}
     pace_of = {p["name"]: p["pace"] for p in people}
+    sort_as = {p["name"]: p.get("sortAs") or p["name"] for p in people}   # a successor sorts as who they replaced
     rank = defaultdict(dict)
     for p in people:
         for i, pool in enumerate(p["pools"]):
@@ -671,7 +708,7 @@ def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper
             for j, pl in enumerate([pool] + [x for x in (it.get("fallback") or ()) if x != pool]):
                 for name, r in rank.get(pl, {}).items():
                     cands.setdefault(name, (r, j))
-            for name, (r, j) in sorted(cands.items()):
+            for name, (r, j) in sorted(cands.items(), key=lambda x: sort_as.get(x[0], x[0])):
                 if name in skip:
                     continue
                 cap = (caps.get(pool) or {}).get(name)
@@ -687,7 +724,7 @@ def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper
                     score += 1
                 if best is None or score < best[0] - 1e-9:
                     best = (score, name)
-            who = best[1] if best else (sorted(set(cands) - skip) or [None])[0]
+            who = best[1] if best else (sorted(set(cands) - skip, key=lambda x: sort_as.get(x, x)) or [None])[0]
             if who is None:
                 start[k], end[k] = 0.0, 0.0
                 continue

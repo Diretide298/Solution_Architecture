@@ -255,11 +255,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-155` Visual Access Rule Builder: *Works in Visual Access Rule Builder*; calls `listAccessRule`
 - → `BO-156` Entry, Exit & Re-entry Rules: *Works in Entry, Exit & Re-entry Rules*; calls `listAccessRule`
 - → `BO-158` Access Validity & Time Rules: *Works in Access Validity & Time Rules*; calls `listAccessRule`
-- → `BO-159` Entitlement Consumption Engine: *Works in Entitlement Consumption Engine*; carries `ruleId`; calls `listAccessRule`
 - → `BO-160` Multi-Park & Crossover Rules: *Works in Multi-Park & Crossover Rules*; calls `listAccessRule`
 - → `BO-162` Group Admission & Quantity Validation: *Works in Group Admission & Quantity Validation*; calls `listAccessRule`
 - → `BO-163` Rule Simulation, Conflict Check & Publication: *Works in Rule Simulation, Conflict Check & Publication*; calls `listAccessRule`
 - → `BO-157` Anti-Passback & Journey Sequence: *Works in Anti-Passback & Journey Sequence*; carries `ruleId`; calls `listAccessRule`
+- → `BO-159` Entitlement Consumption Engine: *Works in Entitlement Consumption Engine*; carries `ruleId`; calls `listAccessRule`
 - → `BO-161` Guest, Companion & Eligibility Rules: *Works in Guest, Companion & Eligibility Rules*; carries `productId`; calls `listAccessRule`
 
 #### States
@@ -398,7 +398,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-154?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-100`, `BO-155`, `BO-156`, `BO-158`, `BO-159`, `BO-160`, `BO-162`, `BO-163`, `BO-157`, `BO-161`.
+- [ ] Every transition is wired: `BO-100`, `BO-155`, `BO-156`, `BO-158`, `BO-160`, `BO-162`, `BO-163`, `BO-157`, `BO-159`, `BO-161`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.

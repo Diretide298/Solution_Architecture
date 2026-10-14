@@ -80,11 +80,7 @@
    "operations": 7
   },
   {
-   "contract": "reporting",
-   "operations": 5
-  },
-  {
-   "contract": "finance",
+   "contract": "promotions",
    "operations": 5
   },
   {
@@ -92,7 +88,11 @@
    "operations": 5
   },
   {
-   "contract": "promotions",
+   "contract": "reporting",
+   "operations": 5
+  },
+  {
+   "contract": "finance",
    "operations": 5
   },
   {
@@ -104,6 +104,10 @@
    "operations": 4
   },
   {
+   "contract": "workforce",
+   "operations": 2
+  },
+  {
    "contract": "access",
    "operations": 2
   },
@@ -112,15 +116,11 @@
    "operations": 2
   },
   {
-   "contract": "workforce",
-   "operations": 2
-  },
-  {
-   "contract": "inventory",
+   "contract": "games",
    "operations": 1
   },
   {
-   "contract": "games",
+   "contract": "inventory",
    "operations": 1
   }
  ],

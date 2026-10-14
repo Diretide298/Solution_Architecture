@@ -41,7 +41,21 @@ SCREEN = re.compile(r"([A-Z]+-\d{3,4})$")
 # and carries its own text and Done-when; reading its subject as operations wrote "Build these 0 operations".
 OPS_TASK = re.compile(r"(?:SVC|VM)-.+-\d+")
 FE_CHECK = ["Chitrangi Mestry", "Chinmay Patkar", "Pallavi Sawant", "Sanket Keluskar", "Pradnya Yeram"]
-BE_CHECK = ["Pranay Shinde", "Tanmay Dukhande"]          # Hrushikant is never a checker
+
+
+def be_checkers():
+    """The back-end reviewers, read from docs/active/team.json: `areas.backend` in its order, without anyone `neverTests`
+    names (Hrushikant is never a checker) or `successors` says has left (CHG-PPL-001, 15 October 2026: Tanmay Dukhande
+    left and Narayan Gaonkar took his place). It was a hard-coded list, which would have kept the leaver reviewing."""
+    try:
+        t = json.loads((ROOT / "docs" / "active" / "team.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ["Pranay Shinde", "Narayan Gaonkar"]
+    off = set(t.get("neverTests") or []) | set(t.get("successors") or {})
+    return [p for p in (t.get("areas") or {}).get("backend") or [] if p not in off]
+
+
+BE_CHECK = be_checkers()
 PLATFORM = {}
 
 

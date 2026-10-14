@@ -24120,11 +24120,6 @@ screens:
       operation: listApprovalRequests
       carries:
       - requestId
-    - to: BO-086
-      trigger: Approval Matrix
-      provenance: 'derived — BO-086 declares entryState.params matrixId and BO-084 holds none of them.
-        The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens
-        on its own'
     entryFrom:
     - ADM-248
     - BO-364
@@ -24334,11 +24329,6 @@ screens:
       operation: decideApprovalRequest
       crossesDevice: true
       back: false
-    - to: BO-086
-      trigger: Approval Matrix
-      provenance: 'derived — BO-086 declares entryState.params matrixId and BO-085 holds none of them.
-        The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens
-        on its own'
   notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. **Cross-platform navigation removed 24 August**: POS-005. **A till does not
     navigate to a back office and a guest app does not navigate to either** — those are device handovers,
@@ -24701,12 +24691,6 @@ screens:
     - to: ADM-238
       trigger: Returns to the board's landing screen
       provenance: flow F164 step 10→11
-    - to: BO-086
-      trigger: Approval Matrix
-      carries:
-      - matrixId
-      provenance: derived — BO-086 declares entryState.params matrixId and BO-087 holds matrixId, so an
-        edge into it carries them
     entryFrom:
     - ADM-238
   notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
@@ -24938,11 +24922,6 @@ screens:
       trigger: Approval Request
       provenance: 'derived — BO-085 declares entryState.params requestId and BO-088 holds none of them.
         The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens
-        on its own'
-    - to: BO-086
-      trigger: Approval Matrix
-      provenance: 'derived — BO-086 declares entryState.params matrixId and BO-088 holds none of them.
-        The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens
         on its own'
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. **Retail board operations wired 24 August.**
@@ -29983,11 +29962,6 @@ screens:
       - roleId
       provenance: derived — BO-054 declares entryState.params campaignId, capabilityTemplateId, principalId,
         roleId and BO-106 holds roleId, so an edge into it carries them
-    - to: BO-086
-      trigger: Approval Matrix
-      provenance: 'derived — BO-086 declares entryState.params matrixId and BO-106 holds none of them.
-        The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens
-        on its own'
   notes: Section landing. **11 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -38294,12 +38268,6 @@ screens:
       trigger: Works in Access Validity & Time Rules
       provenance: flow F112 step 7→8
       operation: listAccessRule
-    - to: BO-159
-      trigger: Works in Entitlement Consumption Engine
-      provenance: flow F112 step 9→10
-      operation: listAccessRule
-      carries:
-      - ruleId
     - to: BO-160
       trigger: Works in Multi-Park & Crossover Rules
       provenance: flow F112 step 11→12
@@ -38315,6 +38283,12 @@ screens:
     - to: BO-157
       trigger: Works in Anti-Passback & Journey Sequence
       provenance: flow F112 step 5→6
+      operation: listAccessRule
+      carries:
+      - ruleId
+    - to: BO-159
+      trigger: Works in Entitlement Consumption Engine
+      provenance: flow F112 step 9→10
       operation: listAccessRule
       carries:
       - ruleId
@@ -42055,18 +42029,6 @@ screens:
       trigger: Works in Biometric Consent & Guardian Management
       provenance: flow F115 step 5→6
       operation: listBiometricAccess
-    - to: BO-188
-      trigger: Works in Face Tag Temporary Enrollment
-      provenance: flow F115 step 7→8
-      operation: listBiometricAccess
-      carries:
-      - profileId
-    - to: BO-189
-      trigger: Works in Face Matching & Verification Thresholds
-      provenance: flow F115 step 9→10
-      operation: listBiometricAccess
-      carries:
-      - profileId
     - to: BO-190
       trigger: Works in Face Change, Re-enrollment & Identity Protection
       provenance: flow F115 step 11→12
@@ -42083,6 +42045,18 @@ screens:
       trigger: Works in Biometric Simulation, Audit & Publication
       provenance: flow F115 step 17→18
       operation: listBiometricAccess
+    - to: BO-188
+      trigger: Works in Face Tag Temporary Enrollment
+      provenance: flow F115 step 7→8
+      operation: listBiometricAccess
+      carries:
+      - profileId
+    - to: BO-189
+      trigger: Works in Face Matching & Verification Thresholds
+      provenance: flow F115 step 9→10
+      operation: listBiometricAccess
+      carries:
+      - profileId
   density: compact
   purposeNote: Authorized administrators can monitor and manage the biometric-access environment from
     one location.
@@ -47149,13 +47123,6 @@ screens:
     inferred: false
     notes: '**Reached from BO-214, the hub of its workshop board.** Stated on 4 September: the pack groups
       its screens ten to a board behind a command centre, and that grouping is the navigation.'
-    transitions:
-    - to: BO-214
-      trigger: Guest Journey Command Center
-      carries:
-      - journeyProfileId
-      provenance: derived — BO-214 declares entryState.params journeyProfileId and BO-223 holds journeyProfileId,
-        so an edge into it carries them
   density: compact
   purposeNote: 'Complex guest journeys can be simulated end-to-end, approved, deployed, audited and rolled
     back. Board 8 — Final 10-Screen Structure # Backend Screen Main Responsibility 8.1 Guest Journey Command
@@ -48660,12 +48627,6 @@ screens:
       trigger: Works in Identity, Membership & Accreditation Policies
       provenance: flow F120 step 7→8
       operation: listDynamicAccessPolicy
-    - to: BO-239
-      trigger: Works in Policy Scope, Hierarchy & Inheritance
-      provenance: flow F120 step 9→10
-      operation: listDynamicAccessPolicy
-      carries:
-      - policyId
     - to: BO-240
       trigger: Works in Authorization Governance & Temporary Access
       provenance: flow F120 step 11→12
@@ -48678,6 +48639,12 @@ screens:
       trigger: Works in Policy Simulation, Conflict & Impact Analysis
       provenance: flow F120 step 15→16
       operation: listDynamicAccessPolicy
+    - to: BO-239
+      trigger: Works in Policy Scope, Hierarchy & Inheritance
+      provenance: flow F120 step 9→10
+      operation: listDynamicAccessPolicy
+      carries:
+      - policyId
     - to: BO-243
       trigger: Works in Policy Approval, Audit, Analytics & AI Optimization
       provenance: flow F120 step 17→18

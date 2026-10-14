@@ -222,7 +222,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **Where the user goes next**
 
 - → `SUP-001` Venue Management Sign In: *Agent Login*
-- → `SUP-020` Queue Configuration & Management: *Works in Queue Configuration & Management*; carries `queueId`; calls `listContact`
 - → `SUP-021` Intelligent Routing, Skills & Assignment Engine: *Works in Intelligent Routing, Skills & Assignment Engine*; calls `listContact`
 - → `SUP-022` SLA Policy & Service-Level Management: *Works in SLA Policy & Service-Level Management*; calls `listContact`
 - → `SUP-023` Agent Workload, Availability & Workforce Control: *Works in Agent Workload, Availability & Workforce Control*; calls `listContact`
@@ -231,6 +230,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `SUP-026` Customer Satisfaction, Feedback & Voice of Customer: *Works in Customer Satisfaction, Feedback & Voice of Customer*; calls `listContact`
 - → `SUP-027` Service Analytics & Root-Cause Intelligence: *Works in Service Analytics & Root-Cause Intelligence*; calls `listContact`
 - → `SUP-028` AI Contact Center Intelligence & Automation Studio: *Works in AI Contact Center Intelligence & Automation Studio*; calls `listContact`
+- → `SUP-020` Queue Configuration & Management: *Works in Queue Configuration & Management*; carries `queueId`; calls `listContact`
 
 #### States
 
@@ -307,7 +307,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `SUP-001`, `SUP-020`, `SUP-021`, `SUP-022`, `SUP-023`, `SUP-024`, `SUP-025`, `SUP-026`, `SUP-027`, `SUP-028`.
+- [ ] Every transition is wired: `SUP-001`, `SUP-021`, `SUP-022`, `SUP-023`, `SUP-024`, `SUP-025`, `SUP-026`, `SUP-027`, `SUP-028`, `SUP-020`.
 - [ ] Every gated control is gated: `CASE_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).

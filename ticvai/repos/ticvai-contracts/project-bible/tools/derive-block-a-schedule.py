@@ -102,6 +102,8 @@ def main():
     svc_owner = {}
     for (svc, who), _ in sorted(owners.items(), key=lambda x: (-x[1], x[0])):
         svc_owner.setdefault(svc, who)
+    # a service the lead fixed keeps its owner (team.json serviceOwners, CHG-PPL-002: "keep hrushikant" for LedgerService)
+    svc_owner.update(sp.service_owners(team))
 
     def pool_of(r):
         if r["track"] == "AI":

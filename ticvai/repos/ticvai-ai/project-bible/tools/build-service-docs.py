@@ -1497,11 +1497,15 @@ def main() -> int:
     ]
     task("SETUP", "", "Epic", "Setup: environments, pipelines, database, seed data and sign-in",
          "Everything else depends on this epic.", 1, area="devops")
-    for who, kind in sorted((team.get("onboard") or {}).items()):
+    # A successor is onboarded on the pushed key of the person they replaced (team.json `successors`, CHG-PPL-001): a
+    # pushed key is never renamed, so SETUP-ONBOARD-TANMAY-DUKHANDE carries Narayan Gaonkar's onboarding.
+    replaced_by = {new_: old_ for old_, new_ in sp.successors(team).items()}
+    for who, kind in sorted((team.get("onboard") or {}).items(), key=lambda x: replaced_by.get(x[0], x[0])):
         # Where the zip comes from and what done looks like (audit R001, R053). By the time this ticket can be
         # pulled, the connector it installs is already answering - so the evidence is that answer.
         roles = "once for backend and once for frontend" if "full" in str(kind) else f"once, for {kind}"
-        task(f"SETUP-ONBOARD-{slug(who).upper()}", "SETUP", "Task", f"Onboard {who}: run adam-setup ({kind})",
+        task(f"SETUP-ONBOARD-{slug(replaced_by.get(who, who)).upper()}", "SETUP", "Task",
+             f"Onboard {who}: run adam-setup ({kind})",
              f"Get adam-connector-setup.zip from your lead (it is built from the ADAM repository and handed out; it is "
              f"not in any repo). Unzip it and run setup.cmd {roles}, answering Yes to the connection test. Done when "
              "the test prints 'N of N checks passed' and asking Claude Code 'What's on my board?' lists your "
@@ -1591,8 +1595,11 @@ def main() -> int:
     load[devops] += sum(p for _, _, p, _, _ in SETUP)
     svc_owner = {}
     backend = areas.get("backend") or []
+    # **A service the lead fixed keeps its owner** (team.json `serviceOwners`, CHG-PPL-002; Chinmay, 15 October 2026:
+    # "keep hrushikant" for LedgerService): it is given to that owner where its turn comes, so the rest balance as before.
+    fixed_svc = sp.service_owners(team)
     for n in sorted(svc_points, key=lambda n: -svc_points[n]):
-        who = min(backend, key=lambda x: load[x]) if backend else ""
+        who = fixed_svc.get(n) or (min(backend, key=lambda x: load[x]) if backend else "")
         svc_owner[n] = who
         load[who] += svc_points[n]
     # **A helper takes the small tasks inside services somebody else owns.** The owner keeps the service
@@ -4286,6 +4293,8 @@ def main() -> int:
     peers_ok = dict(json.loads(EXTRA.read_text(encoding="utf-8")).get("moduleTestPeers") or {}) \
         if EXTRA.exists() else {}
     pools_of = {p_["name"]: set(p_["pools"]) for p_ in people}
+    # a successor is ordered as the person they replaced, so ties fall as before (team.json successors, CHG-PPL-001)
+    sort_as_ = {p_["name"]: p_.get("sortAs") or p_["name"] for p_ in people}
     # **Never a checker, never a module tester** (team.json `neverTests`, CHG-R5-004, 7 October): such a test goes to a
     # peer, pushed or not; the peer is spread by the module-test points each already carries.
     never_ = sp.never_testers(team)
@@ -4318,7 +4327,8 @@ def main() -> int:
             continue
         ai_ = all(x["area"] == "ai" or x["track"] == "AI" for x in ch_)
         pool_ = "ai" if ai_ else (t_.get("pool") or "be")
-        stack_ = [n for n, ps in sorted(pools_of.items()) if pool_ in ps and n not in (b_, t_["assignee"])
+        stack_ = [n for n, ps in sorted(pools_of.items(), key=lambda kv: sort_as_.get(kv[0], kv[0]))
+                  if pool_ in ps and n not in (b_, t_["assignee"])
                   and n not in never_ and n != peers_ok.get(t_["key"])]
         c_ = Counter()
         for x in ch_:
@@ -4327,10 +4337,11 @@ def main() -> int:
         if t_["assignee"] in never_:
             # spread: whoever of its builders (else of its stack) carries the fewest module-test points so far
             pick_ = [n for n in (c_ or stack_) if n not in no_take_] or [n for n in stack_ if n not in no_take_]
-            peer_ = min(pick_ or c_ or stack_ or [""], key=lambda n: (test_load_[n], -c_.get(n, 0), n))
+            peer_ = min(pick_ or c_ or stack_ or [""], key=lambda n: (test_load_[n], -c_.get(n, 0), sort_as_.get(n, n)))
             test_load_[peer_] += float(t_["points"] or 0)
         else:
-            peer_ = sorted(c_.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if c_ else (stack_[0] if stack_ else "")
+            peer_ = (sorted(c_.items(), key=lambda kv: (-kv[1], sort_as_.get(kv[0], kv[0])))[0][0] if c_
+                     else (stack_[0] if stack_ else ""))
         why_ = (f"{t_['assignee']} never tests (neverTests, CHG-R5-004)" if t_["assignee"] in never_
                 else f"{b_} built most of it" if b_ == t_["assignee"] else f"the lead moved it from {t_['assignee']}")
         print(f"  module test {t_['key']}: {why_}; {peer_ or 'nobody'} tests it (CHG-R4-005)")

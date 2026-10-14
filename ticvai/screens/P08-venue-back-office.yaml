@@ -38268,12 +38268,6 @@ screens:
       trigger: Works in Access Validity & Time Rules
       provenance: flow F112 step 7→8
       operation: listAccessRule
-    - to: BO-159
-      trigger: Works in Entitlement Consumption Engine
-      provenance: flow F112 step 9→10
-      operation: listAccessRule
-      carries:
-      - ruleId
     - to: BO-160
       trigger: Works in Multi-Park & Crossover Rules
       provenance: flow F112 step 11→12
@@ -38289,6 +38283,12 @@ screens:
     - to: BO-157
       trigger: Works in Anti-Passback & Journey Sequence
       provenance: flow F112 step 5→6
+      operation: listAccessRule
+      carries:
+      - ruleId
+    - to: BO-159
+      trigger: Works in Entitlement Consumption Engine
+      provenance: flow F112 step 9→10
       operation: listAccessRule
       carries:
       - ruleId
@@ -42029,18 +42029,6 @@ screens:
       trigger: Works in Biometric Consent & Guardian Management
       provenance: flow F115 step 5→6
       operation: listBiometricAccess
-    - to: BO-188
-      trigger: Works in Face Tag Temporary Enrollment
-      provenance: flow F115 step 7→8
-      operation: listBiometricAccess
-      carries:
-      - profileId
-    - to: BO-189
-      trigger: Works in Face Matching & Verification Thresholds
-      provenance: flow F115 step 9→10
-      operation: listBiometricAccess
-      carries:
-      - profileId
     - to: BO-190
       trigger: Works in Face Change, Re-enrollment & Identity Protection
       provenance: flow F115 step 11→12
@@ -42057,6 +42045,18 @@ screens:
       trigger: Works in Biometric Simulation, Audit & Publication
       provenance: flow F115 step 17→18
       operation: listBiometricAccess
+    - to: BO-188
+      trigger: Works in Face Tag Temporary Enrollment
+      provenance: flow F115 step 7→8
+      operation: listBiometricAccess
+      carries:
+      - profileId
+    - to: BO-189
+      trigger: Works in Face Matching & Verification Thresholds
+      provenance: flow F115 step 9→10
+      operation: listBiometricAccess
+      carries:
+      - profileId
   density: compact
   purposeNote: Authorized administrators can monitor and manage the biometric-access environment from
     one location.
@@ -48627,12 +48627,6 @@ screens:
       trigger: Works in Identity, Membership & Accreditation Policies
       provenance: flow F120 step 7→8
       operation: listDynamicAccessPolicy
-    - to: BO-239
-      trigger: Works in Policy Scope, Hierarchy & Inheritance
-      provenance: flow F120 step 9→10
-      operation: listDynamicAccessPolicy
-      carries:
-      - policyId
     - to: BO-240
       trigger: Works in Authorization Governance & Temporary Access
       provenance: flow F120 step 11→12
@@ -48645,6 +48639,12 @@ screens:
       trigger: Works in Policy Simulation, Conflict & Impact Analysis
       provenance: flow F120 step 15→16
       operation: listDynamicAccessPolicy
+    - to: BO-239
+      trigger: Works in Policy Scope, Hierarchy & Inheritance
+      provenance: flow F120 step 9→10
+      operation: listDynamicAccessPolicy
+      carries:
+      - policyId
     - to: BO-243
       trigger: Works in Policy Approval, Audit, Analytics & AI Optimization
       provenance: flow F120 step 17→18

@@ -44,6 +44,10 @@
    "operations": 7
   },
   {
+   "contract": "white-label",
+   "operations": 3
+  },
+  {
    "contract": "catalogue",
    "operations": 3
   },
@@ -52,11 +56,7 @@
    "operations": 3
   },
   {
-   "contract": "white-label",
-   "operations": 3
-  },
-  {
-   "contract": "ai",
+   "contract": "fnb",
    "operations": 2
   },
   {
@@ -64,7 +64,7 @@
    "operations": 2
   },
   {
-   "contract": "fnb",
+   "contract": "ai",
    "operations": 2
   }
  ],

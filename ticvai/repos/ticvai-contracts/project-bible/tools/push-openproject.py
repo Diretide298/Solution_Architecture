@@ -47,7 +47,7 @@ PRIORITY_NO = "customField9"                  # "Priority_No." (integer): the bu
 LEAD = {"POS": "Pradnya Yeram", "MOB": "Chitrangi Mestry", "WEB": "Chinmay Patkar", "WL": "Chinmay Patkar",
         "SETUP": "Pallavi Sawant", "VM": "Pallavi Sawant", "devops": "Hrushikant Patkar"}
 FE_CHECK = ["Chitrangi Mestry", "Chinmay Patkar", "Pallavi Sawant", "Sanket Keluskar", "Pradnya Yeram"]
-BE_CHECK = ["Pranay Shinde", "Tanmay Dukhande"]          # Hrushikant is never a checker
+BE_CHECK = ["Pranay Shinde", "Narayan Gaonkar"]          # Hrushikant is never a checker; Narayan took Tanmay Dukhande's place (CHG-PPL-001)
 
 
 def reduce_links(edges):

@@ -2143,10 +2143,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Data it reads**: `listGuestJourney` (onLoad, The access journey profiles to simulate)
 
-**Where the user goes next**
-
-- → `BO-214` Guest Journey Command Center: *Guest Journey Command Center*; carries `journeyProfileId`
-
 #### States
 
 | State | What it shows |
@@ -2220,7 +2216,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-223?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Free View Day, Run journey simulation.
-- [ ] Every transition is wired: `BO-214`.
+- [ ] No transition is declared; back returns where the user came from.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).

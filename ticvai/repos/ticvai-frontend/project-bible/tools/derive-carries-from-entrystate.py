@@ -55,6 +55,16 @@ its menu entry. Only an edge with none of these still says the destination *open
 cold link between two screens of one module is redundant with the module's own menu, so
 `tools/applied/same-module-links-1-october.py` removed the three that were left.
 
+**A client-approved screen's links are the client's** (r6 gate, 15 October 2026, CHG-GT2-001). Passes 1 and 3
+add a link a user sees -- an exit, or a transition with its trigger -- and pass 2 keeps one. On a screen in the
+approved snapshot (`handoff/approved-ui.json`, held by `check-approved-ui`) none of them adds a link or exit its
+approved navigation does not have, and pass 2 drops an owned edge to a screen the approved navigation does not
+link to. The r6 contract-shapes batch (CHG-SHP-003) gave `setApprovalMatrix` and `setJourneyProfile` keyed paths;
+`derive-entrystate-params` then declared an optional `matrixId` on BO-086 and `journeyProfileId` on BO-214, and
+pass 3 turned five exits into BO-086 and one into BO-214 into new "Approval Matrix" and "Guest Journey Command
+Center" links. A screen the snapshot does not have is not limited; the approved navigation moves only when the
+client approves a new one and the snapshot is re-taken.
+
 **What this does not claim.** The `trigger` on an owned edge is the destination's name, the same
 convention the launcher and board-hub labels use — not a claim to know the button. `carries` is a
 *requirement* both ends can meet, not an observation: a real source that says more is right.
@@ -66,6 +76,7 @@ at all (`WEB-003` has no `q`). Which screen should supply them is a design decis
 
 from __future__ import annotations
 import glob
+import json
 import pathlib
 import re
 import sys
@@ -76,6 +87,29 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 MINE = "derived — "
 MINE_MARK = "declares entryState.params"
 SESSION = "session"
+APPROVED_UI = ROOT / "handoff" / "approved-ui.json"
+
+
+def approved_navigation() -> dict[str, tuple[set[str], set[str]]]:
+    """{screen id: (link targets, exits)} of every client-approved screen, read from the snapshot's navigation
+    text as check-approved-ui writes it ("to <target> | <trigger>" lines, then "exits: a, b"). A screen in the
+    snapshot with no navigation was approved with no links. No snapshot: nothing is limited."""
+    try:
+        snap = json.loads(APPROVED_UI.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    out: dict[str, tuple[set[str], set[str]]] = {}
+    for sid, entry in (snap.get("screens") or {}).items():
+        text = (((entry or {}).get("fields") or {}).get("navigation") or {}).get("text") or ""
+        links: set[str] = set()
+        exits: set[str] = set()
+        for line in text.splitlines():
+            if line.startswith("to "):
+                links.add(base(line[3:].split(" | ", 1)[0].strip()))
+            elif line.startswith("exits:"):
+                exits.update(x.strip() for x in line[len("exits:"):].split(",") if x.strip())
+        out[sid] = (links, exits)
+    return out
 
 
 def base(to) -> str:
@@ -413,7 +447,13 @@ def main() -> int:
     held = {sid: holds(s, contracts) for sid, s in screens.items()}
     reads = {sid: contracts_of(s, contracts) for sid, s in screens.items()}
     dirty: set[str] = set()
-    counts = dict(mirrored=0, narrowed=0, added=0, filled=0)
+    counts = dict(mirrored=0, narrowed=0, added=0, filled=0, dropped=0)
+    withheld = 0
+    approved = approved_navigation()
+
+    def approved_link(src: str, dst: str) -> bool:
+        """May src show a link to dst? Always, unless src is client-approved without it (CHG-GT2-001)."""
+        return src not in approved or dst in approved[src][0]
     log: list[str] = []
 
     def owned(src: str, dst: str, old: dict | None) -> dict:
@@ -446,6 +486,10 @@ def main() -> int:
             exits = pnav.get("exitTo")
             if exits is None:
                 exits = pnav["exitTo"] = []
+            if sid not in exits and parent in approved and sid not in approved[parent][1]:
+                withheld += 1
+                log.append(f"withhold {parent} exitTo += {sid}: not in its client-approved exits")
+                continue
             if sid not in exits:
                 exits.append(sid)
                 exits.sort()
@@ -467,6 +511,11 @@ def main() -> int:
             if not is_mine(t) or dst not in screens:
                 kept.append(t)
                 continue
+            if not approved_link(sid, dst):
+                counts["dropped"] += 1
+                changed = True
+                log.append(f"drop     {sid} -> {dst}: not a link of its client-approved navigation")
+                continue
             new = owned(sid, dst, t)
             if new != t:
                 counts["narrowed"] += 1
@@ -479,6 +528,10 @@ def main() -> int:
         done = {base(t.get("to")) for t in kept}
         for e in (nav.get("exitTo") or []):
             if e in done or e not in screens or not needed(screens[e]):
+                continue
+            if not approved_link(sid, e):
+                withheld += 1
+                log.append(f"withhold {sid} -> {e}: not a link of its client-approved navigation")
                 continue
             new = owned(sid, e, None)
             kept.append(new)
@@ -505,6 +558,8 @@ def main() -> int:
             # In memory either way, so the preview's report matches what --apply would leave;
             # only --apply writes a file.
             s.setdefault("navigation", nav)["transitions"] = kept
+            if not kept:  # the last edge was dropped (CHG-GT2-001): no transitions, as before it was added
+                del s["navigation"]["transitions"]
 
     # report: needed params no inbound edge carries
     inbound: dict[str, set[str]] = {}
@@ -524,8 +579,11 @@ def main() -> int:
     total = sum(counts.values())
     print(f"{counts['mirrored']} entryFrom mirrored into a parent exitTo; derived edges: "
           f"{counts['added']} added, {counts['narrowed']} recomputed to what the source holds; {counts['filled']} bare flow/board/structural edge(s) "
-          f"given carries — {'written' if apply else 'pending (run with --apply)'}"
+          f"given carries; {counts['dropped']} dropped from a client-approved screen — "
+          f"{'written' if apply else 'pending (run with --apply)'}"
           if total else "nothing to do — every edge carries what both ends agree on")
+    print(f"withheld: {withheld} link(s) or exit(s) a client-approved screen's navigation does not have "
+          f"(handoff/approved-ui.json, CHG-GT2-001) — --verbose lists them")
     by_from: dict[str, int] = {}
     for _, _, fr in unsourced:
         key = "deepLink" if fr == "deepLink" else "navigation"

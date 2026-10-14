@@ -408,10 +408,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-236` Visual Dynamic Policy Builder: *Works in Visual Dynamic Policy Builder*; calls `listDynamicAccessPolicy`
 - → `BO-237` Context, Time, Event & Capacity Policy Builder: *Works in Context, Time, Event & Capacity Policy Builder*; calls `listDynamicAccessPolicy`
 - → `BO-238` Identity, Membership & Accreditation Policies: *Works in Identity, Membership & Accreditation Policies*; calls `listDynamicAccessPolicy`
-- → `BO-239` Policy Scope, Hierarchy & Inheritance: *Works in Policy Scope, Hierarchy & Inheritance*; carries `policyId`; calls `listDynamicAccessPolicy`
 - → `BO-240` Authorization Governance & Temporary Access: *Works in Authorization Governance & Temporary Access*; calls `listDynamicAccessPolicy`
 - → `BO-241` Policy Evaluation Architecture & Offline Distribution: *Works in Policy Evaluation Architecture & Offline Distribution*; calls `listDynamicAccessPolicy`
 - → `BO-242` Policy Simulation, Conflict & Impact Analysis: *Works in Policy Simulation, Conflict & Impact Analysis*; calls `listDynamicAccessPolicy`
+- → `BO-239` Policy Scope, Hierarchy & Inheritance: *Works in Policy Scope, Hierarchy & Inheritance*; carries `policyId`; calls `listDynamicAccessPolicy`
 - → `BO-243` Policy Approval, Audit, Analytics & AI Optimization: *Works in Policy Approval, Audit, Analytics & AI Optimization*; carries `policyId`; calls `listDynamicAccessPolicy`
 
 #### States
@@ -516,7 +516,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (182 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-234?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-100`, `BO-235`, `BO-236`, `BO-237`, `BO-238`, `BO-239`, `BO-240`, `BO-241`, `BO-242`, `BO-243`.
+- [ ] Every transition is wired: `BO-100`, `BO-235`, `BO-236`, `BO-237`, `BO-238`, `BO-240`, `BO-241`, `BO-242`, `BO-239`, `BO-243`.
 - [ ] Every gated control is gated: `SCOPE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.

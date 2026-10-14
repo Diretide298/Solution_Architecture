@@ -124,11 +124,11 @@
    "operations": 6
   },
   {
-   "contract": "promotions",
+   "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "promotions",
    "operations": 4
   }
  ],

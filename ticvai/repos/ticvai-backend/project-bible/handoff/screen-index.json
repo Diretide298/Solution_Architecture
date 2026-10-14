@@ -45292,11 +45292,6 @@
     "carries": [
      "requestId"
     ]
-   },
-   {
-    "to": "BO-086",
-    "trigger": "Approval Matrix",
-    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-084 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
    }
   ],
   "machine": null,
@@ -45421,11 +45416,6 @@
     "operation": "decideApprovalRequest",
     "crossesDevice": true,
     "back": false
-   },
-   {
-    "to": "BO-086",
-    "trigger": "Approval Matrix",
-    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-085 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
    }
   ],
   "machine": null,
@@ -45650,14 +45640,6 @@
     "to": "ADM-238",
     "trigger": "Returns to the board's landing screen",
     "provenance": "flow F164 step 10\u219211"
-   },
-   {
-    "to": "BO-086",
-    "trigger": "Approval Matrix",
-    "carries": [
-     "matrixId"
-    ],
-    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-087 holds matrixId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -45766,11 +45748,6 @@
     "to": "BO-085",
     "trigger": "Approval Request",
     "provenance": "derived \u2014 BO-085 declares entryState.params requestId and BO-088 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
-   },
-   {
-    "to": "BO-086",
-    "trigger": "Approval Matrix",
-    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-088 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
    }
   ],
   "machine": null,
@@ -49514,11 +49491,6 @@
      "roleId"
     ],
     "provenance": "derived \u2014 BO-054 declares entryState.params campaignId, capabilityTemplateId, principalId, roleId and BO-106 holds roleId, so an edge into it carries them"
-   },
-   {
-    "to": "BO-086",
-    "trigger": "Approval Matrix",
-    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-106 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
    }
   ],
   "machine": null,
@@ -54088,15 +54060,6 @@
     "operation": "listAccessRule"
    },
    {
-    "to": "BO-159",
-    "trigger": "Works in Entitlement Consumption Engine",
-    "provenance": "flow F112 step 9\u219210",
-    "operation": "listAccessRule",
-    "carries": [
-     "ruleId"
-    ]
-   },
-   {
     "to": "BO-160",
     "trigger": "Works in Multi-Park & Crossover Rules",
     "provenance": "flow F112 step 11\u219212",
@@ -54118,6 +54081,15 @@
     "to": "BO-157",
     "trigger": "Works in Anti-Passback & Journey Sequence",
     "provenance": "flow F112 step 5\u21926",
+    "operation": "listAccessRule",
+    "carries": [
+     "ruleId"
+    ]
+   },
+   {
+    "to": "BO-159",
+    "trigger": "Works in Entitlement Consumption Engine",
+    "provenance": "flow F112 step 9\u219210",
     "operation": "listAccessRule",
     "carries": [
      "ruleId"
@@ -56183,24 +56155,6 @@
     "operation": "listBiometricAccess"
    },
    {
-    "to": "BO-188",
-    "trigger": "Works in Face Tag Temporary Enrollment",
-    "provenance": "flow F115 step 7\u21928",
-    "operation": "listBiometricAccess",
-    "carries": [
-     "profileId"
-    ]
-   },
-   {
-    "to": "BO-189",
-    "trigger": "Works in Face Matching & Verification Thresholds",
-    "provenance": "flow F115 step 9\u219210",
-    "operation": "listBiometricAccess",
-    "carries": [
-     "profileId"
-    ]
-   },
-   {
     "to": "BO-190",
     "trigger": "Works in Face Change, Re-enrollment & Identity Protection",
     "provenance": "flow F115 step 11\u219212",
@@ -56223,6 +56177,24 @@
     "trigger": "Works in Biometric Simulation, Audit & Publication",
     "provenance": "flow F115 step 17\u219218",
     "operation": "listBiometricAccess"
+   },
+   {
+    "to": "BO-188",
+    "trigger": "Works in Face Tag Temporary Enrollment",
+    "provenance": "flow F115 step 7\u21928",
+    "operation": "listBiometricAccess",
+    "carries": [
+     "profileId"
+    ]
+   },
+   {
+    "to": "BO-189",
+    "trigger": "Works in Face Matching & Verification Thresholds",
+    "provenance": "flow F115 step 9\u219210",
+    "operation": "listBiometricAccess",
+    "carries": [
+     "profileId"
+    ]
    }
   ],
   "machine": null,
@@ -59032,16 +59004,7 @@
   "entryFrom": [
    "BO-214"
   ],
-  "transitions": [
-   {
-    "to": "BO-214",
-    "trigger": "Guest Journey Command Center",
-    "carries": [
-     "journeyProfileId"
-    ],
-    "provenance": "derived \u2014 BO-214 declares entryState.params journeyProfileId and BO-223 holds journeyProfileId, so an edge into it carries them"
-   }
-  ],
+  "transitions": [],
   "machine": null,
   "states": {
    "loading": "The journey simulation audit list.",
@@ -59946,15 +59909,6 @@
     "operation": "listDynamicAccessPolicy"
    },
    {
-    "to": "BO-239",
-    "trigger": "Works in Policy Scope, Hierarchy & Inheritance",
-    "provenance": "flow F120 step 9\u219210",
-    "operation": "listDynamicAccessPolicy",
-    "carries": [
-     "policyId"
-    ]
-   },
-   {
     "to": "BO-240",
     "trigger": "Works in Authorization Governance & Temporary Access",
     "provenance": "flow F120 step 11\u219212",
@@ -59971,6 +59925,15 @@
     "trigger": "Works in Policy Simulation, Conflict & Impact Analysis",
     "provenance": "flow F120 step 15\u219216",
     "operation": "listDynamicAccessPolicy"
+   },
+   {
+    "to": "BO-239",
+    "trigger": "Works in Policy Scope, Hierarchy & Inheritance",
+    "provenance": "flow F120 step 9\u219210",
+    "operation": "listDynamicAccessPolicy",
+    "carries": [
+     "policyId"
+    ]
    },
    {
     "to": "BO-243",
@@ -181985,15 +181948,6 @@
     "provenance": "derived \u2014 SUP-001 declares entryState.params challengeId, methodId, providerId and SUP-019 holds none of them. The edge carries nothing: SUP-019 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
    },
    {
-    "to": "SUP-020",
-    "trigger": "Works in Queue Configuration & Management",
-    "provenance": "flow F135 step 1\u21922",
-    "operation": "listContact",
-    "carries": [
-     "queueId"
-    ]
-   },
-   {
     "to": "SUP-021",
     "trigger": "Works in Intelligent Routing, Skills & Assignment Engine",
     "provenance": "flow F135 step 3\u21924",
@@ -182040,6 +181994,15 @@
     "trigger": "Works in AI Contact Center Intelligence & Automation Studio",
     "provenance": "flow F135 step 17\u219218",
     "operation": "listContact"
+   },
+   {
+    "to": "SUP-020",
+    "trigger": "Works in Queue Configuration & Management",
+    "provenance": "flow F135 step 1\u21922",
+    "operation": "listContact",
+    "carries": [
+     "queueId"
+    ]
    }
   ],
   "machine": null,

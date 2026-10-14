@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-600` | Mixed Tender Rule & Combination Builder | C | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-601` | Split Payment & Tender Allocation Manager | C | 12 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-602` | B2B Credit Account & Limit Manager | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | C | 10 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | A | 10 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | C | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | C | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-606` | Partial Payment, Failure & Recovery Manager | A | 0 | 4 | 6 | 1 | 0 | 0 | — | notStarted (—) |

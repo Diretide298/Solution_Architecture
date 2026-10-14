@@ -41,7 +41,7 @@ schemas:
   tables: 30
   stores:
   - postgres
-  largestTable: approvals.request
+  largestTable: approvals.rule
 - schema: accreditation
   tables: 16
   stores:

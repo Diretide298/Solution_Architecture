@@ -21902,6 +21902,7 @@ components:
           type: string
           format: uuid
         campaignId:
+          x-ticvai-references: marketing.invitation_campaign
           type: string
           format: uuid
         subjectId:

@@ -27,7 +27,7 @@
   "backend": [
    "Hrushikant Patkar",
    "Pranay Shinde",
-   "Tanmay Dukhande"
+   "Narayan Gaonkar"
   ]
  },
  "neverTests": [
@@ -43,6 +43,14 @@
   "keys": "^(VM-)?MIG-"
  },
  "migrationsNote": "Every migration task is its owner's, with its table sub-tasks (KEY#schema.table), in every block and wave, ticketed or not, now and for every migration the plan makes later: the rule is the key pattern, not a list (CHG-R5-001; Chinmay, 7 October 2026: \"shift all the migration tickets to Hrushikant\"). It overrides the owner a pushed ticket keeps from the last release (sprintPlan.stableOwners): tools/build-service-docs.py and tools/derive-block-a-schedule.py apply it after the pins, so op-release moves them, and tools/check-plan-owners.py (O-MIG-OWNER) fails on a migration task anyone else owns. The Venue Management migrations (VM-MIG-*) are matched too (Chinmay, 7 October; CHG-R5-003).",
+ "successors": {
+  "Tanmay Dukhande": "Narayan Gaonkar"
+ },
+ "successorsNote": "A person who left the team -> the person who took their place (CHG-PPL-001; Chinmay, 15 October 2026: \"tanmay is leaving so shift all tasks to narayan. Check in pms his exact name\"). 15 October 2026: Tanmay Dukhande (OpenProject user 108) left; Narayan Gaonkar (OpenProject user 79) took his place at the same role (Back end), pools, pace and position in areas.backend, so the load balancer sees only the name change. tools/sprint_plan.py pinned_owners hands every ticket the last release gave the person who left to their successor (a pushed ticket's owner comes from that bundle); tools/build-service-docs.py keeps the leaver's pushed onboarding key (SETUP-ONBOARD-TANMAY-DUKHANDE) for the successor's onboarding, since a pushed key is never renamed; tools/check-plan-owners.py (O-LEFT) fails on any task, in the plan or the schedule, owned, accountable or tested by someone named here, and on a name here still in the team's areas, onboard, pace, people or block-a-extra-tasks.json pins.",
+ "serviceOwners": {
+  "LedgerService": "Hrushikant Patkar"
+ },
+ "serviceOwnersNote": "A service whose owner (the reviewing owner: accountable for its back end and migrations, and the owner who reviews a helper's task in it) the lead fixed, over the load balancer that otherwise gives whole services to the back-end developers largest first (CHG-PPL-002; Chinmay, 15 October 2026: \"keep hrushikant\", when the r6 audit reported that the load balancer moves LedgerService's reviewing owner between Hrushikant Patkar and Tanmay Dukhande as service sizes change). tools/build-service-docs.py gives a service named here to its owner where its turn comes in the balancing, so every other service is balanced as before; tools/derive-block-a-schedule.py uses the same owner; tools/check-plan-owners.py (O-SVC-OWNER) fails on a back-end task of the service with any other accountable.",
  "onboard": {
   "Pradnya Yeram": "frontend",
   "Chitrangi Mestry": "frontend",
@@ -51,7 +59,7 @@
   "Pallavi Sawant": "full stack",
   "Hrushikant Patkar": "backend",
   "Pranay Shinde": "backend",
-  "Tanmay Dukhande": "backend",
+  "Narayan Gaonkar": "backend",
   "Deep Khanvilkar": "backend",
   "Surendra": "full stack",
   "Kalpita Mejari": "AI",
@@ -106,11 +114,11 @@
  "pace": {
   "Surendra": 0.6,
   "Pranay Shinde": 1.17,
-  "Tanmay Dukhande": 1.17,
+  "Narayan Gaonkar": 1.17,
   "Deep Khanvilkar": 1.17,
   "Hrushikant Patkar": 1.17
  },
- "paceNote": "Share of a full developer's pace, used when screens are shared out. Surendra is full stack and junior (29 September): about 60%, on Venue Management from week 1. 13 October 2026 (Chinmay, CHG-R6-057: \"we can up the per day tasks for backend devs\"): the four back-end developers, Hrushikant Patkar, Pranay Shinde, Tanmay Dukhande and Deep Khanvilkar, run at 1.17, 7 tasks a day where the plan gives 6, so Pallavi Sawant's back end (CHG-R6-056) lands without moving a block: A1 last work 25 November, A2 2 December, B 16 December, C 29 December. Measured against 1.0 (A1 3 December), 1.17 for Pranay, Tanmay and Deep only (A2 8 December: Hrushikant's kiosk tasks) and 1.25 for all four.",
+ "paceNote": "Share of a full developer's pace, used when screens are shared out. Surendra is full stack and junior (29 September): about 60%, on Venue Management from week 1. 13 October 2026 (Chinmay, CHG-R6-057: \"we can up the per day tasks for backend devs\"): the four back-end developers, Hrushikant Patkar, Pranay Shinde, Tanmay Dukhande and Deep Khanvilkar, run at 1.17, 7 tasks a day where the plan gives 6, so Pallavi Sawant's back end (CHG-R6-056) lands without moving a block: A1 last work 25 November, A2 2 December, B 16 December, C 29 December. Measured against 1.0 (A1 3 December), 1.17 for Pranay, Tanmay and Deep only (A2 8 December: Hrushikant's kiosk tasks) and 1.25 for all four. 15 October 2026: Tanmay Dukhande left; Narayan Gaonkar took his place (CHG-PPL-001), at Tanmay's pace of 1.17.",
  "helperShare": {
   "Deep Khanvilkar": 0.55
  },
@@ -131,7 +139,7 @@
    ]
   },
   {
-   "name": "Tanmay Dukhande",
+   "name": "Narayan Gaonkar",
    "role": "Back end",
    "pools": [
     "be"

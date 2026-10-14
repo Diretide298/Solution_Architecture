@@ -3285,7 +3285,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; simulateGuestJourney · listGuestJourney</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-214">BO-214</a>  &mdash; <i>Guest Journey Command Center</i> <span class="car">journeyProfileId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-214">BO-214</a> </div>
           
           
         </div>
@@ -21890,7 +21890,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest · escalateApprovalRequest · getApprovalRequestScore</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; requestId&larr;deepLink, approvalRequestId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-248">ADM-248</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-052">BO-052</a>  &mdash; <i>The goods arrive and are received</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approves it</i> <span class="car">requestId</span><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i><br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-364">BO-364</a>  &mdash; <i>Back to the approval command centre</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-248">ADM-248</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-052">BO-052</a>  &mdash; <i>The goods arrive and are received</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approves it</i> <span class="car">requestId</span><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-364">BO-364</a>  &mdash; <i>Back to the approval command centre</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formDecideApprovalRequest &middot; <i>Decide approval request</i> &middot; <b>Decide approval request</b> &middot; Cancel <span class="dis">discards decision · comment · reason · stepUpToken · signature</span></div><div class="ov"><b>modal</b> formEscalateApprovalRequest &middot; <i>Escalate approval request</i> &middot; <b>Escalate approval request</b> &middot; Cancel <span class="dis">discards reason</span></div></div>
         </div>
@@ -21920,7 +21920,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest · resubmitApprovalRequest · withdrawApprovalRequest +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; requestId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i> <span class="car">approvalRequestId · requestId</span><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i><br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i> <span class="car">approvalRequestId · requestId</span><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmWithdrawApprovalRequest &middot; <i>Withdraw approval request</i></div><div class="ov"><b>modal</b> formDecideApprovalRequest &middot; <i>Decide approval request</i> &middot; <b>Decide approval request</b> &middot; Cancel <span class="dis">discards decision · comment · reason · stepUpToken · signature</span></div><div class="ov"><b>modal</b> formResubmitApprovalRequest &middot; <i>Resubmit approval request</i> &middot; <b>Resubmit approval request</b> &middot; Cancel <span class="dis">discards changes · amount</span></div></div>
         </div>
@@ -21980,7 +21980,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listApprovalDelegations · createApprovalDelegation · revokeApprovalDelegation · listApprovalMatrices +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; delegationId&larr;deepLink, matrixId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i> <span class="car">matrixId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRevokeApprovalDelegation &middot; <i>Revoke approval delegation</i></div><div class="ov"><b>modal</b> formCreateApprovalDelegation &middot; <i>Create approval delegation</i> &middot; <b>Create approval delegation</b> &middot; Cancel <span class="dis">discards delegatorPrincipalId · delegatePrincipalId · from · to · kinds · maxAmount · reason · scopePath</span></div><div class="ov"><b>modal</b> formSetApprovalMatrix &middot; <i>Save approval limits</i> &middot; <b>Save approval limits</b> &middot; Cancel <span class="dis">discards kind · scopeLevel · rules · isActive</span></div></div>
         </div>
@@ -22010,7 +22010,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; getApprovalAnalytics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a> </div>
           
           
         </div>
@@ -22040,7 +22040,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; getKpiValues · getVenueSettings · listRoles</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-053">BO-053</a>  &mdash; <i>Staff Directory</i><br><a href="#bo-054">BO-054</a>  &mdash; <i>Role Assignment</i> <span class="car">roleId</span><br><a href="#bo-055">BO-055</a>  &mdash; <i>Rota &amp; Scheduling</i><br><a href="#bo-056">BO-056</a>  &mdash; <i>Time &amp; Attendance</i><br><a href="#bo-057">BO-057</a> <br><a href="#bo-066">BO-066</a>  &mdash; <i>Notification Settings</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i><br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-088">BO-088</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-053">BO-053</a>  &mdash; <i>Staff Directory</i><br><a href="#bo-054">BO-054</a>  &mdash; <i>Role Assignment</i> <span class="car">roleId</span><br><a href="#bo-055">BO-055</a>  &mdash; <i>Rota &amp; Scheduling</i><br><a href="#bo-056">BO-056</a>  &mdash; <i>Time &amp; Attendance</i><br><a href="#bo-057">BO-057</a> <br><a href="#bo-066">BO-066</a>  &mdash; <i>Notification Settings</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-088">BO-088</a> </div>
           
           
         </div>
