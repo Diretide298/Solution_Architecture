@@ -2094,7 +2094,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getUpsellSuggestions` reads one record and nothing reads a population — the screen
     is about that one thing'
-  purpose: See add-ons & upsell for this venue.
+  purpose: Suggested add-ons and the offered bundle for this booking, each added to the cart, before
+    checkout.
   layout:
     template: detail
     regions:
@@ -4435,7 +4436,8 @@ screens:
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list,
     select, act'
-  purpose: Find my tickets for this venue.
+  purpose: 'The guest''s tickets and passes, current and past: each with its code and history, sent to
+    another guest, shared, or added to a phone wallet.'
   gaps:
   - operation: getEntitlementCredential
     why: '**`getEntitlementCredential` declares its response inline**, so the component that shows it
@@ -4729,7 +4731,8 @@ screens:
   pattern: listDetail
   patternReason: '`listMyOrders` reads the population and `getOrder` reads one of them — list, select,
     act'
-  purpose: Find order history for this venue.
+  purpose: 'The guest''s orders: open one, ask for a refund, and get or download its tax invoice and
+    credit notes.'
   layout:
     template: split
     regions:
@@ -5230,7 +5233,8 @@ screens:
   pattern: listDetail
   patternReason: '`listWalletTransactions` reads the population and `getWallet` reads one of them — list,
     select, act'
-  purpose: See wallet & gift cards for this venue.
+  purpose: The guest's wallet and its activity, saved cards, and the balance on a gift card or game
+    card.
   layout:
     template: split
     regions:
@@ -5661,7 +5665,8 @@ screens:
   pattern: listDetail
   patternReason: '`listGuestMemberships` reads the population and `getMyMemberships` reads one of them
     — list, select, act'
-  purpose: Work with membership management for this venue.
+  purpose: 'The guest''s membership: billing statements, payments that need them, and the membership
+    itself.'
   layout:
     template: split
     regions:
@@ -6810,7 +6815,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: Find contact & venue information for this venue.
+  purpose: 'How to reach the venue: phone, email, address and opening hours, readable without signing
+    in.'
   layout:
     template: detail
     regions:

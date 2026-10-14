@@ -1504,7 +1504,8 @@ screens:
   pattern: listDetail
   patternReason: '`listPerformances` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Find what's on for this venue.
+  purpose: 'What is on at this venue over the dates the guest picks: each performance and the products
+    that run.'
   layout:
     template: split
     regions:
@@ -1657,7 +1658,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getPerformance` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: See event / exhibition details for this venue.
+  purpose: 'One event or exhibition: what it is, and the performance being booked, before choosing
+    tickets.'
   layout:
     template: detail
     regions:
@@ -3096,7 +3098,8 @@ screens:
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list,
     select, act'
-  purpose: Find my tickets for this venue.
+  purpose: 'The guest''s tickets and passes, current and past: open one to see its code and history, or
+    send it to another guest.'
   gaps:
   - operation: getEntitlementCredential
     why: '**`getEntitlementCredential` declares its response inline**, so the component that shows it
@@ -3313,7 +3316,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getEntitlement` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Find ticket details for this venue.
+  purpose: 'One ticket: its code to scan, what remains on it and every scan against it; send it to
+    another guest or bind it to this phone.'
   gaps:
   - operation: getEntitlementCredential
     why: '**`getEntitlementCredential` declares its response inline**, so the component that shows it
@@ -3506,7 +3510,7 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Work with ticket transfer for this venue.
+  purpose: Send tickets from one of the guest's orders to another guest, and claim tickets someone sent.
   layout:
     template: split
     regions:
@@ -3681,7 +3685,8 @@ screens:
   pattern: listDetail
   patternReason: '`listDelegations` reads the population and `getMyMemberships` reads one of them — list,
     select, act'
-  purpose: Find memberships for this venue.
+  purpose: 'The guest''s membership: plans, statements, payments that need them, and family members who
+    may use it.'
   layout:
     template: split
     regions:
@@ -3976,7 +3981,7 @@ screens:
   pattern: listDetail
   patternReason: '`listReservations` reads the population and `getReservation` reads one of them — list,
     select, act'
-  purpose: Find my reservations for this venue.
+  purpose: The guest's reservations, each opened to see it or cancel it.
   layout:
     template: split
     regions:
@@ -4125,7 +4130,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getReservation` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: See reservation details for this venue.
+  purpose: One reservation, read and cancellable.
   layout:
     template: detail
     regions:
@@ -4236,7 +4241,7 @@ screens:
   density: comfortable
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select, act'
-  purpose: Find add to calendar / reminders for this venue.
+  purpose: Put a booked visit in the phone's calendar or wallet, and turn its visit reminder on or off.
   layout:
     template: split
     regions:
@@ -5005,7 +5010,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getWaitTimes` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: See attraction wait times for this venue.
+  purpose: How long each attraction's queue is right now.
   layout:
     template: detail
     regions:
@@ -6388,7 +6393,8 @@ screens:
   pattern: configEditor
   patternReason: '`listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session
     claim stays a form on the same screen, so the pattern is kept until the screen is redrawn'
-  purpose: Work with in-venue notifications for this venue.
+  purpose: 'The guest''s in-venue notifications, newest first: queue calls, order ready, booking changes
+    and venue alerts, marked read once seen.'
   layout:
     template: form
     regions:
@@ -7162,7 +7168,7 @@ screens:
   pattern: listDetail
   patternReason: '`listMyCases` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: See lost & found for this venue.
+  purpose: Report a lost item, follow the guest's lost-property cases and reply on them.
   layout:
     template: split
     regions:
@@ -7748,7 +7754,7 @@ screens:
   pattern: listDetail
   patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list, select,
     act'
-  purpose: Find offers & promotions for this venue.
+  purpose: The offers running at this venue, one opened in detail, and a code the guest typed checked.
   layout:
     template: split
     regions:
@@ -9388,7 +9394,7 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`transferOrderTickets`) and no read of a population
     — it is settings, not a list
-  purpose: Find ticket delivery & sharing for this venue.
+  purpose: Send some of the guest's tickets to someone else, and see the tickets sent and received.
   layout:
     template: form
     regions:
@@ -9745,7 +9751,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getUpsellSuggestions` reads one record and nothing reads a population — the screen
     is about that one thing'
-  purpose: See upsell / cross-sell for this venue.
+  purpose: Suggestions for the cart the guest is about to pay for, each added with one tap.
   layout:
     template: detail
     regions:
@@ -9931,7 +9937,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getSeatAvailability` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: See interactive seat selection for this venue.
+  purpose: Pick seats on the seat map for the chosen performance, or let the venue recommend them, and
+    hold them.
   layout:
     template: detail
     regions:
@@ -11330,7 +11337,7 @@ screens:
   pattern: listDetail
   patternReason: '`listCatalogueBundles` reads the population and `getBundle` reads one of them — list,
     select, act'
-  purpose: See bundle package for this venue.
+  purpose: 'One bundle: what it includes and its price, added to the cart.'
   layout:
     template: split
     regions:
