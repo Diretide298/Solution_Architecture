@@ -955,6 +955,12 @@ screens:
     trigger: onAction
     invalidates:
     - listIncidents
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: 'The signed upload for a photo or document the incident form attaches, requested when
+      the form is sent; no control of its own'
+    trigger: background
+    provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
     params:
     - name: incidentId
@@ -6859,6 +6865,12 @@ screens:
     trigger: onAction
     invalidates:
     - listIncidents
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: 'The signed upload for a photo or document the incident form attaches, requested when
+      the form is sent; no control of its own'
+    trigger: background
+    provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
     params:
     - name: incidentId
@@ -8232,6 +8244,12 @@ screens:
     purpose: Record that an external authority was notified, where required
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: 'The signed upload for a photo or document the incident form attaches, requested when
+      the form is sent; no control of its own'
+    trigger: background
+    provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
     params:
     - name: incidentId
