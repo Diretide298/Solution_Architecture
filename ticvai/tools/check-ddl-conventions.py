@@ -27,7 +27,7 @@ RULES = {
     "D-SCOPE-LTREE": "scope_path not typed ltree (R092)",
     "D-SCOPE-NOTNULL": "scope_path nullable on a table under row-level security (R180)",
     "D-RUN-TOGETHER": "a column line whose name and type run together (R247)",
-    "D-STUB-TABLE": "a table holding only keys (R087)",
+    "D-STUB-TABLE": "a table holding only keys (R087); one the lineage writes cannot be baselined (CHG-GEN-003, CR-078 CR-080)",
     "D-DOUBLE-KEY": "a second key to one parent for one concept, or a key named for a renamed table (R102 R160)",
     "D-DESC-CUT": "a column description that is a cut-off prefix of its contract field's (R019)",
     "D-HEADER-COUNT": "a DDL header's table count disagrees with the file (R170 R043)",
@@ -228,6 +228,51 @@ def check_banned_names(guard, tables: dict, ref_cols: dict, by: dict) -> None:
                     guard.add("D-BANNED-NAME", f"{t}.{col}={v}",
                               f"{t}.{col}: value '{v}' carries '{bad[0]}', banned in DDL; a wire value is "
                               "recorded in naming-and-style 3.3 or renamed in the contract")
+def effective_tables(backend) -> dict:
+    """`table -> [columns]` as the databases have them: the frozen baseline files, then each forward migration in
+    order (its ADD COLUMN, DROP COLUMN, renames and new tables), read by tools/ddl_forward.py the way derive-ddl
+    reads them."""
+    import ddl_forward as fwd
+    out = {}
+    for db in ("tenant", "control"):
+        d = backend / db
+        if not d.exists():
+            continue
+        model = fwd.Model()
+        for f in sorted(p for p in d.glob("*.sql") if not p.name.startswith("V")):
+            model.add_file(f.read_text(encoding="utf-8"))
+        for f in sorted((p for p in d.glob("V*.sql") if re.match(r"V\d+__", p.name)),
+                        key=lambda p: int(re.match(r"V(\d+)", p.name).group(1))):
+            model.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", f.read_text(encoding="utf-8"), maxsplit=1,
+                                         flags=re.M)[0])
+        for t, tab in model.tables.items():
+            out[t] = list(tab.cols)
+    return out
+
+
+def check_stub_tables(guard, backend) -> None:
+    """D-STUB-TABLE (R087). **A table the lineage writes may not hold only keys, and that cannot be baselined**
+    (CHG-GEN-003, ADAM CR-078 and CR-080, 14 October 2026). Twelve stubs (an `id` and one `*_id`) sat in the
+    baseline while operations wrote them: `identity.principal_credential` was where every staff credential was to be
+    stored and `platform.sale_board_tile` where every till button was, and a developer building either had nowhere
+    to put a single field. A stub nothing writes is still baselined debt; a written one fails every run until it has
+    its columns. Read from the tables the databases will have (baseline plus forward migrations), so a column added
+    after r1 counts."""
+    lineage = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
+    writers: dict = {}
+    for op, e in lineage.items():
+        for t in (e or {}).get("writes") or []:
+            writers.setdefault(t, []).append(op)
+    for t, names in sorted(effective_tables(backend).items()):
+        if names and len(names) <= 2 and all(c == "id" or c.endswith("_id") for c in names):
+            w = sorted(writers.get(t, []))
+            if w:
+                guard.add("D-STUB-TABLE", t, f"{t}: only {', '.join(names)}, and written by {', '.join(w[:4])}"
+                          + (f" and {len(w) - 4} more" if len(w) > 4 else "") + " (cannot be baselined)", strict=True)
+            else:
+                guard.add("D-STUB-TABLE", t, f"{t}: only {', '.join(names)}")
+
+
 UNIQUE_COMPARE = "x-ticvai-unique-compare"
 
 
@@ -440,9 +485,7 @@ def main() -> int:
                 guard.add("D-SCOPE-LTREE", t, f"{t}.scope_path is not ltree: {line[:60]!r}")
             if t in rls and "NOT NULL" not in line and "shared" not in line.lower():
                 guard.add("D-SCOPE-NOTNULL", t, f"{t}.scope_path is nullable under row-level security")
-        names = list(cols)
-        if names and len(names) <= 2 and all(c == "id" or c.endswith("_id") for c in names):
-            guard.add("D-STUB-TABLE", t, f"{t}: only {', '.join(names)}")
+    check_stub_tables(guard, backend)
 
     # R019: a column description that is its contract field's description, cut.
     ref = g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}

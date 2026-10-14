@@ -2101,7 +2101,7 @@
  },
  "check-ddl-conventions": {
   "updated": "2026-10-14",
-  "commit": "1eb1d063",
+  "commit": "7925608b",
   "rules": {
    "D-CHILD-PARENT": [
     "catalogue.performance_media",
@@ -2352,17 +2352,9 @@
     "contracts/satellite/workforce.yaml:orders.shift"
    ],
    "D-STUB-TABLE": [
-    "ai.index_entry",
-    "approvals.escalation",
-    "games.credit_ledger",
-    "identity.mfa_challenge",
-    "identity.mfa_recovery_code",
-    "identity.otp_challenge",
-    "identity.principal_credential",
     "marketing.message_delivery",
     "orders.payment_tip",
     "platform.device_heartbeat",
-    "platform.sale_board_tile",
     "platform.tenant"
    ],
    "D-UNIQUE-CASE": [
