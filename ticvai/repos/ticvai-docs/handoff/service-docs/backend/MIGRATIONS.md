@@ -239,7 +239,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PLATFORM | `platform.sale_board_page` | 4 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board_tile` | 10 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.scope` | 8 | none |  | 10 | 2 | used by the first release |
-| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.consent_purpose |
+| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by whitelabel.tenant_config |
 | MIG-PLATFORM | `platform.venue_settings` | 32 | venue_id |  | 5 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.workstation` | 22 | scope_path |  | 7 | 1 | used by the first release |
 | MIG-PLATFORM | `sync.dsar_request` | 7 | through its owner |  | 0 | 0 | built by MIG-PLATFORM as platform.dsar_request, before a declared move (CHG-TKT-013) |
@@ -326,8 +326,8 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-CATALOGUE | `catalogue.sales_channel` | 46 | scope_path |  | 8 | 3 | used by the first release |
 | MIG-CATALOGUE | `catalogue.variant` | 9 | through its owner |  | 15 | 3 | used by the first release |
 | MIG-CATALOGUE | `catalogue.waitlist_entry` | 11 | through its owner |  | 2 | 2 | used by the first release |
-| MIG-LEDGER | `ledger.account` | 15 | none |  | 0 | 0 | referenced by inventory.supplier |
-| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by inventory.movement |
+| MIG-LEDGER | `ledger.account` | 15 | none |  | 0 | 0 | referenced by ledger.tax_code |
+| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by marketing.invitation |
 | MIG-LEDGER | `ledger.credit_memo` | 30 | scope_path |  | 5 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.credit_memo_line` | 10 | through its owner |  | 3 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.einvoice_transmission` | 17 | scope_path |  | 3 | 1 | used by the first release |
@@ -355,7 +355,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.serialised_item` | 9 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_batch` | 10 | none |  | 2 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_earmark` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.supplier` | 17 | none |  | 0 | 0 | referenced by inventory.inventory_item |
+| MIG-INVENTORY | `inventory.supplier` | 17 | none |  | 0 | 0 | referenced by inventory.stock_batch |
 | MIG-PROMOTIONS | `promotions.allocation_component` | 9 | venue_id |  | 3 | 2 | used by the first release |
 | MIG-PROMOTIONS | `promotions.allocation_split` | 4 | through its owner |  | 0 | 0 | referenced by promotions.allocation_component |
 | MIG-PROMOTIONS | `promotions.bundle` | 20 | venue_id |  | 5 | 2 | used by the first release |

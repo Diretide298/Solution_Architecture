@@ -70,11 +70,11 @@
    "operations": 10
   },
   {
-   "contract": "catalogue",
+   "contract": "identity",
    "operations": 5
   },
   {
-   "contract": "identity",
+   "contract": "catalogue",
    "operations": 5
   },
   {

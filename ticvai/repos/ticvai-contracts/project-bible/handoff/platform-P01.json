@@ -158,11 +158,11 @@
    "operations": 8
   },
   {
-   "contract": "ai",
+   "contract": "resources",
    "operations": 7
   },
   {
-   "contract": "resources",
+   "contract": "ai",
    "operations": 7
   },
   {
@@ -174,11 +174,11 @@
    "operations": 5
   },
   {
-   "contract": "promotions",
+   "contract": "queue",
    "operations": 5
   },
   {
-   "contract": "queue",
+   "contract": "promotions",
    "operations": 5
   },
   {

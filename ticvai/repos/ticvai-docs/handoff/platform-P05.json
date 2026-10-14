@@ -44,7 +44,7 @@
    "operations": 7
   },
   {
-   "contract": "catalogue",
+   "contract": "white-label",
    "operations": 3
   },
   {
@@ -52,7 +52,7 @@
    "operations": 3
   },
   {
-   "contract": "white-label",
+   "contract": "catalogue",
    "operations": 3
   },
   {
@@ -60,11 +60,11 @@
    "operations": 2
   },
   {
-   "contract": "marketing-crm",
+   "contract": "ai",
    "operations": 2
   },
   {
-   "contract": "ai",
+   "contract": "marketing-crm",
    "operations": 2
   }
  ],

@@ -84,11 +84,11 @@
    "operations": 5
   },
   {
-   "contract": "marketing-crm",
+   "contract": "reporting",
    "operations": 5
   },
   {
-   "contract": "reporting",
+   "contract": "marketing-crm",
    "operations": 5
   },
   {
@@ -96,19 +96,19 @@
    "operations": 5
   },
   {
-   "contract": "approvals",
-   "operations": 4
-  },
-  {
    "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "access",
-   "operations": 2
+   "contract": "approvals",
+   "operations": 4
   },
   {
    "contract": "wallet",
+   "operations": 2
+  },
+  {
+   "contract": "access",
    "operations": 2
   },
   {

@@ -151,11 +151,11 @@
    "operations": 8
   },
   {
-   "contract": "approvals",
+   "contract": "tenancy",
    "operations": 7
   },
   {
-   "contract": "tenancy",
+   "contract": "approvals",
    "operations": 7
   },
   {
@@ -171,15 +171,15 @@
    "operations": 2
   },
   {
-   "contract": "finance",
-   "operations": 1
-  },
-  {
    "contract": "payments",
    "operations": 1
   },
   {
    "contract": "catalogue",
+   "operations": 1
+  },
+  {
+   "contract": "finance",
    "operations": 1
   },
   {

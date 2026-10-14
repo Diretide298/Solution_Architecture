@@ -22,7 +22,8 @@
 #      a gating checker may fail only with error lines the baseline already names (check-package:
 #      the two build-readiness-21-september.md errors; check-authored-inputs: the seven stale
 #      inputs); the tools/ coverage block only on the tools the baseline lists. check-bindings and
-#      the other REPORT_ONLY checkers never gate. No NEW failure = pass.
+#      the other REPORT_ONLY checkers never gate. No NEW failure = pass. Either way the run is
+#      written as handoff/checks.json (run-checks.py --json), which ADAM's Audit page reads.
 #   5. on pass only: copy the worktree's changes to ticvai/ in the main tree -- added, modified
 #      and deleted files, never gitignored files, never repos/*/.git -- after checking that
 #      nothing the refresh changed was also changed in the main tree meanwhile (conflict: nothing
@@ -311,6 +312,9 @@ def classify(tools_dir, manifest_path, pkg_rel, paths):
     mod = manifest_mod(tools_dir)
     rel = {p: p[len(pkg_rel) + 1:] for p in paths}
     c = mod.classify(m, list(rel.values()))
+    # handoff/checks.json is written by the judge, after the traced steps, so the manifest has no
+    # writer for it; it is the run's record and never an input, so it is derived.
+    c.update({r: "derived" for r in rel.values() if r == "handoff/checks.json"})
     return {p: c[rel[p]] for p in paths}
 
 def cmd_status(repo, pkg_rel, tools_dir, manifest_path, out_authored, out_derived, ignore_untracked="0"):
@@ -426,7 +430,12 @@ def cmd_judge(pkg, baseline_path, log_path, tail_path="", jobs="1", out_dir="", 
           % (len(others), jobs, ", ".join(detail)))
     sys.stdout.flush()
     verdicts = {}
-    extra = ["--jobs", str(jobs)] + (["--out-dir", out_dir] if out_dir else [])
+    # The run as JSON for ADAM's Audit page: run-checks writes its half, the baseline checkers above
+    # are added to it below, and the whole is handoff/checks.json in the worktree -- merged home with
+    # the rest of the refresh on a pass, and so part of the release that is tagged from it.
+    run_json = os.path.join(os.path.dirname(os.path.abspath(log_path)), "checks-run.json")
+    started = time.time()
+    extra = ["--jobs", str(jobs), "--json", run_json] + (["--out-dir", out_dir] if out_dir else [])
     p = subprocess.Popen([sys.executable, os.path.join(pkg, "tools", "run-checks.py"), "--no-gate", *extra, *others],
                          cwd=pkg, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                          text=True, encoding="utf-8", errors="replace")
@@ -502,6 +511,21 @@ def cmd_judge(pkg, baseline_path, log_path, tail_path="", jobs="1", out_dir="", 
             new.append("refresh: the derive phase never reported completing all %d selected steps"
                        % len(plan["selected"]))
     rpt = [c for c in others if verdicts.get(c) == "rpt"]
+    try:
+        doc = json.load(open(run_json, encoding="utf-8")) if os.path.exists(run_json) else {"checks": []}
+        records = list(doc.get("checks", []))
+        for c in detail:
+            rc, out, secs = results[c]
+            r = rc_mod.record(c, rc, out, secs)
+            if rc != 0 and not any(e.startswith(c + ":") for e in new):
+                # Failing, and every line of it already in the baseline: the judge let it through.
+                r["baseline"] = base[c].get("why", "a failure tools/refresh-safe-baseline.json already names")
+            records.append(r)
+        rc_mod.write_json(os.path.join(pkg, "handoff", "checks.json"), records, started, time.time(),
+                          extra={"jobs": int(jobs), "judgement": "fail" if new else "pass", "by": "refresh-safe.sh"})
+        print("  the run as JSON: handoff/checks.json (%d checker(s))" % len(records))
+    except Exception as e:                          # the verdict stands without its JSON
+        print("  note: could not write handoff/checks.json: %s" % e)
     print()
     print("  baseline: %s" % ", ".join("%s (%d known)" % (c, len(base[c].get("known", []))) for c in detail))
     if rpt:
