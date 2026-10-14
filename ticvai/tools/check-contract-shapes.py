@@ -34,6 +34,8 @@ same kind that nothing held:
                            only` (UpdateProductRequest, UpdateParkingEntitlementRequest). C-REQUEST-SERVER-FIELDS
                            saw `updateConsentQuestion` only for `status` and it was baselined; the client-owned
                            required fields (`kind`, `text`, ...) are what a PATCH must not require.
+  C-PAGED-STATUS           a cursor-paged list whose items' status can end (revoked, cancelled, expired ...) that
+                           says neither which statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -74,6 +76,8 @@ RULES = {
     "C-SERIES-WINDOW": "a series repeating every N minutes has no last start time of the day (DI-995, CHG-R4-014)",
     "C-SEGREGATION-409": "a segregation check answered other than 409 segregation-breach (ADAM CR-079, CHG-IDR-003)",
     "C-PATCH-FULL-BODY": "a PATCH body is the full resource schema with its required list (ADAM CR-089, CHG-CNS-001)",
+    "C-PAGED-STATUS": "a paged list of items whose status can end (revoked, cancelled ...) that says neither which "
+                      "statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)",
 }
 # CHG-IDR-003: a write that says it runs the segregation check names the rule schema in its description.
 SEGREGATION = re.compile(r"\bSegregationRule\b")
@@ -141,6 +145,50 @@ def response_props(op, doc) -> set:
 
     walk(body_schema(((op.get("responses") or {}).get("200")) or {}) or {})
     return out
+
+
+# CHG-MKT-003 (ADAM CR-088): a status value that ends an item's life, and the parameters that choose among them.
+ENDED_STATUSES = {"revoked", "cancelled", "canceled", "deleted", "archived", "expired", "failed", "closed",
+                  "withdrawn", "voided", "retired", "inactive", "rejected", "lapsed", "superseded", "removed"}
+STATUS_PARAMS = {"status", "statuses", "state", "states", "includeinactive", "includerevoked", "includearchived",
+                 "includeexpired", "includeclosed", "isactive", "active"}
+
+
+def item_status_values(op, doc) -> set:
+    """The `status` enum of the items a paged 200 body lists (`items[]`, through local refs and allOf)."""
+    vals, seen = set(), set()
+
+    def resolve(node):
+        while isinstance(node, dict) and "$ref" in node and node["$ref"] not in seen:
+            seen.add(node["$ref"])
+            node, _ = deref(node, doc)
+        return node if isinstance(node, dict) else {}
+
+    def item_schema(node, depth=0):
+        node = resolve(node)
+        if depth > 6:
+            return []
+        out = []
+        for part in node.get("allOf") or []:
+            out += item_schema(part, depth + 1)
+        items = (node.get("properties") or {}).get("items")
+        if isinstance(items, dict):
+            out.append(resolve(items.get("items") or {}))
+        return out
+
+    def status_of(node, depth=0):
+        node = resolve(node)
+        if depth > 6:
+            return
+        for part in node.get("allOf") or []:
+            status_of(part, depth + 1)
+        st = resolve((node.get("properties") or {}).get("status") or {})
+        for v in st.get("enum") or []:
+            vals.add(str(v).lower())
+
+    for it in item_schema(body_schema(((op.get("responses") or {}).get("200")) or {}) or {}):
+        status_of(it)
+    return vals
 
 
 # An order statement and the field it names: "sorted by `openedAt` descending", "ordered by name", "openedAt
@@ -304,6 +352,16 @@ def main() -> int:
             if not ({"sort", "orderBy", "order", "sortBy"} & pnames) and \
                     not order_names_field(text, response_props(op, doc)):
                 guard.add("C-PAGED-ORDER", oid, f"{oid}: paged by cursor and states no order that names a field")
+            # **Which rows are in the list** (CHG-MKT-003, ADAM CR-088, 14 October 2026). listGuestDevices pages
+            # devices whose status may be revoked or failed and said neither whether they are listed nor how to ask
+            # for them, so the guest's device screen could show a revoked phone as live or drop it silently. A list
+            # whose items carry a status with an ended value, and that takes no status filter, says in words which
+            # statuses it returns.
+            ended = sorted(item_status_values(op, doc) & ENDED_STATUSES)
+            if ended and not (STATUS_PARAMS & {p.lower() for p in pnames}) \
+                    and not re.search(r"\bstatus(es)?\b|`status`", text, re.I):
+                guard.add("C-PAGED-STATUS", oid, f"{oid}: lists items whose status can be {', '.join(ended)} and "
+                          "says neither which statuses it returns nor takes a status filter")
         prose.append((f"{oid}", " ".join(str(op.get(k) or "") for k in ("description", "summary"))))
 
     for (stem, name), s in sorted(g.schemas()[0].items()):

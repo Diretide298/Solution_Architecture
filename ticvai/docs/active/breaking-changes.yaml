@@ -559,3 +559,30 @@ changes:
     tag: r6
     producer-tickets: [SVC-MARKETING-CONSENT-1]
     consumer-tickets: [APP-WL-CMS-018]
+  # BC-087 and BC-088 (CHG-MKT-002, CHG-MKT-003) are numbered after their ADAM CRs, apart from the BC entries other r6
+  # batches add in parallel, so the branches merge as a union.
+  - id: BC-087
+    contract: marketing-crm
+    operation: getWishlist
+    change: "security changed"
+    reason: >-
+      ADAM CR-087 (ticket 30706): getWishlist declared bearerAuth beside guestAuth while its audience is [guest] and it
+      names no permission, so a staff token would have read any guest's wishlist with no permission checked. Guests
+      only, as ADR-0025 and addToWishlist already say; the developer proposed building it so (CHG-MKT-002). Every
+      consumer is a guest screen (WEB-009, WEB-017, WEB-024, GST-020), none started. Lead to confirm.
+    approved-by: 'Chinmay Parab, 14 October 2026 (r6 settlement of CR-087: "pull all Crs and get them fixed")'
+    tag: r6
+    producer-tickets: [SVC-MARKETING-GUEST-1]
+    consumer-tickets: [APP-WEB-WEB-009, APP-WEB-WEB-017, APP-WEB-WEB-024, APP-MOB-GST-020]
+  - id: BC-088
+    contract: marketing-crm
+    operation: listGuestDevices
+    change: "security changed"
+    reason: >-
+      ADAM CR-088 (ticket 30707): as BC-087. listGuestDevices is the guest's own device list (GST-073, WEB-024), with
+      audience [guest] and no permission; bearerAuth would have let a staff token list any guest's devices
+      (CHG-MKT-003). Lead to confirm.
+    approved-by: 'Chinmay Parab, 14 October 2026 (r6 settlement of CR-088: "pull all Crs and get them fixed")'
+    tag: r6
+    producer-tickets: [SVC-MARKETING-GUEST-1]
+    consumer-tickets: [APP-WEB-WEB-024, APP-MOB-GST-073]

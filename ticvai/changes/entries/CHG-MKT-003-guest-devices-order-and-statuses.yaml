@@ -1,0 +1,57 @@
+id: CHG-MKT-003
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'listGuestDevices is ordered by registeredAt descending with id as the tiebreak and lists every status
+  (active, failed, revoked) with no filter; it is guests only; check-contract-shapes fails on a paged list whose items
+  can end in a status it does not say it returns.'
+decision:
+  what: 'contracts/satellite/marketing-crm.yaml listGuestDevices: "Ordered by `registeredAt` descending, `id` as the
+    tiebreak" (the CR''s option A; registeredAt is never null and a re-registration keeps it, CHG-MKT-001, so a
+    device does not move while a guest pages; the cursor is (registeredAt, id) as PageCursor says); every status is
+    listed, a revoked device with its revokedAt and a failed one as such, no status filter (GST-073 and WEB-024 show
+    it); bearerAuth removed (BC-088). handoff/audit-baseline.json: listGuestDevices out of the C-PAGED-ORDER baseline.
+    tools/check-contract-shapes.py: C-PAGED-STATUS, a cursor-paged list whose items carry a status that can end
+    (revoked, cancelled, expired, failed, closed ...) and that takes no status filter says in words which statuses it
+    returns; the 30 lists that predate the rule are baselined.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-088 (ticket 30707, SVC-MARKETING-GUEST-1), audited 14 October 2026. TRUE: listGuestDevices takes subjectId,
+  PageSize and PageCursor and states no order (marketing-crm.yaml listGuestDevices), PageCursor is "a keyset position
+  ... in the list''s order, with the item id as the tiebreak" (common.yaml PageCursor), and GuestDevice.status is
+  active, revoked or failed with nothing saying which are listed. Missed by the CR: check-contract-shapes C-PAGED-ORDER
+  already caught the order and had it baselined (handoff/audit-baseline.json, R154), the same class as CR-077, settled
+  by CHG-IDR-002 and tightened by CHG-GEN-002 the same day; no rule asked which statuses a list returns. The lead''s
+  instruction, 14 October: "pull all Crs and get them fixed".'
+keys_touched:
+  operations:
+  - listGuestDevices
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-contract-shapes.py
+  - handoff/audit-baseline.json
+root_class: A18 API-CONVENTIONS
+tickets:
+  started:
+  - SVC-MARKETING-GUEST-1 (#30707 listGuestDevices; a comment for the agent, never a rewrite)
+  unstarted:
+  - APP-MOB-GST-073
+  - APP-WEB-WEB-024
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-088
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
+  MKT, branch cr/086-088-guest-devices from r6-integrate 594e51a2. The order follows IDR''s wording for CR-077
+  ("Ordered by `<field>` ..., `id` as the tiebreak"). Chosen (lead to confirm): the CR''s recommendation A, every
+  status returned; bearerAuth removed as the developer proposed (BC-088). No migration effect: an index on
+  (subject_id, registered_at, id) is not needed for one guest''s handful of devices beside guest_device_subject_id_idx.
+  Prevention: listGuestDevices left the C-PAGED-ORDER baseline, so check-contract-shapes fails if its order goes; and
+  C-PAGED-STATUS, run on the parent (594e51a2 contract with this branch''s check: fails on listGuestDevices) and
+  passing on this branch; the 30 other paged lists it finds (listMyOrders, listPerformances, listOrderRefunds ...) are
+  baselined for their owners.'

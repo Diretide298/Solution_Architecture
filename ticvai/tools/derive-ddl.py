@@ -69,7 +69,8 @@ column DEFAULT (storage-design.md, "Enum agreement": the database holds the same
 contract). **Uniqueness is carried where the contract marks it**: a property with
 `x-ticvai-unique: tenant` or `venue` becomes a `<table>_<columns>_uniq` unique index (audit R108,
 28 September). A contract schema's `x-ticvai-unique-together: [[a, b, ...]]` is a unique index over
-several columns, each named by property or by column (CHG-R6-006). **A text member of either is
+several columns, each named by property or by column (CHG-R6-006); with `x-ticvai-unique-nulls: not-distinct` on
+the schema a null member still collides (`NULLS NOT DISTINCT`, CHG-MKT-002). **A text member of either is
 indexed as `lower(column)`**, so a code is unique whatever its case, as common.yaml says; an opaque
 external id marked `x-ticvai-unique-compare: exact` is not (CHG-GEN-001). `x-ticvai-required-when:
 {prop: {other: value}}` is a table CHECK that the column is set on rows where `other` is `value`
@@ -1200,6 +1201,13 @@ def table_marks(cols: dict, tables) -> dict:
             entry["unique_together"] = [
                 [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group]
                 for group in ut if isinstance(group, list) and group]
+            # **A null member that still collides** (CHG-MKT-002, ADAM CR-087, 14 October 2026). A wishlist entry
+            # is `variantId` plus `performanceId`, and a save with no performance is one date-less entry
+            # (R149); Postgres treats nulls as distinct, so two date-less saves of one variant were two rows.
+            # `x-ticvai-unique-nulls: not-distinct` on the schema makes its unique-together sets
+            # `NULLS NOT DISTINCT` (PostgreSQL 15 and later; the platform is on 16).
+            if str(marks.get("x-ticvai-unique-nulls") or "").strip() == "not-distinct":
+                entry["unique_nulls_not_distinct"] = True
         # **Who may read a row the scope rule would hide** (CHG-GEN-005): `x-ticvai-rls: read-beneath` or
         # `grant-holder-read` on the schema; see RLS_MARKS.
         rls = marks.get("x-ticvai-rls")
@@ -1936,10 +1944,11 @@ def main() -> int:
                 if part_col and part_col not in keycols:
                     keycols.append(part_col)
                 uname = obj_name(short, *keycols, suffix="uniq")
+                nnd = " NULLS NOT DISTINCT" if (marks.get(t) or {}).get("unique_nulls_not_distinct") else ""
                 idx_lines.append((schema,
                     f"-- unique together (x-ticvai-unique-together): {t} ({', '.join(group)})\n"
                     f"CREATE UNIQUE INDEX IF NOT EXISTS {uname} ON {q(schema)}.{q(short)} "
-                    f"({', '.join(unique_key(k, col_type, src_of) for k in keycols)});"))
+                    f"({', '.join(unique_key(k, col_type, src_of) for k in keycols)}){nnd};"))
                 n_uniq += 1
 
             if not inline_pk and pk_cols:

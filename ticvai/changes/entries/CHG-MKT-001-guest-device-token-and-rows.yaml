@@ -1,0 +1,99 @@
+id: CHG-MKT-001
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'A guest device is one row per app install (installationId), or per token without one; the push token is stored
+  encrypted by the application and found by an HMAC-SHA-256 blind index, never as a Key Vault secret per device; a
+  re-registration says what it changes, a failed device is revived by it and a revoked one never is; ADR-0063 says
+  which of four forms every stored secret takes, and check-contract-storage holds them to it.'
+decision:
+  what: 'contracts/satellite/marketing-crm.yaml: registerGuestDevice takes an optional installationId (a UUIDv7 made
+    once per install, per browser profile for web) and its description says how a registration finds its row (the
+    calling guest''s row with that installationId, else the one with this token''s fingerprint; a revoked row has
+    neither), what a re-registration changes (token, fingerprint, platform, app/os/model/locale as sent, status
+    active, failureCount 0, lastSeenAt now; registeredAt and id kept), that a failed row is made active again and a
+    revoked one never is (a new row instead), and that the push sender sends a token only to the most recently
+    registered or seen row across guests and revokes the others (a shared phone). GuestDevice gains installationId
+    (writeOnly) and x-ticvai-unique-together [subjectId, installationId] and [subjectId, tokenFingerprint] (per guest,
+    never tenant-wide: subject RLS); tokenFingerprint is HMAC-SHA-256 under the tenant''s blind-index key, 64
+    lowercase hex (x-ticvai-secret blind-index, x-ticvai-unique-compare exact); tokenRef keeps its wire name and is
+    stored as token_ciphertext, AES-256-GCM under the tenant''s data key (x-ticvai-secret field-encrypted); status and
+    failureCount say what active, failed and revoked mean. revokeGuestDevice clears the token, fingerprint and
+    installation and is 204 again on a revoked device. docs/adr/0063: amended 14 October 2026, a secret held per guest
+    or device is field-encrypted under section 4 (Key Vault holds the key, never the value), a lookup on it is the
+    section-4 blind index, a Key Vault secret is for the few credentials staff configure, a password or PIN is
+    ADR-0071''s Argon2id; the kernel component is action 6, KERNEL-FIELD-ENC. tools/derive-schema-history.py
+    COLUMN_RENAMES marketing.guest_device token_ref -> token_ciphertext. tools/applied/guest-devices-wishlist-14-october.py:
+    revokeGuestDevice reads and writes marketing.guest_device (the lineage had it writing marketing.guest_profile).
+    tools/check-contract-storage.py ST-SECRET-FORM.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-086 (ticket 30708, SVC-MARKETING-GUEST-1), audited 14 October 2026. TRUE: GuestDevice.tokenRef was "a vault
+  reference to the push token ... the same pattern as PaymentProvider.credentialRef" (marketing-crm.yaml GuestDevice)
+  with no secret-store abstraction in TICVAI.Application, and PaymentProvider holds a few provider credentials per
+  tenant (orders.yaml PaymentProvider); tokenFingerprint was "Hash of the token" with no algorithm; the only index on
+  marketing.guest_device was guest_device_subject_id_idx (backend/tenant/910-indexes.sql:3475), so "idempotent on the
+  token" had nothing behind it; a rotated token is a different token and the request carried no install id; the
+  table is apply_subject_rls (920-row-level-security.sql:1083), so a tenant-wide unique index fails on rows the caller
+  cannot see; the re-registration fields and a revoked row''s fate were unstated. Missed by the CR: ADR-0063 section 4
+  already decides field-level encryption (a per-tenant data key wrapped by an HSM-backed Key Vault key, and a keyed
+  hash blind index for lookup) and says the encryption half "is ours and does not wait" on the client; ADR-0071
+  (CHG-CRD-003) set Argon2id and a Key Vault pepper for PINs the same day; the staff twin tenancy
+  RegisteredDevice.pushToken says "never in a row" (R164) while platform.device.push_token is a plaintext column
+  (010-platform.sql:151); revokeGuestDevice''s path-inferred lineage wrote marketing.guest_profile. The lead''s
+  instruction, 14 October: "pull all Crs and get them fixed".'
+keys_touched:
+  operations:
+  - registerGuestDevice
+  - revokeGuestDevice
+  - listGuestDevices
+  schemas:
+  - GuestDevice
+  tables:
+  - marketing.guest_device
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - docs/adr/0063-encryption-keys-and-biometric-templates.md
+  - tools/derive-schema-history.py
+  - tools/applied/guest-devices-wishlist-14-october.py
+  - handoff/api-data-lineage.json
+  - tools/check-contract-storage.py
+  - handoff/audit-baseline.json
+  other:
+  - ADR-0063 amendment (14 October 2026)
+  - x-ticvai-secret
+root_class: 'new: SECRET-STORAGE-FORM (a stored secret that does not say how it is stored)'
+tickets:
+  started:
+  - SVC-MARKETING-GUEST-1 (#30708 registerGuestDevice; a comment for the agent, never a rewrite)
+  unstarted:
+  - SVC-MARKETING-GUEST-2 (revokeGuestDevice)
+  - MIG-MARKETING (#27677, V0028__marketing.sql)
+  - APP-MOB-GST-073
+  - APP-WEB-WEB-024
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-086
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
+  MKT, branch cr/086-088-guest-devices from r6-integrate 594e51a2. Chosen where the CR left it to the owner (lead to
+  confirm): the CR''s option A (installationId) and V2 (the token encrypted in the row), as ADR-0063 section 4 already
+  decides; the fingerprint is keyed (HMAC-SHA-256, the section-4 blind index) rather than the CR''s plain SHA-256, so a
+  token somebody holds cannot be checked against the table; installationId is optional so an app that predates it
+  still registers. Instead of a partial unique index (WHERE status <> revoked, which derive-ddl cannot emit) a revoke
+  clears the token, fingerprint and installation, so plain per-guest unique indexes hold and a revoked row is never
+  matched. The shared-phone rule (the sender keeps the newest row per fingerprint across guests and revokes the rest)
+  is the lead''s proposal. **KERNEL-FIELD-ENC (ADR-0063 action 6) is not a ticket yet**: registerGuestDevice cannot
+  finish without it, so the lead creates it (a plan change) or the ticket stays On hold on it. Migration effect
+  (MIG-MARKETING #27677, not started): a new column installation_id, two unique indexes, a CHECK on the fingerprint''s
+  length and the rename token_ref -> token_ciphertext (derive-ddl writes the column and indexes into the next V01nn
+  forward migration and lists the rename in handoff/migration-review.md). Prevention: ST-SECRET-FORM in
+  check-contract-storage, run on the parent (594e51a2 contracts with this branch''s check: fails on
+  marketing.guest_device.token_ref) and passing on this branch; the 17 other stored secrets that do not say their
+  form are baselined, among them tenancy RegisteredDevice.pushToken (platform.device.push_token, plaintext: the same
+  gap for staff phones, not fixed here, for the lead), approvals and webhook signing secrets, payment and transfer
+  tokens.'

@@ -304,6 +304,13 @@ COLUMN_RENAMES = [
      "why": "CR-072 (same rule): value is banned (5.1)"},
     {"table": "retail.exchange", "from": "difference", "to": "difference_amount", "on": "2026-10-14",
      "why": "CR-072 (same rule): a money column says it is an amount (5.1)"},
+    # CHG-MKT-001 / CHG-MKT-002 (ADAM CR-086, CR-087, 14 October 2026)
+    {"table": "marketing.guest_device", "from": "token_ref", "to": "token_ciphertext", "on": "2026-10-14",
+     "why": "CR-086: the push token is stored encrypted by the application (ADR-0063 section 4), not as a vault "
+            "reference; the wire keeps tokenRef"},
+    {"table": "marketing.wishlist_item", "from": "price", "to": "list_price", "on": "2026-10-14",
+     "why": "CR-087: the contract said list_price Money (5.1) and the table kept price text from an older run; "
+            "typed numeric(18,4) as Money now (was text)"},
 ]
 
 
