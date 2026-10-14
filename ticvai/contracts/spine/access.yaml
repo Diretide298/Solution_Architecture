@@ -3628,6 +3628,10 @@ paths:
       x-ticvai-bounded: one replacement policy per replacement reason, defined by hand
     put:
       operationId: setMediaReplacementRevocation
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the product replacementFeeReference names (422 unknown-product) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-342 Media Replacement, Revocation & Rebinding Rules"
       x-ticvai-audience:
@@ -3672,6 +3676,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MediaReplacementRevocationRebindingRulesView'
         '422':
+          x-ticvai-problem-types: [unknown-product]
           description: replacementFeeReference names no catalogue product
           content:
             application/problem+json:

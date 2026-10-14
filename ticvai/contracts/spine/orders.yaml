@@ -1522,6 +1522,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReissuedEntitlement'
         '409':
+          x-ticvai-problem-types: [entitlement-not-expired, entitlement-already-replaced]
           description: 'The entitlement is not expired (`entitlementNotExpired`) — this is the reissue
             of an expired entitlement, and a live one is exchanged or rescheduled instead — or it has
             already been replaced by an earlier reissue (`entitlementAlreadyReplaced`).
@@ -1612,6 +1613,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EntitlementShare'
         '409':
+          x-ticvai-problem-types: [sharing-not-allowed, recipient-cannot-share-on, entitlement-not-active]
           description: 'Not shareable, and the reason says which: the entitlement''s template does not
             allow sharing (`sharingNotAllowed`, `EntitlementTemplate.canShareMedia` false), the caller
             holds it only through a share and cannot pass it on (`recipientCannotShareOn`), or it is
@@ -3463,6 +3465,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/AdmissionRequired
         '409':
+          x-ticvai-problem-types: [not-sellable-on-channel, sold-out-for-session, sold-out-for-day, window-unavailable, product-info-only, resource-hold-invalid]
           description: 'No capacity, or the product is not sellable on this channel (`notSellableOnChannel`).
             **The reason is specific** — sold out for this session (`soldOutForSession`) reads differently
             from sold out for the day (`soldOutForDay`), and no room of the type free for the booked window
@@ -3476,6 +3479,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartProblem'
         '422':
+          x-ticvai-problem-types: [window-required, window-not-allowed, window-length-mismatch, deposit-not-due, seat-limit-exceeded, transport-fare-unavailable, pass-not-valid-for-trip]
           description: 'The booked window is missing, not allowed or the wrong length for the variant
             (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or a table deposit
             line names a booking that is not awaiting one (`depositNotDue`; rev 3 REV3-8b). More seats for
@@ -4450,6 +4454,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createOrder
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'the performance''s seat limit on the channel (422 seat-limit-exceeded) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
@@ -4792,6 +4800,10 @@ paths:
         format: uuid
     post:
       operationId: holdOrder
+      x-ticvai-read-via:
+      - query: seating#seatRecords
+        route: in-process
+        for: 'the seated lines'' leases (409 seat-lease-expiring) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
@@ -4867,6 +4879,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Order'
         '409':
+          x-ticvai-problem-types: [already-paid, order-voided, seat-lease-expiring]
           description: 'Order is already paid (`alreadyPaid`) or voided (`orderVoided`) — only a
             `pending` order is parked — or a seated line''s lease ends before `holdUntil`
             (`seatLeaseExpiring`, naming the lines in `lineIds`), because parking cannot extend it and
@@ -6448,6 +6461,10 @@ paths:
         format: uuid
     post:
       operationId: modifyOrder
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'whether a targeted line''s entitlement is redeemed (409 line-redeemed) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-006 Held Orders"
         - "P06 EMP-034 Walk-up sale"
@@ -6501,6 +6518,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderModificationResult'
         '409':
+          x-ticvai-problem-types: [line-redeemed, order-voided]
           description: 'A targeted line''s entitlement has been redeemed (`lineRedeemed`, naming it in
             `lineIds`), or the order is voided (`orderVoided`).
 
@@ -6629,6 +6647,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppendEntitlementResult'
         '409':
+          x-ticvai-problem-types: [media-expired, media-blocked, media-surrendered, entitlement-cannot-share-media, venue-mismatch, guest-already-departed]
           description: 'Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at
             exit (`mediaSurrendered`), or the entitlement cannot share media
             (`entitlementCannotShareMedia`) — a single-entry ticket surrendered at the gate is not a claim
@@ -6734,6 +6753,10 @@ paths:
         format: uuid
     post:
       operationId: rescheduleOrder
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'the target performance (409 target-unavailable) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-006 Held Orders"
         - "P06 EMP-034 Walk-up sale"
@@ -6814,6 +6837,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderExchangeResult'
         '409':
+          x-ticvai-problem-types: [target-unavailable, outside-reschedule-window]
           description: Target performance is unavailable (`targetUnavailable`) or outside the
             reschedule window (`outsideRescheduleWindow`). The window is the venue setting
             `rescheduleCutoffHours`, with a tenant default; a reschedule is refused once the original
@@ -6984,6 +7008,9 @@ paths:
       - query: access#entitlementRecords
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'whether the product allows transfer (409 transfer-not-allowed) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P01 WEB-030 Ticket Transfer"
@@ -7065,6 +7092,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TicketTransfer'
         '409':
+          x-ticvai-problem-types: [already-redeemed, already-offered, transfer-not-allowed]
           description: 'Ticket already redeemed (`alreadyRedeemed`), already offered (`alreadyOffered`),
             or the product forbids transfer (`transferNotAllowed`). `ticketIds` names the tickets refused,
             so the guest can send the rest.
@@ -7133,6 +7161,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TicketTransfer'
         '410':
+          x-ticvai-problem-types: [offer-expired, already-claimed, offer-cancelled]
           description: Offer expired (`offerExpired`), already claimed (`alreadyClaimed`), or withdrawn by
             the sender (`offerCancelled`).
           content:
@@ -9990,7 +10019,12 @@ paths:
         customer category decides what is collected). Shape: 3 properties removed that were filters,
         actions, behaviour, roles, examples or prose fragments rather than fields; 6
         one-value-per-field properties folded into enums (customerType); renamed
-        anonymousSaleWherePermitted to anonymousSale, costCenterWhereApplicable to costCenter.'
+        anonymousSaleWherePermitted to anonymousSale, costCenterWhereApplicable to costCenter.
+
+
+        **It announces each order it attaches to a guest** (14 October 2026, CHG-MOD-006): one `order.linkedToGuest`
+        per order whose subject it sets, written to the outbox in its own transaction (ADR-0033), so Identity''s
+        `identity.subject_holding` learns that the guest holds the order (`orders#openOrdersForSubject`).'
       tags:
       - drafted
       x-ticvai-permission: ORDER_CREATE
@@ -13738,6 +13772,13 @@ paths:
         format: uuid
     post:
       operationId: migrateMembership
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'the target product (409 same-product) (CHG-MOD-003)'
+      - query: identity#customerMembershipRecords
+        route: in-process
+        for: 'whether the membership is active (409 membership-not-active) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-299 Membership Upgrade, Downgrade & Product Migration Operations"
       summary: Upgrade, downgrade or migrate an active membership to another product
@@ -13785,6 +13826,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [membership-not-active, same-product, migration-already-scheduled]
           description: The membership is not active (`membershipNotActive`), the target is the product
             it already holds (`sameProduct`), or a migration is already scheduled (`migrationAlreadyScheduled`).
           content:

@@ -113,7 +113,7 @@ x-ticvai-queries:
       nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through Catalogue's service route (serviceAuth).
-    served: [service]
+    served: [in-process, service]
   seatCategoryRecords:
     module: seating
     table: seating.seat_category

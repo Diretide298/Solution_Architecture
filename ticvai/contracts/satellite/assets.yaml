@@ -228,6 +228,10 @@ paths:
 
     patch:
       operationId: updateMediaAsset
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
         - "P13 CMS-075 Duplicate & Near-Duplicate Management"
@@ -309,6 +313,10 @@ paths:
 
     delete:
       operationId: deleteMediaAsset
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
         - "P13 CMS-075 Duplicate & Near-Duplicate Management"
@@ -336,6 +344,7 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
         '409':
+          x-ticvai-problem-types: [in-use]
           description: Asset is in use. Every reference is listed
           content:
             application/problem+json:

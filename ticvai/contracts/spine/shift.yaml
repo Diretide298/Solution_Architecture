@@ -335,6 +335,7 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
+          x-ticvai-problem-types: [shift-already-open, required-device-absent]
           description: >
             A shift is already open or suspended on this workstation (problem type
             `shift-already-open`), or a required device is absent (`required-device-absent`). A
@@ -908,6 +909,10 @@ paths:
   /shifts/current:
     get:
       operationId: getCurrentShift
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the session''s workstation (404 no-current-shift) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
@@ -929,6 +934,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '404':
+          x-ticvai-problem-types: [no-current-shift]
           description: >
             No shift open or suspended on this workstation, or the session has no workstation
             (problem type `no-current-shift`)
@@ -941,6 +947,10 @@ paths:
   /shifts/current/overview:
     get:
       operationId: getWorkstationShift
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the session''s workstation (404 no-current-shift) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-025 Till Home"
         - "P06 EMP-003 Home — on duty"
@@ -1215,6 +1225,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: resumeShift
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the shift''s workstation (409 shift-already-open) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
       x-ticvai-audience: [staff]
@@ -1256,6 +1270,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
+          x-ticvai-problem-types: [shift-already-open, shift-not-suspended]
           description: >
             Another shift is now open on this workstation (problem type `shift-already-open`), or
             this shift is not `suspended` (`shift-not-suspended`)

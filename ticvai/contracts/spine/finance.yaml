@@ -3057,6 +3057,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: resolveSettlementException
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: in-process
+        for: 'the payment matchedPaymentId names (400) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 ADM-622 Reconciliation Exception & Investigation Center"
         - "P08 BO-025 Chargebacks & Disputes"

@@ -146,7 +146,7 @@ x-ticvai-queries:
       nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Wallet implements.
-    served: [in-process]
+    served: [in-process, service]
   walletTransactionRecords:
     module: wallet
     table: wallet.wallet_transaction
@@ -2183,6 +2183,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: topUpWallet
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: in-process
+        for: 'the top-up''s payment (402 payment-declined) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
         - "P08 BO-488 Self-Service Wallet Top-Up"
@@ -2237,6 +2241,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Wallet' }
         '402':
+          x-ticvai-problem-types: [payment-declined]
           description: Payment declined
           content:
             application/problem+json:
@@ -3723,6 +3728,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [amount-outside-funding-rules, token-not-holders]
           description: An amount outside the venue's funding rules, or a payment token that is not the holder's.
           content:
             application/problem+json:

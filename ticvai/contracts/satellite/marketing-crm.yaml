@@ -10694,6 +10694,10 @@ paths:
   /order-booking-ticket:
     put:
       operationId: setOrderBookingTicket
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'the order and its policies (422 not-permitted-by-policy) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-801 Sales & Service Actions"
         - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
@@ -10748,6 +10752,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [not-permitted-by-policy]
           description: The action is not permitted for this order under its policies; the problem names
             the policy.
           content:
@@ -14645,6 +14650,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWaiverException
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'the performance the exception''s scope names (422 scope-incomplete) (CHG-MOD-003)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' p.37 (11.2.7 Exception Workflow, Override Scope, Critical Rule); the exception workflow needs its write'
@@ -14690,6 +14699,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [exception-not-allowed, scope-incomplete]
           description: The waiver form does not allow exceptions (`exceptionNotAllowed`), or the scope
             is missing its ticket, performance or `validUntil` (`scopeIncomplete`).
           content:
@@ -15848,6 +15858,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLoyaltyRules
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'whether a rule''s product exists (409 unknown-reward-or-product) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
         - "P08 BO-828 Milestones & Reward Rules"
@@ -15891,6 +15905,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoyaltyRuleSet'
         '409':
+          x-ticvai-problem-types: [unknown-reward-or-product]
           description: A rule references a reward or product that does not exist
           content:
             application/problem+json:
@@ -16892,6 +16907,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: recordConsentAnswers
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: service
+        for: 'the questions the cart asks (409, 422 question-not-asked) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-011 Guest Details & Attendee Forms"
@@ -16953,6 +16972,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/BookingConsentRecord'
         '409':
+          x-ticvai-problem-types: [question-version-superseded]
           description: The question has changed since the cart was read (`questionVersionSuperseded`); the
             client re-reads the cart and asks the current version.
           content:
@@ -16960,6 +16980,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConsentAnswerProblem'
         '422':
+          x-ticvai-problem-types: [person-required, question-not-asked, question-retired]
           description: 'A `perPerson` question answered without a person (`personRequired`), a question
             this cart does not ask (`questionNotAsked`), or a retired one (`questionRetired`).'
           content:

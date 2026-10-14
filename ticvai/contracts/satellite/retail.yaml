@@ -461,6 +461,10 @@ paths:
   /merchandise/lookup:
     get:
       operationId: lookupMerchandise
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'the caller''s workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
         - "P02 GST-026 Retail / Merchandise"
@@ -528,6 +532,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PriceCheck' }
         '400':
+          x-ticvai-problem-types: [lookup-key-missing, outlet-required]
           description: Neither barcode nor SKU supplied, or a caller with no workstation sent no `outletId` (audit R215)
           content:
             application/problem+json:

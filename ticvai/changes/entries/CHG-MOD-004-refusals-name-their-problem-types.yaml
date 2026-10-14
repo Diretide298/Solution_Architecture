@@ -1,0 +1,46 @@
+id: CHG-MOD-004
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Every 4xx that names another module''s record declares its problem types: 49 responses gain
+  x-ticvai-problem-types, one kebab-case slug per cause the response already names (its refusedReason values or the
+  causes its description lists).'
+decision:
+  what: 'x-ticvai-problem-types on each response, taken from what the response already says: the refusedReason enum of
+    its own problem schema in kebab case (createFnbOrder 409, createGuestFnbOrder 402), the backticked reason codes its
+    description lists (addCartLine, appendEntitlementToMedia, holdOrder, migrateMembership, ...), or, where the
+    description names causes in words only, one slug per cause (assignRentalEquipment: asset-already-out,
+    asset-under-maintenance, wrong-product). No response''s status, schema or wording changes.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-error-sources/E-PROBLEM-TYPE,
+  60 findings touching 138 Block A tickets (61 due by 28 October); ADAM CR-084: a refusal the client must tell apart
+  names its causes. Default ruling (lead, 14 October): "As E-READ-VIA: and declares its problem types." Count before
+  60, after 0 (11 of them left the class through the vocabulary fix of CHG-MOD-003, where the word was not another
+  module''s record).'
+keys_touched:
+  operations: [acceptFnbOrder, addCartLine, allocateResources, appendEntitlementToMedia, assignRentalEquipment,
+    authoriseWalletSpend, claimLocationSession, claimTableSession, claimTicketTransfer, closeTableVisit,
+    createDeliveryLocation, createFnbOrder, createGuestFnbOrder, createPartnerChangeRequest, createTableReservation,
+    decommissionBurstEnvironment, deleteBookingFlow, deleteMediaAsset, getCurrentShift, holdOrder,
+    importProductCatalogue, linkGuestCheckout, lookupMerchandise, migrateMembership, modifyOrder, openShift,
+    recordConsentAnswers, reissueEntitlement, rescheduleOrder, resumeShift, setDeliveryLocationOutletMapping,
+    setInstalmentPolicy, setKitchenStations, setLoyaltyRules, setMediaReplacementRevocation,
+    setMembershipCommercialConfig, setMembershipUsagePolicy, setOrderBookingTicket, setWaiverException,
+    setWalletAutoReloadSetting, shareEntitlement, topUpWallet, transferOrderTickets, transitionProductLifecycle]
+root_class: A19 ERRORS-AND-STATES
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'Batch MOD, 14 October 2026. Batch SHP fixes C-ERROR-PROBLEM-TYPE (every inline error names a problem type) on
+  the same kind of line: where both batches declare x-ticvai-problem-types on one response the merge keeps one line,
+  and this batch''s slugs are the ones the response''s own reason codes give. Verified: E-PROBLEM-TYPE 60 -> 0;
+  check-contract-shapes and check-contract-compat 0 new.'

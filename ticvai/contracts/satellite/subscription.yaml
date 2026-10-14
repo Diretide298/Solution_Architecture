@@ -3563,6 +3563,10 @@ paths:
   /burst-environments/{burstEnvironmentId}/decommission:
     post:
       operationId: decommissionBurstEnvironment
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'the orders the burst environment took, reconciled into the cell first (409 not-reconciled) (CHG-MOD-003)'
       summary: Tear it down
       description: '**Refused unless the environment is `reconciled`.** An environment torn down before
         its orders reach the permanent platform has lost real money and real tickets, and **`decommissioned`
@@ -3592,6 +3596,7 @@ paths:
             application/json:
               schema: *id001
         '409':
+          x-ticvai-problem-types: [not-reconciled]
           description: Not reconciled — orders would be lost
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -9071,6 +9076,10 @@ paths:
   /membership-usage-policy:
     put:
       operationId: setMembershipUsagePolicy
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the membership product''s catalogue product (404, 409) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-audience:
@@ -9124,12 +9133,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/MembershipUsageVisitConsumptionRulesView'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No membership product with this code
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [product-version-closed]
           description: The product version is retired or expired and cannot take new rules
           content:
             application/problem+json:
@@ -9154,6 +9165,9 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: payments#instalmentPolicyRecords
+        route: service
+        for: 'whether payments supports instalments for the product (422 instalments-not-supported) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-audience:
@@ -9210,18 +9224,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/MembershipCommercialPricingChannelAssociationView'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No membership product with this code
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [product-version-closed]
           description: The product version is retired or expired and cannot be changed
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [unknown-profile, not-auto-renew-eligible, instalments-not-supported, billing-frequency-invalid]
           description: An unknown or inactive profile, autoRenewPayment on a product that is not auto-renew eligible,
             or installments where payments does not support them, or a recurring billing frequency without them or longer
             than the term
@@ -9975,6 +9992,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerChangeRequest'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such order for this partner
           content:
             application/problem+json:

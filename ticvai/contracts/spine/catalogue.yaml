@@ -697,6 +697,10 @@ paths:
   /products/import:
     post:
       operationId: importProductCatalogue
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'live orders against a category the file would replace (409 category-has-live-orders) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
       summary: Parse a catalogue file into a preview
@@ -770,6 +774,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CatalogueImportJob'
         '409':
+          x-ticvai-problem-types: [category-has-live-orders, source-not-ready]
           description: '`mode` is `replaceCategory` and a category the file would replace has live orders
             against it — that is a migration, not an import. Also answered when `sourceRef` names an asset
             that is not `ready`: still `processing`, or `quarantined` by the scan.
@@ -4631,6 +4636,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [invalid-transition, unexpired-entitlements]
           description: 'Transition not valid from the current state, or archiving attempted while unexpired
             entitlements exist.
 

@@ -1,0 +1,39 @@
+id: CHG-MOD-006
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'setCustomerGuestAccount emits order.linkedToGuest for each order it attaches to a guest, through the outbox,
+  so Identity''s identity.subject_holding learns the guest holds the order.'
+decision:
+  what: 'events/order-linkedToGuest.yaml names orders.setCustomerGuestAccount in emittedBy (one event per order whose
+    subject it sets); its description says so; tools/applied/mod-lineage-14-october.py adds platform.outbox to its
+    lineage writes (ADR-0033, check-write-lineage W-OUTBOX). The contract''s x-ticvai-emits is not used, so the
+    operation''s meaning for check-contract-compat does not change.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-error-sources/E-UNFED, 1
+  finding touching 50 Block A tickets (25 due by 28 October): setCustomerGuestAccount writes orders.sales_order and
+  touches pii.* without emitting any event the orders#openOrdersForSubject projection consumes (CHG-GDL-003, ADAM
+  CR-084), so deleteGuestAccount could erase an account that holds an order. Default ruling (lead, 14 October): "A
+  projection hears every event that moves a record in or out." Count before 1, after 0.'
+keys_touched:
+  operations:
+  - setCustomerGuestAccount
+  files:
+  - events/order-linkedToGuest.yaml
+  - contracts/spine/orders.yaml
+  - tools/applied/mod-lineage-14-october.py
+root_class: A22 LINEAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'Batch MOD, 14 October 2026. The lineage is derived: run tools/applied/mod-lineage-14-october.py --apply before
+  derive-lineage at the merge. Verified: E-UNFED 1 -> 0, check-write-lineage and check-states pass.'

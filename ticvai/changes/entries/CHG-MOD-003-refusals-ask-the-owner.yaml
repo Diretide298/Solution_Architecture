@@ -1,0 +1,59 @@
+id: CHG-MOD-003
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'A refusal that rests on another module''s record asks that module through a declared query: 44 operations
+  gain an x-ticvai-read-via for the record their 4xx names, two data-read queries are added (Identity''s
+  customerMembershipRecords, Payments'' instalmentPolicyRecords), and the check''s vocabulary stops reading a tile''s
+  order, a product kind, a wallet pass or a module''s own settlement as another module''s record.'
+decision:
+  what: 'Each response the check found was read (its description and schema). Where the refusal rests on the other
+    module''s record, the operation names the owner''s data-read query (CHG-MOD-001) in x-ticvai-read-via, `for`
+    saying which refusal it feeds, route by deployable (in-process within one, service across); wallet#walletRecords
+    and seating#seatRecords now also serve the route their new askers take. Where the word was not that record,
+    the fix is the vocabulary of tools/check-error-sources.py (NOT_ENTITY: "tile order", "in one order",
+    "out-of-order", "converted to an order", "before taking payment", "layout variants", "product kinds", "card or
+    wallet", "card payment", "wallet pass", "wallet auto-reload", "times a shift", "on a registered workstation",
+    "`order`", "`cart` hold"; HOMONYMS: a resale, exit or partner settlement, a membership product or programme, a
+    workforce posting are the asking module''s own) or a reworded line naming the field (`seatReference`,
+    `productId`; createApprovalRequest''s "one refund" example). linkGuestCheckout 403 is kept with CHG-MOD-002.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-error-sources/E-READ-VIA, 88
+  findings touching 160 Block A tickets (68 due by 28 October); ADAM CR-084 and the ADR-0055 amendment (CHG-GEN-009):
+  a refusal that depends on another module''s record says where it is read from. Default ruling (lead, 14 October):
+  "A 4xx naming another module''s entity has a read-via to that module''s query." Count before 88 (70 after
+  CHG-MOD-001 routed the reads already in the lineage), after 1 (linkGuestCheckout 403, kept: CHG-MOD-002).'
+keys_touched:
+  operations: [acceptFnbOrder, allocateResources, assignRentalEquipment, authoriseWalletSpend, claimLocationSession,
+    closeTableVisit, createDeliveryLocation, createFnbOrder, createGuestFnbOrder, createInstalmentPlan, createOrder,
+    createTableReservation, decommissionBurstEnvironment, deleteMediaAsset, updateMediaAsset, getCurrentShift,
+    getWorkstationShift, getPublishedKioskConfig, holdOrder, importProductCatalogue, listProductStartTimes,
+    lookupMerchandise, migrateMembership, modifyOrder, publishTransportTimetable, withdrawTransportTimetable,
+    setTransportRouteStatus, updateTransportDeparture, recordConsentAnswers, rescheduleOrder,
+    resolveSettlementException, resumeShift, setInstalmentPolicy, setKitchenRoutingRules, setKitchenStations,
+    setLoyaltyRules, setMediaReplacementRevocation, setMembershipCommercialConfig, setMembershipUsagePolicy,
+    setOrderBookingTicket, setWaiverException, topUpWallet, transferOrderItems, transferOrderTickets,
+    createApprovalRequest, createRentalBooking]
+  files:
+  - tools/check-error-sources.py
+  other:
+  - 'x-ticvai-queries: identity#customerMembershipRecords, payments#instalmentPolicyRecords'
+root_class: A19 ERRORS-AND-STATES
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'Batch MOD, 14 October 2026. The vocabulary change only removes matches (no new finding can come of it); each
+  phrase is one the audit found used for something other than the record, as the check''s own rule asks ("a word
+  joins or leaves the list with the change that shows the need"). The transport refusals ("sold seats") ask
+  Catalogue''s channelCapacityRecords: a departure is a performance (transport.departure.performance_id), so its sold
+  seats are Catalogue''s capacity. Verified: E-READ-VIA 88 -> 1, E-QUERY 0, check-cross-module-reads XR-QUERY /
+  XR-ROUTE / XR-LINEAGE 0 after derive-lineage --apply.'

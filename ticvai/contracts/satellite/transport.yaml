@@ -481,6 +481,10 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setTransportRouteStatus
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'seats sold on a departure still on sale (409 route-has-sold-departures) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-1184 Transport Routes & Stops"
       x-ticvai-audience: [staff]
@@ -906,6 +910,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: publishTransportTimetable
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'seats sold on a superseded timetable''s departures (409 timetable-overlaps-sold-departures) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-1186 Transport Timetables"
       x-ticvai-audience: [staff]
@@ -961,6 +969,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: withdrawTransportTimetable
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'seats sold on a future departure (409 timetable-overlaps-sold-departures) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-1186 Transport Timetables"
       x-ticvai-audience: [staff]
@@ -1259,6 +1271,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateTransportDeparture
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'seats sold on the departure (422 capacity-below-sold) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-1187 Transport Departure Board"
       x-ticvai-audience: [staff]

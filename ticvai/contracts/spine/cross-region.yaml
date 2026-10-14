@@ -584,6 +584,10 @@ paths:
   /wallet-authorisations:
     post:
       operationId: authoriseWalletSpend
+      x-ticvai-read-via:
+      - query: wallet#walletRecords
+        route: service
+        for: 'whether the wallet is suspended (409 wallet-suspended) (CHG-MOD-003)'
       x-ticvai-audience:
       - staff
       summary: Hold funds against the guest's home-cell balance
@@ -651,6 +655,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [guest-link-severed, wallet-suspended]
           description: Guest link severed, or the wallet is suspended
           content:
             application/problem+json:

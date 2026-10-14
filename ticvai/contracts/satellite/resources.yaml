@@ -2172,6 +2172,10 @@ paths:
   /resource-allocations:
     post:
       operationId: allocateResources
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the experience product whose resource requirements it allocates (409, ResourceRequirement) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-871 Multi-Event Resource Planning"
         - "P08 BO-899 Customer / Cashier Resource Assignment Experience"
@@ -2282,6 +2286,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ResourceBooking'
         '409':
+          x-ticvai-problem-types: [nothing-available, dependency-missing]
           description: '**Nothing available, or a dependency is missing.** Both are named — "no
             instructor free" and "the stage has no sound system" need different actions from the person
             reading it.
@@ -2983,6 +2988,10 @@ paths:
   /resource-start-times:
     get:
       operationId: listProductStartTimes
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'whether the product is sold by time window and the variant''s length (422) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-048 Book a Space by the Hour"
         - "P02 GST-075 Book a Space by the Hour"

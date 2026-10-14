@@ -2185,6 +2185,10 @@ paths:
         format: uuid
     post:
       operationId: transferOrderItems
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the target visit''s outlet (409 target-visit-not-open) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       summary: Move items to another table's bill
@@ -4152,6 +4156,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createTableReservation
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
@@ -4221,6 +4229,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TableReservation'
         '409':
+          x-ticvai-problem-types: [no-table-for-party-size, outlet-full-at-time]
           description: 'No cover available for that party size at that time. **The reason names the constraint**
             — a party of eight refused when a party of two would fit (`noTableForPartySize`) is a different
             answer from the outlet being full (`outletFullAtTime`).
@@ -4740,6 +4749,10 @@ paths:
   /location-sessions:
     post:
       operationId: claimLocationSession
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'which outlets are open to deliver to the location (409 location-not-served) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
@@ -4805,7 +4818,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LocationSession'
         '400':
-          description: Neither a location code nor a seat reference supplied
+          description: Neither a location code nor a `seatReference` supplied
           content:
             application/problem+json:
               schema:
@@ -4817,6 +4830,7 @@ paths:
                       enum:
                       - locationNotSupplied
         '409':
+          x-ticvai-problem-types: [code-expired, code-unknown, location-out-of-service, location-not-served]
           description: 'Code expired or unknown, the location is out of service, or no outlet currently
             delivers to it — a cabana is useless as an address if nothing serves it. One reason per cause.
 
@@ -5013,6 +5027,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TableSession'
         '409':
+          x-ticvai-problem-types: [code-expired, code-unknown, outlet-closed, table-out-of-service]
           description: 'Code expired or unknown, the outlet is closed, or the table is out of service. One
             reason per cause.
 
@@ -5206,6 +5221,12 @@ paths:
       - query: inventory#movementRecords
         route: in-process
         for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the outlet''s admissionContext and whether it is taking orders (403 entry-ticket-required, 409 outlet-closed, 422 the outlet''s delivery policy) (CHG-MOD-003)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'the order''s payment (402 payment-required, payment-declined) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
@@ -5273,6 +5294,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestOrderResult'
         '409':
+          x-ticvai-problem-types: [item-unavailable, price-changed, location-session-expired, location-not-serviceable, outlet-closed, outlet-not-accepting-orders, modifier-constraint-unmet, order-too-large]
           description: 'An item became unavailable, the quoted total no longer matches, the location session
             expired, or the outlet stopped taking orders. The response names which in `refusedReason`.
 
@@ -5295,6 +5317,7 @@ paths:
                       - modifierConstraintUnmet
                       - orderTooLarge
         '422':
+          x-ticvai-problem-types: [collection-not-offered, delivery-not-offered, below-minimum-order, outside-delivery-area, fulfilment-slot-closed]
           description: The order breaks the outlet's `FnbDeliveryPolicy`. Names the rule in `refusedReason`.
           content:
             application/problem+json:
@@ -5311,6 +5334,7 @@ paths:
                       - outsideDeliveryArea
                       - fulfilmentSlotClosed
         '402':
+          x-ticvai-problem-types: [payment-required, payment-declined]
           description: Payment required or declined
           content:
             application/problem+json:
@@ -5959,6 +5983,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createFnbOrder
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the outlet an entitlement may be redeemed at (409 entitlement-not-redeemable) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-022 Send to Kitchen"
         - "P06 EMP-058 Live Table & Service Management"
@@ -6020,6 +6048,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
+          x-ticvai-problem-types: [item-unavailable, modifier-constraint-unmet, tracked-item-offline, entitlement-not-redeemable]
           description: 'An item is unavailable, modifier constraints are unmet, a tracked item was
             ordered offline, or a line''s `redeemEntitlementId` cannot be redeemed here
             (`entitlementNotRedeemable`: used, another item or outlet, not yet valid; MOB-4). One reason per
@@ -6055,6 +6084,10 @@ paths:
         format: uuid
     post:
       operationId: acceptFnbOrder
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'whether the outlet is taking orders (409 outlet-not-accepting-orders) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-029 Order Queue"
         - "P08 BO-020 F&B Order Management"
@@ -6108,6 +6141,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FnbOrder'
         '409':
+          x-ticvai-problem-types: [order-already-accepted, order-cancelled, outlet-not-accepting-orders]
           description: Already accepted, cancelled, or the outlet has stopped taking orders
           content:
             application/problem+json:
@@ -6796,6 +6830,10 @@ paths:
         format: uuid
     post:
       operationId: closeTableVisit
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'the payments taken against the bill (409 payments-short-of-bill) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
@@ -6877,6 +6915,7 @@ paths:
                     items:
                       type: string
         '409':
+          x-ticvai-problem-types: [payments-short-of-bill, lines-unserved]
           description: Payments do not cover the bill, or lines remain unserved (named in `lineIds`). One
             reason per cause
           content:
@@ -7209,6 +7248,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setKitchenStations
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'the display workstations it assigns (400 workstation-on-two-stations) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-134 Kitchen & Preparation Stations"
       x-ticvai-audience:
@@ -7253,6 +7296,7 @@ paths:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '400':
+          x-ticvai-problem-types: [workstation-on-two-stations, validation-failed]
           description: A workstation is assigned to more than one station (`displayWorkstationIds`, audit
             R277), or the body fails validation.
           content:
@@ -8117,6 +8161,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setKitchenRoutingRules
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the outlet the stations serve (422 unknown-station) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-135 Order Routing & KDS/Printer Rules"
       x-ticvai-audience:
@@ -8468,6 +8516,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [outlet-not-fnb-in-venue, location-of-another-venue]
           description: An outlet that is not an F&B outlet of this venue, or a location of another venue.
           content:
             application/problem+json:
@@ -8482,6 +8531,9 @@ paths:
       - query: tenancy#outletRecords
         route: service
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
+      - query: seating#seatRecords
+        route: service
+        for: 'the seat a `seat` location names (422 seat-id-required) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-065 Venue Configuration"
       x-ticvai-audience:
@@ -8555,6 +8607,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [table-id-required, seat-id-required, table-of-another-venue]
           description: A `table` location without `tableId`, a `seat` location without `seatId`, or a table of
             another venue.
           content:

@@ -1406,7 +1406,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: '`quoteExpired` or `quoteMismatch`: the `acceptedQuoteId` has expired or was
-            given for a different product, location, window or quantity.'
+            given for a different `productId`, location, window or quantity.'
           x-ticvai-problem-types: [quote-expired, quote-mismatch]
           content:
             application/problem+json:
@@ -1659,6 +1659,10 @@ paths:
         format: uuid
     post:
       operationId: assignRentalEquipment
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the product the asset must be of (409 wrong-product) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P06 EMP-074 Equipment Assignment Workspace"
         - "P06 EMP-075 Equipment Scan & Validation"
@@ -1712,6 +1716,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/RentalEquipmentAssignment'
         '409':
+          x-ticvai-problem-types: [asset-already-out, asset-under-maintenance, wrong-product]
           description: Asset already out, under maintenance, or of the wrong product
           content:
             application/problem+json:

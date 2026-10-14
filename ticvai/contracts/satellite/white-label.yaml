@@ -1748,6 +1748,10 @@ paths:
         format: uuid
     get:
       operationId: getPublishedKioskConfig
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'whether the workstation is in this venue (404 not-found) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P05 KSK-001 Attract Loop"
         - "P05 KSK-002 Language Select"
@@ -5605,6 +5609,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [flow-in-use]
           description: A product or category still names this flow, or it is the default for products on
             sale; the problem names them
           content:

@@ -309,8 +309,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
         '409':
-          description: 'An open request already exists for this subject. Two approvals for one refund
-            is how a refund gets paid twice. `refusedReason` is `openRequestExists` and `requestId`
+          description: 'An open request already exists for this subject. Two approvals for one subject
+            is how the same money goes out twice. `refusedReason` is `openRequestExists` and `requestId`
             names the open request, so the caller can point at it rather than raise another. A draft
             is not an open request.
 
