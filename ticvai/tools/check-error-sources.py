@@ -21,6 +21,17 @@ error side of that convention; batch GEN's `check-cross-module-reads` covers the
     E-QUERY         an `x-ticvai-read-via` entry names a query no contract declares in `x-ticvai-queries`, or a route
                     the query does not serve (in-process, service, projection)
 
+**A refusal defined in its schema** (ADAM CR-085, CHG-FIN-012). `closeFiscalPeriod`'s 409 said only "the close checks
+failed"; what fails each check (a POS shift still open, a wallet check) was written in `PeriodCloseResult.checks`, the
+schema its problem shape points at, so the two rules above, which read the response's own description, never saw that
+the refusal rested on Orders' and Wallet's records, and nothing declared how Ledger would learn them:
+
+    E-SCHEMA-READ-VIA  a 4xx whose response schema (followed through the contract's own `$ref`s, plus the schema
+                    fields the response or its problem shape point at in backticks, such as `PeriodCloseResult.checks`,
+                    one hop) defines the refusal by another module's entity, which its own description does not
+                    name, declares no x-ticvai-problem-types, or its operation no x-ticvai-read-via to a query of
+                    that module. MUST_FIX members (closeFiscalPeriod 409) can never be baselined.
+
 **A refusal must also be able to end** (CHG-GDL-003, the lead's follow-up to CR-084). A query that names the states
 it counts (`states: {model, blocking, waitsOnActor}`) and the projection that answers it (`projection: {context,
 table, source, feeds, exitsWithoutEvent}`) is checked against its state model, the event catalogue and the lineage:
@@ -56,6 +67,8 @@ RULES = {
     "E-PROBLEM-TYPE": "a 4xx naming another module's entity declares x-ticvai-problem-types (ADAM CR-084)",
     "E-READ-VIA": "a 4xx naming another module's entity has an x-ticvai-read-via to that module's query (ADAM CR-084)",
     "E-QUERY": "an x-ticvai-read-via names a declared x-ticvai-queries entry and a route it serves",
+    "E-SCHEMA-READ-VIA": "a 4xx defined in its response schema by another module's entity declares problem types and "
+                         "a read-via to that module's query (ADAM CR-085)",
     "E-STUCK": "a state a declared query counts as blocking has a timer or job exit, or says who ends it (CHG-GDL-003)",
     "E-UNFED": "a projection-served query's projection hears of every change that moves a record in or out (CHG-GDL-003)",
 }
@@ -107,6 +120,63 @@ HOMONYMS = {
 NOT_ENTITY = re.compile(r"\b(?:in order (?:to|for)|sort order|display order|order of|"
                         r"the order in which|in the order|in any order|out of order|sequence order|"
                         r"(?:ascending|descending) order|order (?:by|matters))\b", re.I)
+
+
+# **Refusals the r6 batches fix, which may never be baselined** (E-SCHEMA-READ-VIA): the operation and its status.
+MUST_FIX = {
+    ("closeFiscalPeriod", "409"),   # ADAM CR-085, batch FIN: noOpenShifts (Orders) and walletChecks (Wallet)
+}
+# A field of one of the contract's schemas named in backticks: `PeriodCloseResult.checks`, `Shift.businessDate`.
+POINTER = re.compile(r"`([A-Z][A-Za-z0-9]+)\.([A-Za-z0-9_.\[\]]+)`")
+
+
+def schema_text(node, local, seen, out):
+    """Every description under `node`, following `#/components/schemas/X` refs into `local` (one contract's
+    schemas). `seen` stops a cycle."""
+    if isinstance(node, dict):
+        ref = node.get("$ref")
+        if isinstance(ref, str) and ref.startswith("#/components/schemas/"):
+            name = ref.rsplit("/", 1)[-1]
+            if name not in seen and isinstance(local.get(name), dict):
+                seen.add(name)
+                schema_text(local[name], local, seen, out)
+        for k, v in node.items():
+            if k == "description" and isinstance(v, str):
+                out.append(v)
+            elif isinstance(v, (dict, list)):
+                schema_text(v, local, seen, out)
+    elif isinstance(node, list):
+        for v in node:
+            schema_text(v, local, seen, out)
+
+
+def field_of(schema, path):
+    """The subschema at a dotted field path (`checks[].check`), through properties, items and allOf; None if absent."""
+    node = schema
+    for part in [p for p in path.replace("[]", "").split(".") if p]:
+        nxt = None
+        for cand in [node] + [x for x in (node.get("allOf") or []) if isinstance(x, dict)]:
+            for holder in (cand, cand.get("items") if isinstance(cand.get("items"), dict) else {}):
+                p = (holder.get("properties") or {}).get(part)
+                if isinstance(p, dict):
+                    nxt = p
+                    break
+            if nxt is not None:
+                break
+        if nxt is None:
+            return None
+        node = nxt
+    return node
+
+
+def pointed_text(text, local, seen, out):
+    """The text of each field `text` points at in backticks (`Schema.field`), walked as schema_text walks."""
+    for m in POINTER.finditer(text or ""):
+        key = "%s.%s" % (m.group(1), m.group(2))
+        sub = field_of(local.get(m.group(1)) or {}, m.group(2)) if isinstance(local.get(m.group(1)), dict) else None
+        if sub is not None and key not in seen:
+            seen.add(key)
+            schema_text(sub, local, seen, out)
 
 
 def owner_maps():
@@ -263,6 +333,9 @@ def main() -> int:
     words = pattern(vocab)
     declared = queries(service_of_contract)
     lin = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
+    local_schemas = {}
+    for (stem, name), s in g.schemas()[0].items():
+        local_schemas.setdefault(stem, {})[name] = s
 
     for oid, o in sorted(g.operations().items()):
         op = o["op"]
@@ -287,14 +360,39 @@ def main() -> int:
             c = str(code)
             if not c.startswith("4") or c == "429" or not isinstance(r, dict) or "$ref" in r:
                 continue
-            text = NOT_ENTITY.sub(" ", str(r.get("description") or ""))
-            foreign = {}
-            for m in words.finditer(text):
-                w = re.sub(r"\s+", " ", m.group(1).lower())
-                if w in HOMONYMS and mine in {owner_of_schema.get(t.split(".", 1)[0]) for t in HOMONYMS[w]}:
-                    continue
-                if vocab.get(w) and vocab[w] != mine:
-                    foreign.setdefault(vocab[w], set()).add(w)
+            def foreign_in(raw):
+                found = {}
+                for m in words.finditer(NOT_ENTITY.sub(" ", raw)):
+                    w = re.sub(r"\s+", " ", m.group(1).lower())
+                    if w in HOMONYMS and mine in {owner_of_schema.get(t.split(".", 1)[0]) for t in HOMONYMS[w]}:
+                        continue
+                    if vocab.get(w) and vocab[w] != mine:
+                        found.setdefault(vocab[w], set()).add(w)
+                return found
+
+            foreign = foreign_in(str(r.get("description") or ""))
+            # E-SCHEMA-READ-VIA: the refusal as its response schema defines it (CR-085).
+            local = local_schemas.get(o["contract"], {})
+            parts, seen = [], set()
+            schema_text([(mt or {}).get("schema") for mt in (r.get("content") or {}).values() if isinstance(mt, dict)],
+                        local, seen, parts)
+            # the fields the response and its problem shape point at (`PeriodCloseResult.checks`), one hop
+            for t in [str(r.get("description") or "")] + list(parts):
+                pointed_text(t, local, seen, parts)
+            in_schema = {s: ws for s, ws in foreign_in("\n".join(parts)).items() if s not in foreign}
+            if in_schema:
+                named_s = ", ".join("%s (%s)" % ("/".join(sorted(ws)), s) for s, ws in sorted(in_schema.items()))
+                lacks = []
+                if not r.get("x-ticvai-problem-types"):
+                    lacks.append("declares no x-ticvai-problem-types")
+                miss_s = sorted(s for s in in_schema if s not in reached)
+                if miss_s:
+                    lacks.append("has no x-ticvai-read-via to a query of %s" % ", ".join(miss_s))
+                if lacks:
+                    guard.add("E-SCHEMA-READ-VIA", "%s|%s" % (oid, c),
+                              "%s %s is defined in its schema (%s) by %s and %s"
+                              % (oid, c, ", ".join(sorted(seen)) or "inline", named_s, " and ".join(lacks)),
+                              strict=(oid, c) in MUST_FIX)
             if not foreign:
                 continue
             named = ", ".join("%s (%s)" % ("/".join(sorted(ws)), s) for s, ws in sorted(foreign.items()))

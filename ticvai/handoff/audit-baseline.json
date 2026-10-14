@@ -3519,6 +3519,20 @@
     "updateVisitPlan|422",
     "withdrawTransportTimetable|409"
    ],
+   "E-SCHEMA-READ-VIA": [
+    "allocateResources|409",
+    "changeOwnCredential|422",
+    "claimTicketTransfer|410",
+    "createDashboard|422",
+    "createGuestFnbOrder|409",
+    "createGuestFnbOrder|422",
+    "deleteMediaAsset|409",
+    "setApprovalMatrix|409",
+    "setStepUpPolicy|409",
+    "storePaymentToken|409",
+    "transferOrderTickets|409",
+    "updateMediaAsset|409"
+   ],
    "E-UNFED": [
     "orders#openOrdersForSubject|writer|setCustomerGuestAccount"
    ]

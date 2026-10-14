@@ -1,0 +1,135 @@
+id: CHG-FIN-012
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'closeFiscalPeriod asks each module it depends on by a declared in-process query (Orders
+  shift#unclosedShiftsInPeriod, Wallet wallet#periodCloseChecks, Approvals approvals#approvalRequirement) and raises its
+  approval through Approvals'' in-process createApprovalRequest; recognitionRunComplete, the wallet-check mapping, the
+  no-approval and repeat-call paths are defined; a failed wallet check is named in the 409; reopenPeriod takes the same
+  approval route. The close is built after the owners'' queries: the resequencing is the lead''s.'
+decision:
+  what: 'contracts/spine/shift.yaml x-ticvai-queries unclosedShiftsInPeriod(scopePath, fromDate, toDate), served
+    in-process and service: a shift blocks when its businessDate is in the period, its venue at or beneath the legal
+    entity''s scope path, and its status open, suspended, pendingClosure or pendingVariance (not pendingApproval, which
+    cannot transact); states block for E-STUCK with waitsOnActor for pendingVariance. contracts/satellite/wallet.yaml
+    x-ticvai-queries periodCloseChecks(scopePath, periodStart, periodEnd), served in-process and service: Wallet''s six
+    WalletPreCloseCheck codes mapped onto finance''s five walletChecks (subLedgerTiesToLedger and
+    reconciliationSourcesMatched together are walletLiabilityMatchesLedger; warn passes), plus the roll-forward; empty
+    when no wallet.balance exists in scope. contracts/spine/approvals.yaml x-ticvai-queries approvalRequirement (the
+    evaluateApprovalRequirement answer), served in-process and service. finance closeFiscalPeriod: x-ticvai-read-via all
+    three, route in-process (Ledger, Orders, Wallet and Approvals are all in commerce); the request is raised through
+    the in-process createApprovalRequest (no x-ticvai-write-via: same deployable, as CHG-GDL-001); 200 with dryRun false
+    when the matrix requires no approval; a call while approvalRequestId is pending answers 202 naming that request and
+    raises no second one; recognitionRunComplete = runRecognition''s computation run dry moves nothing (blocking =
+    entryCount), because ledger.recognition_schedule holds rules, not lines; PeriodCloseProblem gains
+    failedWalletChecks (additive). reopenPeriod: read-via approvals#approvalRequirement, same in-process request.
+    Lineage (tools/applied/r6-cr085-close-fiscal-period.py): closeFiscalPeriod reads ledger.legal_entity,
+    orders.pos_shift, wallet.balance, approvals.rule and writes approvals.request; reopenPeriod reads approvals.rule and
+    writes approvals.request.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-085 (ticket 28411, raised 14 October 2026 by Sanket Keluskar, blocking). Audit against r6-integrate
+  594e51a2: the 202 path asks approvals.evaluateApprovalRequirement and raises createApprovalRequest
+  (contracts/spine/finance.yaml:3268-3273, TRUE); noOpenShifts is "asked of orders.listShifts" (finance.yaml:7492-7493;
+  listShifts is shift.yaml:162, OrderService, TRUE); settlementsReconciled and recognitionRunComplete read
+  ledger.settlement(_exception) and ledger.recognition_schedule (finance.yaml:7494-7497, TRUE), but recognition_schedule
+  is a rule table with no due lines (backend/tenant/010-ledger.sql:332-349), so the check had no definition;
+  walletChecks need Wallet (finance.yaml:7516-7521) whose getWalletPreCloseChecks is in 30044, Block C
+  (handoff/service-docs/tasks.csv:2446, TRUE) and whose six codes (wallet.yaml WalletPreCloseCheck) did not match
+  finance''s five. Tenancy owns approvals (handoff/service-decomposition.json TenancyService), and Ledger, Orders,
+  Wallet and Tenancy are all in commerce, so ADR-0055 rules 2 and 3 (amended 14 October, CHG-GEN-009) give in-process
+  queries and calls, never a write of approvals.request by Ledger. The tables are PARTLY: VM-MIG-LEDGER (28264) builds
+  fiscal_period_event, recognition_schedule, settlement and settlement_exception and is already in VM-LEDGER-FISCAL-1''s
+  dependsOn (tasks.csv sequence 646, 797); SVC-ORDER-SHIFT-3 (28528) and SVC-TENANCY-REQUEST-1 (27813) are Block A phase 1
+  but not in its dependsOn. The lineage listed none of the three modules (CHG-FXC-004 listed only ledger tables), so
+  no check saw the dependency. Earlier: CHG-FXC-009 (the check definitions), CHG-CSP-040 (walletChecks), CHG-R6-032
+  (Shift.businessDate), CHG-R4-019 (a variance within threshold needs a reason, which keeps a shift pendingClosure),
+  CHG-RONEP-001 (closeFiscalPeriod pulled into Block A by docs/active/block-a-extra-tasks.json).'
+keys_touched:
+  operations:
+  - closeFiscalPeriod
+  - reopenPeriod
+  tables:
+  - approvals.request
+  - orders.pos_shift
+  - wallet.balance
+  - ledger.recognition_schedule
+  schemas:
+  - PeriodCloseProblem
+  - PeriodCloseResult
+  files:
+  - contracts/spine/finance.yaml
+  - contracts/spine/shift.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/satellite/wallet.yaml
+  - handoff/api-data-lineage.json
+  - handoff/audit-baseline.json
+  - tools/applied/r6-cr085-close-fiscal-period.py
+  - tools/check-error-sources.py
+  - tools/run-checks.py
+  tickets:
+  - '28411'
+  - '28412'
+  - '28264'
+  - '28528'
+  - '27813'
+  - '30044'
+  other:
+  - x-ticvai-queries shift#unclosedShiftsInPeriod
+  - x-ticvai-queries wallet#periodCloseChecks
+  - x-ticvai-queries approvals#approvalRequirement
+root_class: A22 LINEAGE
+tickets:
+  started:
+  - '28411'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-085
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+
+
+  VERDICT: VALID as a blocker; its real cause is ordering plus undeclared dependencies. Claims 1-3 and 5 TRUE; claim 4
+  (tables) PARTLY: the plan already orders VM-MIG-LEDGER before the close. Option C (not-evaluated checks) rejected,
+  as the CR says.
+
+
+  PREVENTION: check-cross-module-reads did not catch it (it reads only the lineage, and the lineage listed only ledger
+  tables); check-error-sources did not either (it reads a 4xx''s own description, and closeFiscalPeriod''s 409 said
+  only "the close checks failed": the shifts and wallet checks were defined in PeriodCloseResult). Extended:
+  E-SCHEMA-READ-VIA follows the response schema''s $refs and the schema fields it points at in backticks
+  (`PeriodCloseResult.checks`), one hop, and fails a refusal defined there by another module''s entity without problem
+  types and a read-via; closeFiscalPeriod 409 is MUST_FIX (never baselined). Run with the parent''s contracts
+  (594e51a2) it FAILS ("closeFiscalPeriod 409 is defined in its schema (PeriodCloseProblem, PeriodCloseResult.checks)
+  by order/shift (OrderService), wallet (WalletService)"); on this branch it PASSES with 12 other pre-existing
+  findings baselined (allocateResources, changeOwnCredential, claimTicketTransfer, createDashboard, createGuestFnbOrder
+  x2, deleteMediaAsset, setApprovalMatrix, setStepUpPolicy, storePaymentToken, transferOrderTickets, updateMediaAsset).
+
+
+  LEAD TO CONFIRM: (1) pendingApproval shifts do not block a close; (2) the wallet code mapping, warn passes; (3) "no
+  wallet module" = no wallet.balance in scope; (4) 200 when no approval is required, and a repeat call reuses the
+  pending request; (5) recognitionRunComplete via runRecognition''s dry run (runRecognition itself reads
+  orders.sales_order raw, a baselined XR-UNCOVERED its own ticket must settle).
+
+
+  RESEQUENCING (a plan change, kind plan, 24-hour cooling-off: for the lead, not made here). Split 28411 /
+  VM-LEDGER-FISCAL-1 (28412): listFiscalPeriods ships now (needs only MIG-LEDGER 27672). closeFiscalPeriod moves to a
+  delta task that dependsOn VM-MIG-LEDGER 28264, SVC-ORDER-SHIFT-3 28528 (+ child: Orders implements
+  unclosedShiftsInPeriod), SVC-TENANCY-REQUEST-1 27813 (+ child: the in-process approvalRequirement and
+  createApprovalRequest) and the Wallet query. The Wallet query is the real blocker: getWalletPreCloseChecks and
+  getWalletMovementSummary are in 30044 (Block C, done by 16 Dec) while 28411 is due 10 Nov. Recommended: pull
+  wallet#periodCloseChecks with those two operations into Block A as a WalletService task before the close, because
+  topUpWallet, holds, disputes and expiry are all built in Block A (SVC-WALLET-WALLET-2/8/9, VM-WALLET-WALLET-1), so a
+  close without wallet checks would close over an unchecked stored-value liability. Otherwise closeFiscalPeriod moves
+  to Block C after 30044. Not done: build-service-docs does not yet turn x-ticvai-read-via into dependsOn.
+
+
+  ID: the batch code FIN already held CHG-FIN-001..011 (2 October), so this entry is CHG-FIN-012, not CHG-FIN-001.
+
+
+  [DB] none: no table or column changes; the 409''s failedWalletChecks and the queries are not persisted.'

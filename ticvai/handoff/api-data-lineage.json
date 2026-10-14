@@ -6533,11 +6533,13 @@
   "verb": "POST",
   "path": "/fiscal-periods/{periodId}/reopen",
   "reads": [
+   "approvals.rule",
    "cache:idempotency",
    "ledger.fiscal_period",
    "ledger.fiscal_period_event"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
    "ledger.fiscal_period"
   ],
@@ -6554,24 +6556,30 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "fixNote": "14 October 2026 (ADAM CR-085, CHG-FIN-012): the approval asks approvals#approvalRequirement in process (readVia, reading approvals.rule in the reopen's transaction); the 202's approvalRequestId is the approvals.request raised through Approvals' in-process createApprovalRequest (kind periodReopen)"
  },
  "closeFiscalPeriod": {
   "contract": "finance",
   "verb": "POST",
   "path": "/fiscal-periods/{periodId}/close",
   "reads": [
+   "approvals.rule",
    "cache:idempotency",
    "ledger.fiscal_period",
    "ledger.fiscal_period_event",
    "ledger.journal_entry",
    "ledger.journal_line",
+   "ledger.legal_entity",
    "ledger.price_variance",
    "ledger.recognition_schedule",
    "ledger.settlement",
-   "ledger.settlement_exception"
+   "ledger.settlement_exception",
+   "orders.pos_shift",
+   "wallet.balance"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
    "ledger.fiscal_period",
    "ledger.fiscal_period_event",
@@ -6591,7 +6599,7 @@
   "audience": [
    "staff"
   ],
-  "fixNote": "4 October 2026 (CHG-FXC-004): the close checks (PeriodCloseResult.checks) and the run record"
+  "fixNote": "14 October 2026 (ADAM CR-085, CHG-FIN-012): noOpenShifts asks Orders' shift#unclosedShiftsInPeriod, walletChecks and walletRollForward ask wallet#periodCloseChecks, and the approval asks approvals#approvalRequirement, all in process (readVia); the 202's approvalRequestId is the approvals.request raised through Approvals' in-process createApprovalRequest; the owners' tables those queries read in the close's transaction are orders.pos_shift, wallet.balance and approvals.rule (as CHG-TEN-004 lists orders.pos_shift for configureWorkstation); ledger.legal_entity gives the scope path the queries are asked for; recognitionRunComplete is runRecognition's computation run dry (4 October, CHG-FXC-004: the close checks and the run record)"
  },
  "getFinancialReport": {
   "contract": "finance",
