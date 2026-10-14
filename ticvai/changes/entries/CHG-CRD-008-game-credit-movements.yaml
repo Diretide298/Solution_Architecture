@@ -1,0 +1,41 @@
+id: CHG-CRD-008
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'games.credit_ledger gets its columns from GameCreditMovement: one row per replayed offline play with the credits
+  and points it moved, the balances after, and whether it overdrew the card.'
+decision:
+  what: games.yaml GameCreditMovement (x-ticvai-persistence games.credit_ledger; unique [playId]; cardId, playId, readerId,
+    sequence, creditsUsed, bonusCreditsUsed, pointsAwarded, creditsAfter, pointsAfter, isDivergence, reconciledAt, recordedAt,
+    syncedAt).
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of ADAM CR-078 (14 October 2026): games.credit_ledger held only id and card_id (D-STUB-TABLE baseline) while
+  syncGamePlays wrote it and getGameCard read it; audit R106 (3): an offline play that overdraws is accepted and reported,
+  and nothing could record the divergence.'
+keys_touched:
+  schemas:
+  - GameCreditMovement
+  tables:
+  - games.credit_ledger
+  operations:
+  - syncGamePlays
+  - getGameCard
+  files:
+  - contracts/satellite/games.yaml
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-078 (stub-table class, decided at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-stored-request-fields.py
+status: open
+notes: 'Verified with derive-schema and derive-ddl --apply in the worktree (generated tables read in V0104 and handoff/migration-review.md,
+  then restored): the new columns are additive in the next forward migration; NOT NULL on new columns and the nullability
+  changes on existing ones are listed in migration-review.md for the lead''s gate. Released outside the Tue/Fri window by
+  the lead''s waiver, 14 Oct 2026: ''Release today as an exception''.'

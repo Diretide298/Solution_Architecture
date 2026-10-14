@@ -3321,6 +3321,59 @@ components:
           description: '**Where the card''s credits are held** (4 October 2026, CHG-FXC-006). Set when the card is registered
             to a guest who has a wallet: credits loaded to it are wallet credit lots. Null for an anonymous card, whose
             credits are held on the card row itself (`credits`, `bonusCredits`).'
+    GameCreditMovement:
+      type: object
+      x-ticvai-persistence: games.credit_ledger
+      # One row per replayed play (14 October 2026, CHG-CRD-008); the play id is the replay's idempotency key.
+      x-ticvai-unique-together:
+      - [playId]
+      description: '**What a replayed offline play did to a card, as stored** (14 October 2026, CHG-CRD-008, ADAM CR-078;
+        `games.credit_ledger` held only `id` and `card_id`, so `syncGamePlays` recorded no movement and a divergence had
+        nowhere to be reported from). Never returned whole. `syncGamePlays` writes one row per play it accepts, in reader
+        `sequence` order, after moving the card''s balances: the credits and points it moved and the balances after.
+        **A play that overdrew the card is accepted and marked `isDivergence`** (audit R106 (3)): the guest already
+        played, and the record says so. `getGameCard` reads the card''s unreconciled divergences from here. Append-only.'
+      required: [cardId, playId, readerId, creditsUsed, pointsAwarded, creditsAfter, pointsAfter, isDivergence, recordedAt, syncedAt]
+      properties:
+        cardId:
+          type: string
+          format: uuid
+        playId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: '`RecordPlayRequest.id`, the play''s UUIDv7; also the `games.play` key (`play_id`).'
+        readerId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The reader that recorded the play offline (`syncGamePlays.readerId`).
+        sequence:
+          type: integer
+          nullable: true
+          description: The reader's monotonic sequence, which orders an offline batch.
+        creditsUsed: { type: integer, minimum: 0 }
+        bonusCreditsUsed: { type: integer, minimum: 0, default: 0 }
+        pointsAwarded: { type: integer, minimum: 0 }
+        creditsAfter:
+          type: integer
+          description: The card's paid credits after this play; negative only on a divergence.
+        pointsAfter: { type: integer }
+        isDivergence:
+          type: boolean
+          description: True when the play spent more than the card held; reported in `syncGamePlays.divergences`.
+        reconciledAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When a person settled the divergence; null while it is open.
+        recordedAt:
+          type: string
+          format: date-time
+          description: When the reader recorded the play (`RecordPlayRequest.recordedAt`).
+        syncedAt:
+          type: string
+          format: date-time
     Game:
       x-ticvai-persistence: games.game
       type: object

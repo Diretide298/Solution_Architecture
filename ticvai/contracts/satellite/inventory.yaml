@@ -1509,6 +1509,10 @@ paths:
       - count
       x-ticvai-permission: LEDGER_APPROVE
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: service
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); the operations deployable may not read identity.*: Identity''s serviceAuth operation verifySupervisorStepUp (ADR-0055 rule 4)'
       x-ticvai-step-up-reason: Sends a submitted count back, discarding its variance; a supervisor signs it in place (audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1741,6 +1745,10 @@ paths:
       - transfer
       x-ticvai-permission: LEDGER_APPROVE
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: service
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); the operations deployable may not read identity.*: Identity''s serviceAuth operation verifySupervisorStepUp (ADR-0055 rule 4)'
       x-ticvai-step-up-reason: Writes off stock in transit; a supervisor signs it in place (proposed by the coordinator, client to confirm, audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false

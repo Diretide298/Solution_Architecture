@@ -105,7 +105,8 @@ screens:
         label: PIN
         notes: 'Goes into `LoginRequest.credential` with `method: pin`, or the badge with `method: card`
           or `rfid`. The scanner sends its own `workstationId` (CHG-DOOR-001), so every scan is attributable
-          to a person at this gate.'
+          to a person at this gate. The keypad takes the tenant''s PIN length, exactly `WorkstationContext.pinLength`
+          digits (`PasswordPolicy.pinLength`, 4, 6 or 8; CHG-CRD-002), kept from the scanner''s last session.'
       - kind: primaryButton
         label: Sign in
         operation: login
@@ -154,7 +155,8 @@ screens:
       - kind: textField
         label: New PIN
         operation: changeOwnCredential
-        notes: Only when the PIN was reset and is temporary (audit R132).
+        notes: Shown when `LoginResponse.mustChangeCredential` is true (the PIN is temporary; CHG-CRD-001). The new
+          PIN is the tenant's PIN length, and its reuse follows `PasswordPolicy.pinReusePrevention` (CHG-CRD-002).
         provenance: contract identity.yaml POST /auth/credential
   states:
     loading: Checking the credential. The form stays visible and disabled.

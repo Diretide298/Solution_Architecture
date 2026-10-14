@@ -109,7 +109,10 @@ screens:
         label: PIN or password
         notes: 'Goes into `LoginRequest.credential`, `method: pin` on the handheld (bounded by the device''s
           `workstationId`, which the device sends; CHG-DOOR-001) or `method: password` for a person with
-          no PIN. Large keypad.'
+          no PIN. Large keypad, of the tenant''s PIN length: exactly `WorkstationContext.pinLength` digits
+          (`PasswordPolicy.pinLength`, 4, 6 or 8, chosen by the tenant; CHG-CRD-002), kept from the device''s last
+          session; a handheld never signed into accepts 4 to 8 digits. Wrong PINs lock after the tenant''s
+          `pinLockoutAfterAttempts` (429 `credential-locked`, with until when).'
       - kind: primaryButton
         label: Sign in
         operation: login
@@ -179,8 +182,11 @@ screens:
       - kind: textField
         label: New PIN
         operation: changeOwnCredential
-        notes: 'Only when the PIN was reset and is temporary: a new one twice before anything else; the
-          last five cannot be reused (audit R132).'
+        notes: 'Shown when `LoginResponse.mustChangeCredential` is true (the PIN was issued or reset and is
+          temporary; CHG-CRD-001): a new one twice before anything else, exactly the tenant''s PIN length. Reuse
+          follows the tenant''s `PasswordPolicy.pinReusePrevention` (none, last 3 or last 5; CHG-CRD-002), not the
+          password rule of audit R132. A refusal names its cause (422 `credential-reused`, `policy-not-met`,
+          `current-credential-wrong`).'
         provenance: contract identity.yaml POST /auth/credential
       - kind: secondaryButton
         label: Choose venue and role

@@ -15004,6 +15004,40 @@
    ]
   }
  },
+ "check-stored-request-fields": {
+  "updated": "2026-10-14",
+  "commit": "1eb1d063",
+  "rules": {
+   "SR-SECRET-UNHASHED": [
+    "setApprovalExternalProvider.outboundCredential"
+   ],
+   "SR-STORED-NO-COLUMN": [
+    "acknowledgeAlert.note",
+    "addIncidentPerson.email",
+    "addIncidentPerson.phone",
+    "checkInResource.recordedAt",
+    "checkOutResource.recordedAt",
+    "createCase.attachmentRefs",
+    "exchangeOrderLines.incomingLines[].recommendationId",
+    "retryMyDunningPayment.paymentTokenId",
+    "setTheme.darkMode",
+    "updateMediaAsset.collectionIds",
+    "updateMyProfile.accessibility",
+    "updateMyProfile.dietary"
+   ],
+   "SR-STUB-WRITE": [
+    "createSaleBoard",
+    "evaluateAccess",
+    "guestPasswordLogin",
+    "guestSocialLogin",
+    "guestUaePassLogin",
+    "registerGuest",
+    "setDeliveryLocationOutletMapping",
+    "updateSaleBoard",
+    "verifyGuestOtp"
+   ]
+  }
+ },
  "check-ticket-text": {
   "updated": "2026-10-01",
   "commit": "2d95ec30",

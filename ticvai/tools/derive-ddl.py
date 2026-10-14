@@ -1149,8 +1149,15 @@ def table_marks(cols: dict, tables) -> dict:
     out = {}
     for t in tables:
         votes: dict = defaultdict(int)
+        # **A child table derived from an array is not its parent** (14 October 2026, CHG-CRD-001). Its parent-key
+        # column's source names the parent's array (`identity.PrincipalCredential.history`), which voted for the parent
+        # schema, so `identity.principal_credential_history` took `PrincipalCredential`'s unique-together and failed to
+        # key it. Where a table has item columns (`...array[].prop`), only those vote.
+        _items = any("[]." in str(c.get("source") or "") for c in cols.get(t, []))
         for c in cols.get(t, []):
             src = str(c.get("source") or "")
+            if _items and "[]." not in src:
+                continue
             m = re.match(r"^([\w-]+)\.(\w+)\.(\w+)\[\]\.\w+$", src)
             if m:
                 key = ITEM_SCHEMA.get(f"{m.group(1)}.{m.group(2)}.{m.group(3)}")
@@ -1237,6 +1244,13 @@ def column_rules(short: str, col: str, typ: str, spec: dict) -> str:
         n = spec.get("maxLength")
         if isinstance(n, int) and not isinstance(n, bool) and n > 0:
             checks.append(f"char_length({q(col)}) <= {n}")
+    # **An integer column with a contract enum carries it too** (14 October 2026, CHG-CRD-002): the tenant's PIN
+    # settings (`PasswordPolicy.pinLength` 4, 6 or 8) are drop-downs of numbers, typed integer by
+    # `x-ticvai-persistence-column` in derive-schema, and the database holds the same values as the contract.
+    if typ in ("integer", "bigint", "smallint"):
+        values = [v for v in (spec.get("enum") or []) if v is not None]
+        if values and all(isinstance(v, int) and not isinstance(v, bool) for v in values):
+            checks.append(f"{q(col)} IN ({', '.join(str(v) for v in values)})")
     if checks:
         out += (f" CONSTRAINT {obj_name(short, col, suffix='chk')} CHECK ("
                 + " AND ".join(checks) + ")")

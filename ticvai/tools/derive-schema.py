@@ -275,6 +275,14 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
             return col.strip(), None
         return _array_type(spec.get("items") or {}, schemas, persisted), None
     if "enum" in spec:
+        # **An enum of numbers may say it is a number** (14 October 2026, CHG-CRD-002, ADAM CR-078). The tenant's PIN
+        # settings are drop-downs of integers (`PasswordPolicy.pinLength` 4, 6 or 8), and an enum was always typed
+        # `text`, so the column would have held '6' and a default of 4 had nowhere to go. A property that declares
+        # `x-ticvai-persistence-column` is that column; every other enum stays `text` as before (the two older integer
+        # enums, `UrlRedirect.statusCode` and `AdmissionRule.formatVersion`, are untouched).
+        col = spec.get("x-ticvai-persistence-column")
+        if isinstance(col, str) and col.strip():
+            return col.strip(), None
         return "text", None
     return TYPE_MAP.get((t, spec.get("format")), TYPE_MAP.get((t, None), "text")), None
 
