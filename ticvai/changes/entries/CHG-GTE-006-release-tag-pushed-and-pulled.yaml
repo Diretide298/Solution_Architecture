@@ -14,7 +14,7 @@ decision:
     github).'
   by: Chinmay
   date: '2026-10-14'
-why: 'PROCESS-LOG P-20 (audit/ticvai/PROCESS-LOG.md, 14 October 2026): the audit''s first test pull (#27741) said
+why: 'PROCESS-LOG P-20 (the process log (P-20) in the lead's workspace, 14 October 2026): the audit''s first test pull (#27741) said
   "the latest release (r4)" a day after r5; the r5 tag was made locally and never pushed (a bare git push sends no
   tag) and ADAM''s server knows only the tags it fetched. Its Open items were the runbook''s tag push and a closing
   adam_pull. Follows CHG-ADM-001 (always the latest release). Finding count: 1 -> 0 (the runbook carried neither).'

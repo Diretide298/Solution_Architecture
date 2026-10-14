@@ -11,11 +11,6 @@
    "strict": 4,
    "tickets": 1080,
    "due_soon": 500,
-   "examples": [
-    "AM-ADMISSION-ACCESS-P01 (P01, block A): lists enrolFaceTag (SVC-ACCESS-ACCESS-2), which none of WEB-018, WEB-041 calls",
-    "AM-ADMISSION-ACCESS-P02 (P02, block A): lists approveManualOverrideSupervisor (SVC-ACCESS-ACCESS-1), which none of GST-012, GST-013, GST-027, GST-028, GST-055, GST-069 calls",
-    "AM-ADMISSION-ACCESS-P02 (P02, block A): lists deleteAccessPointGroup (SVC-ACCESS-ACCESS-1), which none of GST-012, GST-013, GST-027, GST-028, GST-055, GST-069 calls"
-   ],
    "id": "check-ticket-scope/S-FEATURE-OP-UNUSED"
   },
   {
@@ -28,11 +23,6 @@
    "strict": 0,
    "tickets": 972,
    "due_soon": 443,
-   "examples": [
-    "P01 WEB-001: component apps/guest-web/src/routes/discovery-and-browse/HomeLandingDashboard.tsx is in the one-workspace layout; the screen is built in ticvai-guest-web",
-    "P01 WEB-002: component apps/guest-web/src/routes/discovery-and-browse/EventAndAttractionListingList.tsx is in the one-workspace layout; the screen is built in ticvai-guest-web",
-    "P01 WEB-003: component apps/guest-web/src/routes/discovery-and-browse/SearchResultsList.tsx is in the one-workspace layout; the screen is built in ticvai-guest-web"
-   ],
    "id": "check-frontend-repos/FR-OLD-PATH"
   },
   {
@@ -45,11 +35,6 @@
    "strict": 0,
    "tickets": 917,
    "due_soon": 428,
-   "examples": [
-    "POS-000: operations need SESSION_FORCE_LOGOUT; the screen declares no permission",
-    "POS-001: operations need DEVICE_VIEW, SHIFT_APPROVE_OPEN, SHIFT_OPEN; the screen declares no permission",
-    "POS-002: operations need APPROVAL_REQUEST, APPROVAL_VIEW, GUEST_VIEW ...; the screen declares no permission"
-   ],
    "id": "check-screen-wiring/S-SCREEN-PERMISSION"
   },
   {
@@ -62,11 +47,6 @@
    "strict": 0,
    "tickets": 858,
    "due_soon": 365,
-   "examples": [
-    "WEB-001: declares getCookieConsentRuntime (onLoad) and no component reaches it",
-    "WEB-001: declares recordDeviceConsent (onAction) and no component reaches it",
-    "WEB-001: declares decideRecommendations (onLoad) and no component reaches it"
-   ],
    "id": "check-screen-wiring/S-OP-UNREACHED"
   },
   {
@@ -79,11 +59,6 @@
    "strict": 0,
    "tickets": 758,
    "due_soon": 341,
-   "examples": [
-    "acceptVenueLabelProposals (VenueOpsService, operations) reads ai.proposed_action, which AiService (ticvai-ai) owns, raw: ask a declared query (x-ticvai-read-via) or, within one deployable and for bulk",
-    "acceptWalkwayProposals (VenueOpsService, operations) reads ai.proposed_action, which AiService (ticvai-ai) owns, raw: ask a declared query (x-ticvai-read-via) or, within one deployable and for bulk da",
-    "accrueLoyaltyPoints (MarketingService, operations) reads orders.sales_order, which OrderService (commerce) owns, raw: ask a declared query (x-ticvai-read-via) or, within one deployable and for bulk da"
-   ],
    "id": "check-cross-module-reads/XR-UNCOVERED"
   },
   {
@@ -96,11 +71,6 @@
    "strict": 0,
    "tickets": 561,
    "due_soon": 268,
-   "examples": [
-    "access.access_change.old_access_id NOT NULL -> access.attraction_access by convention only",
-    "access.access_incident.venue_id NOT NULL -> platform.scope by precedent only",
-    "access.access_map.venue_id NOT NULL -> platform.scope by precedent only"
-   ],
    "id": "check-storage-promises/SP-KEY-UNDECLARED"
   },
   {
@@ -113,11 +83,6 @@
    "strict": 0,
    "tickets": 474,
    "due_soon": 257,
-   "examples": [
-    "EMP-001 (P06-staff-app): frame notStarted and no prototype, workshop board, reference frame or boardFrames",
-    "EMP-002 (P06-staff-app): frame notStarted and no prototype, workshop board, reference frame or boardFrames",
-    "EMP-003 (P06-staff-app): frame notStarted and no prototype, workshop board, reference frame or boardFrames"
-   ],
    "id": "check-wireframe-coverage/W-NO-DESIGN"
   },
   {
@@ -130,11 +95,6 @@
    "strict": 0,
    "tickets": 468,
    "due_soon": 235,
-   "examples": [
-    "ai.setAiRiskRegisterEntry takes entryId and none of ai.risk_register, ai.risk_register has entry_id",
-    "assets.searchMedia takes collectionId and none of assets.media_asset has collection_id",
-    "assets.setMediaAssetTags takes assetId and none of assets.tag, assets.tag has asset_id"
-   ],
    "id": "check-parameter-columns/P-PARAM-NO-COLUMN"
   },
   {
@@ -147,11 +107,6 @@
    "strict": 0,
    "tickets": 490,
    "due_soon": 212,
-   "examples": [
-    "acceptFnbOrder: 409 (Already accepted, cancelled, or the outl) names no problem type",
-    "acceptShiftVariance: 409 (Shift is not `pendingVariance` (problem ) names no problem type",
-    "acceptWorkOrder: 409 (Not assigned to this principal, or alrea) names no problem type"
-   ],
    "id": "check-contract-shapes/C-ERROR-PROBLEM-TYPE"
   },
   {
@@ -164,11 +119,6 @@
    "strict": 0,
    "tickets": 419,
    "due_soon": 211,
-   "examples": [
-    "setAccreditationStatus.effectiveFrom: on (inline), not on AccreditationHolder (accreditation.holder), no column in accreditation.audit, accreditation.credential, accreditation.holder, platform.outbox",
-    "setAccreditationStatus.reviewAt: on (inline), not on AccreditationHolder (accreditation.holder), no column in accreditation.audit, accreditation.credential, accreditation.holder, platform.outbox",
-    "setAiCredential.secret: on (inline), not on AiProvider (ai.provider), no column in ai.provider"
-   ],
    "id": "check-request-fields-stored/RF-REQUEST-NOT-STORED"
   },
   {
@@ -181,11 +131,6 @@
    "strict": 0,
    "tickets": 511,
    "due_soon": 198,
-   "examples": [
-    "actOnWaiverRequirements (venue) writes marketing.message_dispatch, which only the tenant root writes (apply_subject_rls): give the table a scope or run the operation at tenant",
-    "activateGiftCard (venue) reads wallet.gift_card, which only the tenant root reads (apply_subject_rls): open its SELECT (x-ticvai-rls) or run the operation at tenant",
-    "activateGiftCard (venue) writes wallet.gift_card, which only the tenant root writes (apply_subject_rls): give the table a scope or run the operation at tenant"
-   ],
    "id": "check-rls-scope-fit/RF-TENANT-ROOT"
   },
   {
@@ -198,11 +143,6 @@
    "strict": 0,
    "tickets": 356,
    "due_soon": 171,
-   "examples": [
-    "accreditation.AccreditationApplication.requirementStatus persists to accreditation.application and no column or child table holds it",
-    "accreditation.AccreditationNotificationRules.rules persists to accreditation.notification_rules and no column or child table holds it",
-    "accreditation.AccreditationProgramme.categories persists to accreditation.programme and no column or child table holds it"
-   ],
    "id": "check-contract-storage/ST-FIELD-NO-COLUMN"
   },
   {
@@ -215,11 +155,6 @@
    "strict": 0,
    "tickets": 342,
    "due_soon": 159,
-   "examples": [
-    "accreditation.verifyAccreditationCredential's description names access.accreditation_credential and its lineage does not list it",
-    "ai.listIndexSources's description names catalogue.product and its lineage does not list it",
-    "fnb.setFnbReservationPolicy's description names fnb.service_charge_policy and its lineage does not list it"
-   ],
    "id": "check-parameter-columns/P-NAMED-TABLE"
   },
   {
@@ -232,11 +167,6 @@
    "strict": 0,
    "tickets": 337,
    "due_soon": 155,
-   "examples": [
-    "accreditation.AccreditationApplication.requirementStatus persists to accreditation.application and no column or child table holds it",
-    "accreditation.AccreditationNotificationRules.rules persists to accreditation.notification_rules and no column or child table holds it",
-    "accreditation.AccreditationProgramme.categories persists to accreditation.programme and no column or child table holds it"
-   ],
    "id": "check-storage-promises/SP-ARRAY-NOWHERE"
   },
   {
@@ -249,11 +179,6 @@
    "strict": 0,
    "tickets": 449,
    "due_soon": 134,
-   "examples": [
-    "getAssetHistory: paged by cursor and states no order that names a field",
-    "getForecastAccuracy: paged by cursor and states no order that names a field",
-    "getOutletStock: paged by cursor and states no order that names a field"
-   ],
    "id": "check-contract-shapes/C-PAGED-ORDER"
   },
   {
@@ -266,11 +191,6 @@
    "strict": 0,
    "tickets": 242,
    "due_soon": 131,
-   "examples": [
-    "reporting.acknowledgeAlert: note is said to be stored and reaches no column of reporting.alert",
-    "maintenance.addIncidentPerson: phone is said to be stored and reaches no column of maintenance.incident_involved_party",
-    "maintenance.addIncidentPerson: email is said to be stored and reaches no column of maintenance.incident_involved_party"
-   ],
    "id": "check-stored-request-fields/SR-STORED-NO-COLUMN"
   },
   {
@@ -283,11 +203,6 @@
    "strict": 0,
    "tickets": 290,
    "due_soon": 122,
-   "examples": [
-    "access.access_area.support_multi_park_environments: a boolean that does not read as an assertion",
-    "access.access_point.vehicle_location_capture: a boolean that does not read as an assertion",
-    "access.accreditation_credential.admits: a boolean that does not read as an assertion"
-   ],
    "id": "check-ddl-conventions/D-NAMING"
   },
   {
@@ -300,11 +215,6 @@
    "strict": 2,
    "tickets": 271,
    "due_soon": 120,
-   "examples": [
-    "access.access_change is tenant-root only; old_access_id -> access.attraction_access (apply_scope_rls) is a convention, not a declared key, and replaceCredential writes it below tenant",
-    "assets.media_collection_member is tenant-root only; collection_id -> assets.media_collection (apply_venue_rls) is a convention, not a declared key, and createCollection, updateMediaAsset (delivery sli",
-    "assets.media_collection_member is tenant-root only; asset_id -> assets.media_asset (apply_venue_rls) is a convention, not a declared key, and createCollection, updateMediaAsset (delivery slice) writes"
-   ],
    "id": "check-storage-promises/SP-KEY-TENANT-FALLBACK"
   },
   {
@@ -317,11 +227,6 @@
    "strict": 0,
    "tickets": 212,
    "due_soon": 115,
-   "examples": [
-    "access.setVirtualTicketIdentity writes access.configuration_change, access.credential_policy and VirtualTicketIdentityMasterRecordConfigurationInput says no table stores its fields",
-    "access.setDigitalBarcodeTicket writes access.configuration_change, access.media_template and DigitalQrBarcodeTicketDesignerInput says no table stores its fields",
-    "access.setAppleWalletPass writes access.configuration_change, access.media_template and AppleWalletPassDesignerInput says no table stores its fields"
-   ],
    "id": "check-parameter-columns/P-DRAFTED-UNMAPPED"
   },
   {
@@ -334,11 +239,6 @@
    "strict": 1,
    "tickets": 196,
    "due_soon": 114,
-   "examples": [
-    "AM-ADMISSION-ACCESS-P01 (P01 guest, block A): lists enrolFaceTag (SVC-ACCESS-ACCESS-2), which is for staff",
-    "AM-ADMISSION-ACCESS-P02 (P02 guest, block A): lists approveManualOverrideSupervisor (SVC-ACCESS-ACCESS-1), which is for staff",
-    "AM-ADMISSION-ACCESS-P02 (P02 guest, block A): lists deleteAccessPointGroup (SVC-ACCESS-ACCESS-1), which is for staff"
-   ],
    "id": "check-audience-match/AM-TICKET-OP"
   },
   {
@@ -351,11 +251,6 @@
    "strict": 0,
    "tickets": 220,
    "due_soon": 104,
-   "examples": [
-    "approveBookingLimitCommercial: PUT /booking-limit-commercial has no path key and is not a singleton",
-    "approveCampaignWorkflow: PUT /campaign-workflow has no path key and is not a singleton",
-    "approveDecision: PUT /decision has no path key and is not a singleton"
-   ],
    "id": "check-contract-shapes/C-NO-ADDRESS"
   },
   {
@@ -368,11 +263,6 @@
    "strict": 0,
    "tickets": 180,
    "due_soon": 101,
-   "examples": [
-    "EMP-071: emptyFirstRun 'carries the create action' and no create operation",
-    "EMP-072: emptyFirstRun 'carries the create action' and no create operation",
-    "EMP-072: emptyNoResults names a filter and the screen has no filter or search"
-   ],
    "id": "check-screen-wiring/S-STATE-BOILERPLATE"
   },
   {
@@ -385,11 +275,6 @@
    "strict": 0,
    "tickets": 225,
    "due_soon": 96,
-   "examples": [
-    "guest group home: 3 operation(s) on one shell only, e.g. getMyProfile, listProductCategories, searchCatalogue",
-    "guest group search: 1 operation(s) on one shell only, e.g. listProducts",
-    "guest group detail: 3 operation(s) on one shell only, e.g. getBundle, getPerformance, getVenueMap"
-   ],
    "id": "check-navigation/N-TWIN-OPS"
   },
   {
@@ -402,11 +287,6 @@
    "strict": 0,
    "tickets": 238,
    "due_soon": 93,
-   "examples": [
-    "WEB-008: purpose is a template: 'See add-ons & upsell for this venue.'",
-    "WEB-018: purpose is a template: 'Find my tickets for this venue.'",
-    "WEB-019: purpose is a template: 'Find order history for this venue.'"
-   ],
    "id": "check-screen-wiring/S-PURPOSE-BOILERPLATE"
   },
   {
@@ -419,11 +299,6 @@
    "strict": 0,
    "tickets": 203,
    "due_soon": 92,
-   "examples": [
-    "WEB-008: addCartLine has purpose 'Add something'",
-    "WEB-010: addCartLine has purpose 'Add something'",
-    "WEB-033: addCartLine has purpose 'Add something'"
-   ],
    "id": "check-screen-wiring/S-PURPOSE-TEMPLATE"
   },
   {
@@ -436,11 +311,6 @@
    "strict": 0,
    "tickets": 164,
    "due_soon": 86,
-   "examples": [
-    "access.entry_rule_point.admission_profile_id references access.admission_rules",
-    "access.scan_event.ticket_id references access.entitlement",
-    "ai.proposed_action.interaction_id references ai.activity"
-   ],
    "id": "check-ddl-conventions/D-FK-TARGET-NAME"
   },
   {
@@ -453,11 +323,6 @@
    "strict": 0,
    "tickets": 182,
    "due_soon": 78,
-   "examples": [
-    "GST-008: button 'Continue' calls addCartLine, which takes a body, and nothing on the screen collects it",
-    "GST-052: button 'Use this plan' calls generateVisitPlan, which takes a body, and nothing on the screen collects it",
-    "GST-054: button 'Apply this change' calls updateVisitPlan, which takes a body, and nothing on the screen collects it"
-   ],
    "id": "check-screen-wiring/S-BUTTON-FORM"
   },
   {
@@ -470,11 +335,6 @@
    "strict": 0,
    "tickets": 160,
    "due_soon": 68,
-   "examples": [
-    "acceptFnbOrder 409 names outlet (TenancyService) and has no x-ticvai-read-via to a query of TenancyService",
-    "acquireInventoryHold 403 names cart (OrderService) and has no x-ticvai-read-via to a query of OrderService",
-    "actOnPartnerSettlementBatch 409 names settlement (LedgerService) and has no x-ticvai-read-via to a query of LedgerService"
-   ],
    "id": "check-error-sources/E-READ-VIA"
   },
   {
@@ -487,11 +347,6 @@
    "strict": 0,
    "tickets": 168,
    "due_soon": 67,
-   "examples": [
-    "acknowledgeAlert: POST /alerts/{alertId}/acknowledge acts on an item and declares no 409",
-    "acknowledgeAnnouncement: POST /announcements/{announcementId}/acknowledge acts on an item and declares no 409",
-    "activateJourney: POST /journeys/{journeyId}/activate acts on an item and declares no 409"
-   ],
    "id": "check-contract-shapes/C-ACTION-409"
   },
   {
@@ -504,11 +359,6 @@
    "strict": 0,
    "tickets": 209,
    "due_soon": 66,
-   "examples": [
-    "answerConfigurationQuestion (venue) reads ai.policy, written only at tenant (tenant), so its rows sit above the reader: x-ticvai-rls read-beneath, or say why the reader sees none",
-    "askReportingQuestion (venue) reads ai.policy, written only at tenant (tenant), so its rows sit above the reader: x-ticvai-rls read-beneath, or say why the reader sees none",
-    "askReportingQuestion (venue) reads reporting.kpi_definition, written only at tenant (tenant), so its rows sit above the reader: x-ticvai-rls read-beneath, or say why the reader sees none"
-   ],
    "id": "check-rls-scope-fit/RF-OWNED-ABOVE"
   },
   {
@@ -521,11 +371,6 @@
    "strict": 0,
    "tickets": 138,
    "due_soon": 61,
-   "examples": [
-    "acceptFnbOrder 409 names outlet (TenancyService) and declares no x-ticvai-problem-types",
-    "actOnPartnerSettlementBatch 409 names settlement (LedgerService) and declares no x-ticvai-problem-types",
-    "addCartLine 409 names product (CatalogueService) and declares no x-ticvai-problem-types"
-   ],
    "id": "check-error-sources/E-PROBLEM-TYPE"
   },
   {
@@ -538,11 +383,6 @@
    "strict": 0,
    "tickets": 103,
    "due_soon": 60,
-   "examples": [
-    "exportSubjectData (IdentityService, foundation) reads marketing.consent_record of MarketingService (engagement): Identity reads nothing above it but a projection",
-    "exportSubjectData (IdentityService, foundation) reads marketing.form_submission of MarketingService (engagement): Identity reads nothing above it but a projection",
-    "exportSubjectData (IdentityService, foundation) reads marketing.guest_document of MarketingService (engagement): Identity reads nothing above it but a projection"
-   ],
    "id": "check-cross-module-reads/XR-FOUNDATION"
   },
   {
@@ -555,11 +395,6 @@
    "strict": 0,
    "tickets": 125,
    "due_soon": 53,
-   "examples": [
-    "WEB-001: recordRecommendationEvents answers 202 and the screen reads nothing from ai to follow it",
-    "WEB-008: recordRecommendationEvents answers 202 and the screen reads nothing from ai to follow it",
-    "WEB-018: transferOrderTickets answers 202 and the screen reads nothing from orders to follow it"
-   ],
    "id": "check-screen-wiring/S-ASYNC-POLL"
   },
   {
@@ -572,11 +407,6 @@
    "strict": 0,
    "tickets": 118,
    "due_soon": 52,
-   "examples": [
-    "EMP-005: region 'contextPanel' appears 2 times",
-    "EMP-071: region 'contentBody' appears 2 times",
-    "EMP-081: region 'contentBody' appears 2 times"
-   ],
    "id": "check-screen-wiring/S-DUP-REGION"
   },
   {
@@ -589,11 +419,6 @@
    "strict": 0,
    "tickets": 112,
    "due_soon": 45,
-   "examples": [
-    "GST-009 (P02): createPayment is offline-capable (outbox, 4.4); the screen refuses it offline: **Not available, and the offline banner says why.** A payment needs the gateway, and pretending othe",
-    "GST-010 (P02): reprintOrder is offline-capable (outbox, 4.4); the screen refuses it offline: **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything",
-    "GST-034 (P02): recordLostItem is offline-capable (outbox, 4.4); the screen refuses it offline: **The offline banner shows.** Reports already loaded stay read-only with their age. **Reporting a lo"
-   ],
    "id": "check-screen-wiring/S-OFFLINE-REFUSED"
   },
   {
@@ -606,11 +431,6 @@
    "strict": 0,
    "tickets": 68,
    "due_soon": 45,
-   "examples": [
-    "approvals.external_provider.outbound_credential stores approvals.ApprovalExternalProvider.outboundCredential, a write-only secret, and the contract does not say how (x-ticvai-secret: argon2id-phc | bl",
-    "approvals.external_provider.signing_secret stores approvals.ApprovalExternalProvider.signingSecret, a write-only secret, and the contract does not say how (x-ticvai-secret: argon2id-phc | blind-index ",
-    "control.webhook_subscription.signing_secret stores public-api.WebhookSubscription.signingSecret, a write-only secret, and the contract does not say how (x-ticvai-secret: argon2id-phc | blind-index | f"
-   ],
    "id": "check-contract-storage/ST-SECRET-FORM"
   },
   {
@@ -623,11 +443,6 @@
    "strict": 0,
    "tickets": 120,
    "due_soon": 43,
-   "examples": [
-    "POS-012 (P04): offline state promises to queue or sync and does not say reserveMerchandise (not offline-capable) is disabled offline: **Working from the local journal.** The till keeps taking money; t",
-    "POS-012 (P04): offline state promises to queue or sync and does not say collectShopAndDrop (not offline-capable) is disabled offline: **Working from the local journal.** The till keeps taking money; t",
-    "POS-013 (P04): offline state promises to queue or sync and does not say syncOrders (not offline-capable) is disabled offline: **Working from the local journal.** The till keeps taking money; this reco"
-   ],
    "id": "check-screen-wiring/S-OFFLINE-QUEUED"
   },
   {
@@ -640,11 +455,6 @@
    "strict": 0,
    "tickets": 73,
    "due_soon": 42,
-   "examples": [
-    "WEB-012 (P01-guest-web-storefront): createPayment is workstation-scoped and nothing on P01-guest-web-storefront signs a workstation in",
-    "WEB-012 (P01-guest-web-storefront): inquirePaymentStatus is workstation-scoped and nothing on P01-guest-web-storefront signs a workstation in",
-    "WEB-033 (P01-guest-web-storefront): createPayment is workstation-scoped and nothing on P01-guest-web-storefront signs a workstation in"
-   ],
    "id": "check-screen-wiring/S-WORKSTATION-OP"
   },
   {
@@ -657,11 +467,6 @@
    "strict": 0,
    "tickets": 55,
    "due_soon": 38,
-   "examples": [
-    "27661",
-    "27668",
-    "27669"
-   ],
    "id": "adam-pull/links ADAM cannot resolve"
   },
   {
@@ -674,11 +479,6 @@
    "strict": 0,
    "tickets": 123,
    "due_soon": 34,
-   "examples": [
-    "27625",
-    "27645",
-    "27687"
-   ],
    "id": "adam-pull/feature: nothing linked"
   },
   {
@@ -691,11 +491,6 @@
    "strict": 0,
    "tickets": 83,
    "due_soon": 34,
-   "examples": [
-    "access.attraction_access.attraction_id -> games.attraction_type: the name rule's pick from another module",
-    "approvals.workflow_instance.current_node_id -> access.edge_node: the name rule's pick from another module",
-    "approvals.workflow_intervention.alternative_node_id -> access.edge_node: the name rule's pick from another module"
-   ],
    "id": "check-storage-promises/SP-KEY-GUESSED"
   },
   {
@@ -708,11 +503,6 @@
    "strict": 0,
    "tickets": 100,
    "due_soon": 33,
-   "examples": [
-    "P01 WEB-025 Help Centre / FAQ: loads listMyCases (onLoad), which needs bearerAuth or guestAuth",
-    "P01 WEB-026 Survey & Feedback: loads listMyOrders (onLoad), which needs guestAuth",
-    "P01 WEB-036 F&B – Browse & Order: loads listMyTableReservations (onLoad), which needs guestAuth"
-   ],
    "id": "check-preauth-session/PS-UNDECLARED-SIGNIN"
   },
   {
@@ -725,11 +515,6 @@
    "strict": 0,
    "tickets": 73,
    "due_soon": 33,
-   "examples": [
-    "GST-001: wireframes/incoming/P02-mobile-v4/gst-001.html is drawn and the record still points at a notStarted frame",
-    "GST-002: wireframes/incoming/P02-mobile-v4/gst-002.html is drawn and the record still points at a notStarted frame",
-    "GST-003: wireframes/incoming/P02-mobile-v4/gst-003.html is drawn and the record still points at a notStarted frame"
-   ],
    "id": "check-wireframe-coverage/W-INCOMING-UNLINKED"
   },
   {
@@ -742,11 +527,6 @@
    "strict": 0,
    "tickets": 67,
    "due_soon": 33,
-   "examples": [
-    "createAccessPoint: creates with a `code` and declares no 409 for a duplicate",
-    "createAccreditationProgramme: creates with a `code` and declares no 409 for a duplicate",
-    "createAdmissionRules: creates with a `code` and declares no 409 for a duplicate"
-   ],
    "id": "check-contract-shapes/C-CODE-409"
   },
   {
@@ -759,11 +539,6 @@
    "strict": 0,
    "tickets": 51,
    "due_soon": 33,
-   "examples": [
-    "GST-063 -> GST-004 carries productId, which GST-063 neither declares, preloads nor reads",
-    "POS-006 -> POS-002 carries cart, which POS-006 neither declares, preloads nor reads",
-    "POS-006 -> POS-002 carries cartHoldExpiresAt, which POS-006 neither declares, preloads nor reads"
-   ],
    "id": "check-navigation/N-CARRIES-HELD"
   },
   {
@@ -776,11 +551,6 @@
    "strict": 0,
    "tickets": 76,
    "due_soon": 32,
-   "examples": [
-    "inventory.StockMovement.balanceAfter is optional; inventory.movement.balance_after is NOT NULL with no default",
-    "inventory.StockMovement.itemId is optional; inventory.movement.item_id is NOT NULL with no default",
-    "inventory.StockMovement.kind is optional; inventory.movement.kind is NOT NULL with no default"
-   ],
    "id": "check-contract-storage/ST-REQUIRED-MISMATCH"
   },
   {
@@ -793,11 +563,6 @@
    "strict": 0,
    "tickets": 59,
    "due_soon": 30,
-   "examples": [
-    "WEB-024: offline state promises to queue or sync and none of its 9 write(s) is x-ticvai-offline-capable",
-    "GST-066: offline state promises to queue or sync and none of its 4 write(s) is x-ticvai-offline-capable",
-    "GST-067: offline state promises to queue or sync and none of its 2 write(s) is x-ticvai-offline-capable"
-   ],
    "id": "check-screen-wiring/S-OFFLINE-CLAIM"
   },
   {
@@ -810,10 +575,6 @@
    "strict": 0,
    "tickets": 40,
    "due_soon": 29,
-   "examples": [
-    "platform.venue_settings.org_unit_id is named for a table renamed to platform.scope and sits beside venue_id, all keys to platform.scope",
-    "platform.workstation.org_unit_id is named for a table renamed to platform.scope and sits beside department_id, region_id, venue_id, all keys to platform.scope"
-   ],
    "id": "check-ddl-conventions/D-DOUBLE-KEY"
   },
   {
@@ -826,11 +587,6 @@
    "strict": 0,
    "tickets": 43,
    "due_soon": 27,
-   "examples": [
-    "allocateResources 409 is defined in its schema (ResourceAllocationProblem, ResourceDependency, ResourceRequirement) by product (CatalogueService) and declares no x-ticvai-problem-types and has no x-ti",
-    "changeOwnCredential 422 is defined in its schema (PasswordPolicy.pinLength, PasswordPolicy.pinReusePrevention, PasswordPolicy.reusePreventionCount) by workstation (TenancyService) and has no x-ticvai-",
-    "claimTicketTransfer 410 is defined in its schema (TicketTransferProblem) by entitlement (AccessService) and declares no x-ticvai-problem-types and has no x-ticvai-read-via to a query of AccessService"
-   ],
    "id": "check-error-sources/E-SCHEMA-READ-VIA"
   },
   {
@@ -843,11 +599,6 @@
    "strict": 0,
    "tickets": 81,
    "due_soon": 26,
-   "examples": [
-    "listAppBuilds: lists items whose status can be failed, rejected and says neither which statuses it returns nor takes a status filter",
-    "listAudienceActivations: lists items whose status can be expired, failed and says neither which statuses it returns nor takes a status filter",
-    "listAuthorisationPolicyEffectiveness: lists items whose status can be retired and says neither which statuses it returns nor takes a status filter"
-   ],
    "id": "check-contract-shapes/C-PAGED-STATUS"
   },
   {
@@ -860,11 +611,6 @@
    "strict": 0,
    "tickets": 29,
    "due_soon": 26,
-   "examples": [
-    "27626",
-    "27627",
-    "27628"
-   ],
    "id": "adam-pull/task: nothing linked"
   },
   {
@@ -877,9 +623,6 @@
    "strict": 0,
    "tickets": 50,
    "due_soon": 25,
-   "examples": [
-    "orders#openOrdersForSubject: setCustomerGuestAccount writes orders.sales_order and touches pii.* (whom the record belongs to) without emitting any of guest.merged, order.cancelled, order.completed, or"
-   ],
    "id": "check-error-sources/E-UNFED"
   },
   {
@@ -892,11 +635,6 @@
    "strict": 0,
    "tickets": 86,
    "due_soon": 24,
-   "examples": [
-    "awardBadge: request body requires server-owned status",
-    "buildProductionPlan: request body requires server-owned id, status",
-    "configureQueueFeed: request body requires server-owned id"
-   ],
    "id": "check-contract-shapes/C-REQUEST-SERVER-FIELDS"
   },
   {
@@ -909,11 +647,6 @@
    "strict": 0,
    "tickets": 53,
    "due_soon": 24,
-   "examples": [
-    "catalogue.performance_media: no NOT NULL declared key to catalogue.performance (has performance_id -> catalogue.performance (convention))",
-    "fnb.menu_item: no NOT NULL declared key to fnb.menu (has menu_section_id -> fnb.menu_section (convention))",
-    "maintenance.incident_media: no NOT NULL declared key to maintenance.incident (has incident_id -> maintenance.incident (convention))"
-   ],
    "id": "check-ddl-conventions/D-CHILD-PARENT"
   },
   {
@@ -926,11 +659,6 @@
    "strict": 0,
    "tickets": 48,
    "due_soon": 24,
-   "examples": [
-    "contracts/satellite/ai.yaml names ai.interaction, renamed to ai.activity",
-    "contracts/satellite/reporting.yaml names queue.waiting_guest, renamed to queue.entry",
-    "contracts/satellite/subscription.yaml names ai.interaction, renamed to ai.activity"
-   ],
    "id": "check-ddl-conventions/D-RENAME-RESIDUE"
   },
   {
@@ -943,11 +671,6 @@
    "strict": 0,
    "tickets": 74,
    "due_soon": 22,
-   "examples": [
-    "POS-008: metric tile None names no operation and binds nothing",
-    "POS-022: metric tile None names no operation and binds nothing",
-    "EMP-071: metric tile 'Arriving Next 30 Min' names no operation and binds nothing"
-   ],
    "id": "check-screen-wiring/S-METRIC-NO-OP"
   },
   {
@@ -960,11 +683,6 @@
    "strict": 0,
    "tickets": 29,
    "due_soon": 19,
-   "examples": [
-    "GST-073: the table shows GuestDevice, the panel GuestSession",
-    "POS-001: the table shows Denomination, the panel Shift",
-    "BO-406: the table shows Reader, the panel RegisteredDevice"
-   ],
    "id": "check-screen-wiring/S-PANEL-ENTITY"
   },
   {
@@ -977,11 +695,6 @@
    "strict": 0,
    "tickets": 31,
    "due_soon": 17,
-   "examples": [
-    "identity.IdentityBenefitUsage is written offline by recordBenefitUsage and identity.benefit_usage has no recorded_at",
-    "marketing-crm.FormSubmission is written offline by submitForm and marketing.form_submission has no recorded_at",
-    "marketing-crm.LostItem is written offline by recordLostItem and marketing.lost_item has no recorded_at"
-   ],
    "id": "check-contract-storage/ST-OFFLINE-RECORDED-AT"
   },
   {
@@ -994,11 +707,6 @@
    "strict": 0,
    "tickets": 21,
    "due_soon": 15,
-   "examples": [
-    "identity.evaluateAccess writes identity.authz_audit, which holds only keys, and at, attractionId, attributes, deviceId, eventId, permission, principalId, scopePath, subjectId, venueId reach no column ",
-    "identity.guestPasswordLogin writes identity.guest_session, which holds only keys, and deviceId, identifier, venueId reach no column it writes",
-    "identity.guestSocialLogin writes identity.guest_session, which holds only keys, and deviceId, idToken, provider, venueId reach no column it writes"
-   ],
    "id": "check-stored-request-fields/SR-STUB-WRITE"
   },
   {
@@ -1011,11 +719,6 @@
    "strict": 0,
    "tickets": 40,
    "due_soon": 14,
-   "examples": [
-    "P09-platform-admin-console: ADM-035, ADM-036 declare the same 2 operations",
-    "P08-venue-back-office: ADM-058, ADM-067 declare the same 3 operations",
-    "P08-venue-back-office: ADM-188, ADM-197 declare the same 3 operations"
-   ],
    "id": "check-screen-wiring/S-DUP-SCREEN"
   },
   {
@@ -1028,11 +731,6 @@
    "strict": 0,
    "tickets": 43,
    "due_soon": 13,
-   "examples": [
-    "P01 WEB-026 Survey & Feedback: loads getForm (onLoad), which needs bearerAuth or guestAuth",
-    "P01 WEB-044 AI Concierge – Home: loads requestSuggestion (background), which needs bearerAuth or guestAuth",
-    "P02 GST-031 AI Concierge – Home: loads requestSuggestion (background), which needs bearerAuth or guestAuth"
-   ],
    "id": "check-preauth-session/PS-LOAD-NEEDS-SESSION"
   },
   {
@@ -1045,11 +743,6 @@
    "strict": 0,
    "tickets": 58,
    "due_soon": 11,
-   "examples": [
-    "EMP-003: recordAuthorityNotification takes a file reference and the screen uploads nothing",
-    "EMP-005: attachWorkOrderEvidence takes a file reference and the screen uploads nothing",
-    "EMP-006: attachWorkOrderEvidence takes a file reference and the screen uploads nothing"
-   ],
    "id": "check-screen-wiring/S-UPLOAD"
   },
   {
@@ -1062,10 +755,6 @@
    "strict": 0,
    "tickets": 28,
    "due_soon": 11,
-   "examples": [
-    "getOrder: a guest read returns principalId",
-    "getProduct: a guest read returns approvedByPrincipalId, createdByPrincipalId"
-   ],
    "id": "check-contract-shapes/C-GUEST-INTERNAL"
   },
   {
@@ -1078,11 +767,6 @@
    "strict": 0,
    "tickets": 22,
    "due_soon": 9,
-   "examples": [
-    "WEB-001: recordStorefrontSessionEvents (POST) fires onLoad",
-    "GST-001: recordStorefrontSessionEvents (POST) fires onLoad",
-    "BO-1173: publishWalletConfiguration (POST) fires onLoad"
-   ],
    "id": "check-screen-wiring/S-ONLOAD-WRITE"
   },
   {
@@ -1095,11 +779,6 @@
    "strict": 0,
    "tickets": 11,
    "due_soon": 9,
-   "examples": [
-    "EMP-053: edits a record (put) and reads nothing",
-    "BO-131: edits a record (put) and reads nothing",
-    "BO-146: edits a record (put) and reads nothing"
-   ],
    "id": "check-screen-wiring/S-NO-READ"
   },
   {
@@ -1112,11 +791,6 @@
    "strict": 0,
    "tickets": 22,
    "due_soon": 8,
-   "examples": [
-    "cloneAccreditationProgramme: 409 'A programme with this code already exists at this scope' promises code unique per tenant; the field has no x-ticvai-unique",
-    "cloneGame: 409 '`code` already used by another game in the venue.' promises code unique per venue; the field has no x-ticvai-unique",
-    "createCommercialCampaign: 409 '`code` is already used by another campaign at the venue.' promises code unique per venue; the field has no x-ticvai-unique"
-   ],
    "id": "check-storage-promises/SP-DUPLICATE-409"
   },
   {
@@ -1129,11 +803,6 @@
    "strict": 0,
    "tickets": 20,
    "due_soon": 8,
-   "examples": [
-    "TEST-AM-TENANCY-VENUES-P08-BLOCK-A: Pranay Shinde tests in the plan what they built most of (AM-TENANCY-VENUES-P08-BLOCK-A)",
-    "TEST-AM-TENANCY-VENUES-P08-BLOCK-A: Pranay Shinde tests in the schedule what they built most of (AM-TENANCY-VENUES-P08-BLOCK-A)",
-    "TEST-AM-PRICING-PROMOTIONS-P01: Chinmay Patkar tests in the plan what they built most of (AM-PRICING-PROMOTIONS-P01)"
-   ],
    "id": "check-plan-owners/O-SELF-TEST"
   },
   {
@@ -1146,11 +815,6 @@
    "strict": 0,
    "tickets": 18,
    "due_soon": 6,
-   "examples": [
-    "ADM-089 (P08, Block A1) is reached only through ADM-088, outside it: BO-100 > ADM-088 > ADM-089",
-    "ADM-090 (P08, Block A1) is reached only through ADM-088, outside it: BO-100 > ADM-088 > ADM-090",
-    "ADM-091 (P08, Block A1) is reached only through ADM-088, outside it: BO-100 > ADM-088 > ADM-091"
-   ],
    "id": "check-plan-closure/C-REACH"
   },
   {
@@ -1163,11 +827,6 @@
    "strict": 0,
    "tickets": 10,
    "due_soon": 6,
-   "examples": [
-    "updateDonationCampaign: PATCH body is the persisted schema DonationCampaign and requires amountMode, isActive, name; use an Update<X>Request with minProperties: 1 and no required",
-    "updatePartnerAgreement: PATCH body is the persisted schema PartnerAgreement and requires partnerId, rateMode, validFrom; use an Update<X>Request with minProperties: 1 and no required",
-    "updateRotaAssignment: PATCH body is the persisted schema RotaAssignment and requires endsAt, position, principalId, startsAt, venueId; use an Update<X>Request with minProperties: 1 and no required"
-   ],
    "id": "check-contract-shapes/C-PATCH-FULL-BODY"
   },
   {
@@ -1180,9 +839,6 @@
    "strict": 0,
    "tickets": 6,
    "due_soon": 6,
-   "examples": [
-    "assets.MediaFingerprint.embedding is arr:num, column assets.media_fingerprint.embedding is text[]"
-   ],
    "id": "check-contract-storage/ST-TYPE-MISMATCH"
   },
   {
@@ -1195,11 +851,6 @@
    "strict": 0,
    "tickets": 10,
    "due_soon": 5,
-   "examples": [
-    "marketing.message_delivery: only id, campaign_id",
-    "orders.payment_tip: only id, payment_id",
-    "platform.device_heartbeat: only id, device_id"
-   ],
    "id": "check-ddl-conventions/D-STUB-TABLE"
   },
   {
@@ -1212,11 +863,6 @@
    "strict": 0,
    "tickets": 16,
    "due_soon": 4,
-   "examples": [
-    "listReports: ?search does not say what it matches",
-    "listWaiverTemplateMaster: ?q does not say what it matches",
-    "searchCatalogue: ?q does not say what it matches"
-   ],
    "id": "check-contract-shapes/C-SEARCH-PARAM"
   },
   {
@@ -1229,11 +875,6 @@
    "strict": 0,
    "tickets": 9,
    "due_soon": 4,
-   "examples": [
-    "POS-009: 'Export roster' has no operation",
-    "BO-405: 'Export' has no operation",
-    "BO-1022: 'Export compliance evidence' has no operation"
-   ],
    "id": "check-screen-wiring/S-EXPORT"
   },
   {
@@ -1246,10 +887,6 @@
    "strict": 0,
    "tickets": 9,
    "due_soon": 4,
-   "examples": [
-    "marketing.cookie_scan_policy.frequency holds marketing-crm.CookieScanPolicy.frequency, an enum, as text with no CHECK",
-    "control.url_redirect.status_code holds marketing-crm.UrlRedirect.statusCode, an enum, as text with no CHECK"
-   ],
    "id": "check-contract-storage/ST-ENUM-CHECK"
   },
   {
@@ -1262,11 +899,6 @@
    "strict": 0,
    "tickets": 7,
    "due_soon": 4,
-   "examples": [
-    "table platform.cross_region_entitlement: r5 built it (MIG-PLATFORM-3); no task builds it now and block-a-extra-tasks.json departures gives no reason",
-    "table platform.dsar_request: r5 built it (MIG-PLATFORM); no task builds it now and block-a-extra-tasks.json departures gives no reason",
-    "table platform.guest_link: r5 built it (MIG-PLATFORM); no task builds it now and block-a-extra-tasks.json departures gives no reason"
-   ],
    "id": "check-plan-closure/C-GONE"
   },
   {
@@ -1279,11 +911,6 @@
    "strict": 0,
    "tickets": 6,
    "due_soon": 4,
-   "examples": [
-    "APP-KIOSK-KSK-013 (P05, block D): KSK-013 calls getPublishedKioskConfig; built by APP-KIOSK-CONFIG, SVC-WHITELABEL-KIOSK-2, which neither AM-MARKETING-CRM-P05 nor its dependsOn holds",
-    "APP-KIOSK-KSK-010 (P05, block C): KSK-010 calls getPublishedKioskConfig; built by APP-KIOSK-CONFIG, SVC-WHITELABEL-KIOSK-2, which neither AM-ORDERS-RESERVATIONS-P05 nor its dependsOn holds",
-    "APP-KIOSK-KSK-008 (P05, block C): KSK-008 calls getPublishedKioskConfig; built by APP-KIOSK-CONFIG, SVC-WHITELABEL-KIOSK-2, which neither AM-ORDERS-RESERVATIONS-P05 nor its dependsOn holds"
-   ],
    "id": "check-ticket-scope/S-SCREEN-OP-UNBUILT"
   },
   {
@@ -1296,9 +923,6 @@
    "strict": 0,
    "tickets": 4,
    "due_soon": 4,
-   "examples": [
-    "approvals.setApprovalExternalProvider: outboundCredential is a writeOnly credential that is neither x-ticvai-persisted: false nor stored as a *_hash column (ADR-0071)"
-   ],
    "id": "check-stored-request-fields/SR-SECRET-UNHASHED"
   },
   {
@@ -1311,11 +935,6 @@
    "strict": 0,
    "tickets": 6,
    "due_soon": 3,
-   "examples": [
-    "decideApprovalRequest (approvals): audience public, staff, security bearerAuth",
-    "listApprovalRequests (approvals): audience public, staff, security bearerAuth",
-    "listVenueTypeTemplates (subscription): audience public, staff, security bearerAuth"
-   ],
    "id": "check-audience-match/AM-GUEST-SECURITY"
   },
   {
@@ -1328,11 +947,6 @@
    "strict": 0,
    "tickets": 4,
    "due_soon": 3,
-   "examples": [
-    "P08 BO-454 Card Lifecycle Command Center: getGameCard (apis) is for guest",
-    "P08 BO-455 Card / Credential Profile: getGameCard (apis) is for guest",
-    "P08 BO-457 Last Recharge & Last Activity Tracking: getGameCard (apis) is for guest"
-   ],
    "id": "check-audience-match/AM-STAFF-OP"
   },
   {
@@ -1345,11 +959,6 @@
    "strict": 0,
    "tickets": 4,
    "due_soon": 3,
-   "examples": [
-    "BO-454 (P08-venue-back-office): a staff screen calls getGameCard, audience guest",
-    "BO-455 (P08-venue-back-office): a staff screen calls getGameCard, audience guest",
-    "BO-457 (P08-venue-back-office): a staff screen calls getGameCard, audience guest"
-   ],
    "id": "check-screen-wiring/S-STAFF-AUDIENCE"
   },
   {
@@ -1362,11 +971,6 @@
    "strict": 0,
    "tickets": 4,
    "due_soon": 1,
-   "examples": [
-    "broadcastToGuests: 202 body is a bare object",
-    "cancelMerchandiseReservation: 200 body is a bare object",
-    "collectMerchandiseReservation: 200 body is a bare object"
-   ],
    "id": "check-contract-shapes/C-UNTYPED-BODY"
   },
   {
@@ -1379,9 +983,6 @@
    "strict": 0,
    "tickets": 1,
    "due_soon": 1,
-   "examples": [
-    "MIG-BASELINE does not say it creates the schemas, the ltree extension and the row-level security helpers every later migration assumes (R056)"
-   ],
    "id": "check-ddl-conventions/D-MIG-ORDER"
   },
   {
@@ -1394,9 +995,6 @@
    "strict": 0,
    "tickets": 1,
    "due_soon": 1,
-   "examples": [
-    "tickets require the reference fixture; nothing in the backend starter is named for it (SETUP-SEED builds it)"
-   ],
    "id": "check-starter-fit/SF-DONE-GATES"
   },
   {
@@ -1409,11 +1007,6 @@
    "strict": 0,
    "tickets": 4,
    "due_soon": 0,
-   "examples": [
-    "MIG-CATALOGUE-2 (V1091__catalogue.sql) depends on MIG-CATALOGUE-11 (V1126__catalogue.sql), which would run after it",
-    "MIG-CATALOGUE-3 (V1104__catalogue.sql) depends on MIG-CATALOGUE-11 (V1126__catalogue.sql), which would run after it",
-    "MIG-CATALOGUE-5 (V1118__catalogue.sql) depends on MIG-CATALOGUE-11 (V1126__catalogue.sql), which would run after it"
-   ],
    "id": "check-migration-tickets/M-FILE-ORDER"
   },
   {
@@ -1426,11 +1019,6 @@
    "strict": 0,
    "tickets": 1,
    "due_soon": 0,
-   "examples": [
-    "setDataDiscoveryAccess: body requestId beside the Idempotency-Key header",
-    "setPrivacyAction: body requestId beside the Idempotency-Key header",
-    "setPrivacyRequest: body requestId beside the Idempotency-Key header"
-   ],
    "id": "check-contract-shapes/C-TWO-IDEMPOTENCY"
   },
   {
@@ -1443,11 +1031,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "access schema AccessAccessArea: 'area' - the glossary says Region / Branch",
-    "access AccessBiometricProfile.parkId: 'park' - the glossary says Venue",
-    "access AccessLocationGroupingView.groupId: 'group' - the glossary says Category/Role"
-   ],
    "id": "check-glossary-terms/G-BANNED-NAME"
   },
   {
@@ -1460,11 +1043,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "access.AccessCompanionRule.relationshipType: enum carries 'other' and the schema has no note field for it",
-    "access.AccessFaceReenrolmentAttempt.reasonForReEnrollment: enum carries 'other' and the schema has no note field for it",
-    "access.AccessHardwareModel.deviceCategory: enum carries 'other' and the schema has no note field for it"
-   ],
    "id": "check-contract-shapes/C-ENUM-OTHER"
   },
   {
@@ -1477,11 +1055,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "docs/registers/conflict-status.md: cites sources/client/TAIS_Platform_RFP.pdf, which git does not track",
-    "docs/registers/conflict-status.md: cites sources/rfp/TAIS_Platform_RFP_From_Miracle_Star_Trading_2.p, which git does not track",
-    "docs/registers/conflict-status.md: cites states/entitlement.yaml, which git does not track"
-   ],
    "id": "check-cited-sources/CS-MISSING"
   },
   {
@@ -1494,11 +1067,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "catalogue.PricingDynamicPriceAction.minPrice: money-named and typed number, not Money",
-    "catalogue.PricingDynamicPriceAction.maxPrice: money-named and typed number, not Money",
-    "games.PrizeCost.ticketPrice: money-named and typed integer, not Money"
-   ],
    "id": "check-contract-shapes/C-MONEY-NUMBER"
   },
   {
@@ -1511,11 +1079,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "docs/registers/readiness-closeout.md: cites audit/ticvai/steps.jsonl",
-    "docs/registers/readiness-closeout.md: cites audit/ticvai/steps/Q/BRIEF.md",
-    "docs/active/action-register-22-september.md: cites scratchpad/partial-build-check.jsonl"
-   ],
    "id": "check-cited-sources/CS-OUTSIDE-GIT"
   },
   {
@@ -1528,11 +1091,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "ADR-0015 Tier A class 'Receipt printer': no task in block-a-extra-tasks.json names it (`deviceClasses`) and no `deviceClassesDeferred` entry says why",
-    "ADR-0015 Tier A class 'Cash drawer': no task in block-a-extra-tasks.json names it (`deviceClasses`) and no `deviceClassesDeferred` entry says why",
-    "ADR-0015 Tier A class 'Customer / line display': no task in block-a-extra-tasks.json names it (`deviceClasses`) and no `deviceClassesDeferred` entry says why"
-   ],
    "id": "check-device-tiers/D-TIER-A-UNPLANNED"
   },
   {
@@ -1545,11 +1103,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "P01 ticvai-guest-web: no `observed:` layout; the 50 locations its tickets suggest are assumed",
-    "P02 ticvai-guest-app: no `observed:` layout; the 77 locations its tickets suggest are assumed",
-    "P04 ticvai-pos: no `observed:` layout; the 32 locations its tickets suggest are assumed"
-   ],
    "id": "check-frontend-repos/FR-LAYOUT-UNCONFIRMED"
   },
   {
@@ -1562,11 +1115,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "marketing-crm.LostItem.colour: a colour with no pattern",
-    "resources.ResourceType.displayColour: a colour with no pattern",
-    "seating.SeatCategory.displayColour: a colour with no pattern"
-   ],
    "id": "check-contract-shapes/C-COLOUR-PATTERN"
   },
   {
@@ -1579,11 +1127,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "catalogue.PriceCategory: localises other text (LocalisedText) but its name is one plain string",
-    "catalogue.ProductVariant: localises other text (LocalisedText) but its name is one plain string",
-    "subscription.Tenant: localises other text (LocalisedText) but its name is one plain string"
-   ],
    "id": "check-contract-shapes/C-NAME-LOCALISED"
   },
   {
@@ -1596,9 +1139,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "marketing-crm.CookieScanPolicy.frequency: enum value(s) [False] are not strings"
-   ],
    "id": "check-contract-shapes/C-ENUM-NON-STRING"
   },
   {
@@ -1611,9 +1151,6 @@
    "strict": 0,
    "tickets": 0,
    "due_soon": 0,
-   "examples": [
-    "KSK-013: a guest screen calls endKioskAssist, audience device"
-   ],
    "id": "check-screen-wiring/S-GUEST-AUDIENCE"
   }
  ],
