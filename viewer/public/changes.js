@@ -1394,8 +1394,8 @@ function wireForm() {
 function draw() {
   const rows = shown();
   $('cr-lede').textContent = state.items.length
-    ? `${plural(state.items.length, 'change request')} in ${state.projectName || state.project}: places where the package was found wrong, contradictory or missing something a ticket needs.`
-    : `No change requests in ${state.projectName || state.project} yet: places where the package was found wrong, contradictory or missing something a ticket needs.`;
+    ? `${plural(state.items.length, 'change request')} in ${state.projectName || state.project || 'this project'}: places where the package was found wrong, contradictory or missing something a ticket needs.`
+    : `No change requests in ${state.projectName || state.project || 'this project'} yet: places where the package was found wrong, contradictory or missing something a ticket needs.`;
   $('cr-asof').textContent = state.readAt ? `Read at ${state.readAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
   drawVerdict(rows);
   drawFlow(rows);
@@ -1458,7 +1458,7 @@ function openCr(id, { move = true } = {}) {
   // the address nor the last visit did.
   firstRegistry.then((registry) => {
     const names = Object.fromEntries((registry.projects ?? []).map((p) => [p.id, p.name || p.id]));
-    state.projectName = names[state.project] ?? state.project;
+    state.projectName = names[state.project] ?? state.project ?? '';
     const mineOnly = (state.me?.projects ?? []).map((p) => p.id ?? p);
     for (const id of (mineOnly.length ? mineOnly : Object.keys(names))) {
       const o = new Option(names[id] ?? id, id);
