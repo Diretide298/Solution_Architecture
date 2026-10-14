@@ -128,6 +128,10 @@ python3 tools/derive-entrystate-params.py --apply
 # was available and nothing ran it. Same lesson as index-boards: a derive tool outside this
 # script is a number nobody is keeping true.
 python3 tools/derive-components.py --apply
+# **The invisible wiring, derived from the operations** (Block A audit, 14 October 2026, CHG-SCR-*): the permission a
+# screen is gated on, which declared operation a control binds to, api purposes, internal region ids, and the state
+# notes a generator wrote that promise what the client-approved screen does not have. Never a visible change.
+python3 tools/derive-screen-wiring.py --apply
 
 # **Before the boards are drawn, so every screen knows where it was drawn.** Five P04 screens
 # added by hand from the client-approved POS prototype carried no `wireframe` block at all, and a
