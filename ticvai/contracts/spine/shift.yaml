@@ -111,6 +111,51 @@ tags:
   - name: shift
   - name: cash
 
+# **The rule questions Orders answers about shifts** (decided 14 October 2026, Chinmay: "ask the owner by a
+# declared query", the ADR-0055 amendment; ADAM CR-083, CHG-TEN-004). Shift belongs to Orders
+# (OrderService owns shift.yaml; handoff/service-decomposition.json). A module that refuses on an open shift
+# asks one of these and never reads orders.pos_shift itself: in process inside its own transaction from the
+# commerce deployable (ADR-0055 rule 2), through Orders' service operation from another deployable (rule 4).
+x-ticvai-queries:
+  openShiftForWorkstation:
+    module: shift
+    inputs:
+      workstationId: { type: string, format: uuid }
+    returns:
+      type: object
+      nullable: true
+      description: The open shift on the workstation, or null when there is none.
+      properties:
+        shiftId: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/ShiftStatus' }
+        principalId: { type: string, format: uuid }
+    rule: >
+      A shift is open on a workstation while its status is any state before closed or autoClosed in
+      states/shift.yaml: pendingApproval, open, suspended, pendingClosure, pendingVariance. closed and
+      autoClosed end it (closed is left only by the reversal reopenShift, which makes it open again). At most
+      one such shift is returned: openShift refuses a second while one is open or suspended, and of several
+      (a new shift beside one still pendingVariance or pendingClosure) the most recently opened is returned.
+      The caller that changes the workstation locks its platform.workstation row (SELECT ... FOR UPDATE)
+      before it asks, in the same transaction, so no shift opens between the answer and its write.
+    served: [in-process]
+  openShiftsInScope:
+    module: shift
+    inputs:
+      scopePath: { type: string, description: 'The venue or tenant scope path; shifts at it or beneath it.' }
+    returns:
+      type: array
+      items:
+        type: object
+        properties:
+          shiftId: { type: string, format: uuid }
+          workstationId: { type: string, format: uuid }
+          principalId: { type: string, format: uuid }
+          status: { $ref: '#/components/schemas/ShiftStatus' }
+    rule: >
+      Every shift at or beneath the scope path that is open by the rule of openShiftForWorkstation
+      (pendingApproval, open, suspended, pendingClosure, pendingVariance), one entry per shift.
+    served: [in-process, service]
+
 paths:
   /shifts:
     get:

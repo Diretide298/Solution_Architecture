@@ -2441,9 +2441,21 @@ paths:
         **Region cannot change.** Moving a tenant across a residency boundary is not a migration, it is
         an export, and it is refused here.
 
+        **Open shifts are asked of Orders in the tenant''s cell** (decided 14 October 2026, Chinmay, ADAM
+        CR-083; CHG-TEN-004; ADR-0055 rule 4). The Control Plane runs in another deployable from the
+        tenant''s data, so it asks Orders'' declared query `openShiftsInScope(scopePath)` for the tenant''s
+        root scope through Orders'' service route, never by reading `orders.pos_shift`; open means every
+        state before `closed` or `autoClosed` (the query''s rule in shift.yaml), and any is `409
+        shift-open`. Orders'' published service operation for the query is not written yet (a follow-up of
+        CHG-TEN-004).
+
         '
       tags:
       - cell
+      x-ticvai-read-via:
+      - query: shift#openShiftsInScope
+        route: service
+        for: "the open-shift refusal (409 shift-open)"
       x-ticvai-permission: PLATFORM_CELL_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -2488,10 +2500,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/TenantMigrationPlan'
         '409':
-          description: 'Region mismatch, schema versions differ, or the tenant has open shifts. A tenant
-            mid-trade cannot be moved — a cutover during a shift loses the drawer.
+          description: 'Region mismatch (`region-mismatch`), schema versions differ (`schema-version-mismatch`),
+            or the tenant has open shifts (`shift-open`, from Orders'' `openShiftsInScope`; CHG-TEN-004). A
+            tenant mid-trade cannot be moved — a cutover during a shift loses the drawer.
 
             '
+          x-ticvai-problem-types:
+          - region-mismatch
+          - schema-version-mismatch
+          - shift-open
           content:
             application/problem+json:
               schema:

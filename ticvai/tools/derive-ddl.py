@@ -71,7 +71,9 @@ contract). **Uniqueness is carried where the contract marks it**: a property wit
 28 September). A contract schema's `x-ticvai-unique-together: [[a, b, ...]]` is a unique index over
 several columns, each named by property or by column (CHG-R6-006). **A text member of either is
 indexed as `lower(column)`**, so a code is unique whatever its case, as common.yaml says; an opaque
-external id marked `x-ticvai-unique-compare: exact` is not (CHG-GEN-001). Uniqueness and immutability rules
+external id marked `x-ticvai-unique-compare: exact` is not (CHG-GEN-001). `x-ticvai-required-when:
+{prop: {other: value}}` is a table CHECK that the column is set on rows where `other` is `value`
+(CHG-TEN-001: a product tile names its variant). Uniqueness and immutability rules
 the contracts state only in prose are not -- there is nothing machine-readable to derive them from.
 **A storage-only column carries its own `enum`** (and `maxLength`, `default`) on its schema-reference
 record, and gets the same CHECK (CHG-R6-001).
@@ -1190,6 +1192,15 @@ def table_marks(cols: dict, tables) -> dict:
         rls = marks.get("x-ticvai-rls")
         if rls is not None:
             entry["rls"] = str(rls).strip()
+        # **A field needed for one kind of row only** (CHG-TEN-001, ADAM CR-080): `x-ticvai-required-when`
+        # maps a property to the values that require it, `{variantId: {kind: product}}`, so a product tile
+        # with no variant cannot be stored. Becomes `CHECK (<when> IS DISTINCT FROM 'v' OR <col> IS NOT NULL)`.
+        rw = marks.get("x-ticvai-required-when")
+        if isinstance(rw, dict) and rw:
+            entry["required_when"] = [
+                (column_of(str(p)) or f"?{p}",
+                 {(column_of(str(k)) or f"?{k}"): v for k, v in (cond or {}).items()})
+                for p, cond in rw.items() if isinstance(cond, dict) and cond]
         if len(entry) > 1:
             out[t] = entry
     return out
@@ -1903,6 +1914,20 @@ def main() -> int:
             if not inline_pk and pk_cols:
                 body.append(f"    CONSTRAINT {obj_name(short, suffix='pkey')} PRIMARY KEY "
                             f"({', '.join(q(k) for k in pk_cols)})")
+            # `x-ticvai-required-when` (CHG-TEN-001): a column required only for some rows, as a table CHECK.
+            for rcol, cond in (marks.get(t) or {}).get("required_when") or []:
+                bad = [k[1:] for k in [rcol, *cond] if k.startswith("?")]
+                if bad:
+                    no_unique.append(f"{t} (x-ticvai-required-when {rcol}): {', '.join(bad)} is not a column")
+                    continue
+                exempt = []
+                for k, v in sorted(cond.items()):
+                    vals = v if isinstance(v, list) else [v]
+                    lits = ", ".join(sql_literal(x) for x in vals)
+                    exempt.append(f"{q(k)} IS DISTINCT FROM {lits}" if len(vals) == 1
+                                  else f"{q(k)} IS NULL OR {q(k)} NOT IN ({lits})")
+                body.append(f"    CONSTRAINT {obj_name(short, rcol, 'when', suffix='chk')} CHECK ("
+                            f"{' OR '.join(exempt)} OR {q(rcol)} IS NOT NULL)")
             out.append(",\n".join(body))
             # ADR-0056: range-partitioned by month; the partitions are in 930-partitioning.sql.
             out.append(f") PARTITION BY RANGE ({q(part_col)});" if part_col else ");")

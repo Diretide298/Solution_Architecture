@@ -250,6 +250,10 @@ COLUMN_RENAMES = [
      "why": "CR-014: one spelling throughout"},
     {"table": "rental.agreement_item", "from": "stock_reservation_id", "to": "stock_earmark_id", "on": "2026-10-12",
      "why": "CR-014: a key names the table it references (inventory.stock_earmark)"},
+    # CHG-TEN-001 (ADAM CR-080, 14 October 2026)
+    {"table": "platform.sale_board_tile", "from": "page_id", "to": "sale_board_page_id", "on": "2026-10-14",
+     "why": "CR-080: the tile is SaleBoard.pages[].tiles[] and its parent key is derived as sale_board_page_id; the "
+            "relationship graph's old page_id would be a second key to the same page (D-DOUBLE-KEY)"},
 ]
 
 

@@ -1,0 +1,74 @@
+id: CHG-TEN-004
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'Whether a shift is open is asked of Orders by declared queries in shift.yaml (openShiftForWorkstation,
+  openShiftsInScope); configureWorkstation locks the workstation row, asks in process in the same transaction and
+  refuses 409 shift-open naming the shift; revokeAllSessions asks the same in process and planTenantMigration by
+  Orders'' service route; the lineage reads orders.pos_shift.'
+decision:
+  what: 'contracts/spine/shift.yaml top-level x-ticvai-queries: openShiftForWorkstation(workstationId) served
+    in-process, and openShiftsInScope(scopePath) served in-process and service. Open = every state before closed or
+    autoClosed in states/shift.yaml: pendingApproval, open, suspended, pendingClosure, pendingVariance (closed is left
+    only by the reversal reopenShift). configureWorkstation: x-ticvai-read-via shift#openShiftForWorkstation
+    in-process; the description says Tenancy takes SELECT ... FOR UPDATE on the platform.workstation row before it
+    asks, in the same transaction, which serialises against openShift''s key-share lock through its foreign key; the
+    409 declares problem type shift-open and WorkstationShiftOpenProblem (shiftId, shiftStatus). identity
+    revokeAllSessions: read-via shift#openShiftsInScope in-process for openShiftsAffected. subscription
+    planTenantMigration: read-via shift#openShiftsInScope route service, and its 409 names region-mismatch,
+    schema-version-mismatch and shift-open. Lineage: configureWorkstation, revokeAllSessions and planTenantMigration
+    read orders.pos_shift (tools/applied/tenancy-reads-14-october.py).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-083 (ticket #30794): configureWorkstation refused 409 "a shift is open" (tenancy.yaml:1462, 1495-1502)
+  with no problem type, no definition of open and no read of orders.pos_shift in its lineage (it read platform.device
+  and platform.workstation only). Shift belongs to Orders (handoff/service-decomposition.json; OrderService owns
+  shift.yaml), Tenancy and Orders share the commerce deployable (ADR-0055 rule 2), and only shift.closed is an event,
+  so an event-fed flag would race; correctness needs the row lock before the question. revokeAllSessions
+  (identity.yaml:3613) reports open shifts with the same hidden read, planTenantMigration refuses on them from another
+  deployable (rule 4). Lead''s decision of 14 October 2026 (audit, CR-083 DECISION: Option A, a declared Orders
+  query, the shift state machine''s non-terminal states, problem type shift-open, lineage corrected).'
+keys_touched:
+  operations:
+  - configureWorkstation
+  - revokeAllSessions
+  - planTenantMigration
+  schemas:
+  - WorkstationShiftOpenProblem
+  tables:
+  - orders.pos_shift
+  - platform.workstation
+  files:
+  - contracts/spine/shift.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/identity.yaml
+  - contracts/satellite/subscription.yaml
+  - tools/applied/tenancy-reads-14-october.py
+  - handoff/api-data-lineage.json
+  - handoff/audit-baseline.json
+  other:
+  - shift#openShiftForWorkstation
+  - shift#openShiftsInScope
+root_class: A22 LINEAGE
+tickets:
+  started:
+  - '#30794 (CR-082/CR-083; a comment and a linked delta ticket, never a rewrite)'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-083
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  states/shift.yaml lists only autoClosed as terminal because closed can be reopened (isReversal); the lead''s "every
+  non-terminal state" is read as every state before closed or autoClosed, since counting closed would make every
+  till unconfigurable. Consequence stated in the query rule: a till whose last shift waits as pendingClosure or
+  pendingVariance cannot be reconfigured until a supervisor resolves it, though openShift may open the next shift
+  (it refuses only on open or suspended). A second query (openShiftsInScope) was declared because revokeAllSessions
+  and planTenantMigration ask about a venue or a tenant, not one workstation. Prevention: configureWorkstation:409
+  is out of the C-ERROR-PROBLEM-TYPE baseline, so check-contract-shapes fails if the problem type goes; GEN''s
+  read-via lineage check covers the read. Follow-ups: Orders'' published serviceAuth operation for openShiftsInScope
+  (planTenantMigration''s service route) is not written; the ADR-0028/0055 shift-owner text is GEN''s.'

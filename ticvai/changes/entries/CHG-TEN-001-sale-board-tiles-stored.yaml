@@ -1,0 +1,82 @@
+id: CHG-TEN-001
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'A sale board is stored as three tables: SaleBoard persists to platform.sale_board + sale_board_page +
+  sale_board_tile, so each tile gets its columns, a NOT NULL sale_board_page_id and its page''s row-level security;
+  a tile that acts names what it acts on (variant, category or action), a position holds one tile per page, and a
+  duplicate board code is 409 duplicate-code.'
+decision:
+  what: 'contracts/spine/tenancy.yaml: SaleBoard x-ticvai-persistence "platform.sale_board + platform.sale_board_page +
+    platform.sale_board_tile" (the grandchild through the ''+'' chain, CHG-R1S-006); the tile is a named schema
+    SaleBoardTile (x-ticvai-persistence platform.sale_board_tile) with x-ticvai-unique-together
+    [sale_board_page_id, position] and x-ticvai-required-when {variantId: kind product, categoryId: kind category,
+    actionCode: kind action}; additive categoryId and actionCode (enum holdSale, recallHeld, applyDiscount,
+    guestLookup, scanMedia, reprintReceipt, proposed from the POS-002 sell screen, client to correct); colour gets the
+    #rrggbb pattern the r0 table had (char(7)); SaleBoard.code x-ticvai-unique: venue, and createSaleBoard and
+    updateSaleBoard declare 409 duplicate-code (C-CODE-409). The stale relationship-graph column page_id is renamed
+    to the derived parent key in tools/derive-schema-history.py COLUMN_RENAMES (no second key, D-DOUBLE-KEY).
+    tools/derive-ddl.py gains the generator rule x-ticvai-required-when (a table CHECK, kind IS DISTINCT FROM
+    ''product'' OR variant_id IS NOT NULL). tools/check-ddl-conventions.py reads a forward migration''s ADD COLUMN, so
+    D-STUB-TABLE sees a stub fixed after r1. publishBundle''s lineage reads platform.sale_board_page too
+    (tools/applied/tenancy-reads-14-october.py). handoff/storage-design.md names the derived constraint.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-080 (ticket #30796): platform.sale_board_tile was id plus a nullable page_id
+  (backend/tenant/010-platform.sql:338-341) under apply_tenant_rls (920:1224), while its board has a venue policy
+  (920:882) and its page a parent policy (920:1007). SaleBoard persisted to "platform.sale_board" alone
+  (tenancy.yaml:4298), and derive-schema finds a nested array''s child only through a ''+'' chain
+  (derive-schema.py:575-630), so every tile field (position, kind, variantId, label, colour, imageAssetRef) had no
+  column and publishBundle shipped empty boards. The deleted hand-written V0003 (e0c86d41f) had page_id NOT NULL,
+  UNIQUE (page_id, position) and CHECK (kind <> ''product'' OR variant_id IS NOT NULL), still promised by
+  handoff/storage-design.md:99. Category and action tiles referenced nothing. Lead''s decision of 14 October 2026
+  (audit of CR-076..CR-084, CR-080 DECISION). The stub was baselined under D-STUB-TABLE (R087).'
+keys_touched:
+  operations:
+  - createSaleBoard
+  - updateSaleBoard
+  - listSaleBoards
+  - publishBundle
+  schemas:
+  - SaleBoard
+  - SaleBoardTile
+  tables:
+  - platform.sale_board
+  - platform.sale_board_tile
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/derive-ddl.py
+  - tools/derive-schema-history.py
+  - tools/check-ddl-conventions.py
+  - tools/applied/tenancy-reads-14-october.py
+  - handoff/api-data-lineage.json
+  - handoff/audit-baseline.json
+  - handoff/storage-design.md
+  tickets:
+  - '#30796'
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started:
+  - '#30796 (CR-080/CR-081; a comment and a linked delta ticket, never a rewrite)'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-080
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Verified with derive-schema, derive-relationships and derive-ddl --apply (derived files restored, not committed):
+  sale_board_tile gets sale_board_page_id uuid NOT NULL (declared FK to sale_board_page), position, kind (CHECK),
+  variant_id, category_id, action_code (CHECK), label, colour, image_asset_ref, the unique index
+  (sale_board_page_id, position), the three _when_chk CHECKs and apply_parent_rls(sale_board_page_id ->
+  sale_board_page); sale_board gets sale_board_venue_id_code_uniq. Frozen at r1, so the forward migration adds the
+  ten columns and the code index, and handoff/migration-review.md lists for a person the RENAME COLUMN page_id ->
+  sale_board_page_id, SET NOT NULL on it, position and kind, the three CHECKs and the apply_tenant_rls ->
+  apply_parent_rls swap (the table is empty: nothing could write a tile). D-STUB-TABLE: platform.sale_board_tile is
+  removed from the baseline and is gone once the forward migration exists (the lead''s refresh writes it). GEN makes
+  written stubs unbaselinable. check-contract-storage does not yet walk nested array items (audit CR-080 prevention):
+  SaleBoardTile being a named persisted schema puts the tiles in its reach. The actionCode values are proposed (no
+  package source lists till actions); the client corrects them.'

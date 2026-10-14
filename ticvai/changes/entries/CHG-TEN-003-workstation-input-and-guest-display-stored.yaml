@@ -1,0 +1,70 @@
+id: CHG-TEN-003
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'Workstation carries cashierInputMode and guestDisplayContent, so configureWorkstation stores them and
+  getWorkstation returns them; loadedMediaStockId and mediaStockRemaining are deprecated until BL-095 (reopened
+  against the printer device); configureWorkstation states that a PUT replaces the configuration; POS-016 and BO-036
+  stop calling saleBoardId required and add outletId and cashDrawerLimit.'
+decision:
+  what: 'contracts/spine/tenancy.yaml: Workstation gains cashierInputMode (enum keyboard, touch, scanner, hybrid,
+    default hybrid) and guestDisplayContent (array of the display enum, default [lineItems]), additive, derived as
+    platform.workstation.cashier_input_mode text with its CHECK and guest_display_content text[];
+    ConfigureWorkstationRequest.loadedMediaStockId and mediaStockRemaining are deprecated and x-ticvai-persisted:
+    false ("not stored until BL-095 (the media stock record, on the printer device, waits on the BOCA stock
+    answer)"), and guestDisplayContent gets the default the Workstation field has; configureWorkstation''s
+    description: PUT replaces the configuration (a field left out takes its default or is cleared; the client sends
+    back what it read). handoff/contract-backlog.json: BL-061 closed again with the storage, BL-095 reopened (open,
+    deferred, blockedNote on the BOCA answer, fix on platform.device). screens/P04 POS-016 and P08 BO-036
+    formConfigureWorkstation: name required, saleBoardId optional (DEC-183), outletId and cashDrawerLimit added, the
+    PUT semantics, the deprecated fields not asked, 409 shift-open.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-082 (ticket #30794): ConfigureWorkstationRequest (tenancy.yaml:5859) took cashierInputMode,
+  guestDisplayContent and loadedMediaStockId and carried a readOnly mediaStockRemaining (:5885), while Workstation
+  (:5720) and platform.workstation (010-platform.sql:435-456) had none of them; BL-061 (contract-backlog.md:98) and
+  BL-095 (:132) were marked Done on the request fields alone. The media stock belongs to the printer (DeviceBinding,
+  platform.device), and the BOCA stock question is open (CHG-R4-002, DEVICE-BOCA-FGL). POS-016 (P04:6744-6759) and
+  BO-036 (P08:11212) still said saleBoardId was required (optional since DEC-183, CHG-CSP-006) and omitted outletId
+  and cashDrawerLimit. The contract never said "unchanged" for an omitted field, and updateSaleBoard already states
+  PUT replaces (pull audit R103), so the contract and screens now say the same. Lead''s decision of 14 October 2026
+  (audit, CR-082 DECISION).'
+keys_touched:
+  operations:
+  - configureWorkstation
+  - getWorkstation
+  schemas:
+  - Workstation
+  - ConfigureWorkstationRequest
+  tables:
+  - platform.workstation
+  screens:
+  - POS-016
+  - BO-036
+  files:
+  - contracts/spine/tenancy.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P08-venue-back-office.yaml
+  - handoff/contract-backlog.json
+  tickets:
+  - '#30794'
+root_class: A15 STORAGE-GAP
+tickets:
+  started:
+  - '#30794 (CR-082/CR-083; a comment and a linked delta ticket, never a rewrite)'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-082
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Verified with derive-schema and derive-ddl --apply (derived files restored): the forward migration adds
+  platform.workstation.cashier_input_mode text DEFAULT ''hybrid'' with workstation_cashier_input_mode_chk and
+  guest_display_content text[]. tools/check-request-fields-stored.py (CHG-TEN-005) fails on r5 with these four
+  fields and passes here. handoff/contract-backlog.json is the authored source; docs/registers/contract-backlog.md is
+  rebuilt from it at the refresh. The PUT-replaces statement is a clarification the contract never contradicted; a
+  client that sent a partial body now has a stated outcome.'

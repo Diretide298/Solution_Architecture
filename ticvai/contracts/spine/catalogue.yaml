@@ -77,6 +77,47 @@ tags:
 - name: bundle
 - name: lease
 - name: entitlement
+# **The rule questions Catalogue answers for other modules** (decided 14 October 2026, Chinmay: "ask the owner by a
+# declared query", the ADR-0055 amendment; ADAM CR-081, CHG-TEN-002). A module that refuses on whether a variant
+# may be sold asks this and never reads catalogue.variant or catalogue.product itself: in process inside its own
+# transaction from the commerce deployable (ADR-0055 rule 2), through Catalogue's service operation from another
+# deployable (rule 4). **The rule is the lead's proposal, pending the Catalogue owner's confirmation.**
+x-ticvai-queries:
+  variantsSellableAt:
+    module: catalogue
+    decision_owner: Chinmay
+    notes: Catalogue owner to confirm (the rule below, and whether an empty channels list means every channel).
+    inputs:
+      venueId: { type: string, format: uuid }
+      variantIds: { type: array, items: { type: string, format: uuid } }
+      channel: { $ref: '#/components/schemas/Channel' }
+    returns:
+      type: array
+      description: One entry per asked variant, in the order asked.
+      items:
+        type: object
+        required: [variantId, known, sellable]
+        properties:
+          variantId: { type: string, format: uuid }
+          known: { type: boolean, description: False when Catalogue has no such variant (unknown-variant). }
+          sellable: { type: boolean }
+          reason:
+            type: string
+            nullable: true
+            enum: [retired, otherVenue, notApproved, notOnChannel, offSale]
+            description: Why a known variant is not sellable; null when it is.
+    rule: >
+      Proposed by the lead on 14 October 2026 (ADAM CR-081), the Catalogue owner to confirm. A variant is
+      sellable on channel C at venue V when all of these hold: the variant exists and is_active
+      (ProductVariant.isActive, false when retired); its product's venue_id is V (Product.venueId); the
+      product's lifecycle_state is approved or live (ProductLifecycleState); the product's channels contain C
+      (Product.channels, Channel); and the product's on_sale_to is null or later than now (Product.onSaleTo).
+      An empty channels list is read as no channel, so not sellable: the contract says "empty = all" only
+      where it means it (CatalogueAction.channels and the other rule lists) and says nothing of the kind for
+      Product.channels; the owner to confirm. This is not Product.isSellable, which also needs a published
+      bundle: a till board is how a new product reaches its first bundle, so a board save must not need one.
+      publishBundle applies isSellable when the bundle is cut and leaves out a tile whose product fails it.
+    served: [in-process, service]
 paths:
   /product-categories:
     get:
@@ -3351,6 +3392,13 @@ paths:
         terminals with the next bundle, and this is where they do: the snapshot reads the venue''s
         sale boards with the catalogue, so a board edit is live at the till once a bundle is published
         and applied.
+
+        **A tile whose product cannot be sold is left out of the bundle** (decided 14 October 2026, Chinmay,
+        ADAM CR-081; CHG-TEN-002). The board was checked against `variantsSellableAt` when it was saved, but
+        a product can be withdrawn, archived or taken off sale after that. When the bundle is cut, a
+        `product` tile whose product is not `isSellable` in the bundle being published is dropped from the
+        bundle''s copy of the board (the stored board keeps it), so the till never draws a button it
+        cannot sell; the tile comes back with the first bundle in which its product is sellable again.
 
         '
       tags:
