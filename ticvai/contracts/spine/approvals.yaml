@@ -92,6 +92,25 @@ tags:
   description: Standing in for an approver who is away
 - name: analytics
   description: Volumes, times and bottlenecks
+# **The rule question Approvals answers for other modules** (ADR-0055 amendment, 14 October 2026; the r6 shared
+# convention). Approvals is in the Tenancy module, in `commerce`: a module there asks in process and raises the request
+# through the in-process createApprovalRequest in its own transaction (ADR-0055 rules 2 and 3); another deployable calls
+# evaluateApprovalRequirement and createApprovalRequest as operations.
+x-ticvai-queries:
+  approvalRequirement:
+    module: approvals
+    inputs:
+      kind: { $ref: '#/components/schemas/ApprovalKind' }
+      scopePath: { type: string }
+      amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+      attributes: { type: object, additionalProperties: true }
+    returns: { $ref: '#/components/schemas/ApprovalRequirement' }
+    rule: >
+      The answer evaluateApprovalRequirement gives: the tenant's approval matrix in force now (approvals.matrix,
+      approvals.rule) is matched on kind, scope, amount and attributes; isRequired says whether the action waits, and
+      approvers is the chain resolved with delegations applied. Read-only: nothing is raised. Asked first by finance's
+      closeFiscalPeriod (kind periodClose) and reopenPeriod (kind periodReopen); ADAM CR-085, CHG-FIN-012.
+    served: [in-process, service]
 paths:
   /approval-requests:
     get:

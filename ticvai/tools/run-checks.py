@@ -168,7 +168,9 @@ CHECKS = [
     "check-stored-request-fields",
     # 14 October (ADAM CR-084, CHG-GDL-001): a 4xx whose description names another module's record (an order, an
     # entitlement, a shift, a variant) declares its problem types and an x-ticvai-read-via to the owner's declared
-    # query (a ratchet over the 160 known); batch GEN's check-cross-module-reads covers the lineage side.
+    # query (a ratchet over the 160 known); batch GEN's check-cross-module-reads covers the lineage side. Since ADAM
+    # CR-085 (CHG-FIN-012) it also reads the refusal its response schema defines (E-SCHEMA-READ-VIA: closeFiscalPeriod's
+    # close checks named Orders' shifts and Wallet's checks only in PeriodCloseResult).
     "check-error-sources",
     # 14 October (ADAM CR-004 on DB-READ-VIEWS, CHG-LIN-001): a read of personal data by another module names its
     # columns, so its view is narrow; every read's column list is the derived one (tools/derive-read-columns.py).

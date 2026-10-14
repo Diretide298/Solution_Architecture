@@ -155,6 +155,43 @@ x-ticvai-queries:
       Every shift at or beneath the scope path that is open by the rule of openShiftForWorkstation
       (pendingApproval, open, suspended, pendingClosure, pendingVariance), one entry per shift.
     served: [in-process, service]
+  # Finance's period close asks this for its `noOpenShifts` check (ADAM CR-085, ticket 28411; CHG-FIN-012). Ledger is in
+  # `commerce` with Orders, so it asks in process (ADR-0055 rule 2) and never reads orders.pos_shift itself.
+  unclosedShiftsInPeriod:
+    module: shift
+    inputs:
+      scopePath: { type: string, description: "The legal entity's scope path (ledger.legal_entity.scope_path); shifts of every venue at it or beneath it." }
+      fromDate: { type: string, format: date, description: The period's first day (FiscalPeriod.startDate). }
+      toDate: { type: string, format: date, description: The period's last day (FiscalPeriod.endDate). }
+    returns:
+      type: array
+      description: The shifts that stop the period closing; empty when none does.
+      items:
+        type: object
+        properties:
+          shiftId: { type: string, format: uuid }
+          venueId: { type: string, format: uuid }
+          workstationId: { type: string, format: uuid }
+          businessDate: { type: string, format: date }
+          status: { $ref: '#/components/schemas/ShiftStatus' }
+    rule: >
+      A shift stops a period closing when its business date (Shift.businessDate: the venue-local date of openedAt
+      against the venue's businessDayCutoff, set when it opens and never moved; CHG-R6-032) is on or between fromDate
+      and toDate, its venue is at or beneath scopePath, and its status is open, suspended, pendingClosure or
+      pendingVariance: still taking money, or counted and waiting for the close to be decided (finance's "open,
+      suspended or awaiting close approval"). closed and autoClosed do not stop it. pendingApproval does not either: a
+      shift waiting for its opening approval cannot transact (openShift), so it holds no money dated in the period,
+      and its only exit is approveShiftOpen, so counting it would let an unanswered request hold the books open.
+      One entry per shift, in businessDate then shiftId order.
+    served: [in-process, service]
+    # Machine-read by tools/check-error-sources.py (E-STUCK): every blocking state can be ended.
+    states:
+      model: states/shift.yaml
+      blocking: [open, suspended, pendingClosure, pendingVariance]
+      waitsOnActor:
+        pendingVariance: a count beyond the venue's threshold is cash nobody has explained; only a supervisor accepting
+          it (acceptShiftVariance) or a recount within the threshold (submitShiftCount) may end it, and a timer that
+          closed it would close the books over an unexplained difference
 
 paths:
   /shifts:

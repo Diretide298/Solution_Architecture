@@ -3182,9 +3182,10 @@ paths:
         so it requires an approver who is not the requester and records why.
 
         **Goes through the approvals engine to a finance approver** (decided 28 September, audit R144).
-        The call first asks `approvals.evaluateApprovalRequirement` with kind `periodReopen`; where an
-        approval is required (the tenant default matrix always requires one) it raises
-        `approvals.createApprovalRequest` (kind `periodReopen`), routed to a holder of `LEDGER_APPROVE`
+        The call first asks Approvals'' `approvalRequirement` query in process (the answer
+        `evaluateApprovalRequirement` gives; `x-ticvai-read-via`, CHG-FIN-012) with kind `periodReopen`; where an
+        approval is required (the tenant default matrix always requires one) it raises the request through
+        Approvals'' in-process `createApprovalRequest` (kind `periodReopen`), routed to a holder of `LEDGER_APPROVE`
         for the period''s region who is not the caller, and answers 202 with the period still `closed`
         and `approvalRequestId` set (the request is `pending`). The move below happens when that request is
         approved. The caller no longer names the approver; the engine routes it.
@@ -3201,6 +3202,10 @@ paths:
       x-ticvai-scope-level: region
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-via:
+      - query: approvals#approvalRequirement
+        route: in-process
+        for: whether the reopen waits for a finance approver (202)
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -3265,12 +3270,23 @@ paths:
         period; corrections go to the current open one as reversals.
 
         **Goes through the approvals engine to a finance approver** (decided 28 September, audit R144).
-        When the checks pass, the call asks `approvals.evaluateApprovalRequirement` with kind
-        `periodClose`; where an approval is required (the tenant default matrix always requires one) it
-        raises `approvals.createApprovalRequest` (kind `periodClose`), routed to a holder of
+        When the checks pass, the call asks Approvals'' `approvalRequirement` query in process (the answer
+        `evaluateApprovalRequirement` gives) with kind `periodClose`; where an approval is required (the tenant
+        default matrix always requires one) it raises the request through Approvals'' in-process
+        `createApprovalRequest` (kind `periodClose`) in its own transaction, routed to a holder of
         `LEDGER_APPROVE` for the period''s region who is not the caller, and answers 202 with the period
         still `closing` and `approvalRequestId` set (the request is `pending`). The period locks when that request is
-        approved. A dry run raises nothing.
+        approved. A dry run raises nothing. Where the matrix requires no approval the period closes in the call and
+        the answer is 200 with `dryRun` false. A call while the period''s `approvalRequestId` is still `pending` runs
+        the checks again and, if they pass, answers 202 naming that same request; it never raises a second one
+        (lead to confirm; CHG-FIN-012).
+
+        **What it asks other modules, and how** (ADAM CR-085, 14 October 2026; ADR-0055 amended 14 October). Ledger
+        is in `commerce` with Orders, Wallet and Approvals, so each question is an in-process query of its owner,
+        named in `x-ticvai-read-via`, and Ledger reads none of their tables: `noOpenShifts` is
+        `shift#unclosedShiftsInPeriod`, `walletChecks` and `walletRollForward` are `wallet#periodCloseChecks`, and the
+        approval is `approvals#approvalRequirement` then the in-process `createApprovalRequest` (Approvals writes
+        `approvals.request`). The close is built after each owner has built its query (CHG-FIN-012 notes).
 
         **FX revaluation of open cross-currency balances is part of close and is not yet implemented**
         — it depends on CF-37.
@@ -3282,6 +3298,16 @@ paths:
       x-ticvai-scope-level: region
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-via:
+      - query: shift#unclosedShiftsInPeriod
+        route: in-process
+        for: checks noOpenShifts
+      - query: wallet#periodCloseChecks
+        route: in-process
+        for: walletChecks and walletRollForward
+      - query: approvals#approvalRequirement
+        route: in-process
+        for: whether the close waits for a finance approver (202)
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -3300,7 +3326,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Checks reported, when dry run
+          description: Checks reported, when dry run; or, with `dryRun` false, the checks passed, the tenant's matrix
+            required no approval and the period is now `closed`
           content:
             application/json:
               schema:
@@ -3320,7 +3347,9 @@ paths:
         '409':
           description: 'The period is already `closed`, or one or more of the close checks failed. The checks
             are exactly the values of `PeriodCloseResult.checks[].check`; `failedChecks` lists each one that
-            failed with its `blockingCount`, so the screen can say what to fix without a dry run first.
+            failed with its `blockingCount`, so the screen can say what to fix without a dry run first. A failed
+            wallet check (`PeriodCloseResult.walletChecks`) is listed in `failedWalletChecks` under the same
+            `period-close-checks-failed` (CHG-FIN-012).
 
             '
           x-ticvai-problem-types:
@@ -7456,6 +7485,33 @@ components:
                   type: string
                 blockingCount:
                   type: integer
+          failedWalletChecks:
+            type: array
+            description: '**Each wallet check that failed** (ADAM CR-085, CHG-FIN-012), in the shape
+              `PeriodCloseResult.walletChecks` uses: the close fails on a wallet check as on its own, and
+              `failedChecks` has no value to name one. Empty for `fiscal-period-closed` and when only ledger checks
+              failed.'
+            items:
+              type: object
+              required:
+              - check
+              - passed
+              properties:
+                check:
+                  type: string
+                  enum:
+                  - walletRollForwardTies
+                  - walletLiabilityMatchesLedger
+                  - noPendingWalletAuthorisations
+                  - expiredBalancesReleased
+                  - walletDisputesReviewed
+                passed:
+                  type: boolean
+                  description: Always false here.
+                detail:
+                  type: string
+                blockingCount:
+                  type: integer
     PeriodCloseResult:
       x-ticvai-persistence: none — computed
       type: object
@@ -7490,14 +7546,18 @@ components:
                   - `noUnapprovedJournals`: no `ledger.journal_entry` dated in the period is `draft` or awaiting approval. Blocking: those
                     entries.
                   - `noOpenShifts`: no POS shift with a business date (`Shift.businessDate`, closing at the venue's `businessDayCutoff`;
-                    CHG-R6-032) in the period is still open, suspended or awaiting close approval, asked of `orders.listShifts`. Blocking: those shifts.
+                    CHG-R6-032) in the period is still open, suspended or awaiting close approval, at or beneath the legal entity's
+                    scope path. Asked of Orders' `shift#unclosedShiftsInPeriod` in process, which states the rule (ADAM CR-085,
+                    CHG-FIN-012); Ledger never reads `orders.pos_shift`. Blocking: those shifts.
                   - `settlementsReconciled`: every `ledger.settlement` in the period is reconciled and no `ledger.settlement_exception`
                     on it is open. Blocking: unreconciled settlements plus open exceptions.
-                  - `recognitionRunComplete`: no `ledger.recognition_schedule` line due on or before the period end is unrecognised.
-                    Blocking: those lines.
+                  - `recognitionRunComplete`: nothing earned on or before the period end is still deferred: the computation
+                    `runRecognition` makes for this period, run dry inside the close, would move nothing (`entryCount` 0).
+                    `ledger.recognition_schedule` holds the recognition rules, not lines to count, so the run's own answer is the
+                    test (ADAM CR-085, CHG-FIN-012; lead to confirm). Blocking: that `entryCount`.
                   - `priorPeriodClosed`: the legal entity's previous `ledger.fiscal_period` is `closed`. Blocking: 1 or 0.
                   - `varianceExceptionsReviewed`: no `ledger.price_variance` in the period is unreviewed. Blocking: those variances.
-                  The close fails (409, `PeriodCloseProblem.failedChecks`) when any check or wallet check fails; a dry run reports the
+                  The close fails (409, `PeriodCloseProblem.failedChecks` and `failedWalletChecks`) when any check or wallet check fails; a dry run reports the
                   same list and locks nothing. Each run, dry or not, appends one `ledger.fiscal_period_event` with the results.
                 enum:
                 - trialBalanceBalances
@@ -7517,7 +7577,10 @@ components:
           type: array
           description: '**The wallet pre-close checks** (decided 2 October 2026, Chinmay, batch 6 #220, BO-1170; DEC-220;
             CHG-CSP-040). Beside `checks`, whose values clients built at r1 already switch on, so no value is added there.
-            `passed` is false while any of these fails. Empty where the tenant has no wallet module.'
+            `passed` is false while any of these fails. Empty where the tenant has no wallet module. Asked of Wallet''s
+            `wallet#periodCloseChecks` in process, which maps Wallet''s own pre-close checks onto these five and says
+            what "no wallet module" means (ADAM CR-085, CHG-FIN-012); a failure is listed in
+            `PeriodCloseProblem.failedWalletChecks`.'
           items:
             type: object
             required:
