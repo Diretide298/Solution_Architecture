@@ -1,0 +1,39 @@
+id: CHG-SCR-008
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A screen purpose that is a generator template ("See X for this venue.") or a pasted board title ("— from the
+  client design board, 20 August") is written from what the screen does, by a deriver on the refresh: its name, the
+  summaries of what it reads and of what it acts with; a merged screen names the screen it routes to.'
+decision:
+  what: 'tools/derive-screen-wiring.py gains rule S-PURPOSE-BOILERPLATE (fix_screen_purpose). The purpose is spec
+    prose for the designer and developer, never shown to a user (client-approved UI, Chinmay, 14 October 2026).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (CHG-WIR-003): check-screen-wiring/S-PURPOSE-BOILERPLATE had 81
+  members (evidence audit/ticvai/runs/audit-1014/classes.json, 238 Block A tickets). Default ruling (triage.py):
+  "Screen purpose written from what the screen does, not the template". After: 0 package-wide. The screen tickets
+  carry the purpose whole (T-PURPOSE-CUT): they pick the new text up when build-service-docs runs on the refresh
+  (verified: check-ticket-text passes after build-service-docs and op-descriptions).'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - screens/P08-venue-back-office.yaml
+  screens:
+  - P08 (23 screens, BO-110 to BO-142) on this branch; the other platforms at the refresh
+  other:
+  - S-PURPOSE-BOILERPLATE
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-screen-wiring.py::fix_screen_purpose
+status: open
+notes: Batch SCR, 14 October 2026.

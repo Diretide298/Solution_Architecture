@@ -30855,8 +30855,8 @@ screens:
   pattern: listDetail
   patternReason: '`listRecipes` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Recipe & BOM Management — from the client design board, 20 August (merged into BO-111 Ingredient
-    Substitution, Allergen & Nutrition).
+  purpose: 'Recipe & BOM Management: merged into BO-111; this id routes there and nothing on it is built
+    separately.'
   layout:
     template: split
     regions:
@@ -30946,7 +30946,10 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`setRecipe`, `updateMenu`, `setSubstitutionRules`) and
     no read of a population — it is settings, not a list
-  purpose: Ingredient Substitution, Allergen & Nutrition — from the client design board, 20 August.
+  purpose: 'Ingredient Substitution, Allergen & Nutrition: shows the last allergen verdict recorded for
+    a dish (`getAllergenVerification`); list recipes (`listRecipes`), and acts with define a recipe for
+    a menu item (`setRecipe`); what may replace what (`setSubstitutionRules`); does this dish still match
+    its claim? (`verifyAllergens`).'
   layout:
     template: form
     regions:
@@ -31223,7 +31226,10 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`planProductionRun`) and no read of a population — it
     is settings, not a list
-  purpose: Production Planning & Production Sheets — from the client design board, 20 August.
+  purpose: 'Production Planning & Production Sheets: shows what is being made, and what was (`listProductionRuns`);
+    the production plans (`listProductionPlans`), and acts with plan a batch, for one outlet or several
+    (`planProductionRun`); turn a forecast into a prep list (`buildProductionPlan`); make the plan real
+    (`releaseProductionPlan`).'
   layout:
     template: form
     regions:
@@ -31501,8 +31507,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`planProductionRun`, `completeProductionRun`) and no
     read of a population — it is settings, not a list
-  purpose: Central Kitchen & Commissary Management — from the client design board, 20 August (merged into
-    BO-112 Production Planning & Production Sheets).
+  purpose: 'Central Kitchen & Commissary Management: merged into BO-112; this id routes there and nothing
+    on it is built separately.'
   layout:
     template: form
     regions:
@@ -31576,7 +31582,8 @@ screens:
   pattern: listDetail
   patternReason: '`listSerialisedItems` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Variants, Attributes, Barcode & RFID Management — from the client design board, 20 August.
+  purpose: 'Variants, Attributes, Barcode & RFID Management: shows where each individual item is (`listSerialisedItems`);
+    price and stock check by barcode (`lookupMerchandise`).'
   layout:
     template: split
     regions:
@@ -31710,7 +31717,9 @@ screens:
   pattern: listDetail
   patternReason: '`listProductCategories` reads a population and nothing reads one of them; the detail
     is the row until a `get` exists'
-  purpose: Category, Brand & Merchandise Hierarchy — from the client design board, 20 August.
+  purpose: 'Category, Brand & Merchandise Hierarchy: shows the merchandise hierarchy — categories, brands,
+    collections (`listProductCategories`); a venue''s booking flows, in the working draft (`listBookingFlows`),
+    and acts with define the hierarchy, in the order a guest sees it (`setProductCategories`).'
   layout:
     template: split
     regions:
@@ -32137,8 +32146,10 @@ screens:
   pattern: listDetail
   patternReason: '`listSaleBoards` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Product Import, Governance & AI Configuration Assistant — from the client design board, 20
-    August.
+  purpose: 'Product Import, Governance & AI Configuration Assistant: shows progress and findings of a
+    catalogue import (`getCatalogueImportJob`), and acts with parse a catalogue file into a preview (`importProductCatalogue`);
+    draft a configuration from a description (`generateConfiguration`); apply a parsed catalogue import
+    (`commitCatalogueImport`).'
   layout:
     template: split
     regions:
@@ -32331,7 +32342,8 @@ screens:
   pattern: commandCentre
   patternReason: 3 independent reads and no read of one record — the screen watches a population rather
     than working one
-  purpose: Campaign & Audience Management — from the client design board, 20 August.
+  purpose: 'Campaign & Audience Management: shows list campaigns (`listCampaigns`); list segments (`listSegments`),
+    and acts with create a campaign (`createCampaign`); run a report (`runReport`).'
   layout:
     template: dashboard
     regions:
@@ -32531,7 +32543,9 @@ screens:
   pattern: statusTracker
   patternReason: '`getRecommendations` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: Cross-Sell, Upsell & Recommendation Rules — from the client design board, 20 August.
+  purpose: 'Cross-Sell, Upsell & Recommendation Rules: shows list upsell and cross-sell rules (`listUpsellRules`),
+    and acts with create an upsell rule (`createUpsellRule`); remove an upsell rule (`deleteUpsellRule`);
+    fill a recommendation slot (`decideRecommendations`).'
   gaps:
   - operation: getRecommendations
     why: '**`getRecommendations` declares its response inline**, so the component that shows it names
@@ -32666,7 +32680,8 @@ screens:
   pattern: listDetail
   patternReason: '`listJourneys` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Omnichannel Commerce & Journey Configuration — from the client design board, 20 August.
+  purpose: 'Omnichannel Commerce & Journey Configuration: shows automated journeys (`listJourneys`), and
+    acts with define an automated journey (`createJourney`).'
   layout:
     template: split
     regions:
@@ -32813,7 +32828,8 @@ screens:
   pattern: listDetail
   patternReason: '`listSegments` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Personalized Offers & Guest Engagement — from the client design board, 20 August.
+  purpose: 'Personalized Offers & Guest Engagement: shows list segments (`listSegments`), and acts with
+    create a campaign (`createCampaign`).'
   layout:
     template: split
     regions:
@@ -34346,7 +34362,10 @@ screens:
   pattern: listDetail
   patternReason: '`listSyncRejections` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Offline Policy & Rules Configuration — from the client design board, 20 August.
+  purpose: 'Offline Policy & Rules Configuration: shows entries the server refused (`listSyncRejections`);
+    the offline policy saved at one scope node (`getOfflinePolicy`), and acts with what a workstation
+    may do with no network, and for how long (`setOfflinePolicy`); record what was done about a refused
+    entry (`resolveSyncRejection`).'
   layout:
     template: split
     regions:
@@ -34677,7 +34696,8 @@ screens:
   pattern: listDetail
   patternReason: '`listSyncRejections` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Offline Transaction Monitor & Sync Queue — from the client design board, 20 August.
+  purpose: 'Offline Transaction Monitor & Sync Queue: shows entries the server refused (`listSyncRejections`),
+    and acts with replay orders recorded offline (`syncOrders`).'
   layout:
     template: split
     regions:
@@ -34842,7 +34862,9 @@ screens:
   pattern: approvalInbox
   patternReason: '`decideApprovalRequest` decides items that `listSyncRejections` queues — every row is
     waiting for a person, so the empty state is success'
-  purpose: Offline Alerts, Limits & Audit — from the client design board, 20 August.
+  purpose: 'Offline Alerts, Limits & Audit: shows entries the server refused (`listSyncRejections`); what
+    is currently wrong (`listAlerts`), and acts with run a report (`runReport`); watch a metric and tell
+    somebody (`setAlertRule`); record what was done about a refused entry (`resolveSyncRejection`).'
   layout:
     template: split
     regions:
@@ -35153,7 +35175,10 @@ screens:
   pattern: listDetail
   patternReason: '`listKitchenStations` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Kitchen & Preparation Stations — from the client design board, 20 August.
+  purpose: 'Kitchen & Preparation Stations: shows list preparation stations and their routing (`listKitchenStations`);
+    list outlets (`listOutlets`), and acts with configure stations and item routing (`setKitchenStations`);
+    how long a ticket may sit before it is late (`setKitchenSla`); print a production plan''s prep sheet
+    (`printPrepSheet`).'
   layout:
     template: split
     regions:
@@ -35357,7 +35382,8 @@ screens:
   pattern: listDetail
   patternReason: '`listWorkstations` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Order Routing & KDS/Printer Rules — from the client design board, 20 August.
+  purpose: 'Order Routing & KDS/Printer Rules: shows an outlet''s kitchen routing rules (`getKitchenRoutingRules`),
+    and acts with set an outlet''s category rules, default station and fallback station (`setKitchenRoutingRules`).'
   layout:
     template: split
     regions:
@@ -35490,7 +35516,9 @@ screens:
   pattern: listDetail
   patternReason: '`listProductionRuns` reads the population and `getVenueSettings` reads one of them —
     list, select, act'
-  purpose: F&B Global Settings & Controls — from the client design board, 20 August.
+  purpose: 'F&B Global Settings & Controls: shows operational settings for this venue (`getVenueSettings`);
+    how this outlet courses by default (read) (`getCourseRules`), and acts with set support hours, quiet
+    hours, segregated access and alerting (`setVenueSettings`); how this outlet courses by default (`setCourseRules`).'
   layout:
     template: split
     regions:
@@ -35682,7 +35710,8 @@ screens:
   pattern: listDetail
   patternReason: '`listRecipes` reads the population and `getCountVariance` reads one of them — list,
     select, act'
-  purpose: Recipe Consumption & Theoretical Inventory — from the client design board, 20 August.
+  purpose: 'Recipe Consumption & Theoretical Inventory: shows list recipes (`listRecipes`); variance between
+    counted and expected (`getCountVariance`).'
   layout:
     template: split
     regions:
@@ -35852,8 +35881,8 @@ screens:
   pattern: listDetail
   patternReason: '`listExpiringBatches` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Production Execution & Batch Management — from the client design board, 20 August (merged into
-    BO-112 Production Planning & Production Sheets).
+  purpose: 'Production Execution & Batch Management: merged into BO-112; this id routes there and nothing
+    on it is built separately.'
   layout:
     template: split
     regions:
@@ -35930,7 +35959,9 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`recordWaste`) and no read of a population — it is settings,
     not a list
-  purpose: Wastage, Spoilage, Returns & Write-Off — from the client design board, 20 August.
+  purpose: 'Wastage, Spoilage, Returns & Write-Off: shows the venue''s waste-approval policy (`getWasteApprovalPolicy`),
+    and acts with record waste (`recordWaste`); ask for an answer, however it is currently produced (`requestSuggestion`);
+    switch waste approval on or off, and set its bands (`setWasteApprovalPolicy`).'
   layout:
     template: form
     regions:
@@ -36083,7 +36114,10 @@ screens:
   pattern: listDetail
   patternReason: '`listExpiringBatches` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Product Availability, 86 & Operational Food Safety — from the client design board, 20 August.
+  purpose: 'Product Availability, 86 & Operational Food Safety: shows read a menu with sections and items
+    (`getMenu`); where this venue stands, right now (`getHaccpStatus`), and acts with mark an item available
+    or eighty-sixed (`setItemAvailability`); define a checkpoint and its safe range (`setTemperatureCheckpoint`);
+    set today''s count for a dish (`setMenuItemDailyCount`).'
   layout:
     template: split
     regions:
@@ -36296,7 +36330,8 @@ screens:
   pattern: listDetail
   patternReason: '`listAlerts` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Operational Alerts, AI Replenishment & Action Center — from the client design board, 20 August.
+  purpose: 'Operational Alerts, AI Replenishment & Action Center: shows what is currently wrong (`listAlerts`),
+    and acts with mark it seen (`acknowledgeAlert`); raise a requisition (`createRequisition`).'
   layout:
     template: split
     regions:
@@ -36503,7 +36538,8 @@ screens:
   pattern: listDetail
   patternReason: '`listRoles` reads the population and `getVenueSettings` reads one of them — list, select,
     act'
-  purpose: Store Rules, Controls & Permissions — from the client design board, 20 August.
+  purpose: 'Store Rules, Controls & Permissions: shows rules and controls in force in the store (`listStoreRules`),
+    and acts with change a store rule (`setStoreRules`).'
   layout:
     template: split
     regions:
