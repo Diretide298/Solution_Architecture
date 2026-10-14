@@ -1257,3 +1257,23 @@ export const setDefaultRate = (hourly, currency, note = '', projectId = '') =>
   call('/api/rates/default', { method: 'PUT', body: { project_id: projectId ?? '', hourly, currency, note } });
 export const dropDefaultRate = (projectId = '') =>
   call(`/api/rates/default?${new URLSearchParams({ project_id: projectId ?? '' })}`, { method: 'DELETE' });
+
+// ── Agent activity, and People and projects (admin.html) ─────────────
+//
+// Added together, in one block, because both pages were rebuilt at once and a
+// merge is easier over one block than over four scattered lines.
+//
+// `agentUsageFor` is `agentUsage` with a person: an administrator or a pm can
+// narrow the tools, the totals and the session list to one account. The
+// service ignores `person` for anybody who only reads their own.
+export const agentUsageFor = (days = 14, person = 0, projectId = '') =>
+  call(`/api/agent/usage?${new URLSearchParams({
+    days, project_id: projectId ?? '', ...(person ? { person } : {}),
+  })}`);
+
+// Give an existing account another project, or take one away. Until these,
+// only redeeming an invite could grant a project at all.
+export const grantProject = (accountId, projectId) =>
+  call(`/api/accounts/${accountId}/projects/${encodeURIComponent(projectId)}`, { method: 'PUT' });
+export const revokeProject = (accountId, projectId) =>
+  call(`/api/accounts/${accountId}/projects/${encodeURIComponent(projectId)}`, { method: 'DELETE' });

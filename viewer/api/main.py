@@ -5203,79 +5203,142 @@ def _may_read_agents(account: dict) -> bool:
 
 @app.get("/api/agent/usage")
 def agent_usage(project_id: str = Query(default=""), days: int = Query(default=14, ge=1, le=120),
+                person: int = Query(default=0, ge=0),
                 account: dict = Depends(require_account)):
     """How much the agent is being used, and where it keeps failing.
 
     Grouped three ways because three different questions get asked of it: by
     person (is this being used at all), by tool (what is broken), and by ticket
     (what did this one actually cost). Everything is computed on read.
+
+    **Every figure is counted over the whole window, in SQL.** This used to read
+    the latest 500 sessions into Python and add them up, and list the latest 100
+    — so the page's "sessions" said 100 while the per-person totals summed 500,
+    and a 90-day window on a busy team quietly lost everything past the 500th
+    session from every total. The list is still capped, because nobody scrolls
+    a quarter of sessions; the counts are not, and `sessionCount` says how many
+    there were so the page can say "the latest 100 of 312".
+
+    `person` narrows the tools, the totals and the list to one account, for an
+    administrator or a pm asking "how is it going for her". `people` stays the
+    whole window either way: it is what the page's person picker is built from,
+    and a picker that shrank to the one person picked could not be changed back.
+    A developer is never widened by it and never narrowed past themselves.
     """
     project = _readable_project(account, project_id)
     since = security.stamp(security.now() - timedelta(days=days))
     whole = _may_read_agents(account)
-    where = "s.project_id = ? AND s.started_at >= ?"
-    args: tuple = (project, since)
+    base = "s.project_id = ? AND s.started_at >= ?"
+    base_args: tuple = (project, since)
     if not whole:
+        base += " AND s.account_id = ?"
+        base_args = (*base_args, account["id"])
+    # The narrowed clause, for everything but the roster.
+    where, args = base, base_args
+    narrowed = whole and person > 0
+    if narrowed:
         where += " AND s.account_id = ?"
-        args = (*args, account["id"])
-
-    sessions = db.all_rows(
-        f"SELECT s.*, a.name, a.email FROM agent_session s JOIN account a ON a.id = s.account_id "
-        f"WHERE {where} ORDER BY s.started_at DESC LIMIT 500", args)
+        args = (*args, person)
 
     by_person: dict = {}
-    for row in sessions:
-        who = by_person.setdefault(row["account_id"], {
-            "name": row["name"] or row["email"], "sessions": 0, "activeMs": 0,
-            "tickets": set(), "failures": 0, "calls": 0})
-        who["sessions"] += 1
-        who["activeMs"] += row["active_ms"]
-        if row["external_key"]:
-            who["tickets"].add(row["external_key"])
+    for row in db.all_rows(
+            f"SELECT s.account_id, a.name, a.email, COUNT(*) AS sessions, "
+            f"SUM(s.active_ms) AS active, "
+            f"COUNT(DISTINCT NULLIF(s.external_key, '')) AS tickets "
+            f"FROM agent_session s JOIN account a ON a.id = s.account_id "
+            f"WHERE {base} GROUP BY s.account_id", base_args):
+        by_person[row["account_id"]] = {
+            "id": row["account_id"], "name": row["name"] or row["email"],
+            "sessions": row["sessions"], "activeMs": row["active"] or 0,
+            "tickets": row["tickets"], "ticketKeys": [], "failures": 0, "calls": 0}
+    # Which tickets, newest first. Twelve is enough to say what somebody has
+    # been on; the count beside it is the true one.
+    for row in db.all_rows(
+            f"SELECT s.account_id, s.external_key, MAX(s.started_at) AS last "
+            f"FROM agent_session s WHERE {base} AND s.external_key != '' "
+            f"GROUP BY s.account_id, s.external_key ORDER BY last DESC", base_args):
+        keys = by_person.get(row["account_id"], {}).get("ticketKeys")
+        if keys is not None and len(keys) < 12:
+            keys.append(row["external_key"])
+    # Back onto the people, so "is this working for them" and "is this working
+    # at all" come from one read rather than two that can disagree.
+    for row in db.all_rows(
+            f"SELECT s.account_id, COUNT(*) AS n, SUM(CASE WHEN e.ok = 0 THEN 1 ELSE 0 END) AS bad "
+            f"FROM agent_event e JOIN agent_session s ON s.id = e.session_id "
+            f"WHERE {base} AND e.kind = 'tool' GROUP BY s.account_id", base_args):
+        if row["account_id"] in by_person:
+            by_person[row["account_id"]]["calls"] = row["n"]
+            by_person[row["account_id"]]["failures"] = row["bad"] or 0
 
-    ids = [row["id"] for row in sessions]
     tools: dict = {}
-    if ids:
-        holes = ",".join("?" * len(ids))
-        for row in db.all_rows(
-                f"SELECT tool, ok, error_kind, COUNT(*) AS n, SUM(ms) AS total, MAX(ms) AS worst "
-                f"FROM agent_event WHERE session_id IN ({holes}) AND kind = 'tool' AND tool != '' "
-                f"GROUP BY tool, ok, error_kind", tuple(ids)):
-            entry = tools.setdefault(row["tool"], {
-                "tool": row["tool"], "calls": 0, "failed": 0, "totalMs": 0, "worstMs": 0,
-                "why": {}})
-            entry["calls"] += row["n"]
-            entry["totalMs"] += row["total"] or 0
-            entry["worstMs"] = max(entry["worstMs"], row["worst"] or 0)
-            if not row["ok"]:
-                entry["failed"] += row["n"]
-                entry["why"][row["error_kind"] or "error"] = row["n"]
-        # Back onto the people, so "is this working for them" and "is this
-        # working at all" come from one read rather than two that can disagree.
-        for row in db.all_rows(
-                f"SELECT s.account_id, COUNT(*) AS n, SUM(CASE WHEN e.ok = 0 THEN 1 ELSE 0 END) AS bad "
-                f"FROM agent_event e JOIN agent_session s ON s.id = e.session_id "
-                f"WHERE e.session_id IN ({holes}) AND e.kind = 'tool' GROUP BY s.account_id",
-                tuple(ids)):
-            if row["account_id"] in by_person:
-                by_person[row["account_id"]]["calls"] = row["n"]
-                by_person[row["account_id"]]["failures"] = row["bad"] or 0
+    for row in db.all_rows(
+            f"SELECT e.tool, e.ok, e.error_kind, COUNT(*) AS n, SUM(e.ms) AS total, MAX(e.ms) AS worst "
+            f"FROM agent_event e JOIN agent_session s ON s.id = e.session_id "
+            f"WHERE {where} AND e.kind = 'tool' AND e.tool != '' "
+            f"GROUP BY e.tool, e.ok, e.error_kind", args):
+        entry = tools.setdefault(row["tool"], {
+            "tool": row["tool"], "calls": 0, "failed": 0, "totalMs": 0, "worstMs": 0,
+            "why": {}})
+        entry["calls"] += row["n"]
+        entry["totalMs"] += row["total"] or 0
+        entry["worstMs"] = max(entry["worstMs"], row["worst"] or 0)
+        if not row["ok"]:
+            entry["failed"] += row["n"]
+            # Added, not assigned: a failure stored with no word and one stored
+            # as 'error' are both "error" here, and are two groups above.
+            word = row["error_kind"] or "error"
+            entry["why"][word] = entry["why"].get(word, 0) + row["n"]
 
+    count = db.one(
+        f"SELECT COUNT(*) AS n, COALESCE(SUM(s.active_ms), 0) AS active, "
+        f"COUNT(DISTINCT s.account_id) AS people, "
+        f"COUNT(DISTINCT NULLIF(s.external_key, '')) AS tickets "
+        f"FROM agent_session s WHERE {where}", args)
+    listed = db.all_rows(
+        f"SELECT s.*, a.name, a.email FROM agent_session s JOIN account a ON a.id = s.account_id "
+        f"WHERE {where} ORDER BY s.started_at DESC LIMIT 100", args)
+
+    # Who could have used it and has not. Developers and team leads on this
+    # project, active, with no session in the window — the other half of "9 of
+    # 11", and the half a pm actually wants named. Only for those who oversee:
+    # a developer is not told which colleagues have been quiet.
+    quiet = []
+    expected = 0
+    if whole:
+        holes = ",".join("?" * len(security.SCOPED))
+        crew = db.all_rows(
+            f"SELECT a.id, a.name, a.email FROM account a "
+            f"JOIN account_project ap ON ap.account_id = a.id AND ap.project_id = ? "
+            f"WHERE a.active = 1 AND a.role IN ({holes}) ORDER BY a.name, a.email",
+            (project, *security.SCOPED))
+        expected = len({r["id"] for r in crew} | set(by_person))
+        quiet = [r["name"] or r["email"] for r in crew if r["id"] not in by_person]
+
+    calls = sum(t["calls"] for t in tools.values())
+    failed = sum(t["failed"] for t in tools.values())
     return {
         "project": project,
         "days": days,
         "whole": whole,
-        "people": sorted(
-            [{**who, "tickets": len(who["tickets"])} for who in by_person.values()],
-            key=lambda p: -p["activeMs"]),
+        "person": person if narrowed else 0,
+        "people": sorted(by_person.values(), key=lambda p: -p["activeMs"]),
+        # The window's true figures, for whoever `person` narrowed it to.
+        "totals": {
+            "sessions": count["n"], "activeMs": count["active"], "people": count["people"],
+            "tickets": count["tickets"], "calls": calls, "failed": failed,
+        },
+        "expected": expected,
+        "quiet": quiet,
         # Sorted by what is going wrong rather than by what is used most: the
         # page exists to find the thing that keeps failing.
         "tools": sorted(tools.values(), key=lambda t: (-t["failed"], -t["calls"])),
+        "sessionCount": count["n"],
         "sessions": [{
             "id": row["id"], "who": row["name"] or row["email"], "repo": row["repo"],
             "ticket": row["external_key"], "startedAt": row["started_at"],
             "endedAt": row["ended_at"], "activeMs": row["active_ms"], "agent": row["agent"],
-        } for row in sessions[:100]],
+            "host": row["host"],
+        } for row in listed],
     }
 
 

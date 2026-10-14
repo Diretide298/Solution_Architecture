@@ -10,7 +10,7 @@
         }
       } catch { /* storage can be denied outright; day is a fine fallback */ }
     </script>
-    <title>Adam — agents</title>
+    <title>ADAM — Agent activity</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -19,6 +19,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/sheet.css" />
     <link rel="stylesheet" href="/agents.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>
@@ -29,16 +30,10 @@
           <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
           <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
         </a>
-        <span class="brand-sub">agents</span>
+        <span class="brand-sub">agent activity</span>
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
-        <select class="scope-select" id="ag-days" aria-label="How far back">
-          <option value="7">Last 7 days</option>
-          <option value="14" selected>Last 14 days</option>
-          <option value="30">Last 30 days</option>
-          <option value="90">Last 90 days</option>
-        </select>
         <a class="chip" href="/tasks.html">Tasks</a>
         <a class="chip" href="/">Back to the viewer</a>
       </div>
@@ -46,66 +41,96 @@
 
     <div id="agents" class="set-layout set-layout-wide" hidden>
       <nav class="set-nav" aria-label="Sections">
-        <h1 class="set-nav-title">Agents</h1>
+        <h1 class="set-nav-title">Agent activity</h1>
         <div class="set-nav-list">
-          <a href="#overview">Overview</a>
-          <a href="#people">Who is using it</a>
-          <div class="set-nav-group">What is going wrong</div>
-          <a href="#tools">Tools and failures</a>
-          <div class="set-nav-group">Session by session</div>
+          <!-- Named after the window, by agents.js: "This fortnight" over the
+               default 14 days, "Last 30 days" when somebody widens it. -->
+          <a href="#overview" id="ag-nav-overview">This fortnight</a>
+          <div class="set-nav-group" id="ag-nav-who">Who and what</div>
+          <a href="#people" id="ag-nav-people">People</a>
+          <a href="#tools">Tools failing</a>
+          <div class="set-nav-group">One by one</div>
           <a href="#sessions">Sessions</a>
         </div>
       </nav>
 
       <main class="set-content">
-        <section class="admin-panel set-section" id="overview">
-          <h2 class="admin-heading">Overview <span class="admin-count" id="ag-scope"></span></h2>
-          <p class="auth-note set-lede" id="ag-lede">
-            Claude Code runs on each developer&rsquo;s machine, so this is what
-            their hooks have sent: which tools ran, whether they worked, how long
-            they took, and which ticket was open.
-            <strong>Never the prompts, the arguments or the code</strong> &mdash;
-            so this can say that Edit failed eleven times on a ticket and not what
-            it was trying to edit.
-          </p>
-          <p class="auth-error" id="ag-error" hidden></p>
-          <section class="stat-strip" id="ag-stats"></section>
-          <p class="auth-note auth-fine" id="ag-nothing" hidden>
-            Nothing has arrived yet. The hooks are installed per machine &mdash;
-            see <code>viewer/mcp/hooks/README.md</code> &mdash; and a session is
-            sent when it ends, not while it runs.
-          </p>
+        <!-- ── the filter every section obeys ─────────────────────────────
+             Above the sections rather than inside one, for the reason Tasks
+             gives: the rail shows one section at a time, and a filter that
+             left with the overview would leave the other sections filtered by
+             something nobody can see. -->
+        <div class="sh-top">
+          <div class="sh-top-line">
+            <p class="sh-lede" id="ag-lede">
+              What the usage hooks on each developer&rsquo;s machine have sent:
+              which tools ran, whether they worked, how long they took and which
+              ticket was open. Never the prompts, the arguments or the code.
+            </p>
+            <div class="sh-top-actions">
+              <p class="sh-asof" id="ag-asof" role="status"></p>
+            </div>
+          </div>
+          <p class="auth-error" id="ag-error" role="alert" hidden></p>
+          <div class="sh-scope" id="ag-scope" role="group" aria-label="Filter the whole page"></div>
+        </div>
+
+        <!-- ── the window, answered ───────────────────────────────────────
+             The page is opened to ask two things: is the agent being used, and
+             what keeps failing. The headline answers the first, the line under
+             it the second, and the one picture is the second drawn out. -->
+        <section class="admin-panel set-section sh-sheet" id="overview" aria-labelledby="ag-headline">
+          <div class="sh-hero" id="ag-hero">
+            <div class="sh-verdict" id="ag-verdict">
+              <h2 class="sh-headline" id="ag-headline">Reading the sessions…</h2>
+            </div>
+            <figure class="sh-figure ag-figure" id="ag-figure" hidden>
+              <figcaption class="sh-figure-caption" id="ag-figure-caption">Failed calls, by tool</figcaption>
+              <div class="sh-bars ag-bars" id="ag-bars"></div>
+              <div id="ag-bars-key"></div>
+              <div id="ag-bars-twin"></div>
+            </figure>
+          </div>
+          <p class="sh-next" id="ag-next"></p>
+          <div class="ag-nothing" id="ag-nothing" hidden></div>
         </section>
 
-        <section class="admin-panel set-section" id="people">
-          <h2 class="admin-heading">Who is using it <span class="admin-count" id="ag-people-count"></span></h2>
-          <p class="auth-note set-lede">
+        <section class="admin-panel set-section sh-sheet" id="people" aria-labelledby="ag-people-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ag-people-title">People</h2>
+          </div>
+          <p class="sh-note">
             Active time, not wall clock: a session left open over lunch is not an
-            hour of agent use, so gaps longer than five minutes are not counted.
+            hour of agent use, so a gap longer than five minutes between two
+            events is not counted. A name opens that person on Tasks.
           </p>
-          <div class="admin-table" id="ag-people"></div>
+          <div id="ag-people"></div>
+          <p class="sh-note ag-quiet" id="ag-quiet" hidden></p>
         </section>
 
-        <section class="admin-panel set-section" id="tools">
-          <h2 class="admin-heading">Tools and failures <span class="admin-count" id="ag-tools-count"></span></h2>
-          <p class="auth-note set-lede">
-            Sorted by what is failing rather than by what is used most. The error
-            words are classified on the machine &mdash; the messages themselves are
-            never sent, because they carry paths and snippets.
+        <section class="admin-panel set-section sh-sheet" id="tools" aria-labelledby="ag-tools-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ag-tools-title">Tools failing</h2>
+          </div>
+          <p class="sh-note">
+            Every tool the agent called, the ones failing most first. Why a call
+            failed is classified on the machine into one of six words
+            (not-found, refused, timeout, conflict, cancelled, error); the message
+            itself is never sent, because it carries paths and snippets of code.
           </p>
-          <div class="admin-table" id="ag-tools"></div>
+          <div id="ag-tools"></div>
         </section>
 
-        <section class="admin-panel set-section" id="sessions">
-          <h2 class="admin-heading">Sessions <span class="admin-count" id="ag-sessions-count"></span></h2>
-          <p class="auth-note set-lede">Open one to see it event by event.</p>
-          <div class="admin-table" id="ag-sessions"></div>
+        <section class="admin-panel set-section sh-sheet" id="sessions" aria-labelledby="ag-sessions-title">
+          <div class="sh-part-head">
+            <h2 class="sh-part-title" id="ag-sessions-title">Sessions</h2>
+          </div>
+          <p class="sh-note" id="ag-sessions-note">Newest first. Open one to read it event by event.</p>
+          <div id="ag-sessions"></div>
         </section>
       </main>
     </div>
 
-    <script type="module" src="/theme.js"></script>
-    <script type="module" src="/account-drawer.js"></script>
     <script type="module" src="/agents.js"></script>
   </body>
 </html>
