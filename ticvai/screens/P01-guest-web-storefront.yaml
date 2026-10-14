@@ -4605,6 +4605,12 @@ screens:
     contract: orders
     purpose: Send a ticket to somebody
     trigger: onAction
+  - operationId: listTicketTransfers
+    contract: orders
+    purpose: 'Re-read by the screen after transferOrderTickets answers 202, not a control: the guest''s
+      transfers, so the ticket shows as offered, then claimed or returned when the offer lapses'
+    trigger: background
+    provenance: 'Block A audit, 14 October 2026: S-ASYNC-POLL (CHG-SCG-005)'
   entryState:
     params:
     - name: subjectId
