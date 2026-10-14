@@ -1,0 +1,21 @@
+# Client approvals of changes to the approved UI (CHG-GRD-002, 14 October 2026).
+#
+# The client approved the screens' UI (the client prototypes, the design-r1 frames, the wireframes); the lead, 14
+# October 2026: "the UI is fixed. approved by client so dont change that". handoff/approved-ui.json holds what was
+# approved: per screen, a hash and the text of every visible field. tools/check-approved-ui.py fails on any
+# difference this file does not list.
+#
+# One entry per changed field, added only when the client has approved the change:
+#
+#   - screen: BO-006                 # the screen id
+#     field: state:offline           # as check-approved-ui prints it (name, layout, region:<name>, state:<name>,
+#                                    # overlay:<id>, navigation, machine), or `screen` for a screen added or removed
+#     to: f5b800c41ba25990           # the hash of the approved content, as the check prints it (`to: ...`);
+#                                    # `removed` for a field or screen the client approved removing
+#     approval: <the client approval reference: the meeting, minute, tracker row or mail, and its date>
+#     change: CHG-XXX-nnn            # the change entry that made it
+#
+# An entry approves that content only: a later edit to the same field fails again until it has its own approval.
+# When the client approves a whole new UI, the lead re-takes the snapshot (`--snapshot <ref>`) in a reviewed commit
+# and the entries it has taken in can go (the check notes them).
+changes: []
