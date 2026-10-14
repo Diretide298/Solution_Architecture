@@ -46,7 +46,10 @@
      "to": "SUP-020",
      "trigger": "Works in Queue Configuration & Management",
      "provenance": "flow F135 step 1→2",
-     "operation": "listContact"
+     "operation": "listContact",
+     "carries": [
+      "queueId"
+     ]
     },
     {
      "to": "SUP-021",

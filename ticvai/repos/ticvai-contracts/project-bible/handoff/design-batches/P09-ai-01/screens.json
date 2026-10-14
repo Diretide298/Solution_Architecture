@@ -507,7 +507,7 @@
     "id": "formSetAiByokEnablement",
     "component": "modal",
     "trigger": "Save BYOK enablement",
-    "body": "**Collects what `setAiByokEnablement` sends before it is called.** Required: `tenantId`, `enabled`. Optional: `coverage`, `allowedTasks`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setAiByokEnablement` sends before it is called.** Required: `enabled`. Optional: `coverage`, `allowedTasks`, `reason`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `tenantId` (CHG-GT1-002).",
     "confirm": {
      "label": "Save BYOK enablement",
      "operation": "setAiByokEnablement"
@@ -515,7 +515,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "tenantId",
       "enabled",
       "coverage",
       "allowedTasks",

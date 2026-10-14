@@ -763,6 +763,7 @@ screens:
   offlineState: false
   entryParams:
   - partnerId<-session
+  - contactId<-navigation
   goesTo:
   - PTR-022
   boardFrames: null

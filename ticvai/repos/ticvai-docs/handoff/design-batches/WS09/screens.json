@@ -455,7 +455,7 @@
     "id": "formSetPodium",
     "component": "modal",
     "trigger": "Save podium",
-    "body": "**Collects what `setPodium` sends before it is called.** Required: `id`, `venueId`, `podiumType`, `name`, `scopePath`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPodium` sends before it is called.** Required: `venueId`, `podiumType`, `name`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessPodium",
     "confirm": {
      "label": "Save podium",
@@ -464,11 +464,9 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "podiumType",
       "name",
-      "scopePath",
       "accessPointIds"
      ]
     },
@@ -809,7 +807,7 @@
     "id": "formSetReasonCode",
     "component": "modal",
     "trigger": "Save reason code",
-    "body": "**Collects what `setReasonCode` sends before it is called.** Required: `id`, `code`, `name`, `operationalResponse`, `scopePath`. Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setReasonCode` sends before it is called.** Required: `code`, `name`, `operationalResponse`. Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessReasonCode",
     "confirm": {
      "label": "Save reason code",
@@ -818,11 +816,9 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "operationalResponse",
-      "scopePath",
       "venueId",
       "guestMessage",
       "operatorMessage",

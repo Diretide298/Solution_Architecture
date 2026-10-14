@@ -37,7 +37,7 @@
      "carries": [
       "version"
      ],
-     "provenance": "derived — DEV-008 declares entryState.params listingId, requestId, version and DEV-001 holds version, so an edge into it carries them"
+     "provenance": "derived — DEV-008 declares entryState.params anomalyRuleId, licenceId, listingId, quotaId, requestId, version and DEV-001 holds version, so an edge into it carries them"
     }
    ]
   },

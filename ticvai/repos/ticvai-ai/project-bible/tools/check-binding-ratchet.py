@@ -34,6 +34,16 @@ rows) stubbed out for speed. `--from-coverage FILE` reads the per-screen coverag
 
 **The baseline in this commit was recorded on the change-rules branch, before r2.** Re-record it on main
 at r2 (`--update-baseline`) before this gate blocks any audit fix.
+
+**A screen is counted under the block it had when the baseline was recorded** (CHG-GT1-006, r6 gate, 14 October 2026).
+Every replan moves screens between blocks, and each move read as a rise in one block and a fall in another of the same
+app, re-recorded by hand each time (CHG-GTB-013, CHG-GTR-005, CHG-GTRB-009). At the r6 gate ticvai-control B rose
+327 -> 357 while C and D fell: eight AI screens (ADM-488 18, ADM-538 7 ...) moved from D and C to B, 38 controls, and
+no screen's count rose between audit-base and the gate (the app's total 469 both). So `--update-baseline` now records
+each counted screen's block (`blocks`), and a screen that has moved since is compared under that block: a control added
+on a moved screen still rises where it was counted, and nothing leaves the comparison. A screen the baseline did not
+count keeps the block it has now. A baseline recorded before this has no `blocks`; the run says so and compares as
+before (the plan in the baseline's commit is not the one it was counted with: CHG-GTB-013).
 """
 from __future__ import annotations
 
@@ -245,6 +255,18 @@ def counts(fs: list[tuple]) -> dict:
     return dict(sorted(c.items()))
 
 
+def follow(fs: list[tuple], old: dict) -> tuple[list[tuple], collections.Counter]:
+    """Each finding under the block its screen had when the baseline was recorded; the moves it followed, counted."""
+    out, moved = [], collections.Counter()
+    for sid, app, blk, kind, item in fs:
+        ob = old.get(sid)
+        if ob and ob != blk:
+            moved[(sid, ob, blk)] += 1
+            blk = ob
+        out.append((sid, app, blk, kind, item))
+    return out, moved
+
+
 def compare(base: dict, cur: dict) -> tuple[list[tuple], list[tuple]]:
     """([(key, was, now)] risen, [(key, was, now)] fallen)."""
     up, down = [], []
@@ -283,6 +305,16 @@ def self_test() -> list[tuple[str, bool]]:
     long_ = [dict(allow[0], expires="2026-10-20")]
     out.append(("an entry longer than 14 days fails", bool(check_allowlist(long_, t))))
     out.append(("an entry without an approver fails", bool(check_allowlist([dict(allow[0], approved_by="")], t))))
+    # a screen the plan moved is counted where it was (CHG-GT1-006); a control added on it still rises there
+    moved_fs = [("WEB-001", "guest", "B", "unbound-control", "Hero"), ("WEB-001", "guest", "B", "unbound-control",
+                                                                       "Tagline"), fs[2]]
+    up, _ = compare(base, counts(follow(moved_fs, {"WEB-001": "A"})[0]))
+    out.append(("a screen moved to another block is compared where it was", not up))
+    up, _ = compare(base, counts(follow(moved_fs + [("WEB-001", "guest", "B", "unbound-control", "New")],
+                                        {"WEB-001": "A"})[0]))
+    out.append(("a control added on a moved screen still rises", [k for k, *_ in up] == ["guest|A|unbound-control"]))
+    out.append(("a screen the baseline did not count keeps its block",
+                follow([("WEB-009", "guest", "C", "unknown-field", "x")], {"WEB-001": "A"})[0][0][2] == "C"))
     return out
 
 
@@ -330,7 +362,10 @@ def main() -> int:
             "totals": {k: tot.get(k, 0) for k in KINDS},
             "screens": meta["screens"], "fully_resolved": meta["fully_resolved"],
             "block_source": meta["block_source"],
-            "counts": cur}, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+            "counts": cur,
+            # each counted screen's block, so a screen the plan moves later is compared where it was (CHG-GT1-006)
+            "blocks": dict(sorted({sid: blk for sid, _app, blk, _k, _i in kept}.items()))},
+            indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"baseline written: {BASELINE.relative_to(ROOT).as_posix()} ({len(cur)} counts)")
         return 0
 
@@ -345,6 +380,19 @@ def main() -> int:
               "Re-record it with --update-baseline.")
         kept = [(sid, app, blk if blk == "A" else "-", kind, item) for sid, app, blk, kind, item in kept]
         cur = counts(kept)
+    elif base.get("blocks"):
+        kept, moved = follow(kept, base["blocks"])
+        cur = counts(kept)
+        if moved:
+            by_screen = collections.Counter()
+            for (sid, ob, nb), n in moved.items():
+                by_screen[f"{sid} {ob}->{nb}"] += n
+            print(f"  note: {len(by_screen)} screen(s) changed block since the baseline; each is compared under its "
+                  "block then: " + ", ".join(f"{k} ({n})" for k, n in sorted(by_screen.items())[:40])
+                  + (" ..." if len(by_screen) > 40 else ""))
+    else:
+        print("  note: the baseline records no screen blocks (recorded before CHG-GT1-006), so a screen the plan moved "
+              "reads as a rise in its new block; re-record it with --update-baseline")
     up, down = compare(base.get("counts") or {}, cur)
     by_key = collections.defaultdict(collections.Counter)
     for sid, app, blk, kind, _item in kept:

@@ -103,8 +103,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-484` | Promotion, Bundle & Upsell Configuration | D | 9 | 26 | 7 | 1 | 0 | 2 | — | notStarted (—) |
 | `ADM-485` | Seating, Access & Operational Configuration | D | 9 | 26 | 7 | 1 | 0 | 6 | — | notStarted (—) |
 | `ADM-486` | Channel, Media & Fulfillment Configuration | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-487` | Cross-Module Conflict & Dependency Validation | D | 6 | 126 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-488` | Configuration Preview & Impact Analysis | D | 24 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-487` | Cross-Module Conflict & Dependency Validation | B | 6 | 126 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-488` | Configuration Preview & Impact Analysis | B | 24 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings
 

@@ -646,7 +646,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save podium** (modal, opened by *Save podium*; *Save podium* calls `setPodium`, *Cancel* sends nothing)
 
-**Collects what `setPodium` sends before it is called.** Required: `id`, `venueId`, `podiumType`, `name`, `scopePath`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setPodium` sends before it is called.** Required: `venueId`, `podiumType`, `name`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1029,7 +1029,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save reason code** (modal, opened by *Save reason code*; *Save reason code* calls `setReasonCode`, *Cancel* sends nothing)
 
-**Collects what `setReasonCode` sends before it is called.** Required: `id`, `code`, `name`, `operationalResponse`, `scopePath`. Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setReasonCode` sends before it is called.** Required: `code`, `name`, `operationalResponse`. Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

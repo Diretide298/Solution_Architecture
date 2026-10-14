@@ -64,7 +64,10 @@
      "to": "BO-159",
      "trigger": "Works in Entitlement Consumption Engine",
      "provenance": "flow F112 step 9→10",
-     "operation": "listAccessRule"
+     "operation": "listAccessRule",
+     "carries": [
+      "ruleId"
+     ]
     },
     {
      "to": "BO-160",
@@ -782,7 +785,7 @@
     "id": "formSetJourneySequenceRule",
     "component": "modal",
     "trigger": "Save journey sequence rule",
-    "body": "**Collects what `setJourneySequenceRule` sends before it is called.** Required: `id`, `scopePath`, `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setJourneySequenceRule` sends before it is called.** Required: `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessJourneySequenceRule",
     "confirm": {
      "label": "Save journey sequence rule",
@@ -791,8 +794,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "scope",
       "venueId",
       "name",

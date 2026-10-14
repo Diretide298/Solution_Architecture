@@ -628,6 +628,8 @@ screens:
   entryParams:
   - tenantId<-ADM-002
   - requestId<-navigation
+  - anomalyRuleId<-navigation
+  - quotaId<-navigation
   goesTo:
   - ADM-001
   - ADM-002
@@ -1207,6 +1209,7 @@ screens:
   offlineState: false
   entryParams:
   - cellId<-deepLink
+  - wafRuleId<-navigation
   goesTo:
   - ADM-001
   - ADM-002
@@ -1997,7 +2000,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - licensingModelId<-navigation
   goesTo:
   - ADM-389
   boardFrames: null
@@ -2019,7 +2023,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - licensingModelId<-navigation
   goesTo:
   - ADM-389
   boardFrames: null
@@ -2041,7 +2046,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - licensingModelId<-navigation
   goesTo:
   - ADM-389
   boardFrames: null
@@ -2064,7 +2070,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - licensingModelId<-navigation
   goesTo:
   - ADM-389
   boardFrames: null
@@ -2449,6 +2456,7 @@ screens:
   offlineState: false
   entryParams:
   - tenantId<-navigation
+  - providerId<-navigation
   goesTo:
   - ADM-409
   boardFrames: null
@@ -2470,7 +2478,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - trialConfigurationId<-navigation
   goesTo:
   - ADM-409
   boardFrames: null
@@ -5184,6 +5193,7 @@ screens:
   offlineState: false
   entryParams:
   - tenantId<-navigation
+  - matrixId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -5308,6 +5318,7 @@ screens:
   - planId<-navigation
   - requestId<-navigation
   - tenantId<-navigation
+  - slaPolicyId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null

@@ -4019,7 +4019,7 @@
     "id": "formSetChannelListing",
     "component": "modal",
     "trigger": "Save channel listing",
-    "body": "**Collects what `setChannelListing` sends before it is called.** Required: `id`, `channelName`, `productId`, `status`. Optional: `externalProductRef`, `allocationUnits`, `priceListId`, `adapter`, `adapterCredentialRef`, `pushIntervalMinutes`, `guestDataScope`, `lastPushedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setChannelListing` sends before it is called.** Required: `channelName`, `productId`, `status`. Optional: `externalProductRef`, `allocationUnits`, `priceListId`, `adapter`, `adapterCredentialRef`, `pushIntervalMinutes`, `guestDataScope`, `lastPushedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "ChannelListing",
     "confirm": {
      "label": "Save channel listing",
@@ -4028,7 +4028,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "channelName",
       "productId",
       "status",

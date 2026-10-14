@@ -1,10 +1,10 @@
 # Migration changes for a person
 
-**Written by `tools/derive-ddl.py` in frozen mode (20261014). Do not edit; it is rewritten on every run.**
+**Written by `tools/derive-ddl.py` in frozen mode (20261015). Do not edit; it is rewritten on every run.**
 
 The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/check-migration-freeze.py`). `derive-ddl.py` writes additive changes (new tables, columns and indexes) as the next forward migration, `backend/<area>/V<nnnn>__*.sql`. **The changes below it does not write**, because each has a data question behind it: which rows survive a drop, what fills a new NOT NULL column, whether a rename is a rename. Write each as a forward migration by hand; once a forward migration carries it, it leaves this list.
 
-**938 change(s).**
+**963 change(s).**
 
 | Kind | Database | Object | Change | What a person does |
 |---|---|---|---|---|
@@ -65,6 +65,14 @@ The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/ch
 | constraint added | control | `control.upgrade_schedule upgrade_schedule_tenant_id_fkey` | `ALTER TABLE control.upgrade_schedule ADD CONSTRAINT upgrade_schedule_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id)` | existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE) |
 | constraint added | control | `control.webhook_delivery webhook_delivery_subscription_id_fkey` | `ALTER TABLE control.webhook_delivery ADD CONSTRAINT webhook_delivery_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES control.webhook_subscription(id)` | existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE) |
 | constraint added | control | `control.webhook_subscription webhook_subscription_client_id_fkey` | `ALTER TABLE control.webhook_subscription ADD CONSTRAINT webhook_subscription_client_id_fkey FOREIGN KEY (client_id) REFERENCES control.api_client(id)` | existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE) |
+| index dropped | control | `control.partner_allocation_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | control | `control.partner_case_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | control | `control.partner_change_request_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | control | `control.partner_commission_line_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | control | `control.partner_commission_line_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | control | `control.partner_commission_rule_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | control | `control.partner_rate_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | control | `control.partner_reconciliation_exception_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | table renamed | tenant | `catalogue.channel_allocation -> catalogue.channel_envelope` | declared rename (derive-schema-history.py RENAMES) | ALTER TABLE catalogue.channel_allocation RENAME TO channel_envelope; ALTER TABLE catalogue.channel_envelope RENAME COLUMN allocation_type TO envelope_type; ALTER TABLE catalogue.channel_envelope RENAME COLUMN envelope_id TO channel_capacity_id; then rename its key, indexes, constraints and policies to the generated names and apply its row-level security again (the "after rename" row for it) |
 | table renamed | tenant | `catalogue.inventory_hold -> catalogue.inventory_reservation` | declared rename (derive-schema-history.py RENAMES) | ALTER TABLE catalogue.inventory_hold RENAME TO inventory_reservation; then rename its key, indexes, constraints and policies to the generated names and apply its row-level security again (the "after rename" row for it) |
 | table renamed | tenant | `inventory.item -> inventory.inventory_item` | declared rename (derive-schema-history.py RENAMES) | ALTER TABLE inventory.item RENAME TO inventory_item; ALTER TABLE inventory.inventory_item RENAME COLUMN last_purchase_price TO last_purchase_cost_amount; then rename its key, indexes, constraints and policies to the generated names and apply its row-level security again (the "after rename" row for it) |
@@ -888,7 +896,7 @@ The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/ch
 | after rename | tenant | `inventory.stock_earmark` | 7 generated object(s) for the renamed table: `stock_earmark_source_type_chk`, `stock_earmark_status_chk`, `stock_earmark_item_id_fkey`, `stock_earmark_location_id_fkey`, `stock_earmark_item_id_idx`, `stock_earmark_location_id_idx`, `SELECT platform.apply_parent_rls('inventory.stock_earmark'::regclass, ` | in the forward migration that renames the table: rename its old indexes and constraints to these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level security again |
 | after rename | tenant | `orders.group_customer_organisation` | 3 generated object(s) for the renamed table: `group_customer_organisation_name_chk`, `group_customer_organisation_organisation_type_chk`, `SELECT platform.apply_tenant_rls('orders.group_customer_organisation':` | in the forward migration that renames the table: rename its old indexes and constraints to these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level security again |
 | after rename | tenant | `orders.group_customer_organisation_contact` | 3 generated object(s) for the renamed table: `group_customer_organisation_contact_group_custome_3b68685a_fkey`, `group_customer_organisation_contact_group_customer_2ad51596_idx`, `SELECT platform.apply_tenant_rls('orders.group_customer_organisation_c` | in the forward migration that renames the table: rename its old indexes and constraints to these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level security again |
-| after rename | tenant | `resources.resource_reservation` | 8 generated object(s) for the renamed table: `resource_reservation_status_chk`, `resource_reservation_map_id_fkey`, `resource_reservation_held_by_principal_id_idx`, `resource_reservation_order_id_idx`, `resource_reservation_subject_id_idx`, `resource_reservation_map_id_idx`, `resource_reservation_scope_path_idx`, `SELECT platform.apply_scope_rls('resources.resource_reservation'::regc` | in the forward migration that renames the table: rename its old indexes and constraints to these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level security again |
+| after rename | tenant | `resources.resource_reservation` | 7 generated object(s) for the renamed table: `resource_reservation_status_chk`, `resource_reservation_map_id_fkey`, `resource_reservation_held_by_principal_id_idx`, `resource_reservation_subject_id_idx`, `resource_reservation_map_id_idx`, `resource_reservation_scope_path_idx`, `SELECT platform.apply_scope_rls('resources.resource_reservation'::regc` | in the forward migration that renames the table: rename its old indexes and constraints to these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level security again |
 | after rename | tenant | `seating.recommendation_rule` | 4 generated object(s) for the renamed table: `recommendation_rule_performance_id_idx`, `recommendation_rule_seat_map_id_idx`, `recommendation_rule_scope_path_idx`, `SELECT platform.apply_scope_rls('seating.recommendation_rule'::regclas` | in the forward migration that renames the table: rename its old indexes and constraints to these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level security again |
 | after rename | tenant | `seating.seat_reservation` | 10 generated object(s) for the renamed table: `seat_reservation_status_chk`, `seat_reservation_block_id_fkey`, `seat_reservation_held_by_principal_id_fkey`, `seat_reservation_performance_id_fkey`, `seat_reservation_subject_id_fkey`, `seat_reservation_block_id_idx`, `seat_reservation_held_by_principal_id_idx`, `seat_reservation_performance_id_idx`, `seat_reservation_subject_id_idx`, `SELECT platform.apply_parent_rls('seating.seat_reservation'::regclass,` | in the forward migration that renames the table: rename its old indexes and constraints to these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level security again |
 | after rename | tenant | `seating.seat_reservation_item` | 5 generated object(s) for the renamed table: `seat_reservation_item_seat_id_fkey`, `seat_reservation_item_seat_reservation_id_fkey`, `seat_reservation_item_seat_id_idx`, `seat_reservation_item_seat_reservation_id_idx`, `SELECT platform.apply_parent_split_rls('seating.seat_reservation_item'` | in the forward migration that renames the table: rename its old indexes and constraints to these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level security again |
@@ -911,7 +919,13 @@ The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/ch
 | constraint dropped | tenant | `platform.workstation workstation_org_unit_id_fkey` | no longer generated | ALTER TABLE ... DROP CONSTRAINT by hand if intended |
 | constraint dropped | tenant | `queue.queue queue_fast_pass_id_fkey` | no longer generated | ALTER TABLE ... DROP CONSTRAINT by hand if intended |
 | index dropped | tenant | `access.attraction_access_attraction_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `access.media_binding_rule_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `access.media_template_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `ai.byok_enablement_tenant_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `ai.rec_decline_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `ai.rec_event_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `ai.rec_event_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `ai.risk_assessment_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `approvals.workflow_instance_current_node_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `approvals.workflow_intervention_alternative_node_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `catalogue.space_venue_map_zone_id_idx` | no longer generated | DROP INDEX by hand if intended |
@@ -919,14 +933,25 @@ The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/ch
 | index dropped | tenant | `kernel.inbox_event_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `ledger.einvoice_transmission_provider_message_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `ledger.einvoicing_provider_participant_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `ledger.tax_invoice_line_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `marketing.booking_consent_record_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `marketing.case_compensation_request_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `marketing.guest_extra_field_tenant_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `marketing.invitation_issued_by_principal_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `marketing.invitation_offered_by_principal_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `marketing.legal_hold_hold_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `marketing.waiver_requirement_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `orders.after_sale_policy_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `orders.group_quote_line_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `orders.payment_allocation_rule_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `orders.resale_eligibility_rule_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `orders.reservation_hold_policy_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `platform.outbox_event_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `platform.outbox_tenant_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `promotions.partner_bundle_product_external_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `resources.resource_requirement_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `retail.product_recommendation_target_product_id_idx` | no longer generated | DROP INDEX by hand if intended |
+| index dropped | tenant | `retail.shop_and_drop_order_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `subscription.capacity_pack_tenant_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `subscription.membership_entitlement_pricing_rule_id_idx` | no longer generated | DROP INDEX by hand if intended |
 | index dropped | tenant | `wallet.balance_wallet_balance_id_idx` | no longer generated | DROP INDEX by hand if intended |

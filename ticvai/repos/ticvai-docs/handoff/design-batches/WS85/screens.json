@@ -1265,7 +1265,7 @@
     "id": "formSetGateOfflinePolicy",
     "component": "modal",
     "trigger": "Set maximum offline duration",
-    "body": "**Collects what `setGateOfflinePolicy` sends before it is called.** Required: `venueId`. Optional: `maxOfflineDurationHours`, `offlineChecks`, `afterThresholdBehavior`, `revocationTriggerEvents`, `revocationMaxAllowedAgeMinutes`, `revocationStalenessAction`, `operatingModes`, `centralUnavailableAfterSeconds`, `edgeUnavailableAfterSeconds`, `automaticSwitch`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setGateOfflinePolicy` sends before it is called.** Required: `venueId`. Optional: `maxOfflineDurationHours`, `offlineChecks`, `afterThresholdBehavior`, `revocationTriggerEvents`, `revocationMaxAllowedAgeMinutes`, `revocationStalenessAction`, `operatingModes`, `centralUnavailableAfterSeconds`, `edgeUnavailableAfterSeconds`, `automaticSwitch`. is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "confirm": {
      "label": "Set maximum offline duration",
      "operation": "setGateOfflinePolicy"

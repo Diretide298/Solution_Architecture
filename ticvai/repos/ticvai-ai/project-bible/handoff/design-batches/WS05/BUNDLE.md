@@ -467,8 +467,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-185` Biometric Verification Profile Builder: *Works in Biometric Verification Profile Builder*; calls `listBiometricAccess`
 - → `BO-186` Face Pass Enrollment Configuration: *Works in Face Pass Enrollment Configuration*; calls `listBiometricAccess`
 - → `BO-187` Biometric Consent & Guardian Management: *Works in Biometric Consent & Guardian Management*; calls `listBiometricAccess`
-- → `BO-188` Face Tag Temporary Enrollment: *Works in Face Tag Temporary Enrollment*; calls `listBiometricAccess`
-- → `BO-189` Face Matching & Verification Thresholds: *Works in Face Matching & Verification Thresholds*; calls `listBiometricAccess`
+- → `BO-188` Face Tag Temporary Enrollment: *Works in Face Tag Temporary Enrollment*; carries `profileId`; calls `listBiometricAccess`
+- → `BO-189` Face Matching & Verification Thresholds: *Works in Face Matching & Verification Thresholds*; carries `profileId`; calls `listBiometricAccess`
 - → `BO-190` Face Change, Re-enrollment & Identity Protection: *Works in Face Change, Re-enrollment & Identity Protection*; calls `listBiometricAccess`
 - → `BO-191` Biometric Validation at Gate: *Works in Biometric Validation at Gate*; calls `listBiometricAccess`
 - → `BO-192` Biometric Lifecycle, Retention & Deletion: *Works in Biometric Lifecycle, Retention & Deletion*; calls `listBiometricAccess`

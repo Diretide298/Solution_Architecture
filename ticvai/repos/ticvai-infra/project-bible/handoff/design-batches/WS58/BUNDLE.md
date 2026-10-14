@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-268` | Channel Operations Command Center | B | 0 | 24 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
+| `ADM-268` | Channel Operations Command Center | A | 0 | 24 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
 | `ADM-269` | Channel Connection & Integration Manager | A | 33 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-270` | Product, Price & Availability Synchronization | B | 6 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-271` | Real-Time Channel Availability & Inventory Monitor | B | 0 | 14 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block B · ticket #29778 (VM-ADM-268) |
+| Block | Block A · ticket #29778 (VM-ADM-268) |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each channel should display) — counts over a population, then the population |

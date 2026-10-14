@@ -324,6 +324,12 @@ ROW_OWNER = {
     "transport.departure": "timetable_id",                    # the timetable's departure; route and performance named
     "transport.fare_matrix_cell": "fare_table_id",            # the fare table's cell; the stations are its axes
     "transport.route_stop": "route_id",                       # the route's stop, as at r1; the station is where
+    # CHG-GT1-001 (r6 gate, 14 October 2026): the merged batches gave these a second protected candidate (STO declared
+    # the keys, MOD scoped the tables they name), and with two owners protected in one round the table fell to the
+    # tenant root, so a till could not count its own shift and a venue could not read its seat blocks (RF-TENANT-ROOT).
+    "orders.cash_count_line": "shift_id",                     # the shift's count, as at r1; the box is what was counted
+    "orders.deposit_box_opening_denomination": "deposit_box_id",   # the box's opening float, as at r1; the coin is what
+    "seating.seat_block_item": "block_id",                    # the block's seats; the seat is what the block holds
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------

@@ -283,7 +283,7 @@
     "id": "formSetJourneyProfile",
     "component": "modal",
     "trigger": "Save journey profile",
-    "body": "**Collects what `setJourneyProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setJourneyProfile` sends before it is called.** Required: `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessJourneyProfile",
     "confirm": {
      "label": "Save journey profile",
@@ -292,8 +292,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "name",
       "status",
       "venueId",
@@ -1365,7 +1363,7 @@
     "id": "formSetFastPassProfile",
     "component": "modal",
     "trigger": "Save fast pass profile",
-    "body": "**Collects what `setFastPassProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`, `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setFastPassProfile` sends before it is called.** Required: `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`, `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessFastPassProfile",
     "confirm": {
      "label": "Save fast pass profile",
@@ -1374,8 +1372,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "name",
       "unlimited",
       "venueId",
@@ -1533,7 +1529,7 @@
     "id": "formSetOperatingCalendarEntry",
     "component": "modal",
     "trigger": "Save operating calendar entry",
-    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `venueId`, `dayType`, `startsAt`, `endsAt`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessOperatingCalendarEntry",
     "confirm": {
      "label": "Save operating calendar entry",
@@ -1542,12 +1538,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "dayType",
       "startsAt",
       "endsAt",
-      "scopePath",
       "name",
       "ticketValidationRequired",
       "admissionType",
@@ -1626,7 +1620,17 @@
     "BO-214"
    ],
    "inferred": false,
-   "notes": "**Reached from BO-214, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from BO-214, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-214",
+     "trigger": "Guest Journey Command Center",
+     "carries": [
+      "journeyProfileId"
+     ],
+     "provenance": "derived — BO-214 declares entryState.params journeyProfileId and BO-223 holds journeyProfileId, so an edge into it carries them"
+    }
+   ]
   },
   "density": "compact",
   "purposeNote": "Complex guest journeys can be simulated end-to-end, approved, deployed, audited and rolled back. Board 8 — Final 10-Screen Structure # Backend Screen Main Responsibility 8.1 Guest Journey Command Center Special journey management and monitoring 8.2 Group & B2B Admission Profile Builder Configure group-access models 8.3 Group Leader & Fast B2B Validation Accelerate large-group entry 8.4 Group Attendance & Partial Entry Manager Actual attendance and multiple arrival waves 8.5 Family, Child, POD & Companion Journey Linked-person and child-protection journeys 8.6 Re-entry & Temporary Exit Journey",

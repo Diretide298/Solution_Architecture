@@ -93,7 +93,7 @@
     {
      "to": "BO-140",
      "trigger": "Product Availability, 86 & Operational Food Safety",
-     "provenance": "derived — BO-140 declares entryState.params itemId, menuId, outletId and BO-105 holds none of them. The edge carries nothing: itemId, outletId only pre-select (deep link or optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source on BO-140 yet (a gap in BO-140, not in this edge)"
+     "provenance": "derived — BO-140 declares entryState.params checkpointId, itemId, menuId, outletId and BO-105 holds none of them. The edge carries nothing: itemId, outletId, checkpointId only pre-select (deep link or optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source on BO-140 yet (a gap in BO-140, not in this edge)"
     },
     {
      "to": "BO-141",

@@ -350,7 +350,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save scaling policy** (modal, opened by *Save scaling policy*; *Save scaling policy* calls `setScalingPolicy`, *Cancel* sends nothing)
 
-**Collects what `setScalingPolicy` sends before it is called.** Nothing in the body is required. Optional: `service`, `replicaFloor`, `replicaCeiling`, `targetUtilisationPct`, `scaleStepPct`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setScalingPolicy` sends before it is called.** Nothing in the body is required. Optional: `service`, `replicaFloor`, `replicaCeiling`, `targetUtilisationPct`, `scaleStepPct`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

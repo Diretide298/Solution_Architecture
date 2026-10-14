@@ -67,7 +67,10 @@
     {
      "to": "BO-388",
      "trigger": "Approval SLA Policy Configuration",
-     "provenance": "structural — pack board 5 wiring, 9 September 2026"
+     "provenance": "structural — pack board 5 wiring, 9 September 2026",
+     "carries": [
+      "slaPolicyId"
+     ]
     },
     {
      "to": "BO-389",

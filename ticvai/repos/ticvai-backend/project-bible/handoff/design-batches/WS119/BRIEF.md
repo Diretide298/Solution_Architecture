@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-504` | Channel & Booking Pace Forecast | B | 9 | 22 | 7 | 41 | 0 | 6 | — | notStarted (—) |
 | `ADM-505` | Revenue & Commercial Forecast | B | 14 | 26 | 7 | 42 | 0 | 0 | — | notStarted (—) |
 | `ADM-506` | Forecast Drivers, Confidence & Explainability | A | 14 | 36 | 7 | 46 | 0 | 0 | — | notStarted (—) |
-| `ADM-507` | Forecast Scenario & What-If Simulator | D | 6 | 20 | 7 | 39 | 0 | 0 | — | notStarted (—) |
+| `ADM-507` | Forecast Scenario & What-If Simulator | B | 6 | 20 | 7 | 39 | 0 | 0 | — | notStarted (—) |
 | `ADM-508` | Forecast Accuracy, Review & Publication Center | A | 13 | 24 | 7 | 6 | 0 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings

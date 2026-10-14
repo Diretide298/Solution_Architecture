@@ -144,7 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1056` | Seat Utilization Analytics | D | 2 | 19 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1057` | Hold Inventory Reporting | C | 0 | 12 | 6 | 0 | 0 | 4 | — | notStarted (—) |
 | `BO-1058` | Sales Pace & Pick Curves | B | 0 | 20 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-1059` | Heat Maps & Drill-Down | C | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `BO-1059` | Heat Maps & Drill-Down | D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-1060` | Report Builder, Export & Audit | D | 0 | 0 | 6 | 87 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

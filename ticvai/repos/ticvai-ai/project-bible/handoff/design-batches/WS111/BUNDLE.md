@@ -246,7 +246,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `BO-645` Credential Generation Workspace: *Credential Generation Workspace*
 - → `BO-646` Credential Media Configuration: *Credential Media Configuration*
-- → `BO-647` Badge Template Designer: *Badge Template Designer*
+- → `BO-647` Badge Template Designer: *Badge Template Designer*; carries `badgeTemplateId`
 - → `BO-648` Badge Printing & Print Queue: *Badge Printing & Print Queue*
 - → `BO-649` Digital & Mobile Credential Management: *Digital & Mobile Credential Management*; carries `credentialId`
 - → `BO-650` NFC & RFID Credential Encoding: *NFC & RFID Credential Encoding*; carries `credentialId`

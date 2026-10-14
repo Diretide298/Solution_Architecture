@@ -222,7 +222,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **Where the user goes next**
 
 - → `SUP-001` Venue Management Sign In: *Agent Login*
-- → `SUP-020` Queue Configuration & Management: *Works in Queue Configuration & Management*; calls `listContact`
+- → `SUP-020` Queue Configuration & Management: *Works in Queue Configuration & Management*; carries `queueId`; calls `listContact`
 - → `SUP-021` Intelligent Routing, Skills & Assignment Engine: *Works in Intelligent Routing, Skills & Assignment Engine*; calls `listContact`
 - → `SUP-022` SLA Policy & Service-Level Management: *Works in SLA Policy & Service-Level Management*; calls `listContact`
 - → `SUP-023` Agent Workload, Availability & Workforce Control: *Works in Agent Workload, Availability & Workforce Control*; calls `listContact`

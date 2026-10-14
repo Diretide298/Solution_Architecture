@@ -17,7 +17,11 @@ are tools/ticket_done.py MIGRATION_WORDING, written by tools/build-service-docs.
   MW-SOURCE      a [DB] migration task with no "Source DDL:" (MIG-FOREIGN-KEYS and MIG-PARTITIONS had none)
   MW-AFTER-R1    a table a frozen after-r1 file (backend/<db>/V01nn__after_r1_*.sql) changes without creating it, whose
                  creating migration task does not cite that file, or that no migration task creates (the lead's check
-                 of 7 October: V0101's columns on catalogue.product and catalogue.performance were on no ticket)
+                 of 7 October: V0101's columns on catalogue.product and catalogue.performance were on no ticket).
+                 A table no task creates because only held operations reach it (CHG-FXP-003; listed `held:` under
+                 "Tables no migration creates" in MIGRATIONS.md) passes only when that row cites the file
+                 ("Source DDL after r1: <file>"), so the migration planned with its operations applies the change
+                 (CHG-GT1-007: CHG-MOD-007 scoped approvals.accreditation_badge in V0104)
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -64,12 +68,22 @@ def main() -> int:
         m = re.search(r"Tables: (.+?)\. Source", r["description"] or "")
         for t in (m.group(1).split(", ") if m else []):
             made_by.setdefault(t.strip(), r)
+    held = {}
+    mmd = g.ROOT / SD / "backend" / "MIGRATIONS.md"
+    if mmd.exists():
+        seg = mmd.read_text(encoding="utf-8").split("## Tables no migration creates", 1)
+        if len(seg) == 2:
+            for t, why in re.findall(r"^\| `([a-z_]+\.[a-z_0-9]+)` \| \w+ \| [^|]* \| (held: .+?) \|$", seg[1], re.M):
+                held[t] = why
     n_ar1 = 0
     for (rel, t), _ in sorted(td.after_r1_changes(g.ROOT).items()):
         n_ar1 += 1
         r = made_by.get(t)
+        if r is None and f"Source DDL after r1: {rel}" in held.get(t, ""):
+            continue          # held with its operations (CHG-FXP-003); the row cites the file (CHG-GT1-007)
         if r is None:
-            guard.add("MW-AFTER-R1", f"{rel}:{t}", f"{rel} changes {t}, which no migration task creates")
+            guard.add("MW-AFTER-R1", f"{rel}:{t}", f"{rel} changes {t}, which no migration task creates"
+                      + (" (it is held, and its row in MIGRATIONS.md does not cite the file)" if t in held else ""))
         elif f"Source DDL after r1: {rel}" not in (r["description"] or "") or t not in r["description"]:
             guard.add("MW-AFTER-R1", f"{rel}:{t}", f"{r['key']} creates {t} but does not cite {rel}, which changes it")
     base = next((r for r in rows if r["key"] == "MIG-BASELINE"), None)

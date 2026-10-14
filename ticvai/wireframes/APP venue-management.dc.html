@@ -166,7 +166,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; feedId&larr;deepLink, queueId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-002">BO-002</a>  &mdash; <i>Queue Configuration</i> <span class="car">queueId</span><br><a href="#bo-003">BO-003</a>  &mdash; <i>Queue Integration Setup</i> <span class="car">feedId</span><br><a href="#bo-004">BO-004</a>  &mdash; <i>Manual Wait Time Entry</i> <span class="car">queueId</span><br><a href="#bo-005">BO-005</a>  &mdash; <i>Queue Monitor</i> <span class="car">queueId</span><br><a href="#bo-006">BO-006</a>  &mdash; <i>Parking Configuration</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCallNextParties &middot; <i>Call next parties</i> &middot; <b>Call next parties</b> &middot; Cancel <span class="dis">discards partyCount</span></div><div class="ov"><b>modal</b> formConfigureQueueFeed &middot; <i>Configure queue feed</i> &middot; <b>Configure queue feed</b> &middot; Cancel <span class="dis">discards id · queueId · adaptor · isEnabled · adaptorName · credentialsRef · expectedIntervalSeconds</span></div><div class="ov"><b>modal</b> formCreateQueue &middot; <i>Create queue</i> &middot; <b>Create queue</b> &middot; Cancel <span class="dis">discards code · name · venueId · capacityPerCycle · cycleMinutes · attractionProductId · assetId · accessPointId · kind · operatingWindows · parentQueueId · loadBalanceWithQueueIds · inQueueOfferEnabled · notifyBeforeCallMinutes · maxPartySize · returnWindowMinutes · heightRequirementCm · fastPassAllocationPercent</span></div><div class="ov"><b>modal</b> formSetQueueStatus &middot; <i>Save queue status</i> &middot; <b>Save queue status</b> &middot; Cancel <span class="dis">discards status · reason · guestMessage · expectedReopenAt</span></div><div class="ov"><b>modal</b> formSetWaitTime &middot; <i>Save wait time</i> &middot; <b>Save wait time</b> &middot; Cancel <span class="dis">discards waitMinutes · expiresInMinutes · note</span></div><div class="ov"><b>modal</b> formUpdateQueue &middot; <i>Save queue</i> &middot; <b>Save queue</b> &middot; Cancel <span class="dis">discards name · capacityPerCycle · cycleMinutes · maxPartySize · returnWindowMinutes · heightRequirementCm · fastPassAllocationPercent</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCallNextParties &middot; <i>Call next parties</i> &middot; <b>Call next parties</b> &middot; Cancel <span class="dis">discards partyCount</span></div><div class="ov"><b>modal</b> formConfigureQueueFeed &middot; <i>Configure queue feed</i> &middot; <b>Configure queue feed</b> &middot; Cancel <span class="dis">discards queueId · adaptor · isEnabled · adaptorName · credentialsRef · expectedIntervalSeconds</span></div><div class="ov"><b>modal</b> formCreateQueue &middot; <i>Create queue</i> &middot; <b>Create queue</b> &middot; Cancel <span class="dis">discards code · name · venueId · capacityPerCycle · cycleMinutes · attractionProductId · assetId · accessPointId · kind · operatingWindows · parentQueueId · loadBalanceWithQueueIds · inQueueOfferEnabled · notifyBeforeCallMinutes · maxPartySize · returnWindowMinutes · heightRequirementCm · fastPassAllocationPercent</span></div><div class="ov"><b>modal</b> formSetQueueStatus &middot; <i>Save queue status</i> &middot; <b>Save queue status</b> &middot; Cancel <span class="dis">discards status · reason · guestMessage · expectedReopenAt</span></div><div class="ov"><b>modal</b> formSetWaitTime &middot; <i>Save wait time</i> &middot; <b>Save wait time</b> &middot; Cancel <span class="dis">discards waitMinutes · expiresInMinutes · note</span></div><div class="ov"><b>modal</b> formUpdateQueue &middot; <i>Save queue</i> &middot; <b>Save queue</b> &middot; Cancel <span class="dis">discards name · capacityPerCycle · cycleMinutes · maxPartySize · returnWindowMinutes · heightRequirementCm · fastPassAllocationPercent</span></div></div>
         </div>
       </div>
       <div id="bo-002" class="scr">
@@ -226,7 +226,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; feedId&larr;BO-001, orderId&larr;deepLink, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">feedId · queueId</span><br><a href="#bo-002">BO-002</a>  &mdash; <i>Queue Configuration</i> <span class="car">queueId</span><br><a href="#bo-004">BO-004</a>  &mdash; <i>Manual Wait Time Entry</i> <span class="car">queueId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formConfigureQueueFeed &middot; <i>Configure queue feed</i> &middot; <b>Configure queue feed</b> &middot; Cancel <span class="dis">discards id · queueId · adaptor · isEnabled · adaptorName · credentialsRef · expectedIntervalSeconds</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formConfigureQueueFeed &middot; <i>Configure queue feed</i> &middot; <b>Configure queue feed</b> &middot; Cancel <span class="dis">discards queueId · adaptor · isEnabled · adaptorName · credentialsRef · expectedIntervalSeconds</span></div></div>
         </div>
       </div>
       <div id="bo-004" class="scr">
@@ -586,7 +586,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-070">BO-070</a>  &mdash; <i>Work Orders</i> <span class="car">workOrderId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateMaintenancePlan &middot; <i>Create maintenance plan</i> &middot; <b>Create maintenance plan</b> &middot; Cancel <span class="dis">discards id · name · assetId · taskTemplate · assetCategoryId · intervalDays · usageInterval · leadTimeDays · lastCompletedAt · nextDueAt · isActive</span></div><div class="ov"><b>modal</b> formUpdateMaintenancePlan &middot; <i>Change plan</i> &middot; <b>Change plan</b> &middot; Cancel</div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateMaintenancePlan &middot; <i>Create maintenance plan</i> &middot; <b>Create maintenance plan</b> &middot; Cancel <span class="dis">discards name · assetId · taskTemplate · assetCategoryId · intervalDays · usageInterval · leadTimeDays · lastCompletedAt · nextDueAt · isActive</span></div><div class="ov"><b>modal</b> formUpdateMaintenancePlan &middot; <i>Change plan</i> &middot; <b>Change plan</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="bo-072" class="scr">
@@ -737,7 +737,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           <div><b>GOES TO</b> &middot; <a href="#bo-096">BO-096</a>  &mdash; <i>Resource Calendar</i> <span class="car">resourceId</span><br><a href="#bo-097">BO-097</a>  &mdash; <i>Check Out &amp; Check In</i><br><a href="#bo-098">BO-098</a>  &mdash; <i>Qualifications</i> <span class="car">resourceId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateResource &middot; <i>Create resource</i> &middot; <b>Create resource</b> &middot; Cancel <span class="dis">discards id · code · name · kind · venueId · scopePath · parentResourceId · principalId · attributes · setupMinutes · teardownMinutes · requiresQualification · depositAmount · status · isActive</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateResource &middot; <i>Create resource</i> &middot; <b>Create resource</b> &middot; Cancel <span class="dis">discards code · name · kind · venueId · scopePath · parentResourceId · principalId · attributes · setupMinutes · teardownMinutes · requiresQualification · depositAmount · status · isActive</span></div></div>
         </div>
       </div>
       <div id="bo-096" class="scr">
@@ -1127,7 +1127,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; groupId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-144">BO-144</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAccessPointGroup &middot; <i>Save access point group</i> &middot; <b>Save access point group</b> &middot; Cancel <span class="dis">discards id · venueId · name · scopePath · parentGroupId · accessPointIds</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteAccessPointGroup &middot; <i>Delete access point group</i></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAccessPointGroup &middot; <i>Save access point group</i> &middot; <b>Save access point group</b> &middot; Cancel <span class="dis">discards venueId · name · parentGroupId · accessPointIds</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteAccessPointGroup &middot; <i>Delete access point group</i></div></div>
         </div>
       </div>
       <div id="bo-152" class="scr" data-ws="WS01">
@@ -1157,7 +1157,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; entryId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-144">BO-144</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetOperatingCalendarEntry &middot; <i>Save operating calendar entry</i> &middot; <b>Save operating calendar entry</b> &middot; Cancel <span class="dis">discards id · venueId · dayType · startsAt · endsAt · scopePath · name · ticketValidationRequired · admissionType · attractionValidation · manualAttendanceRequired</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteOperatingCalendarEntry &middot; <i>Delete operating calendar entry</i></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetOperatingCalendarEntry &middot; <i>Save operating calendar entry</i> &middot; <b>Save operating calendar entry</b> &middot; Cancel <span class="dis">discards venueId · dayType · startsAt · endsAt · name · ticketValidationRequired · admissionType · attractionValidation · manualAttendanceRequired</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteOperatingCalendarEntry &middot; <i>Delete operating calendar entry</i></div></div>
         </div>
       </div>
       <div id="bo-153" class="scr" data-ws="WS01">
@@ -1215,7 +1215,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listAccessRule · listAdmissionRules · createAdmissionRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-155">BO-155</a>  &mdash; <i>Works in Visual Access Rule Builder</i><br><a href="#bo-156">BO-156</a>  &mdash; <i>Works in Entry, Exit &amp; Re-entry Rules</i><br><a href="#bo-157">BO-157</a>  &mdash; <i>Works in Anti-Passback &amp; Journey Sequence</i> <span class="car">ruleId</span><br><a href="#bo-158">BO-158</a>  &mdash; <i>Works in Access Validity &amp; Time Rules</i><br><a href="#bo-159">BO-159</a>  &mdash; <i>Works in Entitlement Consumption Engine</i><br><a href="#bo-160">BO-160</a>  &mdash; <i>Works in Multi-Park &amp; Crossover Rules</i><br><a href="#bo-161">BO-161</a>  &mdash; <i>Works in Guest, Companion &amp; Eligibility Rule</i> <span class="car">productId</span><br><a href="#bo-162">BO-162</a>  &mdash; <i>Works in Group Admission &amp; Quantity Validati</i><br><a href="#bo-163">BO-163</a>  &mdash; <i>Works in Rule Simulation, Conflict Check &amp; P</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-155">BO-155</a>  &mdash; <i>Works in Visual Access Rule Builder</i><br><a href="#bo-156">BO-156</a>  &mdash; <i>Works in Entry, Exit &amp; Re-entry Rules</i><br><a href="#bo-157">BO-157</a>  &mdash; <i>Works in Anti-Passback &amp; Journey Sequence</i> <span class="car">ruleId</span><br><a href="#bo-158">BO-158</a>  &mdash; <i>Works in Access Validity &amp; Time Rules</i><br><a href="#bo-159">BO-159</a>  &mdash; <i>Works in Entitlement Consumption Engine</i> <span class="car">ruleId</span><br><a href="#bo-160">BO-160</a>  &mdash; <i>Works in Multi-Park &amp; Crossover Rules</i><br><a href="#bo-161">BO-161</a>  &mdash; <i>Works in Guest, Companion &amp; Eligibility Rule</i> <span class="car">productId</span><br><a href="#bo-162">BO-162</a>  &mdash; <i>Works in Group Admission &amp; Quantity Validati</i><br><a href="#bo-163">BO-163</a>  &mdash; <i>Works in Rule Simulation, Conflict Check &amp; P</i></div>
           
           
         </div>
@@ -1307,7 +1307,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; ruleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-154">BO-154</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetJourneySequenceRule &middot; <i>Save journey sequence rule</i> &middot; <b>Save journey sequence rule</b> &middot; Cancel <span class="dis">discards id · scopePath · scope · venueId · name · windowMinutes · requiredSequence · violationResponses</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteJourneySequenceRule &middot; <i>Delete journey sequence rule</i></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetJourneySequenceRule &middot; <i>Save journey sequence rule</i> &middot; <b>Save journey sequence rule</b> &middot; Cancel <span class="dis">discards scope · venueId · name · windowMinutes · requiredSequence · violationResponses</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteJourneySequenceRule &middot; <i>Delete journey sequence rule</i></div></div>
         </div>
       </div>
       <div id="bo-158" class="scr" data-ws="WS02">
@@ -1697,7 +1697,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           <div><b>GOES TO</b> &middot; <a href="#bo-164">BO-164</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetCredentialEventPropagationRule &middot; <i>Save credential event propagation rule</i> &middot; <b>Save credential event propagation rule</b> &middot; Cancel <span class="dis">discards id · triggerEvent · scopePath · revocationAction · propagationTargets · monitoredConditions · propagation</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetCredentialEventPropagationRule &middot; <i>Save credential event propagation rule</i> &middot; <b>Save credential event propagation rule</b> &middot; Cancel <span class="dis">discards triggerEvent · revocationAction · propagationTargets · monitoredConditions · propagation</span></div></div>
         </div>
       </div>
       <div id="bo-171" class="scr" data-ws="WS03">
@@ -1907,7 +1907,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           <div><b>GOES TO</b> &middot; <a href="#bo-174">BO-174</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetVerificationMethodPolicy &middot; <i>Save verification method policy</i> &middot; <b>Save verification method policy</b> &middot; Cancel <span class="dis">discards id · productId · availableMethods · lockOnFirstSuccessfulAccess · changeAfterLock · scopePath · reasonCodes · credentialFormatOverride</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetVerificationMethodPolicy &middot; <i>Save verification method policy</i> &middot; <b>Save verification method policy</b> &middot; Cancel <span class="dis">discards productId · availableMethods · lockOnFirstSuccessfulAccess · changeAfterLock · reasonCodes · credentialFormatOverride</span></div></div>
         </div>
       </div>
       <div id="bo-178" class="scr" data-ws="WS04">
@@ -2115,7 +2115,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listBiometricAccess</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-185">BO-185</a>  &mdash; <i>Works in Biometric Verification Profile Buil</i><br><a href="#bo-186">BO-186</a>  &mdash; <i>Works in Face Pass Enrollment Configuration</i><br><a href="#bo-187">BO-187</a>  &mdash; <i>Works in Biometric Consent &amp; Guardian Manage</i><br><a href="#bo-188">BO-188</a>  &mdash; <i>Works in Face Tag Temporary Enrollment</i><br><a href="#bo-189">BO-189</a>  &mdash; <i>Works in Face Matching &amp; Verification Thresh</i><br><a href="#bo-190">BO-190</a>  &mdash; <i>Works in Face Change, Re-enrollment &amp; Identi</i><br><a href="#bo-191">BO-191</a>  &mdash; <i>Works in Biometric Validation at Gate</i><br><a href="#bo-192">BO-192</a>  &mdash; <i>Works in Biometric Lifecycle, Retention &amp; De</i><br><a href="#bo-193">BO-193</a>  &mdash; <i>Works in Biometric Simulation, Audit &amp; Publi</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-185">BO-185</a>  &mdash; <i>Works in Biometric Verification Profile Buil</i><br><a href="#bo-186">BO-186</a>  &mdash; <i>Works in Face Pass Enrollment Configuration</i><br><a href="#bo-187">BO-187</a>  &mdash; <i>Works in Biometric Consent &amp; Guardian Manage</i><br><a href="#bo-188">BO-188</a>  &mdash; <i>Works in Face Tag Temporary Enrollment</i> <span class="car">profileId</span><br><a href="#bo-189">BO-189</a>  &mdash; <i>Works in Face Matching &amp; Verification Thresh</i> <span class="car">profileId</span><br><a href="#bo-190">BO-190</a>  &mdash; <i>Works in Face Change, Re-enrollment &amp; Identi</i><br><a href="#bo-191">BO-191</a>  &mdash; <i>Works in Biometric Validation at Gate</i><br><a href="#bo-192">BO-192</a>  &mdash; <i>Works in Biometric Lifecycle, Retention &amp; De</i><br><a href="#bo-193">BO-193</a>  &mdash; <i>Works in Biometric Simulation, Audit &amp; Publi</i></div>
           
           
         </div>
@@ -2447,7 +2447,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; modelId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-194">BO-194</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetHardwareModel &middot; <i>Save hardware model</i> &middot; <b>Save hardware model</b> &middot; Cancel <span class="dis">discards id · manufacturer · model · deviceCategory · hardwareType · scopePath · supportedTechnologies · connectivity · offlineCapability · screenCapability · soundCapability · lightCapability · relayControllerSupport · paymentCapability · firmwareSoftwareInformation</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetHardwareModel &middot; <i>Save hardware model</i> &middot; <b>Save hardware model</b> &middot; Cancel <span class="dis">discards manufacturer · model · deviceCategory · hardwareType · supportedTechnologies · connectivity · offlineCapability · screenCapability · soundCapability · lightCapability · relayControllerSupport · paymentCapability · firmwareSoftwareInformation</span></div></div>
         </div>
       </div>
       <div id="bo-196" class="scr" data-ws="WS06">
@@ -2477,7 +2477,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; deviceId&larr;session, placementId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-194">BO-194</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">accessPointId · deviceId · placementId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRegisterDevice &middot; <i>Register device</i> &middot; <b>Register device</b> &middot; Cancel <span class="dis">discards kind · driver · hardwareType · hardwareModelId · serialNumber · model · identifier · ipNetworkReference</span></div><div class="ov"><b>modal</b> formRegisterAccessDevice &middot; <i>Register access device</i> &middot; <b>Register access device</b> &middot; Cancel <span class="dis">discards id · venueId · deviceId · role · isActive · scopePath · accessAreaId · accessPointId · gateLaneId · name · deviceGroupId · controllerReference · proximityThresholdMeters · installationDate</span></div><div class="ov"><b>modal</b> formUpdateAccessDevice &middot; <i>Save access device</i> &middot; <b>Save access device</b> &middot; Cancel <span class="dis">discards id · venueId · deviceId · role · isActive · scopePath · accessAreaId · accessPointId · gateLaneId · name · deviceGroupId · controllerReference · proximityThresholdMeters · installationDate</span></div><div class="ov"><b>modal</b> formEnrolDevice &middot; <i>Enrol with code</i> &middot; <b>Enrol with code</b> &middot; Cancel <span class="dis">discards state · configurationProfileId · reason · enrolmentCode · testResult</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRegisterDevice &middot; <i>Register device</i> &middot; <b>Register device</b> &middot; Cancel <span class="dis">discards kind · driver · hardwareType · hardwareModelId · serialNumber · model · identifier · ipNetworkReference</span></div><div class="ov"><b>modal</b> formRegisterAccessDevice &middot; <i>Register access device</i> &middot; <b>Register access device</b> &middot; Cancel <span class="dis">discards venueId · deviceId · role · isActive · accessAreaId · accessPointId · gateLaneId · name · deviceGroupId · controllerReference · proximityThresholdMeters · installationDate</span></div><div class="ov"><b>modal</b> formUpdateAccessDevice &middot; <i>Save access device</i> &middot; <b>Save access device</b> &middot; Cancel <span class="dis">discards venueId · deviceId · role · isActive · accessAreaId · accessPointId · gateLaneId · name · deviceGroupId · controllerReference · proximityThresholdMeters · installationDate</span></div><div class="ov"><b>modal</b> formEnrolDevice &middot; <i>Enrol with code</i> &middot; <b>Enrol with code</b> &middot; Cancel <span class="dis">discards state · configurationProfileId · reason · enrolmentCode · testResult</span></div></div>
         </div>
       </div>
       <div id="bo-197" class="scr" data-ws="WS06">
@@ -2627,7 +2627,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; gateModePolicyId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-194">BO-194</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetGateModePolicy &middot; <i>Save gate mode policy</i> &middot; <b>Save gate mode policy</b> &middot; Cancel <span class="dis">discards id · venueId · mode · scopePath · whoCanActivate · accessPointGroupId · reasonRequired · emergencyCode · automaticNotification · createsIncident</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetGateModePolicy &middot; <i>Save gate mode policy</i> &middot; <b>Save gate mode policy</b> &middot; Cancel <span class="dis">discards venueId · mode · whoCanActivate · accessPointGroupId · reasonRequired · emergencyCode · automaticNotification · createsIncident</span></div></div>
         </div>
       </div>
       <div id="bo-202" class="scr" data-ws="WS06">
@@ -3017,7 +3017,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; journeyProfileId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-215">BO-215</a>  &mdash; <i>Works in Group &amp; B2B Admission Profile Build</i><br><a href="#bo-216">BO-216</a>  &mdash; <i>Works in Group Leader &amp; Fast B2B Validation</i><br><a href="#bo-217">BO-217</a>  &mdash; <i>Works in Group Attendance &amp; Partial Entry Ma</i><br><a href="#bo-218">BO-218</a>  &mdash; <i>Works in Family, Child, POD &amp; Companion Jour</i><br><a href="#bo-219">BO-219</a>  &mdash; <i>Works in Re-entry &amp; Temporary Exit Journey</i> <span class="car">profileId</span><br><a href="#bo-220">BO-220</a>  &mdash; <i>Works in Multi-Park &amp; Crossover Journey Orch</i> <span class="car">profileId</span><br><a href="#bo-221">BO-221</a>  &mdash; <i>Works in Fast Pass &amp; Attraction Access Journ</i><br><a href="#bo-222">BO-222</a>  &mdash; <i>Works in Special Event, Free View &amp; Alternat</i><br><a href="#bo-223">BO-223</a>  &mdash; <i>Works in Journey Simulation, Audit &amp; Publica</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetJourneyProfile &middot; <i>Save journey profile</i> &middot; <b>Save journey profile</b> &middot; Cancel <span class="dis">discards id · scopePath · name · status · venueId · journeyType · credentialType · steps</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetJourneyProfile &middot; <i>Save journey profile</i> &middot; <b>Save journey profile</b> &middot; Cancel <span class="dis">discards name · status · venueId · journeyType · credentialType · steps</span></div></div>
         </div>
       </div>
       <div id="bo-215" class="scr" data-ws="WS08">
@@ -3227,7 +3227,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; queueId&larr;navigation, fastPassProfileId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-214">BO-214</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetFastPassProfile &middot; <i>Save fast pass profile</i> &middot; <b>Save fast pass profile</b> &middot; Cancel <span class="dis">discards id · scopePath · name · unlimited · venueId · totalUses · consumptionPerValidation · onePerRide · eligibleAttractionCategories</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetFastPassProfile &middot; <i>Save fast pass profile</i> &middot; <b>Save fast pass profile</b> &middot; Cancel <span class="dis">discards name · unlimited · venueId · totalUses · consumptionPerValidation · onePerRide · eligibleAttractionCategories</span></div></div>
         </div>
       </div>
       <div id="bo-222" class="scr" data-ws="WS08">
@@ -3257,7 +3257,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; entryId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-214">BO-214</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetOperatingCalendarEntry &middot; <i>Save operating calendar entry</i> &middot; <b>Save operating calendar entry</b> &middot; Cancel <span class="dis">discards id · venueId · dayType · startsAt · endsAt · scopePath · name · ticketValidationRequired · admissionType · attractionValidation · manualAttendanceRequired</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetOperatingCalendarEntry &middot; <i>Save operating calendar entry</i> &middot; <b>Save operating calendar entry</b> &middot; Cancel <span class="dis">discards venueId · dayType · startsAt · endsAt · name · ticketValidationRequired · admissionType · attractionValidation · manualAttendanceRequired</span></div></div>
         </div>
       </div>
       <div id="bo-223" class="scr" data-ws="WS08">
@@ -3285,7 +3285,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; simulateGuestJourney · listGuestJourney</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-214">BO-214</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-214">BO-214</a>  &mdash; <i>Guest Journey Command Center</i> <span class="car">journeyProfileId</span></div>
           
           
         </div>
@@ -3347,7 +3347,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; shiftId&larr;navigation, podiumId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-224">BO-224</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPodium &middot; <i>Save podium</i> &middot; <b>Save podium</b> &middot; Cancel <span class="dis">discards id · venueId · podiumType · name · scopePath · accessPointIds</span></div><div class="ov"><b>confirmDialog</b> confirmDeletePodium &middot; <i>Delete podium</i></div><div class="ov"><b>modal</b> formEndPodiumShift &middot; <i>End podium shift</i> &middot; <b>End podium shift</b> &middot; Cancel <span class="dis">discards handoverNote</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPodium &middot; <i>Save podium</i> &middot; <b>Save podium</b> &middot; Cancel <span class="dis">discards venueId · podiumType · name · accessPointIds</span></div><div class="ov"><b>confirmDialog</b> confirmDeletePodium &middot; <i>Delete podium</i></div><div class="ov"><b>modal</b> formEndPodiumShift &middot; <i>End podium shift</i> &middot; <b>End podium shift</b> &middot; Cancel <span class="dis">discards handoverNote</span></div></div>
         </div>
       </div>
       <div id="bo-226" class="scr" data-ws="WS09">
@@ -3407,7 +3407,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; reasonCodeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-224">BO-224</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetReasonCode &middot; <i>Save reason code</i> &middot; <b>Save reason code</b> &middot; Cancel <span class="dis">discards id · code · name · operationalResponse · scopePath · venueId · guestMessage · operatorMessage · followUpAction</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteReasonCode &middot; <i>Delete reason code</i></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetReasonCode &middot; <i>Save reason code</i> &middot; <b>Save reason code</b> &middot; Cancel <span class="dis">discards code · name · operationalResponse · venueId · guestMessage · operatorMessage · followUpAction</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteReasonCode &middot; <i>Delete reason code</i></div></div>
         </div>
       </div>
       <div id="bo-228" class="scr" data-ws="WS09">
@@ -3615,7 +3615,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listDynamicAccessPolicy · listDynamicPolicyEffectiveness</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-235">BO-235</a>  &mdash; <i>Works in Access Attribute Catalog</i><br><a href="#bo-236">BO-236</a>  &mdash; <i>Works in Visual Dynamic Policy Builder</i><br><a href="#bo-237">BO-237</a>  &mdash; <i>Works in Context, Time, Event &amp; Capacity Pol</i><br><a href="#bo-238">BO-238</a>  &mdash; <i>Works in Identity, Membership &amp; Accreditatio</i><br><a href="#bo-239">BO-239</a>  &mdash; <i>Works in Policy Scope, Hierarchy &amp; Inheritan</i><br><a href="#bo-240">BO-240</a>  &mdash; <i>Works in Authorization Governance &amp; Temporar</i><br><a href="#bo-241">BO-241</a>  &mdash; <i>Works in Policy Evaluation Architecture &amp; Of</i><br><a href="#bo-242">BO-242</a>  &mdash; <i>Works in Policy Simulation, Conflict &amp; Impac</i><br><a href="#bo-243">BO-243</a>  &mdash; <i>Works in Policy Approval, Audit, Analytics &amp;</i> <span class="car">policyId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-235">BO-235</a>  &mdash; <i>Works in Access Attribute Catalog</i><br><a href="#bo-236">BO-236</a>  &mdash; <i>Works in Visual Dynamic Policy Builder</i><br><a href="#bo-237">BO-237</a>  &mdash; <i>Works in Context, Time, Event &amp; Capacity Pol</i><br><a href="#bo-238">BO-238</a>  &mdash; <i>Works in Identity, Membership &amp; Accreditatio</i><br><a href="#bo-239">BO-239</a>  &mdash; <i>Works in Policy Scope, Hierarchy &amp; Inheritan</i> <span class="car">policyId</span><br><a href="#bo-240">BO-240</a>  &mdash; <i>Works in Authorization Governance &amp; Temporar</i><br><a href="#bo-241">BO-241</a>  &mdash; <i>Works in Policy Evaluation Architecture &amp; Of</i><br><a href="#bo-242">BO-242</a>  &mdash; <i>Works in Policy Simulation, Conflict &amp; Impac</i><br><a href="#bo-243">BO-243</a>  &mdash; <i>Works in Policy Approval, Audit, Analytics &amp;</i> <span class="car">policyId</span></div>
           
           
         </div>
@@ -3827,7 +3827,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           <div><b>GOES TO</b> &middot; <a href="#bo-234">BO-234</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPolicyEvaluationSetting &middot; <i>Save policy evaluation setting</i> &middot; <b>Save policy evaluation setting</b> &middot; Cancel <span class="dis">discards id · scopePath · policyCategory · evaluationMode · supportedLocations · offlineBehaviour · maxDataAgeMinutes</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPolicyEvaluationSetting &middot; <i>Save policy evaluation setting</i> &middot; <b>Save policy evaluation setting</b> &middot; Cancel <span class="dis">discards policyCategory · evaluationMode · supportedLocations · offlineBehaviour · maxDataAgeMinutes</span></div></div>
         </div>
       </div>
       <div id="bo-242" class="scr" data-ws="WS10">
@@ -4097,7 +4097,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           <div><b>GOES TO</b> &middot; <a href="#bo-244">BO-244</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetRiskScoringConfig &middot; <i>Save risk scoring config</i> &middot; <b>Save risk scoring config</b> &middot; Cancel <span class="dis">discards id · scopePath · mediumThreshold · highThreshold · criticalThreshold · riskFactors</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetRiskScoringConfig &middot; <i>Save risk scoring config</i> &middot; <b>Save risk scoring config</b> &middot; Cancel <span class="dis">discards mediumThreshold · highThreshold · criticalThreshold · riskFactors</span></div></div>
         </div>
       </div>
       <div id="bo-251" class="scr" data-ws="WS11">
@@ -4577,7 +4577,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           <div><b>GOES TO</b> &middot; <a href="#bo-334">BO-334</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTicketStatusTransition &middot; <i>Save ticket status transition</i> &middot; <b>Save ticket status transition</b> &middot; Cancel <span class="dis">discards id · fromStatus · toStatus · allowed · requiresAuthorizedException · scopePath · originatingSources</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTicketStatusTransition &middot; <i>Save ticket status transition</i> &middot; <b>Save ticket status transition</b> &middot; Cancel <span class="dis">discards fromStatus · toStatus · allowed · requiresAuthorizedException · originatingSources</span></div></div>
         </div>
       </div>
       <div id="bo-337" class="scr" data-ws="WS59">
@@ -4637,7 +4637,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; ruleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-334">BO-334</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetMediaBindingRule &middot; <i>Save media binding rule</i> &middot; <b>Save media binding rule</b> &middot; Cancel <span class="dis">discards id · scopePath · allowedMediaTypeIds · mandatoryMediaTypeIds · optionalMediaTypeIds · primaryMediaTypeId · secondaryMediaTypeIds · backupMediaTypeIds · temporaryMediaTypeIds · minimumMediaRequired · maximumActiveMedia · mediaCombinations · simultaneousActivation · exclusiveActivation · productId · ticketType · eventId · venueId</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteMediaBindingRule &middot; <i>Delete media binding rule</i></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetMediaBindingRule &middot; <i>Save media binding rule</i> &middot; <b>Save media binding rule</b> &middot; Cancel <span class="dis">discards allowedMediaTypeIds · mandatoryMediaTypeIds · optionalMediaTypeIds · primaryMediaTypeId · secondaryMediaTypeIds · backupMediaTypeIds · temporaryMediaTypeIds · minimumMediaRequired · maximumActiveMedia · mediaCombinations · simultaneousActivation · exclusiveActivation · productId · ticketType · eventId · venueId</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteMediaBindingRule &middot; <i>Delete media binding rule</i></div></div>
         </div>
       </div>
       <div id="bo-339" class="scr" data-ws="WS59">
@@ -4697,7 +4697,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           <div><b>GOES TO</b> &middot; <a href="#bo-334">BO-334</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetCredentialEventPropagationRule &middot; <i>Save credential event propagation rule</i> &middot; <b>Save credential event propagation rule</b> &middot; Cancel <span class="dis">discards id · triggerEvent · scopePath · revocationAction · propagationTargets · monitoredConditions · propagation</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetCredentialEventPropagationRule &middot; <i>Save credential event propagation rule</i> &middot; <b>Save credential event propagation rule</b> &middot; Cancel <span class="dis">discards triggerEvent · revocationAction · propagationTargets · monitoredConditions · propagation</span></div></div>
         </div>
       </div>
       <div id="bo-341" class="scr" data-ws="WS59">
@@ -6285,7 +6285,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listAccreditationCredentials · listAccreditationHolders · listBadgePrintJobs</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-645">BO-645</a>  &mdash; <i>Credential Generation Workspace</i><br><a href="#bo-646">BO-646</a>  &mdash; <i>Credential Media Configuration</i><br><a href="#bo-647">BO-647</a>  &mdash; <i>Badge Template Designer</i><br><a href="#bo-648">BO-648</a>  &mdash; <i>Badge Printing &amp; Print Queue</i><br><a href="#bo-649">BO-649</a>  &mdash; <i>Digital &amp; Mobile Credential Management</i> <span class="car">credentialId</span><br><a href="#bo-650">BO-650</a>  &mdash; <i>NFC &amp; RFID Credential Encoding</i> <span class="car">credentialId</span><br><a href="#bo-651">BO-651</a>  &mdash; <i>Credential Activation &amp; Delivery</i> <span class="car">credentialId</span><br><a href="#bo-027">BO-027</a>  &mdash; <i>Credential Replacement &amp; Reissue (BO-027, ab</i><br><a href="#bo-653">BO-653</a>  &mdash; <i>Credential Registry &amp; Credential History</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-645">BO-645</a>  &mdash; <i>Credential Generation Workspace</i><br><a href="#bo-646">BO-646</a>  &mdash; <i>Credential Media Configuration</i><br><a href="#bo-647">BO-647</a>  &mdash; <i>Badge Template Designer</i> <span class="car">badgeTemplateId</span><br><a href="#bo-648">BO-648</a>  &mdash; <i>Badge Printing &amp; Print Queue</i><br><a href="#bo-649">BO-649</a>  &mdash; <i>Digital &amp; Mobile Credential Management</i> <span class="car">credentialId</span><br><a href="#bo-650">BO-650</a>  &mdash; <i>NFC &amp; RFID Credential Encoding</i> <span class="car">credentialId</span><br><a href="#bo-651">BO-651</a>  &mdash; <i>Credential Activation &amp; Delivery</i> <span class="car">credentialId</span><br><a href="#bo-027">BO-027</a>  &mdash; <i>Credential Replacement &amp; Reissue (BO-027, ab</i><br><a href="#bo-653">BO-653</a>  &mdash; <i>Credential Registry &amp; Credential History</i></div>
           
           
         </div>
@@ -6555,7 +6555,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listAccessProfiles</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-655">BO-655</a>  &mdash; <i>Access Profile Management</i><br><a href="#bo-656">BO-656</a>  &mdash; <i>Venue &amp; Zone Access Matrix</i><br><a href="#bo-657">BO-657</a>  &mdash; <i>Operational Area Permission Management</i><br><a href="#bo-658">BO-658</a>  &mdash; <i>Date &amp; Time Access Rules</i><br><a href="#bo-659">BO-659</a>  &mdash; <i>Access Schedule Management</i><br><a href="#bo-660">BO-660</a>  &mdash; <i>Holder Access Assignment</i><br><a href="#bo-661">BO-661</a>  &mdash; <i>Temporary Access &amp; Exception Management</i><br><a href="#bo-662">BO-662</a>  &mdash; <i>Access Revocation &amp; Suspension</i><br><a href="#bo-663">BO-663</a>  &mdash; <i>Access Rights Preview, Impact &amp; Synchronizat</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-655">BO-655</a>  &mdash; <i>Access Profile Management</i> <span class="car">accessProfileId</span><br><a href="#bo-656">BO-656</a>  &mdash; <i>Venue &amp; Zone Access Matrix</i> <span class="car">accessProfileId</span><br><a href="#bo-657">BO-657</a>  &mdash; <i>Operational Area Permission Management</i> <span class="car">accessProfileId</span><br><a href="#bo-658">BO-658</a>  &mdash; <i>Date &amp; Time Access Rules</i> <span class="car">accessProfileId</span><br><a href="#bo-659">BO-659</a>  &mdash; <i>Access Schedule Management</i> <span class="car">accessProfileId</span><br><a href="#bo-660">BO-660</a>  &mdash; <i>Holder Access Assignment</i><br><a href="#bo-661">BO-661</a>  &mdash; <i>Temporary Access &amp; Exception Management</i><br><a href="#bo-662">BO-662</a>  &mdash; <i>Access Revocation &amp; Suspension</i><br><a href="#bo-663">BO-663</a>  &mdash; <i>Access Rights Preview, Impact &amp; Synchronizat</i></div>
           
           
         </div>
@@ -9255,7 +9255,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listSeatHoldPools</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-1004">BO-1004</a>  &mdash; <i>Hold Type Master</i><br><a href="#bo-1005">BO-1005</a>  &mdash; <i>Hold Pool Creation</i><br><a href="#bo-1006">BO-1006</a>  &mdash; <i>Hold Rule Assignment</i><br><a href="#bo-1007">BO-1007</a>  &mdash; <i>Expiration Rules</i><br><a href="#bo-1008">BO-1008</a>  &mdash; <i>Automatic Hold Release</i> <span class="car">poolId</span><br><a href="#bo-1009">BO-1009</a>  &mdash; <i>Release, Convert &amp; Reassign</i> <span class="car">poolId</span><br><a href="#bo-1010">BO-1010</a>  &mdash; <i>Hold Approval Workflow</i><br><a href="#bo-1011">BO-1011</a>  &mdash; <i>Priority &amp; Conflict Resolution</i><br><a href="#bo-1012">BO-1012</a>  &mdash; <i>Hold Utilization &amp; Audit</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-1004">BO-1004</a>  &mdash; <i>Hold Type Master</i> <span class="car">holdTypeId</span><br><a href="#bo-1005">BO-1005</a>  &mdash; <i>Hold Pool Creation</i><br><a href="#bo-1006">BO-1006</a>  &mdash; <i>Hold Rule Assignment</i> <span class="car">holdTypeId</span><br><a href="#bo-1007">BO-1007</a>  &mdash; <i>Expiration Rules</i> <span class="car">holdTypeId</span><br><a href="#bo-1008">BO-1008</a>  &mdash; <i>Automatic Hold Release</i> <span class="car">poolId</span><br><a href="#bo-1009">BO-1009</a>  &mdash; <i>Release, Convert &amp; Reassign</i> <span class="car">poolId</span><br><a href="#bo-1010">BO-1010</a>  &mdash; <i>Hold Approval Workflow</i><br><a href="#bo-1011">BO-1011</a>  &mdash; <i>Priority &amp; Conflict Resolution</i> <span class="car">holdTypeId</span><br><a href="#bo-1012">BO-1012</a>  &mdash; <i>Hold Utilization &amp; Audit</i></div>
           
           
         </div>
@@ -11748,7 +11748,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; channelCapacityId&larr;deepLink, listingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · version</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i><br><a href="#bo-011">BO-011</a>  &mdash; <i>Packages &amp; Bundles</i> <span class="car">productId · version</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetChannelAllocations &middot; <i>Save channel allocations</i> &middot; <b>Save channel allocations</b> &middot; Cancel <span class="dis">discards allocations</span></div><div class="ov"><b>modal</b> formCreateChannelCapacity &middot; <i>Create channel capacity</i> &middot; <b>Create channel capacity</b> &middot; Cancel <span class="dis">discards performanceId · name · capacity · seatCategoryId</span></div><div class="ov"><b>modal</b> formRelinquishChannelAllocation &middot; <i>Release channel allocation</i> &middot; <b>Release channel allocation</b> &middot; Cancel <span class="dis">discards channels · reason</span></div><div class="ov"><b>modal</b> formUpdateChannelCapacity &middot; <i>Save channel capacity</i> &middot; <b>Save channel capacity</b> &middot; Cancel <span class="dis">discards name · capacity</span></div><div class="ov"><b>modal</b> formPublishBundle &middot; <i>Publish bundle</i> &middot; <b>Publish bundle</b> &middot; Cancel <span class="dis">discards venueId · note · staleAfterHours</span></div><div class="ov"><b>modal</b> formSetChannelListing &middot; <i>Save channel listing</i> &middot; <b>Save channel listing</b> &middot; Cancel <span class="dis">discards id · channelName · productId · status · externalProductRef · allocationUnits · priceListId · adapter · adapterCredentialRef · pushIntervalMinutes · guestDataScope · lastPushedAt · scopePath</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetChannelAllocations &middot; <i>Save channel allocations</i> &middot; <b>Save channel allocations</b> &middot; Cancel <span class="dis">discards allocations</span></div><div class="ov"><b>modal</b> formCreateChannelCapacity &middot; <i>Create channel capacity</i> &middot; <b>Create channel capacity</b> &middot; Cancel <span class="dis">discards performanceId · name · capacity · seatCategoryId</span></div><div class="ov"><b>modal</b> formRelinquishChannelAllocation &middot; <i>Release channel allocation</i> &middot; <b>Release channel allocation</b> &middot; Cancel <span class="dis">discards channels · reason</span></div><div class="ov"><b>modal</b> formUpdateChannelCapacity &middot; <i>Save channel capacity</i> &middot; <b>Save channel capacity</b> &middot; Cancel <span class="dis">discards name · capacity</span></div><div class="ov"><b>modal</b> formPublishBundle &middot; <i>Publish bundle</i> &middot; <b>Publish bundle</b> &middot; Cancel <span class="dis">discards venueId · note · staleAfterHours</span></div><div class="ov"><b>modal</b> formSetChannelListing &middot; <i>Save channel listing</i> &middot; <b>Save channel listing</b> &middot; Cancel <span class="dis">discards channelName · productId · status · externalProductRef · allocationUnits · priceListId · adapter · adapterCredentialRef · pushIntervalMinutes · guestDataScope · lastPushedAt · scopePath</span></div></div>
         </div>
       </div>
       <div id="bo-014" class="scr">
@@ -11960,7 +11960,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; version&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i><br><a href="#bo-128">BO-128</a>  &mdash; <i>The fleet is monitored</i> <span class="car">workstationId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishBundle &middot; <i>Publish bundle</i> &middot; <b>Publish bundle</b> &middot; Cancel <span class="dis">discards venueId · note · staleAfterHours</span></div><div class="ov"><b>modal</b> formReportBundleApplied &middot; <i>Report bundle applied</i> &middot; <b>Report bundle applied</b> &middot; Cancel <span class="dis">discards appliedAt · outcome · error</span></div><div class="ov"><b>modal</b> formSetOfflinePolicy &middot; <i>Save offline policy</i> &middot; <b>Save offline policy</b> &middot; Cancel <span class="dis">discards scopePath · maxOfflineHours · allowedOffline · offlineValueCeiling · offlineTransactionCeiling · onCeilingBreach · requiresManagerToExtend</span></div><div class="ov"><b>modal</b> formSyncOrders &middot; <i>Sync orders</i> &middot; <b>Sync orders</b> &middot; Cancel <span class="dis">discards deviceId · orders</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishBundle &middot; <i>Publish bundle</i> &middot; <b>Publish bundle</b> &middot; Cancel <span class="dis">discards venueId · note · staleAfterHours</span></div><div class="ov"><b>modal</b> formReportBundleApplied &middot; <i>Report bundle applied</i> &middot; <b>Report bundle applied</b> &middot; Cancel <span class="dis">discards appliedAt · outcome · error</span></div><div class="ov"><b>modal</b> formSetOfflinePolicy &middot; <i>Save offline policy</i> &middot; <b>Save offline policy</b> &middot; Cancel <span class="dis">discards maxOfflineHours · allowedOffline · offlineValueCeiling · offlineTransactionCeiling · onCeilingBreach · requiresManagerToExtend</span></div><div class="ov"><b>modal</b> formSyncOrders &middot; <i>Sync orders</i> &middot; <b>Sync orders</b> &middot; Cancel <span class="dis">discards deviceId · orders</span></div></div>
         </div>
       </div>
       <div id="bo-063" class="scr">
@@ -14058,7 +14058,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listSpaces</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-701">BO-701</a>  &mdash; <i>Venue Master Configuration</i><br><a href="#bo-702">BO-702</a>  &mdash; <i>Space Access Rules Configuration</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-701">BO-701</a>  &mdash; <i>Venue Master Configuration</i> <span class="car">spaceId</span><br><a href="#bo-702">BO-702</a>  &mdash; <i>Space Access Rules Configuration</i> <span class="car">spaceId</span></div>
           
           
         </div>
@@ -14688,7 +14688,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; setPerformanceTemplate · listPerformanceTemplates</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; performanceTemplateId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-722">BO-722</a>  &mdash; <i>Prepaid Minute Package &amp; Customer Balance Co</i><br><a href="#bo-723">BO-723</a>  &mdash; <i>Peak, Off-Peak &amp; Super Prime Time Configurat</i><br><a href="#bo-724">BO-724</a>  &mdash; <i>Walk-In / There-and-Then Booking Configurati</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-722">BO-722</a>  &mdash; <i>Prepaid Minute Package &amp; Customer Balance Co</i><br><a href="#bo-723">BO-723</a>  &mdash; <i>Peak, Off-Peak &amp; Super Prime Time Configurat</i> <span class="car">performanceTemplateId</span><br><a href="#bo-724">BO-724</a>  &mdash; <i>Walk-In / There-and-Then Booking Configurati</i> <span class="car">performanceTemplateId</span></div>
           
           
         </div>
@@ -14748,7 +14748,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; setPerformanceTemplate · listPerformanceTemplates</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; performanceTemplateId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-721">BO-721</a>  &mdash; <i>Back to Activity Performance &amp; Slot Template</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-721">BO-721</a>  &mdash; <i>Back to Activity Performance &amp; Slot Template</i> <span class="car">performanceTemplateId</span></div>
           
           
         </div>
@@ -14778,7 +14778,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; setPerformanceTemplate · listPerformanceTemplates</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; performanceTemplateId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-721">BO-721</a>  &mdash; <i>Back to Activity Performance &amp; Slot Template</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-721">BO-721</a>  &mdash; <i>Back to Activity Performance &amp; Slot Template</i> <span class="car">performanceTemplateId</span></div>
           
           
         </div>
@@ -18079,7 +18079,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; getWalletLiability · setGiftCardProduct · createVoucherType · issueGiftCard +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; cardCode&larr;navigation, giftCardProductId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-1124">BO-1124</a>  &mdash; <i>Gift Card Product Configuration</i><br><a href="#bo-1125">BO-1125</a>  &mdash; <i>Gift Card Issuance, Activation &amp; Distributio</i> <span class="car">cardCode</span><br><a href="#bo-1126">BO-1126</a>  &mdash; <i>Voucher &amp; Coupon Type Configuration</i><br><a href="#bo-1127">BO-1127</a>  &mdash; <i>Voucher Eligibility &amp; Redemption Rule Studio</i><br><a href="#bo-1128">BO-1128</a>  &mdash; <i>Membership Benefits &amp; Entitlement Mapping</i><br><a href="#bo-1129">BO-1129</a>  &mdash; <i>Benefit Packaging &amp; Digital Wallet Presentat</i><br><a href="#bo-1130">BO-1130</a>  &mdash; <i>Gift Card &amp; Voucher Expiry Management</i><br><a href="#bo-1131">BO-1131</a>  &mdash; <i>Gift Card Balance, Liability &amp; Breakage Cont</i><br><a href="#bo-1132">BO-1132</a>  &mdash; <i>Gift Card &amp; Voucher Simulator, Validation &amp; </i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-1124">BO-1124</a>  &mdash; <i>Gift Card Product Configuration</i> <span class="car">giftCardProductId</span><br><a href="#bo-1125">BO-1125</a>  &mdash; <i>Gift Card Issuance, Activation &amp; Distributio</i> <span class="car">cardCode</span><br><a href="#bo-1126">BO-1126</a>  &mdash; <i>Voucher &amp; Coupon Type Configuration</i><br><a href="#bo-1127">BO-1127</a>  &mdash; <i>Voucher Eligibility &amp; Redemption Rule Studio</i><br><a href="#bo-1128">BO-1128</a>  &mdash; <i>Membership Benefits &amp; Entitlement Mapping</i><br><a href="#bo-1129">BO-1129</a>  &mdash; <i>Benefit Packaging &amp; Digital Wallet Presentat</i><br><a href="#bo-1130">BO-1130</a>  &mdash; <i>Gift Card &amp; Voucher Expiry Management</i><br><a href="#bo-1131">BO-1131</a>  &mdash; <i>Gift Card Balance, Liability &amp; Breakage Cont</i><br><a href="#bo-1132">BO-1132</a>  &mdash; <i>Gift Card &amp; Voucher Simulator, Validation &amp; </i></div>
           
           
         </div>
@@ -18109,7 +18109,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; setGiftCardProduct</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; giftCardProductId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-1123">BO-1123</a>  &mdash; <i>Back to Gift Card &amp; Digital Benefit Command </i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-1123">BO-1123</a>  &mdash; <i>Back to Gift Card &amp; Digital Benefit Command </i> <span class="car">giftCardProductId</span></div>
           
           
         </div>
@@ -20211,7 +20211,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, rejectionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-108">BO-108</a>  &mdash; <i>Venue Operations</i><br><a href="#bo-129">BO-129</a>  &mdash; <i>The connectivity thresholds are set</i> <span class="car">workstationId</span><br><a href="#bo-131">BO-131</a>  &mdash; <i>The connectivity thresholds are set</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetOfflinePolicy &middot; <i>Save offline policy</i> &middot; <b>Save offline policy</b> &middot; Cancel <span class="dis">discards scopePath · maxOfflineHours · allowedOffline · offlineValueCeiling · offlineTransactionCeiling · onCeilingBreach · requiresManagerToExtend</span></div><div class="ov"><b>modal</b> formResolveSyncRejection &middot; <i>Resolve rejection</i> &middot; <b>Resolve rejection</b> &middot; Cancel</div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetOfflinePolicy &middot; <i>Save offline policy</i> &middot; <b>Save offline policy</b> &middot; Cancel <span class="dis">discards maxOfflineHours · allowedOffline · offlineValueCeiling · offlineTransactionCeiling · onCeilingBreach · requiresManagerToExtend</span></div><div class="ov"><b>modal</b> formResolveSyncRejection &middot; <i>Resolve rejection</i> &middot; <b>Resolve rejection</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="bo-131" class="scr">
@@ -20301,7 +20301,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, reportId&larr;deepLink, requestId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-108">BO-108</a>  &mdash; <i>Venue Operations</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRunReport &middot; <i>Run report</i> &middot; <b>Run report</b> &middot; Cancel <span class="dis">discards parameters · venueId · dateFrom · dateTo · forceAsync</span></div><div class="ov"><b>modal</b> formSetAlertRule &middot; <i>Save alert rule</i> &middot; <b>Save alert rule</b> &middot; Cancel <span class="dis">discards id · name · metric · comparator · threshold · severity · isActive · scopePath · thresholdUpper · windowMinutes · deliverTo · recipientRoleIds · cooldownMinutes</span></div><div class="ov"><b>modal</b> formResolveSyncRejection &middot; <i>Resolve refused entry</i> &middot; <b>Resolve refused entry</b> &middot; Cancel <span class="dis">discards resolution · resolvedRecordId · note</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRunReport &middot; <i>Run report</i> &middot; <b>Run report</b> &middot; Cancel <span class="dis">discards parameters · venueId · dateFrom · dateTo · forceAsync</span></div><div class="ov"><b>modal</b> formSetAlertRule &middot; <i>Save alert rule</i> &middot; <b>Save alert rule</b> &middot; Cancel <span class="dis">discards name · metric · comparator · threshold · severity · isActive · thresholdUpper · windowMinutes · deliverTo · recipientRoleIds · cooldownMinutes</span></div><div class="ov"><b>modal</b> formResolveSyncRejection &middot; <i>Resolve refused entry</i> &middot; <b>Resolve refused entry</b> &middot; Cancel <span class="dis">discards resolution · resolvedRecordId · note</span></div></div>
         </div>
       </div>
       <div id="bo-364" class="scr" data-ws="WS13">
@@ -20929,7 +20929,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listApprovalDelegations · listSlaEscalationBottleneck · actOnWorkflowInstance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; instanceId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-385">BO-385</a>  &mdash; <i>Delegation Management</i> <span class="car">delegationId</span><br><a href="#bo-386">BO-386</a>  &mdash; <i>Temporary Delegation &amp; Availability Calendar</i><br><a href="#bo-387">BO-387</a>  &mdash; <i>Out-of-Office &amp; Substitute Routing</i><br><a href="#bo-388">BO-388</a>  &mdash; <i>Approval SLA Policy Configuration</i><br><a href="#bo-389">BO-389</a>  &mdash; <i>Reminder &amp; Breach Notification Rules</i><br><a href="#bo-390">BO-390</a>  &mdash; <i>Escalation Policy Builder</i><br><a href="#bo-391">BO-391</a>  &mdash; <i>Live Escalation Operations Center</i> <span class="car">instanceId</span><br><a href="#bo-392">BO-392</a>  &mdash; <i>SLA &amp; Escalation Performance Analytics</i><br><a href="#bo-393">BO-393</a>  &mdash; <i>AI SLA &amp; Escalation Advisor</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-385">BO-385</a>  &mdash; <i>Delegation Management</i> <span class="car">delegationId</span><br><a href="#bo-386">BO-386</a>  &mdash; <i>Temporary Delegation &amp; Availability Calendar</i><br><a href="#bo-387">BO-387</a>  &mdash; <i>Out-of-Office &amp; Substitute Routing</i><br><a href="#bo-388">BO-388</a>  &mdash; <i>Approval SLA Policy Configuration</i> <span class="car">slaPolicyId</span><br><a href="#bo-389">BO-389</a>  &mdash; <i>Reminder &amp; Breach Notification Rules</i><br><a href="#bo-390">BO-390</a>  &mdash; <i>Escalation Policy Builder</i><br><a href="#bo-391">BO-391</a>  &mdash; <i>Live Escalation Operations Center</i> <span class="car">instanceId</span><br><a href="#bo-392">BO-392</a>  &mdash; <i>SLA &amp; Escalation Performance Analytics</i><br><a href="#bo-393">BO-393</a>  &mdash; <i>AI SLA &amp; Escalation Advisor</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formActOnWorkflowInstance &middot; <i>Act on workflow instance</i> &middot; <b>Act on workflow instance</b> &middot; Cancel <span class="dis">discards action · reason · workflowStepExecutionId · workflowExceptionId · assigneePrincipalId · alternativeNodeId · correctedInput · extendByMinutes · priority</span></div></div>
         </div>
@@ -21501,7 +21501,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; supplierId&larr;deepLink, contractId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>The new range becomes products in the direct</i><br><a href="#bo-078">BO-078</a>  &mdash; <i>Requisitions</i> <span class="car">requisitionId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateSupplier &middot; <i>Create supplier</i> &middot; <b>Create supplier</b> &middot; Cancel <span class="dis">discards id · code · name · contactName · contactEmail · contactPhone · taxRegistrationNumber · paymentTermsDays · leadTimeDays · currency · accountId · isActive · status · statusReason · minimumOrderValue · scopePath</span></div><div class="ov"><b>modal</b> formRecordQuotation &middot; <i>Record quotation</i> &middot; <b>Record quotation</b> &middot; Cancel <span class="dis">discards requisitionId · lines · validUntil · reference · leadTimeDays · note</span></div><div class="ov"><b>modal</b> formUpdateSupplier &middot; <i>Save supplier</i> &middot; <b>Save supplier</b> &middot; Cancel <span class="dis">discards name · status · statusReason · paymentTermDays · leadTimeDays · minimumOrderValue · contacts</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateSupplier &middot; <i>Create supplier</i> &middot; <b>Create supplier</b> &middot; Cancel <span class="dis">discards code · name · contactName · contactEmail · contactPhone · taxRegistrationNumber · paymentTermsDays · leadTimeDays · currency · accountId · isActive · status · statusReason · minimumOrderValue · scopePath</span></div><div class="ov"><b>modal</b> formRecordQuotation &middot; <i>Record quotation</i> &middot; <b>Record quotation</b> &middot; Cancel <span class="dis">discards requisitionId · lines · validUntil · reference · leadTimeDays · note</span></div><div class="ov"><b>modal</b> formUpdateSupplier &middot; <i>Save supplier</i> &middot; <b>Save supplier</b> &middot; Cancel <span class="dis">discards name · status · statusReason · paymentTermDays · leadTimeDays · minimumOrderValue · contacts</span></div></div>
         </div>
       </div>
       <div id="bo-105" class="scr">
@@ -21890,7 +21890,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest · escalateApprovalRequest · getApprovalRequestScore</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; requestId&larr;deepLink, approvalRequestId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-248">ADM-248</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-052">BO-052</a>  &mdash; <i>The goods arrive and are received</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approves it</i> <span class="car">requestId</span><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-364">BO-364</a>  &mdash; <i>Back to the approval command centre</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-248">ADM-248</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-052">BO-052</a>  &mdash; <i>The goods arrive and are received</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approves it</i> <span class="car">requestId</span><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i><br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-364">BO-364</a>  &mdash; <i>Back to the approval command centre</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formDecideApprovalRequest &middot; <i>Decide approval request</i> &middot; <b>Decide approval request</b> &middot; Cancel <span class="dis">discards decision · comment · reason · stepUpToken · signature</span></div><div class="ov"><b>modal</b> formEscalateApprovalRequest &middot; <i>Escalate approval request</i> &middot; <b>Escalate approval request</b> &middot; Cancel <span class="dis">discards reason</span></div></div>
         </div>
@@ -21920,7 +21920,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest · resubmitApprovalRequest · withdrawApprovalRequest +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; requestId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i> <span class="car">approvalRequestId · requestId</span><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i> <span class="car">approvalRequestId · requestId</span><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i><br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmWithdrawApprovalRequest &middot; <i>Withdraw approval request</i></div><div class="ov"><b>modal</b> formDecideApprovalRequest &middot; <i>Decide approval request</i> &middot; <b>Decide approval request</b> &middot; Cancel <span class="dis">discards decision · comment · reason · stepUpToken · signature</span></div><div class="ov"><b>modal</b> formResubmitApprovalRequest &middot; <i>Resubmit approval request</i> &middot; <b>Resubmit approval request</b> &middot; Cancel <span class="dis">discards changes · amount</span></div></div>
         </div>
@@ -21950,7 +21950,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listApprovalMatrices · setApprovalMatrix</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; matrixId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i> <span class="car">matrixId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetApprovalMatrix &middot; <i>Save approval matrix</i> &middot; <b>Save approval matrix</b> &middot; Cancel <span class="dis">discards kind · scopeLevel · rules · isActive</span></div></div>
         </div>
@@ -21980,7 +21980,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listApprovalDelegations · createApprovalDelegation · revokeApprovalDelegation · listApprovalMatrices +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; delegationId&larr;deepLink, matrixId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i> <span class="car">matrixId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRevokeApprovalDelegation &middot; <i>Revoke approval delegation</i></div><div class="ov"><b>modal</b> formCreateApprovalDelegation &middot; <i>Create approval delegation</i> &middot; <b>Create approval delegation</b> &middot; Cancel <span class="dis">discards delegatorPrincipalId · delegatePrincipalId · from · to · kinds · maxAmount · reason · scopePath</span></div><div class="ov"><b>modal</b> formSetApprovalMatrix &middot; <i>Save approval limits</i> &middot; <b>Save approval limits</b> &middot; Cancel <span class="dis">discards kind · scopeLevel · rules · isActive</span></div></div>
         </div>
@@ -22010,7 +22010,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; getApprovalAnalytics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i></div>
           
           
         </div>
@@ -22040,7 +22040,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; getKpiValues · getVenueSettings · listRoles</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-053">BO-053</a>  &mdash; <i>Staff Directory</i><br><a href="#bo-054">BO-054</a>  &mdash; <i>Role Assignment</i> <span class="car">roleId</span><br><a href="#bo-055">BO-055</a>  &mdash; <i>Rota &amp; Scheduling</i><br><a href="#bo-056">BO-056</a>  &mdash; <i>Time &amp; Attendance</i><br><a href="#bo-057">BO-057</a> <br><a href="#bo-066">BO-066</a>  &mdash; <i>Notification Settings</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-088">BO-088</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-053">BO-053</a>  &mdash; <i>Staff Directory</i><br><a href="#bo-054">BO-054</a>  &mdash; <i>Role Assignment</i> <span class="car">roleId</span><br><a href="#bo-055">BO-055</a>  &mdash; <i>Rota &amp; Scheduling</i><br><a href="#bo-056">BO-056</a>  &mdash; <i>Time &amp; Attendance</i><br><a href="#bo-057">BO-057</a> <br><a href="#bo-066">BO-066</a>  &mdash; <i>Notification Settings</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a>  &mdash; <i>Approval Matrix</i><br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-088">BO-088</a> </div>
           
           
         </div>
@@ -22132,7 +22132,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; profileKey&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAiPolicy &middot; <i>Save AI policy</i> &middot; <b>Save AI policy</b> &middot; Cancel <span class="dis">discards scopeLevel · scopePath · enabledCapabilities · allowedRoleIds · maskedFields · requiresApprovalFor · monthlyTokenCeiling · ceilingBehaviour · ceilingWarningPercent · guestCapabilityScope · retrieveTopK · rerankTopK · cacheAnswers · cacheTtlMinutes · retainInteractionsDays · semanticCacheThreshold · negativeCacheTtlSeconds</span></div><div class="ov"><b>modal</b> formSetAiSpendCeiling &middot; <i>Save spend ceiling</i> &middot; <b>Save spend ceiling</b> &middot; Cancel <span class="dis">discards spend</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAiPolicy &middot; <i>Save AI policy</i> &middot; <b>Save AI policy</b> &middot; Cancel <span class="dis">discards scopeLevel · enabledCapabilities · allowedRoleIds · maskedFields · requiresApprovalFor · monthlyTokenCeiling · ceilingBehaviour · ceilingWarningPercent · guestCapabilityScope · retrieveTopK · rerankTopK · cacheAnswers · cacheTtlMinutes · retainInteractionsDays · semanticCacheThreshold · negativeCacheTtlSeconds</span></div><div class="ov"><b>modal</b> formSetAiSpendCeiling &middot; <i>Save spend ceiling</i> &middot; <b>Save spend ceiling</b> &middot; Cancel <span class="dis">discards spend</span></div></div>
         </div>
       </div>
       <div id="bo-107" class="scr">
@@ -22222,7 +22222,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; gameId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-394">BO-394</a>  &mdash; <i>Back to Game &amp; Ride Operations Dashboard</i> <span class="car">gameId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateGame &middot; <i>Create</i> &middot; <b>Create</b> &middot; Cancel <span class="dis">discards code · name · venueId · creditCost · status · zone · assetId · readerId · minPointsAwarded · maxPointsAwarded · heightRequirementCm · playsToday · creditsTakenToday · pointsAwardedToday</span></div><div class="ov"><b>modal</b> formUpdateGame &middot; <i>Edit</i> &middot; <b>Edit</b> &middot; Cancel <span class="dis">discards name · creditCost · minPointsAwarded · maxPointsAwarded · heightRequirementCm</span></div><div class="ov"><b>modal</b> formCloneGame &middot; <i>Clone</i> &middot; <b>Clone</b> &middot; Cancel <span class="dis">discards code · name · includeReaders · includePricing</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateGame &middot; <i>Create</i> &middot; <b>Create</b> &middot; Cancel <span class="dis">discards code · name · venueId · creditCost · zone · assetId · readerId · minPointsAwarded · maxPointsAwarded · heightRequirementCm · playsToday · creditsTakenToday · pointsAwardedToday</span></div><div class="ov"><b>modal</b> formUpdateGame &middot; <i>Edit</i> &middot; <b>Edit</b> &middot; Cancel <span class="dis">discards name · creditCost · minPointsAwarded · maxPointsAwarded · heightRequirementCm</span></div><div class="ov"><b>modal</b> formCloneGame &middot; <i>Clone</i> &middot; <b>Clone</b> &middot; Cancel <span class="dis">discards code · name · includeReaders · includePricing</span></div></div>
         </div>
       </div>
       <div id="bo-396" class="scr" data-ws="WS78">
@@ -22490,7 +22490,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listReaders</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-405">BO-405</a>  &mdash; <i>Reader Directory</i><br><a href="#bo-406">BO-406</a>  &mdash; <i>Reader Profile &amp; Device Setup</i> <span class="car">deviceId</span><br><a href="#bo-407">BO-407</a>  &mdash; <i>Reader Credit &amp; Payment Configuration</i><br><a href="#bo-408">BO-408</a>  &mdash; <i>Reader / Attraction Assignment</i><br><a href="#bo-409">BO-409</a>  &mdash; <i>Retap Delay &amp; Transaction Protection</i><br><a href="#bo-410">BO-410</a>  &mdash; <i>Free Game Glow &amp; Reader Display Rules</i><br><a href="#bo-411">BO-411</a>  &mdash; <i>Reader Theme &amp; Experience Configuration</i><br><a href="#bo-412">BO-412</a>  &mdash; <i>Real-Time Tap Validation &amp; Reader Response</i><br><a href="#bo-413">BO-413</a>  &mdash; <i>Balance Check Reader &amp; Device Test Console</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-405">BO-405</a>  &mdash; <i>Reader Directory</i><br><a href="#bo-406">BO-406</a>  &mdash; <i>Reader Profile &amp; Device Setup</i> <span class="car">deviceId</span><br><a href="#bo-407">BO-407</a>  &mdash; <i>Reader Credit &amp; Payment Configuration</i><br><a href="#bo-408">BO-408</a>  &mdash; <i>Reader / Attraction Assignment</i><br><a href="#bo-409">BO-409</a>  &mdash; <i>Retap Delay &amp; Transaction Protection</i><br><a href="#bo-410">BO-410</a>  &mdash; <i>Free Game Glow &amp; Reader Display Rules</i><br><a href="#bo-411">BO-411</a>  &mdash; <i>Reader Theme &amp; Experience Configuration</i><br><a href="#bo-412">BO-412</a>  &mdash; <i>Real-Time Tap Validation &amp; Reader Response</i> <span class="car">readerProfileId</span><br><a href="#bo-413">BO-413</a>  &mdash; <i>Balance Check Reader &amp; Device Test Console</i></div>
           
           
         </div>
@@ -24530,7 +24530,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listReaders</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-475">BO-475</a>  &mdash; <i>Reader Manufacturer &amp; Model Profile</i><br><a href="#bo-476">BO-476</a>  &mdash; <i>Communication Protocol Configuration</i><br><a href="#bo-477">BO-477</a>  &mdash; <i>Reader Command &amp; Event Mapping</i><br><a href="#bo-478">BO-478</a>  &mdash; <i>Reader Configuration Deployment &amp; Synchroniz</i><br><a href="#bo-479">BO-479</a>  &mdash; <i>Game Trigger &amp; I/O Control Mapping</i><br><a href="#bo-480">BO-480</a>  &mdash; <i>Reader Screen, LED &amp; Sound Output Mapping</i><br><a href="#bo-481">BO-481</a>  &mdash; <i>Edge Cache &amp; Offline Rule Package</i><br><a href="#bo-482">BO-482</a>  &mdash; <i>Device Diagnostics &amp; Integration Logs</i><br><a href="#bo-483">BO-483</a>  &mdash; <i>Integration Certification &amp; Test Console</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-475">BO-475</a>  &mdash; <i>Reader Manufacturer &amp; Model Profile</i><br><a href="#bo-476">BO-476</a>  &mdash; <i>Communication Protocol Configuration</i> <span class="car">readerProfileId</span><br><a href="#bo-477">BO-477</a>  &mdash; <i>Reader Command &amp; Event Mapping</i><br><a href="#bo-478">BO-478</a>  &mdash; <i>Reader Configuration Deployment &amp; Synchroniz</i><br><a href="#bo-479">BO-479</a>  &mdash; <i>Game Trigger &amp; I/O Control Mapping</i><br><a href="#bo-480">BO-480</a>  &mdash; <i>Reader Screen, LED &amp; Sound Output Mapping</i><br><a href="#bo-481">BO-481</a>  &mdash; <i>Edge Cache &amp; Offline Rule Package</i><br><a href="#bo-482">BO-482</a>  &mdash; <i>Device Diagnostics &amp; Integration Logs</i><br><a href="#bo-483">BO-483</a>  &mdash; <i>Integration Certification &amp; Test Console</i></div>
           
           
         </div>
@@ -33770,7 +33770,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listConversations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-795">BO-795</a>  &mdash; <i>Unified Inbox</i> <span class="car">conversationId</span><br><a href="#bo-796">BO-796</a>  &mdash; <i>Guest Conversation 360</i> <span class="car">conversationId</span><br><a href="#bo-797">BO-797</a>  &mdash; <i>AI Chatbot Configuration</i><br><a href="#bo-798">BO-798</a>  &mdash; <i>Intent &amp; Knowledge Management</i><br><a href="#bo-799">BO-799</a>  &mdash; <i>Agent Workspace</i> <span class="car">conversationId</span><br><a href="#bo-800">BO-800</a>  &mdash; <i>Routing &amp; Queue Management</i><br><a href="#bo-801">BO-801</a>  &mdash; <i>Sales &amp; Service Actions</i><br><a href="#bo-802">BO-802</a>  &mdash; <i>Sentiment, Quality &amp; Escalation</i> <span class="car">caseId</span><br><a href="#bo-803">BO-803</a>  &mdash; <i>Chat Analytics &amp; Audit</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-795">BO-795</a>  &mdash; <i>Unified Inbox</i> <span class="car">conversationId</span><br><a href="#bo-796">BO-796</a>  &mdash; <i>Guest Conversation 360</i> <span class="car">conversationId</span><br><a href="#bo-797">BO-797</a>  &mdash; <i>AI Chatbot Configuration</i><br><a href="#bo-798">BO-798</a>  &mdash; <i>Intent &amp; Knowledge Management</i><br><a href="#bo-799">BO-799</a>  &mdash; <i>Agent Workspace</i> <span class="car">conversationId</span><br><a href="#bo-800">BO-800</a>  &mdash; <i>Routing &amp; Queue Management</i> <span class="car">queueId</span><br><a href="#bo-801">BO-801</a>  &mdash; <i>Sales &amp; Service Actions</i><br><a href="#bo-802">BO-802</a>  &mdash; <i>Sentiment, Quality &amp; Escalation</i> <span class="car">caseId</span><br><a href="#bo-803">BO-803</a>  &mdash; <i>Chat Analytics &amp; Audit</i></div>
           
           
         </div>
@@ -36922,7 +36922,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; actionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-078">ADM-078</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRequestPricingRollback &middot; <i>Request pricing rollback</i> &middot; <b>Request pricing rollback</b> &middot; Cancel <span class="dis">discards subject · actionType · reason · status · productId · priceListId · fromVersion · toVersion · productScope · rollbackTarget · rollbackScope · scopeIds · dependencies · executionMode</span></div><div class="ov"><b>confirmDialog</b> confirmCancelPricingRollback &middot; <i>Cancel pricing rollback</i> &middot; <b>confirm</b></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRequestPricingRollback &middot; <i>Request pricing rollback</i> &middot; <b>Request pricing rollback</b> &middot; Cancel <span class="dis">discards subject · actionType · reason · productId · priceListId · fromVersion · toVersion · productScope · rollbackTarget · rollbackScope · scopeIds · dependencies · executionMode</span></div><div class="ov"><b>confirmDialog</b> confirmCancelPricingRollback &middot; <i>Cancel pricing rollback</i> &middot; <b>confirm</b></div></div>
         </div>
       </div>
       <div id="adm-087" class="scr" data-ws="WS37">
@@ -47630,7 +47630,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listSlaEscalationReminder · setApprovalSlaPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; slaPolicyId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-388">BO-388</a>  &mdash; <i>Open Approval SLA Policy Configuration</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i><br><a href="#bo-388">BO-388</a>  &mdash; <i>Open Approval SLA Policy Configuration</i> <span class="car">slaPolicyId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetApprovalSlaPolicy &middot; <i>Save SLA rules</i> &middot; <b>Save SLA rules</b> &middot; Cancel</div></div>
         </div>
@@ -48620,7 +48620,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listApprovalMatrices</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#adm-330">ADM-330</a>  &mdash; <i>Approval Authority Matrix</i><br><a href="#adm-331">ADM-331</a>  &mdash; <i>Organizational Hierarchy Routing</i><br><a href="#adm-332">ADM-332</a>  &mdash; <i>Department-Based Approval Matrix</i><br><a href="#adm-333">ADM-333</a>  &mdash; <i>Venue &amp; Tenant Approval Matrix</i><br><a href="#adm-334">ADM-334</a>  &mdash; <i>Value &amp; Threshold Routing</i><br><a href="#adm-335">ADM-335</a>  &mdash; <i>Risk-Based &amp; Conditional Routing</i><br><a href="#adm-336">ADM-336</a>  &mdash; <i>Approver Group &amp; Decision Policy</i><br><a href="#adm-337">ADM-337</a>  &mdash; <i>Routing Simulator &amp; Conflict Detection</i><br><a href="#adm-338">ADM-338</a>  &mdash; <i>AI Routing Advisor &amp; Matrix Optimization</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#adm-330">ADM-330</a>  &mdash; <i>Approval Authority Matrix</i> <span class="car">matrixId</span><br><a href="#adm-331">ADM-331</a>  &mdash; <i>Organizational Hierarchy Routing</i> <span class="car">matrixId</span><br><a href="#adm-332">ADM-332</a>  &mdash; <i>Department-Based Approval Matrix</i> <span class="car">matrixId</span><br><a href="#adm-333">ADM-333</a>  &mdash; <i>Venue &amp; Tenant Approval Matrix</i> <span class="car">matrixId</span><br><a href="#adm-334">ADM-334</a>  &mdash; <i>Value &amp; Threshold Routing</i> <span class="car">matrixId</span><br><a href="#adm-335">ADM-335</a>  &mdash; <i>Risk-Based &amp; Conditional Routing</i> <span class="car">matrixId</span><br><a href="#adm-336">ADM-336</a>  &mdash; <i>Approver Group &amp; Decision Policy</i><br><a href="#adm-337">ADM-337</a>  &mdash; <i>Routing Simulator &amp; Conflict Detection</i><br><a href="#adm-338">ADM-338</a>  &mdash; <i>AI Routing Advisor &amp; Matrix Optimization</i></div>
           
           
         </div>
@@ -50600,7 +50600,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listContact</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#sup-001">SUP-001</a>  &mdash; <i>Agent Login</i><br><a href="#sup-020">SUP-020</a>  &mdash; <i>Works in Queue Configuration &amp; Management</i><br><a href="#sup-021">SUP-021</a>  &mdash; <i>Works in Intelligent Routing, Skills &amp; Assig</i><br><a href="#sup-022">SUP-022</a>  &mdash; <i>Works in SLA Policy &amp; Service-Level Manageme</i><br><a href="#sup-023">SUP-023</a>  &mdash; <i>Works in Agent Workload, Availability &amp; Work</i><br><a href="#sup-024">SUP-024</a>  &mdash; <i>Works in Escalation &amp; Critical Case Monitor</i><br><a href="#sup-025">SUP-025</a>  &mdash; <i>Works in Quality Management &amp; Agent Evaluati</i><br><a href="#sup-026">SUP-026</a>  &mdash; <i>Works in Customer Satisfaction, Feedback &amp; V</i><br><a href="#sup-027">SUP-027</a>  &mdash; <i>Works in Service Analytics &amp; Root-Cause Inte</i><br><a href="#sup-028">SUP-028</a>  &mdash; <i>Works in AI Contact Center Intelligence &amp; Au</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#sup-001">SUP-001</a>  &mdash; <i>Agent Login</i><br><a href="#sup-020">SUP-020</a>  &mdash; <i>Works in Queue Configuration &amp; Management</i> <span class="car">queueId</span><br><a href="#sup-021">SUP-021</a>  &mdash; <i>Works in Intelligent Routing, Skills &amp; Assig</i><br><a href="#sup-022">SUP-022</a>  &mdash; <i>Works in SLA Policy &amp; Service-Level Manageme</i><br><a href="#sup-023">SUP-023</a>  &mdash; <i>Works in Agent Workload, Availability &amp; Work</i><br><a href="#sup-024">SUP-024</a>  &mdash; <i>Works in Escalation &amp; Critical Case Monitor</i><br><a href="#sup-025">SUP-025</a>  &mdash; <i>Works in Quality Management &amp; Agent Evaluati</i><br><a href="#sup-026">SUP-026</a>  &mdash; <i>Works in Customer Satisfaction, Feedback &amp; V</i><br><a href="#sup-027">SUP-027</a>  &mdash; <i>Works in Service Analytics &amp; Root-Cause Inte</i><br><a href="#sup-028">SUP-028</a>  &mdash; <i>Works in AI Contact Center Intelligence &amp; Au</i></div>
           
           
         </div>
@@ -54262,7 +54262,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, alertId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i> <span class="car">reportId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAskReportingQuestion &middot; <i>Ask reporting question</i> &middot; <b>Ask reporting question</b> &middot; Cancel <span class="dis">discards question · conversationId · venueId</span></div><div class="ov"><b>modal</b> formAcknowledgeAlert &middot; <i>Acknowledge alert</i> &middot; <b>Acknowledge alert</b> &middot; Cancel <span class="dis">discards note</span></div><div class="ov"><b>modal</b> formRunReport &middot; <i>Run report</i> &middot; <b>Run report</b> &middot; Cancel <span class="dis">discards parameters · venueId · dateFrom · dateTo · forceAsync</span></div><div class="ov"><b>modal</b> formSetAlertRule &middot; <i>Save alert rule</i> &middot; <b>Save alert rule</b> &middot; Cancel <span class="dis">discards id · name · metric · comparator · threshold · severity · isActive · scopePath · thresholdUpper · windowMinutes · deliverTo · recipientRoleIds · cooldownMinutes</span></div><div class="ov"><b>modal</b> formDecideProposedAction &middot; <i>Decide proposed action</i> &middot; <b>Decide proposed action</b> &middot; Cancel <span class="dis">discards decision · reason</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAskReportingQuestion &middot; <i>Ask reporting question</i> &middot; <b>Ask reporting question</b> &middot; Cancel <span class="dis">discards question · conversationId · venueId</span></div><div class="ov"><b>modal</b> formAcknowledgeAlert &middot; <i>Acknowledge alert</i> &middot; <b>Acknowledge alert</b> &middot; Cancel <span class="dis">discards note</span></div><div class="ov"><b>modal</b> formRunReport &middot; <i>Run report</i> &middot; <b>Run report</b> &middot; Cancel <span class="dis">discards parameters · venueId · dateFrom · dateTo · forceAsync</span></div><div class="ov"><b>modal</b> formSetAlertRule &middot; <i>Save alert rule</i> &middot; <b>Save alert rule</b> &middot; Cancel <span class="dis">discards name · metric · comparator · threshold · severity · isActive · thresholdUpper · windowMinutes · deliverTo · recipientRoleIds · cooldownMinutes</span></div><div class="ov"><b>modal</b> formDecideProposedAction &middot; <i>Decide proposed action</i> &middot; <b>Decide proposed action</b> &middot; Cancel <span class="dis">discards decision · reason</span></div></div>
         </div>
       </div>
       <div id="anl-010" class="scr">
@@ -54292,7 +54292,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, suggestionId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i><br><a href="#anl-071">ANL-071</a>  &mdash; <i>AI maturity</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecordSuggestionOutcome &middot; <i>Record suggestion outcome</i> &middot; <b>Record suggestion outcome</b> &middot; Cancel <span class="dis">discards id · suggestionId · decision · actualValue · decidedByPrincipalId · decidedAt · realisedOutcome · note</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecordSuggestionOutcome &middot; <i>Record suggestion outcome</i> &middot; <b>Record suggestion outcome</b> &middot; Cancel <span class="dis">discards suggestionId · decision · actualValue · decidedByPrincipalId · decidedAt · realisedOutcome · note</span></div></div>
         </div>
       </div>
       <div id="anl-012" class="scr" data-ws="WS66">

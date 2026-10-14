@@ -93,8 +93,9 @@ screens:
         edge into it carries them
     - to: BO-006
       trigger: Parking Configuration
-      provenance: 'derived — BO-006 declares entryState.params  and BO-001 holds none of them. The edge
-        carries nothing: BO-006 needs nothing to open'
+      provenance: 'derived — BO-006 declares entryState.params parkingFacilityId and BO-001 holds none
+        of them. The edge carries nothing: parkingFacilityId only pre-selects (deep link or optional),
+        and BO-006 opens on its own'
     - to: BO-002
       trigger: Queue Configuration
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-001): flow F09 step 1→2'
@@ -5128,11 +5129,11 @@ screens:
   - id: formSetChannelListing
     component: modal
     trigger: Save channel listing
-    body: '**Collects what `setChannelListing` sends before it is called.** Required: `channelName`,
-      `productId`, `status`. Optional: `externalProductRef`, `allocationUnits`, `priceListId`, `adapter`,
-      `adapterCredentialRef`, `pushIntervalMinutes`, `guestDataScope`, `lastPushedAt`, `scopePath`. Dismissing
-      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly
-      in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
+    body: '**Collects what `setChannelListing` sends before it is called.** Required: `channelName`, `productId`,
+      `status`. Optional: `externalProductRef`, `allocationUnits`, `priceListId`, `adapter`, `adapterCredentialRef`,
+      `pushIntervalMinutes`, `guestDataScope`, `lastPushedAt`, `scopePath`. Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract
+      since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: ChannelListing
     confirm:
       label: Save channel listing
@@ -11672,10 +11673,10 @@ screens:
     trigger: Save offline policy
     body: '**Collects what `setOfflinePolicy` sends before it is called.** Nothing in the body is required.
       Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`,
-      `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is
-      unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October
-      2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14
-      October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).'
+      `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
+      Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005):
+      `scopePath` (CHG-GT1-002).'
     bindsTo: OfflinePolicy
     confirm:
       label: Save offline policy
@@ -20962,11 +20963,10 @@ screens:
   - id: formCreateMaintenancePlan
     component: modal
     trigger: Create maintenance plan
-    body: '**Collects what `createMaintenancePlan` sends before it is called.** Required: `name`,
-      `assetId`, `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`,
-      `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
-      Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005):
-      `id` (CHG-GT1-002).'
+    body: '**Collects what `createMaintenancePlan` sends before it is called.** Required: `name`, `assetId`,
+      `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`, `lastCompletedAt`,
+      `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: MaintenancePlan
     confirm:
       label: Create maintenance plan
@@ -21418,9 +21418,9 @@ screens:
       provenance: flow F16 step 5→6, F98 step 2→3
     - to: BO-077
       trigger: FX Rates & Variances
-      provenance: 'derived — BO-077 declares entryState.params varianceId and BO-074 holds none of them.
-        The edge carries nothing: varianceId only pre-selects (deep link or optional), and BO-077 opens
-        on its own'
+      provenance: 'derived — BO-077 declares entryState.params rateId, varianceId and BO-074 holds none
+        of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional),
+        and BO-077 opens on its own'
     entryFrom:
     - BO-043
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
@@ -21721,9 +21721,9 @@ screens:
         an edge into it carries them
     - to: BO-077
       trigger: FX Rates & Variances
-      provenance: 'derived — BO-077 declares entryState.params varianceId and BO-075 holds none of them.
-        The edge carries nothing: varianceId only pre-selects (deep link or optional), and BO-077 opens
-        on its own'
+      provenance: 'derived — BO-077 declares entryState.params rateId, varianceId and BO-075 holds none
+        of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional),
+        and BO-077 opens on its own'
     - to: ADM-020
       trigger: Creates the first venue manager
       provenance: flow F16 step 6→7
@@ -21995,9 +21995,9 @@ screens:
         and BO-075 opens on its own'
     - to: BO-077
       trigger: FX Rates & Variances
-      provenance: 'derived — BO-077 declares entryState.params varianceId and BO-076 holds none of them.
-        The edge carries nothing: varianceId only pre-selects (deep link or optional), and BO-077 opens
-        on its own'
+      provenance: 'derived — BO-077 declares entryState.params rateId, varianceId and BO-076 holds none
+        of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional),
+        and BO-077 opens on its own'
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
@@ -24008,11 +24008,11 @@ screens:
   - id: formCreateSupplier
     component: modal
     trigger: Create supplier
-    body: '**Collects what `createSupplier` sends before it is called.** Required: `code`, `name`.
-      Optional: `contactName`, `contactEmail`, `contactPhone`, `taxRegistrationNumber`, `paymentTermsDays`,
-      `leadTimeDays`, `currency`, `accountId`, `isActive`, `status`, `statusReason`, `minimumOrderValue`
-      and 1 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the
-      server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
+    body: '**Collects what `createSupplier` sends before it is called.** Required: `code`, `name`. Optional:
+      `contactName`, `contactEmail`, `contactPhone`, `taxRegistrationNumber`, `paymentTermsDays`, `leadTimeDays`,
+      `currency`, `accountId`, `isActive`, `status`, `statusReason`, `minimumOrderValue` and 1 more. Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in
+      the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: Supplier
     confirm:
       label: Create supplier
@@ -24104,9 +24104,9 @@ screens:
       provenance: flow F15 step 3→4
     - to: BO-087
       trigger: Approval Delegations
-      provenance: 'derived — BO-087 declares entryState.params delegationId and BO-084 holds none of them.
-        The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens
-        on its own'
+      provenance: 'derived — BO-087 declares entryState.params delegationId, matrixId and BO-084 holds
+        none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional),
+        and BO-087 opens on its own'
     - to: BO-364
       trigger: Back to the approval command centre
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-022): inherited from BO-365 (merged), flow F123
@@ -24320,9 +24320,9 @@ screens:
         holds approvalRequestId, requestId, so an edge into it carries them
     - to: BO-087
       trigger: Approval Delegations
-      provenance: 'derived — BO-087 declares entryState.params delegationId and BO-085 holds none of them.
-        The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens
-        on its own'
+      provenance: 'derived — BO-087 declares entryState.params delegationId, matrixId and BO-085 holds
+        none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional),
+        and BO-087 opens on its own'
     - to: POS-005
       trigger: The till applies it and completes the sale
       provenance: flow F14 step 4→5
@@ -24535,9 +24535,10 @@ screens:
         on its own'
     - to: BO-087
       trigger: Approval Delegations
-      provenance: 'derived — BO-087 declares entryState.params delegationId and BO-086 holds none of them.
-        The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens
-        on its own'
+      carries:
+      - matrixId
+      provenance: derived — BO-087 declares entryState.params delegationId, matrixId and BO-086 holds
+        matrixId, so an edge into it carries them
     - to: ADM-238
       trigger: Returns to the board's landing screen
       provenance: flow F164 step 8→9
@@ -25654,13 +25655,13 @@ screens:
     body: '**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `enabledCapabilities`.
       Optional: `allowedRoleIds`, `maskedFields`, `requiresApprovalFor`, `ceilingBehaviour`, `ceilingWarningPercent`,
       `guestCapabilityScope`, `cacheAnswers`, `cacheTtlMinutes`. **Not drawn:** `retainInteractionsDays`
-      (deprecated 29 September, AI-D05; retention is a tenant setting per data class) and the engine
-      tuning (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`, `negativeCacheTtlSeconds`, chunking,
-      quantisation, hnsw, cascade), which is platform tuning left to the console, not a venue manager''s
-      decision. The money ceiling is set with Save spend ceiling. Dismissing sends nothing; the screen
-      behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3
-      October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since
-      14 October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).'
+      (deprecated 29 September, AI-D05; retention is a tenant setting per data class) and the engine tuning
+      (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`, `negativeCacheTtlSeconds`, chunking, quantisation,
+      hnsw, cascade), which is platform tuning left to the console, not a venue manager''s decision. The
+      money ceiling is set with Save spend ceiling. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
+      Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005):
+      `scopePath` (CHG-GT1-002).'
     bindsTo: AiPolicy
     confirm:
       label: Save AI policy
@@ -28588,9 +28589,9 @@ screens:
         and BO-075 opens on its own'
     - to: BO-077
       trigger: FX Rates & Variances
-      provenance: 'derived — BO-077 declares entryState.params varianceId and BO-101 holds none of them.
-        The edge carries nothing: varianceId only pre-selects (deep link or optional), and BO-077 opens
-        on its own'
+      provenance: 'derived — BO-077 declares entryState.params rateId, varianceId and BO-101 holds none
+        of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional),
+        and BO-077 opens on its own'
     - to: BO-089
       trigger: Journal Entries
       provenance: 'derived — BO-089 declares entryState.params entryId and BO-101 holds none of them.
@@ -28856,9 +28857,9 @@ screens:
         on its own'
     - to: BO-013
       trigger: Channel & Distribution
-      provenance: 'derived — BO-013 declares entryState.params channelCapacityId and BO-102 holds none
-        of them. The edge carries nothing: channelCapacityId only pre-selects (deep link or optional),
-        and BO-013 opens on its own'
+      provenance: 'derived — BO-013 declares entryState.params channelCapacityId, listingId and BO-102
+        holds none of them. The edge carries nothing: channelCapacityId, listingId only pre-select (deep
+        link or optional), and BO-013 opens on its own'
     - to: BO-014
       trigger: Catalogue Publishing
       provenance: 'derived — BO-014 declares entryState.params itemId, priceListId, productId and BO-102
@@ -28871,8 +28872,9 @@ screens:
         and BO-015 opens on its own'
     - to: BO-016
       trigger: Performance Template
-      provenance: 'derived — BO-016 declares entryState.params  and BO-102 holds none of them. The edge
-        carries nothing: BO-016 needs nothing to open'
+      provenance: 'derived — BO-016 declares entryState.params performanceTemplateId and BO-102 holds
+        none of them. The edge carries nothing: performanceTemplateId only pre-selects (deep link or optional),
+        and BO-016 opens on its own'
     - to: BO-017
       trigger: Capacity Management
       provenance: 'derived — BO-017 declares entryState.params channelCapacityId, entryId and BO-102 holds
@@ -28965,8 +28967,9 @@ screens:
         carries nothing: BO-122 needs nothing to open'
     - to: BO-123
       trigger: POS Profile Management
-      provenance: 'derived — BO-123 declares entryState.params  and BO-102 holds none of them. The edge
-        carries nothing: BO-123 needs nothing to open'
+      provenance: 'derived — BO-123 declares entryState.params profileId and BO-102 holds none of them.
+        The edge carries nothing: profileId only pre-selects (deep link or optional), and BO-123 opens
+        on its own'
     - to: BO-124
       trigger: Layout & Journey Builder
       provenance: 'derived — BO-124 declares entryState.params deviceId, profileId, saleBoardId and BO-102
@@ -28984,8 +28987,9 @@ screens:
         and BO-126 opens on its own'
     - to: BO-142
       trigger: Store Rules, Controls & Permissions
-      provenance: 'derived — BO-142 declares entryState.params  and BO-102 holds none of them. The edge
-        carries nothing: BO-142 needs nothing to open'
+      provenance: 'derived — BO-142 declares entryState.params storeRuleId and BO-102 holds none of them.
+        The edge carries nothing: storeRuleId only pre-selects (deep link or optional), and BO-142 opens
+        on its own'
     - to: BO-143
       trigger: Retail Global Settings & Controls
       provenance: 'derived — BO-143 declares entryState.params dropId and BO-102 holds none of them. The
@@ -29222,8 +29226,9 @@ screens:
         own'
     - to: BO-006
       trigger: Parking Configuration
-      provenance: 'derived — BO-006 declares entryState.params  and BO-103 holds none of them. The edge
-        carries nothing: BO-006 needs nothing to open'
+      provenance: 'derived — BO-006 declares entryState.params parkingFacilityId and BO-103 holds none
+        of them. The edge carries nothing: parkingFacilityId only pre-selects (deep link or optional),
+        and BO-006 opens on its own'
     - to: BO-030
       trigger: Work Order Verification
       provenance: 'derived — BO-030 declares entryState.params workOrderId and BO-103 holds none of them.
@@ -29737,10 +29742,10 @@ screens:
         carries nothing: BO-139 needs nothing to open'
     - to: BO-140
       trigger: Product Availability, 86 & Operational Food Safety
-      provenance: 'derived — BO-140 declares entryState.params itemId, menuId, outletId and BO-105 holds
-        none of them. The edge carries nothing: itemId, outletId only pre-select (deep link or optional);
-        BO-140 opens on listTemperatureCheckpoints, and menuId has no source on BO-140 yet (a gap in BO-140,
-        not in this edge)'
+      provenance: 'derived — BO-140 declares entryState.params checkpointId, itemId, menuId, outletId
+        and BO-105 holds none of them. The edge carries nothing: itemId, outletId, checkpointId only pre-select
+        (deep link or optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source
+        on BO-140 yet (a gap in BO-140, not in this edge)'
     - to: BO-141
       trigger: Operational Alerts, AI Replenishment & Action Center
       provenance: 'derived — BO-141 declares entryState.params alertId and BO-105 holds none of them.
@@ -29918,9 +29923,9 @@ screens:
     transitions:
     - to: BO-053
       trigger: Staff Directory
-      provenance: 'derived — BO-053 declares entryState.params challengeId, principalId and BO-106 holds
-        none of them. The edge carries nothing: challengeId, principalId only pre-select (deep link or
-        optional), and BO-053 opens on its own'
+      provenance: 'derived — BO-053 declares entryState.params challengeId, jobTitleId, principalId, workAssignmentId
+        and BO-106 holds none of them. The edge carries nothing: challengeId, principalId, jobTitleId,
+        workAssignmentId only pre-select (deep link or optional), and BO-053 opens on its own'
     - to: BO-055
       trigger: Rota & Scheduling
       provenance: 'derived — BO-055 declares entryState.params assignmentId and BO-106 holds none of them.
@@ -29948,15 +29953,15 @@ screens:
         on its own'
     - to: BO-087
       trigger: Approval Delegations
-      provenance: 'derived — BO-087 declares entryState.params delegationId and BO-106 holds none of them.
-        The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens
-        on its own'
+      provenance: 'derived — BO-087 declares entryState.params delegationId, matrixId and BO-106 holds
+        none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional),
+        and BO-087 opens on its own'
     - to: BO-054
       trigger: Role Assignment
       carries:
       - roleId
-      provenance: derived — BO-054 declares entryState.params campaignId, principalId, roleId and BO-106
-        holds roleId, so an edge into it carries them
+      provenance: derived — BO-054 declares entryState.params campaignId, capabilityTemplateId, principalId,
+        roleId and BO-106 holds roleId, so an edge into it carries them
   notes: Section landing. **11 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -30435,9 +30440,9 @@ screens:
         carries nothing: BO-132 needs nothing to open'
     - to: BO-133
       trigger: Offline Alerts, Limits & Audit
-      provenance: 'derived — BO-133 declares entryState.params rejectionId, reportId, requestId and BO-108
-        holds none of them. The edge carries nothing: reportId, requestId, rejectionId only pre-select
-        (deep link or optional), and BO-133 opens on its own'
+      provenance: 'derived — BO-133 declares entryState.params alertRuleId, rejectionId, reportId, requestId
+        and BO-108 holds none of them. The edge carries nothing: reportId, requestId, rejectionId, alertRuleId
+        only pre-select (deep link or optional), and BO-133 opens on its own'
     - to: BO-1184
       trigger: Transport routes
       provenance: authored 29 September, rev 3 REV3-21 — transport setup is venue configuration in Venue
@@ -31460,12 +31465,11 @@ screens:
     component: modal
     trigger: Plan production run
     body: '**Collects what `planProductionRun` sends before it is called.** Required: `recipeId`, `plannedQuantity`.
-      Optional: `stationId`, `producingOutletId`, `forOutletIds`, `scheduledFor`. is a client UUIDv7
-      generated silently, never asked. The recipe, producing outlet and the outlets it serves are pickers
-      by name; is the server''s (planned); actual quantity and variance belong to completing the run
-      (BO-138), not to planning. Dismissing sends nothing; the screen behind is unchanged. Not asked,
-      because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`,
-      `status` (CHG-GT1-002).'
+      Optional: `stationId`, `producingOutletId`, `forOutletIds`, `scheduledFor`. is a client UUIDv7 generated
+      silently, never asked. The recipe, producing outlet and the outlets it serves are pickers by name;
+      is the server''s (planned); actual quantity and variance belong to completing the run (BO-138),
+      not to planning. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the
+      server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `status` (CHG-GT1-002).'
     confirm:
       label: Plan production run
       operation: planProductionRun
@@ -34581,10 +34585,10 @@ screens:
     trigger: Save offline policy
     body: '**Collects what `setOfflinePolicy` sends before it is called.** Nothing in the body is required.
       Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`,
-      `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is
-      unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October
-      2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14
-      October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).'
+      `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
+      Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005):
+      `scopePath` (CHG-GT1-002).'
     bindsTo: OfflinePolicy
     confirm:
       label: Save offline policy
@@ -35164,11 +35168,11 @@ screens:
   - id: formSetAlertRule
     component: modal
     trigger: Save alert rule
-    body: '**Collects what `setAlertRule` sends before it is called.** Required: `name`, `metric`,
-      `comparator`, `threshold`, `severity`, `isActive`. Optional: `thresholdUpper`, `windowMinutes`,
-      `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind
-      is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October
-      2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
+    body: '**Collects what `setAlertRule` sends before it is called.** Required: `name`, `metric`, `comparator`,
+      `threshold`, `severity`, `isActive`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`,
+      `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath`
+      (CHG-GT1-002).'
     bindsTo: AlertRule
     confirm:
       label: Save alert rule
@@ -36705,11 +36709,10 @@ screens:
     body: '**Collects what `setStoreRules` sends before it is called.** Nothing in the body is required.
       Optional: `outletId`, `kind`, `thresholdAmount`, `limitKind`, `thresholdPercent`, `minimumAgeYears`,
       `requiresPermission`, `enabled`. is a client UUIDv7 generated silently, never asked. **Each discount
-      or price-override limit is a percentage or an amount, chosen per limit by the venue (decided 2
-      October 2026 by Chinmay, DEC-195; CHG-CSA-019):** `limitKind` picks which of `thresholdPercent`
-      and `thresholdAmount` applies. Dismissing sends nothing; the screen behind is unchanged. Not asked,
-      because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`
-      (CHG-GT1-002).'
+      or price-override limit is a percentage or an amount, chosen per limit by the venue (decided 2 October
+      2026 by Chinmay, DEC-195; CHG-CSA-019):** `limitKind` picks which of `thresholdPercent` and `thresholdAmount`
+      applies. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server
+      sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     confirm:
       label: Save store rules
       operation: setStoreRules
@@ -37884,10 +37887,10 @@ screens:
   - id: formSetAccessPointGroup
     component: modal
     trigger: Save access point group
-    body: '**Collects what `setAccessPointGroup` sends before it is called.** Required: `venueId`,
-      `name`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind
-      is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October
-      2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
+    body: '**Collects what `setAccessPointGroup` sends before it is called.** Required: `venueId`, `name`.
+      Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005):
+      `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessAccessPointGroup
     confirm:
       label: Save access point group
@@ -38269,6 +38272,8 @@ screens:
       trigger: Works in Entitlement Consumption Engine
       provenance: flow F112 step 9→10
       operation: listAccessRule
+      carries:
+      - ruleId
     - to: BO-160
       trigger: Works in Multi-Park & Crossover Rules
       provenance: flow F112 step 11→12
@@ -38784,10 +38789,10 @@ screens:
   - id: formSetJourneySequenceRule
     component: modal
     trigger: Save journey sequence rule
-    body: '**Collects what `setJourneySequenceRule` sends before it is called.** Required: `scope`.
-      Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing
-      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
-      in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
+    body: '**Collects what `setJourneySequenceRule` sends before it is called.** Required: `scope`. Optional:
+      `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract
+      since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessJourneySequenceRule
     confirm:
       label: Save journey sequence rule
@@ -40550,10 +40555,9 @@ screens:
     component: modal
     trigger: Save credential event propagation rule
     body: '**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required:
-      `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`,
-      `propagation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
-      the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`,
-      `scopePath` (CHG-GT1-002).'
+      `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them
+      (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessCredentialEventPropagationRule
     confirm:
       label: Save credential event propagation rule
@@ -41371,12 +41375,12 @@ screens:
     component: modal
     trigger: Save verification method policy
     body: '**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `productId`,
-      `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`. Optional: `reasonCodes`,
-      and `credentialFormatOverride`, drawn as "Ticket credential for this product" (Channel default,
-      Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP invitation
-      or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing sends
-      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the
-      contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
+      `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`. Optional: `reasonCodes`, and
+      `credentialFormatOverride`, drawn as "Ticket credential for this product" (Channel default, Static
+      signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP invitation or a B2B
+      ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract
+      since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessVerificationMethodPolicy
     confirm:
       label: Save verification method policy
@@ -42029,10 +42033,14 @@ screens:
       trigger: Works in Face Tag Temporary Enrollment
       provenance: flow F115 step 7→8
       operation: listBiometricAccess
+      carries:
+      - profileId
     - to: BO-189
       trigger: Works in Face Matching & Verification Thresholds
       provenance: flow F115 step 9→10
       operation: listBiometricAccess
+      carries:
+      - profileId
     - to: BO-190
       trigger: Works in Face Change, Re-enrollment & Identity Protection
       provenance: flow F115 step 11→12
@@ -43707,12 +43715,12 @@ screens:
   - id: formSetHardwareModel
     component: modal
     trigger: Save hardware model
-    body: '**Collects what `setHardwareModel` sends before it is called.** Required: `manufacturer`,
-      `model`, `deviceCategory`, `hardwareType`. Optional: `supportedTechnologies`, `connectivity`,
-      `offlineCapability`, `screenCapability`, `soundCapability`, `lightCapability`, `relayControllerSupport`,
-      `paymentCapability`, `firmwareSoftwareInformation`. Dismissing sends nothing; the screen behind
-      is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October
-      2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
+    body: '**Collects what `setHardwareModel` sends before it is called.** Required: `manufacturer`, `model`,
+      `deviceCategory`, `hardwareType`. Optional: `supportedTechnologies`, `connectivity`, `offlineCapability`,
+      `screenCapability`, `soundCapability`, `lightCapability`, `relayControllerSupport`, `paymentCapability`,
+      `firmwareSoftwareInformation`. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`,
+      `scopePath` (CHG-GT1-002).'
     bindsTo: AccessHardwareModel
     confirm:
       label: Save hardware model
@@ -46192,9 +46200,9 @@ screens:
     component: modal
     trigger: Save journey profile
     body: '**Collects what `setJourneyProfile` sends before it is called.** Required: `name`, `status`.
-      Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the
-      screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract
-      since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
+      Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14
+      October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessJourneyProfile
     confirm:
       label: Save journey profile
@@ -46936,11 +46944,10 @@ screens:
   - id: formSetFastPassProfile
     component: modal
     trigger: Save fast pass profile
-    body: '**Collects what `setFastPassProfile` sends before it is called.** Required: `name`,
-      `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`,
-      `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged.
-      Not asked, because the server sets them (readOnly in the contract since 14 October 2026,
-      CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
+    body: '**Collects what `setFastPassProfile` sends before it is called.** Required: `name`, `unlimited`.
+      Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`, `eligibleAttractionCategories`.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them
+      (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessFastPassProfile
     confirm:
       label: Save fast pass profile
@@ -47539,8 +47546,8 @@ screens:
     component: modal
     trigger: Save podium
     body: '**Collects what `setPodium` sends before it is called.** Required: `venueId`, `podiumType`,
-      `name`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.
-      Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005):
+      `name`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged. Not
+      asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005):
       `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessPodium
     confirm:
@@ -48624,6 +48631,8 @@ screens:
       trigger: Works in Policy Scope, Hierarchy & Inheritance
       provenance: flow F120 step 9→10
       operation: listDynamicAccessPolicy
+      carries:
+      - policyId
     - to: BO-240
       trigger: Works in Authorization Governance & Temporary Access
       provenance: flow F120 step 11→12
@@ -63133,10 +63142,9 @@ screens:
     component: modal
     trigger: Save credential event propagation rule
     body: '**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required:
-      `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`,
-      `propagation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
-      the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`,
-      `scopePath` (CHG-GT1-002).'
+      `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them
+      (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessCredentialEventPropagationRule
     confirm:
       label: Save credential event propagation rule
@@ -68748,6 +68756,8 @@ screens:
     - to: BO-388
       trigger: Approval SLA Policy Configuration
       provenance: structural — pack board 5 wiring, 9 September 2026
+      carries:
+      - slaPolicyId
     - to: BO-389
       trigger: Reminder & Breach Notification Rules
       provenance: structural — pack board 5 wiring, 9 September 2026
@@ -70165,11 +70175,10 @@ screens:
     component: modal
     trigger: Create
     body: '**Collects what `createGame` sends before it is called.** Required: `code`, `name`, `venueId`,
-      `creditCost`. Optional: `zone`, `assetId`, `readerId`, `minPointsAwarded`, `maxPointsAwarded`,
-      `heightRequirementCm`, `playsToday`, `creditsTakenToday`, `pointsAwardedToday`. is a client
-      UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.
-      Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005):
-      `id`, `status` (CHG-GT1-002).'
+      `creditCost`. Optional: `zone`, `assetId`, `readerId`, `minPointsAwarded`, `maxPointsAwarded`, `heightRequirementCm`,
+      `playsToday`, `creditsTakenToday`, `pointsAwardedToday`. is a client UUIDv7 generated silently,
+      never asked. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server
+      sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `status` (CHG-GT1-002).'
     confirm:
       label: Create
       operation: createGame
@@ -71107,6 +71116,8 @@ screens:
     - to: BO-412
       trigger: Real-Time Tap Validation & Reader Response
       provenance: structural — pack board 2 wiring, 11 September 2026
+      carries:
+      - readerProfileId
     - to: BO-413
       trigger: Balance Check Reader & Device Test Console
       provenance: structural — pack board 2 wiring, 11 September 2026
@@ -78596,9 +78607,9 @@ screens:
     body: '**Collects what `setGateOfflinePolicy` sends before it is called.** Required: `venueId`. Optional:
       `maxOfflineDurationHours`, `offlineChecks`, `afterThresholdBehavior`, `revocationTriggerEvents`,
       `revocationMaxAllowedAgeMinutes`, `revocationStalenessAction`, `operatingModes`, `centralUnavailableAfterSeconds`,
-      `edgeUnavailableAfterSeconds`, `automaticSwitch`. is a client UUIDv7 generated silently, never
-      asked. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server
-      sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
+      `edgeUnavailableAfterSeconds`, `automaticSwitch`. is a client UUIDv7 generated silently, never asked.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
+      (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     confirm:
       label: Set maximum offline duration
       operation: setGateOfflinePolicy
@@ -78818,6 +78829,8 @@ screens:
     - to: BO-476
       trigger: Communication Protocol Configuration
       provenance: structural — pack board 9 wiring, 11 September 2026
+      carries:
+      - readerProfileId
     - to: BO-477
       trigger: Reader Command & Event Mapping
       provenance: structural — pack board 9 wiring, 11 September 2026
@@ -97278,6 +97291,8 @@ screens:
     - to: BO-647
       trigger: Badge Template Designer
       provenance: structural — pack board 4 wiring, 19 September 2026
+      carries:
+      - badgeTemplateId
     - to: BO-648
       trigger: Badge Printing & Print Queue
       provenance: structural — pack board 4 wiring, 19 September 2026
@@ -98256,18 +98271,28 @@ screens:
     - to: BO-655
       trigger: Access Profile Management
       provenance: structural — pack board 5 wiring, 19 September 2026
+      carries:
+      - accessProfileId
     - to: BO-656
       trigger: Venue & Zone Access Matrix
       provenance: structural — pack board 5 wiring, 19 September 2026
+      carries:
+      - accessProfileId
     - to: BO-657
       trigger: Operational Area Permission Management
       provenance: structural — pack board 5 wiring, 19 September 2026
+      carries:
+      - accessProfileId
     - to: BO-658
       trigger: Date & Time Access Rules
       provenance: structural — pack board 5 wiring, 19 September 2026
+      carries:
+      - accessProfileId
     - to: BO-659
       trigger: Access Schedule Management
       provenance: structural — pack board 5 wiring, 19 September 2026
+      carries:
+      - accessProfileId
     - to: BO-660
       trigger: Holder Access Assignment
       provenance: structural — pack board 5 wiring, 19 September 2026
@@ -102920,9 +102945,13 @@ screens:
     - to: BO-701
       trigger: Venue Master Configuration
       provenance: structural — pack board 3 wiring, 19 September 2026
+      carries:
+      - spaceId
     - to: BO-702
       trigger: Space Access Rules Configuration
       provenance: structural — pack board 3 wiring, 19 September 2026
+      carries:
+      - spaceId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -105265,9 +105294,13 @@ screens:
     - to: BO-723
       trigger: Peak, Off-Peak & Super Prime Time Configuration
       provenance: structural — pack board 8 wiring, 19 September 2026
+      carries:
+      - performanceTemplateId
     - to: BO-724
       trigger: Walk-In / There-and-Then Booking Configuration
       provenance: structural — pack board 8 wiring, 19 September 2026
+      carries:
+      - performanceTemplateId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -105480,6 +105513,8 @@ screens:
       trigger: Back to Activity Performance & Slot Template Configuration
       provenance: structural — pack board 8 wiring, 19 September 2026
       back: true
+      carries:
+      - performanceTemplateId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Configure KPI by; Display) and no metric
@@ -105590,6 +105625,8 @@ screens:
       trigger: Back to Activity Performance & Slot Template Configuration
       provenance: structural — pack board 8 wiring, 19 September 2026
       back: true
+      carries:
+      - performanceTemplateId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -113852,6 +113889,8 @@ screens:
     - to: BO-800
       trigger: Routing & Queue Management
       provenance: structural — pack board 7 wiring, 19 September 2026
+      carries:
+      - queueId
     - to: BO-801
       trigger: Sales & Service Actions
       provenance: structural — pack board 7 wiring, 19 September 2026
@@ -139937,15 +139976,21 @@ screens:
     - to: BO-1004
       trigger: Hold Type Master
       provenance: structural — pack board 6 wiring, 19 September 2026
+      carries:
+      - holdTypeId
     - to: BO-1005
       trigger: Hold Pool Creation
       provenance: structural — pack board 6 wiring, 19 September 2026
     - to: BO-1006
       trigger: Hold Rule Assignment
       provenance: structural — pack board 6 wiring, 19 September 2026
+      carries:
+      - holdTypeId
     - to: BO-1007
       trigger: Expiration Rules
       provenance: structural — pack board 6 wiring, 19 September 2026
+      carries:
+      - holdTypeId
     - to: BO-1008
       trigger: Automatic Hold Release
       provenance: structural — pack board 6 wiring, 19 September 2026
@@ -139962,6 +140007,8 @@ screens:
     - to: BO-1011
       trigger: Priority & Conflict Resolution
       provenance: structural — pack board 6 wiring, 19 September 2026
+      carries:
+      - holdTypeId
     - to: BO-1012
       trigger: Hold Utilization & Audit
       provenance: structural — pack board 6 wiring, 19 September 2026
@@ -154781,6 +154828,8 @@ screens:
     - to: BO-1124
       trigger: Gift Card Product Configuration
       provenance: structural — pack board 5 wiring, 19 September 2026
+      carries:
+      - giftCardProductId
     - to: BO-1125
       trigger: Gift Card Issuance, Activation & Distribution
       provenance: structural — pack board 5 wiring, 19 September 2026
@@ -155016,6 +155065,8 @@ screens:
       trigger: Back to Gift Card & Digital Benefit Command Center
       provenance: structural — pack board 5 wiring, 19 September 2026
       back: true
+      carries:
+      - giftCardProductId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§For each gift card define) and no metric
@@ -171197,12 +171248,12 @@ screens:
     component: modal
     trigger: Request pricing rollback
     body: '**Collects what `requestPricingRollback` sends before it is called.** Required: `subject`,
-      `actionType`, `reason`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`,
-      `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`,
-      `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged.
-      Not asked, because the server sets them (readOnly in the contract): `id`, `requestedAt`, `requestedByPrincipalId`,
-      `scopePath` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly
-      in the contract since 14 October 2026, CHG-SHP-005): `status` (CHG-GT1-002).'
+      `actionType`, `reason`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`,
+      `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt`
+      and 6 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server
+      sets them (readOnly in the contract): `id`, `requestedAt`, `requestedByPrincipalId`, `scopePath`
+      (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since
+      14 October 2026, CHG-SHP-005): `status` (CHG-GT1-002).'
     bindsTo: CatalogueRollbackAction
     confirm:
       label: Request pricing rollback
@@ -191945,6 +191996,8 @@ screens:
     - to: BO-388
       trigger: Open Approval SLA Policy Configuration
       provenance: a section of BO-388 since 2 October 2026 (CHG-MOV-002)
+      carries:
+      - slaPolicyId
   notes: '**Merged into BO-388 Approval SLA Policy Configuration as a section of it** (decided 2 October
     2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the
     pre-apply round; CHG-MOV-002). It edits the same record as BO-388: it renders inside BO-388''s component,
@@ -221670,21 +221723,33 @@ screens:
     - to: ADM-330
       trigger: Approval Authority Matrix
       provenance: structural — pack board 3 wiring, 9 September 2026
+      carries:
+      - matrixId
     - to: ADM-331
       trigger: Organizational Hierarchy Routing
       provenance: structural — pack board 3 wiring, 9 September 2026
+      carries:
+      - matrixId
     - to: ADM-332
       trigger: Department-Based Approval Matrix
       provenance: structural — pack board 3 wiring, 9 September 2026
+      carries:
+      - matrixId
     - to: ADM-333
       trigger: Venue & Tenant Approval Matrix
       provenance: structural — pack board 3 wiring, 9 September 2026
+      carries:
+      - matrixId
     - to: ADM-334
       trigger: Value & Threshold Routing
       provenance: structural — pack board 3 wiring, 9 September 2026
+      carries:
+      - matrixId
     - to: ADM-335
       trigger: Risk-Based & Conditional Routing
       provenance: structural — pack board 3 wiring, 9 September 2026
+      carries:
+      - matrixId
     - to: ADM-336
       trigger: Approver Group & Decision Policy
       provenance: structural — pack board 3 wiring, 9 September 2026

@@ -1629,7 +1629,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save risk scoring config** (modal, opened by *Save risk scoring config*; *Save risk scoring config* calls `setRiskScoringConfig`, *Cancel* sends nothing)
 
-**Collects what `setRiskScoringConfig` sends before it is called.** Required: `id`, `scopePath`, `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setRiskScoringConfig` sends before it is called.** Required: `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

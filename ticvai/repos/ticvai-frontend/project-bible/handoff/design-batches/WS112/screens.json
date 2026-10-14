@@ -44,27 +44,42 @@
     {
      "to": "BO-655",
      "trigger": "Access Profile Management",
-     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "accessProfileId"
+     ]
     },
     {
      "to": "BO-656",
      "trigger": "Venue & Zone Access Matrix",
-     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "accessProfileId"
+     ]
     },
     {
      "to": "BO-657",
      "trigger": "Operational Area Permission Management",
-     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "accessProfileId"
+     ]
     },
     {
      "to": "BO-658",
      "trigger": "Date & Time Access Rules",
-     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "accessProfileId"
+     ]
     },
     {
      "to": "BO-659",
      "trigger": "Access Schedule Management",
-     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "accessProfileId"
+     ]
     },
     {
      "to": "BO-660",

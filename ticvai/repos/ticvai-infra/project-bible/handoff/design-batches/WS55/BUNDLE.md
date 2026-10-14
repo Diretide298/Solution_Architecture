@@ -1081,7 +1081,7 @@ Carried, not typed: `slaPolicyId`
 **Where the user goes next**
 
 - → `ADM-238` Rules & Workflow Command Center: *Returns to the board's landing screen*; calls `listSlaEscalationReminder`
-- → `BO-388` Approval SLA Policy Configuration: *Open Approval SLA Policy Configuration*
+- → `BO-388` Approval SLA Policy Configuration: *Open Approval SLA Policy Configuration*; carries `slaPolicyId`
 
 #### States
 

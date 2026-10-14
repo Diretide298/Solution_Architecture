@@ -29,7 +29,7 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 67
 - service: AiService
-  operationCalls: 13
+  operationCalls: 14
 - service: CatalogueService
   operationCalls: 7
 - service: IdentityService
@@ -248,6 +248,7 @@ screens:
   - listContentBlocks
   - listContentPages
   - listLandingPageTemplates
+  - listProposedActions
   - proposeMarketingContent
   - publishContentBlock
   - setHomepageLayout
@@ -533,7 +534,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - analyticsProviderId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -683,7 +685,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - purposeId<-navigation
   goesTo:
   - CMS-021
   boardFrames: null
@@ -760,6 +763,8 @@ screens:
   offlineState: false
   entryParams:
   - scanRunId<-navigation
+  - scanPolicyId<-navigation
+  - technologyId<-navigation
   goesTo:
   - CMS-021
   boardFrames: null
@@ -782,7 +787,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - bannerDesignId<-navigation
   goesTo:
   - CMS-021
   boardFrames: null
@@ -828,7 +834,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - governanceId<-navigation
   goesTo:
   - CMS-021
   boardFrames: null
@@ -873,7 +880,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - governanceId<-navigation
   goesTo:
   - CMS-021
   boardFrames: null
@@ -1040,7 +1048,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - holdId<-navigation
   goesTo:
   - CMS-031
   boardFrames: null
@@ -1063,7 +1072,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - exceptionId<-navigation
   goesTo:
   - CMS-031
   boardFrames: null
@@ -1455,7 +1465,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - verificationId<-navigation
   goesTo:
   - CMS-051
   boardFrames: null
@@ -2360,7 +2371,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - code<-deepLink
   goesTo:
   - CMS-091
   boardFrames: null
@@ -2428,7 +2440,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - code<-deepLink
   goesTo:
   - CMS-091
   boardFrames: null

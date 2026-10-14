@@ -78,7 +78,10 @@
     {
      "to": "BO-800",
      "trigger": "Routing & Queue Management",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "carries": [
+      "queueId"
+     ]
     },
     {
      "to": "BO-801",

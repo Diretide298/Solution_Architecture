@@ -208,7 +208,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 - → `BO-409` Retap Delay & Transaction Protection: *Retap Delay & Transaction Protection*
 - → `BO-410` Free Game Glow & Reader Display Rules: *Free Game Glow & Reader Display Rules*
 - → `BO-411` Reader Theme & Experience Configuration: *Reader Theme & Experience Configuration*
-- → `BO-412` Real-Time Tap Validation & Reader Response: *Real-Time Tap Validation & Reader Response*
+- → `BO-412` Real-Time Tap Validation & Reader Response: *Real-Time Tap Validation & Reader Response*; carries `readerProfileId`
 - → `BO-413` Balance Check Reader & Device Test Console: *Balance Check Reader & Device Test Console*
 
 #### States

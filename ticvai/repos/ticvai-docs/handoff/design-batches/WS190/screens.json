@@ -44,7 +44,10 @@
     {
      "to": "BO-1124",
      "trigger": "Gift Card Product Configuration",
-     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "giftCardProductId"
+     ]
     },
     {
      "to": "BO-1125",
@@ -367,7 +370,10 @@
      "to": "BO-1123",
      "trigger": "Back to Gift Card & Digital Benefit Command Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "giftCardProductId"
+     ]
     }
    ]
   },

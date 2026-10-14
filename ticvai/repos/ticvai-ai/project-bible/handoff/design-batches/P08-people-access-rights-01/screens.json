@@ -1772,7 +1772,7 @@
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-084 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
+     "provenance": "derived — BO-087 declares entryState.params delegationId, matrixId and BO-084 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional), and BO-087 opens on its own"
     },
     {
      "to": "BO-364",
@@ -1792,6 +1792,11 @@
      "carries": [
       "requestId"
      ]
+    },
+    {
+     "to": "BO-086",
+     "trigger": "Approval Matrix",
+     "provenance": "derived — BO-086 declares entryState.params matrixId and BO-084 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
     }
    ],
    "entryFrom": [
@@ -2069,7 +2074,7 @@
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-085 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
+     "provenance": "derived — BO-087 declares entryState.params delegationId, matrixId and BO-085 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional), and BO-087 opens on its own"
     },
     {
      "to": "POS-005",
@@ -2078,6 +2083,11 @@
      "operation": "decideApprovalRequest",
      "crossesDevice": true,
      "back": false
+    },
+    {
+     "to": "BO-086",
+     "trigger": "Approval Matrix",
+     "provenance": "derived — BO-086 declares entryState.params matrixId and BO-085 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
     }
    ]
   },
@@ -2344,7 +2354,10 @@
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-086 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
+     "carries": [
+      "matrixId"
+     ],
+     "provenance": "derived — BO-087 declares entryState.params delegationId, matrixId and BO-086 holds matrixId, so an edge into it carries them"
     },
     {
      "to": "ADM-238",
@@ -2562,6 +2575,14 @@
      "to": "ADM-238",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F164 step 10→11"
+    },
+    {
+     "to": "BO-086",
+     "trigger": "Approval Matrix",
+     "carries": [
+      "matrixId"
+     ],
+     "provenance": "derived — BO-086 declares entryState.params matrixId and BO-087 holds matrixId, so an edge into it carries them"
     }
    ],
    "entryFrom": [

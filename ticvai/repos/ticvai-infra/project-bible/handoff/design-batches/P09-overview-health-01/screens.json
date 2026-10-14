@@ -324,7 +324,7 @@
      "carries": [
       "tenantId"
      ],
-     "provenance": "derived — ADM-015 declares entryState.params requestId, tenantId and ADM-002 holds tenantId, so an edge into it carries them"
+     "provenance": "derived — ADM-015 declares entryState.params anomalyRuleId, quotaId, requestId, tenantId and ADM-002 holds tenantId, so an edge into it carries them"
     },
     {
      "to": "ADM-016",
@@ -408,7 +408,7 @@
     {
      "to": "ADM-032",
      "trigger": "WAF & Security Policy View",
-     "provenance": "derived — ADM-032 declares entryState.params cellId and ADM-002 holds none of them. The edge carries nothing: cellId only pre-selects (deep link or optional), and ADM-032 opens on its own"
+     "provenance": "derived — ADM-032 declares entryState.params cellId, wafRuleId and ADM-002 holds none of them. The edge carries nothing: cellId, wafRuleId only pre-select (deep link or optional), and ADM-032 opens on its own"
     },
     {
      "to": "ADM-033",

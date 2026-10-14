@@ -577,8 +577,8 @@ screens:
       trigger: API Rate Limit & Quota Management
       carries:
       - tenantId
-      provenance: derived — ADM-015 declares entryState.params requestId, tenantId and ADM-002 holds tenantId,
-        so an edge into it carries them
+      provenance: derived — ADM-015 declares entryState.params anomalyRuleId, quotaId, requestId, tenantId
+        and ADM-002 holds tenantId, so an edge into it carries them
     - to: ADM-016
       trigger: White-Label Branding Management
       carries:
@@ -644,9 +644,9 @@ screens:
         tenantId, so an edge into it carries them
     - to: ADM-032
       trigger: WAF & Security Policy View
-      provenance: 'derived — ADM-032 declares entryState.params cellId and ADM-002 holds none of them.
-        The edge carries nothing: cellId only pre-selects (deep link or optional), and ADM-032 opens on
-        its own'
+      provenance: 'derived — ADM-032 declares entryState.params cellId, wafRuleId and ADM-002 holds none
+        of them. The edge carries nothing: cellId, wafRuleId only pre-select (deep link or optional),
+        and ADM-032 opens on its own'
     - to: ADM-033
       trigger: Backup & DR Status
       carries:
@@ -1864,10 +1864,9 @@ screens:
     trigger: Save SSO config
     body: '**Collects what `setSsoConfig` sends before it is called.** Required: `displayName`, `protocol`,
       `groupMappings`. Optional: `metadataUrl`, `issuer`, `clientId`, `clientSecretRef`, `autoProvisionPrincipals`,
-      `isEnforced`, `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note
-      correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not
-      asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005):
-      `id` (CHG-GT1-002).'
+      `isEnforced`, `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction,
+      2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the
+      server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: SsoProviderConfig
     confirm:
       label: Save SSO config
@@ -7746,11 +7745,11 @@ screens:
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7
-      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
-      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
-      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because
-      the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7 generated
+      silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in
+      the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because the server
+      sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -8124,11 +8123,11 @@ screens:
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7
-      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
-      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
-      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because
-      the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7 generated
+      silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in
+      the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because the server
+      sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -8543,9 +8542,9 @@ screens:
     trigger: Register environment
     body: '**Collects what `registerEnvironment` sends before it is called.** Required: `kind`, `name`.
       Optional: `cellIds`, `requiresApprovalToPromote`, `soakHours`, `currentReleaseVersion`, `isActive`.
-      **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026).
-      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
-      (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
+      **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in
+      the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: Environment
     confirm:
       label: Register environment
@@ -9668,10 +9667,10 @@ screens:
     component: modal
     trigger: Save waf policy
     body: '**Collects what `setWafPolicy` sends before it is called.** Nothing in the body is required.
-      Optional: `name`, `action`, `matchOn`, `pattern`, `enabled`, `hitCount24h`. **Not asked:** is
-      a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends
-      nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in
-      the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
+      Optional: `name`, `action`, `matchOn`, `pattern`, `enabled`, `hitCount24h`. **Not asked:** is a
+      client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract
+      since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: WafRule
     confirm:
       label: Save waf policy
@@ -10225,11 +10224,11 @@ screens:
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7
-      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
-      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
-      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because
-      the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7 generated
+      silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in
+      the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because the server
+      sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -10387,11 +10386,11 @@ screens:
     component: modal
     trigger: Publish support notice
     body: '**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`.
-      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7
-      generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026).
-      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
-      (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because
-      the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
+      Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7 generated
+      silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in
+      the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because the server
+      sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: SupportNotice
     confirm:
       label: Publish support notice
@@ -13929,15 +13928,23 @@ screens:
     - to: ADM-393
       trigger: Tier Included Allowances
       provenance: structural — pack board 3 wiring, 11 September 2026
+      carries:
+      - licensingModelId
     - to: ADM-394
       trigger: Commercial & Licensing Model Configuration
       provenance: structural — pack board 3 wiring, 11 September 2026
+      carries:
+      - licensingModelId
     - to: ADM-395
       trigger: Billable Unit, Minimum Guarantee & Enforcement Rules
       provenance: structural — pack board 3 wiring, 11 September 2026
+      carries:
+      - licensingModelId
     - to: ADM-396
       trigger: Overage Pricing & Capacity Packs
       provenance: structural — pack board 3 wiring, 11 September 2026
+      carries:
+      - licensingModelId
     - to: ADM-397
       trigger: Commercial Model & Rule Simulation
       provenance: structural — pack board 3 wiring, 11 September 2026

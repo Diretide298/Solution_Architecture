@@ -249,7 +249,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 **Form: Save BYOK enablement** (modal, opened by *Save BYOK enablement*; *Save BYOK enablement* calls `setAiByokEnablement`, *Cancel* sends nothing)
 
-**Collects what `setAiByokEnablement` sends before it is called.** Required: `tenantId`, `enabled`. Optional: `coverage`, `allowedTasks`, `reason`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setAiByokEnablement` sends before it is called.** Required: `enabled`. Optional: `coverage`, `allowedTasks`, `reason`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `tenantId` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

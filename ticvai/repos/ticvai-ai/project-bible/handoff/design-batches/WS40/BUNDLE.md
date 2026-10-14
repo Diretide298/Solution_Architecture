@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-108` | Revenue Optimization Command Center | B | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-108` | Revenue Optimization Command Center | A | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-109` | Pricing Simulation Studio | A | 0 | 12 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
 | `ADM-110` | Scenario Modeling & What-If Analysis | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-111` | A/B Pricing Experiment Studio | B | 0 | 8 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block B · ticket #29844 (VM-ADM-108) |
+| Block | Block A · ticket #29844 (VM-ADM-108) |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each row displays) — counts over a population, then the population |

@@ -2199,11 +2199,11 @@ screens:
   - id: formSetAlertRule
     component: modal
     trigger: Save alert rule
-    body: '**Collects what `setAlertRule` sends before it is called.** Required: `name`, `metric`,
-      `comparator`, `threshold`, `severity`, `isActive`. Optional: `thresholdUpper`, `windowMinutes`,
-      `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind
-      is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October
-      2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
+    body: '**Collects what `setAlertRule` sends before it is called.** Required: `name`, `metric`, `comparator`,
+      `threshold`, `severity`, `isActive`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`,
+      `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath`
+      (CHG-GT1-002).'
     bindsTo: AlertRule
     confirm:
       label: Save alert rule

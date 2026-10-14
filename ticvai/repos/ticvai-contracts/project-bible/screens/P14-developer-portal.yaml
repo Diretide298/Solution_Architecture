@@ -89,8 +89,8 @@ screens:
       trigger: Programme Administration
       carries:
       - version
-      provenance: derived — DEV-008 declares entryState.params listingId, requestId, version and DEV-001
-        holds version, so an edge into it carries them
+      provenance: derived — DEV-008 declares entryState.params anomalyRuleId, licenceId, listingId, quotaId,
+        requestId, version and DEV-001 holds version, so an edge into it carries them
   notes: 'CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope
     rather than a contract gap — the twelve domain-13 rows left open after the contract landed are all
     this screen and its siblings. **The API reference.** A developer arrives at the documentation, not

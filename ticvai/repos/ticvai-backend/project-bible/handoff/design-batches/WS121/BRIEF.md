@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-522` | AI Autonomy Level Configuration | D | 15 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-523` | AI Action & Permission Policy Builder | A | 30 | 19 | 7 | 1 | 0 | 5 | — | notStarted (—) |
 | `ADM-524` | AI Data Access & Usage Policy | D | 22 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-525` | Environment, Tenant & Scope Governance | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-525` | Environment, Tenant & Scope Governance | B | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-526` | AI Policy Conflict, Exception & Override Management | D | 13 | 33 | 7 | 1 | 2 | 0 | — | notStarted (—) |
 | `ADM-527` | AI Policy Testing & Governance Simulation | A | 9 | 11 | 7 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-528` | AI Governance Policy Publication & Effective Policy Map | A | 6 | 22 | 7 | 1 | 0 | 0 | — | notStarted (—) |

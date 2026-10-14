@@ -1,0 +1,44 @@
+id: CHG-GT2-002
+date: '2026-10-15'
+source: audit
+kind: contract
+summary: A campaign invitation's campaignId is a declared reference to its invitation campaign, so
+  marketing.invitation.campaign_id has its foreign key to marketing.invitation_campaign.
+decision:
+  what: 'contracts/satellite/marketing-crm.yaml CampaignInvitation.campaignId: x-ticvai-references:
+    marketing.invitation_campaign, as CHG-STO-001 declared the others. Re-derived: schema-reference, and r6''s forward
+    migration V0104 (tenant) gains invitation_campaign_id_fkey (V0104 deleted and re-derived; a second derive writes
+    nothing; not committed here, the final derive writes it).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'check-storage-promises/SP-KEY-UNDECLARED at the r6 release gate on r6-gate2 (e2195db7): 1 new
+  (marketing.invitation.campaign_id NOT NULL -> marketing.invitation_campaign by convention only), 0 after (evidence
+  audit/ticvai/runs/audit-1014/classes.json; class 389 -> 0 under CHG-STO-001). The STO batch renamed marketing''s
+  Invitation schema to CampaignInvitation (CHG-STO-010 to 015) after CHG-STO-001 declared every key, and the renamed
+  schema''s campaignId was left undeclared. The target is the invitation campaign (quota, places), not
+  marketing.campaign: respondToInvitation refuses when "the campaign''s quota of places is taken".'
+keys_touched:
+  tables:
+  - marketing.invitation
+  schemas:
+  - CampaignInvitation
+  files:
+  - contracts/satellite/marketing-crm.yaml
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - '27677'
+  unstarted:
+  - '27645'
+  - '27686'
+  - '27872'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch GT2 (r6 gate fix round 2). 27677 (Ready for QA) is the marketing migration: a comment, not a rewrite;
+  the key ships in V0104, a forward migration.'

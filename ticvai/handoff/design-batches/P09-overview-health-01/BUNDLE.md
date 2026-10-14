@@ -121,7 +121,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-002` | Platform Dashboard | A | 2 | 33 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
 | `ADM-003` | Cross-Tenant Health Dashboard | A | 4 | 43 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-004` | Platform Audit Log | D | 9 | 30 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
+| `ADM-004` | Platform Audit Log | B | 9 | 30 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
 | `ADM-013` | Tenant Performance Monitor | B | 0 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-029` | Deployment Monitor | B | 5 | 53 | 7 | 0 | 0 | 0 | — | notStarted (generated) |
 
@@ -675,7 +675,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 2 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-004 |
+| Block | Block B · task APP-CONSOLE-ADM-004 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (3 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAiInteractions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

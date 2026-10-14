@@ -2280,7 +2280,6 @@
       "id",
       "outletId",
       "partySize",
-      "status",
       "recordedAt",
       "subjectId",
       "quotedWaitMinutes",

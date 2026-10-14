@@ -43,12 +43,18 @@
     {
      "to": "BO-723",
      "trigger": "Peak, Off-Peak & Super Prime Time Configuration",
-     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "carries": [
+      "performanceTemplateId"
+     ]
     },
     {
      "to": "BO-724",
      "trigger": "Walk-In / There-and-Then Booking Configuration",
-     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "carries": [
+      "performanceTemplateId"
+     ]
     }
    ]
   },
@@ -342,7 +348,10 @@
      "to": "BO-721",
      "trigger": "Back to Activity Performance & Slot Template Configuration",
      "provenance": "structural — pack board 8 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "performanceTemplateId"
+     ]
     }
    ]
   },
@@ -502,7 +511,10 @@
      "to": "BO-721",
      "trigger": "Back to Activity Performance & Slot Template Configuration",
      "provenance": "structural — pack board 8 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "performanceTemplateId"
+     ]
     }
    ]
   },

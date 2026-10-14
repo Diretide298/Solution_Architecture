@@ -675,7 +675,7 @@
     "id": "formSetTicketStatusTransition",
     "component": "modal",
     "trigger": "Save ticket status transition",
-    "body": "**Collects what `setTicketStatusTransition` sends before it is called.** Required: `id`, `fromStatus`, `toStatus`, `allowed`, `requiresAuthorizedException`, `scopePath`. Optional: `originatingSources`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setTicketStatusTransition` sends before it is called.** Required: `fromStatus`, `toStatus`, `allowed`, `requiresAuthorizedException`. Optional: `originatingSources`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessTicketStatusTransition",
     "confirm": {
      "label": "Save ticket status transition",
@@ -684,12 +684,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "fromStatus",
       "toStatus",
       "allowed",
       "requiresAuthorizedException",
-      "scopePath",
       "originatingSources"
      ]
     },
@@ -1091,7 +1089,7 @@
     "id": "formSetMediaBindingRule",
     "component": "modal",
     "trigger": "Save media binding rule",
-    "body": "**Collects what `setMediaBindingRule` sends before it is called.** Required: `id`, `scopePath`. Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`, `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`, `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setMediaBindingRule` sends before it is called.** Nothing in the body is required. Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`, `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`, `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessMediaBindingRule",
     "confirm": {
      "label": "Save media binding rule",
@@ -1100,8 +1098,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "allowedMediaTypeIds",
       "mandatoryMediaTypeIds",
       "optionalMediaTypeIds",
@@ -1425,7 +1421,7 @@
     "id": "formSetCredentialEventPropagationRule",
     "component": "modal",
     "trigger": "Save credential event propagation rule",
-    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessCredentialEventPropagationRule",
     "confirm": {
      "label": "Save credential event propagation rule",
@@ -1434,9 +1430,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "triggerEvent",
-      "scopePath",
       "revocationAction",
       "propagationTargets",
       "monitoredConditions",

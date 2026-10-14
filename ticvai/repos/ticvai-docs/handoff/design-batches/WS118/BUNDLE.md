@@ -97,12 +97,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-489` | AI Configuration Readiness Center | D | 20 | 174 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-490` | Configuration Validation Results | D | 6 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-491` | AI Recommendations & Best-Practice Review | D | 6 | 20 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-492` | Configuration Approval Workflow | D | 6 | 6 | 7 | 1 | 0 | 3 | — | notStarted (—) |
+| `ADM-491` | AI Recommendations & Best-Practice Review | B | 6 | 20 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-492` | Configuration Approval Workflow | B | 6 | 6 | 7 | 1 | 0 | 3 | — | notStarted (—) |
 | `ADM-493` | AI Configuration Execution Center | D | 8 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-494` | Execution Progress & Dependency Monitor | D | 6 | 48 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-495` | Configuration Results & Object Mapping | D | 6 | 22 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-496` | Configuration Change & Modification Assistant | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-495` | Configuration Results & Object Mapping | B | 6 | 22 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-496` | Configuration Change & Modification Assistant | B | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-497` | Configuration History, Versions & Rollback | D | 8 | 46 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-498` | AI Configuration Audit & Governance | D | 8 | 576 | 7 | 5 | 1 | 0 | — | notStarted (—) |
 
@@ -728,7 +728,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-491 |
+| Block | Block B · task APP-CONSOLE-ADM-491 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Track) and no metric row |
@@ -912,7 +912,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-492 |
+| Block | Block B · task APP-CONSOLE-ADM-492 |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1507,7 +1507,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-495 |
+| Block | Block B · task APP-CONSOLE-ADM-495 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1701,7 +1701,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-496 |
+| Block | Block B · task APP-CONSOLE-ADM-496 |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

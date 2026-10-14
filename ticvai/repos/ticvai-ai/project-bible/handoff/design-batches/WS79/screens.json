@@ -82,7 +82,10 @@
     {
      "to": "BO-412",
      "trigger": "Real-Time Tap Validation & Reader Response",
-     "provenance": "structural — pack board 2 wiring, 11 September 2026"
+     "provenance": "structural — pack board 2 wiring, 11 September 2026",
+     "carries": [
+      "readerProfileId"
+     ]
     },
     {
      "to": "BO-413",

@@ -200,7 +200,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-797` AI Chatbot Configuration: *AI Chatbot Configuration*
 - → `BO-798` Intent & Knowledge Management: *Intent & Knowledge Management*
 - → `BO-799` Agent Workspace: *Agent Workspace*; carries `conversationId`
-- → `BO-800` Routing & Queue Management: *Routing & Queue Management*
+- → `BO-800` Routing & Queue Management: *Routing & Queue Management*; carries `queueId`
 - → `BO-801` Sales & Service Actions: *Sales & Service Actions*
 - → `BO-802` Sentiment, Quality & Escalation: *Sentiment, Quality & Escalation*; carries `caseId`
 - → `BO-803` Chat Analytics & Audit: *Chat Analytics & Audit*

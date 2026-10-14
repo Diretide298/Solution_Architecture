@@ -1010,7 +1010,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 **Form: Save offline policy** (modal, opened by *Save offline policy*; *Save offline policy* calls `setOfflinePolicy`, *Cancel* sends nothing)
 
-**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
+**Collects what `setOfflinePolicy` sends before it is called.** Nothing in the body is required. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2504,7 +2504,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Plan production run** (modal, opened by *Plan production run*; *Plan production run* calls `planProductionRun`, *Cancel* sends nothing)
 
-**Collects what `planProductionRun` sends before it is called.** Required: `recipeId`, `plannedQuantity`. Optional: `stationId`, `producingOutletId`, `forOutletIds`, `scheduledFor`. `id` is a client UUIDv7 generated silently, never asked. The recipe, producing outlet and the outlets it serves are pickers by name; `status` is the server's (planned); actual quantity and variance belong to completing the run (BO-138), not to planning. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `planProductionRun` sends before it is called.** Required: `recipeId`, `plannedQuantity`. Optional: `stationId`, `producingOutletId`, `forOutletIds`, `scheduledFor`. is a client UUIDv7 generated silently, never asked. The recipe, producing outlet and the outlets it serves are pickers by name; is the server's (planned); actual quantity and variance belong to completing the run (BO-138), not to planning. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `status` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

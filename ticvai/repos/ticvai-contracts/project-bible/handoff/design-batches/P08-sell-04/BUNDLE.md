@@ -564,7 +564,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save configuration profile** (modal, opened by *Save configuration profile*; *Save configuration profile* calls `setConfigurationProfile`, *Cancel* sends nothing)
 
-**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).
+**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1512,7 +1512,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save store rules** (modal, opened by *Save store rules*; *Save store rules* calls `setStoreRules`, *Cancel* sends nothing)
 
-**Collects what `setStoreRules` sends before it is called.** Nothing in the body is required. Optional: `outletId`, `kind`, `thresholdAmount`, `limitKind`, `thresholdPercent`, `minimumAgeYears`, `requiresPermission`, `enabled`. `id` is a client UUIDv7 generated silently, never asked. **Each discount or price-override limit is a percentage or an amount, chosen per limit by the venue (decided 2 October 2026 by Chinmay, DEC-195; CHG-CSA-019):** `limitKind` picks which of `thresholdPercent` and `thresholdAmount` applies. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setStoreRules` sends before it is called.** Nothing in the body is required. Optional: `outletId`, `kind`, `thresholdAmount`, `limitKind`, `thresholdPercent`, `minimumAgeYears`, `requiresPermission`, `enabled`. is a client UUIDv7 generated silently, never asked. **Each discount or price-override limit is a percentage or an amount, chosen per limit by the venue (decided 2 October 2026 by Chinmay, DEC-195; CHG-CSA-019):** `limitKind` picks which of `thresholdPercent` and `thresholdAmount` applies. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

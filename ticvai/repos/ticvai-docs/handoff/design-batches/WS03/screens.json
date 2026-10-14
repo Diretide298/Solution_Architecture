@@ -1392,7 +1392,7 @@
     "id": "formSetCredentialEventPropagationRule",
     "component": "modal",
     "trigger": "Save credential event propagation rule",
-    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessCredentialEventPropagationRule",
     "confirm": {
      "label": "Save credential event propagation rule",
@@ -1401,9 +1401,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "triggerEvent",
-      "scopePath",
       "revocationAction",
       "propagationTargets",
       "monitoredConditions",

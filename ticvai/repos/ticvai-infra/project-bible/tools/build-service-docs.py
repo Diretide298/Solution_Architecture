@@ -3771,6 +3771,32 @@ def main() -> int:
         taken.add(n_)
         num_of_[t_["key"]] = n_
         fname_of[t_["key"]] = f"V{n_:04d}__{fwd_head.match(t_['subject']).group(2)}.sql"
+    # **A key into a later kept migration is added by that migration** (CHG-GT1-003, r6 gate, 14 October 2026; the rule
+    # the migrations sheet states: "keys that would point forward are added by the last migration"). Two kept numbers
+    # never move, so when a newly declared key makes a kept migration wait on one numbered after it, the wait is turned
+    # round: the later migration waits on the earlier and adds the key itself. CHG-STO-001 declared
+    # control.rollout_cell.rollout_id and control.release_component.release_id, and MIG-CONTROL-6 (V1004, #27991,
+    # Ready for QA) came to wait on MIG-CONTROL-5 (V1085), which would run after it (M-FILE-ORDER).
+    fwd_keys_ = {t_["key"] for t_ in fwd_tasks}
+    by_key_ = {t_["key"]: t_ for t_ in tasks}
+    for t_ in fwd_tasks:
+        k_ = t_["key"]
+        deps_ = (t_.get("dependsOn") or "").split()
+        late_ = [d_ for d_ in deps_ if d_ in fwd_keys_ and d_ in num_of_ and num_of_[d_] > num_of_[k_]]
+        if not late_:
+            continue
+        t_["dependsOn"] = " ".join(d_ for d_ in deps_ if d_ not in late_)
+        mine_ = set((re.search(r"Tables: (.+?)\. Source", t_["description"]) or [None, ""])[1].split(", ")) - {""}
+        for d_ in late_:
+            dt_ = by_key_[d_]
+            theirs_ = set((re.search(r"Tables: (.+?)\. Source", dt_["description"]) or [None, ""])[1].split(", "))
+            keys_ = sorted(f"{t} -> {x}" for t in mine_ if t in ddl for x in ddl[t]["fks"] if x in theirs_)
+            dt_["dependsOn"] = " ".join(sorted(set((dt_.get("dependsOn") or "").split()) | {k_}))
+            dt_["description"] = (dt_["description"].rstrip() + f" It also adds the foreign key(s) {k_} "
+                                  f"(whose file runs before this one) holds into its tables"
+                                  + (f": {', '.join(keys_)}" if keys_ else "") + ".")
+            print(f"forward key turned round: {k_} ({fname_of[k_]}) no longer waits on {d_} ({fname_of[d_]}); "
+                  f"{d_} adds {len(keys_)} key(s) into its tables")
     fwd_rows = []
     for t_ in fwd_tasks:
         f_ = fname_of[t_["key"]]
@@ -3796,12 +3822,20 @@ def main() -> int:
             for t in (x or {}).get(kk) or []:
                 reached[t].add(o)
     storage_only = []
+    # **A held table an after-r1 file changes says so** (CHG-GT1-007, r6 gate, 14 October 2026): CHG-MOD-007 gave
+    # approvals.accreditation_badge a scope in V0104, and no ticket creates it yet (its operations are held), so the
+    # change was on nothing the migration planned with them will read. The row names the file; check-migration-wording
+    # (MW-AFTER-R1) holds a held table to it.
+    held_ar1 = defaultdict(set)
+    for (rel_, tbl_) in ticket_done.after_r1_changes(ROOT):
+        held_ar1[tbl_].add(rel_)
     for t in sorted(set(ddl) - assigned):
         if reached.get(t) and all((ops.get(o) or {}).get("hold") for o in reached[t]):
             # only operations the plan holds out reach it (CHG-FXP-003): its migration comes with them
             storage_only.append((t, "held: only operations not built until their contract is agreed reach it ("
                                  + ", ".join(f"{o}: {ops[o]['hold']}" for o in sorted(reached[t])[:4])
-                                 + "); its forward migration is planned with them"))
+                                 + "); its forward migration is planned with them"
+                                 + "".join(f"; Source DDL after r1: {r_}" for r_ in sorted(held_ar1.get(t, ())))))
         elif reached.get(t):
             storage_only.append((t, "GAP: read or written by " + ", ".join(sorted(reached[t])[:4])
                                  + " but in no migration"))

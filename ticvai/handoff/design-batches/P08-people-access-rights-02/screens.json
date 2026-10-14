@@ -30,6 +30,11 @@
      "to": "BO-085",
      "trigger": "Approval Request",
      "provenance": "derived — BO-085 declares entryState.params requestId and BO-088 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
+    },
+    {
+     "to": "BO-086",
+     "trigger": "Approval Matrix",
+     "provenance": "derived — BO-086 declares entryState.params matrixId and BO-088 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
     }
    ]
   },
@@ -162,7 +167,7 @@
     {
      "to": "BO-053",
      "trigger": "Staff Directory",
-     "provenance": "derived — BO-053 declares entryState.params challengeId, principalId and BO-106 holds none of them. The edge carries nothing: challengeId, principalId only pre-select (deep link or optional), and BO-053 opens on its own"
+     "provenance": "derived — BO-053 declares entryState.params challengeId, jobTitleId, principalId, workAssignmentId and BO-106 holds none of them. The edge carries nothing: challengeId, principalId, jobTitleId, workAssignmentId only pre-select (deep link or optional), and BO-053 opens on its own"
     },
     {
      "to": "BO-055",
@@ -192,7 +197,7 @@
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId and BO-106 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
+     "provenance": "derived — BO-087 declares entryState.params delegationId, matrixId and BO-106 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional), and BO-087 opens on its own"
     },
     {
      "to": "BO-054",
@@ -200,7 +205,12 @@
      "carries": [
       "roleId"
      ],
-     "provenance": "derived — BO-054 declares entryState.params campaignId, principalId, roleId and BO-106 holds roleId, so an edge into it carries them"
+     "provenance": "derived — BO-054 declares entryState.params campaignId, capabilityTemplateId, principalId, roleId and BO-106 holds roleId, so an edge into it carries them"
+    },
+    {
+     "to": "BO-086",
+     "trigger": "Approval Matrix",
+     "provenance": "derived — BO-086 declares entryState.params matrixId and BO-106 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
     }
    ]
   },

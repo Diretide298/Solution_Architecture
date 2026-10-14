@@ -195,8 +195,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `BO-722` Prepaid Minute Package & Customer Balance Configuration: *Prepaid Minute Package & Customer Balance Configuration*
-- → `BO-723` Peak, Off-Peak & Super Prime Time Configuration: *Peak, Off-Peak & Super Prime Time Configuration*
-- → `BO-724` Walk-In / There-and-Then Booking Configuration: *Walk-In / There-and-Then Booking Configuration*
+- → `BO-723` Peak, Off-Peak & Super Prime Time Configuration: *Peak, Off-Peak & Super Prime Time Configuration*; carries `performanceTemplateId`
+- → `BO-724` Walk-In / There-and-Then Booking Configuration: *Walk-In / There-and-Then Booking Configuration*; carries `performanceTemplateId`
 
 #### States
 
@@ -490,7 +490,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-721` Activity Performance & Slot Template Configuration: *Back to Activity Performance & Slot Template Configuration*
+- → `BO-721` Activity Performance & Slot Template Configuration: *Back to Activity Performance & Slot Template Configuration*; carries `performanceTemplateId`
 
 #### States
 
@@ -625,7 +625,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-721` Activity Performance & Slot Template Configuration: *Back to Activity Performance & Slot Template Configuration*
+- → `BO-721` Activity Performance & Slot Template Configuration: *Back to Activity Performance & Slot Template Configuration*; carries `performanceTemplateId`
 
 #### States
 

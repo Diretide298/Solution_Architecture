@@ -33,7 +33,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 95
+  operationCalls: 96
 - service: FnbService
   operationCalls: 31
 - service: CatalogueService
@@ -543,6 +543,7 @@ screens:
   - exchangeOrderLines
   - getReturnPolicy
   - issueCreditMemo
+  - listOrderRefunds
   - listSerialisedItems
   - lookupRetailSale
   states:

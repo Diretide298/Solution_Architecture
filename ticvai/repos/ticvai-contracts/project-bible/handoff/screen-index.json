@@ -13086,7 +13086,6 @@
       "id",
       "outletId",
       "partySize",
-      "status",
       "recordedAt",
       "subjectId",
       "quotedWaitMinutes",
@@ -32698,7 +32697,7 @@
    {
     "to": "BO-006",
     "trigger": "Parking Configuration",
-    "provenance": "derived \u2014 BO-006 declares entryState.params  and BO-001 holds none of them. The edge carries nothing: BO-006 needs nothing to open"
+    "provenance": "derived \u2014 BO-006 declares entryState.params parkingFacilityId and BO-001 holds none of them. The edge carries nothing: parkingFacilityId only pre-selects (deep link or optional), and BO-006 opens on its own"
    },
    {
     "to": "BO-002",
@@ -32739,7 +32738,7 @@
     "id": "formConfigureQueueFeed",
     "component": "modal",
     "trigger": "Configure queue feed",
-    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "QueueFeed",
     "confirm": {
      "label": "Configure queue feed",
@@ -32748,7 +32747,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "queueId",
       "adaptor",
       "isEnabled",
@@ -33143,7 +33141,7 @@
     "id": "formConfigureQueueFeed",
     "component": "modal",
     "trigger": "Configure queue feed",
-    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "QueueFeed",
     "confirm": {
      "label": "Configure queue feed",
@@ -33152,7 +33150,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "queueId",
       "adaptor",
       "isEnabled",
@@ -35271,7 +35268,7 @@
     "id": "formSetChannelListing",
     "component": "modal",
     "trigger": "Save channel listing",
-    "body": "**Collects what `setChannelListing` sends before it is called.** Required: `id`, `channelName`, `productId`, `status`. Optional: `externalProductRef`, `allocationUnits`, `priceListId`, `adapter`, `adapterCredentialRef`, `pushIntervalMinutes`, `guestDataScope`, `lastPushedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setChannelListing` sends before it is called.** Required: `channelName`, `productId`, `status`. Optional: `externalProductRef`, `allocationUnits`, `priceListId`, `adapter`, `adapterCredentialRef`, `pushIntervalMinutes`, `guestDataScope`, `lastPushedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "ChannelListing",
     "confirm": {
      "label": "Save channel listing",
@@ -35280,7 +35277,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "channelName",
       "productId",
       "status",
@@ -38704,7 +38700,7 @@
     "id": "formSetOfflinePolicy",
     "component": "modal",
     "trigger": "Save offline policy",
-    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Nothing in the body is required. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).",
     "bindsTo": "OfflinePolicy",
     "confirm": {
      "label": "Save offline policy",
@@ -38713,7 +38709,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "scopePath",
       "maxOfflineHours",
       "allowedOffline",
       "offlineValueCeiling",
@@ -43411,7 +43406,7 @@
     "id": "formCreateMaintenancePlan",
     "component": "modal",
     "trigger": "Create maintenance plan",
-    "body": "**Collects what `createMaintenancePlan` sends before it is called.** Required: `id`, `name`, `assetId`, `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`, `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createMaintenancePlan` sends before it is called.** Required: `name`, `assetId`, `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`, `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "MaintenancePlan",
     "confirm": {
      "label": "Create maintenance plan",
@@ -43420,7 +43415,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "assetId",
       "taskTemplate",
@@ -43718,7 +43712,7 @@
    {
     "to": "BO-077",
     "trigger": "FX Rates & Variances",
-    "provenance": "derived \u2014 BO-077 declares entryState.params varianceId and BO-074 holds none of them. The edge carries nothing: varianceId only pre-selects (deep link or optional), and BO-077 opens on its own"
+    "provenance": "derived \u2014 BO-077 declares entryState.params rateId, varianceId and BO-074 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional), and BO-077 opens on its own"
    }
   ],
   "machine": null,
@@ -43894,7 +43888,7 @@
    {
     "to": "BO-077",
     "trigger": "FX Rates & Variances",
-    "provenance": "derived \u2014 BO-077 declares entryState.params varianceId and BO-075 holds none of them. The edge carries nothing: varianceId only pre-selects (deep link or optional), and BO-077 opens on its own"
+    "provenance": "derived \u2014 BO-077 declares entryState.params rateId, varianceId and BO-075 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional), and BO-077 opens on its own"
    },
    {
     "to": "ADM-020",
@@ -44064,7 +44058,7 @@
    {
     "to": "BO-077",
     "trigger": "FX Rates & Variances",
-    "provenance": "derived \u2014 BO-077 declares entryState.params varianceId and BO-076 holds none of them. The edge carries nothing: varianceId only pre-selects (deep link or optional), and BO-077 opens on its own"
+    "provenance": "derived \u2014 BO-077 declares entryState.params rateId, varianceId and BO-076 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional), and BO-077 opens on its own"
    }
   ],
   "machine": null,
@@ -45133,7 +45127,7 @@
     "id": "formCreateSupplier",
     "component": "modal",
     "trigger": "Create supplier",
-    "body": "**Collects what `createSupplier` sends before it is called.** Required: `id`, `code`, `name`. Optional: `contactName`, `contactEmail`, `contactPhone`, `taxRegistrationNumber`, `paymentTermsDays`, `leadTimeDays`, `currency`, `accountId`, `isActive`, `status`, `statusReason`, `minimumOrderValue` and 1 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createSupplier` sends before it is called.** Required: `code`, `name`. Optional: `contactName`, `contactEmail`, `contactPhone`, `taxRegistrationNumber`, `paymentTermsDays`, `leadTimeDays`, `currency`, `accountId`, `isActive`, `status`, `statusReason`, `minimumOrderValue` and 1 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "Supplier",
     "confirm": {
      "label": "Create supplier",
@@ -45142,7 +45136,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "contactName",
@@ -45279,7 +45272,7 @@
    {
     "to": "BO-087",
     "trigger": "Approval Delegations",
-    "provenance": "derived \u2014 BO-087 declares entryState.params delegationId and BO-084 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
+    "provenance": "derived \u2014 BO-087 declares entryState.params delegationId, matrixId and BO-084 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional), and BO-087 opens on its own"
    },
    {
     "to": "BO-364",
@@ -45299,6 +45292,11 @@
     "carries": [
      "requestId"
     ]
+   },
+   {
+    "to": "BO-086",
+    "trigger": "Approval Matrix",
+    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-084 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
    }
   ],
   "machine": null,
@@ -45414,7 +45412,7 @@
    {
     "to": "BO-087",
     "trigger": "Approval Delegations",
-    "provenance": "derived \u2014 BO-087 declares entryState.params delegationId and BO-085 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
+    "provenance": "derived \u2014 BO-087 declares entryState.params delegationId, matrixId and BO-085 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional), and BO-087 opens on its own"
    },
    {
     "to": "POS-005",
@@ -45423,6 +45421,11 @@
     "operation": "decideApprovalRequest",
     "crossesDevice": true,
     "back": false
+   },
+   {
+    "to": "BO-086",
+    "trigger": "Approval Matrix",
+    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-085 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
    }
   ],
   "machine": null,
@@ -45539,7 +45542,10 @@
    {
     "to": "BO-087",
     "trigger": "Approval Delegations",
-    "provenance": "derived \u2014 BO-087 declares entryState.params delegationId and BO-086 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
+    "carries": [
+     "matrixId"
+    ],
+    "provenance": "derived \u2014 BO-087 declares entryState.params delegationId, matrixId and BO-086 holds matrixId, so an edge into it carries them"
    },
    {
     "to": "ADM-238",
@@ -45644,6 +45650,14 @@
     "to": "ADM-238",
     "trigger": "Returns to the board's landing screen",
     "provenance": "flow F164 step 10\u219211"
+   },
+   {
+    "to": "BO-086",
+    "trigger": "Approval Matrix",
+    "carries": [
+     "matrixId"
+    ],
+    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-087 holds matrixId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -45752,6 +45766,11 @@
     "to": "BO-085",
     "trigger": "Approval Request",
     "provenance": "derived \u2014 BO-085 declares entryState.params requestId and BO-088 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
+   },
+   {
+    "to": "BO-086",
+    "trigger": "Approval Matrix",
+    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-088 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
    }
   ],
   "machine": null,
@@ -46098,7 +46117,7 @@
     "id": "formSetAiPolicy",
     "component": "modal",
     "trigger": "Save AI policy",
-    "body": "**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `scopePath` (from the session, not typed), `enabledCapabilities`. Optional: `allowedRoleIds`, `maskedFields`, `requiresApprovalFor`, `ceilingBehaviour`, `ceilingWarningPercent`, `guestCapabilityScope`, `cacheAnswers`, `cacheTtlMinutes`. **Not drawn:** `retainInteractionsDays` (deprecated 29 September, AI-D05; retention is a tenant setting per data class) and the engine tuning (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`, `negativeCacheTtlSeconds`, chunking, quantisation, hnsw, cascade), which is platform tuning left to the console, not a venue manager's decision. The money ceiling is set with Save spend ceiling. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `enabledCapabilities`. Optional: `allowedRoleIds`, `maskedFields`, `requiresApprovalFor`, `ceilingBehaviour`, `ceilingWarningPercent`, `guestCapabilityScope`, `cacheAnswers`, `cacheTtlMinutes`. **Not drawn:** `retainInteractionsDays` (deprecated 29 September, AI-D05; retention is a tenant setting per data class) and the engine tuning (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`, `negativeCacheTtlSeconds`, chunking, quantisation, hnsw, cascade), which is platform tuning left to the console, not a venue manager's decision. The money ceiling is set with Save spend ceiling. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).",
     "bindsTo": "AiPolicy",
     "confirm": {
      "label": "Save AI policy",
@@ -46108,7 +46127,6 @@
      "label": "Cancel",
      "discards": [
       "scopeLevel",
-      "scopePath",
       "enabledCapabilities",
       "allowedRoleIds",
       "maskedFields",
@@ -46631,7 +46649,7 @@
     "id": "formCreateResource",
     "component": "modal",
     "trigger": "Create resource",
-    "body": "**Collects what `createResource` sends before it is called.** Required: `id`, `code`, `name`, `kind`, `venueId`. Optional: `scopePath`, `parentResourceId`, `principalId`, `attributes`, `setupMinutes`, `teardownMinutes`, `requiresQualification`, `depositAmount`, `status`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createResource` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `scopePath`, `parentResourceId`, `principalId`, `attributes`, `setupMinutes`, `teardownMinutes`, `requiresQualification`, `depositAmount`, `status`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "Resource",
     "confirm": {
      "label": "Create resource",
@@ -46640,7 +46658,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "kind",
@@ -48480,7 +48497,7 @@
    {
     "to": "BO-077",
     "trigger": "FX Rates & Variances",
-    "provenance": "derived \u2014 BO-077 declares entryState.params varianceId and BO-101 holds none of them. The edge carries nothing: varianceId only pre-selects (deep link or optional), and BO-077 opens on its own"
+    "provenance": "derived \u2014 BO-077 declares entryState.params rateId, varianceId and BO-101 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional), and BO-077 opens on its own"
    },
    {
     "to": "BO-089",
@@ -48659,7 +48676,7 @@
    {
     "to": "BO-013",
     "trigger": "Channel & Distribution",
-    "provenance": "derived \u2014 BO-013 declares entryState.params channelCapacityId and BO-102 holds none of them. The edge carries nothing: channelCapacityId only pre-selects (deep link or optional), and BO-013 opens on its own"
+    "provenance": "derived \u2014 BO-013 declares entryState.params channelCapacityId, listingId and BO-102 holds none of them. The edge carries nothing: channelCapacityId, listingId only pre-select (deep link or optional), and BO-013 opens on its own"
    },
    {
     "to": "BO-014",
@@ -48674,7 +48691,7 @@
    {
     "to": "BO-016",
     "trigger": "Performance Template",
-    "provenance": "derived \u2014 BO-016 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-016 needs nothing to open"
+    "provenance": "derived \u2014 BO-016 declares entryState.params performanceTemplateId and BO-102 holds none of them. The edge carries nothing: performanceTemplateId only pre-selects (deep link or optional), and BO-016 opens on its own"
    },
    {
     "to": "BO-017",
@@ -48777,7 +48794,7 @@
    {
     "to": "BO-123",
     "trigger": "POS Profile Management",
-    "provenance": "derived \u2014 BO-123 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-123 needs nothing to open"
+    "provenance": "derived \u2014 BO-123 declares entryState.params profileId and BO-102 holds none of them. The edge carries nothing: profileId only pre-selects (deep link or optional), and BO-123 opens on its own"
    },
    {
     "to": "BO-124",
@@ -48797,7 +48814,7 @@
    {
     "to": "BO-142",
     "trigger": "Store Rules, Controls & Permissions",
-    "provenance": "derived \u2014 BO-142 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-142 needs nothing to open"
+    "provenance": "derived \u2014 BO-142 declares entryState.params storeRuleId and BO-102 holds none of them. The edge carries nothing: storeRuleId only pre-selects (deep link or optional), and BO-142 opens on its own"
    },
    {
     "to": "BO-143",
@@ -48957,7 +48974,7 @@
    {
     "to": "BO-006",
     "trigger": "Parking Configuration",
-    "provenance": "derived \u2014 BO-006 declares entryState.params  and BO-103 holds none of them. The edge carries nothing: BO-006 needs nothing to open"
+    "provenance": "derived \u2014 BO-006 declares entryState.params parkingFacilityId and BO-103 holds none of them. The edge carries nothing: parkingFacilityId only pre-selects (deep link or optional), and BO-006 opens on its own"
    },
    {
     "to": "BO-030",
@@ -49339,7 +49356,7 @@
    {
     "to": "BO-140",
     "trigger": "Product Availability, 86 & Operational Food Safety",
-    "provenance": "derived \u2014 BO-140 declares entryState.params itemId, menuId, outletId and BO-105 holds none of them. The edge carries nothing: itemId, outletId only pre-select (deep link or optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source on BO-140 yet (a gap in BO-140, not in this edge)"
+    "provenance": "derived \u2014 BO-140 declares entryState.params checkpointId, itemId, menuId, outletId and BO-105 holds none of them. The edge carries nothing: itemId, outletId, checkpointId only pre-select (deep link or optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source on BO-140 yet (a gap in BO-140, not in this edge)"
    },
    {
     "to": "BO-141",
@@ -49458,7 +49475,7 @@
    {
     "to": "BO-053",
     "trigger": "Staff Directory",
-    "provenance": "derived \u2014 BO-053 declares entryState.params challengeId, principalId and BO-106 holds none of them. The edge carries nothing: challengeId, principalId only pre-select (deep link or optional), and BO-053 opens on its own"
+    "provenance": "derived \u2014 BO-053 declares entryState.params challengeId, jobTitleId, principalId, workAssignmentId and BO-106 holds none of them. The edge carries nothing: challengeId, principalId, jobTitleId, workAssignmentId only pre-select (deep link or optional), and BO-053 opens on its own"
    },
    {
     "to": "BO-055",
@@ -49488,7 +49505,7 @@
    {
     "to": "BO-087",
     "trigger": "Approval Delegations",
-    "provenance": "derived \u2014 BO-087 declares entryState.params delegationId and BO-106 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
+    "provenance": "derived \u2014 BO-087 declares entryState.params delegationId, matrixId and BO-106 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional), and BO-087 opens on its own"
    },
    {
     "to": "BO-054",
@@ -49496,7 +49513,12 @@
     "carries": [
      "roleId"
     ],
-    "provenance": "derived \u2014 BO-054 declares entryState.params campaignId, principalId, roleId and BO-106 holds roleId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-054 declares entryState.params campaignId, capabilityTemplateId, principalId, roleId and BO-106 holds roleId, so an edge into it carries them"
+   },
+   {
+    "to": "BO-086",
+    "trigger": "Approval Matrix",
+    "provenance": "derived \u2014 BO-086 declares entryState.params matrixId and BO-106 holds none of them. The edge carries nothing: matrixId only pre-selects (deep link or optional), and BO-086 opens on its own"
    }
   ],
   "machine": null,
@@ -49823,7 +49845,7 @@
    {
     "to": "BO-133",
     "trigger": "Offline Alerts, Limits & Audit",
-    "provenance": "derived \u2014 BO-133 declares entryState.params rejectionId, reportId, requestId and BO-108 holds none of them. The edge carries nothing: reportId, requestId, rejectionId only pre-select (deep link or optional), and BO-133 opens on its own"
+    "provenance": "derived \u2014 BO-133 declares entryState.params alertRuleId, rejectionId, reportId, requestId and BO-108 holds none of them. The edge carries nothing: reportId, requestId, rejectionId, alertRuleId only pre-select (deep link or optional), and BO-133 opens on its own"
    },
    {
     "to": "BO-1184",
@@ -50300,7 +50322,7 @@
     "id": "formPlanProductionRun",
     "component": "modal",
     "trigger": "Plan production run",
-    "body": "**Collects what `planProductionRun` sends before it is called.** Required: `recipeId`, `plannedQuantity`. Optional: `stationId`, `producingOutletId`, `forOutletIds`, `scheduledFor`. `id` is a client UUIDv7 generated silently, never asked. The recipe, producing outlet and the outlets it serves are pickers by name; `status` is the server's (planned); actual quantity and variance belong to completing the run (BO-138), not to planning. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `planProductionRun` sends before it is called.** Required: `recipeId`, `plannedQuantity`. Optional: `stationId`, `producingOutletId`, `forOutletIds`, `scheduledFor`. is a client UUIDv7 generated silently, never asked. The recipe, producing outlet and the outlets it serves are pickers by name; is the server's (planned); actual quantity and variance belong to completing the run (BO-138), not to planning. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `status` (CHG-GT1-002).",
     "confirm": {
      "label": "Plan production run",
      "operation": "planProductionRun"
@@ -51286,7 +51308,7 @@
     "id": "formSetConfigurationProfile",
     "component": "modal",
     "trigger": "Save configuration profile",
-    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "ConfigurationProfile",
     "confirm": {
      "label": "Save configuration profile",
@@ -51859,7 +51881,7 @@
     "id": "formSetConfigurationProfile",
     "component": "modal",
     "trigger": "Save configuration profile",
-    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "ConfigurationProfile",
     "confirm": {
      "label": "Save configuration profile",
@@ -51979,7 +52001,7 @@
     "id": "formSetOfflinePolicy",
     "component": "modal",
     "trigger": "Save offline policy",
-    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Nothing in the body is required. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).",
     "bindsTo": "OfflinePolicy",
     "confirm": {
      "label": "Save offline policy",
@@ -51988,7 +52010,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "scopePath",
       "maxOfflineHours",
       "allowedOffline",
       "offlineValueCeiling",
@@ -52272,7 +52293,7 @@
     "id": "formSetAlertRule",
     "component": "modal",
     "trigger": "Save alert rule",
-    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AlertRule",
     "confirm": {
      "label": "Save alert rule",
@@ -52281,14 +52302,12 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "metric",
       "comparator",
       "threshold",
       "severity",
       "isActive",
-      "scopePath",
       "thresholdUpper",
       "windowMinutes",
       "deliverTo",
@@ -53080,7 +53099,7 @@
     "id": "formSetStoreRules",
     "component": "modal",
     "trigger": "Save store rules",
-    "body": "**Collects what `setStoreRules` sends before it is called.** Nothing in the body is required. Optional: `outletId`, `kind`, `thresholdAmount`, `limitKind`, `thresholdPercent`, `minimumAgeYears`, `requiresPermission`, `enabled`. `id` is a client UUIDv7 generated silently, never asked. **Each discount or price-override limit is a percentage or an amount, chosen per limit by the venue (decided 2 October 2026 by Chinmay, DEC-195; CHG-CSA-019):** `limitKind` picks which of `thresholdPercent` and `thresholdAmount` applies. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setStoreRules` sends before it is called.** Nothing in the body is required. Optional: `outletId`, `kind`, `thresholdAmount`, `limitKind`, `thresholdPercent`, `minimumAgeYears`, `requiresPermission`, `enabled`. is a client UUIDv7 generated silently, never asked. **Each discount or price-override limit is a percentage or an amount, chosen per limit by the venue (decided 2 October 2026 by Chinmay, DEC-195; CHG-CSA-019):** `limitKind` picks which of `thresholdPercent` and `thresholdAmount` applies. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "confirm": {
      "label": "Save store rules",
      "operation": "setStoreRules"
@@ -53802,7 +53821,7 @@
     "id": "formSetAccessPointGroup",
     "component": "modal",
     "trigger": "Save access point group",
-    "body": "**Collects what `setAccessPointGroup` sends before it is called.** Required: `id`, `venueId`, `name`, `scopePath`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setAccessPointGroup` sends before it is called.** Required: `venueId`, `name`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessAccessPointGroup",
     "confirm": {
      "label": "Save access point group",
@@ -53811,10 +53830,8 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "name",
-      "scopePath",
       "parentGroupId",
       "accessPointIds"
      ]
@@ -53889,7 +53906,7 @@
     "id": "formSetOperatingCalendarEntry",
     "component": "modal",
     "trigger": "Save operating calendar entry",
-    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `venueId`, `dayType`, `startsAt`, `endsAt`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessOperatingCalendarEntry",
     "confirm": {
      "label": "Save operating calendar entry",
@@ -53898,12 +53915,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "dayType",
       "startsAt",
       "endsAt",
-      "scopePath",
       "name",
       "ticketValidationRequired",
       "admissionType",
@@ -54076,7 +54091,10 @@
     "to": "BO-159",
     "trigger": "Works in Entitlement Consumption Engine",
     "provenance": "flow F112 step 9\u219210",
-    "operation": "listAccessRule"
+    "operation": "listAccessRule",
+    "carries": [
+     "ruleId"
+    ]
    },
    {
     "to": "BO-160",
@@ -54301,7 +54319,7 @@
     "id": "formSetJourneySequenceRule",
     "component": "modal",
     "trigger": "Save journey sequence rule",
-    "body": "**Collects what `setJourneySequenceRule` sends before it is called.** Required: `id`, `scopePath`, `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setJourneySequenceRule` sends before it is called.** Required: `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessJourneySequenceRule",
     "confirm": {
      "label": "Save journey sequence rule",
@@ -54310,8 +54328,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "scope",
       "venueId",
       "name",
@@ -55289,7 +55305,7 @@
     "id": "formSetCredentialEventPropagationRule",
     "component": "modal",
     "trigger": "Save credential event propagation rule",
-    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessCredentialEventPropagationRule",
     "confirm": {
      "label": "Save credential event propagation rule",
@@ -55298,9 +55314,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "triggerEvent",
-      "scopePath",
       "revocationAction",
       "propagationTargets",
       "monitoredConditions",
@@ -55760,7 +55774,7 @@
     "id": "formSetVerificationMethodPolicy",
     "component": "modal",
     "trigger": "Save verification method policy",
-    "body": "**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`, `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`. Optional: `reasonCodes`, and `credentialFormatOverride`, drawn as \"Ticket credential for this product\" (Channel default, Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP invitation or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`. Optional: `reasonCodes`, and `credentialFormatOverride`, drawn as \"Ticket credential for this product\" (Channel default, Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP invitation or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessVerificationMethodPolicy",
     "confirm": {
      "label": "Save verification method policy",
@@ -55769,12 +55783,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "productId",
       "availableMethods",
       "lockOnFirstSuccessfulAccess",
       "changeAfterLock",
-      "scopePath",
       "reasonCodes",
       "credentialFormatOverride"
      ]
@@ -56174,13 +56186,19 @@
     "to": "BO-188",
     "trigger": "Works in Face Tag Temporary Enrollment",
     "provenance": "flow F115 step 7\u21928",
-    "operation": "listBiometricAccess"
+    "operation": "listBiometricAccess",
+    "carries": [
+     "profileId"
+    ]
    },
    {
     "to": "BO-189",
     "trigger": "Works in Face Matching & Verification Thresholds",
     "provenance": "flow F115 step 9\u219210",
-    "operation": "listBiometricAccess"
+    "operation": "listBiometricAccess",
+    "carries": [
+     "profileId"
+    ]
    },
    {
     "to": "BO-190",
@@ -57016,7 +57034,7 @@
     "id": "formSetHardwareModel",
     "component": "modal",
     "trigger": "Save hardware model",
-    "body": "**Collects what `setHardwareModel` sends before it is called.** Required: `id`, `manufacturer`, `model`, `deviceCategory`, `hardwareType`, `scopePath`. Optional: `supportedTechnologies`, `connectivity`, `offlineCapability`, `screenCapability`, `soundCapability`, `lightCapability`, `relayControllerSupport`, `paymentCapability`, `firmwareSoftwareInformation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setHardwareModel` sends before it is called.** Required: `manufacturer`, `model`, `deviceCategory`, `hardwareType`. Optional: `supportedTechnologies`, `connectivity`, `offlineCapability`, `screenCapability`, `soundCapability`, `lightCapability`, `relayControllerSupport`, `paymentCapability`, `firmwareSoftwareInformation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessHardwareModel",
     "confirm": {
      "label": "Save hardware model",
@@ -57025,12 +57043,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "manufacturer",
       "model",
       "deviceCategory",
       "hardwareType",
-      "scopePath",
       "supportedTechnologies",
       "connectivity",
       "offlineCapability",
@@ -57145,7 +57161,7 @@
     "id": "formRegisterAccessDevice",
     "component": "modal",
     "trigger": "Register access device",
-    "body": "**Collects what `placeAccessDevice` sends before it is called.** Required: `id`, `venueId`, `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `placeAccessDevice` sends before it is called.** Required: `venueId`, `deviceId`, `role`, `isActive`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessDevicePlacement",
     "confirm": {
      "label": "Register access device",
@@ -57154,12 +57170,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "deviceId",
       "role",
       "isActive",
-      "scopePath",
       "accessAreaId",
       "accessPointId",
       "gateLaneId",
@@ -57176,7 +57190,7 @@
     "id": "formUpdateAccessDevice",
     "component": "modal",
     "trigger": "Save access device",
-    "body": "**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`, `venueId`, `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `venueId`, `deviceId`, `role`, `isActive`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessDevicePlacement",
     "confirm": {
      "label": "Save access device",
@@ -57185,12 +57199,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "deviceId",
       "role",
       "isActive",
-      "scopePath",
       "accessAreaId",
       "accessPointId",
       "gateLaneId",
@@ -57521,7 +57533,7 @@
     "id": "formSetGateModePolicy",
     "component": "modal",
     "trigger": "Save gate mode policy",
-    "body": "**Collects what `setGateModePolicy` sends before it is called.** Required: `id`, `venueId`, `mode`, `scopePath`. Optional: `whoCanActivate`, `accessPointGroupId`, `reasonRequired`, `emergencyCode`, `automaticNotification`, `createsIncident`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setGateModePolicy` sends before it is called.** Required: `venueId`, `mode`. Optional: `whoCanActivate`, `accessPointGroupId`, `reasonRequired`, `emergencyCode`, `automaticNotification`, `createsIncident`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessGateModePolicy",
     "confirm": {
      "label": "Save gate mode policy",
@@ -57530,10 +57542,8 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "mode",
-      "scopePath",
       "whoCanActivate",
       "accessPointGroupId",
       "reasonRequired",
@@ -58454,7 +58464,7 @@
     "id": "formSetJourneyProfile",
     "component": "modal",
     "trigger": "Save journey profile",
-    "body": "**Collects what `setJourneyProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setJourneyProfile` sends before it is called.** Required: `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessJourneyProfile",
     "confirm": {
      "label": "Save journey profile",
@@ -58463,8 +58473,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "name",
       "status",
       "venueId",
@@ -58875,7 +58883,7 @@
     "id": "formSetFastPassProfile",
     "component": "modal",
     "trigger": "Save fast pass profile",
-    "body": "**Collects what `setFastPassProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`, `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setFastPassProfile` sends before it is called.** Required: `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`, `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessFastPassProfile",
     "confirm": {
      "label": "Save fast pass profile",
@@ -58884,8 +58892,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "name",
       "unlimited",
       "venueId",
@@ -58961,7 +58967,7 @@
     "id": "formSetOperatingCalendarEntry",
     "component": "modal",
     "trigger": "Save operating calendar entry",
-    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `venueId`, `dayType`, `startsAt`, `endsAt`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessOperatingCalendarEntry",
     "confirm": {
      "label": "Save operating calendar entry",
@@ -58970,12 +58976,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "dayType",
       "startsAt",
       "endsAt",
-      "scopePath",
       "name",
       "ticketValidationRequired",
       "admissionType",
@@ -59028,7 +59032,16 @@
   "entryFrom": [
    "BO-214"
   ],
-  "transitions": [],
+  "transitions": [
+   {
+    "to": "BO-214",
+    "trigger": "Guest Journey Command Center",
+    "carries": [
+     "journeyProfileId"
+    ],
+    "provenance": "derived \u2014 BO-214 declares entryState.params journeyProfileId and BO-223 holds journeyProfileId, so an edge into it carries them"
+   }
+  ],
   "machine": null,
   "states": {
    "loading": "The journey simulation audit list.",
@@ -59220,7 +59233,7 @@
     "id": "formSetPodium",
     "component": "modal",
     "trigger": "Save podium",
-    "body": "**Collects what `setPodium` sends before it is called.** Required: `id`, `venueId`, `podiumType`, `name`, `scopePath`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPodium` sends before it is called.** Required: `venueId`, `podiumType`, `name`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessPodium",
     "confirm": {
      "label": "Save podium",
@@ -59229,11 +59242,9 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "podiumType",
       "name",
-      "scopePath",
       "accessPointIds"
      ]
     },
@@ -59381,7 +59392,7 @@
     "id": "formSetReasonCode",
     "component": "modal",
     "trigger": "Save reason code",
-    "body": "**Collects what `setReasonCode` sends before it is called.** Required: `id`, `code`, `name`, `operationalResponse`, `scopePath`. Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setReasonCode` sends before it is called.** Required: `code`, `name`, `operationalResponse`. Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessReasonCode",
     "confirm": {
      "label": "Save reason code",
@@ -59390,11 +59401,9 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "operationalResponse",
-      "scopePath",
       "venueId",
       "guestMessage",
       "operatorMessage",
@@ -59940,7 +59949,10 @@
     "to": "BO-239",
     "trigger": "Works in Policy Scope, Hierarchy & Inheritance",
     "provenance": "flow F120 step 9\u219210",
-    "operation": "listDynamicAccessPolicy"
+    "operation": "listDynamicAccessPolicy",
+    "carries": [
+     "policyId"
+    ]
    },
    {
     "to": "BO-240",
@@ -60382,7 +60394,7 @@
     "id": "formSetPolicyEvaluationSetting",
     "component": "modal",
     "trigger": "Save policy evaluation setting",
-    "body": "**Collects what `setPolicyEvaluationSetting` sends before it is called.** Required: `id`, `scopePath`, `policyCategory`, `evaluationMode`. Optional: `supportedLocations`, `offlineBehaviour`, `maxDataAgeMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPolicyEvaluationSetting` sends before it is called.** Required: `policyCategory`, `evaluationMode`. Optional: `supportedLocations`, `offlineBehaviour`, `maxDataAgeMinutes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessPolicyEvaluationSetting",
     "confirm": {
      "label": "Save policy evaluation setting",
@@ -60391,8 +60403,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "policyCategory",
       "evaluationMode",
       "supportedLocations",
@@ -61223,7 +61233,7 @@
     "id": "formSetRiskScoringConfig",
     "component": "modal",
     "trigger": "Save risk scoring config",
-    "body": "**Collects what `setRiskScoringConfig` sends before it is called.** Required: `id`, `scopePath`, `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setRiskScoringConfig` sends before it is called.** Required: `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessRiskScoringConfig",
     "confirm": {
      "label": "Save risk scoring config",
@@ -61232,8 +61242,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "mediumThreshold",
       "highThreshold",
       "criticalThreshold",
@@ -67079,7 +67087,7 @@
     "id": "formSetTicketStatusTransition",
     "component": "modal",
     "trigger": "Save ticket status transition",
-    "body": "**Collects what `setTicketStatusTransition` sends before it is called.** Required: `id`, `fromStatus`, `toStatus`, `allowed`, `requiresAuthorizedException`, `scopePath`. Optional: `originatingSources`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setTicketStatusTransition` sends before it is called.** Required: `fromStatus`, `toStatus`, `allowed`, `requiresAuthorizedException`. Optional: `originatingSources`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessTicketStatusTransition",
     "confirm": {
      "label": "Save ticket status transition",
@@ -67088,12 +67096,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "fromStatus",
       "toStatus",
       "allowed",
       "requiresAuthorizedException",
-      "scopePath",
       "originatingSources"
      ]
     },
@@ -67211,7 +67217,7 @@
     "id": "formSetMediaBindingRule",
     "component": "modal",
     "trigger": "Save media binding rule",
-    "body": "**Collects what `setMediaBindingRule` sends before it is called.** Required: `id`, `scopePath`. Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`, `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`, `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setMediaBindingRule` sends before it is called.** Nothing in the body is required. Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`, `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`, `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessMediaBindingRule",
     "confirm": {
      "label": "Save media binding rule",
@@ -67220,8 +67226,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "allowedMediaTypeIds",
       "mandatoryMediaTypeIds",
       "optionalMediaTypeIds",
@@ -67363,7 +67367,7 @@
     "id": "formSetCredentialEventPropagationRule",
     "component": "modal",
     "trigger": "Save credential event propagation rule",
-    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AccessCredentialEventPropagationRule",
     "confirm": {
      "label": "Save credential event propagation rule",
@@ -67372,9 +67376,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "triggerEvent",
-      "scopePath",
       "revocationAction",
       "propagationTargets",
       "monitoredConditions",
@@ -70356,7 +70358,10 @@
    {
     "to": "BO-388",
     "trigger": "Approval SLA Policy Configuration",
-    "provenance": "structural \u2014 pack board 5 wiring, 9 September 2026"
+    "provenance": "structural \u2014 pack board 5 wiring, 9 September 2026",
+    "carries": [
+     "slaPolicyId"
+    ]
    },
    {
     "to": "BO-389",
@@ -71166,7 +71171,7 @@
     "id": "formCreateGame",
     "component": "modal",
     "trigger": "Create",
-    "body": "**Collects what `createGame` sends before it is called.** Required: `code`, `name`, `venueId`, `creditCost`, `status`. Optional: `zone`, `assetId`, `readerId`, `minPointsAwarded`, `maxPointsAwarded`, `heightRequirementCm`, `playsToday`, `creditsTakenToday`, `pointsAwardedToday`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createGame` sends before it is called.** Required: `code`, `name`, `venueId`, `creditCost`. Optional: `zone`, `assetId`, `readerId`, `minPointsAwarded`, `maxPointsAwarded`, `heightRequirementCm`, `playsToday`, `creditsTakenToday`, `pointsAwardedToday`. is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `status` (CHG-GT1-002).",
     "confirm": {
      "label": "Create",
      "operation": "createGame"
@@ -71178,7 +71183,6 @@
       "name",
       "venueId",
       "creditCost",
-      "status",
       "zone",
       "assetId",
       "readerId",
@@ -71788,7 +71792,10 @@
    {
     "to": "BO-412",
     "trigger": "Real-Time Tap Validation & Reader Response",
-    "provenance": "structural \u2014 pack board 2 wiring, 11 September 2026"
+    "provenance": "structural \u2014 pack board 2 wiring, 11 September 2026",
+    "carries": [
+     "readerProfileId"
+    ]
    },
    {
     "to": "BO-413",
@@ -75905,7 +75912,7 @@
     "id": "formSetGateOfflinePolicy",
     "component": "modal",
     "trigger": "Set maximum offline duration",
-    "body": "**Collects what `setGateOfflinePolicy` sends before it is called.** Required: `venueId`. Optional: `maxOfflineDurationHours`, `offlineChecks`, `afterThresholdBehavior`, `revocationTriggerEvents`, `revocationMaxAllowedAgeMinutes`, `revocationStalenessAction`, `operatingModes`, `centralUnavailableAfterSeconds`, `edgeUnavailableAfterSeconds`, `automaticSwitch`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setGateOfflinePolicy` sends before it is called.** Required: `venueId`. Optional: `maxOfflineDurationHours`, `offlineChecks`, `afterThresholdBehavior`, `revocationTriggerEvents`, `revocationMaxAllowedAgeMinutes`, `revocationStalenessAction`, `operatingModes`, `centralUnavailableAfterSeconds`, `edgeUnavailableAfterSeconds`, `automaticSwitch`. is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "confirm": {
      "label": "Set maximum offline duration",
      "operation": "setGateOfflinePolicy"
@@ -76040,7 +76047,10 @@
    {
     "to": "BO-476",
     "trigger": "Communication Protocol Configuration",
-    "provenance": "structural \u2014 pack board 9 wiring, 11 September 2026"
+    "provenance": "structural \u2014 pack board 9 wiring, 11 September 2026",
+    "carries": [
+     "readerProfileId"
+    ]
    },
    {
     "to": "BO-477",
@@ -86785,7 +86795,10 @@
    {
     "to": "BO-647",
     "trigger": "Badge Template Designer",
-    "provenance": "structural \u2014 pack board 4 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 4 wiring, 19 September 2026",
+    "carries": [
+     "badgeTemplateId"
+    ]
    },
    {
     "to": "BO-648",
@@ -87355,27 +87368,42 @@
    {
     "to": "BO-655",
     "trigger": "Access Profile Management",
-    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026",
+    "carries": [
+     "accessProfileId"
+    ]
    },
    {
     "to": "BO-656",
     "trigger": "Venue & Zone Access Matrix",
-    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026",
+    "carries": [
+     "accessProfileId"
+    ]
    },
    {
     "to": "BO-657",
     "trigger": "Operational Area Permission Management",
-    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026",
+    "carries": [
+     "accessProfileId"
+    ]
    },
    {
     "to": "BO-658",
     "trigger": "Date & Time Access Rules",
-    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026",
+    "carries": [
+     "accessProfileId"
+    ]
    },
    {
     "to": "BO-659",
     "trigger": "Access Schedule Management",
-    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026",
+    "carries": [
+     "accessProfileId"
+    ]
    },
    {
     "to": "BO-660",
@@ -90085,12 +90113,18 @@
    {
     "to": "BO-701",
     "trigger": "Venue Master Configuration",
-    "provenance": "structural \u2014 pack board 3 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 19 September 2026",
+    "carries": [
+     "spaceId"
+    ]
    },
    {
     "to": "BO-702",
     "trigger": "Space Access Rules Configuration",
-    "provenance": "structural \u2014 pack board 3 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 19 September 2026",
+    "carries": [
+     "spaceId"
+    ]
    }
   ],
   "machine": null,
@@ -91446,12 +91480,18 @@
    {
     "to": "BO-723",
     "trigger": "Peak, Off-Peak & Super Prime Time Configuration",
-    "provenance": "structural \u2014 pack board 8 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 8 wiring, 19 September 2026",
+    "carries": [
+     "performanceTemplateId"
+    ]
    },
    {
     "to": "BO-724",
     "trigger": "Walk-In / There-and-Then Booking Configuration",
-    "provenance": "structural \u2014 pack board 8 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 8 wiring, 19 September 2026",
+    "carries": [
+     "performanceTemplateId"
+    ]
    }
   ],
   "machine": null,
@@ -91559,7 +91599,10 @@
     "to": "BO-721",
     "trigger": "Back to Activity Performance & Slot Template Configuration",
     "provenance": "structural \u2014 pack board 8 wiring, 19 September 2026",
-    "back": true
+    "back": true,
+    "carries": [
+     "performanceTemplateId"
+    ]
    }
   ],
   "machine": null,
@@ -91612,7 +91655,10 @@
     "to": "BO-721",
     "trigger": "Back to Activity Performance & Slot Template Configuration",
     "provenance": "structural \u2014 pack board 8 wiring, 19 September 2026",
-    "back": true
+    "back": true,
+    "carries": [
+     "performanceTemplateId"
+    ]
    }
   ],
   "machine": null,
@@ -96514,7 +96560,10 @@
    {
     "to": "BO-800",
     "trigger": "Routing & Queue Management",
-    "provenance": "structural \u2014 pack board 7 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 7 wiring, 19 September 2026",
+    "carries": [
+     "queueId"
+    ]
    },
    {
     "to": "BO-801",
@@ -110342,7 +110391,10 @@
    {
     "to": "BO-1004",
     "trigger": "Hold Type Master",
-    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026",
+    "carries": [
+     "holdTypeId"
+    ]
    },
    {
     "to": "BO-1005",
@@ -110352,12 +110404,18 @@
    {
     "to": "BO-1006",
     "trigger": "Hold Rule Assignment",
-    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026",
+    "carries": [
+     "holdTypeId"
+    ]
    },
    {
     "to": "BO-1007",
     "trigger": "Expiration Rules",
-    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026",
+    "carries": [
+     "holdTypeId"
+    ]
    },
    {
     "to": "BO-1008",
@@ -110383,7 +110441,10 @@
    {
     "to": "BO-1011",
     "trigger": "Priority & Conflict Resolution",
-    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026",
+    "carries": [
+     "holdTypeId"
+    ]
    },
    {
     "to": "BO-1012",
@@ -117856,7 +117917,10 @@
    {
     "to": "BO-1124",
     "trigger": "Gift Card Product Configuration",
-    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026",
+    "carries": [
+     "giftCardProductId"
+    ]
    },
    {
     "to": "BO-1125",
@@ -117950,7 +118014,10 @@
     "to": "BO-1123",
     "trigger": "Back to Gift Card & Digital Benefit Command Center",
     "provenance": "structural \u2014 pack board 5 wiring, 19 September 2026",
-    "back": true
+    "back": true,
+    "carries": [
+     "giftCardProductId"
+    ]
    }
   ],
   "machine": null,
@@ -125458,7 +125525,7 @@
     "id": "formRequestPricingRollback",
     "component": "modal",
     "trigger": "Request pricing rollback",
-    "body": "**Collects what `requestPricingRollback` sends before it is called.** Required: `subject`, `actionType`, `reason`, `status`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `requestedAt`, `requestedByPrincipalId`, `scopePath` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `requestPricingRollback` sends before it is called.** Required: `subject`, `actionType`, `reason`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `requestedAt`, `requestedByPrincipalId`, `scopePath` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `status` (CHG-GT1-002).",
     "bindsTo": "CatalogueRollbackAction",
     "confirm": {
      "label": "Request pricing rollback",
@@ -125470,7 +125537,6 @@
       "subject",
       "actionType",
       "reason",
-      "status",
       "productId",
       "priceListId",
       "fromVersion",
@@ -136161,7 +136227,10 @@
    {
     "to": "BO-388",
     "trigger": "Open Approval SLA Policy Configuration",
-    "provenance": "a section of BO-388 since 2 October 2026 (CHG-MOV-002)"
+    "provenance": "a section of BO-388 since 2 October 2026 (CHG-MOV-002)",
+    "carries": [
+     "slaPolicyId"
+    ]
    }
   ],
   "machine": null,
@@ -151177,32 +151246,50 @@
    {
     "to": "ADM-330",
     "trigger": "Approval Authority Matrix",
-    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026",
+    "carries": [
+     "matrixId"
+    ]
    },
    {
     "to": "ADM-331",
     "trigger": "Organizational Hierarchy Routing",
-    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026",
+    "carries": [
+     "matrixId"
+    ]
    },
    {
     "to": "ADM-332",
     "trigger": "Department-Based Approval Matrix",
-    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026",
+    "carries": [
+     "matrixId"
+    ]
    },
    {
     "to": "ADM-333",
     "trigger": "Venue & Tenant Approval Matrix",
-    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026",
+    "carries": [
+     "matrixId"
+    ]
    },
    {
     "to": "ADM-334",
     "trigger": "Value & Threshold Routing",
-    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026",
+    "carries": [
+     "matrixId"
+    ]
    },
    {
     "to": "ADM-335",
     "trigger": "Risk-Based & Conditional Routing",
-    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 9 September 2026",
+    "carries": [
+     "matrixId"
+    ]
    },
    {
     "to": "ADM-336",
@@ -154824,7 +154911,7 @@
     "carries": [
      "tenantId"
     ],
-    "provenance": "derived \u2014 ADM-015 declares entryState.params requestId, tenantId and ADM-002 holds tenantId, so an edge into it carries them"
+    "provenance": "derived \u2014 ADM-015 declares entryState.params anomalyRuleId, quotaId, requestId, tenantId and ADM-002 holds tenantId, so an edge into it carries them"
    },
    {
     "to": "ADM-016",
@@ -154908,7 +154995,7 @@
    {
     "to": "ADM-032",
     "trigger": "WAF & Security Policy View",
-    "provenance": "derived \u2014 ADM-032 declares entryState.params cellId and ADM-002 holds none of them. The edge carries nothing: cellId only pre-selects (deep link or optional), and ADM-032 opens on its own"
+    "provenance": "derived \u2014 ADM-032 declares entryState.params cellId, wafRuleId and ADM-002 holds none of them. The edge carries nothing: cellId, wafRuleId only pre-select (deep link or optional), and ADM-032 opens on its own"
    },
    {
     "to": "ADM-033",
@@ -155584,7 +155671,7 @@
     "id": "formSetSsoConfig",
     "component": "modal",
     "trigger": "Save SSO config",
-    "body": "**Collects what `setSsoConfig` sends before it is called.** Required: `displayName`, `protocol`, `groupMappings`. Optional: `metadataUrl`, `issuer`, `clientId`, `clientSecretRef`, `autoProvisionPrincipals`, `isEnforced`, `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setSsoConfig` sends before it is called.** Required: `displayName`, `protocol`, `groupMappings`. Optional: `metadataUrl`, `issuer`, `clientId`, `clientSecretRef`, `autoProvisionPrincipals`, `isEnforced`, `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "SsoProviderConfig",
     "confirm": {
      "label": "Save SSO config",
@@ -158330,7 +158417,7 @@
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -158510,7 +158597,7 @@
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -158778,7 +158865,7 @@
     "id": "formRegisterEnvironment",
     "component": "modal",
     "trigger": "Register environment",
-    "body": "**Collects what `registerEnvironment` sends before it is called.** Required: `kind`, `name`. Optional: `cellIds`, `requiresApprovalToPromote`, `soakHours`, `currentReleaseVersion`, `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `registerEnvironment` sends before it is called.** Required: `kind`, `name`. Optional: `cellIds`, `requiresApprovalToPromote`, `soakHours`, `currentReleaseVersion`, `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "Environment",
     "confirm": {
      "label": "Register environment",
@@ -159167,7 +159254,7 @@
     "id": "formSetScalingPolicy",
     "component": "modal",
     "trigger": "Save scaling policy",
-    "body": "**Collects what `setScalingPolicy` sends before it is called.** Nothing in the body is required. Optional: `service`, `replicaFloor`, `replicaCeiling`, `targetUtilisationPct`, `scaleStepPct`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setScalingPolicy` sends before it is called.** Nothing in the body is required. Optional: `service`, `replicaFloor`, `replicaCeiling`, `targetUtilisationPct`, `scaleStepPct`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "ScalingPolicy",
     "confirm": {
      "label": "Save scaling policy",
@@ -159410,7 +159497,7 @@
     "id": "formSetWafPolicy",
     "component": "modal",
     "trigger": "Save waf policy",
-    "body": "**Collects what `setWafPolicy` sends before it is called.** Nothing in the body is required. Optional: `name`, `action`, `matchOn`, `pattern`, `enabled`, `hitCount24h`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setWafPolicy` sends before it is called.** Nothing in the body is required. Optional: `name`, `action`, `matchOn`, `pattern`, `enabled`, `hitCount24h`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "WafRule",
     "confirm": {
      "label": "Save waf policy",
@@ -159628,7 +159715,7 @@
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -159710,7 +159797,7 @@
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -159935,7 +160022,7 @@
     "id": "formSetAiByokEnablement",
     "component": "modal",
     "trigger": "Save BYOK enablement",
-    "body": "**Collects what `setAiByokEnablement` sends before it is called.** Required: `tenantId`, `enabled`. Optional: `coverage`, `allowedTasks`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setAiByokEnablement` sends before it is called.** Required: `enabled`. Optional: `coverage`, `allowedTasks`, `reason`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `tenantId` (CHG-GT1-002).",
     "confirm": {
      "label": "Save BYOK enablement",
      "operation": "setAiByokEnablement"
@@ -159943,7 +160030,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "tenantId",
       "enabled",
       "coverage",
       "allowedTasks",
@@ -161419,22 +161505,34 @@
    {
     "to": "ADM-393",
     "trigger": "Tier Included Allowances",
-    "provenance": "structural \u2014 pack board 3 wiring, 11 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 11 September 2026",
+    "carries": [
+     "licensingModelId"
+    ]
    },
    {
     "to": "ADM-394",
     "trigger": "Commercial & Licensing Model Configuration",
-    "provenance": "structural \u2014 pack board 3 wiring, 11 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 11 September 2026",
+    "carries": [
+     "licensingModelId"
+    ]
    },
    {
     "to": "ADM-395",
     "trigger": "Billable Unit, Minimum Guarantee & Enforcement Rules",
-    "provenance": "structural \u2014 pack board 3 wiring, 11 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 11 September 2026",
+    "carries": [
+     "licensingModelId"
+    ]
    },
    {
     "to": "ADM-396",
     "trigger": "Overage Pricing & Capacity Packs",
-    "provenance": "structural \u2014 pack board 3 wiring, 11 September 2026"
+    "provenance": "structural \u2014 pack board 3 wiring, 11 September 2026",
+    "carries": [
+     "licensingModelId"
+    ]
    },
    {
     "to": "ADM-397",
@@ -181890,7 +181988,10 @@
     "to": "SUP-020",
     "trigger": "Works in Queue Configuration & Management",
     "provenance": "flow F135 step 1\u21922",
-    "operation": "listContact"
+    "operation": "listContact",
+    "carries": [
+     "queueId"
+    ]
    },
    {
     "to": "SUP-021",
@@ -191146,7 +191247,7 @@
     "carries": [
      "version"
     ],
-    "provenance": "derived \u2014 DEV-008 declares entryState.params listingId, requestId, version and DEV-001 holds version, so an edge into it carries them"
+    "provenance": "derived \u2014 DEV-008 declares entryState.params anomalyRuleId, licenceId, listingId, quotaId, requestId, version and DEV-001 holds version, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -194217,7 +194318,7 @@
     "id": "formSetAlertRule",
     "component": "modal",
     "trigger": "Save alert rule",
-    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).",
     "bindsTo": "AlertRule",
     "confirm": {
      "label": "Save alert rule",
@@ -194226,14 +194327,12 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "metric",
       "comparator",
       "threshold",
       "severity",
       "isActive",
-      "scopePath",
       "thresholdUpper",
       "windowMinutes",
       "deliverTo",
@@ -194352,7 +194451,7 @@
     "id": "formRecordSuggestionOutcome",
     "component": "modal",
     "trigger": "Record suggestion outcome",
-    "body": "**Collects what `recordSuggestionOutcome` sends before it is called.** Required: `id`, `suggestionId`, `decision`. Optional: `actualValue`, `decidedByPrincipalId`, `decidedAt`, `realisedOutcome`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `recordSuggestionOutcome` sends before it is called.** Required: `suggestionId`, `decision`. Optional: `actualValue`, `decidedByPrincipalId`, `decidedAt`, `realisedOutcome`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).",
     "bindsTo": "SuggestionOutcome",
     "confirm": {
      "label": "Record suggestion outcome",
@@ -194361,7 +194460,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "suggestionId",
       "decision",
       "actualValue",

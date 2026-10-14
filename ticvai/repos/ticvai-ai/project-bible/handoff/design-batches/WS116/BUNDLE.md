@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-473` | Product & Admission Model Discovery | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-474` | Operational Requirement Discovery | D | 6 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-475` | Commercial Requirement Discovery | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-476` | Required, Recommended & Optional Decisions | D | 10 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-476` | Required, Recommended & Optional Decisions | B | 10 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-477` | Missing Information & Clarification Center | D | 6 | 106 | 7 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-478` | Configuration Blueprint & Dependency Map | D | 6 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
@@ -1599,7 +1599,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block D · task APP-CONSOLE-ADM-476 |
+| Block | Block B · task APP-CONSOLE-ADM-476 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Options) and no display directory — it is settings, not a population |
