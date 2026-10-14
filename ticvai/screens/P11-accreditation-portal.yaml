@@ -207,7 +207,7 @@ screens:
   layout:
     template: wizard
     regions:
-    - name: contentBody
+    - name: progress
       slot: progress
       components:
       - kind: progressIndicator
@@ -348,7 +348,7 @@ screens:
   layout:
     template: wizard
     regions:
-    - name: contentBody
+    - name: progress
       slot: progress
       components:
       - kind: progressIndicator
@@ -518,7 +518,7 @@ screens:
   layout:
     template: detail
     regions:
-    - name: contentBody
+    - name: state
       slot: state
       components:
       - kind: banner
@@ -657,7 +657,7 @@ screens:
   layout:
     template: fullscreen
     regions:
-    - name: contentBody
+    - name: credential
       slot: credential
       components:
       - kind: credentialDisplay
@@ -669,7 +669,7 @@ screens:
 
           '
         provenance: frame claude-design/Accreditation Board.dc.html#acc-005
-    - name: contentBody
+    - name: identity
       slot: identity
       components:
       - kind: detailPanel
@@ -803,7 +803,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -1128,7 +1128,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField

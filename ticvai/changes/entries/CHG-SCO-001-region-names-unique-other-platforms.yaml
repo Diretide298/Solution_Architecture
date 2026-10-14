@@ -1,0 +1,41 @@
+id: CHG-SCO-001
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Every region name is unique on its screen on P09, P10, P11, P12, P13 and P16: of a repeated `contentBody`, the
+  last keeps the name and each earlier one is named after its slot (`filters`, `headline`, `progress`, `state`, ...).'
+decision:
+  what: 'Rename the earlier of each repeated region on 48 screens of the other platforms (56 renames). The last region
+    of the name keeps it, because tools/derive-wireframes.py keys regions by name and draws the last one today, so the
+    boards draw exactly what they drew. Nothing is added, removed, moved or merged; region names are invisible.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, class check-screen-wiring S-DUP-REGION (R253, audit root class A30
+  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  your recommendation"): region names unique per screen, rename the second. A second `contentBody` is invisible to
+  every reader that keys regions by name, which is how a generated table disappeared from a wireframe. The approved
+  UI is fixed (lead, 14 October), so the regions are renamed rather than merged. On these platforms: 48 members
+  before, 0 after.'
+keys_touched:
+  screens: [ADM-068, ADM-370, ADM-373, ADM-375, ADM-376, ADM-459, ADM-464, ADM-489, ADM-498, ADM-509, ADM-529,
+    ADM-534, ADM-539, ADM-540, ADM-549, ADM-552, ADM-553, ADM-619, PTR-022, PTR-032, PTR-042, PTR-043, PTR-044,
+    PTR-046, ACC-002, ACC-003, ACC-004, ACC-005, ACC-006, ACC-008, SUP-014, SUP-019, CMS-021, CMS-031, CMS-040,
+    CMS-041, CMS-051, CMS-052, CMS-059, CMS-062, CMS-099, ANL-017, ANL-027, ANL-040, ANL-049, ANL-061, ANL-067,
+    ANL-069]
+  other: [S-DUP-REGION]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: ['27764', '27765', '27775', '27829', '27836', '27838', '27841', '27843', '27887', '27932', '27945',
+    '27951', '28000', '28029', '28215', '28217', '28282', '28388', '28547', '28728']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCO (screens of P07, P09-P17), 14 October 2026. tools/render-screens.py (run by hand, not in the
+  refresh) still collects body components by the name `contentBody`; batch SCR owns that rule. The Block A tickets
+  of the changed screens are in the batch hand-back''s impact list.'

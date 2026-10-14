@@ -5248,7 +5248,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -5271,7 +5271,7 @@ screens:
         notes: The pack filters this screen by partner type, country, territory, brand, venue, account
           manager and 5 more — which are present is a decision the pack already made.
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -6421,7 +6421,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -6444,7 +6444,7 @@ screens:
         notes: The pack filters this screen by partner, partner type, brand, venue, country, agreement
           type and 5 more — which are present is a decision the pack already made.
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -7282,7 +7282,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7304,7 +7304,7 @@ screens:
         notes: The pack filters this screen by partner, partner type, venue, event, market, account manager
           and 4 more — which are present is a decision the pack already made.
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -7466,7 +7466,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7619,7 +7619,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -7872,7 +7872,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile

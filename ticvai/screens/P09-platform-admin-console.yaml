@@ -10931,7 +10931,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: selectField
@@ -10985,7 +10985,7 @@ screens:
         notes: The pack filters this screen by tax, fee, surcharge, waiver, exemption, calculation profile
           and 1 more — which are present is a decision the pack already made.
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 39 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -11638,7 +11638,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -11961,7 +11961,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -12189,7 +12189,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -12328,7 +12328,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -19438,7 +19438,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -20049,7 +20049,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -24639,7 +24639,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: selectField
@@ -26448,7 +26448,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: selectField
@@ -26514,7 +26514,7 @@ screens:
         notes: The pack filters this screen by tenant, venue, user, date, session, configuration plan
           and 13 more — which are present is a decision the pack already made.
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -29134,7 +29134,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: selectField
@@ -33215,7 +33215,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: selectField
@@ -34270,7 +34270,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: part0
       components:
       - kind: selectField
         label: Tenant
@@ -35467,7 +35467,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: selectField
@@ -35685,7 +35685,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: part0
       components:
       - kind: selectField
         label: Tenant
@@ -37471,7 +37471,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: selectField
@@ -38106,7 +38106,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: selectField
@@ -38321,7 +38321,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: selectField
@@ -39761,7 +39761,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: selectField

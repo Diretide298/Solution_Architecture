@@ -4529,7 +4529,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -6157,7 +6157,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7259,7 +7259,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7466,7 +7466,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7487,7 +7487,7 @@ screens:
         notes: The pack filters this screen by type, brand, venue, product, event, language and 3 more
           — which are present is a decision the pack already made.
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -8856,7 +8856,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -8874,7 +8874,7 @@ screens:
         notes: The pack filters this screen by brand, venue, event, product, waiver, date and 3 more —
           which are present is a decision the pack already made.
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -9027,7 +9027,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -9815,7 +9815,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -10219,7 +10219,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -14594,7 +14594,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
