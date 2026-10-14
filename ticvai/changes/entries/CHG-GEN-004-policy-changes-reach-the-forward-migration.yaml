@@ -1,0 +1,56 @@
+id: CHG-GEN-004
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'A row-level-security policy change on a table that already exists is written into the next forward
+  migration (drop the table''s policies, apply its generated policy again), not listed for a person; the CR-005
+  append-only audit policies and the seven parent policies of CHG-R6-005..015 reach the databases at the next gate.'
+decision:
+  what: 'tools/ddl_forward.py: a generated `SELECT platform.apply_*_rls(''t''::regclass ...)` call that differs from
+    the old side for an existing table is written into the forward migration as `SELECT
+    platform.drop_rls_policies(''t''::regclass)` followed by the call, with the old call as its rollback, and counted as
+    a re-applied policy; the old call is no longer listed as "statement dropped" (on later runs too, once a forward
+    migration carries the new one). tools/derive-ddl.py generates platform.drop_rls_policies(target) (drops every
+    policy on the table through pg_policy) in 920, so it reaches the forward migration as a new function. Destructive
+    items (drops, renames, type, nullability and index changes) stay in handoff/migration-review.md.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October, process findings: CR-005 (CHG-R6-002, CHG-R6-014) is marked Done, but at r5
+  backend/tenant/920-row-level-security.sql:1216 and 1139 still give platform.audit_record and identity.authz_audit
+  apply_tenant_rls, and the fix exists only as "statement added" rows in handoff/migration-review.md:118-119.
+  Developers transcribe 920; CR-076 and CR-080 fixes would travel the same route. A policy re-application is
+  idempotent and touches no data, so it has no question for a person.'
+keys_touched:
+  tables:
+  - platform.audit_record
+  - identity.authz_audit
+  - catalogue.product_media
+  - inventory.quotation_line
+  - reporting.dashboard_tile
+  - seating.seat_block_item
+  - workforce.attendance_amendment
+  - orders.group_participant_list
+  - orders.group_participant
+  files:
+  - tools/ddl_forward.py
+  - tools/derive-ddl.py
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::rls_call
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Verified on this branch: derive-ddl --apply wrote backend/tenant/V0104__after_r1_20261014.sql with the function and
+  nine policy swaps (platform.audit_record and identity.authz_audit to apply_append_audit_rls; product_media,
+  quotation_line, dashboard_tile, seat_block_item, attendance_amendment, group_participant_list and group_participant
+  to apply_parent_rls), parents before children, and the review list fell by the 9 "statement added" and 12
+  "statement dropped" rows; a second run wrote nothing. The derived files were restored before the commit; the
+  lead''s gate writes them. The control database gets a forward migration holding only the function. Policies on a
+  renamed table stay on its "after rename" row, because they follow the rename a person writes.'

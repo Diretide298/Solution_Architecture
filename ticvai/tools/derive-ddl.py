@@ -579,6 +579,31 @@ END
 $$;
 """
 
+# **A policy change reaches the databases in the forward migration** (CHG-GEN-004, 14 October 2026). CR-005's
+# append-only policies were listed in handoff/migration-review.md for a person and never reached a database: the
+# review row was read as done, and 920 at r5 still gave platform.audit_record the tenant-root policy. ddl_forward now
+# writes a policy change on an existing table into the next forward migration as this call, then the table's
+# generated helper call: every policy on the table goes, and the helper creates its own again. Idempotent, and it
+# touches no row. It is needed because the helpers name their policies differently (`<t>_scope` for one policy,
+# `<t>_append`, `<t>_read`... for one per command), and none drops the other's.
+RLS_RESET = """
+-- Drops every policy on a table, so a forward migration can apply a different generated policy to it
+-- (CHG-GEN-004). Row-level security stays enabled and forced: until the next call creates a policy the
+-- table returns no rows, and both run in the migration's one transaction.
+CREATE OR REPLACE FUNCTION platform.drop_rls_policies(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    pol record;
+BEGIN
+    FOR pol IN SELECT polname FROM pg_policy WHERE polrelid = target LOOP
+        EXECUTE format('DROP POLICY IF EXISTS %I ON %s', pol.polname, target);
+    END LOOP;
+END
+$$;
+"""
+
 # Where the venue half of RLS_HEAD starts; the control database's file is cut here.
 VENUE_MARKER = "-- **{n_venue} tables carry `venue_id`"
 assert VENUE_MARKER in RLS_HEAD
@@ -772,7 +797,7 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         # control file carries no venue functions and no venue policies.
         cut = head.index(VENUE_MARKER.replace("{n_venue}", str(len(by_venue))))
         head = head[:cut].replace("-- Row-level security.", "-- Row-level security, control database.")
-    body = [head]
+    body = [head, RLS_RESET]
     by_subject = by_subject or []
     tenant_only = tenant_only or []
     append_audit = append_audit or []
@@ -1229,6 +1254,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         c = p.counts
         print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {c['tables']} table(s), "
               f"{c['columns']} column(s), {c['indexes']} index(es), {c['other']} other"
+              + (f", {c['policies']} row-level security polic(ies) re-applied" if c.get("policies") else "")
               + ("" if apply else " (not written, pass --apply)"))
     if not written:
         print("  no additive change since the baseline and the forward migrations; nothing to write")
