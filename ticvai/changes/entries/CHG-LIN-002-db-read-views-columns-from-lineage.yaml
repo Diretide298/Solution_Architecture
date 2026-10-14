@@ -36,7 +36,7 @@ waivers:
   cooling_off:
     by: Chinmay
     date: '2026-10-14'
-    quote: 'Release today as an exception'
+    quote: "Waive, ship in r6"
 prevention:
   type: check
   ref: tools/check-read-columns.py
