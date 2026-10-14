@@ -11547,39 +11547,51 @@ screens:
       components:
       - kind: metricTile
         label: Total Active Customers
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: Active Subscriptions
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: Active Trials
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: MRR / Monthly Equivalent Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: ARR / Annualized Contract Value
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: New Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: Expansion Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: Contraction Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: Churned Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: Renewal Rate
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: Trial-to-Paid Conversion
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
       - kind: metricTile
         label: Average Revenue per Customer
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs
   states:
     loading: The commercial list; the counts above it resolve separately.
@@ -11601,6 +11613,11 @@ screens:
     purpose: One customer
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-369
@@ -11882,27 +11899,35 @@ screens:
       components:
       - kind: metricTile
         label: Customers by VSI
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs
       - kind: metricTile
         label: Customers by Operational Profile
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs
       - kind: metricTile
         label: Customers by Commercial Model
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs
       - kind: metricTile
         label: Average VSI
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs
       - kind: metricTile
         label: Profile Misalignment
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs
       - kind: metricTile
         label: Commercial Model Optimization Candidates
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs
       - kind: metricTile
         label: Upgrade Candidates
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs
       - kind: metricTile
         label: Downgrade Candidates
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs
   states:
     loading: The operational profile vsi list; the counts above it resolve separately.
@@ -11919,6 +11944,11 @@ screens:
     purpose: Their VSI and model
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
     preloaded:
     - Customers by VSI
@@ -11979,30 +12009,39 @@ screens:
       components:
       - kind: metricTile
         label: MRR / Monthly Equivalent
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs
       - kind: metricTile
         label: ARR / ACV
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs
       - kind: metricTile
         label: New Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs
       - kind: metricTile
         label: Expansion Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs
       - kind: metricTile
         label: Contraction Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs
       - kind: metricTile
         label: Churned Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs
       - kind: metricTile
         label: NRR
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs
       - kind: metricTile
         label: ARPC
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs
       - kind: metricTile
         label: Growth %
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs
     - name: contentBody
       slot: moduleTiles
@@ -12047,6 +12086,11 @@ screens:
     purpose: Revenue against metering
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
     preloaded:
     - MRR / Monthly Equivalent
@@ -12101,27 +12145,35 @@ screens:
       components:
       - kind: metricTile
         label: Active Trials
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs
       - kind: metricTile
         label: New Trials
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs
       - kind: metricTile
         label: Expiring Trials
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs
       - kind: metricTile
         label: Trial-to-Paid %
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs
       - kind: metricTile
         label: Average Trial Duration
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs
       - kind: metricTile
         label: Setup Completion
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs
       - kind: metricTile
         label: Go-Live Readiness
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs
       - kind: metricTile
         label: Estimated Conversion Value
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs
   states:
     loading: The trial conversion list; the counts above it resolve separately.
@@ -12138,6 +12190,11 @@ screens:
     purpose: Trials running
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-374
@@ -12207,30 +12264,39 @@ screens:
       components:
       - kind: metricTile
         label: Renewals Next 30 Days
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs
       - kind: metricTile
         label: Next 60 Days
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs
       - kind: metricTile
         label: Next 90 Days
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs
       - kind: metricTile
         label: Renewal Value
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs
       - kind: metricTile
         label: Renewal Rate
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs
       - kind: metricTile
         label: At-Risk Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs
       - kind: metricTile
         label: Auto-Renew Value
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs
       - kind: metricTile
         label: Expansion Opportunity
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs
       - kind: metricTile
         label: Optimization Opportunity
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs
     - name: contentBody
       slot: moduleTiles
@@ -12281,7 +12347,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
       decides access.'
-  apis: []
+  apis:
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-375
@@ -12346,21 +12417,27 @@ screens:
       components:
       - kind: metricTile
         label: Total Opportunities
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs
       - kind: metricTile
         label: Potential Expansion Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs
       - kind: metricTile
         label: Potential Retention Value
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs
       - kind: metricTile
         label: Model Optimization Opportunities
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs
       - kind: metricTile
         label: Module Opportunities
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs
       - kind: metricTile
         label: Cost Optimization Opportunities
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs
     - name: contentBody
       slot: moduleTiles
@@ -12402,7 +12479,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
       decides access.'
-  apis: []
+  apis:
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
     preloaded:
     - Total Opportunities
@@ -12558,110 +12640,144 @@ screens:
       components:
       - kind: metricTile
         label: Active Customers
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics
       - kind: metricTile
         label: New Customers
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics
       - kind: metricTile
         label: Churned Customers
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics
       - kind: metricTile
         label: Trials
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics
       - kind: metricTile
         label: Conversion
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics
       - kind: metricTile
         label: MRR / Monthly Equivalent Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics
       - kind: metricTile
         label: ARR / ACV
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics
       - kind: metricTile
         label: New Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics
       - kind: metricTile
         label: Expansion
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics
       - kind: metricTile
         label: Contraction
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics
       - kind: metricTile
         label: Churn
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics
       - kind: metricTile
         label: NRR
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics
       - kind: metricTile
         label: ARPC
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics
       - kind: metricTile
         label: Billable Tickets
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics
       - kind: metricTile
         label: Billable Transactions
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics
       - kind: metricTile
         label: Eligible Transaction Value
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics
       - kind: metricTile
         label: Variable Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics
       - kind: metricTile
         label: Minimum Guaranteed Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics
       - kind: metricTile
         label: Guarantee Utilization
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics
       - kind: metricTile
         label: Revenue Above Guarantee
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics
       - kind: metricTile
         label: VSI
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics
       - kind: metricTile
         label: Operational Profile
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics
       - kind: metricTile
         label: POS Utilization
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics
       - kind: metricTile
         label: Access Utilization
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics
       - kind: metricTile
         label: User Utilization
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics
       - kind: metricTile
         label: API
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics
       - kind: metricTile
         label: Storage
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics
       - kind: metricTile
         label: Admissions
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics
       - kind: metricTile
         label: Renewal Risk
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence
           Metrics
       - kind: metricTile
         label: Expansion Probability
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence
           Metrics
       - kind: metricTile
         label: Model Optimization Opportunity
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence
           Metrics
       - kind: metricTile
         label: Cost Optimization
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence
           Metrics
       - kind: metricTile
         label: Upgrade/Downgrade Probability
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence
           Metrics
       - kind: metricTile
         label: Commercial Health
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence
           Metrics
     - name: actionBar
@@ -12690,6 +12806,11 @@ screens:
     purpose: Commercial recommendations beside the enforcement position
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
     preloaded:
     - Active Customers
@@ -13763,33 +13884,43 @@ screens:
       components:
       - kind: metricTile
         label: Active Commercial Models
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
       - kind: metricTile
         label: Active Tiers
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
       - kind: metricTile
         label: Active VSI Model
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
       - kind: metricTile
         label: Customers by Commercial Model
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
       - kind: metricTile
         label: Average VSI
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
       - kind: metricTile
         label: Customers Near Threshold
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
       - kind: metricTile
         label: Customers Above Allowance
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
       - kind: metricTile
         label: Per-Ticket Contracts
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
       - kind: metricTile
         label: Minimum Guarantee Contracts
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
       - kind: metricTile
         label: Pending Rule Changes
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards
   states:
     loading: The commercial rules overview list; the counts above it resolve separately.
@@ -13806,6 +13937,11 @@ screens:
     purpose: The rules engine
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-389
@@ -19456,33 +19592,43 @@ screens:
       components:
       - kind: metricTile
         label: Current Billing Period
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
       - kind: metricTile
         label: Current Charge
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
       - kind: metricTile
         label: MRR / Monthly Equivalent
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
       - kind: metricTile
         label: ACV
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
       - kind: metricTile
         label: YTD Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
       - kind: metricTile
         label: Outstanding Balance
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
       - kind: metricTile
         label: Next Invoice
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
       - kind: metricTile
         label: Minimum Guarantee
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
       - kind: metricTile
         label: Variable Consumption
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
       - kind: metricTile
         label: Payment Status
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs
     - name: contentBody
       slot: moduleTiles
@@ -19536,6 +19682,11 @@ screens:
     purpose: Billing at a glance
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
     preloaded:
     - Current Billing Period
@@ -20067,24 +20218,31 @@ screens:
       components:
       - kind: metricTile
         label: Renewals Due
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs
       - kind: metricTile
         label: Renewal ARR / Contract Value
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs
       - kind: metricTile
         label: Renewal Rate
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs
       - kind: metricTile
         label: At-Risk Revenue
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs
       - kind: metricTile
         label: Auto-Renew Value
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs
       - kind: metricTile
         label: Expansion Opportunity
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs
       - kind: metricTile
         label: Cost Optimization Opportunity
+        operation: getCommercialMetrics
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs
     - name: contentBody
       slot: moduleTiles
@@ -20134,7 +20292,12 @@ screens:
       offers to clear it.
     emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
       decides access.'
-  apis: []
+  apis:
+  - operationId: getCommercialMetrics
+    contract: subscription
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
     preloaded:
     - Renewals Due
@@ -20276,30 +20439,39 @@ screens:
       components:
       - kind: metricTile
         label: Customer Cost
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics
       - kind: metricTile
         label: TICVAI Revenue
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics
       - kind: metricTile
         label: Minimum Revenue Protection
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics
       - kind: metricTile
         label: Variable Revenue Exposure
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics
       - kind: metricTile
         label: Margin
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics
       - kind: metricTile
         label: Expected Overage
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics
       - kind: metricTile
         label: Customer Saving/Increase
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics
       - kind: metricTile
         label: Contract Predictability
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics
       - kind: metricTile
         label: Revenue Growth/Contraction
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics
   states:
     loading: The commercial scenario simulator list; the counts above it resolve separately.
@@ -22280,18 +22452,23 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: metricTile
         label: Required Missing
+        operation: getConfigurationBlueprint
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs
       - kind: metricTile
         label: Clarifications Needed
+        operation: getConfigurationBlueprint
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs
       - kind: metricTile
         label: Conflicts
+        operation: getConfigurationBlueprint
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs
       - kind: metricTile
         label: Warnings
+        operation: getConfigurationBlueprint
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs
       - kind: metricTile
         label: Recommendations
+        operation: getConfigurationBlueprint
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs
   states:
     loading: The missing information clarification list; the counts above it resolve separately.
@@ -22708,27 +22885,35 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: metricTile
         label: Configuration Areas
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs
       - kind: metricTile
         label: Objects Proposed
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs
       - kind: metricTile
         label: Ready
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs
       - kind: metricTile
         label: Warnings
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs
       - kind: metricTile
         label: Conflicts
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs
       - kind: metricTile
         label: Missing Configuration
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs
       - kind: metricTile
         label: AI Recommendations
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs
       - kind: metricTile
         label: Approval Required
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs
   states:
     loading: The build list; the counts above it resolve separately.
@@ -24228,21 +24413,27 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: metricTile
         label: Configuration Objects
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs
       - kind: metricTile
         label: Passed
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs
       - kind: metricTile
         label: Warnings
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs
       - kind: metricTile
         label: Conflicts
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs
       - kind: metricTile
         label: Missing Dependencies
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs
       - kind: metricTile
         label: Approval Requirements
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs
     - name: actionBar
       slot: rowActions
@@ -24692,27 +24883,35 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: metricTile
         label: Configuration Objects
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs
       - kind: metricTile
         label: Ready
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs
       - kind: metricTile
         label: Warnings
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs
       - kind: metricTile
         label: Blocking Issues
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs
       - kind: metricTile
         label: Approval Requirements
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs
       - kind: metricTile
         label: AI Recommendations
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs
       - kind: metricTile
         label: Modules Affected
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs
       - kind: metricTile
         label: Production Impact
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs
     - name: contentBody
       slot: fields
@@ -26532,87 +26731,115 @@ screens:
       components:
       - kind: metricTile
         label: AI Configuration Sessions
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs
       - kind: metricTile
         label: AI Recommendations
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs
       - kind: metricTile
         label: Accepted
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs
       - kind: metricTile
         label: Rejected
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs
       - kind: metricTile
         label: Executed Changes
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs
       - kind: metricTile
         label: Rollbacks
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs
       - kind: metricTile
         label: Approval Overrides
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs
       - kind: metricTile
         label: Failed Executions
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs
       - kind: metricTile
         label: User Request
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: ↓
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: AI Interpretation
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Blueprint Decision
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Configuration Object
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Validation
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Approval
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Execution
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Audit Requirements
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Original User Intent
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: AI Recommendation
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: User Decision
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Configuration Plan
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Before / After
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Validation Results
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Failure / Retry
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Rollback
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Timestamp
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Actor
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
       - kind: metricTile
         label: Correlation / Trace ID
+        operation: searchAiDecisions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show
     - name: contentBody
       slot: moduleTiles
@@ -26859,39 +27086,51 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: metricTile
         label: Forecast Attendance Today
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Forecast Attendance Tomorrow
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Forecast Attendance Next 7 Days
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Forecast Revenue
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Current Bookings
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Expected Walk-In
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Forecast Occupancy
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Demand Index
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Forecast Confidence
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Forecast vs Actual
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Revenue Forecast Accuracy
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Active Forecast Alerts
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs
   states:
     loading: The forecasting list; the counts above it resolve separately.
@@ -29207,39 +29446,51 @@ screens:
       components:
       - kind: metricTile
         label: Forecast Attendance
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: Peak In-Venue Population
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: Forecast Occupancy
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: High-Pressure Periods
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: Attractions at Risk
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: Queue Pressure Alerts
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: Required Workforce
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: Workforce Gap
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: Required POS Capacity
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: F&B Demand Index
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: Inventory Risk Items
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
       - kind: metricTile
         label: Operational Readiness Score
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs
   states:
     loading: The operational forecasting list; the counts above it resolve separately.
@@ -30671,18 +30922,22 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: metricTile
         label: Readiness 87% 93% 90% 91%
+        operation: compareForecastScenarios
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline
           A B C
       - kind: metricTile
         label: Workforce Gap 18 0 18 18
+        operation: compareForecastScenarios
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline
           A B C
       - kind: metricTile
         label: Avg Queue 26m 24m 25m 19m
+        operation: compareForecastScenarios
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline
           A B C
       - kind: metricTile
         label: POS Wait 17m 16m 7m 16m
+        operation: compareForecastScenarios
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline
           A B C
   states:
@@ -31104,33 +31359,43 @@ screens:
         provenance: check-screens publish rule, 29 September 2026
       - kind: metricTile
         label: AI Capabilities Registered
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Active Governance Policies
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Governed AI Actions Today
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Approval-Required Actions
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Blocked AI Actions
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Policy Exceptions
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: High-Risk AI Capabilities
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Policy Violations
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: AI Autonomy Coverage
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: metricTile
         label: Governance Warnings
+        operation: listAiCapabilities
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
       - kind: dataTable
         label: AI maturity by question
@@ -33290,33 +33555,43 @@ screens:
       components:
       - kind: metricTile
         label: Pending AI Approvals
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
       - kind: metricTile
         label: High-Risk Reviews
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
       - kind: metricTile
         label: Critical Reviews
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
       - kind: metricTile
         label: Awaiting Additional Approver
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
       - kind: metricTile
         label: Conditional Approvals
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
       - kind: metricTile
         label: Requested Changes
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
       - kind: metricTile
         label: Escalated Cases
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
       - kind: metricTile
         label: Overdue Reviews
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
       - kind: metricTile
         label: Active AI Executions Under Oversight
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
       - kind: metricTile
         label: Human Interventions Today
+        operation: listProposedActions
         provenance: pack AI_Governance_Reference.pdf, page 30 §Header KPIs
   states:
     loading: The human oversight list; the counts above it resolve separately.
@@ -35542,33 +35817,43 @@ screens:
       components:
       - kind: metricTile
         label: AI Decisions Today
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
       - kind: metricTile
         label: Governed AI Actions
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
       - kind: metricTile
         label: Automated Decisions
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
       - kind: metricTile
         label: Human-Reviewed Decisions
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
       - kind: metricTile
         label: Human Overrides
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
       - kind: metricTile
         label: Blocked Decisions
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
       - kind: metricTile
         label: Explainability Coverage
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
       - kind: metricTile
         label: Complete Decision Traces
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
       - kind: metricTile
         label: Incomplete Traces
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
       - kind: metricTile
         label: Audit Warnings
+        operation: searchAiDecisions
         provenance: pack AI_Governance_Reference.pdf, page 55 §Header KPIs
   states:
     loading: The explainability audit list; the counts above it resolve separately.
@@ -37567,39 +37852,51 @@ screens:
       components:
       - kind: metricTile
         label: Active AI Capabilities
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: AI Decisions Today
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: Governance Compliance Rate
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: Policy Violations
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: High-Risk Events
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: Critical AI Events
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: Open AI Incidents
+        operation: listAiIncidents
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: Active Exceptions
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: Controls Passing
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: Controls Failing
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: AI Capabilities Under Review
+        operation: getAiUsage
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
       - kind: metricTile
         label: Governance Health Score
+        operation: listAiCapabilityHealth
         provenance: pack AI_Governance_Reference.pdf, page 82 §Header KPIs
   states:
     loading: The governance monitoring list; the counts above it resolve separately.
@@ -38159,24 +38456,31 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: metricTile
         label: Evaluated Actions
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs
       - kind: metricTile
         label: Compliant
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs
       - kind: metricTile
         label: Blocked by Policy
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs
       - kind: metricTile
         label: Policy Violations
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs
       - kind: metricTile
         label: Attempted Violations
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs
       - kind: metricTile
         label: Exception-Based Actions
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs
       - kind: metricTile
         label: Unknown / Unclassified Actions
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs
     - name: contentBody
       slot: moduleTiles
@@ -38374,27 +38678,35 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: metricTile
         label: AI Data Requests
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs
       - kind: metricTile
         label: Allowed
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs
       - kind: metricTile
         label: Conditionally Allowed
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs
       - kind: metricTile
         label: Blocked
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs
       - kind: metricTile
         label: External Transfers
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs
       - kind: metricTile
         label: Masked / Redacted
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs
       - kind: metricTile
         label: Data Policy Violations
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs
       - kind: metricTile
         label: Unknown Data Categories
+        operation: listAiGovernanceAlerts
         provenance: pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs
     - name: contentBody
       slot: moduleTiles
@@ -39814,39 +40126,51 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: metricTile
         label: TICVAI Transaction Value
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Provider Transaction Value
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Matched Transactions
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Match Rate
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Unmatched Transactions
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Unmatched Value
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Settlement Expected
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Settlement Received
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Settlement Variance
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Provider Fees
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Refund Settlement Value
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
       - kind: metricTile
         label: Open Exceptions
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards
     - name: contentBody
       slot: moduleTiles

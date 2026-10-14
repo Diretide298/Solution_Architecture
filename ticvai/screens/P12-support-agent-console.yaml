@@ -3532,6 +3532,7 @@ screens:
         bindsTo: ContactCenterOperationsCommandCenterView.casesToday
       - kind: metricTile
         label: Open Cases
+        operation: listContact
         provenance: pack Customer Service_Reference.pdf, page 24 §Display
       - kind: metricTile
         label: Unassigned Cases

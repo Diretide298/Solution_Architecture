@@ -2448,45 +2448,59 @@ screens:
       components:
       - kind: metricTile
         label: Visitors currently on-site
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Entries today
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Exits today
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Current occupancy
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Capacity remaining
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Occupancy %
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Active gates
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Gate status
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Active POS terminals
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Active sessions/timeslots
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Current queues
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Resource utilization
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Operational incidents
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: System/device exceptions
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
   states:
     loading: The live operations list; the counts above it resolve separately.
@@ -2787,48 +2801,63 @@ screens:
       components:
       - kind: metricTile
         label: Total Visitors
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Current Visitors On-Site
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Entry Count
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Exit Count
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Hourly Footfall
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Peak Entry Time
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Average Visit Duration
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Site
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Attraction
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Ticket Type
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Product
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Timeslot
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Repeat Visits
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: No-Show %
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Ticketed vs Actual Attendance
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
   states:
     loading: The attendance footfall intelligence list; the counts above it resolve separately.
@@ -2908,27 +2937,35 @@ screens:
       components:
       - kind: metricTile
         label: Available Capacity
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Booked Capacity
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Used Capacity
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Remaining Capacity
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Utilization %
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: No-Show %
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Peak Utilization
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Forecast Utilization
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
   states:
     loading: The capacity utilization list; the counts above it resolve separately.
@@ -3007,39 +3044,51 @@ screens:
       components:
       - kind: metricTile
         label: Gross Sales
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Net Sales
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Transactions
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Tickets Sold
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Average Order Value
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Conversion Rate
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Discount Value
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Refunds
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Cancellations
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Commission
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Upsell Revenue
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Cross-Sell Revenue
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
   states:
     loading: The sales channel performance list; the counts above it resolve separately.
@@ -3649,59 +3698,73 @@ screens:
       components:
       - kind: metricTile
         label: Net revenue
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
         notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Revenue Growth
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Attendance
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Capacity Utilization
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Revenue per Visitor
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Average Transaction Value
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Conversion
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Refund %
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Membership Conversion
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Repeat Visitor %
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Customer Satisfaction
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: F&B Spend
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Retail Spend
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Operational Exceptions
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: textField
@@ -6351,27 +6414,35 @@ screens:
       components:
       - kind: metricTile
         label: Report Name
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Description
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Owner
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Last Run
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Data Refresh
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Applied Parameters
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Reporting Period
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Visual management dashboards Detailed reporting
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Dashboard
           Designer Report Builder
     - name: contentBody
@@ -9121,39 +9192,51 @@ screens:
       components:
       - kind: metricTile
         label: Active Dashboards
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Active Reports
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Published KPIs
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Connected Data Sources
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Active Datasets
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Data Refresh Success %
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Data Quality Score
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Failed Refreshes
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: BI Service Health
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: AI Analytics Health
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Active Alerts
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Analytics Users
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
     - name: contentBody
       slot: moduleTiles
@@ -9472,30 +9555,37 @@ screens:
       components:
       - kind: metricTile
         label: Revenue per Visitor
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Transactions per 1,000 Visitors
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Entries per Gate per Hour
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Incidents per 10,000 Visitors
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Revenue per m² where applicable
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Revenue per Operating Hour
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Utilization %
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: textField
@@ -9886,24 +9976,31 @@ screens:
       components:
       - kind: metricTile
         label: Pipelines Running
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Successful Refreshes
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Failed Refreshes
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Average Refresh Duration
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Data Latency
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Stale Datasets
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Records Processed
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
     - name: contentBody
       slot: moduleTiles
@@ -10092,58 +10189,72 @@ screens:
       components:
       - kind: metricTile
         label: Active Analytics Users
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Dashboard Views
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Report Runs
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: AI Queries
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Exports
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: API Requests
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Peak Concurrent Users
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Average Dashboard Load Time
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Query Duration
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Slowest Reports
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Failed Queries
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Dataset Size
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Refresh Duration
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Embedded BI Availability
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
     - name: contentBody

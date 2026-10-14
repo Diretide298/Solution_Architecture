@@ -7328,6 +7328,7 @@ screens:
         bindsTo: PartnerOperationsCommandCenterSummary.activePartnerOrders
       - kind: metricTile
         label: Active Reservations/Holds
+        operation: listPartner2
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
       - kind: metricTile
         label: Tickets Sold
@@ -7928,15 +7929,19 @@ screens:
         bindsTo: PartnerStatementAccountActivitySummary.current
       - kind: metricTile
         label: 1–30 Days
+        operation: listPartnerStatementAccount
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
       - kind: metricTile
         label: 31–60 Days
+        operation: listPartnerStatementAccount
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
       - kind: metricTile
         label: 61–90 Days
+        operation: listPartnerStatementAccount
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
       - kind: metricTile
         label: 90+ Days
+        operation: listPartnerStatementAccount
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
     - name: contentBody
       slot: moduleTiles

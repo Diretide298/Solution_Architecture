@@ -14492,18 +14492,23 @@ screens:
       components:
       - kind: metricTile
         label: Delivery Availability
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
       - kind: metricTile
         label: Average Response Time
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
       - kind: metricTile
         label: CDN Cache Hit %
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
       - kind: metricTile
         label: API Success %
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
       - kind: metricTile
         label: Failed Requests
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
     - name: actionBar
       slot: rowActions
@@ -14599,18 +14604,23 @@ screens:
       components:
       - kind: metricTile
         label: impressions
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
       - kind: metricTile
         label: requests
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
       - kind: metricTile
         label: downloads
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
       - kind: metricTile
         label: delivery volume
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
       - kind: metricTile
         label: reuse count
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
     - name: contentBody
       slot: moduleTiles

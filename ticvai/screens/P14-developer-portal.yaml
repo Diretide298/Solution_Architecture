@@ -1130,6 +1130,7 @@ screens:
         operation: getApiUsage
         provenance: contract public-api.yaml GET /api-usage
       - kind: metricTile
+        operation: getApiUsage
         notes: Calls, success rate, p95 latency, quota headroom.
         provenance: carried from the previous definition
       - kind: chart

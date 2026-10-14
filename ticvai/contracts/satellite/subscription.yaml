@@ -8364,6 +8364,90 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /commercial-metrics:
+    get:
+      operationId: getCommercialMetrics
+      x-ticvai-agreed: '14 October: Block A audit, class S-METRIC-NO-OP (CHG-SCO-006); the P09 commercial command
+        centres (pack Subscription_Licensing_AI_Self_Service.pdf boards 1, 3 and 10, Primary KPIs) show these figures
+        and no operation read them; shape follows reporting getKpiValues'
+      summary: The commercial figures across the customer portfolio, by code
+      description: 'Subscription boards 1, 3 and 10 (§Primary KPIs). **The tiles of the commercial command
+        centres**: customers, subscriptions and trials, recurring revenue and its movement, renewals, guarantees
+        and utilisation, read in one call as one value per metric code, like reporting''s `getKpiValues`.
+        Computed from the subscription, licence, usage-metering and invoice records this service already
+        keeps; nothing is stored for it.
+
+
+        **Codes name the figures the commercial command centres show** (ADM-369, ADM-372 to ADM-376, ADM-378,
+        ADM-389, ADM-459, ADM-464): customers and trials (`activeCustomers`, `newCustomers`, `churnedCustomers`,
+        `activeSubscriptions`, `activeTrials`, `newTrials`, `expiringTrials`, `trialToPaidRate`,
+        `averageTrialDays`), recurring revenue and its movement (`mrr`, `arr`, `newRevenue`, `expansionRevenue`,
+        `contractionRevenue`, `churnedRevenue`, `nrr`, `arpc`, `growthRate`), renewals and opportunities
+        (`renewalsDue30`, `renewalsDue60`, `renewalsDue90`, `renewalValue`, `renewalRate`, `atRiskRevenue`,
+        `autoRenewValue`, `expansionOpportunityValue`, `optimisationOpportunityValue`, `opportunityCount`),
+        the commercial model (`customersByVsiBand`, `customersByOperationalProfile`,
+        `customersByCommercialModel`, `averageVsi`, `customersNearThreshold`, `customersAboveAllowance`,
+        `upgradeCandidates`, `downgradeCandidates`, `activeCommercialModels`, `activeTiers`,
+        `pendingRuleChanges`), guarantees and usage (`billableTickets`, `billableTransactions`,
+        `eligibleTransactionValue`, `variableRevenue`, `minimumGuaranteedRevenue`, `guaranteeUtilisation`,
+        `revenueAboveGuarantee`) and one customer''s billing (`currentCharge`, `nextInvoiceAmount`,
+        `ytdRevenue`, `outstandingBalance`). A code split by a dimension (the `customersBy...` codes) carries
+        `groupKey` on each row. An unknown code is `400`. The full list of codes, and the formula of each, is
+        settled with the commercial team before the first of these screens is built.
+
+
+        **One customer or the portfolio.** With `tenantId` the figures are that customer''s (the billing and
+        renewal centres); without it, the whole portfolio. With no `period`, the current calendar month.'
+      tags:
+      - subscription
+      x-ticvai-permission: PLATFORM_BILLING_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: codes
+        in: query
+        description: Comma-separated metric codes; every code when absent.
+        schema:
+          type: string
+      - name: tenantId
+        in: query
+        description: One customer's figures; the portfolio when absent.
+        schema:
+          type: string
+          format: uuid
+      - name: period
+        in: query
+        description: '`YYYY-MM`, `YYYY-Qn` or `YYYY`; the current month when absent.'
+        schema:
+          type: string
+      - name: compareTo
+        in: query
+        schema:
+          type: string
+          enum:
+          - previousPeriod
+          - samePeriodLastYear
+      responses:
+        '200':
+          description: The figures
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommercialMetricSet'
+        '400':
+          description: An unknown metric code or a malformed period
+          x-ticvai-problem-types:
+          - unknown-metric-code
+          - invalid-period
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
   /plans/{planId}/tiers:
     get:
       operationId: getPlanTiers
@@ -11348,6 +11432,60 @@ components:
           type: string
           format: uuid
           nullable: true
+    CommercialMetricSet:
+      type: object
+      description: 'The commercial command centres'' figures, one row per metric code (getCommercialMetrics).'
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The customer the figures are for; null for the whole portfolio.
+        period:
+          type: string
+        asOf:
+          type: string
+          format: date-time
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommercialMetric'
+    CommercialMetric:
+      type: object
+      description: 'One commercial figure. Money-valued codes carry a `Money`; counts, rates and days a number
+        (naming-and-style 5.1: money is never a float).'
+      required:
+      - code
+      - value
+      properties:
+        code:
+          type: string
+        groupKey:
+          type: string
+          nullable: true
+          description: The band, profile or model this row is for, on a code split by one; null otherwise.
+        unit:
+          type: string
+          enum:
+          - count
+          - currency
+          - percent
+          - days
+        value:
+          oneOf:
+          - type: number
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+        comparison:
+          nullable: true
+          oneOf:
+          - type: number
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+        direction:
+          type: string
+          enum:
+          - up
+          - down
+          - flat
     BillingReconciliation:
       type: object
       description: 'Boards 10.2 and 10.3. **The first invoice sets the tone for the relationship.**'

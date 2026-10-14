@@ -1,0 +1,50 @@
+id: CHG-SCO-006
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Every metric tile on P09, P10, P12, P13, P14, P15 and P16 names the read that computes it; the P09 commercial
+  command centres, whose figures no operation read, get getCommercialMetrics (GET /commercial-metrics, subscription).'
+decision:
+  what: 'Bind the 410 metric tiles that named no operation to the read that computes them: the KPI read
+    (getKpiValues) on the analytics dashboards, the usage, benchmark, forecast, action-plan, decision, alert and
+    summary reads the screens already declare elsewhere, and listKitchenTickets for the kitchen displays'' station-load
+    tile (KIT-009 declares it for that tile). The ten commercial command centres of P09 (ADM-369, ADM-372 to ADM-376,
+    ADM-378, ADM-389, ADM-459, ADM-464) show recurring revenue, renewals, trials and guarantee figures no operation
+    computed, so subscription.yaml gains getCommercialMetrics (PLATFORM_BILLING_VIEW, platform scope, read from the
+    replica), shaped like reporting''s getKpiValues: one value per metric code, money as Money, for the portfolio or
+    one customer. No tile is added, removed or relabelled.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, class check-screen-wiring S-METRIC-NO-OP (R283; audit root class A30
+  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  your recommendation"): a metric tile binds the read that computes it, or is removed. The approved UI is fixed
+  (lead, 14 October), so no tile is removed: where the read did not exist, the contract gains it (AUDIT-FIX-RULES:
+  a contract operation only where the approved UI needs one). On these platforms: 410 members before, 0 after.'
+keys_touched:
+  screens: [ADM-369, ADM-372, ADM-373, ADM-374, ADM-375, ADM-376, ADM-378, ADM-389, ADM-459, ADM-464, ADM-466,
+    ADM-477, ADM-479, ADM-487, ADM-489, ADM-498, ADM-499, ADM-509, ADM-517, ADM-519, ADM-529, ADM-539, ADM-549,
+    ADM-552, ADM-553, ADM-619, PTR-042, PTR-046, SUP-019, CMS-098, CMS-099, DEV-006, KIT-001, KIT-002, KIT-003,
+    KIT-004, KIT-005, KIT-006, KIT-007, KIT-009, ANL-012, ANL-014, ANL-015, ANL-016, ANL-020, ANL-040, ANL-061,
+    ANL-064, ANL-067, ANL-069]
+  operations: [getCommercialMetrics, getKpiValues, listKitchenTickets]
+  schemas: [CommercialMetricSet, CommercialMetric]
+  other: [S-METRIC-NO-OP]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: ['27764', '27765', '27775', '27887', '27943', '27972', '28000', '28244', '28246', '28248', '28282',
+    '28388', '28522', '28523', '28540', '28543', '28552', '28567', '28568', '28569', '28570', '28571', '28572',
+    '28573', '28575', '28576', '28728', '28754']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCO, 14 October 2026. getCommercialMetrics is additive (no breaking change). Its metric codes are the
+  tiles'' figures; the formula of each is settled with the commercial team before the first of these wave-3 screens
+  is built (said in the operation''s description). A tile bound to a read declared for other components on the
+  same screen also makes that read reached (S-OP-UNREACHED falls with it). Derived artefacts (lineage, consumed-by,
+  schema reference, service docs) pick the operation up at the lead''s refresh.'
