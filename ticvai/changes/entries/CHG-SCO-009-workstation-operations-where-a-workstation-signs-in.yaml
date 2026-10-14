@@ -1,0 +1,44 @@
+id: CHG-SCO-009
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'The scanner''s screens take workstationId from the session, so its workstation-scoped access operations
+  are called where a workstation is signed in; getCurrentSession is scoped at the tenant, so a browser door''s
+  session read (P09, P10, P12) needs no workstation.'
+decision:
+  what: 'P07: SCN-003, SCN-007, SCN-008, SCN-009, SCN-011, SCN-013, SCN-014 and SCN-015 declare the entry parameter
+    workstationId (from the session), as the staff app does: a scanner is a registered workstation at an access point
+    (tenancy Workstation.accessPointId), and validateAccess, validateGroupAccess, getOfflinePackage, syncScans and
+    consumeCrossRegionEntitlement are workstation-scoped. identity getCurrentSession: x-ticvai-scope-level workstation
+    becomes tenant, the level of its self-scoped siblings (changeOwnCredential, the MFA operations); it has no
+    permission and is self-scoped to the principal, and a browser door sends no workstation (CHG-DOOR-001,
+    CHG-CSP-002), so ADM-001, PTR-001 and SUP-001 read the session they opened. Not a breaking change: the request,
+    the response and the permission are unchanged. P10''s createOrder, holdOrder, resumeOrder, createPayment,
+    capturePayment and inquirePaymentStatus stay (12 keeps): the approved partner screens and flow F03 call them, a
+    partner has no workstation, and a partner variant is the lead''s call (a venue-scoped partner order against the
+    allocation and credit, or the cart: createCart is guest-only today).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, class check-screen-wiring S-WORKSTATION-OP (R100; audit root class A31
+  SCREEN-WRONG-OP), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
+  your recommendation"): a workstation-scoped operation is called only from a platform that signs a workstation in.
+  On these platforms: 34 members before, 12 after (P10, keeps).'
+keys_touched:
+  screens: [SCN-003, SCN-007, SCN-008, SCN-009, SCN-011, SCN-013, SCN-014, SCN-015]
+  operations: [getCurrentSession]
+  other: [S-WORKSTATION-OP]
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted: ['27691', '27703', '27705', '27706', '27709', '28138', '28359', '28371', '28372', '28373', '28890',
+    '28891', '28892']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCO, 14 October 2026. getCurrentSession is also called by P04 POS-000 and P06 EMP-001, EMP-002 and
+  EMP-042, which sign a workstation in; the scope level does not change what they send or receive.'

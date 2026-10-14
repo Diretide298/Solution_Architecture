@@ -206,6 +206,7 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
+        operation: listKitchenTickets
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
@@ -382,6 +383,7 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
+        operation: listKitchenTickets
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
@@ -663,6 +665,7 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
+        operation: listKitchenTickets
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
@@ -888,6 +891,7 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
+        operation: listKitchenTickets
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
@@ -1058,6 +1062,7 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
+        operation: listKitchenTickets
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
@@ -1270,6 +1275,7 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
+        operation: listKitchenTickets
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
@@ -1538,6 +1544,7 @@ screens:
           The handover is recorded on KIT-006.'
         provenance: v2 build, Queue (the guest status board, wireframes/incoming/P04-pos-v2/img/pos-029.png)
       - kind: metricTile
+        operation: listKitchenTickets
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
@@ -1740,7 +1747,7 @@ screens:
     - list86Events
   - operationId: getHaccpStatus
     contract: fnb
-    purpose: getHaccpStatus
+    purpose: Where the venue's food-safety checks stand right now, beside the exceptions
     trigger: onLoad
   - operationId: list86Events
     contract: fnb
@@ -1883,10 +1890,12 @@ screens:
       components:
       - kind: cardList
         bindsTo: KitchenTicket[]
+        operation: listKitchenTickets
         notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
+        operation: listKitchenTickets
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
@@ -1937,6 +1946,12 @@ screens:
     contract: fnb
     purpose: How this outlet courses by default, shown beside the targets (CHG-CSA-045)
     trigger: onLoad
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: The station's queue depth and oldest ticket age, for the station-load tile (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
+    trigger: onLoad
+    provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
     params:
     - name: venueId

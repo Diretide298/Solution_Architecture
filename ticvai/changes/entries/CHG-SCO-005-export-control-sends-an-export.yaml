@@ -1,0 +1,36 @@
+id: CHG-SCO-005
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'ACC-008 Credential Register''s Export button sends exportAccreditationData, and the screen follows the queued
+  export with getAccreditationExport until its download link is ready.'
+decision:
+  what: 'Bind the existing Export button on ACC-008 to exportAccreditationData (onAction) and add getAccreditationExport
+    (onInterval, the 202''s pollExport link) to its apis. No component is added. CMS-054''s "Export Missing List" stays
+    a keep: no operation exports the minors still missing a guardian''s consent (proposed: exportMinorGuardianGroup,
+    202 and a poll like exportAccreditationData; it needs an export record and the lead''s call).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, class check-screen-wiring S-EXPORT (R293; audit root class A30
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
+  your recommendation"): an Export control binds an export operation, or is removed; the approved UI is fixed (lead,
+  14 October), so the control stays and is bound where an operation exists. On these platforms: 2 members before,
+  1 after (CMS-054, a keep).'
+keys_touched:
+  screens: [ACC-008]
+  operations: [exportAccreditationData, getAccreditationExport]
+  other: [S-EXPORT]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCO, 14 October 2026. The x-ticvai-consumed-by lists of the two operations gain P11 ACC-008 at the next
+  link-screens-contracts run (derived; not committed from the branch). ACC-008 is on no Block A ticket.'

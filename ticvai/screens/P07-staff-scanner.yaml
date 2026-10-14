@@ -672,6 +672,8 @@ screens:
       from: deepLink
     - name: rightId
       from: deepLink
+    - name: workstationId
+      from: session
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -852,6 +854,9 @@ screens:
     purpose: Read-only validity check without admitting
     trigger: onAction
   entryState:
+    params:
+    - name: workstationId
+      from: session
     preloaded:
     - ScanEvent.id
     - ScanEvent.accessPointId
@@ -1029,6 +1034,9 @@ screens:
     purpose: Validate media at an access point and admit or deny
     trigger: onAction
   entryState:
+    params:
+    - name: workstationId
+      from: session
     preloaded:
     - ScanEvent.id
     - ScanEvent.accessPointId
@@ -1230,6 +1238,9 @@ screens:
     purpose: List scan events
     trigger: onLoad
   entryState:
+    params:
+    - name: workstationId
+      from: session
     preloaded:
     - ScanEvent.id
     - ScanEvent.accessPointId
@@ -1363,6 +1374,8 @@ screens:
     params:
     - name: rightId
       from: deepLink
+    - name: workstationId
+      from: session
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -1594,6 +1607,9 @@ screens:
     purpose: Admit a group on one read
     trigger: onAction
   entryState:
+    params:
+    - name: workstationId
+      from: session
     preloaded:
     - ScanEvent.id
     - ScanEvent.accessPointId
@@ -1888,6 +1904,9 @@ screens:
     invalidates:
     - listSyncRejections
   entryState:
+    params:
+    - name: workstationId
+      from: session
     preloaded:
     - SyncRejection.id
     - SyncRejection.workstationId
@@ -2012,6 +2031,9 @@ screens:
     purpose: Read-only validity check without admitting
     trigger: onAction
   entryState:
+    params:
+    - name: workstationId
+      from: session
     preloaded:
     - ScanEvent.id
     - ScanEvent.accessPointId

@@ -1,0 +1,36 @@
+id: CHG-SCO-004
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'The confirm dialogs ADM-003 "Cancel decommission" and ADM-007/ADM-011 "Remove licence add on" name the
+  operation their confirm sends, so the reason they collect reaches cancelDecommission and removeLicenceAddOn.'
+decision:
+  what: 'Add `confirm: {label, operation}` to the existing overlays confirmCancelDecommission (ADM-003) and
+    confirmRemoveLicenceAddOn (ADM-007, ADM-011). The dialogs are in the approved UI already (their body says they
+    collect `reason`, and `moduleKey`); the confirm button keeps the trigger''s label, as the sibling forms on the
+    same screens do. No component is added or removed.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, class check-screen-wiring S-BUTTON-FORM (R264; audit root class A30
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
+  your recommendation"): a button whose operation needs a body opens the form or panel that collects it. The
+  dialog existed and was not bound, so a developer could not tell that its confirm sends the body. On these
+  platforms: 3 members before, 0 after.'
+keys_touched:
+  screens: [ADM-003, ADM-007, ADM-011]
+  operations: [cancelDecommission, removeLicenceAddOn]
+  other: [S-BUTTON-FORM]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: ['27775', '27807', '27887', '27970', '27972', '27994', '27995', '28002', '28003', '28004', '28383',
+    '28385', '28388']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: Batch SCO, 14 October 2026.

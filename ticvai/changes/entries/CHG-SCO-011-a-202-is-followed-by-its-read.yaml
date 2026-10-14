@@ -1,0 +1,36 @@
+id: CHG-SCO-011
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'The CMS content screens follow their asynchronous AI drafts: CMS-008 polls listProposedActions after
+  proposeMarketingContent and decideProposedAction answer 202; four stay as keeps.'
+decision:
+  what: 'CMS-008 declares listProposedActions (onInterval): each draft proposeMarketingContent queues is an
+    ai.proposed_action, and decideProposedAction routes one to Approvals; the read follows them until applied or
+    refused. No component is added. CMS-007 (Page Builder, a Block A screen with a design-r1 frame) stays a keep: a
+    third AI read on the page builder is flagged by check-screens as unrelated to the screen, and its two AI writes
+    have no control on the approved design (CHG-SCO-007 keeps).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, class check-screen-wiring S-ASYNC-POLL (R288; audit root class A30
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
+  your recommendation"): a 202 operation''s screen reads the job or record that follows it. On these platforms: 6
+  members before, 4 after (keeps: CMS-007 twice; CMS-063 and CMS-072 analyseMediaAsset, whose approved screens show no
+  asset to read and which stay because removing the operation moves its backend task, CHG-SCO-007).'
+keys_touched:
+  screens: [CMS-008]
+  operations: [listProposedActions, proposeMarketingContent, decideProposedAction]
+  other: [S-ASYNC-POLL]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: ['27845', '27846', '27848', '27849', '27850', '27897', '27917', '27918', '27920', '28338']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: Batch SCO, 14 October 2026.

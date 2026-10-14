@@ -1,0 +1,72 @@
+id: CHG-SCO-007
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'On P07 and P09 to P17, every operation a screen declares is reached by one of its existing components, or
+  leaves the screen because nothing on the approved screen calls or shows it; 160 stay as keeps (client-approved UI).'
+decision:
+  what: 'For each unreached operation on the other platforms'' screens (498): a read binds the unbound display
+    components that show its response (by the schema they name, then by their label; "The selected X" with the read
+    behind "Every X"; a screen''s tiles with the read that computes them), a write binds the unbound button whose
+    label says its verb, the screen''s one unlabelled primary act, or, on an editor, the unbound inputs that collect
+    its body; one confirm dialog that already collects a body names its operation. An operation nothing on the
+    approved screen calls or shows leaves the screen''s apis (119). No component is added, removed, moved or
+    relabelled. An operation stays (a keep, 160) where removing it would leave the screen binding nothing (the NP
+    ratchet), make a read or no-access finding (READ, P3), leave one operation read off the title, break a flow or a
+    carried id, split or make an identical screen group, move its backend task under a feature none of whose screens calls it
+    (check-ticket-scope S-FEATURE-OP-UNUSED, through the plan composition rule), or where its button has nothing on the approved screen to
+    collect the body, or the approved design-r1 frame of a Block A screen draws it.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, class check-screen-wiring S-OP-UNREACHED (R273; audit root class A30
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
+  your recommendation"): an operation no component reaches: wire onLoad reads to the load; otherwise remove it from
+  the screen. The approved UI is fixed (lead, 14 October), so wiring uses only components the approved screen
+  already has. On these platforms: 498 members before, 160 after, all keeps (listed with reasons in the batch
+  hand-back).'
+keys_touched:
+  screens: [ACC-002, ACC-003, ACC-004, ACC-006, ACC-007, ACC-008, ADM-004, ADM-009, ADM-037, ADM-068, ADM-369,
+    ADM-370, ADM-371, ADM-372, ADM-373, ADM-374, ADM-375, ADM-376, ADM-378, ADM-381, ADM-383, ADM-384, ADM-386,
+    ADM-389, ADM-390, ADM-392, ADM-393, ADM-394, ADM-395, ADM-396, ADM-400, ADM-401, ADM-402, ADM-403, ADM-404,
+    ADM-407, ADM-411, ADM-413, ADM-414, ADM-418, ADM-420, ADM-422, ADM-423, ADM-426, ADM-449, ADM-450, ADM-451,
+    ADM-452, ADM-454, ADM-455, ADM-457, ADM-458, ADM-459, ADM-462, ADM-463, ADM-464, ADM-465, ADM-467, ADM-469,
+    ADM-470, ADM-471, ADM-472, ADM-473, ADM-474, ADM-475, ADM-476, ADM-477, ADM-478, ADM-479, ADM-480, ADM-481,
+    ADM-482, ADM-483, ADM-484, ADM-485, ADM-486, ADM-487, ADM-488, ADM-489, ADM-490, ADM-491, ADM-492, ADM-493,
+    ADM-494, ADM-495, ADM-496, ADM-497, ADM-498, ADM-501, ADM-502, ADM-507, ADM-509, ADM-510, ADM-511, ADM-512,
+    ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, ADM-519, ADM-521, ADM-522, ADM-524, ADM-525, ADM-526,
+    ADM-529, ADM-530, ADM-531, ADM-532, ADM-533, ADM-538, ADM-540, ADM-543, ADM-544, ADM-546, ADM-547, ADM-548,
+    ADM-550, ADM-551, ADM-552, ADM-553, ADM-555, ADM-557, ADM-558, ADM-619, ANL-001, ANL-006, ANL-008, ANL-009,
+    ANL-012, ANL-017, ANL-018, ANL-021, ANL-022, ANL-024, ANL-026, ANL-027, ANL-028, ANL-030, ANL-031, ANL-032,
+    ANL-033, ANL-035, ANL-036, ANL-038, ANL-039, ANL-040, ANL-041, ANL-042, ANL-043, ANL-044, ANL-045, ANL-048,
+    ANL-050, ANL-051, ANL-055, ANL-056, ANL-057, ANL-058, ANL-059, ANL-060, ANL-061, ANL-062, ANL-063, ANL-065,
+    CMS-014, CMS-030, CMS-033, CMS-040, CMS-050, CMS-060, CMS-062, CMS-063, CMS-066, CMS-068, CMS-070, CMS-072,
+    CMS-073, CMS-076, CMS-077, CMS-078, CMS-080, CMS-081, CMS-082, CMS-088, CMS-090, CMS-091, CMS-092, CMS-093,
+    CMS-094, CMS-095, CMS-096, CMS-103, DEV-005, KIT-009, PTR-022, PTR-030, PTR-031, PTR-032, PTR-041, PTR-042,
+    SGN-003, SGN-005, SGN-006, SGN-008, SGN-012, SGN-013, SGN-014, SGN-015, SGN-016, SGN-022, SUP-009, SUP-010,
+    SUP-018]
+  other: [S-OP-UNREACHED]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: ['27711', '27715', '27729', '27730', '27740', '27749', '27764', '27765', '27775', '27778', '27779',
+    '27780', '27807', '27808', '27836', '27837', '27838', '27839', '27840', '27841', '27843', '27853', '27869',
+    '27870', '27875', '27878', '27879', '27885', '27887', '27906', '27925', '27941', '27943', '27945', '27949',
+    '27959', '27962', '27967', '27971', '27972', '27997', '27998', '28000', '28004', '28005', '28007', '28282',
+    '28334', '28336', '28337', '28338', '28383', '28385', '28388', '28481', '28523', '28540', '28547', '28575',
+    '28576', '28683', '28723', '28728', '28732', '28733', '28735', '28739', '28742', '28746', '28768', '28958',
+    '28964', '28965', '28970', '28979', '28993', '28994', '28995', '29012', '29013', '29014', '29015', '29021']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCO, 14 October 2026. The same commit gives ADM-375, ADM-376 and ADM-464 the screen permission
+  PLATFORM_BILLING_VIEW, the permission of getCommercialMetrics (CHG-SCO-006), their only permissioned operation, so
+  S-SCREEN-PERMISSION finds nothing new; their no-access text still says nothing needs a permission (visible copy,
+  for the lead). The x-ticvai-consumed-by lists, the plan and the service docs follow at the next derive
+  (link-screens-contracts, build-service-docs); not committed from the branch. Block A screens with a design-r1 frame
+  (ADM-037, ADM-500, ANL-001, CMS-007, CMS-008, CMS-010, CMS-014, CMS-016, CMS-101, CMS-103, CMS-104, KIT-009,
+  SCN-003) lose no operation: the approved design draws filters and behaviour from them.'
