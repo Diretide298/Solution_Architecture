@@ -3949,6 +3949,13 @@ def chat_providers(account: dict = Depends(require_account)):
                                        row["endpoint"] or "")
             except secrets.Unreadable:
                 pass
+        # The model a first question goes to when the person has not chosen one.
+        # The table's first pick when the provider still offers it (the table is
+        # ordered best first), else whatever the provider listed first, else
+        # nothing: the escape hatch has no list, and a guessed name would fail
+        # on somebody's own key. Both pages read this, so the first ask never
+        # stops at "type a model".
+        suggested = next((m for m in spec["models"] if m in models), models[0] if models else "")
         out.append({
             "id": name,
             "label": spec["label"],
@@ -3958,6 +3965,7 @@ def chat_providers(account: dict = Depends(require_account)):
             "endpoint": (row["endpoint"] if row else "") or spec["base"],
             "keysAt": spec["keysAt"],
             "models": models,
+            "suggested": suggested,
         })
     return {"providers": out}
 

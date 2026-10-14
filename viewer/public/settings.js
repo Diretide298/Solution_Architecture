@@ -25,9 +25,10 @@ import {
   requireSignIn, account, mySettings, saveGitIdentity,
   saveOpenProjectToken, forgetOpenProjectToken,
   changePassword, signOut, logoutAll, project, isAdmin, isOwner,
-  connectorFleet, servedBuild,
+  connectorFleet, servedBuild, chatProviders, setLlmKey, forgetLlmKey,
 } from '/validation.js';
 import { mountPanels } from '/panels.js';
+import { confirmStep } from '/sheet.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -264,6 +265,119 @@ async function drawFleet() {
     host.append(row);
   }
 }
+// ── AI answers ───────────────────────────────────────────────────────
+//
+// The keys Ask about the package answers on, one per provider. The same rules
+// as the OpenProject token: checked with the provider before it is kept,
+// encrypted, never sent back (only its last four characters), and forgetting it
+// here is said plainly not to revoke it there. Forgetting is confirmed first,
+// because the next question to that provider fails until a key is pasted again.
+
+const ai = { providers: [] };
+
+async function drawAi() {
+  const { providers } = await chatProviders();
+  ai.providers = providers ?? [];
+  const held = ai.providers.filter((p) => p.configured);
+
+  const badge = $('ai-state');
+  badge.textContent = held.length ? `${held.length} key${held.length === 1 ? '' : 's'}` : 'no key';
+  badge.dataset.on = held.length ? 'yes' : 'no';
+
+  const list = $('ai-keys');
+  list.replaceChildren();
+  for (const p of held) {
+    const row = el('div', 'set-row ai-key-row');
+    row.append(el('span', 'ai-key-name', p.label),
+      el('span', 'ai-key-hint', `key ${p.hint}${p.needsEndpoint && p.endpoint ? ` · ${p.endpoint}` : ''}`));
+    const replace = el('button', 'chip', 'Replace');
+    replace.type = 'button';
+    replace.onclick = () => {
+      $('ai-provider').value = p.id;
+      drawAiProvider();
+      $('ai-key').focus();
+    };
+    const forget = el('button', 'chip', 'Forget');
+    forget.type = 'button';
+    forget.onclick = async () => {
+      const sure = await confirmStep(row, {
+        say: `ADAM forgets your ${p.label} key, and questions to ${p.label} stop until you add one `
+          + `again. The key itself still works with ${p.label} until you revoke it there.`,
+        action: `Forget the ${p.label} key`,
+      });
+      if (!sure) return;
+      try {
+        await forgetLlmKey(p.id);
+        say($('ai-says'), `Forgot the ${p.label} key.`, 'good');
+        await drawAi();
+      } catch (error) {
+        say($('ai-says'), `The key was not forgotten: ${because(error)}`, 'bad');
+      }
+    };
+    row.append(replace, forget);
+    list.append(row);
+  }
+  if (!held.length) {
+    list.append(el('p', 'auth-note auth-fine',
+      'No key yet. Add one below and Ask about the package can answer.'));
+  }
+
+  const picker = $('ai-provider');
+  const was = picker.value;
+  picker.replaceChildren(...ai.providers.map((p) =>
+    new Option(p.configured ? `${p.label} (has a key)` : p.label, p.id)));
+  if (was && ai.providers.some((p) => p.id === was)) picker.value = was;
+  $('ai-add-title').textContent = held.length ? 'Add or replace a key' : 'Add a key';
+  drawAiProvider();
+}
+
+function drawAiProvider() {
+  const p = ai.providers.find((x) => x.id === $('ai-provider').value) ?? ai.providers[0];
+  if (!p) return;
+  $('ai-endpoint-label').hidden = !p.needsEndpoint;
+  $('ai-endpoint-row').hidden = !p.needsEndpoint;
+  if (p.needsEndpoint) $('ai-endpoint').value = p.configured ? (p.endpoint ?? '') : '';
+  $('ai-keys-at').hidden = !p.keysAt;
+  if (p.keysAt) $('ai-keys-at').href = p.keysAt;
+  $('ai-save').textContent = p.configured ? 'Check and replace' : 'Check and save';
+}
+
+function wireAi(settings) {
+  // A deployment with no encryption key cannot store a credential: said before
+  // the field, the same as OpenProject's, not after a live key is pasted.
+  if (!settings.canStoreCredentials) {
+    const note = $('ai-nokey');
+    note.hidden = false;
+    note.replaceChildren(el('strong', null, 'This deployment cannot store credentials yet. '),
+      settings.whyNot ?? 'No encryption key is configured.');
+    $('ai-key').disabled = true;
+    $('ai-save').disabled = true;
+  }
+  $('ai-provider').addEventListener('change', drawAiProvider);
+  $('ai-save').addEventListener('click', async () => {
+    const says = $('ai-says');
+    const p = ai.providers.find((x) => x.id === $('ai-provider').value);
+    const key = $('ai-key').value.trim();
+    if (!p) return;
+    if (!key) return say(says, 'Paste a key first.', 'bad');
+    if (p.needsEndpoint && !$('ai-endpoint').value.trim()) {
+      return say(says, 'This provider needs the address of its endpoint as well.', 'bad');
+    }
+    $('ai-save').disabled = true;
+    say(says, `Checking the key with ${p.label}…`);
+    try {
+      const saved = await setLlmKey(p.id, key, $('ai-endpoint').value.trim());
+      $('ai-key').value = '';
+      say(says, `Saved: ${saved.checked}.`, 'good');
+      await drawAi();
+    } catch (error) {
+      say(says, `Not saved: ${because(error)}`, 'bad');
+    } finally {
+      $('ai-save').disabled = false;
+    }
+  });
+  drawAi().catch((error) => say($('ai-says'), `ADAM could not list the AI providers: ${because(error)}`, 'bad'));
+}
 
 async function load() {
   const state = await mySettings();
@@ -416,8 +530,9 @@ function wireSessions() {
 
 if (await requireSignIn()) {
   try {
-    await load();
+    const settings = await load();
     $('settings').hidden = false;
+    wireAi(settings);
     // Not awaited and not inside load(): the build list is the one thing on this
     // page that asks two services a question, and a page that will not show
     // somebody their password form because a build list timed out is worse than

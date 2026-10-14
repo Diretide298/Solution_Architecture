@@ -3305,13 +3305,19 @@ textarea.rt-sendback-note {
 }
 
 /* ── the chat panel the mascot opens ─────────────────────────────────────────
-   Tokens and geometry from the design handoff. Every chamfer is a 1px padded
-   parent behind a clipped child: a border follows the box rather than the
-   clip-path, so a chamfered box with a plain border shows its corners cut
-   straight through the line. */
+   Geometry from the design handoff. Every chamfer is a 1px padded parent
+   behind a clipped child: a border follows the box rather than the clip-path,
+   so a chamfered box with a plain border shows its corners cut straight
+   through the line.
+
+   **Colours are the theme's tokens.** The handoff's forty-odd hexes were the
+   night palette written out by hand, so in the day theme the panel stayed a
+   black box over a white page. Every one of them is exactly a night token
+   (#071015 is --bg-panel, #1a2c35 is --border, and so on), so naming the
+   token keeps the night panel identical and gives the day theme its own. */
 .cp-rim {
   padding: 1px;
-  background: #28414d;
+  background: var(--border-strong);
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 }
 #cp-panel {
@@ -3321,15 +3327,15 @@ textarea.rt-sendback-note {
   z-index: 59;
   width: 380px;
   max-width: calc(100vw - 40px);
-  background: linear-gradient(160deg, #00c4e8, #0b6f8c 35%, #1a2c35 70%, #0b6f8c);
-  filter: drop-shadow(0 12px 34px rgb(0 0 0 / 0.55));
+  background: linear-gradient(160deg, var(--accent-bright), var(--accent-line) 35%, var(--border) 70%, var(--accent-line));
+  filter: drop-shadow(0 12px 34px var(--shadow-ink));
 }
 #cp-panel[hidden] { display: none; }
 .cp-body {
   display: flex;
   flex-direction: column;
   max-height: min(540px, calc(100vh - 260px));
-  background: #071015;
+  background: var(--bg-panel);
   clip-path: polygon(9.5px 0, 100% 0, 100% calc(100% - 9.5px), calc(100% - 9.5px) 100%, 0 100%, 0 9.5px);
 }
 
@@ -3338,22 +3344,22 @@ textarea.rt-sendback-note {
   align-items: center;
   gap: 8px;
   padding: 10px 10px 10px 14px;
-  border-bottom: 1px solid #12222a;
+  border-bottom: 1px solid var(--divider);
 }
-.cp-title { flex: 1; font-size: 13px; font-weight: 700; color: #e8f3f6; }
+.cp-title { flex: 1; font-size: 13px; font-weight: 700; color: var(--text); }
 .cp-icon {
   width: 28px;
   height: 28px;
   display: grid;
   place-items: center;
   padding: 0;
-  border: 1px solid #1a2c35;
+  border: 1px solid var(--border);
   background: transparent;
-  color: #93a9b1;
+  color: var(--text-dim);
   cursor: pointer;
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
 }
-.cp-icon:hover { border-color: #00c4e8; color: #00c4e8; }
+.cp-icon:hover { border-color: var(--accent-bright); color: var(--accent-bright); }
 .cp-icon svg { width: 13px; height: 13px; }
 
 .cp-log {
@@ -3365,7 +3371,7 @@ textarea.rt-sendback-note {
   flex-direction: column;
   gap: 10px;
 }
-.cp-empty { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; color: #93a9b1; }
+.cp-empty { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; color: var(--text-dim); }
 .cp-suggest {
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr);
@@ -3373,19 +3379,19 @@ textarea.rt-sendback-note {
   gap: 8px;
   text-align: left;
   padding: 10px 12px;
-  border: 1px solid #1a2c35;
-  background: #0b161c;
-  color: #e8f3f6;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
   font-size: 12.5px;
   cursor: pointer;
   clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
 }
-.cp-suggest:hover { border-color: #00c4e8; background: #062a38; }
-.cp-n { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #00c4e8; }
+.cp-suggest:hover { border-color: var(--accent-bright); background: var(--accent-soft); }
+.cp-n { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--accent-bright); }
 
 .cp-turn { display: flex; flex-direction: column; gap: 5px; }
 .cp-user { align-items: flex-end; }
-.cp-label { font-size: 10.5px; color: #7d949d; }
+.cp-label { font-size: 10.5px; color: var(--text-faint); }
 .cp-bubble {
   max-width: 88%;
   padding: 9px 13px;
@@ -3394,43 +3400,43 @@ textarea.rt-sendback-note {
   white-space: pre-wrap;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
 }
-.cp-user .cp-bubble { background: #062a38; border: 1px solid #0b6f8c; color: #e8f3f6; }
-.cp-assistant .cp-bubble { background: #0b161c; border: 1px solid #1a2c35; color: #cfe3ea; }
+.cp-user .cp-bubble { background: var(--accent-soft); border: 1px solid var(--accent-line); color: var(--text); }
+.cp-assistant .cp-bubble { background: var(--bg-card); border: 1px solid var(--border); color: var(--text); }
 .cp-chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .cp-chip {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   padding: 2px 7px;
-  border: 1px solid #1a2c35;
-  color: #7d949d;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
 }
 
-.cp-note { margin: 0; padding: 0 14px 8px; font-size: 11.5px; color: #7d949d; }
-.cp-note[data-bad='1'] { color: #d96c63; }
+.cp-note { margin: 0; padding: 0 14px 8px; font-size: 11.5px; color: var(--text-faint); }
+.cp-note[data-bad='1'] { color: var(--red); }
 
 .cp-foot { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; }
-.cp-model { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #7d949d; }
+.cp-model { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-faint); }
 .cp-model input {
   flex: 1;
   height: 28px;
   padding: 0 10px;
-  border: 1px solid #1a2c35;
+  border: 1px solid var(--border);
   border-radius: 0;
-  background: #040709;
-  color: #cfe3ea;
+  background: var(--bg-canvas);
+  color: var(--text);
   font-family: 'JetBrains Mono', monospace;
   font-size: 11.5px;
   outline: 0;
 }
-.cp-model input:focus { border-color: #0b6f8c; }
-.cp-askrim { background: #28414d; }
-.cp-askrim:focus-within { background: #00c4e8; }
+.cp-model input:focus { border-color: var(--accent-line); }
+.cp-askrim { background: var(--border-strong); }
+.cp-askrim:focus-within { background: var(--accent-bright); }
 .cp-ask {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 4px 4px 4px 12px;
-  background: #040709;
+  background: var(--bg-canvas);
   clip-path: polygon(8.5px 0, 100% 0, 100% calc(100% - 8.5px), calc(100% - 8.5px) 100%, 0 100%, 0 8.5px);
 }
 .cp-ask input {
@@ -3438,25 +3444,57 @@ textarea.rt-sendback-note {
   height: 34px;
   border: 0;
   background: transparent;
-  color: #e8f3f6;
+  color: var(--text);
   font-size: 13px;
   outline: 0;
 }
-.cp-ask input::placeholder { color: #5f747c; }
+.cp-ask input::placeholder { color: var(--text-faint); }
 .cp-ask button {
   width: 34px;
   height: 34px;
   display: grid;
   place-items: center;
   border: 0;
-  background: #00b4e0;
-  color: #00161e;
+  background: var(--accent);
+  color: var(--ink-on-accent);
   cursor: pointer;
   clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
 }
-.cp-ask button:hover { background: #00c4e8; }
-.cp-ask button:disabled { background: #28414d; color: #7d949d; cursor: not-allowed; }
+.cp-ask button:hover { background: var(--accent-bright); }
+.cp-ask button:disabled { background: var(--border-strong); color: var(--text-faint); cursor: not-allowed; }
 .cp-ask button svg { width: 14px; height: 14px; }
+
+/* What the panel gained with the shared chat state: a real heading, a label a
+   screen reader hears, answers drawn from their Markdown, and the sources under
+   them as links. Scoped to the panel, because chat.css is the full page's and
+   the viewer does not load it. */
+.cp-title { margin: 0; }
+.cp-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.cp-icon:focus-visible,
+.cp-suggest:focus-visible,
+.cp-ask button:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 1px; }
+.cp-link { color: var(--accent-text); }
+.cp-assistant .cp-bubble { white-space: normal; }
+#cp-panel .chat-md p { margin: 0 0 8px; }
+#cp-panel .chat-md > :last-child { margin-bottom: 0; }
+#cp-panel .chat-md ul, #cp-panel .chat-md ol { margin: 0 0 8px; padding-left: 18px; }
+#cp-panel .chat-md-head { margin: 10px 0 4px; font-size: 13px; }
+#cp-panel .chat-md code { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; }
+#cp-panel .chat-code { margin: 0 0 8px; padding: 8px; overflow-x: auto; background: var(--bg-canvas); border: 1px solid var(--border); }
+#cp-panel .chat-sources { max-width: 88%; }
+#cp-panel .chat-sources-title { margin: 2px 0; font-size: 10.5px; color: var(--text-faint); }
+#cp-panel .chat-sources-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+#cp-panel .chat-sources-list li { display: inline-flex; }
+#cp-panel .chat-source-kind, #cp-panel .chat-source-name, #cp-panel .chat-source-file { display: none; }
+#cp-panel .chat-source {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 2px 7px;
+  border: 1px solid var(--border); color: var(--accent-text); text-decoration: none;
+}
+#cp-panel a.chat-source:hover { border-color: var(--accent-bright); }
+#cp-panel .chat-sources-more { margin: 2px 0 0; font-size: 10.5px; color: var(--text-faint); }
 
 @media (max-width: 900px) {
   #cp-panel { display: none; }

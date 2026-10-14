@@ -269,6 +269,19 @@ export function mountMascot() {
     dock.dataset.mode = video ? 'video' : 'flat';
   };
   paintVideo();
+
+  // Clicking him is how you ask, and it opens over the page rather than
+  // navigating: you came to ask about what is on screen, and asking should not
+  // take it off screen. The full page is a button away inside the panel.
+  //
+  // Bound here, before the still mode returns below. It used to be bound after
+  // that return, so with the animation off "Ask Adam about the package" was a
+  // button that did nothing.
+  document.getElementById('mascot-hit').onclick = async () => {
+    const { toggleChatPanel } = await import('/chat-panel.js');
+    toggleChatPanel();
+  };
+
   videoBtn.onclick = (event) => {
     event.stopPropagation();
     video = !video;
@@ -290,14 +303,6 @@ export function mountMascot() {
     teardown = () => { teardown = null; };
     return;
   }
-
-  // Clicking him is how you ask, and it opens over the page rather than
-  // navigating: you came to ask about what is on screen, and asking should not
-  // take it off screen. The full page is a button away inside the panel.
-  document.getElementById('mascot-hit').onclick = async () => {
-    const { toggleChatPanel } = await import('/chat-panel.js');
-    toggleChatPanel();
-  };
 
   // ── the engine ─────────────────────────────────────────────────────
 
