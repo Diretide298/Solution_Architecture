@@ -35,6 +35,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+from typed_props import DEVICE_GUEST_PLATFORMS  # noqa: E402
 
 RULES = {
     "S-STATE-BOILERPLATE": "empty-state text promises a create action, filter or permission the screen lacks (R250)",
@@ -168,6 +169,10 @@ def main() -> int:
         # --- R100 workstation operations off the till ------------------------------------------
         for o in sorted(op_ids):
             f = ops.get(o)
+            # A workstation-scoped operation a guest may call in its own session (`x-ticvai-guest-callable`, CHG-GCF-003:
+            # createPayment, inquirePaymentStatus) is the guest variant on a guest platform (CHG-SCR-012).
+            if f and plat.startswith(GUEST_CODES) and f["op"].get("x-ticvai-guest-callable"):
+                continue
             if f and f["op"].get("x-ticvai-scope-level") == "workstation" and plat not in ws_platforms:
                 guard.add("S-WORKSTATION-OP", f"{sid}:{o}",
                           f"{sid} ({plat}): {o} is workstation-scoped and nothing on {plat} signs a workstation in")
@@ -176,7 +181,10 @@ def main() -> int:
             for o in sorted(op_ids):
                 f = ops.get(o)
                 aud = (f or {}).get("op", {}).get("x-ticvai-audience") or []
-                if f and aud and not ({"guest", "public", "anonymous"} & set(aud)) \
+                # The kiosk is a guest surface on a registered device: device operations are its own
+                # (typed_props.DEVICE_GUEST_PLATFORMS; CHG-SCR-013).
+                ok = {"guest", "public", "anonymous"} | ({"device"} if plat.startswith(DEVICE_GUEST_PLATFORMS) else set())
+                if f and aud and not (ok & set(aud)) \
                         and not f["op"].get("x-ticvai-guest-callable") and f["op"].get("x-ticvai-auth") != "none":
                     guard.add("S-GUEST-AUDIENCE", f"{sid}:{o}",
                               f"{sid}: a guest screen calls {o}, audience {', '.join(aud)}")
