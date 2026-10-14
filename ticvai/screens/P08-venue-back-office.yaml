@@ -28900,9 +28900,9 @@ screens:
         own'
     - to: BO-118
       trigger: Campaign & Audience Management
-      provenance: 'derived — BO-118 declares entryState.params reportId and BO-102 holds none of them.
-        The edge carries nothing: reportId only pre-selects (deep link or optional), and BO-118 opens
-        on its own'
+      provenance: 'derived — BO-118 declares entryState.params executionId, reportId and BO-102 holds
+        none of them. The edge carries nothing: reportId, executionId only pre-select (deep link or optional),
+        and BO-118 opens on its own'
     - to: BO-119
       trigger: Cross-Sell, Upsell & Recommendation Rules
       carries:
@@ -32446,6 +32446,11 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the
         id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+    - name: executionId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, `runReport` answers 202 with it and `getReportExecution` follows
+        it.'
     coldEntry: Resolves from the session. A principal with more than one venue is asked which before the
       page renders.
   wireframe:
@@ -145953,6 +145958,11 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the
         id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+    - name: executionId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, `runReport` answers 202 with it and `getReportExecution` follows
+        it.'
 - id: BO-1060
   name: Report Builder, Export & Audit
   module: Access & Venue
@@ -146069,6 +146079,11 @@ screens:
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `exportReportResult`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+    - name: exportId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, `exportReportResult` answers 202 with it and `getReportExport`
+        follows it.'
 - id: BO-1061
   name: Platform Command Center
   module: Access & Venue
@@ -209446,7 +209461,13 @@ screens:
     bound to a contract property; 1 of 34 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
-  entryState: {}
+  entryState:
+    params:
+    - name: settlementId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, `ingestSettlementFile` answers 202 with it and `getSettlement`
+        follows it.'
 - id: ADM-621
   name: Transaction Matching & Reconciliation Engine
   module: Commercial

@@ -686,6 +686,22 @@ def fix_async(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
             "trigger": "onInterval", "provenance": f"{STAMP}: the read that follows a 202 (CHG-SCR-011)"})
         known[poll] = s["apis"][-1]
         log.append(f"{s['id']}: polls {poll} after {o}")
+    # The id a poll needs comes back in the 202, so it is optional on entry (as screen_patterns.param_for writes an
+    # id the screen makes itself); check-screens asks every id an operation needs to be declared.
+    for a in apis(s):
+        m = re.match(r"^Follows (\w+) \(202\)", str(a.get("purpose") or ""))
+        if a.get("trigger") != "onInterval" or not m or a["operationId"] not in ops or m.group(1) not in ops:
+            continue
+        ent = s.get("entryState") if isinstance(s.get("entryState"), dict) else {}
+        have = {p.get("name") if isinstance(p, dict) else str(p) for p in (ent.get("params") or [])}
+        for name in re.findall(r"\{(\w+)\}", ops[a["operationId"]]["path"]):
+            if name not in have and "{" + name + "}" not in ops[m.group(1)]["path"]:
+                ent = s.setdefault("entryState", ent)
+                ent.setdefault("params", []).append({
+                    "name": name, "from": "navigation", "optional": True,
+                    "notes": f"Optional: opened without it, `{m.group(1)}` answers 202 with it and "
+                             f"`{a['operationId']}` follows it."})
+                log.append(f"{s['id']}: {name} optional on entry, for the poll {a['operationId']}")
 
 
 # ── S-ONLOAD-WRITE ──────────────────────────────────────────────────────────────────────────────

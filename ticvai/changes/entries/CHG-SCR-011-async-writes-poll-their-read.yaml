@@ -46,4 +46,9 @@ prevention:
   type: generator-rule
   ref: tools/derive-screen-wiring.py::fix_async
 status: open
-notes: Batch SCR, 14 October 2026.
+notes: 'Batch SCR, 14 October 2026. A poll that reads one record needs its id (check-screens'' entry-parameter rule):
+  the deriver declares it optional on entry ("Optional: opened without it, <op> answers 202 with it and <poll> follows
+  it"), the way screen_patterns.param_for writes an id the screen makes itself (BO-118, BO-1059 executionId, BO-1060
+  exportId, ADM-620 settlementId); derive-carries then carries settlementId on ADM-619 -> ADM-620 (P09, at the
+  refresh). The ticket texts (T-SLICE-CALLS, T-USED-BY) follow at build-service-docs; a feature that does not hold the
+  poll''s producer is batch TKT''s S-SCREEN-OP-UNBUILT rule (CMS-007, CMS-008 listProposedActions).'
