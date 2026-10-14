@@ -1502,6 +1502,7 @@ components:
           type: string
           nullable: true
         sourceProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         sourceVariantId:
@@ -1515,6 +1516,7 @@ components:
           type: string
           maxLength: 30
         targetProductId:
+          x-ticvai-references: none
           type: string
           format: uuid
         targetVariantId:
@@ -1833,9 +1835,9 @@ components:
               merchandiseId: { type: string, format: uuid }
               name: { type: string }
               quantity: { type: integer }
-              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-              discount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-              lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: unit_amount }
+              discount: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: discount_amount }
+              lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: gross_amount }
               serialNumbers:
                 type: array
                 items: { type: string }
@@ -2038,11 +2040,12 @@ components:
         requiresReceipt: { type: boolean, default: true }
         allowCashRefundOnCardSale: { type: boolean, default: false }
         selfAuthoriseLimit:
+          x-ticvai-column: self_authorise_limit_amount
           allOf:
             - $ref: '../shared/common.yaml#/components/schemas/Money'
           description: Up to this, one cashier may accept a return alone.
-        requiresSecondUserAbove: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        requiresApprovalAbove: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        requiresSecondUserAbove: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: second_user_above_amount }
+        requiresApprovalAbove: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: approval_above_amount }
         restockableConditions:
           type: array
           description: >
@@ -2091,9 +2094,10 @@ components:
         saleId: { type: string }
         returnId: { type: string }
         newSaleId: { type: string }
-        returnedValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        replacementValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        returnedValue: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: returned_amount }
+        replacementValue: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: replacement_amount }
         difference:
+          x-ticvai-column: difference_amount
           allOf:
             - $ref: '../shared/common.yaml#/components/schemas/Money'
           description: >

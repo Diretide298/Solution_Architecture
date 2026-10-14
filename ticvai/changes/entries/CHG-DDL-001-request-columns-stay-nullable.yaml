@@ -1,0 +1,56 @@
+id: CHG-DDL-001
+date: '2026-10-14'
+source: developer
+kind: spec
+summary: 'orders.pos_shift.cashier_reason is nullable again: a *Request schema persisted beside the row''s own schema, and
+  not creating the row, no longer makes the row''s columns NOT NULL in the schema reference, and the row''s own schema
+  wins where both carry a column.'
+decision:
+  what: 'tools/derive-schema.py `_later_writer`: where a table is persisted by a schema of its own (not *Request, not
+    *Summary), a *Request beside it that is not Create* and carries no `id` (so it writes into an existing row, as
+    ShiftVarianceReasonRequest does) contributes nullable columns, and where the row''s own schema names the same
+    column the row''s spec is kept. orders.pos_shift.cashier_reason and cashier_note now come from Shift.cashierReason
+    and Shift.cashierNote (both nullable); the "not null" row for cashier_reason leaves handoff/migration-review.md.
+    The request field ShiftVarianceReasonRequest.reason stays required on the wire. No conditional CHECK (CR option 3)
+    is added: whether a shift may close within the threshold without a reason is already the 409/approval rule of
+    giveShiftVarianceReason and approveShiftClose (CHG-R4-019), not a column rule.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-065 (MIG-ORDERS, #27675), raised by the backend developer: r4 marked orders.pos_shift.cashier_reason
+  required because derive-schema merged ShiftVarianceReasonRequest (persisted to orders.pos_shift, required [reason])
+  over Shift (cashierReason nullable, shift.yaml:2571-2579); it sorted after Shift and overrode it
+  (derive-schema.py merge "prior ... + cols"). migration-review.md asked for SET NOT NULL, which would refuse every
+  openShift: a shift opens with no count. CHG-R4-019 (CR-033) added the request; the reason is required on the
+  request, not on the row. Audit: TRUE on every claim (010-orders.sql:973 nullable; migration-review.md row "not
+  null | orders.pos_shift.cashier_reason"). The same rule found maintenance.inspection (SubmitInspectionRequest) and
+  left it alone, because that request creates the inspection (it carries the client-generated id).'
+keys_touched:
+  tables:
+  - orders.pos_shift
+  schemas:
+  - shift.ShiftVarianceReasonRequest
+  - shift.Shift
+  files:
+  - tools/derive-schema.py
+  - tools/check-storage-promises.py
+  tickets:
+  - MIG-ORDERS
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started:
+  - MIG-ORDERS (#27675)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-065 (ADAM)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Contract impact: none (no contract file changed). Migration effect: none to write;
+  MIG-ORDERS keeps cashier_reason nullable as built, and the r4 "not null" row disappears from migration-review.md.
+  The generator rule is derive-schema.py::_later_writer; the check is check-storage-promises SP-REQUEST-NOT-NULL (a
+  NOT NULL column sourced only from a non-creating *Request), which fails on r5 (1eb1d063) with
+  orders.pos_shift.cashier_reason and passes on this branch (0 found).'

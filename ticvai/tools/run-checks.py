@@ -66,6 +66,11 @@ CHECKS = [
     "check-ticket-text", "check-screen-wiring", "check-navigation", "check-contract-shapes",
     "check-ddl-conventions", "check-contract-storage", "check-starter-fit", "check-glossary-terms",
     "check-wireframe-coverage",
+    # 14 October (ADAM CR-065..CR-074, batch DDL, CHG-DDL-001..008): what an operation promises about storage, the
+    # derived DDL keeps -- an array a slice operation takes is stored, a 409 for a duplicate code has its unique
+    # index at the level it names, a request does not make the row's column NOT NULL, NOT NULL keys are declared,
+    # and the name rule's cross-module guesses do not grow.
+    "check-storage-promises",
     # 1 October: the process design notes (handoff/design-notes/*.yaml) reach every design session through
     # BUNDLE.md; every rule there must carry a source that exists. Passes while the folder is empty.
     "check-design-notes",
