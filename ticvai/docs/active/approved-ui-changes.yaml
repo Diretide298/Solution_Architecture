@@ -8,7 +8,7 @@
 # One entry per changed field, added only when the client has approved the change:
 #
 #   - screen: BO-006                 # the screen id
-#     field: state:offline           # as check-approved-ui prints it (name, layout, region:<name>, state:<name>,
+#     field: state:offline           # as check-approved-ui prints it (name, layout, region:<slot>, state:<name>,
 #                                    # overlay:<id>, navigation, machine), or `screen` for a screen added or removed
 #     to: f5b800c41ba25990           # the hash of the approved content, as the check prints it (`to: ...`);
 #                                    # `removed` for a field or screen the client approved removing

@@ -1,0 +1,42 @@
+id: CHG-GRD-004
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'check-approved-ui compares only what is seen: a confirm or dismiss button gaining its operation binding is no
+  change, and regions are compared by slot as a multiset of their visible content, never by their internal name, so a
+  renamed region is no change and two regions sharing a name are both kept.'
+decision:
+  what: 'tools/check-approved-ui.py visible(): an overlay''s confirm/dismiss line is written only from its label and
+    target (operation, discards, carries are bindings); field `region:<slot>` holds every region in that slot, their
+    visible content sorted; the layout field lists the regions'' slots in order, not their names. handoff/approved-ui.json
+    regenerated from b93b5a87 (--snapshot b93b5a87) in the new format; the approved UI itself is unchanged.
+    Self-tests added for a confirm gaining its operation, a renamed duplicate region, and emptying the second of two
+    same-named regions.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Finding: two false positives of CHG-GRD-002 on r6-integrate (coordinator, 14 October 2026, after the POS and staff
+  screens batch): EMP-009 overlay confirmSuspendShift gained `confirm: {operation: suspendShift}`, the binding of its
+  existing Confirm, reported as "confirm: None"; EMP-005''s second `contextPanel` region was renamed `partsPanel`
+  (S-DUP-REGION) with nothing on screen changed, reported three times, and the snapshot keyed by name had kept only the
+  last of the two regions. Counts on r6-integrate 5bd53a8e: 4 -> 0. The r5 (80390e75) snapshot against audit-base
+  b93b5a87 still finds its 6 (ADM-342, ADM-422, BO-053, BO-054, POS-000, POS-001). Evidence of the audit classes:
+  audit/ticvai/runs/audit-1014/classes.json.'
+keys_touched:
+  files:
+  - tools/check-approved-ui.py
+  - handoff/approved-ui.json
+  - docs/active/approved-ui-changes.yaml
+root_class: 'new: APPROVED-UI'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'Batch GRD (audit/gate-guards-2), 14 October 2026. Approvals now name a region field as `region:<slot>`
+  (a region with no slot is `region:-`). docs/active/approved-ui-changes.yaml has no entries, so none needed rewriting.'

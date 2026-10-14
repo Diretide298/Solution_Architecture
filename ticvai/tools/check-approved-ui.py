@@ -11,8 +11,9 @@ the next batch. This compares every screen in screens/P*.yaml with the approved 
 
     AU-SCREEN    a screen the snapshot has is gone, or a screen it does not have was added (screen existence)
     AU-FIELD     a visible field differs from the snapshot: the screen's name; its layout (template, pattern,
-                 density, the order of its regions); a region's slot and its components and controls (kind, label,
-                 tab, the fields of a table's columns, nested components, in order); a state's text (loading,
+                 density, the order of its regions by slot); the regions of each slot, compared as a multiset of
+                 their visible content and never by their internal `name` (CHG-GRD-004): components and controls
+                 (kind, label, tab, the fields of a table's columns, nested components, in order); a state's text (loading,
                  error, empty, no access, offline, banners and every other state); an overlay (its component, its
                  trigger, its confirm and dismiss labels and where they go); the navigation the user sees (each
                  transition's target and trigger, the exits); a step machine's steps
@@ -87,15 +88,22 @@ def visible(s: dict) -> dict:
     out = {"name": str(s.get("name") or "")}
     lay = s.get("layout") or {}
     regions = [r for r in lay.get("regions") or [] if isinstance(r, dict)]
+    # **A region is what it shows, not what it is called** (CHG-GRD-004): a region's `name` is an internal id (EMP-005's
+    # second `contextPanel` became `partsPanel`, S-DUP-REGION, and nothing on screen moved). Regions are compared by
+    # slot, as a multiset of their visible content: field `region:<slot>` holds every region in that slot, sorted, so a
+    # rename is no change and two regions sharing a name are both kept. The layout keeps their order by slot.
     out["layout"] = "\n".join([f"template: {lay.get('template')}", f"pattern: {s.get('pattern')}",
                                f"density: {s.get('density')}",
-                               "regions: " + ", ".join(str(r.get("name")) for r in regions)])
+                               "regions: " + ", ".join(str(r.get("slot") or "-") for r in regions)])
+    by_slot: dict = {}
     for r in regions:
-        lines = [f"slot: {r.get('slot')}"]
+        lines = []
         for c in r.get("components") or []:
             if isinstance(c, dict):
                 lines += _component(c)
-        out[f"region:{r.get('name')}"] = "\n".join(lines)
+        by_slot.setdefault(str(r.get("slot") or "-"), []).append("\n".join(lines) or "(empty)")
+    for slot, texts in by_slot.items():
+        out[f"region:{slot}"] = "\n--\n".join(sorted(texts))
     for k, v in (s.get("states") or {}).items():
         out[f"state:{k}"] = v if isinstance(v, str) else json.dumps(v, sort_keys=True, ensure_ascii=False)
     for o in s.get("overlays") or []:
@@ -104,7 +112,9 @@ def visible(s: dict) -> dict:
         lines = [f"component: {o.get('component')}", f"trigger: {o.get('trigger')}"]
         for side in ("confirm", "dismiss"):
             b = o.get(side)
-            if isinstance(b, dict):
+            # only the label and the target are seen; `operation`, `discards` and `carries` are bindings (CHG-GRD-004:
+            # EMP-009's existing Confirm gained `operation: suspendShift` and was reported as `confirm: None`)
+            if isinstance(b, dict) and (b.get("label") not in (None, "") or b.get("to")):
                 lines.append(f"{side}: {b.get('label')}" + (f" -> {b.get('to')}" if b.get("to") else ""))
         out[f"overlay:{o.get('id')}"] = "\n".join(lines)
     nav = s.get("navigation") or {}
@@ -306,14 +316,38 @@ def self_test() -> list:
     quiet["layout"]["regions"][0]["components"][0]["columns"] = ["ParkingSite.name", "ParkingSite.mode"]
     quiet["overlays"][0]["body"] = "Collects name and mode."
     quiet["navigation"]["transitions"][0]["carries"] = ["facilityId"]
-    got = compare(approved, snapshot_of([("P08", quiet)]), [])
+    quiet["overlays"][0]["confirm"]["operation"] = "setParkingFacility"
+    quiet["overlays"].append({"id": "confirmGone", "component": "confirmDialog", "trigger": "Delete"})
+    quiet["layout"]["regions"][1]["name"] = "buttons"                # a region renamed: an internal id
+    got = compare(snapshot_of([("P08", with_(overlays=base["overlays"] + [
+        {"id": "confirmGone", "component": "confirmDialog", "trigger": "Delete"}]))]),
+        snapshot_of([("P08", quiet)]), [])
     if got:
         fails.append(f"an invisible change was reported: {got[:2]}")
+    # an existing confirm gaining its operation binding (EMP-009) is not a change
+    bound = json.loads(json.dumps(quiet))
+    bound["overlays"][1]["confirm"] = {"operation": "deleteParking"}
+    got = compare(snapshot_of([("P08", quiet)]), snapshot_of([("P08", bound)]), [])
+    if got:
+        fails.append(f"a confirm gaining its operation was reported: {got[:2]}")
+    # two regions sharing a name are both kept; renaming the second (EMP-005, S-DUP-REGION) is no change
+    dup = with_()
+    dup["layout"]["regions"].append({"name": "contentBody", "slot": "selection", "components": [
+        {"kind": "dataTable", "label": "Parts reserved", "columns": ["Part.itemId"]}]})
+    ren = json.loads(json.dumps(dup))
+    ren["layout"]["regions"][2]["name"] = "partsPanel"
+    if compare(snapshot_of([("P08", dup)]), snapshot_of([("P08", ren)]), []):
+        fails.append("a renamed duplicate region was reported")
+    gone = json.loads(json.dumps(dup))
+    gone["layout"]["regions"][2]["components"] = []
+    got = [k for _, k, _ in compare(snapshot_of([("P08", dup)]), snapshot_of([("P08", gone)]), [])]
+    if got != ["BO-1 region:selection"]:
+        fails.append(f"emptying the second of two same-named regions gave {got}")
     # visible changes fail, each in its field
     cases = {
         "state:loading": with_(states={"loading": "Loading car parks.", "emptyNoAccess": "Names PARKING_CONFIGURE."}),
         "name": with_(name="Car parks"),
-        "region:actionBar": with_(**{"layout__regions__1__components": []}),
+        "region:rowActions": with_(**{"layout__regions__1__components": []}),
         "overlay:formSet": with_(**{"overlays__0__confirm": {"label": "Save car park", "operation": "setParking"}}),
         "navigation": with_(navigation={"exitTo": ["BO-3"], "transitions": [{"to": "BO-3", "trigger": "Open"}]}),
         "layout": with_(density="comfortable"),
@@ -325,7 +359,7 @@ def self_test() -> list:
             fails.append(f"a visible change to {field} gave {keys}")
     col = with_()
     col["layout"]["regions"][0]["components"][0]["columns"] = ["ParkingFacility.name"]
-    if [k for _, k, _ in compare(approved, snapshot_of([("P08", col)]), [])] != ["BO-1 region:contentBody"]:
+    if [k for _, k, _ in compare(approved, snapshot_of([("P08", col)]), [])] != ["BO-1 region:collection"]:
         fails.append("a dropped table column was not reported")
     # an approval with its reference and hash passes; one without either, or for other content, does not
     changed = snapshot_of([("P08", cases["name"])])
