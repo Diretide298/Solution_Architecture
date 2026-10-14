@@ -52,7 +52,8 @@ The deployed viewer has no `.git`, so the deploy exports each tag from the check
 `/srv/ticvai/viewer/.releases/<project>/<tag>/` (`deploy/export-releases.mjs`, the same code the
 viewer uses on a workstation). A tag is exported once and never rewritten; a file unchanged since
 an earlier release is a hard link to it, so a release costs what changed. The mirrors under
-`repos/<repo>/` are left out apart from `.github`, `terraform`, `apps` and `openapi` — they are
+`repos/<repo>/` are left out apart from `.github`, `terraform`, `apps` and `openapi`, and
+`ticvai-docs/setup` (the starter guides SETUP tickets link; the list is `lib/export-keep.json`) — they are
 generated copies of the package, 4 GB of its 4.8, and carry the same tag in their own repositories.
 The rsync of the viewer excludes `.releases`, so `--delete` cannot take the exports away.
 

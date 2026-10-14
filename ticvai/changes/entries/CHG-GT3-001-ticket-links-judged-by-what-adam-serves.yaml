@@ -1,0 +1,63 @@
+id: CHG-GT3-001
+date: '2026-10-15'
+source: audit
+kind: process
+summary: ADAM's release export keeps ticvai-docs' setup guides, so the 18 setup and onboarding tickets that link them
+  pull them, and check-ticket-links judges a file link by what the export keeps, from the same list ADAM uses.
+decision:
+  what: 'viewer/lib/export-keep.json (new) holds the export keep-list, read by viewer/lib/releases.mjs exportRule and by
+    ticvai/tools/check-ticket-links.py: the folders kept in every repos/<repo>/ (.github, terraform, apps, openapi, as
+    before) and, new, per repo: ticvai-docs keeps setup/. check-ticket-links.py: a `file` link resolves only if git
+    tracks it AND the export keeps it (`exported`, with self-tests); without export-keep.json the check fails rather
+    than guess. tools/adam-links.py SETUP_DOCS is unchanged: the package has no copy of the setup guides outside repos/
+    (the project-bible copies are under repos/ too, emptied the same way, and differ in three files).'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'The r6 rehearsal pull of r6-candidate c56b9dc4 (audit/rehearsal/rehearsal-summary.md, lead workspace) failed its
+  dead-link criterion (CHG-GRD-003): 36 links on 18 tickets could not be found, all to repos/ticvai-docs/setup/{README,
+  quickstart,dependencies}.md, which git tracks (so check-ticket-links TL-DEAD-LINK, CHG-GRD-001, passed) but ADAM''s
+  release export empties. Before: check-ticket-links on c56b9dc4 judged by the export, 36 TL-DEAD-LINK; after, 0.'
+keys_touched:
+  files:
+  - viewer/lib/export-keep.json
+  - viewer/lib/releases.mjs
+  - viewer/deploy/README.md
+  - tools/check-ticket-links.py
+  - repos/ticvai-docs/setup/README.md
+  - repos/ticvai-docs/setup/quickstart.md
+  - repos/ticvai-docs/setup/dependencies.md
+root_class: 'new: PULL-LINKS'
+tickets:
+  started:
+  - '27628'
+  - '27629'
+  - '27630'
+  - '27631'
+  - '27632'
+  - '27635'
+  - '27636'
+  - '27638'
+  - '27641'
+  unstarted:
+  - '27626'
+  - '27627'
+  - '27633'
+  - '27634'
+  - '27637'
+  - '27639'
+  - '27640'
+  - '27642'
+  - '27684'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-links.py
+status: open
+notes: 'Batch GT3 (r6 fix round 3). ADAM code changed (viewer/lib): it needs the ADAM deploy and the setup zip rebuilt.
+  A tag is exported once and never rewritten, so r6 must be exported by the new code (it is not tagged yet); r5''s
+  export keeps no setup/. The started tickets (Ready for QA) gain the three guides on their next pull, nothing else.
+  Found on the way, not changed: repos/ticvai-docs/setup/README.md holds a copy of docs/active/README.md ("# Active"),
+  not a setup index.'

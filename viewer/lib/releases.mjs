@@ -22,7 +22,8 @@
 //     server finds the exports already there.
 //
 // **The mirrors under `repos/` are left out of an export**, all but the parts
-// the viewer reads (.github, terraform, apps, openapi, and the top-level names).
+// the viewer reads (.github, terraform, apps, openapi, and the top-level names;
+// lib/export-keep.json) and ticvai-docs' setup/, the starter guides tickets link.
 // They are generated copies of the package itself — 4 GB of the 4.8 GB — and
 // carry the same tag in their own repositories. The folders left out are still
 // created, empty, so a reader listing `repos/<repo>/` sees the same names.
@@ -38,6 +39,7 @@
 //                            export can link rather than copy
 
 import { execFile, spawn } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { copyFile, link, mkdir, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -48,8 +50,16 @@ const run = promisify(execFile);
 export const TAG = /^r([1-9]\d{0,5})$/;
 export const tagNumber = (tag) => Number(TAG.exec(String(tag ?? ''))?.[1] ?? NaN);
 
-/** Mirror folders an export keeps; every other folder under repos/<repo>/ is left empty. */
-const KEEP_REPO_DIRS = new Set(['.github', 'terraform', 'apps', 'openapi']);
+/**
+ * Mirror folders an export keeps; every other folder under repos/<repo>/ is left
+ * empty. `every_repo` is kept in each repo, `per_repo` only in the repo named.
+ * The list lives in export-keep.json because TICVAI's tools/check-ticket-links.py
+ * reads the same file: a ticket linking a file the export empties is a dead link
+ * to the developer, and the check can only say so if it judges by this list.
+ */
+const KEEP = JSON.parse(readFileSync(new URL('./export-keep.json', import.meta.url), 'utf8'));
+const KEEP_REPO_DIRS = new Set(KEEP.every_repo);
+const KEEP_IN_REPO = new Map(Object.entries(KEEP.per_repo ?? {}).map(([repo, dirs]) => [repo, new Set(dirs)]));
 
 /**
  * `-c safe.directory=*` only when running as root. A deploy runs under sudo
@@ -157,7 +167,7 @@ export async function scanReleases({ root, releasesDir }) {
 export function exportRule(rel) {
   const parts = rel.split('/');
   if (parts[0] !== 'repos' || parts.length < 4) return { keep: true, hollow: null };
-  if (KEEP_REPO_DIRS.has(parts[2])) return { keep: true, hollow: null };
+  if (KEEP_REPO_DIRS.has(parts[2]) || KEEP_IN_REPO.get(parts[1])?.has(parts[2])) return { keep: true, hollow: null };
   return { keep: false, hollow: parts.slice(0, 3).join('/') };
 }
 

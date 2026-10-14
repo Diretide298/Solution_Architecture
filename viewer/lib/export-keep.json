@@ -1,0 +1,5 @@
+{
+  "_note": "What a release export keeps under repos/<repo>/ (lib/releases.mjs exportRule). Every other folder there is left empty. One definition: TICVAI's tools/check-ticket-links.py reads this file to judge a ticket's file links against what ADAM serves, so the two cannot drift.",
+  "every_repo": [".github", "terraform", "apps", "openapi"],
+  "per_repo": {"ticvai-docs": ["setup"]}
+}
