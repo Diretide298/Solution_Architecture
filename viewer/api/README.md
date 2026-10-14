@@ -186,6 +186,17 @@ Chinmay, 14 October) is filed while the request is not yet Done; the preview/app
 ticket for a Done request. Migration work a request causes is a child task of the affected MIG-* ticket,
 assigned to the migration owner (`ticvai/docs/active/team.json` `migrations.owner`), filed by the lead.
 
+**A child task OpenProject has and ADAM did not record** (CHG-ADM-003, 14 October: every apply answered
+502 behind the proxy, so the lead made the CR child tasks on the server with `ticvai/tools/op-create.rb`,
+subjects starting `[CR-nnn] `). `POST /api/changes/<n>/ticket/link {project_id, key}` (admin only) records
+an existing work package as the CR's child: `child_key`, `child_at`, `child_by` and the artefact link, as an
+apply would. Refused when the CR already has one, was raised from no ticket, when the work package is
+another CR's, or when it does not hang under the CR's ticket. The apply (and the settlement's child task)
+now looks under the parent for a child whose subject starts `[CR-nnn]`, or is exactly the subject it would
+send, and links it instead of creating (`how: linked`); after a create that errors, it looks again before
+reporting the failure, because OpenProject sometimes made the ticket and only the answer was lost
+(`how: recovered`). `settle_changes.py --link-existing` links such a child before it would file one.
+
 **Intake.** A change request carries `source` (minutes, answer, design, developer, audit) with
 `source_ref`, the line that finds it again; `approver`; `triage` (clarification, scope, defect) and
 `when` (now, later); `artefact_ids`; `contract_impact` (none, additive, breaking);

@@ -494,6 +494,26 @@ def comment(endpoint: str, token: str, key: str, text: str, notify: Optional[boo
          method="POST", body={"comment": {"raw": text}})
 
 
+def children(endpoint: str, token: str, key: str) -> list:
+    """The work packages directly under `key`, as `{key, subject}`.
+
+    From the parent's own `children` links, which carry each child's subject as the title; an
+    instance that leaves them out is asked with a parent filter instead. Used to find a CR's child
+    task that exists although ADAM did not record it (made on the server with op-create.rb, or made
+    by a create whose answer was lost behind the proxy; CHG-ADM-003).
+    """
+    raw = call(endpoint, token, f"work_packages/{key}")
+    links = (raw.get("_links") or {}).get("children")
+    if isinstance(links, list):
+        return [{"key": str(_id_from_href(c.get("href")) or ""), "subject": c.get("title") or ""}
+                for c in links if _id_from_href(c.get("href")) is not None]
+    page = call(endpoint, token, "work_packages", params={
+        "filters": json.dumps([{"parent": {"operator": "=", "values": [str(key)]}}]),
+        "pageSize": 200})
+    return [{"key": str(wp.get("id", "")), "subject": wp.get("subject", "")}
+            for wp in page.get("_embedded", {}).get("elements", [])]
+
+
 def is_closed(endpoint: str, token: str, key: str) -> bool:
     """Whether the work package's status is a closing one, by OpenProject's own `isClosed`.
 

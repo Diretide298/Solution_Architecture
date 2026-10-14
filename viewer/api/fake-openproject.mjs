@@ -370,6 +370,8 @@ const created = [];
 // Comments posted to each work package, by its number: read back by GET
 // .../activities and listed whole at /_comments.
 const comments = new Map();
+// How many of the next creates to make and then answer 502 (/_lose-create).
+let LOSE_CREATES = 0;
 
 const read = (req) => new Promise((resolve) => {
   const parts = [];
@@ -389,6 +391,29 @@ createServer(async (req, res) => {
   // What the check reads afterwards. Outside /api/v3 so it cannot be mistaken
   // for something OpenProject offers.
   if (path === '/_created') return json(res, 200, { created });
+  // A work package made on the server, the way tools/op-create.rb makes one: ADAM never sees
+  // the create. Kept out of `created`, which is what ADAM sent (CHG-ADM-003).
+  if (path === '/_make') {
+    const id = nextId++;
+    const parent = url.searchParams.get('parent');
+    packages.set(String(id), {
+      id, subject: url.searchParams.get('subject') ?? `Made on the server ${id}`, lockVersion: 1, percentageDone: 0,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+      _links: {
+        project: { href: `/api/v3/projects/${url.searchParams.get('project') ?? PROJECT.id}`, title: PROJECT.name },
+        type: { href: '/api/v3/types/1', title: 'Task' },
+        status: { href: '/api/v3/statuses/1', title: 'New' },
+        ...(parent ? { parent: { href: `/api/v3/work_packages/${parent}`, title: `Ticket ${parent}` } } : {}),
+      },
+    });
+    return json(res, 200, { id });
+  }
+  // The next N creates are made, and answered 502 as a proxy that timed out would: the
+  // ticket exists and the caller is told it does not (CHG-ADM-003).
+  if (path === '/_lose-create') {
+    LOSE_CREATES = Number(url.searchParams.get('n') ?? 1);
+    return json(res, 200, { lose: LOSE_CREATES });
+  }
   if (path === '/_comments') {
     return json(res, 200, { comments: Object.fromEntries([...comments].map(([k, list]) =>
       [k, list.map((c) => ({ text: c.comment.raw, notify: c.notify }))])) });
@@ -515,7 +540,12 @@ createServer(async (req, res) => {
 
   const one = path.match(/^\/api\/v3\/work_packages\/(\d+)$/);
   if (one && req.method === 'GET') {
-    return json(res, 200, ensure(one[1]));
+    // With its children's links, titled with their subjects, as OpenProject sends them.
+    const wp = ensure(one[1]);
+    const href = `/api/v3/work_packages/${one[1]}`;
+    const kids = [...packages.values()].filter((p) => p._links?.parent?.href === href)
+      .map((p) => ({ href: `/api/v3/work_packages/${p.id}`, title: p.subject }));
+    return json(res, 200, { ...wp, _links: { ...wp._links, ...(kids.length ? { children: kids } : {}) } });
   }
   if (one && req.method === 'PATCH') {
     const found = ensure(one[1]);
@@ -606,6 +636,10 @@ createServer(async (req, res) => {
       type: typeHref || null,
       project: Number(make[1]),
     });
+    if (LOSE_CREATES > 0) {
+      LOSE_CREATES -= 1;
+      return json(res, 502, { message: 'Bad gateway: the origin did not answer in time' });
+    }
     return json(res, 201, made);
   }
 

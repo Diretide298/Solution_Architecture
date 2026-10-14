@@ -6034,9 +6034,9 @@ def apply_ticket(number: str, proposal: str, body: FileIn,
                      (security.stamp(), held["id"])):
         raise HTTPException(409, "That ticket has already been created.")
     try:
-        made = openproject.create(
-            endpoint, token, pms["pmsId"], held["subject"], held["description"],
-            type_id=held["type_id"], parent_key=held["external_key"] or None)
+        made, how = _create_or_find_child(
+            endpoint, token, pms["pmsId"], row["number"], held["external_key"] or "",
+            held["subject"], held["description"], held["type_id"])
     except openproject.Blocked as exc:
         # The claim is released on every failure: nothing was created, so the
         # person should be able to press it again rather than having to preview
@@ -6052,9 +6052,113 @@ def apply_ticket(number: str, proposal: str, body: FileIn,
 
     return {
         "ok": True,
+        # created, or linked (it was already there), or recovered (the create's
+        # answer was lost but OpenProject made it) — CHG-ADM-003.
+        "how": how,
         "ticket": {k: made.get(k) for k in ("key", "subject", "status", "type", "url")},
         "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],))),
     }
+
+
+# ── a CR's child task that OpenProject has and ADAM did not record (CHG-ADM-003) ──
+#
+# 14 October 2026: every apply above answered 502 — the preview worked, and the
+# create to OpenProject failed or timed out behind Cloudflare — so the lead made
+# the CR child tasks on the OpenProject server with tools/op-create.rb, subjects
+# starting "[CR-nnn] ". Three things follow, so ADAM and OpenProject agree again:
+#   - an admin can record an existing work package as a CR's child (the link
+#     route below), only when it hangs under the ticket the CR came out of;
+#   - a create first looks for such a child and links it instead of making a
+#     second one;
+#   - after a create that errors, it looks again before reporting a failure,
+#     because OpenProject sometimes makes the ticket and the answer is what got lost.
+
+
+def _existing_child(endpoint: str, token: str, parent_key: str, number: int, subject: str = ""):
+    """A child of `parent_key` that is this CR's child task and is nobody else's: its subject
+    starts "[CR-nnn]", or is exactly the subject ADAM would have sent. None when there is none."""
+    if not parent_key:
+        return None
+    tag = f"[CR-{number:03d}]"
+    for child in openproject.children(endpoint, token, parent_key):
+        text = (child.get("subject") or "").strip()
+        if not child.get("key") or not (text.startswith(tag) or (subject.strip() and text == subject.strip())):
+            continue
+        if db.one("SELECT 1 FROM change_request WHERE child_key = ?", (child["key"],)):
+            continue
+        return child["key"]
+    return None
+
+
+def _create_or_find_child(endpoint: str, token: str, pms_id: int, number: int, parent_key: str,
+                          subject: str, description: str, type_id):
+    """The CR's child task: an existing one linked, else created; a create that errors is looked
+    for once more before the error is believed. Returns (work package, how)."""
+    found = _existing_child(endpoint, token, parent_key, number, subject)
+    if found:
+        return openproject.work_package(endpoint, token, found), "linked"
+    try:
+        return (openproject.create(endpoint, token, pms_id, subject, description,
+                                   type_id=type_id, parent_key=parent_key or None), "created")
+    except (openproject.Blocked, openproject.Refused) as exc:
+        if getattr(exc, "status", None) == 422:
+            raise
+        try:
+            found = _existing_child(endpoint, token, parent_key, number, subject)
+        except (openproject.Blocked, openproject.Refused):
+            found = None
+        if not found:
+            raise
+        return openproject.work_package(endpoint, token, found), "recovered"
+
+
+class LinkTicketIn(BaseModel):
+    project_id: str = ""
+    key: str = Field(max_length=32)
+
+
+@app.post("/api/changes/{number}/ticket/link")
+def link_ticket(number: str, body: LinkTicketIn, admin: dict = Depends(require_admin)):
+    """Record a work package that already exists in OpenProject as this CR's child task.
+
+    Admin only. Refused when the CR already has one, when it was raised from no
+    ticket, when the work package is another CR's, or when it does not hang
+    under the ticket the CR came out of — a CR's work is one child task of its
+    source ticket, and a link that says otherwise would be a second plan.
+    """
+    scope = _change_project(admin, body.project_id)
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    cr = f"CR-{row['number']:03d}"
+    if row["child_key"]:
+        raise HTTPException(409, f"{cr} already has a ticket: #{row['child_key']}. One request, one ticket.")
+    if not row["external_key"]:
+        raise HTTPException(409, f"{cr} was raised from no ticket, so it has no ticket to hang a child under.")
+    key = _work_package_key(body.key)
+    other = db.one("SELECT number FROM change_request WHERE child_key = ?", (key,))
+    if other:
+        raise HTTPException(409, f"#{key} is already the ticket of CR-{other['number']:03d}.")
+    pms = _pms_scope(admin, scope["project"])
+    endpoint, token = _pms_for(admin["id"])
+    try:
+        found = openproject.work_package(endpoint, token, key)
+    except openproject.Blocked as exc:
+        raise HTTPException(502, str(exc))
+    except openproject.Refused as exc:
+        raise HTTPException(404 if exc.status == 404 else 502, str(exc))
+    _same_pms_project(found, pms, key)
+    parent = str(found.get("parent") or "")
+    if parent != str(row["external_key"]):
+        raise HTTPException(409, (
+            f"#{key} hangs under {f'#{parent}' if parent else 'nothing'}, not #{row['external_key']}, "
+            f"the ticket {cr} was raised from. A CR's work is a child task of that ticket."))
+    _record_child(scope["project"], row, found, admin)
+    after = db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],))
+    if after["child_key"] != key:
+        raise HTTPException(409, f"{cr} got a ticket at the same moment: #{after['child_key']}.")
+    return {"ok": True, "linked": key, "change": _change_row(after)}
 
 
 def _default_type(kinds: list):
@@ -6169,9 +6273,9 @@ def _file_settlement_ticket(account: dict, project: str, row, endpoint: str, tok
                      (_SETTLE_CLAIM, row["id"])):
         return None
     try:
-        made = openproject.create(endpoint, token, pms["pmsId"], row["title"].strip(),
-                                  _ticket_text(row, row["external_key"]),
-                                  type_id=chosen["id"], parent_key=row["external_key"])
+        made, _how = _create_or_find_child(endpoint, token, pms["pmsId"], row["number"], row["external_key"],
+                                           row["title"].strip(), _ticket_text(row, row["external_key"]),
+                                           chosen["id"])
     except Exception:
         db.write("UPDATE change_request SET child_key = '' WHERE id = ? AND child_key = ?",
                  (row["id"], _SETTLE_CLAIM))

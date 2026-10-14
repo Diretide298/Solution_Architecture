@@ -59,7 +59,9 @@ Once everything is green:
   (CHG-ADM-002): a ticket that is not closed gets one comment for the AI agent that pulls it; a closed one
   gets a child task for the change, created before the CR is marked Done. Never two tickets or two identical
   comments per CR. Migration work a CR causes is a child task of the affected MIG-* ticket for the migration
-  owner, filed by the lead.
+  owner, filed by the lead. If ADAM cannot create a child task (its apply answers 502 behind the proxy), make it
+  on the OpenProject server with `tools/op-create.rb`, subject `[CR-nnn] ...`, under the CR's ticket, then record
+  it in ADAM with `settle_changes.py --link-existing` (or `POST /api/changes/<n>/ticket/link`, admin) (CHG-ADM-003).
 - **ADAM:** on the box, run `git pull` and deploy. ADAM serves `r<N>`, and every developer and agent is always
   on the latest release: their next `/ticket` is at `r<N>` and shows what changed since their previous pull.
 - **Client:** send the release note, `python tools/release-notes.py r<N-1> r<N>`: what their answers changed, and what is waiting on them.

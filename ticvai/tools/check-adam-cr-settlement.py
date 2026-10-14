@@ -17,6 +17,9 @@ and OpenProject (no network) and reads the route's order:
     CS-ONCE           a second run comments or files again
     CS-ROUTE          the resolve route does not tell the ticket before it writes the status, or the CSV bulk settle
                       does not tell it at all
+    CS-LINK           (CHG-ADM-003) a child task made outside ADAM ("[CR-nnn] ...", tools/op-create.rb) is not linked by
+                      settle_changes.py --link-existing, or is made again; or ADAM has no admin link route, or its
+                      apply does not look for an existing child before and after a create
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -41,6 +44,7 @@ RULES = {
     "CS-DRY-RUN": "settle_changes.py changes nothing without --apply (CHG-ADM-002)",
     "CS-ONCE": "a second run neither comments nor files again (CHG-ADM-002)",
     "CS-ROUTE": "the resolve route and the bulk settle tell the ticket, before the status is written (CHG-ADM-002)",
+    "CS-LINK": "a child task made outside ADAM is linked, never made twice (CHG-ADM-003)",
 }
 API = g.ROOT.parent / "viewer" / "api"
 
@@ -50,7 +54,7 @@ class FakeAdam:
 
     def __init__(self, rows):
         self.rows = {r["id"]: dict(r) for r in rows}
-        self.resolves, self.tickets, self.next = [], [], 9000
+        self.resolves, self.tickets, self.links, self.next = [], [], [], 9000
 
     def changes(self, project):
         return {k: dict(v) for k, v in self.rows.items()}
@@ -74,14 +78,26 @@ class FakeAdam:
         self.tickets.append((row["id"], row.get("ticket"), str(self.next), row["status"], row.get("resolution")))
         return {"key": str(self.next)}
 
+    def link_ticket(self, project, number, key):
+        row = self._by_number(number)
+        if row.get("childTicket"):
+            raise RuntimeError(f"ADAM 409: {row['id']} already has a ticket")
+        row["childTicket"] = str(key)
+        self.links.append((row["id"], str(key)))
+        return {"ok": True}
+
     def raise_change(self, project, fields):
         raise AssertionError("not used")
 
 
 class FakeOp:
-    def __init__(self, closed):
+    def __init__(self, closed, kids=None):
         self.closed = set(closed)
         self.threads: dict = {}
+        self.kids = kids or {}
+
+    def children(self, wp):
+        return list(self.kids.get(str(wp), []))
 
     def is_closed(self, wp):
         return str(wp) in self.closed
@@ -183,6 +199,30 @@ def main() -> int:
         if again != counts:
             guard.add("CS-ONCE", "rerun", f"a second run went from (tickets, comments) {counts} to {again}")
 
+    if mod:
+        try:
+            spec = {"project": "ticvai", "ref": "r6", "items": [
+                {"cr": "CR-005", "status": "accepted", "resolution": "Show 21 days on the receipt."}]}
+            base = dict(rows()[0], id="CR-005", number=5, ticket="7008")
+            adam, op = FakeAdam([base]), FakeOp({"7008"}, {"7008": [("9500", "[CR-005] Loan period")]})
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                mod.settle(adam, op, spec, "ticvai", "r6", False, False, g.ROOT.parent, link_existing=True)
+            if adam.links or adam.tickets:
+                guard.add("CS-LINK", "dry-run", "a dry run with --link-existing linked or filed")
+            with contextlib.redirect_stdout(out):
+                mod.settle(adam, op, spec, "ticvai", "r6", True, False, g.ROOT.parent, link_existing=True)
+                mod.settle(adam, op, spec, "ticvai", "r6", True, False, g.ROOT.parent, link_existing=True)
+            if adam.links != [("CR-005", "9500")] or adam.tickets:
+                guard.add("CS-LINK", "settle", f"--link-existing linked {adam.links} and filed {adam.tickets} "
+                                               "(want #9500 linked once, nothing filed)")
+            if len([t for t in op.threads.get("9500", []) if t.startswith("**ADAM CR-005 · accepted")]) != 1:
+                guard.add("CS-LINK", "comment", "the linked child task did not get exactly one comment for the agent")
+        except Exception as exc:  # noqa: BLE001
+            guard.add("CS-LINK", "settle", f"settle_changes.py --link-existing could not be run: {exc}")
+    else:
+        guard.add("CS-LINK", "settle", "settle_changes.py could not be run")
+
     main_py = API / "main.py"
     src = main_py.read_text(encoding="utf-8", errors="replace") if main_py.is_file() else ""
     route = re.search(r"def resolve_change\(.*?(?=\n@app\.|\n# ── )", src, re.S)
@@ -194,6 +234,14 @@ def main() -> int:
     bulk = re.search(r"def apply_changes\(.*?(?=\n@app\.|\Z)", src, re.S)
     if not bulk or "_tell_ticket(" not in bulk.group(0):
         guard.add("CS-ROUTE", "apply_changes", "the CSV bulk settle does not tell the tickets")
+    if '"/api/changes/{number}/ticket/link"' not in src or not re.search(
+            r'def link_ticket\([^)]*require_admin', src):
+        guard.add("CS-LINK", "route", "ADAM has no admin-only POST /api/changes/{number}/ticket/link")
+    apply_fn = re.search(r"def apply_ticket\(.*?(?=\n# |\ndef |\n@app\.)", src, re.S)
+    finder = re.search(r"def _create_or_find_child\(.*?(?=\n\n\n)", src, re.S)
+    if not apply_fn or "_create_or_find_child(" not in apply_fn.group(0) or not finder \
+            or finder.group(0).count("_existing_child(") < 2:
+        guard.add("CS-LINK", "apply", "the apply does not look for an existing child task before and after a create")
     return guard.finish()
 
 

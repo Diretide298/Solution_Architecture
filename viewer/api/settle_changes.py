@@ -54,6 +54,9 @@ Decisions file (JSON):
 
   python3 settle_changes.py decisions.json            # dry run: what would change
   python3 settle_changes.py decisions.json --apply
+  python3 settle_changes.py decisions.json --link-existing [--apply]
+      # a closed ticket's child task made on the server (tools/op-create.rb, subject "[CR-nnn] ...") is linked
+      # in ADAM (POST /api/changes/<n>/ticket/link, admin only) instead of a second one being made (CHG-ADM-003)
 
 The branches are tested without a network by ticvai/tools/check-adam-cr-settlement.py (in run-checks.py).
 """
@@ -121,6 +124,10 @@ class Adam:
                           {"project_id": project, "status": status, "resolution": resolution, "ref": ref,
                            "tell_ticket": False})
 
+    def link_ticket(self, project: str, number: int, key: str) -> dict:
+        """Record a work package that already exists as the request's child task (admin only, CHG-ADM-003)."""
+        return self._post(f"/api/changes/{number}/ticket/link", {"project_id": project, "key": str(key)})
+
     def new_ticket(self, project: str, number: int) -> dict:
         """The request's ticket, through ADAM's own preview and apply: ADAM records it as the child."""
         shown = self._post(f"/api/changes/{number}/ticket/preview", {"project_id": project})
@@ -150,6 +157,16 @@ class OpenProject:
     def comment(self, wp: str, text: str, notify: bool) -> None:
         self._req("POST", f"/work_packages/{wp}/activities?notify={'true' if notify else 'false'}",
                   json.dumps({"comment": {"raw": text}}).encode())
+
+    def children(self, wp: str) -> list:
+        """The work packages directly under `wp`, as (key, subject), from its children links."""
+        got = self._req("GET", f"/work_packages/{wp}")
+        out = []
+        for c in ((got.get("_links") or {}).get("children") or []):
+            key = str(c.get("href") or "").rstrip("/").rsplit("/", 1)[-1]
+            if key.isdigit():
+                out.append((key, c.get("title") or ""))
+        return out
 
     def is_closed(self, wp: str) -> bool:
         """By OpenProject's own isClosed, never by the status's name."""
@@ -192,7 +209,7 @@ def heading(cr: str, status: str) -> str:
 
 
 def tell_ticket(adam, op, project: str, row: dict, cr: str, status: str, resolution: str, ref: str,
-                apply: bool, notify: bool, prepare=None) -> list:
+                apply: bool, notify: bool, prepare=None, link_existing: bool = False) -> list:
     """Step 2 for one request: the lines to print. Changes nothing unless `apply`. Raises on a failure.
 
     `prepare` runs just before a child task is filed: it settles the request as accepted with its
@@ -208,6 +225,17 @@ def tell_ticket(adam, op, project: str, row: dict, cr: str, status: str, resolut
         cr, row.get("title") or "", status, resolution, ref, key, "", row.get("artefacts") or [])
 
     if step["action"] == "ticket":
+        if link_existing:
+            # A child task made outside ADAM (tools/op-create.rb, subject "[CR-nnn] ...") is linked, not made again.
+            there = next((k for k, subject in op.children(ticket) if subject.strip().startswith(f"[{cr}]")), None)
+            if there:
+                if not apply:
+                    return [f"      #{ticket}: closed -> its child task #{there} ([{cr}] ...) would be linked in ADAM"]
+                # No prepare(): ADAM records an existing child whatever the request's status.
+                adam.link_ticket(project, row["number"], there)
+                if not cr_notice.already_told(op.comments(there), cr, status):
+                    op.comment(there, text(there), notify)
+                return [f"      #{ticket}: closed -> child task #{there} linked in ADAM (commented)"]
         if not apply:
             return [f"      #{ticket}: closed -> a child task under it, with the request, the decision and the release"]
         if prepare:
@@ -229,6 +257,9 @@ def main() -> int:
     ap.add_argument("decisions")
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--notify", action="store_true", help="let OpenProject mail the comment")
+    ap.add_argument("--link-existing", action="store_true",
+                    help="before filing a child task, link a child of the source ticket whose subject starts "
+                         "\"[CR-nnn]\" (made on the server with tools/op-create.rb) instead of creating one")
     ap.add_argument("--adam", default=os.environ.get("ADAM_VIEWER_URL", "https://adam.ainfinite.ai"))
     ap.add_argument("--pms", default=os.environ.get("TICVAI_PMS_URL", "https://pms.softlabsgroup.in"))
     ap.add_argument("--repo", default=str(Path(__file__).resolve().parents[2]), help="git checkout for `git:` files")
@@ -241,10 +272,11 @@ def main() -> int:
             die(f"{need} is not set")
     adam = Adam(a.adam, os.environ["ADAM_EMAIL"], os.environ["ADAM_PASSWORD"])
     op = OpenProject(a.pms, os.environ["TICVAI_OP_TOKEN"])
-    return settle(adam, op, spec, project, default_ref, a.apply, a.notify, Path(a.repo))
+    return settle(adam, op, spec, project, default_ref, a.apply, a.notify, Path(a.repo), a.link_existing)
 
 
-def settle(adam, op, spec: dict, project: str, default_ref: str, apply: bool, notify: bool, repo: Path) -> int:
+def settle(adam, op, spec: dict, project: str, default_ref: str, apply: bool, notify: bool, repo: Path,
+           link_existing: bool = False) -> int:
     current = adam.changes(project)
     mode = "APPLY" if apply else "dry run (--apply to change)"
     print(f"settle_changes: {len(spec['items'])} decision(s) for {project}; {mode}")
@@ -287,8 +319,8 @@ def settle(adam, op, spec: dict, project: str, default_ref: str, apply: bool, no
                         and (row.get("resolvedRef") or "") == ref):
                     return
                 adam.resolve(project, row["number"], "accepted", resolution, ref)
-                if status == "accepted":
-                    settled["done"] = True
+                # Accepted is where it ends, or a step on the way to done (even when it was done already).
+                settled["done"] = status == "accepted"
 
             # 2 first, then 1: the ticket is told (a comment for the agent when it is open, a child task
             # when it is closed) before the request is written as settled, so a child task is filed while
@@ -296,7 +328,8 @@ def settle(adam, op, spec: dict, project: str, default_ref: str, apply: bool, no
             if it.get("comment", True):
                 try:
                     for line in tell_ticket(adam, op, project, row, cr, status, resolution, ref, apply, notify,
-                                            prepare=prepare if status in ("accepted", "done") else None):
+                                            prepare=prepare if status in ("accepted", "done") else None,
+                                            link_existing=link_existing):
                         print(line)
                 except Exception as e:  # noqa: BLE001
                     print(f"      ticket FAILED: {e}"); failed += 1
