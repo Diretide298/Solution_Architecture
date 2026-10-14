@@ -1201,6 +1201,12 @@ screens:
     params:
     - name: programmeId
       from: session
+    - name: exportId
+      from: navigation
+      optional: true
+      notes: 'Optional (14 October 2026, CHG-SCO-005): the export this screen queues.
+        exportAccreditationData answers 202 with its id and getAccreditationExport follows it to the signed
+        download link; no edge brings one.'
     preloaded: []
     coldEntry: Opens on the current season.
   navigation:
