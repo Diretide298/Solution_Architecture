@@ -1,0 +1,34 @@
+id: CHG-GT1-006
+date: '2026-10-14'
+source: audit
+kind: process
+summary: The binding ratchet records each counted screen's block and compares a screen the plan has moved since under the
+  block it was counted in.
+decision:
+  what: 'tools/check-binding-ratchet.py: --update-baseline writes `blocks` (screen -> block); the comparison follows a moved
+    screen back to that block (a control added on it still rises there); a baseline without `blocks` is compared as before
+    and the run says to re-record it. Three self-tests.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'check-binding-ratchet at the r6 release gate on r6-gate1 (23eb3d98, every r6 batch merged and fully derived): ticvai-control|B|unbound-control
+  327 -> 357. Measured per screen, audit-base b93b5a87 against the gate: no screen''s count rose anywhere (ticvai-control
+  469 both, venue-management 4568 -> 4567); B''s rise is eight AI screens the plan moved from D and C (ADM-488 18, ADM-538
+  7, ADM-476 4, ADM-068, ADM-509, ADM-529, ADM-531 2, ADM-558 1: 38) less eight fixed. The same drift was re-recorded by
+  hand in CHG-GTB-013, CHG-GTR-005 and CHG-GTRB-009; recomputed with blocks recorded at audit-base the gate passes.'
+keys_touched:
+  files:
+  - tools/check-binding-ratchet.py
+root_class: 'new: ratchet-baseline-drift'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: 'Batch GT1. checks/baseline.json is not touched: the lead re-records it after the merges (--update-baseline), which
+  now writes `blocks`; until then this check still fails on the move.'

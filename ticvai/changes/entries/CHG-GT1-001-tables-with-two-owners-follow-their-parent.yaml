@@ -1,0 +1,60 @@
+id: CHG-GT1-001
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: A shift's count lines, a deposit box's opening float and a seat block's seats follow the row that owns them again,
+  so the till, the cash office and the seat map can reach them below the tenant root.
+decision:
+  what: 'tools/derive-ddl.py ROW_OWNER: orders.cash_count_line -> shift_id, orders.deposit_box_opening_denomination -> deposit_box_id,
+    seating.seat_block_item -> block_id. r6''s forward migration V0104 (tenant) re-derived: the two orders tables keep their
+    r1 parent policy (the tenant-root swap leaves V0104) and seat_block_item takes its block''s.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Class check-rls-scope-fit/RF-TENANT-ROOT, 23 new at the r6 release gate on r6-gate1 (23eb3d98, every r6 batch merged
+  and fully derived), 0 after (evidence docs/active/audit-runs/audit-1014/classes.json). A merge interaction: CHG-STO-001
+  declared the NOT NULL keys and CHG-MOD-007 scoped the tables they point into, so each table had two protected owners in
+  one round and derive-ddl put it at the tenant root, which no venue or workstation operation passes (openShift, submitShiftCount,
+  closeDepositBoxes, getSeatInventory and 11 more). The owner is the table the rows belong to, as at r1 and as ROW_OWNER
+  already decides for 25 tables.'
+keys_touched:
+  tables:
+  - orders.cash_count_line
+  - orders.deposit_box_opening_denomination
+  - seating.seat_block_item
+  files:
+  - tools/derive-ddl.py
+  - backend/tenant/V0104__after_r1_20261014.sql
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started:
+  - '27668'
+  - '27675'
+  unstarted:
+  - '27645'
+  - '27686'
+  - '27705'
+  - '27709'
+  - '27792'
+  - '27794'
+  - '27818'
+  - '28194'
+  - '28279'
+  - '28527'
+  - '28528'
+  - '28529'
+  - '28530'
+  - '28531'
+  - '28593'
+  - '28691'
+  - '28728'
+  - '28754'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open
+notes: 'Batch GT1 (r6 gate fix round 1). V0104 is derived: deleted and re-derived (FINAL-DERIVE-CHECKLIST 5d), and a second
+  derive writes nothing. 27668 and 27675 (Ready for QA) are the orders and seating migrations: a comment, not a rewrite.'

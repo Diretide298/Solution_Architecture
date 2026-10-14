@@ -1,0 +1,36 @@
+id: CHG-GT1-007
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: A table no migration creates because only held operations reach it says which after-r1 file changes it, and the
+  migration wording check holds it to that.
+decision:
+  what: 'tools/build-service-docs.py: a held row under ''Tables no migration creates'' (MIGRATIONS.md) ends ''Source DDL
+    after r1: <file>'' for every after-r1 file that changes the table. tools/check-migration-wording.py MW-AFTER-R1 passes
+    such a table only when its row cites the file.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Class check-migration-wording/MW-AFTER-R1 (CHG-R5-002): 1 new at the r6 release gate on r6-gate1 (23eb3d98, every
+  r6 batch merged and fully derived), 0 after (evidence docs/active/audit-runs/audit-1014/classes.json): V0104 scopes approvals.accreditation_badge
+  (CHG-MOD-007), a table only stub operations reach (issueAccreditationBadge, listAccreditationBadges; held, CHG-FXP-003),
+  so no migration task creates it and none could cite the file. check-migration-tickets already lets a held table go unassigned;
+  now the migration planned with its operations is told about V0104.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  - tools/check-migration-wording.py
+  tables:
+  - approvals.accreditation_badge
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-wording.py
+status: open
+notes: Batch GT1.

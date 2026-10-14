@@ -1,0 +1,39 @@
+id: CHG-GT1-003
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'When a newly declared key makes a kept forward migration wait on one numbered after it, the wait is turned round:
+  the later migration waits on the earlier and adds the key.'
+decision:
+  what: 'tools/build-service-docs.py (after the forward migrations are numbered): a forward migration that depends on a
+    higher-numbered one stops waiting on it; that one waits on it instead and its description says it adds the keys. MIG-CONTROL-6
+    (V1004, #27991, Ready for QA) no longer waits on MIG-CONTROL-5 (V1085, #29186, New), which adds control.rollout_cell
+    -> control.rollout and control.release_component -> control.release.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Class check-migration-tickets/M-FILE-ORDER (CHG-TBF-002): 1 new at the r6 release gate on r6-gate1 (23eb3d98, every
+  r6 batch merged and fully derived), 0 after (evidence docs/active/audit-runs/audit-1014/classes.json). CHG-STO-001 declared
+  the two keys after V1004 was built; kept file numbers never move (CHG-TBF-002), and the migrations sheet already states
+  the rule: keys that would point forward are added by the last migration. No file renumbered.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  tickets:
+  - MIG-CONTROL-5
+  - MIG-CONTROL-6
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started:
+  - '27991'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open
+notes: 'Batch GT1. MIG-CONTROL-5 also moved from Block B to Block A in the merged plan (its tables are in the key closure
+  of a Block A module, AM-SUBSCRIPTION-LICENSING-P09): that move came from the batches, not this change; listed for the
+  lead. #27991 is Ready for QA: a comment, not a rewrite.'
