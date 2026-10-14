@@ -380,7 +380,6 @@ function markCurrent(root) {
     else a.removeAttribute('aria-current');
   }
 }
-}
 
 /** The other half of `showMentionCount`: the bell persists across having
  *  nothing to say, but not across having nobody to say it to. */
