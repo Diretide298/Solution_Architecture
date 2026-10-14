@@ -377,8 +377,11 @@ def main() -> int:
                               f"{sid} ({plat[:3]}): a web app has no offline store, and its offline state queues "
                               f"{o}: {off[:90]}")
     pairs = g.load_yaml(g.SCREENS / "_guest-pairs.yaml") or {}
+    division = {s["id"]: bool(str(s.get("division") or "").strip()) for _, s in all_screens}
     for (plat, sig), ids in sorted(sigs.items(), key=lambda kv: kv[1]):
-        if len(ids) > 1:
+        # **A stated division is the answer** (Block A audit, 14 October 2026, CHG-SCR-009): screens are never merged
+        # to clear this (client-approved UI); each member says what it is for (`division`, derive-screen-wiring.py).
+        if len(ids) > 1 and not all(division.get(i) for i in ids):
             guard.add("S-DUP-SCREEN", "+".join(sorted(ids)),
                       f"{plat}: {', '.join(sorted(ids))} declare the same {len(sig)} operations")
     return guard.finish()

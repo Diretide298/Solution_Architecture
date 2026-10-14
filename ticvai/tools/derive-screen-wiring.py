@@ -569,6 +569,52 @@ def fix_api_purpose(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
             log.append(f"{s['id']}: {o} purpose from the contract summary")
 
 
+# ── S-DUP-SCREEN ────────────────────────────────────────────────────────────────────────────────
+# Two screens on one platform calling the same operations are either one screen drawn twice or two facets of one
+# record the client's boards drew apart. Screens are never merged here (client-approved UI); each states its
+# division (`division`): what it shares, with whom, and which part of the record it is for, from its own purpose
+# and source. `check-screen-wiring` accepts a group whose members all state one.
+
+CONSOLE_FRAME = {"listTenants", "openPlatformStaffGrant", "listOwnPlatformStaffGrants"}
+_GROUPS: dict = {}
+
+
+def dup_groups(docs: dict) -> dict:
+    """screen id -> the other ids on its platform with the same operation signature (the check's)."""
+    key = id(docs)
+    if key not in _GROUPS:
+        sigs: dict = {}
+        for d in docs.values():
+            code = (d.get("platform") or {}).get("code")
+            for s in d.get("screens") or []:
+                own = {a["operationId"] for a in apis(s)} - CONSOLE_FRAME
+                if len(own) >= 2:
+                    sigs.setdefault((code, frozenset(own)), []).append(s["id"])
+        out = {}
+        for ids in sigs.values():
+            if len(ids) > 1:
+                for i in ids:
+                    out[i] = [x for x in ids if x != i]
+        _GROUPS.clear()
+        _GROUPS[key] = out
+    return _GROUPS[key]
+
+
+def fix_division(s: dict, ops: dict, log: list, keeps: list, docs: dict | None = None, **_) -> None:
+    others = dup_groups(docs or {}).get(s["id"])
+    if not others or s.get("division"):
+        return
+    shared = sorted({a["operationId"] for a in apis(s)} - CONSOLE_FRAME)
+    what = " ".join(str(s.get("purpose") or s.get("name") or "").split()).rstrip(".")
+    src = s.get("source") or {}
+    where = (f" (pack {src.get('pack')}, board {src.get('board')}.{src.get('number')}, page {src.get('page')})"
+             if src.get("pack") else "")
+    put_after(s, "division", f"Shares {', '.join(f'`{o}`' for o in shared[:4])}{' and more' if len(shared) > 4 else ''} with "
+                     f"{', '.join(sorted(others))}; this screen is {s.get('name')}{where}: "
+                     f"{what[:1].lower() + what[1:]}.", ("purposeNote", "purpose", "name"))
+    log.append(f"{s['id']}: division stated against {', '.join(sorted(others)[:3])}")
+
+
 STEPS = {
     "S-PURPOSE-BOILERPLATE": fix_screen_purpose,
     "S-PURPOSE-TEMPLATE": fix_api_purpose,
@@ -578,6 +624,7 @@ STEPS = {
     "S-NO-READ": fix_no_read,
     "S-DUP-REGION": fix_dup_regions,
     "S-OP-UNREACHED": fix_unreached,
+    "S-DUP-SCREEN": fix_division,
 }
 
 

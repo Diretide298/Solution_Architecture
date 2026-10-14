@@ -5899,6 +5899,10 @@ screens:
   purpose: Define the pattern the calendar is generated from — slot length, turnaround, concurrent capacity,
     peak bands and walk-in rules. BO-015 Performance Calendar generates and manages the performances themselves
     (kept separate, decided 28 September, audit R276).
+  division: 'Shares `listPerformanceTemplates`, `setPerformanceTemplate` with BO-721, BO-723, BO-724;
+    this screen is Performance Template: define the pattern the calendar is generated from — slot length,
+    turnaround, concurrent capacity, peak bands and walk-in rules. BO-015 Performance Calendar generates
+    and manages the performances themselves (kept separate, decided 28 September, audit R276).'
   layout:
     template: split
     regions:
@@ -27141,6 +27145,8 @@ screens:
   patternReason: the screen declares only writes (`setResourceQualifications`) and no read of a population
     — it is settings, not a list
   purpose: What a person is certified to do, and until when.
+  division: 'Shares `getResourceQualifications`, `setResourceQualifications` with BO-875; this screen
+    is Qualifications: what a person is certified to do, and until when.'
   layout:
     template: form
     regions:
@@ -32682,6 +32688,9 @@ screens:
     until a `get` exists'
   purpose: 'Omnichannel Commerce & Journey Configuration: shows automated journeys (`listJourneys`), and
     acts with define an automated journey (`createJourney`).'
+  division: 'Shares `createJourney`, `listJourneys` with BO-777; this screen is Omnichannel Commerce &
+    Journey Configuration: omnichannel Commerce & Journey Configuration: shows automated journeys (`listJourneys`),
+    and acts with define an automated journey (`createJourney`).'
   layout:
     template: split
     regions:
@@ -38499,6 +38508,11 @@ screens:
   density: compact
   purposeNote: The complete entry → exit → re-entry lifecycle can be configured independently by ticket/product/access
     policy.
+  division: 'Shares `listAdmissionRules`, `updateAdmissionRules` with BO-160, BO-219; this screen is Entry,
+    Exit & Re-entry Rules (pack Access Control Module_Reference.pdf, board 2.2.3, page 19): configure
+    admission quantity and journey sequencing. The source matrix explicitly requires configurable quantities
+    for entry, exit and same-day re-entry, anti- passback intervals, required exit before re-entry, and
+    required entry before exit.'
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -39018,6 +39032,11 @@ screens:
   purpose: Configure complex access between multiple parks/venues. The matrix specifically requires multi-park
     access on different days, same-day crossover, park-specific entry quantities and conditional access
     based on previous park admission.
+  division: 'Shares `listAdmissionRules`, `updateAdmissionRules` with BO-156, BO-219; this screen is Multi-Park
+    & Crossover Rules (pack Access Control Module_Reference.pdf, board 2.2.7, page 23): configure complex
+    access between multiple parks/venues. The matrix specifically requires multi-park access on different
+    days, same-day crossover, park-specific entry quantities and conditional access based on previous
+    park admission.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -43489,6 +43508,9 @@ screens:
       operation: listDeviceTypeHardware
   density: compact
   purposeNote: manufacturer-specific logic into admission policies.
+  division: 'Shares `listDeviceTypeHardware`, `setHardwareModel` with BO-475; this screen is Device Type
+    & Hardware Library (pack Access Control Module_Reference.pdf, board 6.6.2, page 72): create reusable
+    hardware definitions independently from physical deployed devices.'
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -46473,6 +46495,11 @@ screens:
   density: compact
   purposeNote: Temporary exit and re-entry are tracked as distinct journey events rather than being counted
     as new normal admissions.
+  division: 'Shares `listAdmissionRules`, `updateAdmissionRules` with BO-156, BO-160; this screen is Re-entry
+    & Temporary Exit Journey (pack Access Control Module_Reference.pdf, board 8.8.6, page 106): manage
+    guests temporarily leaving and returning to the venue. The source matrix requires configurable re-entry
+    and also describes a journey using a designated re-entry gate with both ticket verification and a
+    UV stamp.'
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
@@ -52207,6 +52234,9 @@ screens:
   density: compact
   purposeNote: The Group Sales team can manage its complete direct-sales pipeline and immediately identify
     opportunities requiring commercial action.
+  division: 'Shares `listGroupSale`, `listGroupSale2` with BO-283; this screen is Group Sales Command
+    Center (pack Group_Sales___Corporate_Booking_Management_Reference.pdf, board 1.9.1.1, page 4): provide
+    the Group Sales team with a centralized commercial workspace showing the entire group-sales pipeline.'
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display; Show) and a per-row directory
     (§Each opportunity should display) — counts over a population, then the population
@@ -54671,6 +54701,10 @@ screens:
   density: compact
   purposeNote: Management can analyze group-sales performance and use explainable AI recommendations to
     improve conversion, utilization, revenue and operational planning. Board 2 — Final Screen Register
+  division: 'Shares `listGroupSale`, `listGroupSale2` with BO-264; this screen is Group Sales Analytics
+    & AI Intelligence Center (pack Group_Sales___Corporate_Booking_Management_Reference.pdf, board 2.9.2.10,
+    page 33): provide management with intelligence across the complete group-sales lifecycle. This should
+    combine data from Board 1 + Board 2.'
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Analyze) and no metric row
   purpose: Provide management with intelligence across the complete group-sales lifecycle. This should
@@ -59204,6 +59238,10 @@ screens:
   density: compact
   purposeNote: Authorized users can monitor and manage all after-sales order activities from one centralized
     operational workspace.
+  division: 'Shares `listAmendmentAfterSale`, `listAmendmentAfterSale2` with BO-323; this screen is Amendment
+    & After-Sales Command Center (pack Order___Reservation_Management_Reference.pdf, board 2.12.2.1, page
+    20): provide one operational workspace for all post-sale activities affecting confirmed orders and
+    reservations.'
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide one operational workspace for all post-sale activities affecting confirmed orders and
@@ -60375,6 +60413,10 @@ screens:
   density: compact
   purposeNote: 'through the final commercial, financial and credential state. Board 2 — Final Screen Register
     # Backend Screen Core Responsibility 12.2. Central after-sales'
+  division: 'Shares `listAmendmentAfterSale`, `listAmendmentAfterSale2` with BO-314; this screen is Amendment
+    History, Audit & After-Sales Analytics (pack Order___Reservation_Management_Reference.pdf, board 2.12.2.10,
+    page 35): provide complete traceability and analytical visibility across all changes made after original
+    order creation.'
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
@@ -66872,6 +66914,8 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: AI Decision Support
+  division: 'Shares `getApprovalRequestScore`, `listApprovalRequests` with BO-369; this screen is AI Decision
+    Support (pack Approval_Workflows_and_Governance_Reference.pdf, board 1.5, page 6): aI Decision Support.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -66974,6 +67018,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Create a dedicated operational screen for approvals requiring immediate attention.
+  division: 'Shares `getApprovalRequestScore`, `listApprovalRequests` with BO-368; this screen is High
+    Priority & Risk Queue (pack Approval_Workflows_and_Governance_Reference.pdf, board 1.6, page 7): create
+    a dedicated operational screen for approvals requiring immediate attention.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -67485,6 +67532,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Provide the approver with one comprehensive workspace to evaluate and action a request.
+  division: 'Shares `decideApprovalRequest`, `listApprovalRequests` with BO-940; this screen is Approval
+    Decision Workspace (pack Approval_Workflows_and_Governance_Reference.pdf, board 4.1, page 31): provide
+    the approver with one comprehensive workspace to evaluate and action a request.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -72429,6 +72479,9 @@ screens:
   density: compact
   purposeNote: Administrators can define permitted wallet top-up values and their applicable channels/effective
     periods.
+  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
+    BO-1099, BO-1101, BO-418; this screen is Top-Up Configuration (pack Game_and_Ride_Module.pdf, board
+    3.4, page 26): configure the rules governing customer wallet recharges.'
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -72527,6 +72580,10 @@ screens:
   density: compact
   purposeNote: The system automatically calculates and allocates the correct bonus based on the configured
     top-up rule.
+  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
+    BO-1099, BO-1101, BO-417; this screen is Top-Up Bonus Rule Configuration (pack Game_and_Ride_Module.pdf,
+    board 3.5, page 27): configure promotional bonus value automatically awarded when a customer tops
+    up. The requirement explicitly gives the example: Top-Up AED 100 → AED 100 Paid Credit + AED 25 Bonus.'
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -72721,6 +72778,10 @@ screens:
   density: compact
   purposeNote: Every bonus allocation follows the configured validity rule and becomes unusable after
     expiry.
+  division: 'Shares `listCreditTypes`, `updateCreditType` with BO-1105, BO-1108; this screen is Bonus
+    Validity & Expiry Configuration (pack Game_and_Ride_Module.pdf, board 3.7, page 28): define how long
+    promotional bonus credit remains valid. The source specifically requires the ability to set a validity
+    period for the bonus.'
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -72821,6 +72882,10 @@ screens:
   density: compact
   purposeNote: Authorized users can issue free-game/ride credits and restrict them to applicable attractions
     and validity periods.
+  division: 'Shares `createGameEntitlement`, `listGameEntitlements` with BO-427, BO-430; this screen is
+    Free Game & Ride Credit Management (pack Game_and_Ride_Module.pdf, board 3.8, page 29): configure
+    and allocate free gameplay credits to customer wallets. The requirement explicitly requires the system
+    to add credits for free games and rides to a guest''s digital wallet, usable across applicable attractions.'
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Free Credit Configuration) and
     no display directory — it is settings, not a population
@@ -73429,6 +73494,10 @@ screens:
   density: compact
   purposeNote: A valid all-games ticket allows access to all applicable attractions without requiring
     individual paid-wallet deductions.
+  division: 'Shares `createGameEntitlement`, `listGameEntitlements` with BO-421, BO-430; this screen is
+    All Games & Rides Pass Configuration (pack Game_and_Ride_Module.pdf, board 4.4, page 36): configure
+    a ticket/product that permits the guest to play all games/rides in the amusement park. This directly
+    represents requirement 10.2.8.'
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Pass Setup; Options) and no display
     directory — it is settings, not a population
@@ -73710,6 +73779,10 @@ screens:
   density: compact
   purposeNote: Administrators can create reusable packages containing selected games/rides with different
     usage allowances.
+  division: 'Shares `createGameEntitlement`, `listGameEntitlements` with BO-421, BO-427; this screen is
+    Game Package Builder (pack Game_and_Ride_Module.pdf, board 4.7, page 38): create a package containing
+    a specific collection of games/rides. Requirement 10.2.7 explicitly requires: Create a package with
+    specific games. Define validity for the game entitlement.'
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -78660,6 +78733,9 @@ screens:
     and no display directory — it is settings, not a population
   purpose: Allow TICVAI to support multiple reader manufacturers/models without building business rules
     specifically for one Chinese reader.
+  division: 'Shares `listDeviceTypeHardware`, `setHardwareModel` with BO-195; this screen is Reader Manufacturer
+    & Model Profile (pack Game_and_Ride_Module.pdf, board 9.2, page 87): allow TICVAI to support multiple
+    reader manufacturers/models without building business rules specifically for one Chinese reader.'
   layout:
     template: form
     regions:
@@ -95032,6 +95108,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Capture identity data and verify the holder before approval.
+  division: 'Shares `getAccreditationHolder`, `updateAccreditationHolder` with BO-628; this screen is
+    Identity Details & Verification (pack ACCREDITATION.pdf, board 2.3, page 12): capture identity data
+    and verify the holder before approval.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -95133,6 +95212,8 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Manage accreditation holder photographs.
+  division: 'Shares `getAccreditationHolder`, `updateAccreditationHolder` with BO-627; this screen is
+    Photo Management (pack ACCREDITATION.pdf, board 2.4, page 13): manage accreditation holder photographs.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -97405,6 +97486,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Manage credentials delivered electronically to accreditation holders.
+  division: 'Shares `deliverAccreditationCredential`, `listAccreditationCredentials` with BO-651; this
+    screen is Digital & Mobile Credential Management (pack ACCREDITATION.pdf, board 4.6, page 32): manage
+    credentials delivered electronically to accreditation holders.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -97645,6 +97729,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Control when an issued credential becomes operational.
+  division: 'Shares `deliverAccreditationCredential`, `listAccreditationCredentials` with BO-649; this
+    screen is Credential Activation & Delivery (pack ACCREDITATION.pdf, board 4.8, page 33): control when
+    an issued credential becomes operational.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -97992,6 +98079,9 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Each profile shall define) and
     no display directory — it is settings, not a population
   purpose: Create reusable accreditation access profiles.
+  division: 'Shares `listAccessProfiles`, `setAccessProfile` with BO-656, BO-657, BO-658, BO-668; this
+    screen is Access Profile Management (pack ACCREDITATION.pdf, board 5.2, page 38): create reusable
+    accreditation access profiles.'
   layout:
     template: form
     regions:
@@ -98086,6 +98176,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Visually configure which accreditation profiles can access each venue zone.
+  division: 'Shares `listAccessProfiles`, `setAccessProfile` with BO-655, BO-657, BO-658, BO-668; this
+    screen is Venue & Zone Access Matrix (pack ACCREDITATION.pdf, board 5.3, page 39): visually configure
+    which accreditation profiles can access each venue zone.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -98180,6 +98273,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Configure access to operational areas below the broader zone level.
+  division: 'Shares `listAccessProfiles`, `setAccessProfile` with BO-655, BO-656, BO-658, BO-668; this
+    screen is Operational Area Permission Management (pack ACCREDITATION.pdf, board 5.4, page 40): configure
+    access to operational areas below the broader zone level.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -98273,6 +98369,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Control when accreditation access is valid.
+  division: 'Shares `listAccessProfiles`, `setAccessProfile` with BO-655, BO-656, BO-657, BO-668; this
+    screen is Date & Time Access Rules (pack ACCREDITATION.pdf, board 5.5, page 40): control when accreditation
+    access is valid.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -99259,6 +99358,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Allow one accreditation to operate across multiple approved venues.
+  division: 'Shares `listAccessProfiles`, `setAccessProfile` with BO-655, BO-656, BO-657, BO-658; this
+    screen is Multi-Venue Accreditation Management (pack ACCREDITATION.pdf, board 6.5, page 49): allow
+    one accreditation to operate across multiple approved venues.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -100830,6 +100932,9 @@ screens:
   patternReason: the pack gives this screen a display directory (§Dashboard filters shall include) and
     no metric row
   purpose: Provide management with a real-time overview of the complete accreditation operation.
+  division: 'Shares `getKpiValues`, `listAccreditationHolders` with BO-685; this screen is Accreditation
+    Executive Dashboard (pack ACCREDITATION.pdf, board 8.1, page 65): provide management with a real-time
+    overview of the complete accreditation operation.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -100940,6 +101045,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Report on active, expired, suspended and revoked accreditation records.
+  division: 'Shares `getKpiValues`, `listAccreditationHolders` with BO-684; this screen is Accreditation
+    Status & Portfolio Reporting (pack ACCREDITATION.pdf, board 8.2, page 66): report on active, expired,
+    suspended and revoked accreditation records.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -102138,6 +102246,9 @@ screens:
     2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and
     does not describe this screen; it is rewritten from the screen''s name and operations (design-notes
     correction ticketing-backoffice BO-697)'
+  division: 'Shares `getEvent`, `setEventSchedule` with BO-698; this screen is Event Schedule Command
+    Center (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 2.01, page 81): set
+    and review an event''s schedule: its dates, sessions and timings.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -102241,6 +102352,9 @@ screens:
     The purpose was pack text attached by page rather than by screen and does not describe this screen;
     it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
     BO-698)'
+  division: 'Shares `getEvent`, `setEventSchedule` with BO-697; this screen is Dynamic Performance Duration
+    Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 86):
+    set how long an event''s performances last, including durations that vary by day or session.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -102349,6 +102463,9 @@ screens:
     October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does
     not describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-699)'
+  division: 'Shares `getEvent`, `rescheduleEvent` with BO-719, BO-720; this screen is Schedule Change
+    & Rescheduling Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board
+    2.08, page 87): move an event to new dates and decide how its existing bookings follow.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -102542,6 +102659,9 @@ screens:
     October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does
     not describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-701)'
+  division: 'Shares `listSpaces`, `setSpace` with BO-702; this screen is Venue Master Configuration (pack
+    Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 3.02, page 82): define a space an
+    event can occupy: its name, capacity and layout.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -102639,6 +102759,9 @@ screens:
     The purpose was pack text attached by page rather than by screen and does not describe this screen;
     it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
     BO-702)'
+  division: 'Shares `listSpaces`, `setSpace` with BO-701; this screen is Space Access Rules Configuration
+    (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 3.06, page 85): set the access
+    rules of a space: who may enter it and when.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -102759,6 +102882,10 @@ screens:
     2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and
     does not describe this screen; it is rewritten from the screen''s name and operations (design-notes
     correction ticketing-backoffice BO-703)'
+  division: 'Shares `getEvent`, `setEventCapacityProfile` with BO-704, BO-705; this screen is Seating
+    & Capacity Command Center (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 4.01,
+    page 81): review and set an event''s capacity profile: how many guests it takes and how that capacity
+    is split.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -102863,6 +102990,9 @@ screens:
     October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does
     not describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-704)'
+  division: 'Shares `getEvent`, `setEventCapacityProfile` with BO-703, BO-705; this screen is Event Capacity
+    Profile Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 4.02,
+    page 82): set an event''s capacity profile: total capacity, allocations and limits.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -102966,6 +103096,10 @@ screens:
     The purpose was pack text attached by page rather than by screen and does not describe this screen;
     it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
     BO-705)'
+  division: 'Shares `getEvent`, `setEventCapacityProfile` with BO-703, BO-704; this screen is Seating
+    Mode & Reservation Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
+    board 4.03, page 83): choose whether an event is seated, general admission or mixed, and how places
+    are reserved.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -103085,6 +103219,9 @@ screens:
     2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and
     does not describe this screen; it is rewritten from the screen''s name and operations (design-notes
     correction ticketing-backoffice BO-706)'
+  division: 'Shares `getEvent`, `setEventRegistration` with BO-707, BO-709; this screen is Registration
+    & Attendance Command Center (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board
+    5.01, page 81): review and set how guests register for an event and how attendance is recorded.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -103187,6 +103324,9 @@ screens:
     2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not
     describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-707)'
+  division: 'Shares `getEvent`, `setEventRegistration` with BO-706, BO-709; this screen is Attendee Data
+    & Registration Form Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
+    board 5.05, page 85): choose what each attendee is asked for when registering for an event.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -103393,6 +103533,9 @@ screens:
     October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does
     not describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-709)'
+  division: 'Shares `getEvent`, `setEventRegistration` with BO-706, BO-707; this screen is Event Admission
+    & Entry Policy Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board
+    5.08, page 87): set an event''s admission policy: when entry opens, who may enter and on what credential.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -103608,6 +103751,10 @@ screens:
     October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does
     not describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-711)'
+  division: 'Shares `getEventResourcePlan`, `setEventResourcePlan` with BO-713, BO-715, BO-914; this screen
+    is Event Resource Requirement Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
+    board 6.02, page 82): list the resources an event needs (staff, equipment and spaces) with quantities
+    and times.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -103831,6 +103978,10 @@ screens:
     The purpose was pack text attached by page rather than by screen and does not describe this screen;
     it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
     BO-713)'
+  division: 'Shares `getEventResourcePlan`, `setEventResourcePlan` with BO-711, BO-715, BO-914; this screen
+    is Contractor & External Workforce Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
+    board 6.04, page 84): plan the contractors and external workers an event needs, as part of its resource
+    plan.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -104074,6 +104225,9 @@ screens:
     The purpose was pack text attached by page rather than by screen and does not describe this screen;
     it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
     BO-715)'
+  division: 'Shares `getEventResourcePlan`, `setEventResourcePlan` with BO-711, BO-713, BO-914; this screen
+    is Resource Location & Deployment Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
+    board 6.07, page 86): set where and when each of an event''s resources is deployed.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -104202,6 +104356,9 @@ screens:
     2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and
     does not describe this screen; it is rewritten from the screen''s name and operations (design-notes
     correction ticketing-backoffice BO-716)'
+  division: 'Shares `getEvent`, `setEventLifecycleState` with BO-717; this screen is Event Lifecycle &
+    Change Command Center (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 7.01,
+    page 81): see where an event is in its lifecycle and move it to its next state under change control.'
   layout:
     template: split
     regions:
@@ -104322,6 +104479,9 @@ screens:
     October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does
     not describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-717)'
+  division: 'Shares `getEvent`, `setEventLifecycleState` with BO-716; this screen is Lifecycle Transition
+    Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 7.02, page 82):
+    move an event between lifecycle states, with the checks each transition requires.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -104512,6 +104672,9 @@ screens:
     2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not
     describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-719)'
+  division: 'Shares `getEvent`, `rescheduleEvent` with BO-699, BO-720; this screen is Event Cancellation
+    Workflow Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 7.05,
+    page 85): set out what happens when an event is cancelled or moved, and apply it to the event''s bookings.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -104613,6 +104776,10 @@ screens:
     The purpose was pack text attached by page rather than by screen and does not describe this screen;
     it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
     BO-720)'
+  division: 'Shares `getEvent`, `rescheduleEvent` with BO-699, BO-719; this screen is Ticket, Reservation
+    & Customer Treatment Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
+    board 7.06, page 85): choose how tickets, reservations and guests are treated when an event changes:
+    refund, exchange or move.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -104739,6 +104906,10 @@ screens:
     October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does
     not describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-721)'
+  division: 'Shares `listPerformanceTemplates`, `setPerformanceTemplate` with BO-016, BO-723, BO-724;
+    this screen is Activity Performance & Slot Template Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
+    board 8.02, page 82): define slot templates for activities: slot length, capacity and the time bands
+    they run in.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -104934,6 +105105,9 @@ screens:
     The purpose was pack text attached by page rather than by screen and does not describe this screen;
     it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
     BO-723)'
+  division: 'Shares `listPerformanceTemplates`, `setPerformanceTemplate` with BO-016, BO-721, BO-724;
+    this screen is Peak, Off-Peak & Super Prime Time Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
+    board 8.07, page 86): set the peak, off-peak and super-prime time bands of a slot template.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -105037,6 +105211,9 @@ screens:
     October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does
     not describe this screen; it is rewritten from the screen''s name and operations (design-notes correction
     ticketing-backoffice BO-724)'
+  division: 'Shares `listPerformanceTemplates`, `setPerformanceTemplate` with BO-016, BO-721, BO-723;
+    this screen is Walk-In / There-and-Then Booking Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
+    board 8.08, page 87): set whether a slot template takes walk-in bookings, and on what terms.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -109097,6 +109274,15 @@ screens:
     and behavior rules and show reachable audience before activation. Acceptance condition: Authorized
     users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the audit history.'
+  division: 'Shares `createSegment`, `previewSegment` with BO-760; this screen is Membership & Loyalty
+    Segments (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 3.05, page 17): create audiences
+    using membership, loyalty and wallet state. Filter by membership type, status, start, expiry, renewal,
+    freeze, benefit use and upgrade eligibility. Filter by loyalty tier, points, earn/redemption history,
+    reward use, milestone and tier movement. Use wallet balance, top-up, spend, low-balance and dormancy
+    conditions while protecting financial data. Combine these signals with profile and behavior rules
+    and show reachable audience before activation. Acceptance condition: Authorized users can complete
+    the described task end to end; saved changes are validated, permission-controlled, integrated with
+    the named shared services and traceable in the audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -109297,6 +109483,15 @@ screens:
     and scoring version used. Acceptance condition: Authorized users can complete the described task end
     to end; saved changes are validated, permission-controlled, integrated with the named shared services
     and traceable in the audit history.'
+  division: 'Shares `createSegment`, `previewSegment` with BO-758; this screen is Revenue & Engagement
+    Segments (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 3.07, page 17): create value-
+    and engagement-based audiences. Configuration Scope of Work | Version 1.0 17 Use total revenue, LTV,
+    average order value, purchase frequency, category spend, refund behavior and propensity. Use engagement
+    score, campaign interaction, app activity, visit frequency, inactivity and product affinity. Define
+    bands, percentiles, scoring periods and calculation sources and preview distribution before publishing.
+    Protect against circular attribution and record the data snapshot and scoring version used. Acceptance
+    condition: Authorized users can complete the described task end to end; saved changes are validated,
+    permission-controlled, integrated with the named shared services and traceable in the audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -110255,6 +110450,15 @@ screens:
     common campaign intent while allowing controlled channel variations and version history. Acceptance
     condition: Authorized users can complete the described task end to end; saved changes are validated,
     permission-controlled, integrated with the named shared services and traceable in the audit history.'
+  division: 'Shares `listMessageTemplates`, `updateCampaign` with BO-769; this screen is Multichannel
+    Composer (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 4.05, page 22): create personalized
+    content for every selected communication channel. Provide channel-specific email, SMS, WhatsApp, push,
+    in-app and website-banner editors and previews. Insert approved personalization tokens, products,
+    events, tickets, QR codes, vouchers, payment links and media assets. Support brand and language variants,
+    accessibility checks, link validation and character/channel constraints. Maintain common campaign
+    intent while allowing controlled channel variations and version history. Acceptance condition: Authorized
+    users can complete the described task end to end; saved changes are validated, permission-controlled,
+    integrated with the named shared services and traceable in the audit history.'
   gaps:
   - operation: null
     why: '**Multichannel Composer declares no operation that writes anything** — its only declared call
@@ -110367,6 +110571,15 @@ screens:
     the described task end to end; saved changes are validated, permission-controlled, integrated with
     the named shared services and traceable in the audit history. Configuration Scope of Work | Version
     1.0 22'
+  division: 'Shares `listMessageTemplates`, `updateCampaign` with BO-768; this screen is Schedule & Trigger
+    Rules (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 4.06, page 22): configure when and
+    under what conditions a campaign executes. Support immediate, scheduled, recurring, event-triggered
+    and API/webhook execution. Configure timezone, send windows, blackout dates, frequency caps, re-entry,
+    expiry and audience refresh timing. Map events such as purchase, expiry, birthday, milestone, top-up,
+    first visit and abandoned cart. Provide schedule summary, conflict detection and pre-flight audience/inventory
+    revalidation. Acceptance condition: Authorized users can complete the described task end to end; saved
+    changes are validated, permission-controlled, integrated with the named shared services and traceable
+    in the audit history. Configuration Scope of Work | Version 1.0 22.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -111063,6 +111276,15 @@ screens:
     optimization opportunities without automatically changing live flows. Acceptance condition: Authorized
     users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the audit history.'
+  division: 'Shares `getJourneyPerformance`, `listJourneys` with BO-783; this screen is Journey Automation
+    Center (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 5.01, page 26): monitor the health
+    and value of automated customer journeys. Show active journeys, enrolled guests, conversions, recovered
+    revenue, exits, errors and upcoming actions. Compare journey performance by objective, lifecycle,
+    brand, venue, audience, channel and owner. Surface paused nodes, delivery failures, SLA risk and data
+    or consent problems requiring intervention. Provide drill-down and explainable optimization opportunities
+    without automatically changing live flows. Acceptance condition: Authorized users can complete the
+    described task end to end; saved changes are validated, permission-controlled, integrated with the
+    named shared services and traceable in the audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -111373,6 +111595,15 @@ screens:
     and block publication when a branch has no safe outcome. Acceptance condition: Authorized users can
     complete the described task end to end; saved changes are validated, permission-controlled, integrated
     with the named shared services and traceable in the audit history.'
+  division: 'Shares `createJourney`, `listJourneys` with BO-120; this screen is Decision Logic & Timing
+    (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 5.04, page 27): control journey branching,
+    timing and re-entry. Build nested AND/OR conditions using guest, event, segment, transaction, product,
+    channel and engagement data. Configure waits, dates, timezones, send windows, blackout periods, frequency
+    limits and expiry. Define re-entry, concurrency, suppression, exit and goal conditions and behavior
+    when data is missing. Simulate paths for representative guests and block publication when a branch
+    has no safe outcome. Acceptance condition: Authorized users can complete the described task end to
+    end; saved changes are validated, permission-controlled, integrated with the named shared services
+    and traceable in the audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -111939,6 +112170,17 @@ screens:
     integrated with the named shared services and traceable in the audit history. Configuration Scope
     of Work | Version 1.0 29 Board 6 - Newsletter, Notifications & Message Delivery Figure 6. High-definition
     configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 30'
+  division: 'Shares `getJourneyPerformance`, `listJourneys` with BO-774; this screen is Journey Analytics
+    & Audit (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 5.10, page 28): measure journey
+    behavior at node and end-goal level. Show triggered, eligible, enrolled, reached, clicked, converted,
+    exited and failed stages. Analyze node drop-off, branch performance, time-to-conversion, revenue,
+    attribution and cost. Provide error log, delivery trace, suppression reason, version comparison and
+    guest-level path where authorized. Audit creation, edits, approvals, publication, pauses, AI recommendations
+    and administrative actions. Configuration Scope of Work | Version 1.0 28 Acceptance condition: Authorized
+    users can complete the described task end to end; saved changes are validated, permission-controlled,
+    integrated with the named shared services and traceable in the audit history. Configuration Scope
+    of Work | Version 1.0 29 Board 6 - Newsletter, Notifications & Message Delivery Figure 6. High-definition
+    configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 30.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -112371,6 +112613,15 @@ screens:
     and version-management workflows. Acceptance condition: Authorized users can complete the described
     task end to end; saved changes are validated, permission-controlled, integrated with the named shared
     services and traceable in the audit history.'
+  division: 'Shares `createMessageTemplate`, `proposeMarketingContent` with BO-787; this screen is Newsletter
+    Builder (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 6.03, page 31): create responsive,
+    branded newsletters without coding. Provide drag-and-drop header, text, image, event, ticket, membership,
+    loyalty, CTA, divider and footer blocks. Configuration Scope of Work | Version 1.0 31 Support personalization,
+    dynamic content, reusable templates, language variants and desktop/mobile preview. Validate accessibility,
+    links, unsubscribe content, sender details and deliverability before test or approval. Support draft,
+    test send, review, approve, schedule, clone and version-management workflows. Acceptance condition:
+    Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
+    integrated with the named shared services and traceable in the audit history.'
   gaps:
   - operation: null
     why: '**Newsletter Builder declares no operation that writes anything** — its only declared call is
@@ -112464,6 +112715,16 @@ screens:
   purpose: 'Connect communications to reusable content and live products. Maintain approved content blocks
     for banners, copy, events, tickets, memberships, loyalty, promotions, CTAs and footers. Configure
     live feeds from events, products, ticket inventory, capacity, pricing, promotions and recommendations.
+    Define filters, sorting, fallback content, refresh interval, expiration and behavior when inventory
+    is unavailable. Track which campaigns and templates use each block before editing or deactivation.
+    Acceptance condition: Authorized users can complete the described task end to end; saved changes are
+    validated, permission-controlled, integrated with the named shared services and traceable in the audit
+    history.'
+  division: 'Shares `createMessageTemplate`, `proposeMarketingContent` with BO-786; this screen is Content
+    Blocks & Product Feed (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 6.04, page 32):
+    connect communications to reusable content and live products. Maintain approved content blocks for
+    banners, copy, events, tickets, memberships, loyalty, promotions, CTAs and footers. Configure live
+    feeds from events, products, ticket inventory, capacity, pricing, promotions and recommendations.
     Define filters, sorting, fallback content, refresh interval, expiration and behavior when inventory
     is unavailable. Track which campaigns and templates use each block before editing or deactivation.
     Acceptance condition: Authorized users can complete the described task end to end; saved changes are
@@ -121101,6 +121362,10 @@ screens:
     package.
   purposeNote: Administrators can create reusable resource packages containing fixed or dynamically selected
     resources and use those packages later during experience, event, reservation, and operational allocation.
+  division: 'Shares `createResourcePackage`, `listResourcePackages`, `updateResourcePackage` with BO-895,
+    BO-918; this screen is Resource Package & Bundle Configuration (pack Resource_Management_Configuration_Reference.pdf,
+    board 1.08, page 14): allow commonly used combinations of resources to be predefined and assigned
+    as a single operational package.'
   layout:
     template: form
     regions:
@@ -123113,6 +123378,9 @@ screens:
   purpose: Define what each staff resource is capable of performing.
   purposeNote: Administrators can maintain reusable staff competencies and proficiency levels that are
     available to the assignment and AI recommendation engines.
+  division: 'Shares `getResourceQualifications`, `setResourceQualifications` with BO-098; this screen
+    is Skills & Competency Management (pack Resource_Management_Configuration_Reference.pdf, board 3.03,
+    page 36): define what each staff resource is capable of performing.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -125838,6 +126106,9 @@ screens:
   purpose: Allow experiences to require multiple resources in valid combinations.
   purposeNote: Administrators can configure flexible multi-resource combinations and TICVAI can determine
     whether at least one valid combination exists before confirming availability.
+  division: 'Shares `createResourcePackage`, `listResourcePackages`, `updateResourcePackage` with BO-861,
+    BO-918; this screen is Resource Combination Builder (pack Resource_Management_Configuration_Reference.pdf,
+    board 5.03, page 67): allow experiences to require multiple resources in valid combinations.'
   gaps:
   - operation: null
     why: '**Resource Combination Builder declares no operation that writes anything** — its only declared
@@ -126390,6 +126661,10 @@ screens:
   purpose: Configure how TICVAI automatically chooses a resource when a customer or cashier does not make
     a specific selection.
   purposeNote: mobile, and API channels.
+  division: 'Shares `getResourceAllocationPolicy`, `setResourceAllocationPolicy` with BO-901, BO-948;
+    this screen is Dynamic Resource Allocation Engine (pack Resource_Management_Configuration_Reference.pdf,
+    board 5.08, page 73): configure how TICVAI automatically chooses a resource when a customer or cashier
+    does not make a specific selection.'
   layout:
     template: form
     regions:
@@ -126504,6 +126779,10 @@ screens:
   purpose: Configure how TICVAI ranks eligible resources when several resources could satisfy the same
     requirement.
   purposeNote: Resource allocation priorities are configurable, transparent, testable, and explainable.
+  division: 'Shares `getResourceAllocationPolicy`, `setResourceAllocationPolicy` with BO-900, BO-948;
+    this screen is Priority, Scoring & Allocation Policy (pack Resource_Management_Configuration_Reference.pdf,
+    board 5.09, page 74): configure how TICVAI ranks eligible resources when several resources could satisfy
+    the same requirement.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -128402,6 +128681,9 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Define every resource required to deliver a specific event.
   purposeNote: Event managers can define a complete structured resource requirement plan for each event.
+  division: 'Shares `getEventResourcePlan`, `setEventResourcePlan` with BO-711, BO-713, BO-715; this screen
+    is Event Resource Requirement Builder (pack Resource_Management_Configuration_Reference.pdf, board
+    7.02, page 100): define every resource required to deliver a specific event.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -128863,6 +129145,10 @@ screens:
   purpose: Allow frequently used event-resource configurations to be saved as reusable templates.
   purposeNote: Reusable event-resource templates significantly reduce manual event setup while maintaining
     controlled versioning.
+  division: 'Shares `createResourcePackage`, `listResourcePackages`, `updateResourcePackage` with BO-861,
+    BO-895; this screen is Event Resource Template Library (pack Resource_Management_Configuration_Reference.pdf,
+    board 7.06, page 106): allow frequently used event-resource configurations to be saved as reusable
+    templates.'
   layout:
     template: form
     regions:
@@ -131589,6 +131875,10 @@ screens:
     access to the desktop backend.
   purposeNote: Authorized managers can review and action operational approvals from mobile with sufficient
     validation context to make an informed decision.
+  division: 'Shares `decideApprovalRequest`, `listApprovalRequests` with BO-374; this screen is Manager
+    Mobile Approval Center (pack Resource_Management_Configuration_Reference.pdf, board 9.08, page 144):
+    allow authorized supervisors and managers to approve operational requests without requiring access
+    to the desktop backend.'
   gaps:
   - operation: null
     why: '**Manager Mobile Approval Center declares no operation that writes anything** — its only declared
@@ -132637,6 +132927,10 @@ screens:
   purpose: Centralize the administrative policies controlling how Resource Management behaves.
   purposeNote: Administrators can centrally manage Resource Management policies with controlled inheritance,
     versioning, and effective dating.
+  division: 'Shares `getResourceAllocationPolicy`, `setResourceAllocationPolicy` with BO-900, BO-901;
+    this screen is Resource Governance & Policy Center (pack Resource_Management_Configuration_Reference.pdf,
+    board 10.06, page 159): centralize the administrative policies controlling how Resource Management
+    behaves.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -133783,6 +134077,16 @@ screens:
     audit evidence. Acceptance condition: Authorized users can complete the described task end to end;
     saved changes are validated, permission-controlled, integrated with the named shared services and
     traceable in the immutable audit history.'
+  division: 'Shares `getSeatMap`, `setMapZones` with BO-958, BO-960, BO-961; this screen is Standing Zones
+    (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 1.05, page 6): configure non-assigned
+    areas with controlled capacity and density. Draw standing, general-admission, pit, dance-floor or
+    hospitality zones and assign type, capacity, density and color. Calculate capacity from area and approved
+    density while allowing an authorized lower operating limit. Associate entrances, exits, age rules,
+    access products, pricing bands and event-specific restrictions. Version geometry and property changes,
+    enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence.
+    Acceptance condition: Authorized users can complete the described task end to end; saved changes are
+    validated, permission-controlled, integrated with the named shared services and traceable in the immutable
+    audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -133887,6 +134191,17 @@ screens:
     Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the immutable audit history. Configuration
     Scope of Work | Version 1.0 6'
+  division: 'Shares `getSeatMap`, `setMapZones` with BO-957, BO-960, BO-961; this screen is Suites & Boxes
+    (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 1.06, page 6): model suites, boxes and
+    hospitality spaces as sellable seating inventory. Create suites and boxes with code, capacity, internal
+    seat layout, standing allowance, amenities and accessibility attributes. Support whole-suite, per-seat,
+    shared and configurable sales models with linked products and price categories. Maintain owner, contract,
+    allocation, entrance, service area and operational-status references without duplicating CRM or contract
+    data. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity
+    and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the
+    described task end to end; saved changes are validated, permission-controlled, integrated with the
+    named shared services and traceable in the immutable audit history. Configuration Scope of Work |
+    Version 1.0 6.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -134096,6 +134411,16 @@ screens:
     validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized
     users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatMap`, `setMapZones` with BO-957, BO-958, BO-961; this screen is Entrances,
+    Exits & Aisles (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 1.08, page 7): map circulation
+    elements used by access, accessibility and safety operations. Create entrances, exits, gates, portals,
+    vomitories, concourses, stairways and aisles with unique identifiers and attributes. Define width,
+    direction, level, connected zones, access-control device, accessible status and emergency designation.
+    Validate disconnected zones, blocked paths, minimum aisle width and route continuity against configured
+    venue rules. Version geometry and property changes, enforce venue-scoped permissions, validate affected
+    capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete
+    the described task end to end; saved changes are validated, permission-controlled, integrated with
+    the named shared services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -134197,6 +134522,16 @@ screens:
     previews, operations and accessibility routing. Version geometry and property changes, enforce venue-scoped
     permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition:
     Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
+    integrated with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatMap`, `setMapZones` with BO-957, BO-958, BO-960; this screen is Amenities
+    & Obstructions (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 1.09, page 7): add guest
+    facilities, service points and view-affecting objects to the venue map. Place restrooms, concessions,
+    bars, first aid, merchandise, lifts, escalators, information, prayer and accessibility facilities.
+    Map pillars, cameras, speaker arrays, lighting trusses, barriers and production structures with obstruction
+    type and dimensions. Expose approved amenity and view attributes to filters, seat previews, operations
+    and accessibility routing. Version geometry and property changes, enforce venue-scoped permissions,
+    validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized
+    users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the immutable audit history.'
   gaps:
   - operation: null
@@ -134908,6 +135243,16 @@ screens:
     evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized
     users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatMapImport`, `validateSeatMap` with BO-971; this screen is AI Section Recognition
+    (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 2.05, page 11): recognize venue levels,
+    sections and standing zones from source geometry. Display detected boundaries, labels, hierarchy,
+    capacity estimate and per-object confidence on the source preview. Allow accept, reject, merge, split,
+    rename and redraw with AI correction suggestions and reason capture. Flag ambiguous, overlapping,
+    disconnected or unlabelled areas and prevent silent assignment to the wrong level. Retain source files,
+    model/version, confidence, reviewer corrections and publication evidence; never allow AI output to
+    bypass validation or approval. Acceptance condition: Authorized users can complete the described task
+    end to end; saved changes are validated, permission-controlled, integrated with the named shared services
+    and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -135355,6 +135700,16 @@ screens:
     evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized
     users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatMapImport`, `validateSeatMap` with BO-967; this screen is Validation & Correction
+    (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 2.09, page 12): provide one controlled
+    workspace for resolving AI and import exceptions. Compare the source and generated map side by side
+    with issue list, filters, severity and confidence. Offer manual draw, move, split, merge, add, delete,
+    renumber, relabel and property-edit tools on a correction layer. Re-run selected recognizers, validate
+    affected objects and preserve every AI suggestion, human edit and reviewer decision. Retain source
+    files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output
+    to bypass validation or approval. Acceptance condition: Authorized users can complete the described
+    task end to end; saved changes are validated, permission-controlled, integrated with the named shared
+    services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -136340,6 +136695,16 @@ screens:
     holds, access routes or pricing. Acceptance condition: Authorized users can complete the described
     task end to end; saved changes are validated, permission-controlled, integrated with the named shared
     services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 15'
+  division: 'Shares `createSeatHoldPool`, `listSeatHoldPools` with BO-1005; this screen is Temporary Seat
+    Blocking (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 3.07, page 15): temporarily
+    remove seats from sale for production or operational reasons. Select section, row, seat or polygon
+    on the map and define block type, reason, owner and effective period. Preview affected available,
+    held, reserved and sold inventory with required remediation or approval. Support camera, equipment,
+    safety, maintenance, sightline, house and event-production block categories. Preserve version lineage
+    and require impact analysis for every change affecting capacity, products, sold seats, holds, access
+    routes or pricing. Acceptance condition: Authorized users can complete the described task end to end;
+    saved changes are validated, permission-controlled, integrated with the named shared services and
+    traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 15.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -138850,6 +139215,16 @@ screens:
     maintain an independent seat-state cache beyond approved freshness rules. Acceptance condition: Authorized
     users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatAvailability`, `recommendSeats` with BO-1002, BO-1039; this screen is View
+    Preview, Compare & Heat Map (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 5.09, page
+    24): help customers understand qualitative and demand differences before choosing. Show approved seat-view
+    previews or representative section views with source, freshness and obstruction disclosure. Compare
+    seats by price, distance, view, level, amenities, accessibility and overall match. Display configurable
+    demand, price or availability heat maps without revealing sensitive sales strategy. All channels shall
+    use the same authoritative availability, lock and pricing services; no channel may maintain an independent
+    seat-state cache beyond approved freshness rules. Acceptance condition: Authorized users can complete
+    the described task end to end; saved changes are validated, permission-controlled, integrated with
+    the named shared services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -138958,6 +139333,20 @@ screens:
     Figure 6. High-definition configuration board with all 10 screens. Visual reference: information architecture
     and configuration coverage; detailed production behavior is defined in the following scope. Configuration
     Scope of Work | Version 1.0 25'
+  division: 'Shares `getSeatAvailability`, `recommendSeats` with BO-1001, BO-1039; this screen is AI Conversational
+    Seat Assistant (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 5.10, page 24): allow
+    natural-language seat discovery through governed AI. Understand requests such as family size, budget,
+    view, aisle, stage proximity, accessibility and preferred level. Return only currently valid seat
+    groups with match score, rationale, trade-offs, total price and add-to-cart action. Record model/version
+    and feedback, disclose uncertainty and prevent AI from bypassing locks, pricing, eligibility or accessible-seat
+    rules. All channels shall use the same authoritative availability, lock and pricing services; no channel
+    may maintain an independent seat-state cache beyond approved freshness rules. Acceptance condition:
+    Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
+    integrated with the named shared services and traceable in the immutable audit history. Configuration
+    Scope of Work | Version 1.0 24 Board 6 - Holds, Blocks & Inventory Controls Figure 6. High-definition
+    configuration board with all 10 screens. Visual reference: information architecture and configuration
+    coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work
+    | Version 1.0 25.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -139184,6 +139573,16 @@ screens:
     overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can
     complete the described task end to end; saved changes are validated, permission-controlled, integrated
     with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `listSeatHoldTypes`, `setSeatHoldType` with BO-1006, BO-1007; this screen is Hold
+    Type Master (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.02, page 26): configure
+    reusable hold categories and their default behavior. Maintain VIP, Sponsor, Artist, Media, Corporate,
+    Internal and custom types with code, color and description. Set default duration, priority, approval,
+    reminder, maximum quantity, permitted channels and auto-release policy. Map type to stakeholder classes,
+    contract requirements, reporting dimensions and permitted roles. Hold creation and release shall be
+    atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds
+    require explicit priority resolution. Acceptance condition: Authorized users can complete the described
+    task end to end; saved changes are validated, permission-controlled, integrated with the named shared
+    services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -139286,6 +139685,16 @@ screens:
     described task end to end; saved changes are validated, permission-controlled, integrated with the
     named shared services and traceable in the immutable audit history. Configuration Scope of Work |
     Version 1.0 26'
+  division: 'Shares `createSeatHoldPool`, `listSeatHoldPools` with BO-979; this screen is Hold Pool Creation
+    (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.03, page 26): select and create an
+    explicit pool of held seats or capacity. Choose inventory by map, section, row, seat list, zone quantity
+    or uploaded allocation with current-state validation. Capture event/performance, type, owner, stakeholder,
+    value, purpose, effective time, expiry and notes. Preview available, already held, reserved, sold,
+    blocked and inaccessible inventory before submission. Hold creation and release shall be atomic, reason-coded
+    and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority
+    resolution. Acceptance condition: Authorized users can complete the described task end to end; saved
+    changes are validated, permission-controlled, integrated with the named shared services and traceable
+    in the immutable audit history. Configuration Scope of Work | Version 1.0 26.'
   gaps:
   - operation: null
     why: '**Hold Pool Creation declares no operation that writes anything** — its only declared call is
@@ -139394,6 +139803,16 @@ screens:
     require explicit priority resolution. Acceptance condition: Authorized users can complete the described
     task end to end; saved changes are validated, permission-controlled, integrated with the named shared
     services and traceable in the immutable audit history.'
+  division: 'Shares `listSeatHoldTypes`, `setSeatHoldType` with BO-1004, BO-1007; this screen is Hold
+    Rule Assignment (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.04, page 27): automatically
+    apply approved hold policies to eligible performances. Build conditions by tenant, venue, event, product,
+    date, performance, section, category, stakeholder and channel. Define seat set or quantity, type,
+    owner, priority, duration, release rule and exception behavior. Simulate upcoming performances, detect
+    rule collisions and version every activated rule. Hold creation and release shall be atomic, reason-coded
+    and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority
+    resolution. Acceptance condition: Authorized users can complete the described task end to end; saved
+    changes are validated, permission-controlled, integrated with the named shared services and traceable
+    in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -139495,6 +139914,16 @@ screens:
     explicit priority resolution. Acceptance condition: Authorized users can complete the described task
     end to end; saved changes are validated, permission-controlled, integrated with the named shared services
     and traceable in the immutable audit history.'
+  division: 'Shares `listSeatHoldTypes`, `setSeatHoldType` with BO-1004, BO-1006; this screen is Expiration
+    Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.05, page 27): control when held
+    inventory must be reviewed or released. Set fixed timestamp, time-before-performance, contract milestone,
+    payment condition or manual approval expiry. Configure reminder sequence, grace period, escalation,
+    extension eligibility and maximum extension. Respect venue timezone and daylight-saving behavior and
+    preserve the rule/version applied to each hold. Hold creation and release shall be atomic, reason-coded
+    and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority
+    resolution. Acceptance condition: Authorized users can complete the described task end to end; saved
+    changes are validated, permission-controlled, integrated with the named shared services and traceable
+    in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -139595,6 +140024,16 @@ screens:
     explicit priority resolution. Acceptance condition: Authorized users can complete the described task
     end to end; saved changes are validated, permission-controlled, integrated with the named shared services
     and traceable in the immutable audit history.'
+  division: 'Shares `listSeatHoldPools`, `releaseSeatHoldPool` with BO-1009; this screen is Automatic
+    Hold Release (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.06, page 27): release
+    eligible held inventory reliably and in controlled batches. Schedule releases by type, rule, event,
+    performance, stakeholder, age and remaining time. Preview seats, price bands, channel availability,
+    sold-out status and exceptions before execution. Use idempotent processing, partial-failure handling,
+    retry, reconciliation and stakeholder notification. Hold creation and release shall be atomic, reason-coded
+    and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority
+    resolution. Acceptance condition: Authorized users can complete the described task end to end; saved
+    changes are validated, permission-controlled, integrated with the named shared services and traceable
+    in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -139709,6 +140148,16 @@ screens:
     require explicit priority resolution. Acceptance condition: Authorized users can complete the described
     task end to end; saved changes are validated, permission-controlled, integrated with the named shared
     services and traceable in the immutable audit history.'
+  division: 'Shares `listSeatHoldPools`, `releaseSeatHoldPool` with BO-1008; this screen is Release, Convert
+    & Reassign (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.07, page 27): allow authorized
+    users to change the outcome of an active hold. Release all or selected inventory, convert it to reservation/order,
+    reassign owner/stakeholder or extend expiry. Revalidate state, price, eligibility, payment or contract
+    condition before committing the action. Require reason, supporting notes and approval when value,
+    timing or policy threshold is exceeded. Hold creation and release shall be atomic, reason-coded and
+    approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority
+    resolution. Acceptance condition: Authorized users can complete the described task end to end; saved
+    changes are validated, permission-controlled, integrated with the named shared services and traceable
+    in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -140296,6 +140745,16 @@ screens:
     reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users
     can complete the described task end to end; saved changes are validated, permission-controlled, integrated
     with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatRules`, `setSeatRules` with BO-1015, BO-1016, BO-1021; this screen is Seat
+    Kill Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.02, page 30): remove seats
+    from sale based on permanent or conditional unusability. Configure sightline, stage, production, obstruction,
+    equipment, safety, maintenance and venue-defined kill reasons. Apply by seat list, section, row, polygon,
+    obstruction distance, event type or layout condition. Preview affected capacity, sold/reserved inventory
+    and alternative seating before activation. Accessibility inventory and companion rules shall be policy-driven
+    and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability.
+    Acceptance condition: Authorized users can complete the described task end to end; saved changes are
+    validated, permission-controlled, integrated with the named shared services and traceable in the immutable
+    audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -140399,6 +140858,17 @@ screens:
     Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the immutable audit history. Configuration
     Scope of Work | Version 1.0 30'
+  division: 'Shares `getSeatRules`, `setSeatRules` with BO-1014, BO-1016, BO-1021; this screen is Buffer
+    Seat Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.03, page 30): create controlled
+    unsold spacing around seats, zones or production objects. Define left/right, radial, row, perimeter,
+    alternating or custom buffer patterns and minimum distance. Apply dynamically around selected seats,
+    wheelchair spaces, camera positions, stages or restricted zones. Configure release behavior, priority,
+    interaction with holds and treatment when a buffer conflicts with a sale. Accessibility inventory
+    and companion rules shall be policy-driven and auditable; overrides require authority and reason and
+    must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete
+    the described task end to end; saved changes are validated, permission-controlled, integrated with
+    the named shared services and traceable in the immutable audit history. Configuration Scope of Work
+    | Version 1.0 30.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -140499,6 +140969,16 @@ screens:
     must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete
     the described task end to end; saved changes are validated, permission-controlled, integrated with
     the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatRules`, `setSeatRules` with BO-1014, BO-1015, BO-1021; this screen is Companion
+    Seat Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.04, page 31): keep appropriate
+    companion inventory linked to designated seats. Configure eligible seat types, adjacency, ratio, maximum
+    companions and same-row or nearby rules. Control whether companions must be selected together and
+    when unneeded companion seats may be released. Support family, premium, group and venue-defined companion
+    policies without overriding wheelchair-specific rules. Accessibility inventory and companion rules
+    shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully
+    reduce accessible availability. Acceptance condition: Authorized users can complete the described
+    task end to end; saved changes are validated, permission-controlled, integrated with the named shared
+    services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -140696,6 +141176,16 @@ screens:
     authority and reason and must not unlawfully reduce accessible availability. Acceptance condition:
     Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getAccessibleSeating`, `setAccessibleSeating` with BO-1019, BO-1020; this screen
+    is Accessible Seating Master (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.06, page
+    31): maintain a standard catalog of accessible seat and space attributes. Configure wheelchair, companion,
+    ambulatory, transfer, hearing, vision, service-animal and other supported types. Store dimensions,
+    capacity treatment, route requirements, amenities, assisted access and display labels. Map each type
+    to venue inventory, ticket products, customer-facing filters and compliance reporting. Accessibility
+    inventory and companion rules shall be policy-driven and auditable; overrides require authority and
+    reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users
+    can complete the described task end to end; saved changes are validated, permission-controlled, integrated
+    with the named shared services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -140793,6 +141283,17 @@ screens:
     the described task end to end; saved changes are validated, permission-controlled, integrated with
     the named shared services and traceable in the immutable audit history. Configuration Scope of Work
     | Version 1.0 31'
+  division: 'Shares `getAccessibleSeating`, `setAccessibleSeating` with BO-1018, BO-1020; this screen
+    is Accessible Route Mapping (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.07, page
+    31): identify accessible journeys from entry to seats and facilities. Create routes through accessible
+    entrances, lifts, ramps, concourses, restrooms and designated seating. Store distance, slope, level
+    changes, width, surface, assistance requirement and temporary closure status. Validate route continuity
+    and show impact when a layout, facility or access point becomes unavailable. Accessibility inventory
+    and companion rules shall be policy-driven and auditable; overrides require authority and reason and
+    must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete
+    the described task end to end; saved changes are validated, permission-controlled, integrated with
+    the named shared services and traceable in the immutable audit history. Configuration Scope of Work
+    | Version 1.0 31.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -140889,6 +141390,17 @@ screens:
     rather than passed off as a decision'
   purpose: 'Configure inclusive discovery without exposing sensitive guest information. Define filters
     and labels for wheelchair, companion, aisle, step-free, transfer, hearing, vision and service-animal
+    needs. Configure eligibility attestation, documentation policy where lawful, assisted-sale path and
+    privacy restrictions. Preview the B2C, mobile, POS and call-center experience and ensure equivalent
+    inventory visibility. Accessibility inventory and companion rules shall be policy-driven and auditable;
+    overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance
+    condition: Authorized users can complete the described task end to end; saved changes are validated,
+    permission-controlled, integrated with the named shared services and traceable in the immutable audit
+    history.'
+  division: 'Shares `getAccessibleSeating`, `setAccessibleSeating` with BO-1018, BO-1019; this screen
+    is Accessible Filters & Eligibility (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board
+    7.08, page 32): configure inclusive discovery without exposing sensitive guest information. Define
+    filters and labels for wheelchair, companion, aisle, step-free, transfer, hearing, vision and service-animal
     needs. Configure eligibility attestation, documentation policy where lawful, assisted-sale path and
     privacy restrictions. Preview the B2C, mobile, POS and call-center experience and ensure equivalent
     inventory visibility. Accessibility inventory and companion rules shall be policy-driven and auditable;
@@ -140996,6 +141508,16 @@ screens:
     not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete
     the described task end to end; saved changes are validated, permission-controlled, integrated with
     the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatRules`, `setSeatRules` with BO-1014, BO-1015, BO-1016; this screen is Flexible
+    Spacing Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.09, page 32): support
+    temporary public-health or operational spacing requirements. Configure distance, seat count, checkerboard,
+    blocked-row, household-group and custom patterns. Apply by event, venue, zone, seat type or time window
+    and preview capacity and revenue impact. Coordinate with group seating, accessible inventory, holds
+    and sold seats and prevent retroactive unsafe changes. Accessibility inventory and companion rules
+    shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully
+    reduce accessible availability. Acceptance condition: Authorized users can complete the described
+    task end to end; saved changes are validated, permission-controlled, integrated with the named shared
+    services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -141562,6 +142084,16 @@ screens:
     dates and contract approvals follow shared finance policies. Acceptance condition: Authorized users
     can complete the described task end to end; saved changes are validated, permission-controlled, integrated
     with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `allocateGroupSeats`, `listGroupSeatRequests` with BO-1027; this screen is Availability
+    & Best-Fit Search (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 8.04, page 35): find
+    the strongest seating options for a group request. Search live inventory by group size, contiguous
+    requirement, split limit, price, zone, view and accessibility. Rank sections or seat groups by fit
+    score, average price, distance, fragmentation and operational constraints. Allow comparison, map preview,
+    alternative performance and immediate controlled hold creation. Bulk allocation shall use the same
+    real-time inventory and hold controls as individual sale; discounts, deposits, release dates and contract
+    approvals follow shared finance policies. Acceptance condition: Authorized users can complete the
+    described task end to end; saved changes are validated, permission-controlled, integrated with the
+    named shared services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -141670,6 +142202,16 @@ screens:
     and contract approvals follow shared finance policies. Acceptance condition: Authorized users can
     complete the described task end to end; saved changes are validated, permission-controlled, integrated
     with the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `allocateGroupSeats`, `listGroupSeatRequests` with BO-1026; this screen is Bulk Seat
+    Allocation (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 8.05, page 35): allocate
+    large quantities without compromising seat-state integrity. Select section, row, seat range, polygon
+    or recommended group and validate all inventory atomically. Configure contiguous groups, aisle breaks,
+    split sections, wheelchair/companion pairings and staff seats. Create the linked hold/reservation
+    with value, expiry, owner and exact allocated-seat list. Bulk allocation shall use the same real-time
+    inventory and hold controls as individual sale; discounts, deposits, release dates and contract approvals
+    follow shared finance policies. Acceptance condition: Authorized users can complete the described
+    task end to end; saved changes are validated, permission-controlled, integrated with the named shared
+    services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -142454,6 +142996,16 @@ screens:
     rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete
     the described task end to end; saved changes are validated, permission-controlled, integrated with
     the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1035, BO-1036,
+    BO-1037, BO-1041; this screen is Best Seat Recommendations (pack Seat_Management_Venue_Mapping_Reference
+    v1.0.pdf, board 9.02, page 38): rank the strongest overall options for the requested quantity. Score
+    view, distance, orientation, row, aisle, obstruction, amenities, demand and customer preference. Return
+    valid seat groups with match score, total price, view summary, rationale and trade-offs. Support rule-based
+    fallback when AI is unavailable or confidence falls below the configured threshold. Recommendations
+    must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility,
+    eligibility and consent rules; models cannot write inventory state directly. Acceptance condition:
+    Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
+    integrated with the named shared services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -142555,6 +143107,17 @@ screens:
     cannot write inventory state directly. Acceptance condition: Authorized users can complete the described
     task end to end; saved changes are validated, permission-controlled, integrated with the named shared
     services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 38'
+  division: 'Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1034, BO-1036,
+    BO-1037, BO-1041; this screen is Best Value Recommendations (pack Seat_Management_Venue_Mapping_Reference
+    v1.0.pdf, board 9.03, page 38): balance quality and price to identify strong value options. Calculate
+    value from price, view, distance, category, demand, historical preference and comparable inventory.
+    Present a price-versus-quality matrix and explain why each option represents better value. Respect
+    minimum/maximum budget, promotion eligibility, fee transparency and price-lock policy. Recommendations
+    must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility,
+    eligibility and consent rules; models cannot write inventory state directly. Acceptance condition:
+    Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
+    integrated with the named shared services and traceable in the immutable audit history. Configuration
+    Scope of Work | Version 1.0 38.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -142655,6 +143218,16 @@ screens:
     rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete
     the described task end to end; saved changes are validated, permission-controlled, integrated with
     the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1034, BO-1035,
+    BO-1037, BO-1041; this screen is Closest-to-Stage Recommendations (pack Seat_Management_Venue_Mapping_Reference
+    v1.0.pdf, board 9.04, page 39): rank seats by meaningful proximity to the event focal point. Use configured
+    stage/field/focal point, seat coordinates, orientation, level and route rather than row number alone.
+    Show distance, section, row, elevation, obstruction and route information for each option. Support
+    multiple focal points and event-specific stage layouts with the correct layout version. Recommendations
+    must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility,
+    eligibility and consent rules; models cannot write inventory state directly. Acceptance condition:
+    Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
+    integrated with the named shared services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -142755,6 +143328,16 @@ screens:
     cannot write inventory state directly. Acceptance condition: Authorized users can complete the described
     task end to end; saved changes are validated, permission-controlled, integrated with the named shared
     services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1034, BO-1035,
+    BO-1036, BO-1041; this screen is Family Seating Recommendations (pack Seat_Management_Venue_Mapping_Reference
+    v1.0.pdf, board 9.05, page 39): find safe and practical seat groups for families. Prioritize contiguity,
+    aisle preference, child-friendly areas, short routes and proximity to approved facilities. Consider
+    adult/child ratio, age policy, stroller/service needs, family membership and budget. Explain splits
+    or compromises and never separate minors contrary to configured policy. Recommendations must be explainable,
+    confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent
+    rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete
+    the described task end to end; saved changes are validated, permission-controlled, integrated with
+    the named shared services and traceable in the immutable audit history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -142952,6 +143535,17 @@ screens:
     the described task end to end; saved changes are validated, permission-controlled, integrated with
     the named shared services and traceable in the immutable audit history. Configuration Scope of Work
     | Version 1.0 39'
+  division: 'Shares `getSeatAvailability`, `recommendSeats` with BO-1001, BO-1002; this screen is Seat
+    Upgrade Recommendations (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 9.07, page 39):
+    offer an eligible higher-value alternative before or after purchase. Compare current and candidate
+    seat on view, distance, level, amenities, accessibility and price difference. Apply membership, loyalty,
+    promotion, exchange, refund, fee and event cutoff rules. Show expected value and acquire new inventory
+    before releasing the original seat through a safe exchange flow. Recommendations must be explainable,
+    confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent
+    rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete
+    the described task end to end; saved changes are validated, permission-controlled, integrated with
+    the named shared services and traceable in the immutable audit history. Configuration Scope of Work
+    | Version 1.0 39.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -143159,6 +143753,17 @@ screens:
     rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete
     the described task end to end; saved changes are validated, permission-controlled, integrated with
     the named shared services and traceable in the immutable audit history.'
+  division: 'Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1034, BO-1035,
+    BO-1036, BO-1037; this screen is Scoring Rules & Model Governance (pack Seat_Management_Venue_Mapping_Reference
+    v1.0.pdf, board 9.09, page 40): configure recommendation objectives, constraints and AI controls.
+    Set weighted factors, hard constraints, tie-breakers, minimum score, fallback, audience and use-case
+    priority. Manage model/version, training/evaluation metadata, approval, effective dates and rollback.
+    Run test personas, backtests, bias/accessibility checks and scenario comparison before publication.
+    Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock,
+    accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance
+    condition: Authorized users can complete the described task end to end; saved changes are validated,
+    permission-controlled, integrated with the named shared services and traceable in the immutable audit
+    history.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -148689,6 +149294,9 @@ screens:
     — it is settings, not a population
   purpose: Define currencies and monetary rules applicable to wallet balances.
   purposeNote: Wallet transactions consistently follow configured currency, conversion and rounding rules.
+  division: 'Shares `listWalletTypes`, `updateWalletType` with BO-1089, BO-1090; this screen is Wallet
+    Currency & Monetary Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 1.05,
+    page 7): define currencies and monetary rules applicable to wallet balances.'
   layout:
     template: form
     regions:
@@ -148815,6 +149423,11 @@ screens:
     explicitly call for multiple wallet credit types including Cash Credit, Bonus Credit, Redemption Tickets
     Credit and Rides Credit.
   purposeNote: New wallet credit types can be introduced through configuration without development changes.
+  division: 'Shares `createCreditType`, `listCreditTypes`, `updateCreditType` with BO-1104; this screen
+    is Credit & Balance Type Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board
+    1.06, page 8): configure all value types that may be stored inside a TICVAI wallet. The attached requirements
+    explicitly call for multiple wallet credit types including Cash Credit, Bonus Credit, Redemption Tickets
+    Credit and Rides Credit.'
   layout:
     template: form
     regions:
@@ -149003,6 +149616,9 @@ screens:
     rather than passed off as a decision'
   purpose: Control which capabilities are available for each wallet type.
   purposeNote: Features can be centrally enabled or restricted based on wallet context.
+  division: 'Shares `listWalletTypes`, `updateWalletType` with BO-1087, BO-1090; this screen is Wallet
+    Feature Profile (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 1.07, page 8): control
+    which capabilities are available for each wallet type.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -149100,6 +149716,9 @@ screens:
   purpose: Govern the complete wallet lifecycle from creation through closure.
   purposeNote: Every status transition is controlled by permissions, configurable business rules and audit
     logging.
+  division: 'Shares `listWalletTypes`, `updateWalletType` with BO-1087, BO-1089; this screen is Wallet
+    Lifecycle Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 1.08, page 9):
+    govern the complete wallet lifecycle from creation through closure.'
   layout:
     template: form
     regions:
@@ -149353,6 +149972,14 @@ screens:
     2–10 can reuse the Wallet Type, Credit Type, Currency, Ownership and Lifecycle objects without recreating
     them. The next board should therefore be Board 2 — Funding, Top-Up & Reload Management, covering cash/card
     top-up, payment-source rules, auto-reload, recurring funding, funding authorization, rev
+  division: 'Shares `listWalletConfigurationVersions`, `publishWalletConfiguration` with BO-1132, BO-1180;
+    this screen is Wallet Configuration Preview, Validation & Publication (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 1.10, page 11): provide a governed final validation step before wallet configuration becomes
+    operational. Configure how value enters a TICVAI wallet across digital and physical channels, including
+    manual top-ups, payment-method funding, automatic reload, recurring funding, authorization controls,
+    reversals, limits, and operational monitoring. This board directly covers the wallet requirements
+    for multiple funding methods, auto-reload, recurring funding, configurable limits, security controls,
+    and complete transaction auditing.'
   layout:
     template: form
     regions:
@@ -149833,6 +150460,9 @@ screens:
     — it is settings, not a population
   purpose: Control the business rules governing individual wallet top-up transactions.
   purposeNote: Every wallet top-up is evaluated against the applicable funding rules before value is credited.
+  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099,
+    BO-1101, BO-417, BO-418; this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 2.03, page 15): control the business rules governing individual wallet top-up transactions.'
   layout:
     template: form
     regions:
@@ -149975,6 +150605,9 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Configure funding availability
     across; Configure) and no display directory — it is settings, not a population
   purpose: Determine where each funding method may be used.
+  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099,
+    BO-1101, BO-417, BO-418; this screen is Channel & Funding Source Mapping (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 2.04, page 16): determine where each funding method may be used.'
   layout:
     template: form
     regions:
@@ -150124,6 +150757,11 @@ screens:
     threshold.
   purposeNote: Auto-reload occurs only after the configured threshold is reached and all consent, payment,
     security and funding-limit validations have passed.
+  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099,
+    BO-1101, BO-417, BO-418; this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 2.05, page 17): configure automatic wallet replenishment when balances fall below predefined
+    thresholds. The attached scope specifically requires automatic top-up when a wallet balance falls
+    below a configurable threshold.'
   layout:
     template: form
     regions:
@@ -150254,6 +150892,11 @@ screens:
     specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method
     and customer authorization.
   purposeNote: and authorization requirements.
+  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099,
+    BO-1101, BO-417, BO-418; this screen is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 2.06, page 17): configure scheduled wallet funding independent of the wallet''s current balance.
+    The source specifically requires scheduled or recurring top-ups based on date, frequency, amount,
+    payment method and customer authorization.'
   layout:
     template: form
     regions:
@@ -150388,6 +151031,9 @@ screens:
   purpose: Apply governance and approval controls to wallet funding operations.
   purposeNote: Funding transactions requiring approval cannot alter the wallet balance until all configured
     authorization requirements are satisfied.
+  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
+    BO-1101, BO-417, BO-418; this screen is Funding Authorization & Approval Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 2.07, page 18): apply governance and approval controls to wallet funding operations.'
   layout:
     template: form
     regions:
@@ -150684,6 +151330,11 @@ screens:
     configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.
   purposeNote: Funding limits are evaluated in real time before wallet value is credited, with configurable
     actions for violations.
+  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
+    BO-1099, BO-417, BO-418; this screen is Funding Limits & Velocity Controls (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 2.09, page 20): protect wallets against excessive or suspicious funding activity. The source
+    specifically requires configurable maximum balance, daily top-up limit, single-transaction limit and
+    user- specific limits.'
   layout:
     template: form
     regions:
@@ -151129,6 +151780,11 @@ screens:
     Bonus Credit, Redemption Tickets Credit and Rides Credit, with configurable usage criteria.
   purposeNote: Administrators can introduce and configure new stored-value or entitlement credit types
     without software development.
+  division: 'Shares `createCreditType`, `listCreditTypes`, `updateCreditType` with BO-1088; this screen
+    is Credit Type Definition Studio (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.02,
+    page 24): create and maintain the individual value buckets that can exist inside a TICVAI wallet.
+    The source explicitly requires support for different digital wallet credit types such as Cash Credit,
+    Bonus Credit, Redemption Tickets Credit and Rides Credit, with configurable usage criteria.'
   gaps:
   - operation: null
     why: '**Credit Type Definition Studio declares no operation that writes anything** — its only declared
@@ -151319,6 +151975,12 @@ screens:
     and entitlements.'
   purposeNote: Configured business events generate the correct wallet credits with appropriate source
     references, expiry rules and audit history.
+  division: 'Shares `listCreditTypes`, `updateCreditType` with BO-1108, BO-420; this screen is Credit
+    Issuance Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.03, page
+    25): define how credits enter a wallet after the wallet itself has already been funded or as the result
+    of another TICVAI business process. This screen is deliberately different from Board 2: Board 2 controls
+    funding/payment into a wallet; this screen controls the creation of individual credit buckets and
+    entitlements.'
   layout:
     template: form
     regions:
@@ -151669,6 +152331,11 @@ screens:
     for cash credit.
   purposeNote: Each issued credit receives the correct validity period based on the applicable published
     expiry policy.
+  division: 'Shares `listCreditTypes`, `updateCreditType` with BO-1105, BO-420; this screen is Expiry
+    & Validity Policy Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.06,
+    page 28): configure how long each type of wallet value remains valid. The source requires configurable
+    expiry periods for all credit types, including the ability to configure unlimited validity, particularly
+    for cash credit.'
   layout:
     template: form
     regions:
@@ -152002,6 +152669,9 @@ screens:
   purpose: Provide governed administrative management of credits approaching or reaching expiry.
   purposeNote: Expiry-related administrative actions preserve the original credit history and create immutable
     audit entries.
+  division: 'Shares `expireCreditLots`, `listCreditLots` with BO-1130; this screen is Credit Expiry, Extension
+    & Forfeiture Operations (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.09, page 31):
+    provide governed administrative management of credits approaching or reaching expiry.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -152441,6 +153111,11 @@ screens:
     Wallet Parent–Child Wallet Corporate Wallet Employee Wallet School Wallet Student Wallet Tour Group
     Wallet Event Group Wallet Hospitality Group Wallet Balance Models Model A — Fully Shared Balance Parent:'
   purposeNote: customer or venue.
+  division: 'Shares `createSharedWallet`, `listSharedWallets` with BO-1119; this screen is Shared Wallet
+    Model Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 4.02, page 39): define
+    reusable shared-wallet structures. Administrators can create models such as: Family Wallet Parent–Child
+    Wallet Corporate Wallet Employee Wallet School Wallet Student Wallet Tour Group Wallet Event Group
+    Wallet Hospitality Group Wallet Balance Models Model A — Fully Shared Balance Parent:.'
   layout:
     template: form
     regions:
@@ -152559,6 +153234,12 @@ screens:
     Member Child Dependant Viewer
   purposeNote: Authorized users can create and maintain family structures while preserving individual
     identities and wallet permissions.
+  division: 'Shares `listSharedWallets`, `setSharedWalletMembers` with BO-1117, BO-1118; this screen is
+    Family & Household Structure Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 4.03, page 40): configure family relationships and wallet participation. The source requires
+    customers to register individually or as a family/group, with a designated owner able to allocate
+    budgets to linked accounts and monitor/cancel spending authorization. Supported Roles Family Owner
+    Co-Owner Parent Guardian Adult Member Child Dependant Viewer.'
   layout:
     template: form
     regions:
@@ -152816,6 +153497,11 @@ screens:
     Ride allowance Shopping allowance Custom allocation
   purposeNote: Wallet owners or authorized administrators can distribute stored value according to configurable
     allocation rules while preserving central financial control.
+  division: 'Shares `listSharedWallets`, `setSharedWalletMembers` with BO-1115, BO-1118; this screen is
+    Allowance & Budget Allocation Engine (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board
+    4.05, page 42): configure how wallet owners distribute value to linked members. Allocation Types One-time
+    allowance Daily allowance Weekly allowance Monthly allowance Event allowance Attraction allowance
+    Meal allowance Ride allowance Shopping allowance Custom allocation.'
   layout:
     template: form
     regions:
@@ -152932,6 +153618,11 @@ screens:
     requires family owners to cap expenses and cancel spending authorization at any time. Permission Controls
   purposeNote: Every member transaction is evaluated against that member's current permissions and spending
     policy before wallet value is authorized.
+  division: 'Shares `listSharedWallets`, `setSharedWalletMembers` with BO-1115, BO-1117; this screen is
+    Member Spending Controls & Permissions (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board
+    4.06, page 43): give wallet owners granular control over what each linked member can do. The source
+    explicitly requires family owners to cap expenses and cancel spending authorization at any time. Permission
+    Controls.'
   layout:
     template: form
     regions:
@@ -153081,6 +153772,11 @@ screens:
     calls specifically for corporate wallets with spending limits, user-level permissions, departmental
     allocation and reporting. Organizational Structure
   purposeNote: configured organizational level.
+  division: 'Shares `createSharedWallet`, `listSharedWallets` with BO-1114; this screen is Corporate Wallet
+    & Organizational Hierarchy (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 4.07, page
+    44): configure wallets for companies, schools, partners and other organizations. Requirement 4.3.27
+    calls specifically for corporate wallets with spending limits, user-level permissions, departmental
+    allocation and reporting. Organizational Structure.'
   layout:
     template: form
     regions:
@@ -154140,6 +154836,13 @@ screens:
     Meal Voucher F&B Voucher Retail Voucher Parking Voucher Attraction Voucher Ride Voucher Rental Voucher
     Upgrade Voucher Campaign Reward Service Recovery Voucher Custom Voucher
   purposeNote: New voucher types and redemption behaviors can be introduced without development changes.
+  division: 'Shares `createVoucherType`, `listVoucherTypes` with BO-1127; this screen is Voucher & Coupon
+    Type Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 5.04, page 53): create
+    and manage digital vouchers and non-cash redemption instruments. The source requires the wallet to
+    store and manage digital vouchers, coupons, meal vouchers, parking vouchers, attraction credits and
+    campaign rewards. Voucher Types Monetary Voucher Percentage Voucher Complimentary Ticket Meal Voucher
+    F&B Voucher Retail Voucher Parking Voucher Attraction Voucher Ride Voucher Rental Voucher Upgrade
+    Voucher Campaign Reward Service Recovery Voucher Custom Voucher.'
   layout:
     template: form
     regions:
@@ -154275,6 +154978,9 @@ screens:
   purpose: Define precisely when, where and by whom a voucher may be redeemed. Eligibility Rules
   purposeNote: Every voucher redemption is validated in real time against the currently published eligibility
     and redemption policy.
+  division: 'Shares `createVoucherType`, `listVoucherTypes` with BO-1126; this screen is Voucher Eligibility
+    & Redemption Rule Studio (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 5.05, page 54):
+    define precisely when, where and by whom a voucher may be redeemed. Eligibility Rules.'
   gaps:
   - operation: null
     why: '**Voucher Eligibility & Redemption Rule Studio declares no operation that writes anything**
@@ -154715,6 +155421,11 @@ screens:
     of event Membership expiry
   purposeNote: Gift cards and vouchers follow configurable validity policies and customers receive applicable
     expiry notifications.
+  division: 'Shares `expireCreditLots`, `listCreditLots` with BO-1111; this screen is Gift Card & Voucher
+    Expiry Management (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 5.08, page 57): control
+    validity, expiration, extension and customer notification. Expiry Models Never expires Fixed date
+    X days after purchase X days after activation X days after issuance End of campaign End of event Membership
+    expiry.'
   layout:
     template: form
     regions:
@@ -154953,6 +155664,15 @@ screens:
     The backend should operate approximately as: Gift Card / Voucher / Benefit Definition → Issuance Rule
     → Activation → Wallet Association → Eligibility → Validity & Expiry → Redemption → Partial Balance
     / Remaining Entitlement → Wallet Ledger → Liability / Finance Event → Audit'
+  division: 'Shares `listWalletConfigurationVersions`, `publishWalletConfiguration` with BO-1092, BO-1180;
+    this screen is Gift Card & Voucher Simulator, Validation & Publication (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 5.10, page 59): allow administrators to test complete gift-card, voucher and benefit configurations
+    before activation. Scenario Example Customer: Gold Member Venue: Theme Park Configure how customers
+    actually use TICVAI Wallet value across every sales and venue touchpoint—POS, mobile app, B2C website,
+    kiosk, RFID/NFC wristbands, QR credentials, attractions, F&B, Retail, Parking, Rental and integrated
+    third-party systems. This board primarily covers requirements 4.3.7, 4.3.8, 4.3.10, 4.3.12, 4.3.13
+    and 4.3.20, including cross-channel wallet usage, wearables, NFC/RFID/QR, Digital Key authentication
+    and integration-based wallet usage.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -161999,6 +162719,10 @@ screens:
     screen becomes the master configuration governance layer for the entire Wallet module.
   purposeNote: Every material Wallet configuration change is version-controlled and historical configurations
     remain available for audit and investigation.
+  division: 'Shares `listWalletConfigurationVersions`, `publishWalletConfiguration` with BO-1092, BO-1132;
+    this screen is Wallet Configuration Governance & Version Control (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+    board 10.08, page 123): provide centralized governance for configuration changes across all ten Wallet
+    boards. This screen becomes the master configuration governance layer for the entire Wallet module.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -165924,6 +166648,10 @@ screens:
     never from the console directly. The id is kept, so its tickets keep their keys.'
   density: compact
   purposeNote: Administrators can identify, search, and manage all contextual pricing rules from one workspace.
+  division: 'Shares `listPricingRule`, `listPricingRulePriority`, `testPricingRule` with ADM-067; this
+    screen is Pricing Rule Command Center (pack Pricing___Revenue_Management_Reference.pdf, board 2.10.2.1,
+    page 23): provide administrators with a centralized workspace for all pricing eligibility and contextual
+    pricing rules.'
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display) and a per-row directory
     (§Each rule should show) — counts over a population, then the population
@@ -166997,6 +167725,11 @@ screens:
   density: compact
   purposeNote: For any commercial transaction, TICVAI can deterministically resolve and explain exactly
     why a specific rate was selected. Board 2 — Final Screen Register
+  division: 'Shares `listPricingRule`, `listPricingRulePriority`, `testPricingRule` with ADM-058; this
+    screen is Pricing Rule Priority, Conflict Resolution & Testing (pack Pricing___Revenue_Management_Reference.pdf,
+    board 2.10.2.10, page 34): define how TICVAI decides the final applicable rate when multiple pricing
+    rules match. This is the critical control screen for Board 2. Board 1 established what commercial
+    prices exist. Board 2 determines which commercial rate applies to a transaction.'
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Identify; Show) and no metric row
   purpose: Define how TICVAI decides the final applicable rate when multiple pricing rules match. This
@@ -183848,6 +184581,9 @@ screens:
     measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
     licence's
   purpose: Provide real-time visibility into the operational health of all active bundles.
+  division: 'Shares `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule` with ADM-197; this
+    screen is Dynamic Bundle Operations Command Center (pack Promotions___Bundles_Management_Reference.pdf,
+    board 6.1, page 78): provide real-time visibility into the operational health of all active bundles.'
   layout:
     template: dashboard
     regions:
@@ -184808,6 +185544,10 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Test how a bundle behaves under different operational scenarios before activating dynamic rules.
+  division: 'Shares `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule` with ADM-188; this
+    screen is Dynamic Bundle Simulation & AI Optimization (pack Promotions___Bundles_Management_Reference.pdf,
+    board 6.10, page 87): test how a bundle behaves under different operational scenarios before activating
+    dynamic rules.'
   layout:
     template: split
     regions:
@@ -197143,6 +197883,9 @@ screens:
   density: compact
   purposeNote: Operations can monitor every resale transaction from buyer payment through final completion
     and immediately identify transactions requiring intervention.
+  division: 'Shares `listResale`, `listResale2` with ADM-297; this screen is Resale Operations Command
+    Center (pack Ticket Resale Marketplace_Reference.pdf, board 2.3.2.1, page 21): provide operations
+    teams with a real-time control center for all resale transactions after listings move into purchase/fulfillment.'
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display) and a per-row directory
     (§Each resale transaction shall show) — counts over a population, then the population
@@ -198421,6 +199164,15 @@ screens:
   purposeNote: Management can evaluate the commercial and operational performance of resale and use explainable
     AI insights to improve primary pricing, marketplace policies and future event strategy. Board 2 —
     Final Screen Register Screen Backend Screen Primary Responsibility
+  division: 'Shares `listResale`, `listResale2` with ADM-288; this screen is Resale Analytics & AI Intelligence
+    (pack Ticket Resale Marketplace_Reference.pdf, board 2.3.2.10, page 35): provide management with commercial,
+    operational and predictive intelligence about the resale marketplace. Board 3 defines how the end
+    customer actually accesses, uses, sells through, and buys from The existing resale architecture already
+    defines the backend marketplace configuration and transaction processing across Boards 1 and 2. Board
+    3 closes the missing experience layer: Board 1 — Configure Marketplace Eligibility → Policy → Listings
+    → Pricing → Fees → Approval → Inventory Board 2 — Execute Resale Transaction Buyer → Payment → Ownership
+    Transfer → Credentials → Fraud → Settlement → Audit Board 3 — Customer Experience Seller Journey →
+    Buyer Journey → White-Label Portal → Client B2C Integration → Hosted Marketplace → Headless/API.'
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
     over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
@@ -201158,6 +201910,9 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§General Configuration; Configure
     whether the method allows) and no display directory — it is settings, not a population
   purpose: Configure detailed behavior for each payment method.
+  division: 'Shares `listPaymentMethods`, `updatePaymentMethod` with ADM-562, ADM-563, ADM-590, ADM-591;
+    this screen is Payment Method Configuration (pack Payment_Payment_Orchestration.pdf, board 1.3, page
+    7): configure detailed behavior for each payment method.'
   layout:
     template: form
     regions:
@@ -201290,6 +202045,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Control which payment methods are available on each sales channel.
+  division: 'Shares `listPaymentMethods`, `updatePaymentMethod` with ADM-561, ADM-563, ADM-590, ADM-591;
+    this screen is Channel & Touchpoint Payment Configuration (pack Payment_Payment_Orchestration.pdf,
+    board 1.4, page 8): control which payment methods are available on each sales channel.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -201394,6 +202152,10 @@ screens:
     no display directory — it is settings, not a population
   purpose: Allow different venues and business units to operate different payment configurations. This
     is important for TICVAI's multi-venue architecture.
+  division: 'Shares `listPaymentMethods`, `updatePaymentMethod` with ADM-561, ADM-562, ADM-590, ADM-591;
+    this screen is Venue, Location & Business Unit Payment Assignment (pack Payment_Payment_Orchestration.pdf,
+    board 1.5, page 9): allow different venues and business units to operate different payment configurations.
+    This is important for TICVAI''s multi-venue architecture.'
   gaps:
   - operation: null
     why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -201517,6 +202279,10 @@ screens:
     — it is settings, not a population
   purpose: Define which currencies can be used for payment and how payment currencies interact with TICVAI's
     selling and accounting currencies.
+  division: 'Shares `getPaymentRules`, `updatePaymentMethod` with ADM-565, ADM-566; this screen is Currency
+    & Payment Currency Configuration (pack Payment_Payment_Orchestration.pdf, board 1.6, page 10): define
+    which currencies can be used for payment and how payment currencies interact with TICVAI''s selling
+    and accounting currencies.'
   layout:
     template: form
     regions:
@@ -201617,6 +202383,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Determine whether a payment method should be available for a particular transaction.
+  division: 'Shares `getPaymentRules`, `updatePaymentMethod` with ADM-564, ADM-566; this screen is Payment
+    Eligibility & Availability Rule Builder (pack Payment_Payment_Orchestration.pdf, board 1.7, page 11):
+    determine whether a payment method should be available for a particular transaction.'
   gaps:
   - operation: null
     why: '**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -201751,6 +202520,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Configure payment-related commercial rules where legally and contractually permitted.
+  division: 'Shares `getPaymentRules`, `updatePaymentMethod` with ADM-564, ADM-565; this screen is Payment
+    Fees, Surcharges & Commercial Rules (pack Payment_Payment_Orchestration.pdf, board 1.8, page 12):
+    configure payment-related commercial rules where legally and contractually permitted.'
   gaps:
   - operation: null
     why: '**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -202682,6 +203454,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Configure the rules that determine which provider should receive each payment transaction.
+  division: 'Shares `listPaymentRoutingRules`, `setPaymentRoutingRules` with ADM-574; this screen is Payment
+    Routing Rule Builder (pack Payment_Payment_Orchestration.pdf, board 2.5, page 29): configure the rules
+    that determine which provider should receive each payment transaction.'
   gaps:
   - operation: null
     why: '**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -202802,6 +203577,9 @@ screens:
     — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
     licence's
   purpose: Manage how payment traffic is distributed when several valid providers are available.
+  division: 'Shares `listPaymentRoutingRules`, `setPaymentRoutingRules` with ADM-573; this screen is Routing
+    Strategy, Priority & Load Distribution (pack Payment_Payment_Orchestration.pdf, board 2.6, page 31):
+    manage how payment traffic is distributed when several valid providers are available.'
   layout:
     template: dashboard
     regions:
@@ -204817,6 +205595,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Configure the digital payment experiences available through TICVAI.
+  division: 'Shares `listPaymentMethods`, `updatePaymentMethod` with ADM-561, ADM-562, ADM-563, ADM-591;
+    this screen is Digital & Alternative Payment Method Manager (pack Payment_Payment_Orchestration.pdf,
+    board 4.2, page 70): configure the digital payment experiences available through TICVAI.'
   gaps:
   - operation: null
     why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -204941,6 +205722,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Manage wallet-based and mobile digital payment methods.
+  division: 'Shares `listPaymentMethods`, `updatePaymentMethod` with ADM-561, ADM-562, ADM-563, ADM-590;
+    this screen is Digital Wallet & Mobile Payment Configuration (pack Payment_Payment_Orchestration.pdf,
+    board 4.3, page 71): manage wallet-based and mobile digital payment methods.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -206105,6 +206889,9 @@ screens:
   patternReason: the pack gives this screen a display directory (§Card r t Credit; Card) and no metric
     row
   purpose: Define which payment methods may be combined within a single transaction.
+  division: 'Shares `getMixedTenderRules`, `setMixedTenderRules` with ADM-605; this screen is Mixed Tender
+    Rule & Combination Builder (pack Payment_Payment_Orchestration.pdf, board 5.2, page 92): define which
+    payment methods may be combined within a single transaction.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -206699,6 +207486,10 @@ screens:
   patternReason: the pack gives this screen a display directory (§Gift Card second) and no metric row
   purpose: Provide advanced transaction-level payment rules beyond the general method availability configured
     in Board 1.
+  division: 'Shares `getMixedTenderRules`, `setMixedTenderRules` with ADM-600; this screen is Advanced
+    Payment Eligibility, Sequence & Restriction Rules (pack Payment_Payment_Orchestration.pdf, board 5.7,
+    page 97): provide advanced transaction-level payment rules beyond the general method availability
+    configured in Board 1.'
   gaps:
   - operation: null
     why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -211189,6 +211980,12 @@ screens:
     and no display directory — it is settings, not a population
   purpose: Define exactly what the recommendation engine should optimize. This is important because the
     "best" recommendation depends on the business objective. Allow weighted objectives.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-643, ADM-644,
+    ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Recommendation Objective & KPI Configuration (pack
+    Upsell,CrossSellEngine.pdf, board 1.3, page 11): define exactly what the recommendation engine should
+    optimize. This is important because the "best" recommendation depends on the business objective. Allow
+    weighted objectives.'
   gaps:
   - operation: null
     why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -211324,6 +212121,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Define the commercial relationships from which recommendations can be generated.
+  division: 'Shares `listProductRelationships`, `setProductRelationships` with ADM-650, ADM-660, ADM-663,
+    ADM-664; this screen is Recommendation Type & Product Relationship Manager (pack Upsell,CrossSellEngine.pdf,
+    board 1.4, page 13): define the commercial relationships from which recommendations can be generated.'
   gaps:
   - operation: null
     why: '**The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -211445,6 +212245,11 @@ screens:
     rather than passed off as a decision'
   purpose: Define where in the customer journey recommendations are permitted to appear. This is a major
     requirement for the engine.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-644,
+    ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Recommendation Placement & Touchpoint Manager (pack
+    Upsell,CrossSellEngine.pdf, board 1.5, page 15): define where in the customer journey recommendations
+    are permitted to appear. This is a major requirement for the engine.'
   gaps:
   - operation: null
     why: '**Recommendation Placement & Touchpoint Manager declares no operation that writes anything**
@@ -211555,6 +212360,10 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Control recommendation behavior across TICVAI's omnichannel environment.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Channel & Journey Strategy Manager (pack Upsell,CrossSellEngine.pdf,
+    board 1.6, page 17): control recommendation behavior across TICVAI''s omnichannel environment.'
   gaps:
   - operation: null
     why: '**Channel & Journey Strategy Manager declares no operation that writes anything** — its only
@@ -211798,6 +212607,11 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Protect the business and customer experience from inappropriate AI or rule- generated recommendations.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Recommendation Guardrails & Business Controls (pack
+    Upsell,CrossSellEngine.pdf, board 1.8, page 20): protect the business and customer experience from
+    inappropriate AI or rule- generated recommendations.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -211901,6 +212715,11 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Define how much authority the TICVAI AI layer has over recommendation decisions.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Recommendation Policy, AI Control & Governance
+    (pack Upsell,CrossSellEngine.pdf, board 1.9, page 22): define how much authority the TICVAI AI layer
+    has over recommendation decisions.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -212024,6 +212843,14 @@ screens:
     are supported. 7. Relationships can be manual, rule-generated or AI-discovered. 8. Recommendation
     placements can be configured. 9. Journey-stage-specific placements are supported. 10.Channel-specific
     be'
+  division: 'Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-658, ADM-668,
+    ADM-688, ADM-698; this screen is Recommendation Strategy Simulator & AI Advisor (pack Upsell,CrossSellEngine.pdf,
+    board 1.10, page 24): allow administrators to test recommendation strategies before activating them.
+    This should become the final validation screen for Board 1. ↓ Board 2 shall provide TICVAI with the
+    specialized Upsell & Upgrade Recommendation Engine responsible for identifying when a customer can
+    be moved from their current product, ticket, experience, membership, bundle, or service to a higher-value
+    or more valuable alternative. Board 1 established the overall recommendation strategy, placements,
+    ranking, guardrails, and AI governance.'
   layout:
     template: form
     regions:
@@ -212273,6 +213100,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Define valid upgrade relationships between products. governed product relationships.
+  division: 'Shares `listProductRelationships`, `setProductRelationships` with ADM-642, ADM-660, ADM-663,
+    ADM-664; this screen is Upgrade Path & Product Ladder Builder (pack Upsell,CrossSellEngine.pdf, board
+    2.2, page 39): define valid upgrade relationships between products. governed product relationships.'
   gaps:
   - operation: null
     why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -212375,6 +213205,13 @@ screens:
   purpose: Determine whether an upsell opportunity is valid for the current customer and transaction.
     This screen provides upgrade-specific qualification, while the reusable customer targeting capabilities
     remain centralized in the recommendation/CRM eligibility architecture.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Upsell Eligibility & Qualification Rules (pack
+    Upsell,CrossSellEngine.pdf, board 2.3, page 41): determine whether an upsell opportunity is valid
+    for the current customer and transaction. This screen provides upgrade-specific qualification, while
+    the reusable customer targeting capabilities remain centralized in the recommendation/CRM eligibility
+    architecture.'
   gaps:
   - operation: null
     why: '**The pack names 10 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -212502,6 +213339,11 @@ screens:
   purpose: Configure how TICVAI calculates and communicates the commercial difference between the current
     product and the recommended upgrade. The Recommendation Engine should not become the authoritative
     pricing engine. It should consume the authoritative price difference from Pricing/Promotion services.
+  division: 'Shares `listProductRelationships`, `quoteUpgrade` with ADM-653, ADM-654; this screen is Upgrade
+    Price Difference & Value Proposition Manager (pack Upsell,CrossSellEngine.pdf, board 2.4, page 42):
+    configure how TICVAI calculates and communicates the commercial difference between the current product
+    and the recommended upgrade. The Recommendation Engine should not become the authoritative pricing
+    engine. It should consume the authoritative price difference from Pricing/Promotion services.'
   gaps:
   - operation: null
     why: '**Upgrade Price Difference & Value Proposition Manager declares no operation that writes anything**
@@ -212615,6 +213457,9 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Track; Show) and no metric row
   purpose: Configure detailed upsell relationships for ticketing and experience products.
+  division: 'Shares `listProductRelationships`, `quoteUpgrade` with ADM-652, ADM-654; this screen is Ticket,
+    Experience & Bundle Upgrade Manager (pack Upsell,CrossSellEngine.pdf, board 2.5, page 44): configure
+    detailed upsell relationships for ticketing and experience products.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -212741,6 +213586,9 @@ screens:
     rather than passed off as a decision'
   purpose: 'Handle one of the most commercially valuable upgrade scenarios: Converting visitors into members/pass
     holders.'
+  division: 'Shares `listProductRelationships`, `quoteUpgrade` with ADM-652, ADM-653; this screen is Membership
+    & Pass Upgrade Engine (pack Upsell,CrossSellEngine.pdf, board 2.6, page 45): handle one of the most
+    commercially valuable upgrade scenarios: Converting visitors into members/pass holders.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -212840,6 +213688,10 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
   purpose: Control upselling during the active purchase journey.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Pre-Purchase, Cart & Checkout Upsell Manager (pack
+    Upsell,CrossSellEngine.pdf, board 2.7, page 47): control upselling during the active purchase journey.'
   gaps:
   - operation: null
     why: '**Pre-Purchase, Cart & Checkout Upsell Manager declares no operation that writes anything**
@@ -213137,6 +213989,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Allow business users to simulate an upsell strategy before activation.
+  division: 'Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-648, ADM-668,
+    ADM-688, ADM-698; this screen is Upgrade Simulator, Comparison & AI Advisor (pack Upsell,CrossSellEngine.pdf,
+    board 2.10, page 51): allow business users to simulate an upsell strategy before activation.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -213416,6 +214271,9 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Identify) and no metric row
   purpose: Allow administrators to manually define governed complementary-product relationships.
+  division: 'Shares `listProductRelationships`, `setProductRelationships` with ADM-642, ADM-650, ADM-663,
+    ADM-664; this screen is Cross-Sell Relationship Builder (pack Upsell,CrossSellEngine.pdf, board 3.2,
+    page 66): allow administrators to manually define governed complementary-product relationships.'
   gaps:
   - operation: null
     why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -213753,6 +214611,10 @@ screens:
     rather than passed off as a decision'
   purpose: Manage recommendations across TICVAI's different commercial modules. This is especially important
     because TICVAI is not only a ticketing platform.
+  division: 'Shares `listProductRelationships`, `setProductRelationships` with ADM-642, ADM-650, ADM-660,
+    ADM-664; this screen is Cross-Category Recommendation Manager (pack Upsell,CrossSellEngine.pdf, board
+    3.5, page 71): manage recommendations across TICVAI''s different commercial modules. This is especially
+    important because TICVAI is not only a ticketing platform.'
   gaps:
   - operation: null
     why: '**Cross-Category Recommendation Manager declares no operation that writes anything** — its only
@@ -213855,6 +214717,10 @@ screens:
     rather than passed off as a decision'
   purpose: Support cross-selling beyond the original venue or attraction. This addresses the matrix requirements
     around multi-destination and external product combinations.
+  division: 'Shares `listProductRelationships`, `setProductRelationships` with ADM-642, ADM-650, ADM-660,
+    ADM-663; this screen is Multi-Attraction, Destination & Partner Cross-Sell (pack Upsell,CrossSellEngine.pdf,
+    board 3.6, page 73): support cross-selling beyond the original venue or attraction. This addresses
+    the matrix requirements around multi-destination and external product combinations.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -213953,6 +214819,12 @@ screens:
     rather than passed off as a decision'
   purpose: Make cross-selling aware of the customer's complete current basket. This is critical because
     basic recommendation engines often recommend something the customer already owns.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Basket-Aware Cross-Sell & Duplicate Prevention
+    (pack Upsell,CrossSellEngine.pdf, board 3.7, page 74): make cross-selling aware of the customer''s
+    complete current basket. This is critical because basic recommendation engines often recommend something
+    the customer already owns.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -214055,6 +214927,11 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
   purpose: Ensure recommendations reflect actual operational availability.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Availability, Inventory & Capacity-Aware Cross-Sell
+    (pack Upsell,CrossSellEngine.pdf, board 3.8, page 76): ensure recommendations reflect actual operational
+    availability.'
   layout:
     template: form
     regions:
@@ -214224,6 +215101,10 @@ screens:
   patternReason: the pack gives this screen a display directory (§Track) and no metric row
   purpose: Allow administrators to test cross-sell strategies and AI recommendations before activation.
     ↓
+  division: 'Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-648, ADM-658,
+    ADM-688, ADM-698; this screen is Cross-Sell Simulator & AI Opportunity Advisor (pack Upsell,CrossSellEngine.pdf,
+    board 3.10, page 79): allow administrators to test cross-sell strategies and AI recommendations before
+    activation. ↓.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -214505,6 +215386,11 @@ screens:
     display directory — it is settings, not a population
   purpose: Allow TICVAI administrators to visually configure the customer journey and recommendation-enabled
     touchpoints.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-671, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Customer Journey Map & Touchpoint Designer (pack
+    Upsell,CrossSellEngine.pdf, board 4.2, page 95): allow TICVAI administrators to visually configure
+    the customer journey and recommendation-enabled touchpoints.'
   gaps:
   - operation: null
     why: '**Customer Journey Map & Touchpoint Designer declares no operation that writes anything** —
@@ -214633,6 +215519,11 @@ screens:
     rather than passed off as a decision'
   purpose: Determine recommendation behavior using the customer's current transactional and operational
     context.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-672, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Real-Time Context Rule Engine (pack Upsell,CrossSellEngine.pdf,
+    board 4.3, page 97): determine recommendation behavior using the customer''s current transactional
+    and operational context.'
   gaps:
   - operation: null
     why: '**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -214758,6 +215649,11 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
   purpose: Manage recommendation behavior before transaction completion.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-673, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Pre-Purchase & Booking Journey Recommendation Manager
+    (pack Upsell,CrossSellEngine.pdf, board 4.4, page 99): manage recommendation behavior before transaction
+    completion.'
   gaps:
   - operation: null
     why: '**Pre-Purchase & Booking Journey Recommendation Manager declares no operation that writes anything**
@@ -214866,6 +215762,11 @@ screens:
     — it is settings, not a population
   purpose: Continue the commercial journey after payment while respecting the guest's existing purchase
     and visit plan.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-674,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is Post-Purchase & Pre-Visit Recommendation Manager
+    (pack Upsell,CrossSellEngine.pdf, board 4.5, page 101): continue the commercial journey after payment
+    while respecting the guest''s existing purchase and visit plan.'
   gaps:
   - operation: null
     why: '**Post-Purchase & Pre-Visit Recommendation Manager declares no operation that writes anything**
@@ -214973,6 +215874,12 @@ screens:
     rather than passed off as a decision'
   purpose: Support context-aware recommendations while the guest is physically visiting the venue. This
     directly addresses the matrix's requirement for location-aware in-venue upsell/cross-sell.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673,
+    ADM-675, ADM-681, ADM-684, ADM-695; this screen is In-Venue & Location-Aware Recommendation Engine
+    (pack Upsell,CrossSellEngine.pdf, board 4.6, page 103): support context-aware recommendations while
+    the guest is physically visiting the venue. This directly addresses the matrix''s requirement for
+    location-aware in-venue upsell/cross-sell.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -215077,6 +215984,11 @@ screens:
     over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
   purpose: Make recommendations aware of what the customer has already done and what remains possible
     during the visit.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673,
+    ADM-674, ADM-681, ADM-684, ADM-695; this screen is Visit State, Itinerary & Time-Aware Recommendation
+    (pack Upsell,CrossSellEngine.pdf, board 4.7, page 104): make recommendations aware of what the customer
+    has already done and what remains possible during the visit.'
   layout:
     template: dashboard
     regions:
@@ -215723,6 +216635,11 @@ screens:
     rather than passed off as a decision'
   purpose: Control which approved data signals the AI may use when calculating personalized recommendations.
     This is critical for governance and explainability.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673,
+    ADM-674, ADM-675, ADM-684, ADM-695; this screen is Customer Feature & Signal Configuration (pack Upsell,CrossSellEngine.pdf,
+    board 5.3, page 127): control which approved data signals the AI may use when calculating personalized
+    recommendations. This is critical for governance and explainability.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -216051,6 +216968,11 @@ screens:
     rather than passed off as a decision'
   purpose: Configure how TICVAI converts AI scores and commercial factors into the final recommendation
     ranking.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673,
+    ADM-674, ADM-675, ADM-681, ADM-695; this screen is Personalized Ranking & Decision Policy Builder
+    (pack Upsell,CrossSellEngine.pdf, board 5.6, page 132): configure how TICVAI converts AI scores and
+    commercial factors into the final recommendation ranking.'
   gaps:
   - operation: null
     why: '**The pack names 10 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -216522,6 +217444,10 @@ screens:
     — it is settings, not a population
   purpose: Allow administrators to simulate how TICVAI would personalize recommendations for different
     customers before deploying changes.
+  division: 'Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-648, ADM-658,
+    ADM-668, ADM-698; this screen is Personalization Simulator & Next-Best-Offer Lab (pack Upsell,CrossSellEngine.pdf,
+    board 5.10, page 139): allow administrators to simulate how TICVAI would personalize recommendations
+    for different customers before deploying changes.'
   layout:
     template: form
     regions:
@@ -217372,6 +218298,11 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Monitor) and no metric row
   purpose: Control how new strategies, rules, models and AI changes move into production.
+  division: 'Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643,
+    ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673,
+    ADM-674, ADM-675, ADM-681, ADM-684; this screen is Recommendation Governance & Deployment Control
+    (pack Upsell,CrossSellEngine.pdf, board 6.7, page 162): control how new strategies, rules, models
+    and AI changes move into production.'
   gaps:
   - operation: null
     why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -217770,6 +218701,10 @@ screens:
   patternReason: the pack gives this screen a display directory (§Track; Measure) and no metric row
   purpose: Turn all Recommendation Engine data into actionable improvement opportunities. This is the
     final optimization screen for Module 2.
+  division: 'Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-648, ADM-658,
+    ADM-668, ADM-688; this screen is AI Optimization & Recommendation Intelligence Lab (pack Upsell,CrossSellEngine.pdf,
+    board 6.10, page 168): turn all Recommendation Engine data into actionable improvement opportunities.
+    This is the final optimization screen for Module 2.'
   gaps:
   - operation: null
     why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
