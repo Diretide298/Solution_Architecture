@@ -8086,7 +8086,7 @@ components:
         each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks`
         a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In
         the tenant''s own database, not the control plane (decided 28 September, audit R163)**: it moved
-        from `control.footer_config` and its two child tables.
+        from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.
 
         '
       required:

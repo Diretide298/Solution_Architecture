@@ -1,0 +1,39 @@
+id: CHG-STO-009
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: Every boolean column reads as an assertion (is_, has_, supports_, requires_ or a third-person verb), by one rule
+  the generator names with and the check reads.
+decision:
+  what: 'tools/derive-schema.py conventional_name: BOOL_ASSERTING, bool_reads_as_assertion and bool_assertion_name (an imperative
+    becomes the third person, a capability or support becomes supports_, a requirement requires_, an approval or verification
+    requires_, a check or fallback has_, else is_; BOOL_NAMES where the mechanical name would read wrong, never inverting
+    the meaning and never taking a word naming-and-style bans). tools/check-ddl-conventions.py D-NAMING loads that rule
+    and reads the schema reference; tools/check-contract-storage.py matches a boolean field to the column the generator
+    names. 188 r1 columns declared renamed in tools/derive-schema-history.py COLUMN_RENAMES.'
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-ddl-conventions/D-NAMING (211 at audit-base b93b5a87, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json;
+  triage ruling "Booleans read as assertions (is_/has_/supports_)" (R093, R119, naming-and-style 6.1). The generator and
+  the check used two word lists, so the class could not fall.
+keys_touched:
+  files:
+  - tools/derive-schema.py
+  - tools/derive-schema-history.py
+  - tools/check-ddl-conventions.py
+  - tools/check-contract-storage.py
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: 'tools/derive-schema.py::bool_assertion_name'
+status: open
+notes: 'Batch STO. Contract impact: none (the wire keeps every field name; only columns move). Migration effect: 188 "column
+  renamed" rows in handoff/migration-review.md (ALTER TABLE ... RENAME COLUMN), per table in the hand-back''s impact list;
+  code reading the old column names must follow.'

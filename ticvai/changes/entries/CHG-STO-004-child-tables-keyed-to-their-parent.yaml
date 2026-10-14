@@ -1,0 +1,49 @@
+id: CHG-STO-004
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'An item, line or media table keys its parent by a NOT NULL declared reference: a menu item sits in its section
+  (and the section in its menu), and the rental item tables'' parent keys are declared.'
+decision:
+  what: 'fnb MenuItem.menuSectionId is required, never null, readOnly and x-ticvai-references: fnb.menu_section (createMenu
+    and setMenuSections write the item with its section; MenuSection.items says an item''s membership is menuSectionId),
+    and tools/derive-ddl.py ROW_OWNER makes fnb.menu_item follow its section (it followed its catalogue variant, a tenant
+    row a venue grant cannot see). rental.agreement_item and rental.inspection_item have rental_agreement_id and rental_inspection_id
+    declared (CHG-STO-001), catalogue.performance_media and maintenance.incident_media their performance_id and incident_id.
+    tools/check-ddl-conventions.py D-CHILD-PARENT reads a key named with its module in front (rental_agreement_id) and a
+    key through the parent''s own child (menu_section_id -> menu_section.menu_id).'
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-ddl-conventions/D-CHILD-PARENT (5 at audit-base b93b5a87, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json;
+  triage ruling "A child table's key to its parent is NOT NULL and declared." Same class as CHG-R6-004..006 (ADAM CR-007,
+  CR-009, CR-010).
+keys_touched:
+  tables:
+  - fnb.menu_item
+  - rental.agreement_item
+  - rental.inspection_item
+  - catalogue.performance_media
+  - maintenance.incident_media
+  schemas:
+  - MenuItem
+  files:
+  - contracts/satellite/fnb.yaml
+  - tools/applied/sto-children-and-names-14-october.py
+  - tools/derive-ddl.py
+  - tools/check-ddl-conventions.py
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch STO. Contract impact: MenuItem.menuSectionId is a readOnly field now always present (a response guarantee,
+  no request changes). Migration effect: fnb.menu_item.menu_section_id NOT NULL is a "not null" row and its foreign key
+  a "constraint added" row in handoff/migration-review.md (backfill from the section the item sits in); the policy swap
+  (parent through fnb.menu_section) is in V0104.'

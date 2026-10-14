@@ -1,0 +1,67 @@
+id: CHG-STO-005
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: A key column is named for the table it references (an x-ticvai-column, the wire keeps its name), and check-ddl-conventions
+  reads keys, key names and boolean names from the DDL the generator writes now rather than the frozen r1 files.
+decision:
+  what: 'x-ticvai-column on the key fields named for another table: access_change old/new_entitlement_id, entry_rule_point
+    admission_rules_id, scan_event and sync.cross_region_entitlement entitlement_id, ai.proposed_action activity_id and
+    marketing.conversation_message ai_activity_id (ai.interaction was renamed ai.activity), performance_media event_registration_id,
+    tax_exemption evidence_asset_id, waiver_signature form_definition_id, selection_policy ticket_product_id, shop_and_drop
+    collection_location_id, tier_allowance and tier_module plan_id (/plans/{planId}/tiers); ChannelAllocation gains the
+    readOnly channelCapacityId (its path id) for channel_envelope''s key to catalogue.channel_capacity (was envelope_id);
+    VisitPlan.subjectId references pii.subject (not marketing.guest_profile); QueueDetail.fastPass is columns of queue.queue
+    itself, not a key to it. Each old column is retired on its schema (x-ticvai-retired-columns) and declared a rename in
+    tools/derive-schema-history.py COLUMN_RENAMES. tools/check-ddl-conventions.py: D-FK-TARGET-NAME, D-DOUBLE-KEY and D-NAMING
+    read the schema reference (what derive-ddl writes the DDL from), and a role in front of an aliased concept (home_region_id,
+    primary_venue_id) names the scope.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit before r6, class check-ddl-conventions/D-FK-TARGET-NAME (12 at audit-base b93b5a87, 0 after), evidence
+  audit/ticvai/runs/audit-1014/classes.json; triage ruling "A key column is named for the table it references." Read from
+  the frozen r1 900-foreign-keys.sql the class could never fall: the baseline is never rewritten (CHG-R6-010 lists a rename
+  for a person), so the check reads what check-storage-promises reads.'
+keys_touched:
+  tables:
+  - access.access_change
+  - access.entry_rule_point
+  - access.scan_event
+  - ai.proposed_action
+  - catalogue.channel_envelope
+  - catalogue.performance_media
+  - ledger.tax_exemption
+  - marketing.conversation_message
+  - marketing.waiver_signature
+  - queue.queue
+  - resources.selection_policy
+  - retail.shop_and_drop
+  - subscription.tier_allowance
+  - subscription.tier_module
+  - sync.cross_region_entitlement
+  - venuemap.visit_plan
+  schemas:
+  - ChannelAllocation
+  - VisitPlan
+  - QueueDetail
+  files:
+  - contracts/
+  - tools/applied/sto-children-and-names-14-october.py
+  - tools/derive-schema-history.py
+  - tools/check-ddl-conventions.py
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch STO. Contract impact: additive (x-ticvai extensions and one readOnly response field, ChannelAllocation.channelCapacityId).
+  Migration effect: each is a "column renamed" row in handoff/migration-review.md (ALTER TABLE ... RENAME COLUMN, then the
+  key and index names); queue.queue.fast_pass_id is a "column dropped" row (it pointed at its own table). Code reading the
+  old column names must follow (impact list in the hand-back).'

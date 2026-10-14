@@ -5021,6 +5021,7 @@ components:
 
 
     VenueSettings:
+      x-ticvai-retired-columns: [org_unit_id]
       type: object
       x-ticvai-persistence: "platform.venue_settings"
       description: >
@@ -5997,6 +5998,7 @@ components:
             When true, the workstation refuses to open a shift if the device is absent.
 
     Workstation:
+      x-ticvai-retired-columns: [org_unit_id]
       x-ticvai-persistence: "platform.workstation"
       type: object
       required: [id, code, name, venueId, regionId, scopePath, saleBoard, currency, currencyScale, timeZone]

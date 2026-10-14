@@ -24477,6 +24477,7 @@ components:
           type: string
           maxLength: 500
     AccessAccessChange:
+      x-ticvai-retired-columns: [old_access_id, new_access_id]
       type: object
       x-ticvai-persistence: access.access_change
       description: '**Taken from the backend workbook, 20 September.** Audits ticket/access replacement during an upgrade. The old access should normally be marked UPGRADED/REPLACED and the new access becomes ACTIVE; old records should not be deleted.'
@@ -24489,10 +24490,12 @@ components:
           type: string
           format: uuid
         oldAccessId:
+          x-ticvai-column: old_entitlement_id
           x-ticvai-references: access.entitlement
           type: string
           format: uuid
         newAccessId:
+          x-ticvai-column: new_entitlement_id
           x-ticvai-references: access.entitlement
           type: string
           format: uuid
@@ -24521,6 +24524,7 @@ components:
           type: string
           format: date-time
     AccessEntryRulePoint:
+      x-ticvai-retired-columns: [admission_profile_id]
       type: object
       x-ticvai-persistence: access.entry_rule_point
       description: '**Taken from the backend workbook, 20 September.** Maps the access points that are allowed for an admission profile.'
@@ -24531,6 +24535,8 @@ components:
       - createdAt
       properties:
         admissionProfileId:
+          x-ticvai-references: access.admission_rules
+          x-ticvai-column: admission_rules_id
           type: string
           format: uuid
           readOnly: true
@@ -26074,6 +26080,7 @@ components:
               error:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
     ScanEvent:
+      x-ticvai-retired-columns: [ticket_id]
       x-ticvai-append-only: recordedAt
       x-ticvai-persistence: access.scan_event
       type: object
@@ -26098,6 +26105,8 @@ components:
         scopePath:
           type: string
         ticketId:
+          x-ticvai-references: access.entitlement
+          x-ticvai-column: entitlement_id
           type: string
           format: uuid
           nullable: true

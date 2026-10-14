@@ -10925,6 +10925,7 @@ components:
       - name
       - price
       - isAvailable
+      - menuSectionId
       properties:
         id:
           type: string
@@ -10983,9 +10984,9 @@ components:
           format: uuid
           nullable: true
         menuSectionId:
+          x-ticvai-references: fnb.menu_section
           type: string
           format: uuid
-          nullable: true
           readOnly: true
           description: The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`).
         isStockTracked:

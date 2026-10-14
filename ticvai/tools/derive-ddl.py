@@ -305,7 +305,8 @@ ROW_OWNER = {
     # CHG-STO-001 (Block A storage audit, 14 October 2026): declaring every NOT NULL key (SP-KEY-UNDECLARED) gave these
     # a second protected candidate, and the rule picked the one protected first, which is not the row's owner: a line,
     # a cell, a point or an option is its parent's (the table it is the rows of); the other key names what it is about.
-    "access.entry_rule_point": "admission_profile_id",        # a rule's points; the access point is where
+    "access.entry_rule_point": "admission_rules_id",          # a rule's points; the access point is where
+    "fnb.menu_item": "menu_section_id",                       # CHG-STO-004: the section's item; the variant is reported as
     "fnb.menu_item_modifier": "item_id",                      # a menu item's attachment of a (tenant) modifier group
     "fnb.substitution_rule": "recipe_id",                     # a recipe's rule; the ingredients are what it swaps
     "fnb.sub_bill": "bill_split_id",                          # a split's sub-bill, as at r1; the visit is what it bills

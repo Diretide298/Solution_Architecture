@@ -118,6 +118,21 @@ def singular(w: str) -> str:
     return w
 
 
+_GEN: dict = {}
+
+
+def bool_column(sn: str) -> str:
+    """The column derive-schema names a boolean property (`conventional_name`, CHG-STO-009: `offline_capability` is
+    stored as `supports_offline`), read from the generator so this check cannot disagree with it."""
+    if "conv" not in _GEN:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("derive_schema", str(g.ROOT / "tools" / "derive-schema.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _GEN["conv"] = mod.conventional_name
+    return _GEN["conv"](sn, "boolean", None)
+
+
 def props_of(schema: dict, stem: str, by: dict, depth=0) -> dict:
     out = {}
     if not isinstance(schema, dict) or depth > 4:
@@ -189,6 +204,8 @@ def main() -> int:
                                                       re.sub(r"_id$", "", sn) + "_id"}
             if col:
                 cands.add(str(col))
+            elif kind(ps, by, stem) == "bool":
+                cands.add(bool_column(sn))        # the generator names a boolean as an assertion (CHG-STO-009)
             hit = cands & have
             if hit:
                 col_name = str(col) if col and str(col) in have else (sn if sn in have else sorted(hit)[0])

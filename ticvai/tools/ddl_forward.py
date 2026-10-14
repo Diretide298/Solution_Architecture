@@ -509,7 +509,15 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL",
                                "backfill, then ALTER COLUMN ... SET NOT NULL in a forward migration")
                 elif a.cols[c] != d and (t, c) not in old.handled:
-                    if a.cols[c] == relaxed(d):
+                    fill = scope_path_backfill(t, b.cols) if c == "scope_path" else None
+                    if a.cols[c] == relaxed(d) and fill:
+                        # CHG-STO-003: a scope_path an earlier forward migration added nullable keeps its backfill on
+                        # every later run, not only the run that added it (the row lost it on a second derive, and
+                        # check-ddl-conventions D-SCOPE-NOTNULL failed a column that was on its way to NOT NULL).
+                        review("not null", f"{t}.{c}", "still nullable in the databases; the schema reference says NOT "
+                               "NULL, and row-level security reads it",
+                               f"in a forward migration, backfill first, then the NOT NULL: {fill}")
+                    elif a.cols[c] == relaxed(d):
                         review("not null", f"{t}.{c}", "still nullable in the databases; the schema reference "
                                "says NOT NULL", "backfill, then ALTER COLUMN ... SET NOT NULL")
                     else:

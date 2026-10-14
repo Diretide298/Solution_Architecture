@@ -3943,8 +3943,8 @@ components:
         | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements
         issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order`
         | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation
-        on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at`
-        | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries
+        on the shift that took it | | `waitTime` | `queue.entry.estimated_call_at` against `called_at`
+        | | `throughput` | `queue.entry` completions per hour | | `abandonmentRate` | Queue entries
         that left before being called |
 
         **`salesByInstructor` was deliberately absent from the first cut** because it needed the

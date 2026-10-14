@@ -182,6 +182,34 @@ class Contracts:
         s, _e = self.schema_span(stem, schema)
         return self._set(stem, s, key, value)
 
+    def add_retired(self, stem, schema, column):
+        """Add a column name to the schema's `x-ticvai-retired-columns` (kept as a flow list), keeping any already there."""
+        f = self.files[stem]
+        lines = f["lines"]
+        s, e = self.schema_span(stem, schema)
+        k = next((i for i in range(s + 1, e) if _indent(lines[i]) == 6
+                  and lines[i].lstrip().startswith("x-ticvai-retired-columns:")), None)
+        if k is None:
+            lines.insert(s + 1, "      x-ticvai-retired-columns: [%s]" % column)
+            f["dirty"] = True
+            return "+"
+        ke = _span(lines, k, 6)
+        have = []
+        m = re.match(r"^\s+x-ticvai-retired-columns:\s*\[(.*)\]\s*$", lines[k])
+        if m:
+            have = [x.strip().strip("'\"") for x in m.group(1).split(",") if x.strip()]
+        else:
+            k2 = k + 1
+            while k2 < len(lines) and lines[k2].strip().startswith("- ") and _indent(lines[k2]) >= 6:
+                have.append(lines[k2].strip()[2:].strip().strip("'\""))
+                k2 += 1
+            ke = k2
+        if column in have:
+            return "="
+        lines[k:ke] = ["      x-ticvai-retired-columns: [%s]" % ", ".join(have + [column])]
+        f["dirty"] = True
+        return "+"
+
     def add_required(self, stem, schema, prop):
         f = self.files[stem]
         lines = f["lines"]
@@ -200,8 +228,10 @@ class Contracts:
             lines[p:p] = ["      required:", "      - %s" % prop]
             f["dirty"] = True
             return "+"
-        re_ = _span(lines, r, 6)
-        items = [i for i in range(r + 1, re_) if lines[i].strip().startswith("- ")]
+        items, k = [], r + 1
+        while k < len(lines) and lines[k].strip().startswith("- ") and _indent(lines[k]) >= 6:
+            items.append(k)
+            k += 1
         if any(lines[i].strip()[2:].strip().strip("'\"") == prop for i in items):
             return "="
         ind = _indent(lines[items[0]]) if items else 6
@@ -209,6 +239,54 @@ class Contracts:
         lines.insert(at, " " * ind + "- %s" % prop)
         f["dirty"] = True
         return "+"
+
+    def replace_in_schema(self, stem, schema, old, new):
+        """One exact replacement of `old` (lines joined by \\n) inside the schema's text; "=" when `new` is there."""
+        f = self.files[stem]
+        lines = f["lines"]
+        s, e = self.schema_span(stem, schema)
+        seg = "\n".join(lines[s:e])
+        if new and new in seg and (old not in seg or old in new):
+            return "="
+        if seg.count(old) != 1:
+            raise LookupError("%s.%s: %r found %d times" % (stem, schema, old[:70], seg.count(old)))
+        lines[s:e] = seg.replace(old, new).split("\n")
+        f["dirty"] = True
+        return "~"
+
+    def replace_in_op(self, stem, op_id, old, new):
+        """One exact replacement inside an operation's text (from its method line to the next sibling)."""
+        f = self.files[stem]
+        lines = f["lines"]
+        hits = [i for i, l in enumerate(lines) if l.strip() == "operationId: %s" % op_id]
+        if len(hits) != 1:
+            raise LookupError("operation %s: %d matches in %s" % (op_id, len(hits), stem))
+        k = hits[0]
+        ind = _indent(lines[k]) - 2
+        s = k
+        while _indent(lines[s]) != ind or not lines[s].strip():
+            s -= 1
+        e = _span(lines, s, ind)
+        seg = "\n".join(lines[s:e])
+        if new and new in seg and (old not in seg or old in new):
+            return "="
+        if seg.count(old) != 1:
+            raise LookupError("%s: %r found %d times" % (op_id, old[:70], seg.count(old)))
+        lines[s:e] = seg.replace(old, new).split("\n")
+        f["dirty"] = True
+        return "~"
+
+    def replace_text(self, stem, old, new):
+        """One exact replacement anywhere in the file."""
+        f = self.files[stem]
+        text = "\n".join(f["lines"])
+        if new and new in text and (old not in text or old in new):
+            return "="
+        if text.count(old) != 1:
+            raise LookupError("%s: %r found %d times" % (stem, old[:70], text.count(old)))
+        f["lines"] = text.replace(old, new).split("\n")
+        f["dirty"] = True
+        return "~"
 
     def save(self):
         from ruamel.yaml import YAML

@@ -19820,6 +19820,7 @@ components:
           format: date-time
           nullable: true
     MarketingWaiverSignature:
+      x-ticvai-retired-columns: [template_id]
       type: object
       x-ticvai-persistence: marketing.waiver_signature
       description: '**Taken from the backend workbook, 20 September.** Stores the auditable signature of a customer/guardian against an exact immutable waiver-template version.'
@@ -19836,6 +19837,7 @@ components:
           type: string
           format: uuid
         templateId:
+          x-ticvai-column: form_definition_id
           x-ticvai-references: marketing.form_definition
           type: string
           format: uuid
@@ -22485,6 +22487,7 @@ components:
           type: string
           format: date-time
     ConversationMessage:
+      x-ticvai-retired-columns: [ai_interaction_id]
       type: object
       x-ticvai-persistence: marketing.conversation_message + marketing.conversation_message_attachment
       required:
@@ -22531,6 +22534,8 @@ components:
                 - qr
                 - paymentLink
         aiInteractionId:
+          x-ticvai-references: ai.activity
+          x-ticvai-column: ai_activity_id
           type: string
           format: uuid
           nullable: true
@@ -22734,6 +22739,7 @@ components:
           type: string
           format: uuid
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           format: uuid
         venueId:

@@ -22178,6 +22178,7 @@ components:
           type: integer
           minimum: 0
     ChannelAllocation:
+      x-ticvai-retired-columns: [envelope_id]
       x-ticvai-persistence: catalogue.channel_envelope
       type: object
       required:
@@ -22217,6 +22218,13 @@ components:
             freed close to a performance without someone remembering to do it.
 
             '
+        channelCapacityId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: catalogue.channel_capacity
+          description: The capacity envelope this allocation draws from (`catalogue.channel_capacity`), from the path of
+            `setChannelAllocations`.
         salesChannelId:
           type: string
           format: uuid
@@ -38189,6 +38197,7 @@ components:
           format: date-time
           readOnly: true
     PerformanceMediaAssignment:
+      x-ticvai-retired-columns: [participant_id]
       type: object
       x-ticvai-persistence: catalogue.performance_media
       description: >-
@@ -38215,6 +38224,7 @@ components:
           type: string
           format: uuid
         participantId:
+          x-ticvai-column: event_registration_id
           x-ticvai-references: catalogue.event_registration
           type: string
           format: uuid

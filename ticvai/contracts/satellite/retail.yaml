@@ -2128,6 +2128,7 @@ components:
         lastSoldAt: { type: string, format: date-time, nullable: true }
 
     ShopAndDrop:
+      x-ticvai-retired-columns: [collection_point_id]
       type: object
       x-ticvai-persistence: "retail.shop_and_drop + retail.shop_and_drop_line"
       required: [id, dropReference, collectionPointId, status, collectBy]
@@ -2152,7 +2153,7 @@ components:
             The ticket that claims these goods. The point of 4.4.7 — a guest does not have to
             keep a receipt safe for eight hours in a water park.
         subjectId: { type: string, format: uuid, nullable: true }
-        collectionPointId: { type: string, format: uuid }
+        collectionPointId: { type: string, format: uuid, x-ticvai-column: collection_location_id, x-ticvai-references: fnb.delivery_location}
         collectionPointName: { type: string }
         status:
           type: string

@@ -3598,6 +3598,7 @@ components:
           nullable: true
           description: Total cost over booked hours; null when nothing was booked.
     ResourceSelectionPolicy:
+      x-ticvai-retired-columns: [ticket_type_id]
       type: object
       x-ticvai-persistence: resources.selection_policy
       description: '**Whether the guest may choose the resource, per ticket type**: the body of
@@ -3614,6 +3615,7 @@ components:
           format: uuid
           readOnly: true
         ticketTypeId:
+          x-ticvai-column: ticket_product_id
           x-ticvai-references: catalogue.product
           type: string
           format: uuid

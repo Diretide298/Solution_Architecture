@@ -25,7 +25,7 @@ info:
 
     ## Rota is not a shift
 
-    `orders.shift` is a cash-handling session — a drawer opened, counted and closed, tied to a
+    `orders.pos_shift` is a cash-handling session — a drawer opened, counted and closed, tied to a
     workstation. **A rota assignment is a person expected somewhere at a time**, and most of
     the people on a rota never touch a till.
 

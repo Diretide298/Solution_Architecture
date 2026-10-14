@@ -1316,6 +1316,7 @@ components:
           description: Share of each cycle reserved for Fast Pass holders.
         zone: { type: string, nullable: true }
         fastPass:
+          x-ticvai-persisted: false
           allOf:
             - $ref: '#/components/schemas/QueueFastPass'
           nullable: true

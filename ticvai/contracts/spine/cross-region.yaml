@@ -1309,6 +1309,7 @@ components:
           type: string
           format: date-time
     CrossRegionEntitlement:
+      x-ticvai-retired-columns: [ticket_id]
       x-ticvai-persistence: sync.cross_region_entitlement
       type: object
       required:
@@ -1336,6 +1337,8 @@ components:
           type: string
           format: uuid
         ticketId:
+          x-ticvai-references: access.entitlement
+          x-ticvai-column: entitlement_id
           type: string
         guestLinkId:
           type: string

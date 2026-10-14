@@ -6070,6 +6070,7 @@ components:
           format: date
           description: A day in the region's time zone, local midnight to local midnight.
     TaxExemption:
+      x-ticvai-retired-columns: [evidence_document_id]
       x-ticvai-persistence: ledger.tax_exemption
       type: object
       description: 'Also the `createTaxExemption` body. **`id` is server-owned** (`readOnly`): a client does
@@ -6126,6 +6127,7 @@ components:
           description: 'Tax Exemption Evidence: reference, e.g. the exemption certificate, diplomatic card or
             export declaration number.'
         evidenceDocumentId:
+          x-ticvai-column: evidence_asset_id
           x-ticvai-references: assets.media_asset
           type: string
           format: uuid

@@ -377,7 +377,7 @@ paths:
       description: '**The link between the meter and the invoice, and it did not exist.** It lives in
         `subscription` rather than `ai` because **AI meters and subscription bills** — an AI operation
         writing a billing record would break the read-only rule in ADR-0020, which is how this landed
-        in the wrong contract on 17 August. `ai.interaction` recorded tokens and cost per call; `recordUsage`
+        in the wrong contract on 17 August. `ai.activity` recorded tokens and cost per call; `recordUsage`
         wrote a billing line; nothing joined them.
 
         Runs per tenant per period, aggregating from the interaction log and writing one `control.usage_record`
@@ -386,7 +386,7 @@ paths:
         each into a `metered` invoice line (metric `aiTokens`) at the AI module''s metered price (decided 29
         September: AI token usage is a metered line).
 
-        **Reads the primary, not the analytical replica.** `ai.interaction` sits on the analytical store
+        **Reads the primary, not the analytical replica.** `ai.activity` sits on the analytical store
         (ADR-0020) and replica lag at period close would invoice a number that changes after it is sent.
 
         '
@@ -10668,6 +10668,7 @@ components:
           items:
             $ref: '#/components/schemas/SubscriptionTierModule'
     SubscriptionTierAllowance:
+      x-ticvai-retired-columns: [tier_id]
       type: object
       x-ticvai-persistence: subscription.tier_allowance
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines usage/quantity allowances included in a subscription tier.'
@@ -10683,6 +10684,7 @@ components:
           type: string
           format: uuid
         tierId:
+          x-ticvai-column: plan_id
           x-ticvai-references: subscription.plan
           type: string
           format: uuid
@@ -10711,6 +10713,7 @@ components:
           format: date-time
           nullable: true
     SubscriptionTierModule:
+      x-ticvai-retired-columns: [tier_id]
       type: object
       x-ticvai-persistence: subscription.tier_module
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines which TICVAI technical modules are commercially included in a subscription tier.'
@@ -10725,6 +10728,7 @@ components:
           type: string
           format: uuid
         tierId:
+          x-ticvai-column: plan_id
           x-ticvai-references: subscription.plan
           type: string
           format: uuid

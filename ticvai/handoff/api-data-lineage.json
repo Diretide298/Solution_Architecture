@@ -13107,7 +13107,6 @@
    "marketing.attribution_touch",
    "marketing.campaign",
    "marketing.campaign_variant",
-   "marketing.message_delivery",
    "marketing.message_dispatch"
   ],
   "writes": [],
@@ -46238,7 +46237,6 @@
   "path": "/workstations/{workstationId}/health",
   "reads": [
    "platform.device",
-   "platform.device_heartbeat",
    "platform.workstation"
   ],
   "writes": [],
@@ -60519,7 +60517,6 @@
   "reads": [
    "ledger.settlement_exception",
    "orders.payment",
-   "orders.payment_tip",
    "orders.refund",
    "orders.sales_order",
    "orders.stored_value_authorisation"

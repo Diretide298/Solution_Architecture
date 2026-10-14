@@ -1180,7 +1180,7 @@ paths:
         becomes one secret per tenant and provider in the cell''s Azure Key Vault (the tenant''s own secret, never
         shared between tenants), encrypted at rest under the vault''s HSM-backed key; only the AI gateway''s workload
         identity may read it. It is write-only: never returned, never shown again, never logged, never in an audit
-        record or an `ai.interaction`; a reader sees `credentialHint` (the last four characters) and
+        record or an `ai.activity`; a reader sees `credentialHint` (the last four characters) and
         `credentialRotatedAt`. A new key resets `AiProvider.compatibility` to `notTested`; an active provider keeps
         serving on the previous key through the grace window while `testAiProvider` re-runs.
 
@@ -1219,7 +1219,7 @@ paths:
                 secret:
                   type: string
                   format: password
-                  description: '**Write-only, never returned, never logged, never in an `ai.interaction`.**
+                  description: '**Write-only, never returned, never logged, never in an `ai.activity`.**
                     Masked in any audit record of this call.
 
                     '
@@ -17665,6 +17665,7 @@ components:
           type: string
           format: date-time
     ProposedAction:
+      x-ticvai-retired-columns: [interaction_id]
       type: object
       x-ticvai-persistence: ai.proposed_action
       required:
@@ -17679,6 +17680,8 @@ components:
           type: string
           format: uuid
         interactionId:
+          x-ticvai-references: ai.activity
+          x-ticvai-column: activity_id
           type: string
           format: uuid
         translationJobId:
