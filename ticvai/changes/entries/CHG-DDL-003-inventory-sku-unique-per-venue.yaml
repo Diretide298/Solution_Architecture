@@ -1,0 +1,57 @@
+id: CHG-DDL-003
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'An inventory item''s SKU is unique per venue, as createInventoryItem''s 409 says: the generated index is
+  inventory_item_venue_id_sku_uniq on (venue_id, sku), replacing inventory_item_sku_uniq on (sku), and the 409 names
+  duplicate-code.'
+decision:
+  what: 'contracts/satellite/inventory.yaml: CreateInventoryItemRequest.sku `x-ticvai-unique: venue` (was tenant,
+    CHG-R6-017) with a description, and createInventoryItem''s 409 "SKU already in use in this venue" declares
+    x-ticvai-problem-types [duplicate-code]. derive-ddl writes CREATE UNIQUE INDEX inventory_item_venue_id_sku_uniq ON
+    inventory.inventory_item (venue_id, sku).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-068 (MIG-INVENTORY, #27673). Audit: TRUE. r4 generated inventory_item_sku_uniq on (sku) alone
+  (CHG-R6-017, CR-013, decided "unique per tenant") while inventory.inventory_item carries a required venue_id
+  (InventoryItem.venueId; CreateInventoryItemRequest requires venueId) and the venue policy, and the contract''s own
+  409 already said "SKU already in use in this venue" (inventory.yaml:666). An inventory item is "something a venue
+  stocks" (storage note), so a chain stocking one syrup at two venues keeps two rows; a tenant-wide index refuses the
+  second. Missed context: CHG-R6-017 chose tenant for every human code at once without reading this 409.'
+keys_touched:
+  operations:
+  - createInventoryItem
+  schemas:
+  - inventory.CreateInventoryItemRequest
+  tables:
+  - inventory.inventory_item
+  files:
+  - contracts/satellite/inventory.yaml
+  tickets:
+  - MIG-INVENTORY
+  other:
+  - CHG-R6-017
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - MIG-INVENTORY (#27673)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-068 (ADAM)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Lead to confirm: per venue (chosen; matches the 409, the required venueId and the venue
+  policy) against per tenant (CHG-R6-017; right only if head office keeps one SKU list across venues, and then the 409
+  text and the item model change instead). Not per stock location: an item row is per venue, locations hold its stock.
+  Contract impact: additive (an x-ticvai extension and a problem type; check-contract-compat PASS). Migration effect:
+  MIG-INVENTORY; the index is listed with the inventory.item rename in migration-review.md ("after rename"
+  inventory_item_venue_id_sku_uniq), so the forward migration that renames the table creates the per-venue index
+  instead of the per-tenant one; a database already carrying inventory_item_sku_uniq drops it there. lookupInventoryItem
+  (sku query) answers one item for the caller''s venue scope; a grant spanning venues needs the venue to pick one, a
+  follow-up for its owner. Check: check-storage-promises SP-DUPLICATE-409 fails on r5 (1eb1d063) with
+  "createInventoryItem ... promises sku unique per venue; the field has x-ticvai-unique: tenant" and passes here.'

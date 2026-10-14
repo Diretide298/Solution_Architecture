@@ -663,7 +663,9 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          description: SKU already in use in this venue
+          description: SKU already in use in this venue (`duplicate-code`; CHG-DDL-003)
+          x-ticvai-problem-types:
+          - duplicate-code
           content:
             application/problem+json:
               schema:
@@ -3934,9 +3936,14 @@ components:
       - costingMethod
       properties:
         sku:
-          x-ticvai-unique: tenant
+          x-ticvai-unique: venue
           type: string
           maxLength: 64
+          description: 'Unique within the item''s venue, as the 409 says (ADAM CR-068, CHG-DDL-003): an
+            inventory item is something one venue stocks (`venueId` is required), so two venues of a chain
+            keep their own row for the same syrup under the same SKU. The index is (venue_id, sku).
+
+            '
         barcode:
           type: string
           maxLength: 128
