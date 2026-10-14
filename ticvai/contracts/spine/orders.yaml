@@ -3388,7 +3388,7 @@ paths:
       - guest
       - partner
       - staff
-      summary: Add something
+      summary: Add a line to the cart
       description: '**A till''s cart is the session''s own** (decided 2 October 2026, CHG-SEED-013). On the till the cart
         belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller''s
         own cart, and for a till that is the session''s. A guest identified at the till is attached to

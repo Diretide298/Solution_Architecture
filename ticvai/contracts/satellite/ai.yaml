@@ -2396,6 +2396,8 @@ paths:
       operationId: listProposedActions
       x-ticvai-consumed-by:
         - "P08 BO-093 Map Import & Labelling"
+        - "P08 BO-762 Predictive Audiences"
+        - "P08 BO-793 AI Content, Translation & Audit"
         - "P08 BO-928 AI Conflict Resolution Assistant"
         - "P08 BO-929 Automatic Schedule Optimization"
         - "P09 ADM-492 Configuration Approval Workflow"

@@ -14406,7 +14406,7 @@ screens:
           (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type,
           group/individual, readiness and 1 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 64 §Filters
-      name: contentBody
+      name: contentBodyFilters
       slot: filters
     - components:
       - kind: metricTile
@@ -14437,8 +14437,8 @@ screens:
       slot: headline
     template: dashboard
   states:
-    emptyFirstRun: No rental checkout yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No rental checkout yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: The filter narrowed it and the rental checkout are still there. Names the active filter
@@ -14574,15 +14574,16 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No voucher scan reservation yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No voucher scan reservation yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the voucher scan reservation are still there. Names the
-      active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the voucher scan reservation untouched.
     loading: The voucher scan reservation list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -14625,10 +14626,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-073
   name: Checkout Readiness Validation
   module: Rentals
@@ -14661,15 +14662,16 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No checkout readiness validation yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No checkout readiness validation yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the checkout readiness validation are still there. Names
-      the active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the checkout readiness validation untouched.
     loading: The checkout readiness validation list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -14712,10 +14714,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-074
   name: Equipment Assignment Workspace
   module: Rentals
@@ -14754,9 +14756,9 @@ screens:
         kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
-      - kind: detailPanel
+      - bindsTo: RentalAvailability
+        kind: detailPanel
         label: Available units
-        bindsTo: RentalAvailability
         operation: getRentalAvailability
         provenance: contract rental.yaml GET /rental-availability; wiring fix, 2 October 2026
       name: contentBody
@@ -14765,8 +14767,8 @@ screens:
     emptyFirstRun: No equipment yet. Carries the create action; distinct from a filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the equipment are still there. Names the active filter
-      and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the equipment untouched.
     loading: The equipment list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -14790,11 +14792,11 @@ screens:
     provenance: board reading, 19 September 2026
     purpose: Bind the assets
     trigger: onAction
-  - operationId: getRentalAvailability
-    contract: rental
+  - contract: rental
+    operationId: getRentalAvailability
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
     purpose: Units available to assign
     trigger: onLoad
-    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 67. 0 of 0 labels bound to a
     contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14816,10 +14818,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-075
   name: Equipment Scan & Validation
   module: Rentals
@@ -14853,12 +14855,14 @@ screens:
         kind: primaryButton
         label: Assign rental equipment
         notes: The act the screen exists for.
+        operation: assignRentalEquipment
       - derived: true
         impliedBy: lookupAsset
         kind: searchField
         label: Search
         notes: Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012).
           A search that returns nothing must say so differently from a search not yet run.
+        operation: lookupAsset
       - derived: true
         impliedBy: assignRentalEquipment
         kind: secondaryButton
@@ -14922,10 +14926,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-076
   name: Pre-Rental Condition Inspection
   module: Rentals
@@ -14974,23 +14978,23 @@ screens:
       filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the pre-rental condition inspection are still there. Names
-      the active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the pre-rental condition inspection untouched.
     loading: The pre-rental condition inspection list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
       a connection, and no minute has decided it.
   gaps:
   - operation: null
+    source: pack Rental_Management.pdf, page 69
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
       it is built.'
-    source: pack Rental_Management.pdf, page 69
   - operation: null
+    source: pack Rental_Management.pdf, page 69
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-    source: pack Rental_Management.pdf, page 69
   apis:
   - contract: rental
     invalidates:
@@ -15022,10 +15026,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-077
   name: Safety & Handover Checklist
   module: Rentals
@@ -15070,12 +15074,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No safety handover checklist yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No safety handover checklist yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the safety handover checklist are still there. Names the
-      active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the safety handover checklist untouched.
     loading: The safety handover checklist list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15122,9 +15126,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-078
   name: Deposit & Financial Handover Validation
   module: Rentals
@@ -15173,12 +15177,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No deposit financial handover yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No deposit financial handover yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the deposit financial handover are still there. The pack's
-      own statuses are ✓ AUTHORIZED — the state names which is selected.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the deposit financial handover untouched.
     loading: The deposit financial handover list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15225,9 +15229,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-079
   name: Group & Multi-Item Checkout
   module: Rentals
@@ -15274,8 +15278,8 @@ screens:
       that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the group multi-item checkout are still there. Names the
-      active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the group multi-item checkout untouched.
     loading: The group multi-item checkout list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15320,10 +15324,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-080
   name: Checkout Confirmation & Rental Activation
   module: Rentals
@@ -15361,8 +15365,8 @@ screens:
       slot: fields
     template: form
   states:
-    emptyFirstRun: No checkout confirmation rental configured yet. Carries the create action and says
-      what the platform does in the meantime.
+    emptyFirstRun: No checkout confirmation rental configured. `checkOutRental` saves the first one; the
+      state says what the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
@@ -15402,9 +15406,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-081
   name: Active Rental Operations Command Center
   module: Rentals
@@ -15451,7 +15455,7 @@ screens:
           (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status,
           expected return and 2 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 78 §Filters
-      name: contentBody
+      name: contentBodyFilters
       slot: filters
     - components:
       - kind: metricTile
@@ -15482,8 +15486,8 @@ screens:
       slot: headline
     template: dashboard
   states:
-    emptyFirstRun: No active rental operations yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No active rental operations yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: The filter narrowed it and the active rental operations are still there. Names the
@@ -15613,15 +15617,16 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No active rental detail yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No active rental detail yet. **Offers no create action** — this screen declares no
+      operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the active rental detail are still there. Names the active
-      filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the active rental detail untouched.
     loading: The active rental detail list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15664,10 +15669,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-083
   name: Rental Extension Request
   module: Rentals
@@ -15695,22 +15700,19 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    template: split
     regions:
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: Current rental
-        columns:
+    - components:
+      - columns:
         - Start
         - Expected return
         - Current duration
+        kind: detailPanel
+        label: Current rental
         notes: No rental read is bound; these are the pack's labels.
         provenance: pack Rental_Management.pdf, page 81
-    - name: contentBody
-      slot: fields
-      components:
+      name: contextPanel
+      slot: selection
+    - components:
       - kind: selectField
         label: Additional duration
         notes: Sends `?to=` to `getRentalAvailability` (the expected return plus the added time) (CHG-RFM-012).
@@ -15721,37 +15723,40 @@ screens:
         label: Requested new return
         notes: Computed from expected return plus the added duration; read-only.
         provenance: pack Rental_Management.pdf, page 81
-    - name: contentBody
-      slot: collection
-      components:
-      - kind: dataTable
-        label: Extension check
-        bindsTo: RentalAvailability
+      name: contentBodyFields
+      slot: fields
+    - components:
+      - bindsTo: RentalAvailability
         columns:
         - RentalAvailability.windows[].availableQuantity
         - RentalAvailability.blockedWindows[].from
         - RentalAvailability.blockedWindows[].to
         - RentalAvailability.blockedWindows[].reason
         - Blocking asset
-        operation: getRentalAvailability
+        kind: dataTable
+        label: Extension check
         notes: EXTENSION AVAILABLE when the window stays open; otherwise the first blocking window's reason.
           The pack names the blocking asset (BIKE-017); no field does.
+        operation: getRentalAvailability
         provenance: pack Rental_Management.pdf, page 81
-    - name: actionBar
-      slot: rowActions
-      components:
+      name: contentBody
+      slot: collection
+    - components:
       - kind: secondaryButton
         label: Check availability
-        operation: getRentalAvailability
         notes: Re-reads availability for the extended window.
+        operation: getRentalAvailability
         provenance: contract rental.yaml GET /rental-availability
       - kind: primaryButton
         label: Continue to pricing
         notes: Hands over to Extension Pricing & Confirmation (pack page 82).
         provenance: pack Rental_Management.pdf, page 82
+      name: actionBar
+      slot: rowActions
+    template: split
   states:
-    emptyFirstRun: No rental extension request yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No rental extension request yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: The filter narrowed it and the rental extension request are still there. Names the
@@ -15762,9 +15767,9 @@ screens:
       a connection, and no minute has decided it.
   gaps:
   - operation: null
+    source: pack Rental_Management.pdf, page 81
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-    source: pack Rental_Management.pdf, page 81
   apis:
   - contract: rental
     operationId: getRentalAvailability
@@ -15832,12 +15837,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No extension pricing confirmation yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No extension pricing confirmation yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the extension pricing confirmation are still there. Names
-      the active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the extension pricing confirmation untouched.
     loading: The extension pricing confirmation list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15888,9 +15893,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `extendRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-085
   name: Equipment Swap / Replacement
   module: Rentals
@@ -15932,12 +15937,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No equipment swap replacement yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No equipment swap replacement yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the equipment swap replacement are still there. Names the
-      active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the equipment swap replacement untouched.
     loading: The equipment swap replacement list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -15982,10 +15987,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `swapRentalEquipment`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-086
   name: Rental Incident & Operational Exception
   module: Rentals
@@ -16026,12 +16031,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No rental incident operational yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No rental incident operational yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the rental incident operational are still there. Names
-      the active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the rental incident operational untouched.
     loading: The rental incident operational list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16106,15 +16111,16 @@ screens:
         kind: dataTable
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOverdueRentals
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No due soon customer yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No due soon customer yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the due soon customer are still there. Names the active
-      filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen offers no filter, so an empty `listOverdueRentals` is always
+      the first-run state above.'
     error: Could not load. Names which read failed and leaves the due soon customer untouched.
     loading: The due soon customer list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16188,6 +16194,7 @@ screens:
         kind: dataTable
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOverdueRentals
       name: contentBody
     template: split
   states:
@@ -16195,8 +16202,8 @@ screens:
       that makes one; distinct from a filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the overdue rental are still there. Names the active filter
-      and offers to clear it.
+    emptyNoResults: 'Never shown: this screen offers no filter, so an empty `listOverdueRentals` is always
+      the first-run state above.'
     error: Could not load. Names which read failed and leaves the overdue rental untouched.
     loading: The overdue rental list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16214,14 +16221,14 @@ screens:
       a default rather than a reading. It needs a person before it is built.'
   - operation: sendTransactionalMessage
     removed: true
+    source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage
     why: 'Removed 2 October 2026 (CHG-WIR-008): sendTransactionalMessage declares the service and partner
       audiences, not staff, so a staff device cannot call it as declared (design-notes correction fnb-retail
       EMP-088).'
-    source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage
   - operation: null
+    source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-callable reminder for an overdue
       rental.'
-    source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage
   apis:
   - contract: rental
     operationId: listOverdueRentals
@@ -16277,15 +16284,16 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No active group rental yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No active group rental yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the active group rental are still there. Names the active
-      filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the active group rental untouched.
     loading: The active group rental list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16328,10 +16336,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-090
   name: Active Rental Intelligence & Operational Alerts
   module: Rentals
@@ -16366,7 +16374,7 @@ screens:
         - Extension demand
         kind: dataTable
         label: Every active rental intelligence
-        operation: null
+        operation: listOverdueRentals
         provenance: pack Rental_Management.pdf, page 87 §Display
       name: contentBody
       slot: collection
@@ -16387,12 +16395,12 @@ screens:
       slot: selection
     template: split
   states:
-    emptyFirstRun: No active rental intelligence yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No active rental intelligence yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the active rental intelligence are still there. Names the
-      active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen offers no filter, so an empty `listOverdueRentals` is always
+      the first-run state above.'
     error: Could not load. Names which read failed and leaves the active rental intelligence untouched.
     loading: The active rental intelligence list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16478,9 +16486,13 @@ screens:
         kind: multiSelect
         label: Filter by
         notes: The pack filters this screen by venue, return location, product, expected return, rental
-          status, damage status and 2 more — which are present is a decision the pack already made.
+          status, damage status and 2 more — which are present is a decision the pack already made. Sends
+          `?status=` to `listRentalBookings` for Rental Status; Return Location sends `?locationId=` and
+          Expected Return `?from=` and `?to=`; Venue, Product, Damage Status, Deposit Status and Group/Individual
+          have no parameter on it yet (Block A audit, 14 October 2026, CHG-SCR-020).
+        operation: listRentalBookings
         provenance: pack Rental_Management.pdf, page 92 §Filters
-      name: contentBody
+      name: contentBodyFilters
       slot: filters
     - components:
       - kind: metricTile
@@ -16517,8 +16529,8 @@ screens:
       slot: headline
     template: dashboard
   states:
-    emptyFirstRun: No rental return yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No rental return yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
     emptyNoResults: The filter narrowed it and the rental return are still there. Names the active filter
@@ -16654,15 +16666,16 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No return scan rental yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No return scan rental yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the return scan rental are still there. Names the active
-      filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the return scan rental untouched.
     loading: The return scan rental list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16705,10 +16718,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-093
   name: Return Summary & Actual Return Time
   module: Rentals
@@ -16749,12 +16762,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No return summary actual yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No return summary actual yet. **Offers no create action** — this screen declares no
+      operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the return summary actual are still there. Names the active
-      filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the return summary actual untouched.
     loading: The return summary actual list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16802,9 +16815,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-094
   name: Post-Rental Condition Inspection
   module: Rentals
@@ -16849,8 +16862,8 @@ screens:
       filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the post-rental condition inspection are still there. Names
-      the active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the post-rental condition inspection untouched.
     loading: The post-rental condition inspection list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16895,10 +16908,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-095
   name: Before vs After Condition Comparison
   module: Rentals
@@ -16944,8 +16957,8 @@ screens:
       matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the before after condition are still there. Names the active
-      filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the before after condition untouched.
     loading: The before after condition list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -16962,8 +16975,8 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
   - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No read returns a rental booking''s inspections.'
     source: contracts/satellite/rental.yaml#recordRentalInspection
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No read returns a rental booking''s inspections.'
   apis:
   - contract: rental
     invalidates:
@@ -16993,10 +17006,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-096
   name: Damage Assessment & Charge Workflow
   module: Rentals
@@ -17038,12 +17051,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No damage assessment charge yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No damage assessment charge yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the damage assessment charge are still there. Names the
-      active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the damage assessment charge untouched.
     loading: The damage assessment charge list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17088,10 +17101,10 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assessRentalDamage`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-097
   name: Partial Return & Missing Equipment
   module: Rentals
@@ -17133,12 +17146,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No partial return missing yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No partial return missing yet. **Offers no create action** — this screen declares no
+      operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the partial return missing are still there. Names the active
-      filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the partial return missing untouched.
     loading: The partial return missing list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17186,9 +17199,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-098
   name: Late Fees, Damage Fees & Final Settlement
   module: Rentals
@@ -17236,12 +17249,12 @@ screens:
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No late fees damage yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No late fees damage yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the late fees damage are still there. Names the active
-      filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the late fees damage untouched.
     loading: The late fees damage list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17289,9 +17302,9 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-099
   name: Deposit Release, Capture & Customer Confirmation
   module: Rentals
@@ -17331,20 +17344,20 @@ screens:
         kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
-      - kind: dataTable
+      - bindsTo: PaymentsDepositActivity
+        kind: dataTable
         label: Deposit history
-        bindsTo: PaymentsDepositActivity
         operation: listDepositActivity
         provenance: contract payments.yaml GET /deposits/{depositId}/activity; wiring fix, 2 October 2026
       name: contentBody
     template: split
   states:
-    emptyFirstRun: No deposit release capture yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No deposit release capture yet. **Offers no create action** — this screen declares
+      no operation that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the deposit release capture are still there. Names the
-      active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen offers no filter, so an empty `listDepositActivity` is always
+      the first-run state above.'
     error: Could not load. Names which read failed and leaves the deposit release capture untouched.
     loading: The deposit release capture list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17371,11 +17384,11 @@ screens:
     provenance: board reading, 19 September 2026
     purpose: Capture or release the deposit
     trigger: onAction
-  - operationId: listDepositActivity
-    contract: payments
+  - contract: payments
+    operationId: listDepositActivity
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
     purpose: The deposit's movement history
     trigger: onLoad
-    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 100. 0 of 0 labels bound to a
     contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -17397,11 +17410,11 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
-    - name: depositId
-      from: navigation
+      optional: true
+    - from: navigation
+      name: depositId
 - id: EMP-100
   name: Return Completion & Equipment Disposition
   module: Rentals
@@ -17448,8 +17461,8 @@ screens:
       no operation that makes one; distinct from a filter that matched nothing.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-    emptyNoResults: The filter narrowed it and the return completion equipment are still there. Names
-      the active filter and offers to clear it.
+    emptyNoResults: 'Never shown: this screen has no list or filter to narrow, so nothing it shows can
+      be filtered to empty.'
     error: Could not load. Names which read failed and leaves the return completion equipment untouched.
     loading: The return completion equipment list.
     offline: TODO — not decided. Rental Management does not say what a staff device does here without
@@ -17467,13 +17480,13 @@ screens:
       a default rather than a reading. It needs a person before it is built.'
   - operation: setAssetStatus
     removed: true
+    source: contracts/satellite/maintenance.yaml#setAssetStatus | DI-500
     why: 'Removed 2 October 2026 (CHG-WIR-008): setAssetStatus needs ASSET_MANAGE (a configure-tier grant
       on the staff app), offers six maintenance statuses and takes one asset per screen; the unit''s next
       state belongs to the return (DI-500; design-notes correction fnb-retail EMP-100).'
-    source: contracts/satellite/maintenance.yaml#setAssetStatus | DI-500
   - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): returnRental carries no per-unit disposition.'
     source: contracts/satellite/rental.yaml#returnRental | DI-500
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): returnRental carries no per-unit disposition.'
   apis:
   - contract: rental
     invalidates:
@@ -17506,6 +17519,6 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true

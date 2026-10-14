@@ -1,0 +1,44 @@
+id: CHG-SCR-009
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Screens on one platform that call the same operations each state their division in a new screen field,
+  `division`, derived on the refresh from their own purpose and pack source; no screen is merged.'
+decision:
+  what: 'screens/_schema.yaml declares `division`. tools/derive-screen-wiring.py gains rule S-DUP-SCREEN
+    (fix_division): each member of a same-signature group (the check''s signature, the console grant frame left out)
+    states the operations it shares, the screens it shares them with, and which part of the record it is for (its
+    purpose, its pack board and page). tools/check-screen-wiring.py S-DUP-SCREEN now reads the field it always named
+    ("no stated division"): a group passes when every member states one. Screens are never merged (client-approved UI,
+    Chinmay, 14 October 2026).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R276): check-screen-wiring/S-DUP-SCREEN had 74 groups
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 40 Block A tickets). Default ruling (triage.py): "Two screens
+  with the same operations state their division, or merge"; the coordinator''s instruction: record the division,
+  never merge. After: 0 package-wide.'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - tools/check-screen-wiring.py
+  - screens/_schema.yaml
+  - screens/P08-venue-back-office.yaml
+  screens:
+  - P08 on this branch; the other platforms at the refresh
+  other:
+  - S-DUP-SCREEN
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCR, 14 October 2026. The derived division is a floor: where two screens are in fact one screen drawn
+  twice, the lead and the client decide; the field says so in the meantime.'

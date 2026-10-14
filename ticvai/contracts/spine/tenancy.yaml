@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 47
+  x-ticvai-screen-count: 48
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -917,6 +917,8 @@ paths:
   /profile-deployments:
     get:
       operationId: listProfileDeployments
+      x-ticvai-consumed-by:
+        - "P08 BO-1068 Lifecycle & Environment Promotion"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Recent deployments, with a date, a target and an outcome

@@ -1,0 +1,39 @@
+id: CHG-SCR-017
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A write declared onLoad fires on the control that calls it, or in the background for a shell beacon, by a
+  deriver on the refresh.'
+decision:
+  what: 'tools/derive-screen-wiring.py gains rule S-ONLOAD-WRITE (fix_onload_write): a write (not read-like) declared
+    `onLoad` that a component, overlay or transition reaches becomes `onAction` (BO-1173 publishWalletConfiguration,
+    bound to its publish gate); a `record...Events` beacon becomes `background` (WEB-001 and GST-001
+    recordStorefrontSessionEvents, through the event sink). Trigger metadata only (client-approved UI, Chinmay, 14
+    October 2026).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R268): check-screen-wiring/S-ONLOAD-WRITE had 3 members
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 22 Block A tickets). Default ruling (triage.py): "No write on
+  load; move it to an action (analytics events go through the event sink)". After: 0 package-wide.'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - screens/P08-venue-back-office.yaml
+  screens:
+  - BO-1173 on this branch; WEB-001 and GST-001 at the refresh
+  other:
+  - S-ONLOAD-WRITE
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-screen-wiring.py::fix_onload_write
+status: open
+notes: Batch SCR, 14 October 2026.

@@ -1,0 +1,38 @@
+id: CHG-SCR-012
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'check-screen-wiring S-WORKSTATION-OP accepts a workstation-scoped operation on a guest platform when the
+  operation is guest-callable (x-ticvai-guest-callable: createPayment, inquirePaymentStatus): that is the guest
+  variant the ruling asks for.'
+decision:
+  what: 'tools/check-screen-wiring.py: a workstation-scoped operation declaring `x-ticvai-guest-callable` (CHG-GCF-003)
+    is not a finding on P01, P02 or P05. Strict for every other member: a workstation operation on the scanner, the
+    partner portal or a console still fails until its screen takes a workstation from the session or calls another
+    variant (those screens are the platform batches'').'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R100): check-screen-wiring/S-WORKSTATION-OP had 41 members
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 73 Block A tickets). Default ruling (triage.py): "the guest
+  storefront uses the guest variant"; the guest variant of createPayment and inquirePaymentStatus is the same
+  operation, guest-callable since CHG-GCF-003 (rule asked by the guest-screens batch). After: 34 package-wide (7 guest
+  members cleared): P07 scanner 19, P10 partner 13, P09/P12 getCurrentSession 2, none on P08.'
+keys_touched:
+  files:
+  - tools/check-screen-wiring.py
+  other:
+  - S-WORKSTATION-OP
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCR, 14 October 2026. The remaining 34 are on platforms the audit/screens-other batch owns; whether the
+  scanner and the partner portal sign a workstation in is a product question for the lead.'

@@ -859,3 +859,16 @@ changes:
     tag: r6
     producer-tickets: [SVC-MARKETING-CONSENT-23]
     consumer-tickets: [APP-SETUP-CMS-025, APP-SETUP-CMS-025-REST]
+  - id: BC-230
+    contract: games
+    operation: getGameCard
+    change: "x-ticvai-permission changed"
+    reason: >-
+      Block A audit, 14 October 2026 (S-STAFF-AUDIENCE, AM-STAFF-OP; the contract gap CHG-WIR-004): five back-office
+      screens (BO-454, BO-455, BO-457, BO-462, BO-486) read a game card and the operation was guest-only. Staff now call
+      it with WALLET_VIEW (a card's credits are stored value); a guest calls it in its own session as before
+      (x-ticvai-guest-callable). Breaking only for an API-key reader whose key lacks WALLET_VIEW (CHG-SCR-015).
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-VENUEOPS-CARD-1]
+    consumer-tickets: [VM-BO-454, VM-BO-455, VM-BO-457, VM-BO-462, VM-BO-486, APP-WEB-WEB-021, APP-MOB-GST-011]

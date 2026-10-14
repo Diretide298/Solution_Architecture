@@ -175,7 +175,6 @@ paths:
         - "P08 BO-940 Manager Mobile Approval Center"
       x-ticvai-audience:
       - staff
-      - public
       summary: Requests awaiting a decision, or already decided
       description: '11.1.16. The approver''s queue and the requester''s history are the same list filtered
         differently, so they are one operation.
@@ -509,7 +508,6 @@ paths:
         event: approval.granted
       x-ticvai-audience:
       - staff
-      - public
       summary: Approve, reject, return or ask for information
       description: '**Records an authorisation. Does not perform the action.** The requesting contract
         executes afterwards under the approver''s permission.

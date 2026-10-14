@@ -1,0 +1,32 @@
+id: CHG-SCR-013
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'check-screen-wiring S-GUEST-AUDIENCE accepts a device-audience operation on the kiosk (P05), as
+  typed_props.DEVICE_GUEST_PLATFORMS already does: the kiosk is a guest surface on a registered device.'
+decision:
+  what: 'tools/check-screen-wiring.py reads typed_props.DEVICE_GUEST_PLATFORMS; on those platforms a device operation is
+    the screen''s own (KSK-013 endKioskAssist). Strict on guest web and app.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R167 R289): check-screen-wiring/S-GUEST-AUDIENCE had 1 member
+  (KSK-013 endKioskAssist; evidence audit/ticvai/runs/audit-1014/classes.json). Default ruling (triage.py): "kiosk
+  assist goes through the device". The device is the kiosk (rule asked by the guest-screens batch). After: 0.'
+keys_touched:
+  files:
+  - tools/check-screen-wiring.py
+  other:
+  - S-GUEST-AUDIENCE
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: Batch SCR, 14 October 2026.

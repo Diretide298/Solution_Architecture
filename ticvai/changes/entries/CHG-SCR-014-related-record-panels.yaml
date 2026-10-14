@@ -1,0 +1,41 @@
+id: CHG-SCR-014
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'check-screen-wiring S-PANEL-ENTITY tells a related-record panel from a wrong one: a detail panel showing
+  another entity than the table passes when its read needs no id the screen does not hold (the selected row carries
+  it, or the screen does), and fails when it needs one nothing gives it.'
+decision:
+  what: 'tools/check-screen-wiring.py S-PANEL-ENTITY reads the panel''s operation path parameters against the table''s
+    row schema and the screen''s entry parameters. GST-073 (the guest''s devices, with the device''s sessions in the
+    panel) is the case #27741 decided: the panel is right, and revoking a device also signs it out in the API (decision
+    1; batch MOD). No screen changes (client-approved UI, Chinmay, 14 October 2026).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R256; #27741 problem 2): check-screen-wiring/S-PANEL-ENTITY had
+  8 members (evidence audit/ticvai/runs/audit-1014/classes.json, 29 Block A tickets): GST-073, POS-001, BO-406,
+  BO-1116, BO-1149, ADM-598, ADM-351, CMS-102. Each panel reads a related record whose id the row or the screen holds
+  (getDevice for a reader, getWalletBalance for a shared wallet, getCurrentShift beside the denominations, the rules
+  beside their performance). After: 0.'
+keys_touched:
+  files:
+  - tools/check-screen-wiring.py
+  screens:
+  - GST-073
+  other:
+  - S-PANEL-ENTITY
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCR, 14 October 2026. GST-073 needs from the contract (batch MOD): revokeGuestDevice ends every guest
+  session and refresh token of that device, so the screen''s promise that revoking signs the device out holds, and the
+  sessions panel shows none for a revoked device afterwards.'

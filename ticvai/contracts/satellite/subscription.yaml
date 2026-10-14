@@ -191,7 +191,7 @@ paths:
       - bearerAuth: []
       - prospectAuth: []
       x-ticvai-audience:
-      - public
+      - staff
       - prospect
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -234,7 +234,6 @@ paths:
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience:
       - staff
-      - public
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: false
@@ -8936,8 +8935,16 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-595 AI Setup Command Center"
         - "P08 BO-596 Guided Setup Plan"
+        - "P08 BO-603 Configuration Health & AI Review"
         - "P08 BO-604 Setup Completion & Handoff to Go-Live"
         - "P08 BO-605 Go-Live Readiness Command Center"
+        - "P08 BO-606 Automated Validation Plan"
+        - "P08 BO-607 Ticketing & Product Validation"
+        - "P08 BO-608 End-to-End Sales Channel Testing"
+        - "P08 BO-609 Payment & Financial Validation"
+        - "P08 BO-610 Ticket, QR & Access Validation"
+        - "P08 BO-611 User, Security & Integration Validation"
+        - "P08 BO-612 Communication & Customer Journey Validation"
         - "P08 BO-613 Blocker, Warning & AI Resolution Center"
         - "P08 BO-614 Final Go-Live Approval & Production Launch"
         - "P09 ADM-427 Provisioning Validation & Exception Management"

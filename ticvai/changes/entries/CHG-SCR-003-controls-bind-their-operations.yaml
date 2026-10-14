@@ -1,0 +1,50 @@
+id: CHG-SCR-003
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A declared operation is bound to the control or panel on the client-approved screen that calls it, by a
+  deriver on the refresh; an operation no approved control reaches stays declared and is reported as a keep.'
+decision:
+  what: 'tools/derive-screen-wiring.py gains rule S-OP-UNREACHED (fix_unreached). For each declared operation no
+    component, overlay or transition reaches, it sets `operation` on the component already on the screen that calls
+    it, in this order: the component derive-components proposed for it (`impliedBy`, never the Cancel beside it); a
+    panel bound to the schema the read returns, or a form field bound to the write''s body; a button whose label names
+    the operation''s verb and object (one clear winner only); the screen''s one publish gate for a publish; the
+    screen''s one unbound table or panel for its one read nothing shows. A shell beacon no person triggers
+    (record...Events) runs in the background. A button whose write needs a body nothing on the screen collects is
+    not bound (S-BUTTON-FORM). Nothing visible is added, removed or relabelled (client-approved UI, Chinmay, 14
+    October 2026); the ruling''s "otherwise remove it from the screen" is not applied, because the screen records
+    of the pack-sourced screens do not enumerate every control their approved boards draw, and removing the call
+    would drop it from the screen''s ticket.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R273): check-screen-wiring/S-OP-UNREACHED had 2,171 members
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 858 Block A tickets). Default ruling (triage.py): "wire onLoad
+  reads to the load; otherwise remove it from the screen". After: 1,640 package-wide, every one a keep reported by
+  the deriver (client-approved UI): 1,305 have no control on the approved screen (788 actions, 515 loads, 2 saves)
+  and 337 have a control whose body nothing on the screen collects. 531 bindings made (342 proposed components, 155
+  one-panel reads, 16 publish gates, 10 by label or schema, 8 beacons).'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - screens/P08-venue-back-office.yaml
+  screens:
+  - P08 on this branch; the other platforms at the refresh
+  other:
+  - S-OP-UNREACHED
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-screen-wiring.py::fix_unreached
+status: open
+notes: 'Batch SCR, 14 October 2026. The keeps need a lead decision: either the client confirms the missing controls
+  (the board draws them and the record does not list them yet), or the declarations go. Listed by the deriver
+  (--only S-OP-UNREACHED --verbose).'

@@ -1,0 +1,40 @@
+id: CHG-SCR-018
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A search hit''s `id` with its `kind` is that kind''s id: an operation returning `{id, kind}` rows that takes
+  `kind` as a query enum yields `<kind>Id` for each value, so a transition from a search screen carries the id of the
+  hit it opens (GST-063 -> GST-004 productId).'
+decision:
+  what: 'tools/derive-carries-from-entrystate.py Contracts.yields: the rule above (asked by the guest-screens batch).
+    check-navigation reads holds() from the same deriver, so N-CARRIES-HELD sees it. The deriver, on the refresh, then
+    carries bundleId as well on GST-002 and GST-003 -> GST-004 and orderId on BO-133 -> POS-002 (the P08 edge is
+    committed here; the P02 edges come with the refresh). Transition metadata only.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R251 R262): check-navigation/N-CARRIES-HELD had 7 members
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 51 Block A tickets). Default ruling (triage.py): "A transition
+  carries only ids the source screen holds". After: 6, all POS-006 -> POS-002 (cart, cartHoldExpiresAt, discount,
+  guest, orderType, table: the held sale''s state, not ids), which the POS and staff screens batch owns.'
+keys_touched:
+  files:
+  - tools/derive-carries-from-entrystate.py
+  - screens/P08-venue-back-office.yaml
+  screens:
+  - BO-133
+  other:
+  - N-CARRIES-HELD
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: open
+notes: Batch SCR, 14 October 2026.

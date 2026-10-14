@@ -193,15 +193,23 @@ paths:
         - "P08 BO-486 Customer Card / Wallet Identification"
       x-ticvai-audience:
       - guest
+      - staff
       x-ticvai-read-routing: primary
       summary: Read a card's balances
       description: 'The reader path. Offline-capable so a machine can validate a card during a network
         blip — the balance may be stale, which is why spend is reconciled on sync.
 
+
+        **Staff read a card here too** (Block A audit, 14 October 2026, CHG-SCR-015; the contract gap CHG-WIR-004
+        recorded): the back office''s card lifecycle, profile, activity, balance and identification screens (BO-454,
+        BO-455, BO-457, BO-462, BO-486) need `WALLET_VIEW`, a card''s credits being stored value. A guest calls it in
+        its own session without a permission (`x-ticvai-guest-callable`), as before.
+
         '
       tags:
       - card
-      x-ticvai-permission: null
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins

@@ -1,0 +1,39 @@
+id: CHG-SCR-005
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A screen that edits a record reads it on load where the contract has the read and the approved screen has a
+  panel to show it; every member left is reported by the deriver as a contract gap (no read on the record''s path) or
+  a client-approved-UI keep (nothing on the screen to show the read in).'
+decision:
+  what: 'tools/derive-screen-wiring.py gains rule S-NO-READ (fix_no_read): for a screen that PUTs or PATCHes and reads
+    nothing, the GET on the edited path is declared onLoad and bound to the screen''s one unbound panel or table that
+    shows its schema. No panel or field is added (client-approved UI, Chinmay, 14 October 2026), so where the approved
+    screen has nowhere to show the record the read is not declared (it would be an unreached operation).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R265): check-screen-wiring/S-NO-READ had 223 members (evidence
+  audit/ticvai/runs/audit-1014/classes.json, 11 Block A tickets). Default ruling (triage.py): "A screen that edits a
+  record reads it first". After: 223 package-wide, all reported: 159 edit a record the contract cannot read back (no
+  GET on the PUT''s path: a contract gap for the module owners) and 64 have a read but no panel on the approved screen
+  to show it.'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  other:
+  - S-NO-READ
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-screen-wiring.py::fix_no_read
+status: open
+notes: 'Batch SCR, 14 October 2026. No screen file changes in this class. The 64 with a read could be closed by
+  counting a prefill read as reaching the form it fills (a check-screen-wiring refinement the lead may want); the 159
+  need contract reads.'

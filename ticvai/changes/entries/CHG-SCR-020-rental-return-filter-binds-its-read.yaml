@@ -1,0 +1,41 @@
+id: CHG-SCR-020
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'BO-564 Rental Return''s "Filter by" binds the parameters listRentalBookings takes (status, locationId, from,
+  to) and says which of the pack''s filters have none yet; its staff-app twin EMP-091 follows. The binding ratchet''s
+  venue-staff-mobile block C count falls back under its baseline.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-564: the multiSelect "Filter by" gains `operation: listRentalBookings`
+    and a note naming the parameter each pack filter sends; label, columns and layout unchanged (client-approved UI,
+    Chinmay, 14 October 2026). EMP-091 re-synced by tools/applied/apply-rental-staff-app.py --apply.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026: check-binding-ratchet failed on audit-base,
+  venue-staff-mobile|C|unbound-control 21 -> 22 (EMP-080, EMP-091 and four other staff-app screens; council of 2
+  October, rule 15: the binding counts only fall). After: 21 -> 20 there, 5,195 -> 5,193 unbound controls overall, no
+  count above its baseline.'
+keys_touched:
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P06-staff-app.yaml
+  screens:
+  - BO-564
+  - EMP-091
+  other:
+  - check-binding-ratchet
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - VM-BO-564
+  - the staff-app ticket of EMP-091 (impact list)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: Batch SCR, 14 October 2026. The lead records the lower counts with --update-baseline after the merge.
