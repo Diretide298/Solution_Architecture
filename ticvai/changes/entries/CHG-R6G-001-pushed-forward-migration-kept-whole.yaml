@@ -1,0 +1,57 @@
+id: CHG-R6G-001
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'A pushed forward migration every table of which the first release now needs keeps its key: approvals.escalation
+  stays on VM-MIG-APPROVALS (#27826, V1005), moved into the first release, instead of joining MIG-APPROVALS and
+  leaving the pushed ticket out of the plan; the key-stability self-tests judge only what their own edit causes.'
+decision:
+  what: 'tools/build-service-docs.py (fwd_kept, beside the first-release migrations): a pushed VM-MIG-<S> or MIG-<S>-<n>
+    whose pushed tables are all now read or written by the first release, and none of them pushed under MIG-<S>, is
+    one task under its pushed key in the MIG epic (phase 1, after MIG-<S> and the migrations its keys point into),
+    keeps its planned file (V1005__approvals.sql) and is what the slice operations writing the table wait on. A pushed
+    migration only part of whose tables are needed is left as before. tools/check-key-stability.py: the three
+    "passes" self-tests subtract the findings today''s unedited plan already has, so a real finding is reported once,
+    by the check, not again as three failed tests.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'First full r6 gate (14 October 2026, run 20261014-144320-609): check-key-stability failed, "#27826 VM-MIG-APPROVALS
+  left the plan, and its work approvals.escalation is now under MIG-APPROVALS: keep VM-MIG-APPROVALS for that work
+  (moves are metadata)", and three self-tests failed with the same text. CHG-CRD-006 (ADAM CR-078) made
+  ApprovalRequest.escalations[] persist to approvals.escalation, so createApprovalRequest, resubmitApprovalRequest and
+  reopenApprovalRequest (first release) write it, and the first-release migration grouping put it into MIG-APPROVALS
+  (V0010, the frozen r1 file). Lead''s decision: a pushed key is never renamed; keep VM-MIG-APPROVALS for that work.
+  The self-tests compared check() on an edited plan with no errors at all, so any live finding failed them.'
+keys_touched:
+  tables:
+  - approvals.escalation
+  tickets:
+  - VM-MIG-APPROVALS
+  - MIG-APPROVALS
+  files:
+  - tools/build-service-docs.py
+  - tools/check-key-stability.py
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started:
+  - VM-MIG-APPROVALS (#27826)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py::fwd_kept
+status: open
+notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". check-key-stability (already registered) is the check that caught it. Verified in the kept
+  gate worktree (w609) with the committed plan-tasks.csv and tasks.csv as the prior: build-service-docs writes
+  VM-MIG-APPROVALS "[DB] Forward migration V1005__approvals.sql: approvals for the first release (1 tables)", phase 1,
+  Block A, depends MIG-APPROVALS and MIG-BASELINE; MIG-APPROVALS is back to its six r1 tables. check-key-stability
+  passes (16 tests); on the gate''s tasks.csv the new check still fails with the 8 renamed lines and 0 self-tests
+  failed. check-plan-closure, check-migration-tickets, check-migration-wording, check-ticket-scope, -text, -builds,
+  check-plan-owners, check-device-tiers and check-ddl-conventions (D-MIG-TABLES, D-MIG-ORDER) pass as at the gate.
+  The ticket moves from AM-APPROVALS-P08-BLOCK-A to the first release''s database work: metadata, its text unchanged
+  on OpenProject until the tag. Not changed: identity.sso_provider joined MIG-IDENTITY while MIG-IDENTITY-2 (#27753)
+  keeps sso_group_mapping (only part of that pushed migration is needed, so the rule leaves it; no check fails).'
