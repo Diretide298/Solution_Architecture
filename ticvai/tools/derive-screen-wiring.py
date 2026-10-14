@@ -713,6 +713,36 @@ def fix_onload_write(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
             keeps.append((s["id"], "S-ONLOAD-WRITE", f"{o} is a write declared onLoad and no control calls it"))
 
 
+# ── W-INCOMING-UNLINKED ─────────────────────────────────────────────────────────────────────────
+# A frame drawn or captured into `wireframes/incoming/<batch>/<id>.html` that the screen's record never names is a
+# design nobody building the screen will open. The record names it in `wireframe.note` (a link, invisible).
+
+_INCOMING: dict = {}
+
+
+def incoming_frames() -> dict:
+    if not _INCOMING:
+        _INCOMING["_"] = {}
+        for f in (ROOT / "wireframes" / "incoming").glob("*/*.html"):
+            m = re.match(r"([a-z]{2,5}-\d{3,4})", f.stem, re.I)
+            if m:
+                _INCOMING["_"].setdefault(m.group(1).upper(), []).append(f.relative_to(ROOT).as_posix())
+    return _INCOMING["_"]
+
+
+def fix_incoming(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    w = s.get("wireframe")
+    if not isinstance(w, dict) or w.get("status") not in (None, "notStarted"):
+        return
+    blob = json.dumps({"w": w, "b": s.get("boardFrames")}, default=str)
+    paths = [p for p in sorted(incoming_frames().get(s["id"], [])) if p not in blob]
+    if not paths or "incoming" in blob:
+        return
+    w["note"] = (str(w.get("note") or "").rstrip() + (" " if w.get("note") else "")
+                 + "Drawn frame: " + ", ".join(paths) + " (linked by the Block A audit, 14 October 2026).")
+    log.append(f"{s['id']}: wireframe names its drawn frame {paths[0]}")
+
+
 STEPS = {
     "S-PURPOSE-BOILERPLATE": fix_screen_purpose,
     "S-PURPOSE-TEMPLATE": fix_api_purpose,
@@ -726,6 +756,7 @@ STEPS = {
     "S-ASYNC-POLL": fix_async,
     "S-BUTTON-FORM": fix_button_form,
     "S-DUP-SCREEN": fix_division,
+    "W-INCOMING-UNLINKED": fix_incoming,
 }
 
 
