@@ -369,7 +369,6 @@ python3 tools/build-changelog-index.py
 # here, so the release gate runs adam-links.py first: docs/active/release-runbook.md section 4) and
 # check-approved-ui (screens/ against handoff/approved-ui.json; its --snapshot <ref> is an act, run by hand when the
 # client approves a new UI, never here).
-python3 tools/run-checks.py
 # `--json` keeps the run for ADAM's Audit page as well as printing it (refresh-safe.sh writes the same
 # file from the run it judges, which is the one a release is made from).
 python3 tools/run-checks.py --json handoff/checks.json
