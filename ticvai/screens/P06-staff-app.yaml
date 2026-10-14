@@ -4591,6 +4591,11 @@ screens:
     contract: ai
     purpose: A principal's conversation history
     trigger: onLoad
+  - operationId: recordAnswerFeedback
+    contract: ai
+    purpose: Say whether an answer helped
+    trigger: onAction
+    provenance: build, 29 September 2026
   - operationId: askReportingQuestion
     contract: reporting
     purpose: Answer a numeric question from the semantic layer

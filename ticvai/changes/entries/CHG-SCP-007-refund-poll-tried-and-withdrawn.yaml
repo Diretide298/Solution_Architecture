@@ -1,0 +1,37 @@
+id: CHG-SCP-007
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Tried and withdrawn: POS-011 polling listOrderRefunds after createRefund''s 202. The added orders read moves
+  POS-011 from the Retail feature (AM-RETAIL-P04) to Orders & Reservations (AM-ORDERS-RESERVATIONS-P04) when the
+  plan is composed, which is ticket churn on a Block A frontend ticket and three new check-ticket-scope findings.'
+decision:
+  what: 'No change kept. Commit 578f8b81 added listOrderRefunds (onInterval) to POS-011; commit 7a166d5c reverts it.
+    S-ASYNC-POLL POS-011:createRefund stays open for the lead: either the composition rule (batch TKT/GAP) keeps a
+    screen in its feature when a poll read is added, or the refund''s 202 is followed another way.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+  S-ASYNC-POLL (R288), 1 member on P04 (POS-011:createRefund); still 1. With the read in place, build-service-docs
+  regrouped SVC-INVENTORY-ITEM-1 under AM-ORDERS-RESERVATIONS-P04 and check-ticket-scope found 3 new
+  S-FEATURE-OP-UNUSED (createInventoryItem, setInventoryKitDefinition, updateInventoryItem); the batch rule is 0 new.'
+keys_touched:
+  screens:
+  - POS-011
+  other:
+  - S-ASYNC-POLL
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-011 (#28620)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: defer
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 7a166d5c
+notes: 'Batch SCP, 14 October 2026. Closed as withdrawn: the commit that closes it is the revert.'
