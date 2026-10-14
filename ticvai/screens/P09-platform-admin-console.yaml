@@ -1130,6 +1130,9 @@ screens:
     body: '**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather
       than the verb. A cross-tenant health this affects should be identified in the dialog, not just counted.
       **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.'
+    confirm:
+      label: Cancel decommission
+      operation: cancelDecommission
     provenance: contract subscription.yaml POST /cells/{cellId}/cancel-decommission
   - id: formDecommissionCell
     component: modal
@@ -2578,6 +2581,9 @@ screens:
       than the verb. A module feature entitlement this affects should be identified in the dialog, not
       just counted. **Collects what `removeLicenceAddOn` sends before it is called.** Required: `moduleKey`,
       `reason`.'
+    confirm:
+      label: Remove licence add on
+      operation: removeLicenceAddOn
     provenance: contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons
   - id: formAddLicenceAddOn
     component: modal
@@ -3752,6 +3758,9 @@ screens:
     body: '**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather
       than the verb. A licence seat this affects should be identified in the dialog, not just counted.
       **Collects what `removeLicenceAddOn` sends before it is called.** Required: `moduleKey`, `reason`.'
+    confirm:
+      label: Remove licence add on
+      operation: removeLicenceAddOn
     provenance: contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons
   - id: formAddLicenceAddOn
     component: modal
