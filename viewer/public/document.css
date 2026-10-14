@@ -1,31 +1,80 @@
-/* The documentation generator. Furniture from layers.css. */
+/* The documentation generator. Furniture from layers.css, type from sheet.css.
+   A tool page, not a dashboard: one form, then what it made. */
 
 .doc-main { max-width: 1080px; display: grid; gap: 18px; }
 .doc-main .admin-panel { margin: 0; }
+.doc-title { margin: 0 0 8px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+.doc-lede { margin-bottom: 18px; }
 
-.doc-sections { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 14px 0 4px; }
-.doc-section {
-  display: inline-flex; gap: 6px; align-items: center;
-  font-size: 12.5px; color: var(--text-dim);
+.doc-fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+.doc-legend { padding: 0; margin-bottom: 10px; }
+.doc-pick-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+.doc-pick-bar .chip { font-size: 12px; padding: 4px 12px; }
+.doc-sections {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px 18px; margin: 0 0 16px;
 }
+.doc-section {
+  display: inline-flex; gap: 8px; align-items: baseline; flex-wrap: wrap;
+  font-size: 13px; color: var(--text); cursor: pointer;
+}
+.doc-section input { margin: 0; accent-color: var(--accent); transform: translateY(1px); }
+.doc-section input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.doc-actions { flex-wrap: wrap; }
+.doc-actions .auth-button { width: auto; margin: 0; padding: 8px 22px; }
+.doc-form .auth-error { margin: 0 0 12px; }
 
-/* Monospace and preformatted, because it is Markdown and the reader is about
-   to paste it somewhere: showing it rendered would hide the thing they are
-   actually taking away. */
+/* ── the preview ─────────────────────────────────────────────────── */
+.doc-preview-head { margin-bottom: 10px; }
+/* Stale is "waiting on somebody" (generate again), so the stalled colour, with
+   the sentence carrying the meaning. */
+.doc-stale {
+  margin: 0 0 12px; padding: 8px 12px; border-radius: 8px; font-size: 12.5px; color: var(--text);
+  border: 1px solid var(--st-stalled); background: color-mix(in srgb, var(--st-stalled) 10%, transparent);
+}
+.doc-stale[hidden] { display: none; }
+#dc-preview-panel.is-stale .doc-rendered,
+#dc-preview-panel.is-stale .doc-preview { opacity: 0.55; }
+
+.doc-rendered {
+  max-height: 70vh; overflow: auto; padding: 4px 18px 18px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--bg-raised);
+  font-size: 13px; line-height: 1.6; color: var(--text);
+}
+.doc-rendered[hidden] { display: none; }
+.doc-rendered .md-head { margin: 22px 0 8px; color: var(--text); }
+.doc-rendered .md-table-wrap { overflow-x: auto; margin: 8px 0 14px; }
+.doc-rendered .md-table { border-collapse: collapse; font-size: 12px; }
+.doc-rendered .md-table th, .doc-rendered .md-table td {
+  padding: 5px 9px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top;
+}
+.doc-rendered .md-table th { color: var(--text-dim); font-weight: 600; }
+
+/* Monospace and preformatted, for the reader who is about to paste it
+   somewhere and wants to see exactly what they are taking. */
 .doc-preview {
-  margin: 10px 0 0; padding: 16px; max-height: 60vh; overflow: auto;
+  margin: 0; padding: 16px; max-height: 70vh; overflow: auto;
   border: 1px solid var(--border); border-radius: 8px; background: var(--bg-raised);
   font-family: var(--mono); font-size: 11.5px; line-height: 1.6;
   white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-dim);
 }
+.doc-preview[hidden] { display: none; }
 
-/* Printing is the third way out, after download and copy. On paper the
-   furniture is noise: the document is the only thing anybody wants. */
+@media (max-width: 640px) {
+  .doc-sections { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Printing is the third way out, after download and copy, and it prints the
+   document as it reads, never the Markdown source: on paper `| --- |` and
+   `**` are noise. Everything else on the page is furniture. */
 @media print {
-  .admin-bar, .doc-sections, .set-actions, #dc-skipped, .set-lede, .admin-heading { display: none; }
-  .doc-main, .admin-panel { max-width: none; margin: 0; padding: 0; border: 0; background: none; }
-  .doc-preview {
-    max-height: none; overflow: visible; border: 0; padding: 0; background: none;
-    color: #000; font-size: 10pt;
+  .admin-bar, .doc-panel:first-child, .doc-preview-head, .doc-stale, .doc-preview,
+  #account-panel, #bell-panel, .mascot-dock { display: none !important; }
+  .doc-main, .admin-panel { max-width: none; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; }
+  .doc-rendered, .doc-rendered[hidden] {
+    display: block !important; max-height: none; overflow: visible; border: 0; padding: 0;
+    background: none; color: #000; font-size: 10.5pt; opacity: 1 !important;
   }
+  .doc-rendered .md-table-wrap { overflow: visible; }
+  .doc-rendered .md-table th, .doc-rendered .md-table td { border-color: #bbb; color: #000; }
 }

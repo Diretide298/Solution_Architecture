@@ -98,15 +98,28 @@ check('carrying every section that was ticked', Number(got.sheets) >= 16, `${got
 check('and it is a zip, which is what an xlsx is', got.base64.startsWith('UEsD'), got.base64);
 writeFileSync(OUT, Buffer.from(got.body));
 
-// Nothing ticked is a sentence, not a broken file.
-await page.evaluate(() => {
-  for (const n of document.querySelectorAll('#dc-sections input')) n.checked = false;
-});
+// Nothing ticked is a sentence, not a broken file. Said in the page's one place
+// for anything that went wrong, `#dc-error`, which is where every other failure
+// on the page is said too.
+await page.click('#dc-none');
 await page.click('#dc-excel');
 await new Promise((r) => setTimeout(r, 900));
+const said = await page.evaluate(() => ({
+  error: document.getElementById('dc-error').hidden ? '' : document.getElementById('dc-error').textContent,
+  status: document.getElementById('dc-says').textContent,
+}));
 check('with nothing chosen it says so and downloads nothing',
-  /Choose a section/.test(await page.evaluate(() => document.getElementById('dc-says').textContent)),
-  await page.evaluate(() => document.getElementById('dc-says').textContent));
+  /Choose a section/.test(said.error) && !/Building/.test(said.status), JSON.stringify(said));
+
+// The section names are one list: the picker's words are the document's headings.
+await page.click('#dc-all');
+const names = await page.evaluate(() => [...document.querySelectorAll('#dc-sections label span:first-of-type')]
+  .map((s) => s.textContent));
+const doc = await page.evaluate(async () => (await (await fetch('/api/document?sections=frontend,backend',
+  { credentials: 'include' })).json()).markdown);
+check('the document heads its sections with the picker\'s names',
+  names.filter((n) => /screens|tables/i.test(n)).every((n) => doc.includes(`## ${n}`)),
+  names.join(' | '));
 
 check('nothing shouted on the way', noise.length === 0, noise.slice(0, 2).join(' | '));
 await browser.close();
