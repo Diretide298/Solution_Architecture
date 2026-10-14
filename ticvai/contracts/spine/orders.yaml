@@ -1659,6 +1659,7 @@ paths:
         type: string
         format: uuid
     - name: shareId
+      x-ticvai-column: identity.delegated_access.id
       in: path
       required: true
       schema:
@@ -1855,6 +1856,7 @@ paths:
   /resale-fee-policy:
     get:
       operationId: getResaleFeePolicy
+      x-ticvai-names-for-context: [orders.order_fee, orders.resale_listing, payments.fee_rule]
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
       summary: The commission and price cap a resale listing is created under
@@ -2792,6 +2794,7 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-names-for-context: [orders.sales_order]
       x-ticvai-write-via:
       - table: access.entitlement
         event: invitation.issued
@@ -9815,6 +9818,7 @@ paths:
           type: string
         description: Mobile
       - name: membershipId
+        x-ticvai-column: orders.membership_renewal.customer_membership_id
         in: query
         required: false
         schema:
@@ -13509,6 +13513,7 @@ paths:
   /deposits:
     get:
       operationId: listDeposits
+      x-ticvai-names-for-context: [ledger.deposit]
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
       summary: Deposits and their authorisation state
@@ -14629,6 +14634,7 @@ paths:
       operationId: setResaleMarketplaceConfig
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-names-for-context: [orders.resale_eligibility_rule, orders.resale_fee_policy]
       x-ticvai-consumed-by:
         - "P08 ADM-280 Resale Policy & Marketplace Settings"
         - "P08 ADM-282 Resale Pricing & Price Guardrails"
@@ -16418,6 +16424,7 @@ components:
       - milestones
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -17037,6 +17044,7 @@ components:
       - allocations
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -17066,6 +17074,7 @@ components:
                 format: uuid
                 readOnly: true
               productId:
+                x-ticvai-references: catalogue.product
                 type: string
                 format: uuid
               quantity:
@@ -17127,6 +17136,7 @@ components:
       - recipients
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -17732,10 +17742,12 @@ components:
           format: uuid
           readOnly: true
         customerMembershipId:
+          x-ticvai-references: identity.customer_membership
           type: string
           format: uuid
           description: The membership in the path. Taken from the path on `renewMembership`.
         entitlementTemplateId:
+          x-ticvai-references: catalogue.entitlement_template
           type: string
           format: uuid
         orderId:
@@ -17846,6 +17858,7 @@ components:
           type: string
           format: uuid
         originalOrderLineId:
+          x-ticvai-references: orders.order_line
           type: string
           format: uuid
         newOrderLineId:
@@ -18464,6 +18477,7 @@ components:
           maxLength: 50
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         orderLineId:
@@ -18715,9 +18729,11 @@ components:
           format: uuid
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         relatedOrderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         relationshipType:
@@ -19114,6 +19130,7 @@ components:
           format: uuid
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         paymentId:
@@ -19142,6 +19159,7 @@ components:
           maxLength: 60
           nullable: true
         merchantId:
+          x-ticvai-references: payments.merchant_account
           type: string
           maxLength: 60
           nullable: true
@@ -19284,6 +19302,7 @@ components:
 
             '
         token:
+          x-ticvai-secret: blind-index
           type: string
           format: password
           writeOnly: true
@@ -19399,6 +19418,7 @@ components:
       - expectedSize
       properties:
         groupQuoteId:
+          x-ticvai-persisted: false
           x-ticvai-references: orders.group_quote
           type: string
           format: uuid
@@ -19870,6 +19890,7 @@ components:
           type: string
           format: uuid
         leaderSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         organisationName:
@@ -19940,6 +19961,7 @@ components:
         serialNumber:
           type: string
         authenticationToken:
+          x-ticvai-secret: blind-index
           type: string
           format: password
           writeOnly: true
@@ -20069,6 +20091,7 @@ components:
           type: string
           format: uuid
         sellerSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         askPrice:
@@ -20605,6 +20628,7 @@ components:
           format: uuid
           description: Unique; one settlement per sold listing.
         sellerSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         listingPrice:
@@ -21172,6 +21196,7 @@ components:
               type: boolean
               default: false
         credentialRef:
+          x-ticvai-secret: vault-reference
           type: string
           writeOnly: true
           description: 'A vault reference. **Never the credential**, never returned, and rotated without
@@ -21314,6 +21339,7 @@ components:
           type: string
           format: uuid
         token:
+          x-ticvai-secret: field-encrypted
           type: string
           format: password
           writeOnly: true
@@ -21382,6 +21408,7 @@ components:
           - community
           - trade
         offeredByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         issuedByPrincipalId:
@@ -21629,6 +21656,7 @@ components:
           type: string
           nullable: true
         claimToken:
+          x-ticvai-secret: blind-index
           type: string
           format: password
           writeOnly: true
@@ -21838,7 +21866,7 @@ components:
       - surrendered
     EntitlementSummary:
       type: object
-      x-ticvai-persistence: catalogue.entitlement_template
+      x-ticvai-persistence: 'none — projection of access.entitlement and its product, as a guest or a steward sees it'
       description: 'One entitlement on a piece of media, as a guest or a steward sees it.
 
         '
@@ -22333,10 +22361,12 @@ components:
           nullable: true
           description: Null for an anonymous sale. Identity and entitlement are separate.
         guestLinkId:
+          x-ticvai-persisted: false
           type: string
           nullable: true
           description: Present where the guest is linked across cells.
         catalogueBundleVersion:
+          x-ticvai-persisted: false
           type: string
           description: 'The bundle the client priced from. Lets the server explain a variance rather than
             merely report one.
@@ -22364,6 +22394,7 @@ components:
           format: uuid
           description: Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these.
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         recommendationId:
@@ -22798,10 +22829,12 @@ components:
           items:
             $ref: '#/components/schemas/CartLine'
         conflicts:
+          x-ticvai-persisted: false
           type: array
           items:
             $ref: '#/components/schemas/CartConflict'
         consentQuestions:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: >
@@ -23662,16 +23695,19 @@ components:
 
             '
         walletAuthorisationId:
+          x-ticvai-persisted: false
           type: string
           nullable: true
           description: Cross-cell wallet hold, where the guest's home cell is elsewhere.
         walletHoldId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true
           description: For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture
             debits it; the order service writes no wallet table.
         returnUrl:
+          x-ticvai-persisted: false
           type: string
           format: uri
           nullable: true
@@ -23683,6 +23719,7 @@ components:
           nullable: true
           description: The card terminal to instruct, for a card payment at a till (ECR flow, SD-034).
         deviceId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true
@@ -24210,6 +24247,7 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         creditLimit:
@@ -28346,8 +28384,7 @@ components:
     CustomerGuestAccountAssignmentInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `orders.reservation` (with `orders.sales_order`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Customer, Guest & Account Assignment submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -30682,8 +30719,7 @@ components:
     ListingCreationSellerConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `orders.resale_listing`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Listing Creation & Seller Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'

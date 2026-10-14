@@ -1524,6 +1524,7 @@ paths:
                   type: integer
                   nullable: true
                 reason:
+                  x-ticvai-stored-as: rental.booking.change_reason
                   type: string
                   nullable: true
       responses:
@@ -2218,6 +2219,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRentalAgreement
+      x-ticvai-names-for-context: [rental.agreement_signature]
       x-ticvai-conflict-policy: serverWins
       summary: Raise a rental agreement
       description: >
@@ -2392,12 +2394,15 @@ components:
           type: string
           format: uuid
         rentalAgreementId:
+          x-ticvai-references: rental.agreement
           type: string
           format: uuid
         orderLineId:
+          x-ticvai-references: orders.order_line
           type: string
           format: uuid
         catalogueProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         trackingMode:
@@ -2464,9 +2469,11 @@ components:
           type: string
           format: uuid
         rentalInspectionId:
+          x-ticvai-references: rental.inspection
           type: string
           format: uuid
         rentalAgreementItemId:
+          x-ticvai-references: rental.agreement_item
           type: string
           format: uuid
         componentCode:
@@ -2655,6 +2662,8 @@ components:
           nullable: true
           description: Pooled only. *150 lockers.*
         components:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**Hybrid only** — *one serialised kayak, two pooled paddles, two pooled life
             jackets.* One booking, two mechanisms.
@@ -2690,6 +2699,14 @@ components:
           default: true
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product this model is for (one per product), from the path.
     RentalLocationRule:
       type: object
       x-ticvai-persistence: rental.location_rule
@@ -2701,6 +2718,7 @@ components:
       - locationId
       properties:
         locationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         enabled:
@@ -2731,6 +2749,13 @@ components:
           additionalProperties: true
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          description: The rental product offered at this location, from the path of `setRentalProductLocations`.
     RentalDurationRules:
       type: object
       x-ticvai-persistence: rental.duration_rules
@@ -2765,6 +2790,14 @@ components:
           default: false
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RentalOperationalRules:
       type: object
       x-ticvai-persistence: rental.operational_rules
@@ -2819,6 +2852,14 @@ components:
           default: false
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RuleRequirement:
       type: string
       enum:
@@ -2865,6 +2906,14 @@ components:
           default: perParticipant
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RentalConfigurationFinding:
       type: object
       description: 'Boards 1.10 and 4.10. **Severity travels with the finding**, so the publish gate can
@@ -2972,6 +3021,8 @@ components:
         '
       properties:
         operatingWindows:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3002,6 +3053,14 @@ components:
           default: 0
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RentalBlackout:
       type: object
       x-ticvai-persistence: rental.blackout
@@ -3098,6 +3157,8 @@ components:
         basePrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
         durationTiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Board 4.3. *30 min AED 40, 60 min AED 60, 90 min AED 80, 120 min AED 95.*'
           items:
@@ -3123,6 +3184,8 @@ components:
           - roundUpHour
           default: exactUsage
         calendarRules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Board 4.4. *Peak 16:00–20:00 AED 90/hr; off-peak 09:00–12:00 AED 50/hr; peak
             season 1 Nov – 31 Mar.*
@@ -3249,6 +3312,7 @@ components:
           type: string
           format: uuid
         productId:
+          x-ticvai-references: rental.product
           type: string
           format: uuid
           description: The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted.
@@ -3432,6 +3496,8 @@ components:
         lateFeeAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         lateFeeTiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3574,6 +3640,7 @@ components:
           items:
             $ref: '#/components/schemas/RentalParticipant'
         acceptedQuoteId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true
@@ -3602,6 +3669,7 @@ components:
         reference:
           type: string
         productId:
+          x-ticvai-references: rental.product
           type: string
           format: uuid
         locationId:
@@ -3654,6 +3722,7 @@ components:
           format: date-time
           nullable: true
         depositAuthorisationId:
+          x-ticvai-references: orders.stored_value_authorisation
           type: string
           format: uuid
           nullable: true
@@ -3662,6 +3731,7 @@ components:
         accruedLateFee:
           $ref: ../shared/common.yaml#/components/schemas/Money
         readiness:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: '**Computed, not stored** — agreement, requirements, deposit, equipment.'
@@ -3681,6 +3751,11 @@ components:
             $ref: '#/components/schemas/RentalParticipant'
         scopePath:
           type: string
+        changeReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Why the booking was last changed (`updateRentalBooking`).
     RentalParticipant:
       required: [scopePath]
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by checkOutRental, createRentalBooking, extendRental, getRentalBooking and others
@@ -3811,6 +3886,7 @@ components:
           type: string
           format: uuid
         assetId:
+          x-ticvai-references: maintenance.asset
           type: string
           format: uuid
           description: A `maintenance.Asset`, which is also a `resources` resource where the product is
@@ -3833,6 +3909,13 @@ components:
           nullable: true
         scopePath:
           type: string
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.booking
+          description: The rental booking the equipment is assigned to, from the path of `assignRentalEquipment`.
     RentalInspection:
       type: object
       x-ticvai-persistence: rental.inspection
@@ -3871,6 +3954,8 @@ components:
 
             '
         checklist:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3904,6 +3989,13 @@ components:
           description: '**When the device made the write** (R113; CHG-OFL-003). `recordRentalInspection` is offline-capable, so
             the client sets this from its own clock and keeps it on replay; `created_at` is when the server
             heard of it. Omitted online, the server sets it to the time it received the call.'
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.booking
+          description: The rental booking inspected, from the path of `recordRentalInspection`.
     RentalDamageAssessment:
       type: object
       x-ticvai-persistence: rental.damage_assessment
@@ -3948,6 +4040,13 @@ components:
           description: Raised in `maintenance`, so the repair is tracked where every other repair is.
         scopePath:
           type: string
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.booking
+          description: The rental booking assessed, from the path of `assessRentalDamage`.
     RentalReturn:
       type: object
       description: 'Board 8. **Late fee, damage and partial return all land on one deposit.**'

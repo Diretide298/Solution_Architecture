@@ -2182,6 +2182,7 @@ paths:
                   type: array
                   items: { type: string }
                 escalate:
+                  x-ticvai-stored-as: maintenance.incident.escalation
                   type: object
                   description: >
                     Escalate an incident under investigation (the optional Escalated step;
@@ -2191,6 +2192,7 @@ paths:
                     toPrincipalId: { type: string, format: uuid }
                     reason: { type: string, minLength: 3, maxLength: 1000 }
                 reason:
+                  x-ticvai-stored-as: maintenance.incident_history.note
                   type: string
                   minLength: 3
                   maxLength: 1000
@@ -2594,7 +2596,7 @@ components:
       required: [id, assetId, ref]
       properties:
         id: { type: string, format: uuid }
-        assetId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid, x-ticvai-references: maintenance.asset }
         ref: { type: string, description: The document in the media store. }
         name: { type: string, maxLength: 200, nullable: true }
         kind:
@@ -2784,7 +2786,7 @@ components:
       required: [id, assetId, toStatus, reason, recordedAt]
       properties:
         id: { type: string, format: uuid }
-        assetId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid, x-ticvai-references: maintenance.asset }
         fromStatus:
           allOf:
             - $ref: '#/components/schemas/AssetStatus'
@@ -3053,6 +3055,8 @@ components:
               type: array
               items: { type: string }
             timeEntries:
+              x-ticvai-persistence-column: jsonb
+              x-ticvai-persistence-kind: valueObject
               type: array
               items:
                 type: object
@@ -3062,6 +3066,8 @@ components:
                   pauseReason: { type: string, nullable: true }
                   recordedAt: { type: string, format: date-time }
             parts:
+              x-ticvai-persistence-column: jsonb
+              x-ticvai-persistence-kind: valueObject
               type: array
               items:
                 type: object
@@ -3147,6 +3153,8 @@ components:
             revenue: { type: integer, minimum: 0, maximum: 100 }
             criticality: { type: integer, minimum: 0, maximum: 100 }
         bands:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           maxItems: 5
@@ -3197,8 +3205,8 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         venueId: { type: string, format: uuid, readOnly: true }
-        workOrderId: { type: string, format: uuid }
-        supplierId: { type: string, format: uuid }
+        workOrderId: { type: string, format: uuid, x-ticvai-references: maintenance.work_order }
+        supplierId: { type: string, format: uuid, x-ticvai-references: inventory.supplier }
         scope: { type: string, maxLength: 2000, description: What the vendor is asked to do. }
         status:
           allOf:
@@ -3339,7 +3347,7 @@ components:
       required: [id, templateId, venueId, responses, recordedAt]
       properties:
         id: { type: string, format: uuid }
-        templateId: { type: string, format: uuid }
+        templateId: { type: string, format: uuid, x-ticvai-references: maintenance.inspection_template }
         venueId: { type: string, format: uuid }
         assetId: { type: string, format: uuid }
         responses:
@@ -3538,12 +3546,12 @@ components:
       required: [id, incidentId, kind, recordedAt, principalId]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         kind: { type: string, enum: [note, statusChange, escalation] }
         fromStatus: { type: string, nullable: true }
         toStatus: { type: string, nullable: true }
         note: { type: string, nullable: true }
-        principalId: { type: string, format: uuid }
+        principalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
         recordedAt: { type: string, format: date-time }
     IncidentDetail:
       x-ticvai-persistence: "maintenance.incident"
@@ -3596,7 +3604,7 @@ components:
       required: [id, incidentId, kind]
       properties:
         id: { type: string, format: uuid }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         kind: { type: string, enum: [subject, staff] }
         subjectId:
           type: string
@@ -3641,7 +3649,7 @@ components:
       required: [id, incidentId, kind, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         kind: { type: string, enum: [photo, video, document] }
         status:
           type: string
@@ -3728,7 +3736,7 @@ components:
       required: [id, incidentId, note, recordedAt]
       properties:
         id: { type: string, format: uuid }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         note: { type: string, maxLength: 10000 }
         kind:
           type: string
@@ -3757,7 +3765,7 @@ components:
       required: [id, incidentId, authority, notifiedAt]
       properties:
         id: { type: string, format: uuid }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         authority: { type: string, maxLength: 200 }
         reference: { type: string, maxLength: 128, nullable: true }
         notifiedAt: { type: string, format: date-time }

@@ -664,6 +664,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createWebhookSubscription
+      x-ticvai-names-for-context: [platform.outbox]
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
         - "P08 BO-1074 Webhook Configuration"
@@ -1359,6 +1360,7 @@ paths:
               properties:
                 status: { type: string, enum: [active, suspended] }
                 reason:
+                  x-ticvai-stored-as: control.api_client.status_reason
                   type: string
                   maxLength: 500
                   description: Required with `suspended`.
@@ -1911,7 +1913,7 @@ components:
       required: [id, developerId, sandboxClientId, listingId, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        developerId: { type: string, format: uuid, readOnly: true }
+        developerId: { type: string, format: uuid, readOnly: true, x-ticvai-references: control.developer_account }
         sandboxClientId:
           type: string
           format: uuid
@@ -2055,7 +2057,7 @@ components:
       required: [id, developerId, name, environment, scopes, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        developerId: { type: string, format: uuid }
+        developerId: { type: string, format: uuid, x-ticvai-references: control.developer_account }
         name: { type: string }
         clientId: { type: string, readOnly: true }
         environment:
@@ -2120,6 +2122,12 @@ components:
           readOnly: true
           description: >
             **A credential unused for a year is a credential nobody will notice being stolen.**
+        statusReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: Why the client was suspended (`setApiClientStatus`).
 
     Sandbox:
       type: object
@@ -2289,7 +2297,7 @@ components:
       required: [id, clientId, endpointUrl, eventTypes, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        clientId: { type: string, format: uuid }
+        clientId: { type: string, format: uuid, x-ticvai-references: control.api_client }
         endpointUrl: { type: string }
         eventTypes:
           type: array
@@ -2304,6 +2312,7 @@ components:
           description: 13.3.22. Tenant, venue, or a business condition on the payload.
           additionalProperties: true
         signingSecret:
+          x-ticvai-secret: vault-reference
           type: string
           format: password
           writeOnly: true
@@ -2334,7 +2343,7 @@ components:
       required: [id, subscriptionId, eventType, status]
       properties:
         id: { type: string, format: uuid }
-        subscriptionId: { type: string, format: uuid }
+        subscriptionId: { type: string, format: uuid, x-ticvai-references: control.webhook_subscription }
         eventId: { type: string, format: uuid }
         eventType: { type: string }
         status: { type: string, enum: [pending, delivered, failed, retrying, abandoned] }
@@ -2368,7 +2377,7 @@ components:
           readOnly: true
           description: >
             **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
-        clientId: { type: string, format: uuid }
+        clientId: { type: string, format: uuid, x-ticvai-references: control.api_client }
         sustainedPerMinute: { type: integer }
         burstPerSecond:
           type: integer
@@ -2436,6 +2445,8 @@ components:
         migrationGuideUrl: { type: string, nullable: true }
         activeClientCount: { type: integer, readOnly: true }
         changes:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: >
             **The developer changelog for this version** (17 September minutes, M17-14): every operation
@@ -2463,7 +2474,7 @@ components:
       required: [id, developerId, name, category, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        developerId: { type: string, format: uuid }
+        developerId: { type: string, format: uuid, x-ticvai-references: control.developer_account }
         name: { type: string }
         category: { type: string, enum: [crm, marketing, accounting, hotel, transport, analytics, accessibility, other] }
         description: { type: string }

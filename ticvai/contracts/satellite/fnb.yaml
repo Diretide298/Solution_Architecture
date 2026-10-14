@@ -184,6 +184,7 @@ paths:
       operationId: setFnbReservationPolicy
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per outlet, the one the body''s `outletId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-names-for-context: [fnb.service_charge_policy, orders.order_fee]
       summary: Set turn times and seating buffers
       description: '**The booking keeps its own duration as the snapshot.** A turn time revised in
         March must not shorten a reservation already made in February — the same rule-and-record
@@ -225,6 +226,7 @@ paths:
   /service-charge-policy:
     get:
       operationId: getFnbServiceChargePolicy
+      x-ticvai-names-for-context: [rental.fee_policy]
       x-ticvai-consumed-by:
         - "P08 BO-733 Service Channel Configuration"
       summary: The service charge a venue applies, and on what
@@ -2143,6 +2145,7 @@ paths:
                   format: date-time
                   description: Device time of the act (offline-capable; replayed in this order).
                 stage:
+                  x-ticvai-stored-as: fnb.table_visit.service_stage
                   type: string
                   enum:
                   - seated
@@ -2248,6 +2251,7 @@ paths:
       - query: tenancy#outletRecords
         route: service
         for: 'the target visit''s outlet (409 target-visit-not-open) (CHG-MOD-003)'
+      x-ticvai-names-for-context: [orders.order_line]
       x-ticvai-consumed-by:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       summary: Move items to another table's bill
@@ -4312,6 +4316,7 @@ paths:
       - query: tenancy#outletRecords
         route: service
         for: 'the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)'
+      x-ticvai-names-for-context: [orders.deposit]
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
@@ -5898,6 +5903,7 @@ paths:
                 isAvailable:
                   type: boolean
                 reason:
+                  x-ticvai-stored-as: fnb.menu_item.unavailable_reason
                   type: string
                   enum:
                   - soldOut
@@ -5909,6 +5915,7 @@ paths:
                     audit R222). A reason of `other` with no note is refused `400`, and the notes are reviewed
                     quarterly so the common ones become real reasons.'
                 note:
+                  x-ticvai-stored-as: fnb.menu_item.unavailable_note
                   type: string
                   maxLength: 500
                   nullable: true
@@ -5918,6 +5925,7 @@ paths:
                   format: date-time
                   description: Automatic restore, typically at next service. Kept as `MenuItem.restoreAt`.
                 recordedAt:
+                  x-ticvai-persisted: false
                   type: string
                   format: date-time
                   description: Device time of the act (offline-capable; replayed in this order).
@@ -5985,6 +5993,7 @@ paths:
               - count
               properties:
                 count:
+                  x-ticvai-stored-as: fnb.menu_item.daily_count
                   type: integer
                   minimum: 0
                   nullable: true
@@ -6775,6 +6784,7 @@ paths:
                   type: string
                   format: uuid
                 note:
+                  x-ticvai-stored-as: fnb.table_visit.note
                   type: string
                   maxLength: 500
                 recordedAt:
@@ -7306,6 +7316,7 @@ paths:
                   type: string
                   format: uuid
                 recordedAt:
+                  x-ticvai-persisted: false
                   type: string
                   format: date-time
       responses:
@@ -8731,6 +8742,7 @@ paths:
                         type: string
                         format: uuid
                       servingOutletIds:
+                        x-ticvai-stored-as: fnb.delivery_location_outlet.outlet_id
                         type: array
                         items:
                           type: string
@@ -9107,6 +9119,7 @@ components:
       - trigger
       properties:
         menuItemId:
+          x-ticvai-references: fnb.menu_item
           type: string
           format: uuid
         matches:
@@ -9184,6 +9197,8 @@ components:
           minimum: 15
           description: The turn time when no party-size band matches.
         turnTimeBands:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**Turn time by party size** — a two-top and a table of eight do not turn at the
             same speed, and a single default is how a restaurant ends up double-booking its large
@@ -9388,9 +9403,11 @@ components:
           type: string
           format: uuid
         fromInventoryItemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
         toInventoryItemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
         substitutionRatio:
@@ -9429,9 +9446,11 @@ components:
       - isActive
       properties:
         itemId:
+          x-ticvai-references: fnb.menu_item
           type: string
           format: uuid
         groupId:
+          x-ticvai-references: fnb.modifier_group
           type: string
           format: uuid
         sortOrder:
@@ -9459,6 +9478,7 @@ components:
           type: string
           nullable: true
         sourceProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         sourceVariantId:
@@ -9472,6 +9492,7 @@ components:
           type: string
           maxLength: 30
         targetProductId:
+          x-ticvai-references: none
           type: string
           format: uuid
         targetVariantId:
@@ -9516,6 +9537,7 @@ components:
       - createdAt
       properties:
         reservationId:
+          x-ticvai-references: fnb.table_reservation
           type: string
           format: uuid
         tableId:
@@ -9561,6 +9583,7 @@ components:
           type: string
           format: uuid
         recipeId:
+          x-ticvai-references: fnb.recipe
           type: string
           format: uuid
           description: '**The recipe the rule applies to** (decided 28 September, audit R125 (10)). Not a menu
@@ -9568,9 +9591,11 @@ components:
 
             '
         fromIngredientId:
+          x-ticvai-references: fnb.recipe_ingredient
           type: string
           format: uuid
         toIngredientId:
+          x-ticvai-references: fnb.recipe_ingredient
           type: string
           format: uuid
         ratio:
@@ -9668,6 +9693,7 @@ components:
             - plannedQuantity
             properties:
               itemId:
+                x-ticvai-references: fnb.menu_item
                 type: string
                 format: uuid
               suggestedQuantity:
@@ -9788,6 +9814,7 @@ components:
             - menuItemId
             properties:
               menuItemId:
+                x-ticvai-references: fnb.menu_item
                 type: string
                 format: uuid
               upcharge:
@@ -9881,6 +9908,7 @@ components:
           type: string
           format: uuid
         menuItemId:
+          x-ticvai-references: fnb.menu_item
           type: string
           format: uuid
         offAt:
@@ -9942,6 +9970,7 @@ components:
           type: string
           format: uuid
         visitId:
+          x-ticvai-references: fnb.table_visit
           type: string
           format: uuid
         label:
@@ -10895,6 +10924,7 @@ components:
         kind:
           $ref: '#/components/schemas/DeliveryLocationKind'
         label:
+          x-ticvai-unique: venue
           type: string
           description: What a runner is told. "Cabana 12", "Row H Seat 4", "Lawn — north gate".
         zone:
@@ -11073,6 +11103,7 @@ components:
           format: uuid
           readOnly: true
         outletId:
+          x-ticvai-references: platform.outlet
           type: string
           format: uuid
         collectionEnabled:
@@ -11507,6 +11538,7 @@ components:
       - name
       - price
       - isAvailable
+      - menuSectionId
       properties:
         id:
           type: string
@@ -11565,9 +11597,9 @@ components:
           format: uuid
           nullable: true
         menuSectionId:
+          x-ticvai-references: fnb.menu_section
           type: string
           format: uuid
-          nullable: true
           readOnly: true
           description: The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`).
         isStockTracked:
@@ -11590,6 +11622,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AllergenCode'
+        unavailableNote:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The free text with an `other` unavailable reason (`setItemAvailability`); reviewed quarterly so the common ones become reasons (audit R222).
     ModifierGroup:
       x-ticvai-persistence: fnb.modifier_group + fnb.modifier_option
       type: object
@@ -11704,6 +11742,7 @@ components:
           type: string
           format: uuid
         menuItemId:
+          x-ticvai-references: fnb.menu_item
           type: string
           format: uuid
         quantity:
@@ -12105,6 +12144,12 @@ components:
           format: date-time
           nullable: true
           readOnly: true
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The server's note on the visit (`updateTableVisit`).
     Bill:
       x-ticvai-persistence: none — computed from visit orders
       type: object
@@ -12289,6 +12334,7 @@ components:
           type: string
           format: uuid
         orderId:
+          x-ticvai-references: fnb.service_order
           type: string
           format: uuid
           description: The F&B order the ticket was created from on acceptance (`FnbOrder.id`).
@@ -12516,6 +12562,7 @@ components:
                 type: string
                 format: uuid
         defaultStationId:
+          x-ticvai-references: fnb.kitchen_station
           type: string
           format: uuid
           description: Where a line that matches no item rule and no category rule goes (workbook Q190). Never
@@ -13004,6 +13051,7 @@ components:
         '
       properties:
         outletId:
+          x-ticvai-references: platform.outlet
           type: string
           format: uuid
           readOnly: true
@@ -13209,6 +13257,7 @@ components:
           format: uuid
           readOnly: true
         menuId:
+          x-ticvai-references: fnb.menu
           type: string
           format: uuid
         version:
@@ -13274,6 +13323,7 @@ components:
           format: uuid
           readOnly: true
         menuId:
+          x-ticvai-references: fnb.menu
           type: string
           format: uuid
         effectiveAt:

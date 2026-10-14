@@ -1312,10 +1312,12 @@ paths:
                 reason:
                   type: string
                 effectiveFrom:
+                  x-ticvai-stored-as: accreditation.holder.status_effective_from
                   type: string
                   format: date-time
                   nullable: true
                 reviewAt:
+                  x-ticvai-stored-as: accreditation.holder.status_review_at
                   type: string
                   format: date
                   nullable: true
@@ -2521,6 +2523,7 @@ paths:
   /accreditation-credentials/verify:
     get:
       operationId: verifyAccreditationCredential
+      x-ticvai-names-for-context: [access.accreditation_credential]
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P07 SCN-003 Ready to scan"
@@ -2866,6 +2869,7 @@ components:
           format: uuid
           readOnly: true
         credentialId:
+          x-ticvai-references: accreditation.credential
           type: string
           format: uuid
         holderId:
@@ -3151,6 +3155,8 @@ components:
             type: string
             format: uuid
         categories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3279,6 +3285,8 @@ components:
           type: string
           format: uuid
         rows:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3386,6 +3394,7 @@ components:
         reference:
           type: string
         programmeId:
+          x-ticvai-references: accreditation.programme
           type: string
           format: uuid
         categoryCode:
@@ -3406,6 +3415,7 @@ components:
           additionalProperties: true
           description: Name, date of birth, nationality, contact — shaped by the requirements matrix.
         requirementStatus:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -3562,6 +3572,18 @@ components:
           readOnly: true
         scopePath:
           type: string
+        statusEffectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the status `setAccreditationStatus` set takes effect.
+        statusReviewAt:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: When the status is due for review (`setAccreditationStatus`).
     AccreditationDocument:
       type: object
       x-ticvai-persistence: accreditation.document
@@ -3584,6 +3606,7 @@ components:
         requirementCode:
           type: string
         assetId:
+          x-ticvai-references: assets.media_asset
           type: string
           format: uuid
         submittedAt:
@@ -3699,6 +3722,7 @@ components:
           type: string
           format: uuid
         holderId:
+          x-ticvai-references: accreditation.holder
           type: string
           format: uuid
         kind:
@@ -3847,6 +3871,8 @@ components:
           type: integer
           readOnly: true
         failures:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4055,6 +4081,8 @@ components:
           type: string
           format: uuid
         rules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

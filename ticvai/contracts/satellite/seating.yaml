@@ -568,6 +568,7 @@ paths:
                 isActive:
                   type: boolean
                 sectionViews:
+                  x-ticvai-stored-as: seating.section.view_asset_id
                   type: array
                   description: 'Set or clear the view photo of one or more sections (`Section.viewAssetId`,
                     decided 29 September, rev 3 23SEP-14). **Not a structural change**, so it is accepted
@@ -1318,6 +1319,7 @@ paths:
                   type: string
                   maxLength: 200
                 sourceSeatMapId:
+                  x-ticvai-persisted: false
                   type: string
                   format: uuid
                 description:
@@ -3310,6 +3312,7 @@ components:
           format: uuid
           x-ticvai-references: seating.seat_block
         seatId:
+          x-ticvai-references: seating.seat
           type: string
           format: uuid
         createdAt:
@@ -3333,6 +3336,7 @@ components:
           format: uuid
           x-ticvai-references: seating.seat_reservation
         seatId:
+          x-ticvai-references: seating.seat
           type: string
           format: uuid
         heldPrice:
@@ -3413,9 +3417,11 @@ components:
           type: string
           format: uuid
         holdTypeId:
+          x-ticvai-references: seating.hold_type
           type: string
           format: uuid
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
         seatIds:
@@ -3545,6 +3551,8 @@ components:
           type: string
           format: uuid
         spaces:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3627,6 +3635,7 @@ components:
         reference:
           type: string
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
         organisationId:
@@ -3766,6 +3775,8 @@ components:
           format: uuid
           nullable: true
         profiles:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4157,6 +4168,8 @@ components:
         seatCount:
           type: integer
         boundary:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             $ref: '#/components/schemas/Point'
@@ -4653,6 +4666,7 @@ components:
           items:
             type: string
         findings:
+          x-ticvai-persisted: false
           type: array
           items:
             $ref: '#/components/schemas/ValidationFinding'

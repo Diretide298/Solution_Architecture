@@ -1887,6 +1887,7 @@ paths:
   /payments/rules:
     get:
       operationId: getPaymentRules
+      x-ticvai-names-for-context: [whitelabel.policy]
       x-ticvai-consumed-by:
         - "P08 ADM-564 Currency & Payment Currency Configuration"
         - "P08 ADM-565 Payment Eligibility & Availability Rule Builder"
@@ -1964,6 +1965,7 @@ paths:
   /deposits/{depositId}/activity:
     get:
       operationId: listDepositActivity
+      x-ticvai-names-for-context: [ledger.deposit, orders.deposit]
       x-ticvai-consumed-by:
         - "P06 EMP-099 Deposit Release, Capture & Customer Confirmation"
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
@@ -2364,12 +2366,15 @@ paths:
                   - quarterly
                   - custom
                 instalmentCount:
+                  x-ticvai-persisted: false
                   type: integer
                   minimum: 2
                 firstDueDate:
+                  x-ticvai-stored-as: payments.instalment.due_date
                   type: string
                   format: date
                 customDueDates:
+                  x-ticvai-stored-as: payments.instalment.due_date
                   type: array
                   description: Required with `custom`; one per instalment after the first.
                   items:
@@ -2767,6 +2772,7 @@ components:
       description: Request only.
       properties:
         paymentTokenId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true
@@ -3313,6 +3319,7 @@ components:
         scopePath:
           type: string
         credentialRef:
+          x-ticvai-secret: vault-reference
           type: string
           writeOnly: true
           description: '**Where the provider credential is kept** (4 October 2026, CHG-FXC-010; ADM-570): the vault reference
@@ -3409,6 +3416,8 @@ components:
               items:
                 type: string
         targets:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4067,6 +4076,8 @@ components:
             type: string
           description: '**Across tender kinds.** `wallet` decides the order within stored value.'
         allowedCombinations:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4320,6 +4331,8 @@ components:
         '
       properties:
         rules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4356,6 +4369,8 @@ components:
                 - allowAndFlag
                 - raiseCase
         lists:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4394,6 +4409,8 @@ components:
           type: string
           nullable: true
         documents:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

@@ -1,0 +1,60 @@
+id: CHG-STO-002
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'The ten keys the name rule guessed into another module are declared to the table they mean or refused as
+  keys (x-ticvai-references: none); the one storage-only column among them is declared in derive-schema.'
+decision:
+  what: 'rental.booking and resources.booking deposit_authorisation_id -> orders.stored_value_authorisation (CF-126,
+    orders.authoriseStoredValue), not games.authorisation; ledger.tax_exemption.evidence_document_id ->
+    assets.media_asset (an uploaded document), not accreditation.document; orders.external_reference_mapping.merchant_id
+    -> payments.merchant_account; pii.subject.erasure_request_id -> approvals.request (identity.yaml deleteGuestAccount
+    names it; a storage-only column, so tools/derive-schema.py STORAGE_REFERENCES carries it). Refused (`none`):
+    approvals.workflow_instance.current_node_id and workflow_intervention.alternative_node_id (a node of the workflow
+    version''s graph, held in the version, not access.edge_node), catalogue.space.venue_map_zone_id (venuemap keeps no
+    zone table; not seating.zone), access.attraction_access.attraction_id (no attraction table; not
+    games.attraction_type) and subscription.membership_entitlement.pricing_rule_id (the central commercial engine''s
+    rule, not catalogue.seat_pricing_rule).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit before r6, class check-storage-promises/SP-KEY-GUESSED (10 at audit-base b93b5a87, 0 after),
+  evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "A guessed key into another module is declared to
+  the right table or dropped." Same class as ADAM CR-070 (CHG-DDL-005, refund.tax_reversal_entry_id).'
+keys_touched:
+  tables:
+  - rental.booking
+  - resources.booking
+  - ledger.tax_exemption
+  - orders.external_reference_mapping
+  - pii.subject
+  - approvals.workflow_instance
+  - approvals.workflow_intervention
+  - catalogue.space
+  - access.attraction_access
+  - subscription.membership_entitlement
+  files:
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/access.yaml
+  - contracts/satellite/subscription.yaml
+  - tools/derive-schema.py
+  - tools/applied/sto-keys-14-october.py
+root_class: A17 DDL-DERIVATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch STO. Contract impact: additive (x-ticvai extensions only). Migration effect: the declared ones are
+  "constraint added" rows in handoff/migration-review.md; a refused one drops its convention index (an "index dropped"
+  row), nothing to backfill.'

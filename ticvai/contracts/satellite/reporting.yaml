@@ -482,6 +482,7 @@ paths:
               type: object
               properties:
                 note:
+                  x-ticvai-stored-as: reporting.alert.acknowledgement_note
                   type: string
                   maxLength: 300
                   description: Stored as `Alert.acknowledgementNote`.
@@ -1746,6 +1747,7 @@ paths:
       - query: ai#providerRecords
         route: service
         for: 'its read of ai.provider, AI''s data (CHG-MOD-001)'
+      x-ticvai-names-for-context: [ai.knowledge_gap]
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P06 EMP-020 AI assistant — answer"
@@ -1950,6 +1952,7 @@ paths:
   /semantic-queries:
     post:
       operationId: runSemanticQuery
+      x-ticvai-names-for-context: [ai.knowledge_gap]
       x-ticvai-agreed: '29 September: AI system design 2.2 E and 5.7; shape follows askReportingQuestion'
       x-ticvai-audience:
       - service
@@ -3449,6 +3452,8 @@ components:
           readOnly: true
           description: Assigned by the server on each publish.
         domains:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3498,6 +3503,8 @@ components:
                             type: string
                             nullable: true
         relationships:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3601,6 +3608,8 @@ components:
         severity:
           $ref: '#/components/schemas/AnomalySeverity'
         candidateCauses:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**The beginning of the question, not the end of it.**'
           items:
@@ -3638,6 +3647,8 @@ components:
           format: uuid
           nullable: true
         recipients:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3973,6 +3984,7 @@ components:
           type: string
           format: uuid
         ruleId:
+          x-ticvai-references: reporting.alert_rule
           type: string
           format: uuid
         ruleName:
@@ -4065,8 +4077,8 @@ components:
         | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements
         issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order`
         | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation
-        on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at`
-        | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries
+        on the shift that took it | | `waitTime` | `queue.entry.estimated_call_at` against `called_at`
+        | | `throughput` | `queue.entry` completions per hour | | `abandonmentRate` | Queue entries
         that left before being called |
 
         **`salesByInstructor` was deliberately absent from the first cut** because it needed the
@@ -5435,6 +5447,7 @@ components:
 
             '
         askedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         askedAt:

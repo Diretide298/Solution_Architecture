@@ -594,6 +594,7 @@ paths:
       - query: wallet#walletRecords
         route: service
         for: 'whether the wallet is suspended (409 wallet-suspended) (CHG-MOD-003)'
+      x-ticvai-names-for-context: [wallet.balance]
       x-ticvai-audience:
       - staff
       summary: Hold funds against the guest's home-cell balance
@@ -857,8 +858,10 @@ paths:
 
                     '
                 fixedAmount:
+                  x-ticvai-stored-as: sync.wallet_authorisation.allocated_amount
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 percentage:
+                  x-ticvai-stored-as: sync.wallet_authorisation.share_percentage
                   type: number
                   minimum: 0
                   maximum: 100
@@ -1248,6 +1251,7 @@ components:
           type: string
           format: uuid
         guestLinkId:
+          x-ticvai-references: sync.guest_link
           type: string
           format: uuid
         type:
@@ -1309,6 +1313,8 @@ components:
 
             '
         linkedCells:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1334,6 +1340,13 @@ components:
           type: string
           format: date-time
           nullable: true
+        localSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The guest in this cell the link resolves to (`resolveGuestLink`); never sent to another cell.
     CreateGuestLinkRequest:
       type: object
       required:
@@ -1346,20 +1359,25 @@ components:
         homeCellName:
           type: string
         homeSubjectId:
+          x-ticvai-stored-as: sync.guest_link.local_subject_id
           type: string
           format: uuid
           description: Local subject id in the home cell. Never leaves that cell beyond this call.
         targetCellName:
+          x-ticvai-stored-as: sync.guest_link.linked_cells
           type: string
         targetSubjectId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
         consentVersion:
           type: string
         consentedAt:
+          x-ticvai-stored-as: sync.guest_link.linked_at
           type: string
           format: date-time
     CrossRegionEntitlement:
+      x-ticvai-retired-columns: [ticket_id]
       x-ticvai-persistence: sync.cross_region_entitlement
       type: object
       required:
@@ -1387,6 +1405,8 @@ components:
           type: string
           format: uuid
         ticketId:
+          x-ticvai-references: access.entitlement
+          x-ticvai-column: entitlement_id
           type: string
         guestLinkId:
           type: string
@@ -1520,6 +1540,7 @@ components:
 
             '
         authorisationId:
+          x-ticvai-references: none
           type: string
         guestLinkId:
           type: string
@@ -1646,6 +1667,13 @@ components:
           description: '**The allocation is denominated in the home currency.** A ceiling set in AED does
             not become a different ceiling because the guest walked into a Saudi venue — converting the
             limit as well as the spend is how a policy silently loosens when a rate moves.'
+        sharePercentage:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          readOnly: true
+          description: The share of the wallet allocated, where the policy is a percentage (`setWalletAllocationPolicy`).
     DsarRequest:
       x-ticvai-persistence: sync.dsar_request
       type: object
@@ -1694,6 +1722,8 @@ components:
           format: date-time
           nullable: true
         cellResults:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

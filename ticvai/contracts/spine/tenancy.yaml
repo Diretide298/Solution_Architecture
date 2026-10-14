@@ -2157,6 +2157,7 @@ paths:
   /devices:
     get:
       operationId: listDevices
+      x-ticvai-names-for-context: [access.device_placement]
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
@@ -2889,6 +2890,7 @@ paths:
                   - deprecated
                   - withdrawn
                 reason:
+                  x-ticvai-stored-as: tenancy.device_firmware.status_reason
                   type: string
                   maxLength: 500
                   description: Required with `deprecated` and `withdrawn`.
@@ -4155,6 +4157,7 @@ components:
           format: uuid
           readOnly: true
         firmwareId:
+          x-ticvai-references: tenancy.device_firmware
           type: string
           format: uuid
         targetScopePath:
@@ -4166,6 +4169,8 @@ components:
             type: string
             format: uuid
         waves:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**A canary first.** Gate hardware failing across a venue at once is an
             evacuation problem rather than an IT one.
@@ -4320,6 +4325,7 @@ components:
           format: uuid
           readOnly: true
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           format: uuid
         kind:
@@ -4470,6 +4476,7 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         profileId:
+          x-ticvai-references: platform.configuration_profile
           type: string
           format: uuid
           readOnly: true
@@ -4898,6 +4905,7 @@ components:
             The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the
             library; this names a model in it.
         serialNumber:
+          x-ticvai-unique: tenant
           type: string
           nullable: true
           maxLength: 100
@@ -4943,6 +4951,7 @@ components:
           readOnly: true
           description: Reported connectivity.
         pushToken:
+          x-ticvai-secret: field-encrypted
           type: string
           format: password
           nullable: true
@@ -5279,6 +5288,7 @@ components:
 
 
     VenueSettings:
+      x-ticvai-retired-columns: [org_unit_id]
       type: object
       x-ticvai-persistence: "platform.venue_settings"
       description: >
@@ -6255,6 +6265,7 @@ components:
             When true, the workstation refuses to open a shift if the device is absent.
 
     Workstation:
+      x-ticvai-retired-columns: [org_unit_id]
       x-ticvai-persistence: "platform.workstation"
       type: object
       required: [id, code, name, venueId, regionId, scopePath, saleBoard, currency, currencyScale, timeZone]

@@ -4969,6 +4969,7 @@ paths:
                 priority:
                   type: integer
                 isActive:
+                  x-ticvai-stored-as: catalogue.price_list.status
                   type: boolean
                 description:
                   type: string
@@ -7056,6 +7057,7 @@ paths:
             format: uuid
           description: Product
         - name: userId
+          x-ticvai-column: catalogue.audit_entry.actor_principal_id
           in: query
           required: false
           schema:
@@ -8671,6 +8673,7 @@ paths:
             type: string
           description: Order ID
         - name: transactionId
+          x-ticvai-column: orders.sales_order.id
           in: query
           required: false
           schema:
@@ -9748,6 +9751,7 @@ paths:
               - customerProfile
           description: Segment source
         - name: customerId
+          x-ticvai-column: none
           in: query
           required: false
           schema:
@@ -10076,6 +10080,7 @@ paths:
               - experience
           description: Context level
         - name: contextRefId
+          x-ticvai-column: catalogue.event.id
           in: query
           required: false
           schema:
@@ -10437,12 +10442,14 @@ paths:
             type: boolean
           description: Only rules with conflicts
         - name: customerId
+          x-ticvai-column: none
           in: query
           required: false
           schema:
             type: string
           description: 'Simulator: Customer'
         - name: membershipId
+          x-ticvai-column: none
           in: query
           required: false
           schema:
@@ -12752,6 +12759,7 @@ paths:
               - location
           description: Dimension
         - name: strategyId
+          x-ticvai-column: pricing.dynamic_price_rule.dynamic_pricing_strategy_id
           in: query
           required: false
           schema:
@@ -12843,6 +12851,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
         - name: strategyId
+          x-ticvai-column: catalogue.price_ladder.dynamic_pricing_strategy_id
           in: query
           required: false
           schema:
@@ -13093,6 +13102,7 @@ paths:
               - guardrailConflict
           description: Only cases that met this conflict
         - name: strategyId
+          x-ticvai-column: pricing.dynamic_price_rule.dynamic_pricing_strategy_id
           in: query
           required: false
           schema:
@@ -15589,6 +15599,7 @@ paths:
                     type: string
                     format: date
                 reason:
+                  x-ticvai-stored-as: catalogue.audit_entry.reason
                   type: string
                   maxLength: 300
                   nullable: true
@@ -16412,6 +16423,7 @@ paths:
   /membership-programmes:
     get:
       operationId: listMembershipProgrammes
+      x-ticvai-names-for-context: [catalogue.entitlement_template]
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -16578,6 +16590,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
       - name: templateId
+        x-ticvai-column: catalogue.plan_benefit.entitlement_template_id
         in: path
         required: true
         schema:
@@ -16613,6 +16626,7 @@ paths:
       x-ticvai-config-scope: venue
       parameters:
       - name: templateId
+        x-ticvai-column: catalogue.plan_benefit.entitlement_template_id
         in: path
         required: true
         schema:
@@ -17734,6 +17748,7 @@ paths:
                   format: date-time
                   nullable: true
                 resolutionNote:
+                  x-ticvai-stored-as: catalogue.channel_incident.resolution_note
                   type: string
                   maxLength: 1000
                   nullable: true
@@ -18043,6 +18058,7 @@ paths:
   /fees/{feeId}:
     put:
       operationId: setFeeDefinition
+      x-ticvai-names-for-context: [catalogue.fee_rule, orders.order_fee, payments.fee_rule]
       x-ticvai-consumed-by:
         - "P08 ADM-071 Fee & Surcharge Library"
       summary: Create or update a fee or surcharge
@@ -19122,6 +19138,7 @@ components:
           format: uuid
           readOnly: true
         recommendationId:
+          x-ticvai-references: catalogue.pricing_recommendation
           type: string
           format: uuid
           description: A `catalogue.pricing_recommendation` (29 September, data model DM3).
@@ -19171,6 +19188,7 @@ components:
           description: >-
             The `createLiveDynamicPrice` execution that carried it out, once it has.
         decidedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true
@@ -19367,9 +19385,11 @@ components:
       - createdAt
       properties:
         entitlementTemplateId:
+          x-ticvai-references: catalogue.entitlement_template
           type: string
           format: uuid
         membershipBenefitId:
+          x-ticvai-references: catalogue.membership_benefit
           type: string
           format: uuid
         usageLimit:
@@ -19399,6 +19419,7 @@ components:
           type: string
           format: uuid
         dynamicPriceRuleId:
+          x-ticvai-references: pricing.dynamic_price_rule
           type: string
           format: uuid
         type:
@@ -19428,6 +19449,7 @@ components:
           type: string
           format: uuid
         dynamicPriceRuleId:
+          x-ticvai-references: pricing.dynamic_price_rule
           type: string
           format: uuid
         type:
@@ -19594,6 +19616,8 @@ components:
           type: string
           format: uuid
         performances:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19717,6 +19741,7 @@ components:
           format: uuid
           description: The dynamic pricing strategy that decides when to move (`setDynamicPricingStrategy`).
         seatMapId:
+          x-ticvai-references: seating.seat_map
           type: string
           format: uuid
         performanceId:
@@ -19853,6 +19878,7 @@ components:
           type: string
           format: uuid
         venueMapZoneId:
+          x-ticvai-references: none
           type: string
           format: uuid
           nullable: true
@@ -19954,6 +19980,8 @@ components:
           type: boolean
           default: true
         participantCategories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20005,6 +20033,8 @@ components:
           type: string
           format: uuid
         requirements:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20057,6 +20087,8 @@ components:
                   type: string
                   format: uuid
         contractors:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20113,6 +20145,8 @@ components:
         concurrentCapacity:
           type: integer
         bands:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20390,6 +20424,8 @@ components:
         updateCount:
           type: integer
         findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**What an operator sees before committing** — missing prices, duplicate codes,
             unknown categories, codes that do not match the tenant''s schema.
@@ -20634,6 +20670,7 @@ components:
           type: string
           format: date-time
         publishedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         note:
@@ -21014,6 +21051,8 @@ components:
         includedValue:
           $ref: ../shared/common.yaml#/components/schemas/Money
         validTimeWindows:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           nullable: true
           description: 'BL-036, 1.1.81 and 1.1.83. **A time-window entitlement needed a performance to
@@ -21320,6 +21359,7 @@ components:
         amountMode:
           $ref: '#/components/schemas/DonationAmountMode'
         fixedAmounts:
+          x-ticvai-persistence-column: 'numeric(18,4)[]'
           type: array
           description: 1.1.129. Predefined values, e.g. 5, 10, 25.
           items:
@@ -21919,6 +21959,8 @@ components:
 
             '
         displayTags:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           maxItems: 6
           items:
@@ -22220,6 +22262,8 @@ components:
           type: string
           maxLength: 200
         values:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:
@@ -23108,6 +23152,7 @@ components:
           type: integer
           minimum: 0
     ChannelAllocation:
+      x-ticvai-retired-columns: [envelope_id]
       x-ticvai-persistence: catalogue.channel_envelope
       type: object
       required:
@@ -23147,6 +23192,13 @@ components:
             freed close to a performance without someone remembering to do it.
 
             '
+        channelCapacityId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: catalogue.channel_capacity
+          description: The capacity envelope this allocation draws from (`catalogue.channel_capacity`), from the path of
+            `setChannelAllocations`.
         salesChannelId:
           type: string
           format: uuid
@@ -23430,6 +23482,7 @@ components:
           format: uuid
           x-ticvai-references: catalogue.performance
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
           readOnly: true
@@ -23886,8 +23939,7 @@ components:
     LifecycleStatusWorkflowConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.lifecycle_workflow` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Lifecycle Status & Workflow Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -24327,8 +24379,7 @@ components:
     ProductContextOwnershipAssignmentInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.product` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Product Context, Ownership & Assignment submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -24480,8 +24531,7 @@ components:
     ChannelPublicationAvailabilityInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.product` (with `catalogue.audit_entry`, `catalogue.product_channel_assignment`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Channel Publication & Availability submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -24614,9 +24664,7 @@ components:
     PublicationActivationSchedulerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_envelope at 4%, so this is not an update to anything the package stores today
-        and no new table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.lifecycle_action` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Publication & Activation Scheduler submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -24854,8 +24902,7 @@ components:
     AiCatalogueBuilderConfigurationReviewInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.ai_catalogue_session` (with `catalogue.audit_entry`, `catalogue.product`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What AI Catalogue Builder & Configuration Review submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -25151,8 +25198,7 @@ components:
     ApprovalWorkflowDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.approval_policy` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Approval Workflow Designer submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -25354,8 +25400,7 @@ components:
     ApprovalReviewDecisionWorkspaceInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.change_request` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Approval Review & Decision Workspace submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -26137,8 +26182,7 @@ components:
     ChannelCreationProfileConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.sales_channel` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Channel Creation & Profile Configuration submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -26362,8 +26406,7 @@ components:
     ProductCatalogueAssignmentInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.product` (with `catalogue.audit_entry`, `catalogue.product_channel_assignment`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Product & Catalogue Assignment submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -26509,9 +26552,7 @@ components:
     ChannelPricingCommercialProfileAssignmentInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.price_list at 6%, so this is not an update to anything the package stores today and
-        no new table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.price_assignment` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Channel Pricing & Commercial Profile Assignment submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.
@@ -27126,8 +27167,7 @@ components:
     ChannelFeesPaymentFulfillmentConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.sales_channel` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Channel Fees, Payment & Fulfillment Configuration submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -27297,8 +27337,7 @@ components:
     ChannelPublicationReadinessAiValidationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.sales_channel` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Channel Publication, Readiness & AI Validation submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -28968,8 +29007,7 @@ components:
     ProductServicePriceAssignmentInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.price_assignment` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Product & Service Price Assignment submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -29290,9 +29328,7 @@ components:
     PriceHierarchyInheritanceConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.price_list at 17%, so this is not an update to anything the package stores today and
-        no new table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.price_resolution_policy` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Price Hierarchy & Inheritance Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -30575,8 +30611,7 @@ components:
     TaxProfileJurisdictionConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.tax_profile` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Tax Profile & Jurisdiction Configuration submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -30788,8 +30823,7 @@ components:
     TaxRuleTreatmentBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.tax_rule` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Tax Rule & Treatment Builder submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -31167,9 +31201,7 @@ components:
     FeeApplicabilityChargingRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_envelope at 5%, so this is not an update to anything the package stores today
-        and no new table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.fee_rule` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Fee Applicability & Charging Rule Builder submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -32131,9 +32163,7 @@ components:
     PricingChangeRequestWorkspaceInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.entitlement_template at 3%, so this is not an update to anything the package stores
-        today and no new table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.change_request` (with `catalogue.audit_entry`, `catalogue.change_request_line`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Pricing Change Request & Workspace submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -32729,9 +32759,7 @@ components:
     PricingApprovalWorkflowAuthorityMatrixInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_envelope at 4%, so this is not an update to anything the package stores today
-        and no new table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.approval_policy` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Pricing Approval Workflow & Authority Matrix submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.
@@ -32956,8 +32984,7 @@ components:
     PricingPublicationEffectiveDateSchedulerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.change_request` (with `catalogue.audit_entry`, `catalogue.price_list_version`, `catalogue.pricing_publication`, `catalogue.pricing_publication_target`, `platform.outbox`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Pricing Publication & Effective-Date Scheduler submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -33565,8 +33592,7 @@ components:
     DynamicPricingStrategyBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.dynamic_pricing_strategy` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Dynamic Pricing Strategy Builder submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -33790,8 +33816,7 @@ components:
     DemandOccupancyAvailabilityRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `pricing.dynamic_price_action` (with `catalogue.audit_entry`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Demand, Occupancy & Availability Rule Builder submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -34042,8 +34067,7 @@ components:
     BookingVelocityTimeToEventRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `pricing.dynamic_price_action` (with `catalogue.audit_entry`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Booking Velocity & Time-to-Event Rule Builder submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -36569,8 +36593,7 @@ components:
     PricingSimulationStudioInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.pricing_recommendation` (with `catalogue.pricing_simulation`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Pricing Simulation Studio submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -36889,9 +36912,7 @@ components:
     ABPricingExperimentStudioInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_envelope at 5%, so this is not an update to anything the package stores today
-        and no new table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.pricing_experiment` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What A/B Pricing Experiment Studio submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -37416,8 +37437,7 @@ components:
     LiveDynamicPriceExecutionDeploymentMonitorInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.price` (with `catalogue.audit_entry`, `catalogue.price_execution`, `catalogue.pricing_recommendation_decision`, `platform.outbox`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Live Dynamic Price Execution & Deployment Monitor submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -38074,6 +38094,7 @@ components:
           format: uuid
           nullable: true
         requestedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true
@@ -38247,6 +38268,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         productId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         venueId:
@@ -38382,6 +38404,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         productId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         salesChannelId:
@@ -38477,6 +38500,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         sourceProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         dependencyType:
@@ -38662,6 +38686,7 @@ components:
           - cancelled
           default: requested
         requestedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true
@@ -39114,6 +39139,7 @@ components:
           format: date-time
           readOnly: true
     PerformanceMediaAssignment:
+      x-ticvai-retired-columns: [participant_id]
       type: object
       x-ticvai-persistence: catalogue.performance_media
       description: >-
@@ -39136,13 +39162,17 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
         participantId:
+          x-ticvai-column: event_registration_id
+          x-ticvai-references: catalogue.event_registration
           type: string
           format: uuid
           description: 'The participant as the request names them: a `catalogue.event_registration`.'
         assetId:
+          x-ticvai-references: assets.media_asset
           type: string
           format: uuid
           description: A `MediaAsset` of `assets.yaml`.
@@ -39460,6 +39490,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         salesChannelId:
+          x-ticvai-references: catalogue.sales_channel
           type: string
           format: uuid
         connectorName:
@@ -39590,6 +39621,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         salesChannelId:
+          x-ticvai-references: catalogue.sales_channel
           type: string
           format: uuid
         channelConnectionId:
@@ -39689,6 +39721,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         salesChannelId:
+          x-ticvai-references: catalogue.sales_channel
           type: string
           format: uuid
         productId:
@@ -39938,6 +39971,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         salesChannelId:
+          x-ticvai-references: catalogue.sales_channel
           type: string
           format: uuid
         channelConnectionId:
@@ -40037,6 +40071,12 @@ components:
           type: string
           format: date-time
           readOnly: true
+        resolutionNote:
+          type: string
+          maxLength: 1000
+          nullable: true
+          readOnly: true
+          description: How the incident was resolved (`updateChannelIncident`).
     PriceCategory:
       x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listCommercialPricing, listCommercialPricingStructure, listPriceCategoryRate
       type: object
@@ -40143,9 +40183,11 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         priceListId:
+          x-ticvai-references: catalogue.price_list
           type: string
           format: uuid
         priceCategoryId:
+          x-ticvai-references: catalogue.price_category
           type: string
           format: uuid
         rateTypeId:
@@ -40235,6 +40277,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         priceListId:
+          x-ticvai-references: catalogue.price_list
           type: string
           format: uuid
         objectType:
@@ -40382,6 +40425,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         productId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         recordKind:
@@ -40928,6 +40972,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         taxCodeId:
+          x-ticvai-references: ledger.tax_code
           type: string
           format: uuid
           description: The `ledger.tax_code` holding rate, country, inclusivity and compounding.
@@ -41438,6 +41483,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         priceListId:
+          x-ticvai-references: catalogue.price_list
           type: string
           format: uuid
         version:
@@ -41525,6 +41571,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         changeRequestId:
+          x-ticvai-references: catalogue.change_request
           type: string
           format: uuid
         priceListVersionId:
@@ -42042,6 +42089,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         dynamicPricingStrategyId:
+          x-ticvai-references: catalogue.dynamic_pricing_strategy
           type: string
           format: uuid
         basePriceSource:

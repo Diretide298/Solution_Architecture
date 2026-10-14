@@ -1,0 +1,32 @@
+id: CHG-STO-013
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'A number array is numeric[] (the column type follows the field type): MediaFingerprint.embedding was text[].'
+decision:
+  what: tools/derive-schema.py _SCALAR_ARRAY number -> numeric[]; tools/check-contract-storage.py notes a type, enum or
+    nullability change migration-review lists for the migration owner.
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-contract-storage/ST-TYPE-MISMATCH (1 at audit-base b93b5a87, 0 after), evidence
+  audit/ticvai/runs/audit-1014/classes.json; triage ruling "Column type follows the field type." (R227).
+keys_touched:
+  tables:
+  - assets.media_fingerprint
+  files:
+  - tools/derive-schema.py
+  - tools/check-contract-storage.py
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: 'tools/derive-schema.py::_SCALAR_ARRAY'
+status: open
+notes: 'Batch STO. Migration effect: assets.media_fingerprint.embedding text[] -> numeric[] is a "column changed" row in
+  handoff/migration-review.md (ALTER COLUMN ... TYPE numeric[] USING embedding::numeric[]).'

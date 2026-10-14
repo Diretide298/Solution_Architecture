@@ -1,0 +1,52 @@
+id: CHG-STO-011
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: A persisted schema's every field has a column, a child table or a stated no-store; the campaign invitation no longer
+  shares Orders' Invitation's name, and EntitlementSummary is a projection.
+decision:
+  what: 'marketing-crm Invitation renamed CampaignInvitation (its one $ref follows; the wire is unchanged), so derive-schema
+    stops reading Orders'' complimentary Invitation into marketing.invitation; Orders'' graph keys left there are retired;
+    states/invitation.yaml names the enum''s schema. orders.EntitlementSummary persistence ''none - projection of access.entitlement
+    and its product'' (it named catalogue.entitlement_template). tools/check-contract-storage.py ST-FIELD-NO-COLUMN reads
+    storage as derive-schema and SP-ARRAY-NOWHERE do: a child table built from the array (`<Schema>.<prop>[]` sources),
+    items that are rows of a table of their own, or a $ref to a shape the contract says is computed. tools/ddl_forward.py
+    SCOPE_FILL_FROM: orders.invitation''s new scope_path is backfilled from its product (it followed the product at r1).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit before r6, class check-contract-storage/ST-FIELD-NO-COLUMN (171 at audit-base b93b5a87, 0 after; most
+  are the SP-ARRAY-NOWHERE arrays, CHG-STO-010), evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "A persisted
+  field gets a column, or x-ticvai-persisted: false." (R086 R099 R107 ... R248).'
+keys_touched:
+  operations:
+  - issueInvitation
+  tables:
+  - marketing.invitation
+  - orders.invitation
+  - catalogue.entitlement_template
+  schemas:
+  - CampaignInvitation
+  - EntitlementSummary
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/orders.yaml
+  - states/invitation.yaml
+  - tools/applied/sto-storage-14-october.py
+  - tools/check-contract-storage.py
+  - tools/ddl_forward.py
+root_class: A15 STORAGE-GAP
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Batch STO. Contract impact: a component schema renamed (CampaignInvitation); every field and path is unchanged.
+  Migration effect: marketing.invitation gains campaign_id, token, status, plus_ones, responded_at, subject_id (ADD COLUMN
+  in V0104) and its Orders columns are "column dropped" rows; orders.invitation gains scope_path (ADD COLUMN, backfilled
+  from its product, then NOT NULL, in migration-review) and moves to the scope policy.'

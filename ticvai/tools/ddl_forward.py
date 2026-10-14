@@ -228,12 +228,28 @@ def relaxed(coldef: str) -> str:
 SCOPE_OWNER_KEYS = ("org_unit_id", "scope_id", "region_id")
 
 
+# **A table whose rows followed a parent's policy before they had a scope_path of their own takes the parent's path**
+# (CHG-STO-011, 14 October 2026): `orders.invitation` was read through its product (apply_parent_rls on product_id)
+# until the contract's `Invitation.scopePath` reached it (Marketing's invitation had taken its name, so Orders' fields
+# never did); an existing invitation belongs where its product does. table -> (key column, parent table).
+SCOPE_FILL_FROM = {
+    "orders.invitation": ("product_id", "catalogue.product"),
+}
+
+
+
+
 # **A table that was the tenant root's alone has rows only the tenant root wrote** (MOD audit, 14 October 2026,
 # CHG-MOD-007). Until its scope_path arrives, its policy (`apply_tenant_rls`) let no other connection insert a row, so
 # every row it holds sits at the tenant root by construction: the backfill is the tenant root's path, then NOT NULL.
 def scope_path_backfill(t: str, cols, was_tenant_root: bool = False) -> str | None:
     """The statements that fill and then close a scope_path added nullable to `t`, or None when the owner is unknown.
     `was_tenant_root`: the table's policy before this migration was the tenant root's alone."""
+    if t in SCOPE_FILL_FROM and SCOPE_FILL_FROM[t][0] in cols:
+        key, parent = SCOPE_FILL_FROM[t]
+        return (f"UPDATE {t} x SET scope_path = p.scope_path FROM {parent} p WHERE p.id = x.{key} AND x.scope_path IS "
+                f"NULL; UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE "
+                f"scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
     owner = next((c for c in SCOPE_OWNER_KEYS if c in cols), None)
     if not owner and was_tenant_root:
         return (f"UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE "
@@ -638,6 +654,15 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
             p.counts["other"] += 1
             continue
         rc_ = rls_call(s)
+        if rc_ and rc_[0] != "drop_rls_policies" and rc_[1] in new_tables:
+            # **A new table's policy is written with the table** (CHG-STO-003, 14 October 2026). A parent policy names
+            # its parent too (`apply_parent_rls(child, 'outlet_id', 'platform.outlet', 'id')`), so the "every table it
+            # names is new" rule above missed it: `platform.outlet_opening_hour` was created by V0104 with no policy at
+            # all, listed as "statement added" for a person, and the next run wrote the policy into a V0105 because by
+            # then the table existed. A forward migration that grows on a second run is not one migration.
+            p.statements.append(stmt)
+            p.counts["other"] += 1
+            continue
         if rc_ and rc_[0] != "drop_rls_policies" and rc_[1] in old.tables:
             # **A policy change on a table that already exists is written, not listed** (CHG-GEN-004). The call is
             # the generated helper the baseline used for every table: it drops what was there and creates the

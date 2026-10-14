@@ -297,6 +297,7 @@ paths:
                 minimumOrderValue:
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 contacts:
+                  x-ticvai-stored-as: inventory.supplier.contacts
                   type: array
                   items:
                     type: object
@@ -3293,6 +3294,7 @@ paths:
   /stock-reservations:
     get:
       operationId: listStockReservations
+      x-ticvai-names-for-context: [rental.agreement_item]
       x-ticvai-consumed-by:
         - "P06 EMP-005 Task detail"
         - "P08 BO-579 Parts, Cost & Maintenance Expense Tracking"
@@ -3908,9 +3910,11 @@ components:
           type: string
           format: uuid
         supplierId:
+          x-ticvai-references: inventory.supplier
           type: string
           format: uuid
         number:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 100
         name:
@@ -4588,6 +4592,7 @@ components:
           type: string
           format: uuid
         locationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         locationName:
@@ -4761,9 +4766,11 @@ components:
         transferNumber:
           type: string
         fromLocationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         toLocationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         status:
@@ -5132,6 +5139,15 @@ components:
 
             **Operations write it at `tenant` scope.** Suppliers are owned at tenant and venues quote
             against them (decided 28 September, audit R183).'
+        contacts:
+          type: array
+          readOnly: true
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          description: Every contact `updateSupplier` was given; the first is also the primary contact's three fields.
+          items:
+            type: object
+            additionalProperties: true
     CreateQuotationRequest:
       x-ticvai-persistence: none — request only
       type: object

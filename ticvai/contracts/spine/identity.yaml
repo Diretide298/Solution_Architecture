@@ -308,6 +308,7 @@ paths:
   /internal/consent-identifiers:
     post:
       operationId: recordConsentIdentifier
+      x-ticvai-names-for-context: [marketing.device_consent, platform.outbox]
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -364,6 +365,7 @@ paths:
         format: uuid
     patch:
       operationId: updateGuestSubjectDetails
+      x-ticvai-names-for-context: [platform.outbox]
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -4724,6 +4726,7 @@ paths:
               - state
               properties:
                 state:
+                  x-ticvai-stored-as: identity.authorisation_policy.status
                   type: string
                   enum:
                   - draft
@@ -4732,6 +4735,7 @@ paths:
                   - suspended
                   - retired
                 reason:
+                  x-ticvai-stored-as: identity.authorisation_policy.status_reason
                   type: string
                   nullable: true
                 effectiveFrom:
@@ -4894,6 +4898,7 @@ paths:
       x-ticvai-offline-capable: true
       parameters:
       - name: deviceId
+        x-ticvai-column: none
         in: query
         description: The device the bundle is issued to; recorded as `AuthorisationPolicyBundle.deviceId`.
         schema:
@@ -5623,6 +5628,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - name: membershipId
+        x-ticvai-column: identity.benefit_usage.customer_membership_id
         in: path
         required: true
         schema:
@@ -5971,6 +5977,7 @@ paths:
           minimum: 1
           default: 3
       - name: draftPolicyId
+        x-ticvai-column: identity.authorisation_policy.id
         in: query
         description: Evaluate as if this draft `AuthorisationPolicy` were active, so a policy can be checked for the
           grants it would widen or leave missing before it is submitted.
@@ -7488,6 +7495,7 @@ components:
           format: uuid
           readOnly: true
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         subjectDocumentId:
@@ -7707,9 +7715,11 @@ components:
           format: uuid
           readOnly: true
         customerMembershipId:
+          x-ticvai-references: identity.customer_membership
           type: string
           format: uuid
         membershipBenefitId:
+          x-ticvai-references: catalogue.membership_benefit
           type: string
           format: uuid
         quantity:
@@ -7760,6 +7770,7 @@ components:
           type: string
           format: uuid
         entitlementTemplateId:
+          x-ticvai-references: catalogue.entitlement_template
           type: string
           format: uuid
         number:
@@ -7823,6 +7834,7 @@ components:
           type: string
           format: uuid
         customerMembershipId:
+          x-ticvai-references: identity.customer_membership
           type: string
           format: uuid
         fromStatus:
@@ -7971,6 +7983,7 @@ components:
           type: string
           format: uuid
         moduleId:
+          x-ticvai-references: identity.module
           type: string
           format: uuid
         code:
@@ -8011,6 +8024,7 @@ components:
           type: string
           format: uuid
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         hash:
@@ -8167,6 +8181,11 @@ components:
             tenant''s.
 
             '
+        statusReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Why the policy's state last changed (`setAuthorisationPolicyState`).
     GuestCredential:
       x-ticvai-persistence: identity.guest_credential
       type: object
@@ -8179,8 +8198,8 @@ components:
         the operation''s audience disagreed. The hash is the self-describing PHC string ADR-0071 decides.'
       required: [subjectId, passwordHash, failedAttempts]
       properties:
-        subjectId: { type: string, format: uuid }
-        passwordHash: { type: string, writeOnly: true, description: 'Argon2id, with its parameters, never the password: the self-describing PHC string (ADR-0071).' }
+        subjectId: { type: string, format: uuid, x-ticvai-references: pii.subject }
+        passwordHash: { type: string, writeOnly: true, description: 'Argon2id, with its parameters, never the password: the self-describing PHC string (ADR-0071).', x-ticvai-secret: argon2id-phc }
         failedAttempts: { type: integer, minimum: 0 }
         lockedUntil: { type: string, format: date-time, nullable: true }
         passwordSetAt: { type: string, format: date-time }
@@ -8216,6 +8235,7 @@ components:
           enum: [password, pin]
           description: Which secret this row holds. Card, RFID and SSO are not secrets the principal holds and have no row.
         credentialHash:
+          x-ticvai-secret: argon2id-phc
           type: string
           writeOnly: true
           description: '**A self-describing PHC string**, `$argon2id$v=19$m=<KiB>,t=<passes>,p=<lanes>$<salt>$<hash>`
@@ -8248,6 +8268,7 @@ components:
             required: [credentialHash, replacedAt]
             properties:
               credentialHash:
+                x-ticvai-secret: argon2id-phc
                 type: string
                 writeOnly: true
                 description: The replaced credential's PHC string (ADR-0071), never the credential.
@@ -8655,6 +8676,8 @@ components:
         scopePath:
           type: string
         matchedPolicies:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -8803,6 +8826,7 @@ components:
           type: string
           format: uuid
         operatorPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true
@@ -9845,6 +9869,7 @@ components:
           type: string
           format: uuid
         username:
+          x-ticvai-unique: tenant
           type: string
         displayName:
           type: string

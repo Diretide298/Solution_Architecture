@@ -1,0 +1,31 @@
+id: CHG-STO-012
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: check-contract-storage reads a schema's required fields through allOf, as derive-schema does; the 33 required-or-NOT-NULL
+  mismatches were all schemas built as allOf of a create request and a required list.
+decision:
+  what: tools/check-contract-storage.py required_of (StockMovement, VoucherBatch, CouponCampaign, Promotion, Asset, Campaign,
+    Review, CashMovement require their fields in an allOf part; the columns are right).
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-contract-storage/ST-REQUIRED-MISMATCH (33 at audit-base b93b5a87, 0 after), evidence
+  audit/ticvai/runs/audit-1014/classes.json; triage ruling "Required and NOT NULL agree (the contract decides)." (R089).
+  The contract does decide, and it already required them.
+keys_touched:
+  files:
+  - tools/check-contract-storage.py
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: Batch STO. No contract or table change. A mismatch whose change migration-review lists for the migration owner is
+  now a note (as D-SCOPE-NOTNULL reads a scope_path on its way to NOT NULL).

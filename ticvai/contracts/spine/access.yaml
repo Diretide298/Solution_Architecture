@@ -1225,6 +1225,7 @@ paths:
   /face-pass/enrolments/{enrolmentId}:
     parameters:
     - name: enrolmentId
+      x-ticvai-column: pii.subject_biometric.id
       in: path
       required: true
       schema:
@@ -2178,6 +2179,7 @@ paths:
         format: uuid
     put:
       operationId: setTurnstileMode
+      x-ticvai-names-for-context: [access.configuration_change]
       x-ticvai-consumed-by:
         - "P07 SCN-016 Gate mode"
         - "P08 BO-230 Live Gate Mode & Lane Control"
@@ -2417,11 +2419,13 @@ paths:
                 direction:
                   $ref: '#/components/schemas/Direction'
                 reason:
+                  x-ticvai-stored-as: access.access_point.direction_change_reason
                   type: string
                   minLength: 3
                   maxLength: 200
                   description: Why the gate is turned round, kept on the log.
                 effectiveAt:
+                  x-ticvai-stored-as: access.access_point.direction_effective_at
                   type: string
                   format: date-time
                   nullable: true
@@ -2657,6 +2661,7 @@ paths:
   /admission-rules/{profileId}:
     parameters:
     - name: profileId
+      x-ticvai-column: access.admission_rules.id
       in: path
       required: true
       schema:
@@ -3497,6 +3502,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: virtualTicketId
+        x-ticvai-column: access.entitlement.id
         in: query
         required: false
         schema:
@@ -3953,6 +3959,7 @@ paths:
   /pdf-printable-pos:
     get:
       operationId: getPdfPrintablePos
+      x-ticvai-names-for-context: [access.configuration_change]
       x-ticvai-consumed-by:
         - "P08 BO-346 PDF, Printable & POS Ticket Designer"
       x-ticvai-audience: [staff]
@@ -5535,6 +5542,7 @@ paths:
                   type: integer
                   description: Added to entries minus exits for the current count.
                 reason:
+                  x-ticvai-stored-as: access.configuration_change.reason
                   type: string
                   maxLength: 200
                   description: Required when `operationalAdjustment` changes; refused 400 without it.
@@ -10850,6 +10858,7 @@ paths:
           type: string
         description: NFC
       - name: virtualCredentialId
+        x-ticvai-column: access.entitlement.id
         in: query
         required: false
         schema:
@@ -14247,6 +14256,7 @@ paths:
       operationId: setGateOfflinePolicy
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-names-for-context: [access.edge_package]
       x-ticvai-consumed-by:
         - "P08 BO-171 Offline Cryptographic Validation Profile"
         - "P08 BO-206 Offline Validation Policy Builder"
@@ -14643,6 +14653,7 @@ paths:
   /device-placements:
     post:
       operationId: placeAccessDevice
+      x-ticvai-names-for-context: [platform.device]
       x-ticvai-consumed-by:
         - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-audience:
@@ -14729,6 +14740,7 @@ paths:
         format: uuid
     put:
       operationId: updateAccessDevicePlacement
+      x-ticvai-names-for-context: [platform.device]
       x-ticvai-consumed-by:
         - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-audience:
@@ -16615,6 +16627,7 @@ paths:
                   - resolved
                   - dismissed
                 note:
+                  x-ticvai-stored-as: access.security_alert.note
                   type: string
                   maxLength: 1000
                 securityInvestigationId:
@@ -17586,6 +17599,7 @@ components:
           - product
           - mediaTemplate
         scopeId:
+          x-ticvai-references: platform.scope
           type: string
           description: ID of the tenant, brand, venue, event, product or media template at that level; unique with level
         parentScopeId:
@@ -17773,10 +17787,12 @@ components:
           format: uuid
           description: The credential binding id (credentialBindingId / bindingId in the views)
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
           description: The Virtual Ticket the medium resolves to
         mediaTypeId:
+          x-ticvai-references: access.media_type
           type: string
           format: uuid
           description: access.media_type row of the medium
@@ -17913,6 +17929,7 @@ components:
           format: uuid
           description: Client-generated delivery attempt id (CredentialDeliveryInput.id)
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         credentialBindingId:
@@ -18191,6 +18208,7 @@ components:
           type: string
           format: uuid
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         credentialBindingId:
@@ -18561,6 +18579,7 @@ components:
           - bulkOperation
           - scheduledProcess
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         credentialBindingId:
@@ -18569,6 +18588,7 @@ components:
           nullable: true
           description: The credential generated, once bound
         mediaTypeId:
+          x-ticvai-references: access.media_type
           type: string
           format: uuid
         mediaTemplateId:
@@ -18807,6 +18827,7 @@ components:
           nullable: true
           description: The guest (pii.subject)
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         credentialBindingId:
@@ -18814,6 +18835,7 @@ components:
           format: uuid
           nullable: true
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           maxLength: 200
         deviceReference:
@@ -19415,10 +19437,12 @@ components:
           type: string
           format: uuid
         mediaTypeId:
+          x-ticvai-references: access.media_type
           type: string
           format: uuid
           description: The media profile being published (mediaProfileId)
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         parkId:
@@ -19818,6 +19842,7 @@ components:
           type: string
           format: uuid
         mediaTemplateId:
+          x-ticvai-references: access.media_template
           type: string
           format: uuid
         version:
@@ -20029,6 +20054,7 @@ components:
           format: uuid
           description: The policyId of listVerificationMethodSelection
         productId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
           description: Unique per scope
@@ -20265,9 +20291,11 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         mapId:
+          x-ticvai-references: venuemap.map
           type: string
           description: The venue map this digital twin is drawn on (venuemap.map)
         sourceFileType:
@@ -20315,6 +20343,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         name:
@@ -20364,6 +20393,7 @@ components:
           readOnly: true
           $ref: ../shared/common.yaml#/components/schemas/Id
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         deviceId:
@@ -20515,6 +20545,7 @@ components:
           nullable: true
           description: State after the change
         changedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: Actor
@@ -20522,6 +20553,12 @@ components:
           type: string
           format: date-time
         scopePath: *id001
+        reason:
+          type: string
+          maxLength: 200
+          nullable: true
+          readOnly: true
+          description: Why the change was made, where the operation asks for one (`setAccessAreaCapacity`).
     AccessConfigurationVersion:
       type: object
       x-ticvai-persistence: access.configuration_version
@@ -20648,9 +20685,11 @@ components:
           type: string
           format: uuid
         accessPointId:
+          x-ticvai-references: access.access_point
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         name:
@@ -20724,6 +20763,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         maxOfflineDurationHours:
@@ -20848,6 +20888,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         dayType:
@@ -20930,10 +20971,12 @@ components:
           type: string
           format: uuid
         accessPointId:
+          x-ticvai-references: access.access_point
           type: string
           format: uuid
           description: The access point configured; unique
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         passThroughTimeoutSeconds:
@@ -21000,6 +21043,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         outcome:
@@ -21071,6 +21115,7 @@ components:
       - results
       properties:
         modelId:
+          x-ticvai-references: access.hardware_model
           type: string
           format: uuid
           description: The `AccessHardwareModel` certified.
@@ -21215,6 +21260,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         configurationKind:
@@ -21363,6 +21409,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         mode:
@@ -21413,6 +21460,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         nodeType:
@@ -21472,6 +21520,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         version:
@@ -21545,6 +21594,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         podiumType:
@@ -21584,9 +21634,11 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         operatorPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         role:
@@ -21632,6 +21684,7 @@ components:
           nullable: true
           description: Null for a tenant-wide code
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 32
           description: e.g. AC-002
@@ -21678,9 +21731,11 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         accessPointId:
+          x-ticvai-references: access.access_point
           type: string
           format: uuid
         fromMode:
@@ -21716,6 +21771,7 @@ components:
           format: date-time
           nullable: true
         changedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: Operator
@@ -21740,6 +21796,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         incidentType:
@@ -21809,6 +21866,7 @@ components:
           type: string
           format: uuid
         attractionId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: The attraction this row configures; unique per tenant
@@ -21816,6 +21874,7 @@ components:
           type: string
           maxLength: 200
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -21907,6 +21966,7 @@ components:
           - faceMatch
           description: verification is written by setBiometricVerificationProfile, facePassEnrolment by setFacePassEnrollment (one per venue), faceTagEnrolment by setFaceTagTemporaryEnrollment, faceMatch by setFaceMatchingVerification
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -22126,6 +22186,7 @@ components:
           format: uuid
           description: The ruleId setGuestCompanionEligibility is keyed by
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -22211,6 +22272,7 @@ components:
           format: uuid
           description: The profileId / ruleId the operations show
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -22392,12 +22454,14 @@ components:
           format: uuid
           description: The attemptId the list shows
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
           type: string
           description: ltree of the owning scope node
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The guest (pii.subject)
@@ -22477,6 +22541,7 @@ components:
           format: uuid
           description: The eventId the list shows
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -22682,6 +22747,12 @@ components:
           type: string
           format: uuid
           nullable: true
+        note:
+          type: string
+          maxLength: 1000
+          nullable: true
+          readOnly: true
+          description: The latest note on the alert (`updateSecurityAlert`).
     AccessJourneyProfile:
       type: object
       x-ticvai-persistence: access.journey_profile
@@ -23082,6 +23153,7 @@ components:
           type: string
           format: uuid
         dynamicPolicyId:
+          x-ticvai-references: access.dynamic_policy
           type: string
           format: uuid
         scopePath:
@@ -23200,6 +23272,7 @@ components:
           type: string
           format: uuid
         dynamicPolicyId:
+          x-ticvai-references: access.dynamic_policy
           type: string
           format: uuid
           description: The operation's policyId
@@ -23216,6 +23289,7 @@ components:
           - attraction
           - accessPoint
         scopeId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         policyCategory:
@@ -23501,6 +23575,7 @@ components:
           type: string
           description: ltree of the owning scope node
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
           description: The credential (the list's credentialId)
@@ -23569,6 +23644,7 @@ components:
           type: string
           description: ltree of the owning scope node
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The locked identity (the list's identityId, pii.subject)
@@ -25054,6 +25130,7 @@ components:
       - escalateAfterAttempts
       properties:
         venueId:
+          x-ticvai-references: platform.scope
           type: string
         automaticRetry:
           type: boolean
@@ -25233,6 +25310,7 @@ components:
           type: string
           maxLength: 500
     AccessAccessChange:
+      x-ticvai-retired-columns: [old_access_id, new_access_id]
       type: object
       x-ticvai-persistence: access.access_change
       description: '**Taken from the backend workbook, 20 September.** Audits ticket/access replacement during an upgrade. The old access should normally be marked UPGRADED/REPLACED and the new access becomes ACTIVE; old records should not be deleted.'
@@ -25245,9 +25323,13 @@ components:
           type: string
           format: uuid
         oldAccessId:
+          x-ticvai-column: old_entitlement_id
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         newAccessId:
+          x-ticvai-column: new_entitlement_id
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
           nullable: true
@@ -25275,6 +25357,7 @@ components:
           type: string
           format: date-time
     AccessEntryRulePoint:
+      x-ticvai-retired-columns: [admission_profile_id]
       type: object
       x-ticvai-persistence: access.entry_rule_point
       description: '**Taken from the backend workbook, 20 September.** Maps the access points that are allowed for an admission profile.'
@@ -25285,10 +25368,13 @@ components:
       - createdAt
       properties:
         admissionProfileId:
+          x-ticvai-references: access.admission_rules
+          x-ticvai-column: admission_rules_id
           type: string
           format: uuid
           readOnly: true
         accessPointId:
+          x-ticvai-references: access.access_point
           type: string
           format: uuid
         isActive:
@@ -25388,6 +25474,7 @@ components:
 
             '
         templateId:
+          x-ticvai-references: catalogue.entitlement_template
           type: string
           format: uuid
           description: 'The definition it was issued against. **Pinned at issue** — a template edited
@@ -26827,6 +26914,7 @@ components:
               error:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
     ScanEvent:
+      x-ticvai-retired-columns: [ticket_id]
       x-ticvai-append-only: recordedAt
       x-ticvai-persistence: access.scan_event
       type: object
@@ -26851,6 +26939,8 @@ components:
         scopePath:
           type: string
         ticketId:
+          x-ticvai-references: access.entitlement
+          x-ticvai-column: entitlement_id
           type: string
           format: uuid
           nullable: true
@@ -27094,6 +27184,18 @@ components:
           type: string
           format: date-time
           nullable: true
+        directionEffectiveAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When a direction change set by `setAccessPointDirection` takes effect; held `pending` until then.
+        directionChangeReason:
+          type: string
+          maxLength: 200
+          nullable: true
+          readOnly: true
+          description: Why the gate was last turned round (`setAccessPointDirection`).
     AccessPointGeofence:
       type: object
       x-ticvai-persistence-kind: valueObject
@@ -27427,6 +27529,7 @@ components:
           format: uuid
           description: The accreditation credential's id (`credentialId` on the events).
         holderId:
+          x-ticvai-references: accreditation.holder
           type: string
           format: uuid
         programmeId:
@@ -27642,8 +27745,7 @@ components:
     VirtualTicketIdentityMasterRecordConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.credential_policy` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Virtual Ticket Identity & Master Record Configuration submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -28415,8 +28517,7 @@ components:
     DigitalQrBarcodeTicketDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.media_template` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Digital QR & Barcode Ticket Designer submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -28784,8 +28885,7 @@ components:
     AppleWalletPassDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.media_template` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Apple Wallet Pass Designer submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -28966,8 +29066,7 @@ components:
     GoogleWalletPassDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.media_template` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Google Wallet Pass Designer submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -29158,8 +29257,7 @@ components:
     RfidNfcCardWristbandMediaDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.media_template` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What RFID, NFC, Card & Wristband Media Designer submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -29347,8 +29445,7 @@ components:
     DigitalCardMembershipWearableDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.media_template` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Digital Card, Membership & Wearable Designer submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -29530,9 +29627,7 @@ components:
     DynamicFieldsDataMappingContentBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest is
-        access.entitlement at 3%, so this is not an update to anything the package stores today and no new
-        table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `access.dynamic_field` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Dynamic Fields, Data Mapping & Content Builder submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -29804,8 +29899,7 @@ components:
     MultiMediaPreviewTestingApprovalPublicationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.media_template` (with `access.configuration_change`, `access.media_template_version`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Multi-Media Preview, Testing, Approval & Publication submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -30516,8 +30610,7 @@ components:
     MediaBindingActivationAssignmentOperationsInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.credential_binding` (with `access.credential_event`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Media Binding, Activation & Assignment Operations submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -31119,9 +31212,7 @@ components:
     AccessAreaZoneBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest is
-        access.parking_facility at 14%, so this is not an update to anything the package stores today and
-        no new table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `access.access_area` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Access Area & Zone Builder submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.
@@ -31263,9 +31354,7 @@ components:
     AttractionAccessConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest is
-        access.parking_facility at 6%, so this is not an update to anything the package stores today and no
-        new table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `access.attraction_access` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Attraction Access Configuration submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.
@@ -31401,8 +31490,7 @@ components:
     GateLaneConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.gate_lane` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Gate & Lane Configuration submits.** The configurable fields from the pack''s directory
         for this screen; the metrics the screen displays are deliberately absent, because a figure the system
         computed is not a figure a client may send back.'
@@ -31494,8 +31582,7 @@ components:
     AccessControlGraphicalMapDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.access_map` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Access Control Graphical Map Designer submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -31652,8 +31739,7 @@ components:
     TopologyValidationPublicationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.configuration_version` (with `access.configuration_change`, `access.hardware_deployment`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Topology Validation & Publication submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -31820,8 +31906,7 @@ components:
     VisualAccessRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.admission_rules` (with `access.configuration_change`, `access.entry_rule_point`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Visual Access Rule Builder submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -32304,8 +32389,7 @@ components:
     RuleSimulationConflictCheckPublicationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.configuration_version` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Rule Simulation, Conflict Check & Publication submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -32486,9 +32570,7 @@ components:
     DynamicQrSecurityProfileBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest is
-        access.scan_event at 7%, so this is not an update to anything the package stores today and no new
-        table has been decided
+      x-ticvai-persistence: 'none — request only; applied to `access.credential_security_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Dynamic QR Security Profile Builder submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -32711,8 +32793,7 @@ components:
     BleBeaconGeofenceConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.access_point` (with `access.configuration_change`, `access.device_placement`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What BLE Beacon & Geofence Configuration submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -32947,8 +33028,7 @@ components:
     EmbeddedEntitlementPayloadDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.credential_security_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Embedded Entitlement Payload Designer submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -33453,8 +33533,7 @@ components:
     RfidNfcConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.media_encoding_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What RFID & NFC Configuration submits.** The configurable fields from the pack''s directory
         for this screen; the metrics the screen displays are deliberately absent, because a figure the system
         computed is not a figure a client may send back.'
@@ -33662,8 +33741,7 @@ components:
     MediaCompatibilityTestingPublicationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.media_compatibility_test`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Media Compatibility, Testing & Publication submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -33850,8 +33928,7 @@ components:
     BiometricVerificationProfileBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.biometric_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Biometric Verification Profile Builder submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -33975,8 +34052,7 @@ components:
     FacePassEnrollmentConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.biometric_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Face Pass Enrollment Configuration submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -34647,8 +34723,7 @@ components:
     TurnstileLaneBehaviorConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.access_point_configuration` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Turnstile & Lane Behavior Configuration submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -34758,8 +34833,7 @@ components:
     ValidationOutcomeGuestFeedbackDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.gate_outcome_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Validation Outcome & Guest Feedback Designer submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -34870,8 +34944,7 @@ components:
     ReaderScannerPeripheralConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.access_point_configuration` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Reader, Scanner & Peripheral Configuration submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -34976,8 +35049,7 @@ components:
     HandheldMobileAccessDeviceConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.device_configuration` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Handheld & Mobile Access Device Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -35166,8 +35238,7 @@ components:
     DeviceSoftwareContentRemoteConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.device_configuration` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Device Software, Content & Remote Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -35446,8 +35517,7 @@ components:
     EdgeNodeLocalProcessingConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.edge_node` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Edge Node & Local Processing Configuration submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -36061,8 +36131,7 @@ components:
     GroupB2bAdmissionProfileBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.group_admission_rule` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Group & B2B Admission Profile Builder submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -36632,8 +36701,7 @@ components:
     ManualOverrideSupervisorApprovalInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.scan_event`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Manual Override & Supervisor Approval submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -36931,8 +36999,7 @@ components:
     OperationalIncidentExceptionWorkspaceInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.access_incident`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Operational Incident & Exception Workspace submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
         a figure the system computed is not a figure a client may send back.'
@@ -37209,8 +37276,7 @@ components:
     VisualDynamicPolicyBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.dynamic_policy` (with `access.configuration_change`, `access.dynamic_policy_version`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Visual Dynamic Policy Builder submits.** The configurable fields from the pack''s
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
@@ -37315,8 +37381,7 @@ components:
     ContextTimeEventCapacityPolicyBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.dynamic_policy` (with `access.configuration_change`, `access.dynamic_policy_version`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Context, Time, Event & Capacity Policy Builder submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -38169,8 +38234,7 @@ components:
     RealTimeSecurityResponsePlaybookBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.security_playbook` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Real-Time Security Response & Playbook Builder submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -38271,8 +38335,7 @@ components:
     SecurityInvestigationEvidenceWorkspaceInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `access.security_investigation`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Security Investigation & Evidence Workspace submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'

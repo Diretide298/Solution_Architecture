@@ -1329,6 +1329,7 @@ paths:
       - query: orders#invitationRecords
         route: service
         for: 'its read of orders.invitation, Orders''s data (CHG-MOD-001)'
+      x-ticvai-names-for-context: [access.entitlement]
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
         - "P02 GST-072 Share & Group Booking"
@@ -1384,7 +1385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Invitation'
+                $ref: '#/components/schemas/CampaignInvitation'
         '409':
           description: Already answered, expired or revoked — the token is single-use — or an acceptance
             when the campaign's `quota` of places is taken.
@@ -3130,6 +3131,7 @@ paths:
                   - push
                   - none
                 dietary:
+                  x-ticvai-stored-as: marketing.guest_preference.dietary
                   type: array
                   description: '**Health-adjacent personal data, kept structured rather than as a tag**
                     (BL-134). `GuestProfile.tags` carries VIP-style markers adequately and is the wrong
@@ -3140,6 +3142,7 @@ paths:
                   items:
                     type: string
                 accessibility:
+                  x-ticvai-stored-as: marketing.guest_preference.accessibility
                   type: array
                   description: Same treatment, same reason. Stored as `GuestPreferences.accessibility`.
                   items:
@@ -4127,6 +4130,7 @@ paths:
       operationId: setLeaderboardNickname
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own leaderboard nickname: one per signed-in guest, so there is no key in the path.'
+      x-ticvai-names-for-context: [pii.subject]
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
@@ -4167,6 +4171,7 @@ paths:
               - nickname
               properties:
                 nickname:
+                  x-ticvai-stored-as: marketing.loyalty_position.leaderboard_nickname
                   type: string
                   minLength: 2
                   maxLength: 24
@@ -5252,6 +5257,7 @@ paths:
         format: uuid
     get:
       operationId: listGuestDevices
+      x-ticvai-names-for-context: [platform.device]
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
@@ -10415,6 +10421,7 @@ paths:
             type: string
             format: uuid
         - name: requestId
+          x-ticvai-column: marketing.privacy_audit_event.related_request_id
           in: query
           required: false
           schema:
@@ -10595,6 +10602,7 @@ paths:
       parameters:
         - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: agentPrincipalId
+          x-ticvai-column: marketing.case.assigned_to_principal_id
           in: query
           required: false
           description: Whose workload; defaults to the caller. Another agent's needs a team-level CASE_VIEW grant.
@@ -10756,6 +10764,7 @@ paths:
               - internalNote
               - automatedNotification
         - name: agentPrincipalId
+          x-ticvai-column: marketing.conversation.assigned_principal_id
           in: query
           required: false
           schema:
@@ -10768,12 +10777,14 @@ paths:
             type: string
             format: uuid
         - name: orderId
+          x-ticvai-column: marketing.case.related_order_id
           in: query
           required: false
           schema:
             type: string
             format: uuid
         - name: ticketId
+          x-ticvai-column: marketing.case.id
           in: query
           required: false
           schema:
@@ -12301,6 +12312,7 @@ paths:
             type: string
             format: uuid
         - name: agentPrincipalId
+          x-ticvai-column: marketing.case.assigned_to_principal_id
           in: query
           required: false
           schema:
@@ -12604,12 +12616,14 @@ paths:
             type: string
             format: uuid
         - name: productId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
             type: string
             format: uuid
         - name: eventId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
@@ -13883,12 +13897,14 @@ paths:
             type: string
             pattern: ^[A-Z]{2}$
         - name: productId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
             type: string
             format: uuid
         - name: eventId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
@@ -14972,6 +14988,7 @@ paths:
             type: string
             format: uuid
         - name: customerSubjectId
+          x-ticvai-column: marketing.waiver_requirement.signatory_subject_id
           in: query
           required: false
           schema:
@@ -14990,6 +15007,7 @@ paths:
             type: string
             format: uuid
         - name: membershipId
+          x-ticvai-column: marketing.waiver_requirement.ticket_id
           in: query
           required: false
           schema:
@@ -16206,6 +16224,7 @@ paths:
   /loyalty/programmes/{programmeId}/rules:
     get:
       operationId: getLoyaltyRules
+      x-ticvai-names-for-context: [marketing.loyalty_programme]
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
         - "P08 BO-828 Milestones & Reward Rules"
@@ -16332,6 +16351,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
       - name: programmeId
+        x-ticvai-column: marketing.loyalty_campaign.program_id
         in: query
         schema:
           type: string
@@ -16402,6 +16422,7 @@ paths:
   /loyalty/points:
     get:
       operationId: listLoyaltyPointEntries
+      x-ticvai-names-for-context: [marketing.loyalty_position]
       summary: The ledger behind a points balance
       description: '**This is the point of decision 8.** The merge response says it plainly:
         *"`marketing.loyalty_position` is a balance with no ledger behind it. It cannot be audited or
@@ -16430,6 +16451,7 @@ paths:
           type: string
           format: uuid
       - name: programmeId
+        x-ticvai-column: marketing.loyalty_points.program_id
         in: query
         schema:
           type: string
@@ -16500,6 +16522,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
       - name: programmeId
+        x-ticvai-column: marketing.reward.loyalty_program_id
         in: query
         schema:
           type: string
@@ -17010,6 +17033,7 @@ paths:
   /sla-policies:
     get:
       operationId: listSlaPolicies
+      x-ticvai-names-for-context: [approvals.sla_policy]
       summary: Response and resolution targets for cases
       description: >
         **Not `approvals.sla_policy`, which times an approval request.** This times a guest case:
@@ -17312,6 +17336,7 @@ paths:
           type: string
           format: uuid
       - name: subjectId
+        x-ticvai-column: marketing.booking_consent_record.person_subject_id
         in: query
         schema:
           type: string
@@ -17917,6 +17942,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listDeviceConsents
+      x-ticvai-names-for-context: [pii.consent_identifier]
       x-ticvai-consumed-by:
         - "P13 CMS-033 Consent Evidence, History & Withdrawal Management"
         - "P13 CMS-039 Privacy Audit, Evidence & Compliance Reporting"
@@ -19072,6 +19098,7 @@ components:
           format: uuid
           readOnly: true
         deviceConsentId:
+          x-ticvai-references: marketing.device_consent
           type: string
           format: uuid
           description: The `DeviceConsent` row it was captured with.
@@ -19574,7 +19601,7 @@ components:
           - daily
           - weekly
           - monthly
-          - off
+          - 'off'
         dayOfWeek:
           type: integer
           minimum: 1
@@ -20228,6 +20255,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         name:
@@ -20376,6 +20404,7 @@ components:
           type: string
           format: uuid
         campaignId:
+          x-ticvai-references: marketing.campaign
           type: string
           format: uuid
         domain:
@@ -20409,6 +20438,7 @@ components:
           type: string
           format: uuid
         badgeId:
+          x-ticvai-references: marketing.badge
           type: string
           format: uuid
         challengeId:
@@ -20630,6 +20660,7 @@ components:
           type: string
           format: uuid
         campaignId:
+          x-ticvai-references: marketing.campaign
           type: string
           format: uuid
         type:
@@ -20726,6 +20757,7 @@ components:
           type: string
           format: uuid
         reviewId:
+          x-ticvai-references: marketing.review
           type: string
           format: uuid
         text:
@@ -20810,6 +20842,7 @@ components:
           type: string
           format: uuid
         rewardId:
+          x-ticvai-references: marketing.reward
           type: string
           format: uuid
         code:
@@ -20891,6 +20924,7 @@ components:
           format: date-time
           nullable: true
     MarketingWaiverSignature:
+      x-ticvai-retired-columns: [template_id]
       type: object
       x-ticvai-persistence: marketing.waiver_signature
       description: '**Taken from the backend workbook, 20 September.** Stores the auditable signature of a customer/guardian against an exact immutable waiver-template version.'
@@ -20907,6 +20941,8 @@ components:
           type: string
           format: uuid
         templateId:
+          x-ticvai-column: form_definition_id
+          x-ticvai-references: marketing.form_definition
           type: string
           format: uuid
         customerId:
@@ -20963,6 +20999,8 @@ components:
         version:
           type: integer
         fieldGroups:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20974,6 +21012,8 @@ components:
               displayOrder:
                 type: integer
         attributes:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -21024,6 +21064,8 @@ components:
                 type: boolean
                 default: false
         identifiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -21256,6 +21298,8 @@ components:
       description: 'Board 2.2. **Three thresholds, and the middle band is the point.**'
       properties:
         matchers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -21289,6 +21333,8 @@ components:
         possibleMatchThreshold:
           type: number
         survivorship:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -21349,6 +21395,8 @@ components:
           items:
             type: string
         conflicts:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -21576,6 +21624,7 @@ components:
           type: string
           format: uuid
         segmentId:
+          x-ticvai-references: marketing.segment
           type: string
           format: uuid
         destination:
@@ -21730,6 +21779,7 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           readOnly: true
@@ -21748,6 +21798,7 @@ components:
           type: string
           description: Where the opt-in happened, because a regulator asks.
         unsubscribeToken:
+          x-ticvai-secret: blind-index
           writeOnly: true
           type: string
           description: '**Unsubscribe must work without a login.** The link in a message carries the token
@@ -21844,7 +21895,8 @@ components:
 
 
             **Operations write it at `venue` scope.**'
-    Invitation:
+    CampaignInvitation:
+      x-ticvai-retired-columns: [product_id, performance_id, offered_by_principal_id, issued_by_principal_id, cost_center_id]
       type: object
       x-ticvai-persistence: marketing.invitation
       description: '**Addressed and tokenised.** A guest accepting an invitation is claiming a specific
@@ -22666,6 +22718,7 @@ components:
         toPath:
           type: string
         statusCode:
+          x-ticvai-persistence-column: integer
           type: integer
           enum:
           - 301
@@ -22928,6 +22981,7 @@ components:
           type: string
           format: uuid
         referrerSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         refereeSubjectId:
@@ -23335,6 +23389,7 @@ components:
 
             '
         templateId:
+          x-ticvai-references: marketing.message_template
           type: string
           format: uuid
         offsetMinutes:
@@ -23561,6 +23616,7 @@ components:
           type: string
           format: date-time
     ConversationMessage:
+      x-ticvai-retired-columns: [ai_interaction_id]
       type: object
       x-ticvai-persistence: marketing.conversation_message + marketing.conversation_message_attachment
       required:
@@ -23607,6 +23663,8 @@ components:
                 - qr
                 - paymentLink
         aiInteractionId:
+          x-ticvai-references: ai.activity
+          x-ticvai-column: ai_activity_id
           type: string
           format: uuid
           nullable: true
@@ -23810,6 +23868,7 @@ components:
           type: string
           format: uuid
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           format: uuid
         venueId:
@@ -23843,6 +23902,8 @@ components:
           - guest
           - timeout
         actionsTaken:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**Every action recorded as the staff member''s**, not the kiosk''s. A cashier
             completing a guest''s checkout remotely is a staff action on a guest cart.
@@ -24266,6 +24327,7 @@ components:
           readOnly: true
           description: The guest who saved it. The wishlist is keyed by subject; there is no parent wishlist row.
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         productName:
@@ -25065,6 +25127,7 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         kind:
@@ -25812,6 +25875,7 @@ components:
         relatedOrderId:
           type: string
         attachmentRefs:
+          x-ticvai-stored-as: marketing.case_message.attachment_refs
           type: array
           description: Stored on the opening `CaseMessage`, not on the case.
           items:
@@ -25976,6 +26040,7 @@ components:
       - authorKind
       - recordedAt
       - scopePath
+      - caseId
       properties:
         scopePath:
           type: string
@@ -26018,6 +26083,12 @@ components:
           format: date-time
           readOnly: true
           description: Server time the message arrived.
+        caseId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: marketing.case
+          description: The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`).
     LoyaltyProgramme:
       x-ticvai-persistence: marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier
       type: object
@@ -26289,13 +26360,16 @@ components:
           type: string
           format: uuid
         journeyId:
+          x-ticvai-references: marketing.journey
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The guest. `pii.subject`, never duplicated here.
         stepId:
+          x-ticvai-references: marketing.journey_step
           type: string
           format: uuid
           description: Where they are now.
@@ -26677,6 +26751,7 @@ components:
           pattern: '^[A-Z]{2}$'
           description: ISO 3166-1 alpha-2 (required for sms and whatsapp).
         providerId:
+          x-ticvai-references: marketing.communication_provider
           type: string
           format: uuid
           description: The marketing.communication_provider row this identity is registered with.
@@ -27020,6 +27095,8 @@ components:
             - partner
             - employee
         providers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Tried in order; a provider below minimum health is skipped.
           items:
@@ -27099,6 +27176,7 @@ components:
           type: string
           description: marketing.message_dispatch id.
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         messageClass:
@@ -28180,6 +28258,8 @@ components:
           nullable: true
           description: The white-label theme it takes colours and fonts from.
         buttons:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -28201,6 +28281,8 @@ components:
           default: true
           description: Must be true.
         links:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -28217,6 +28299,8 @@ components:
                 - cookie
                 - termsAndConditions
         categories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:
@@ -28371,6 +28455,8 @@ components:
           - school
           nullable: true
         steps:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           maxItems: 20
@@ -28639,6 +28725,8 @@ components:
           - rolledBack
           - rejected
         items:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -28651,6 +28739,7 @@ components:
               version:
                 type: integer
         validationIssues:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -28677,6 +28766,7 @@ components:
               message:
                 type: string
         simulation:
+          x-ticvai-persisted: false
           type: array
           description: What the scenario's guest would be shown, step by step (from `simulate`; not stored).
           items:
@@ -28713,6 +28803,7 @@ components:
           format: date-time
           nullable: true
         audit:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -29052,6 +29143,8 @@ components:
           - other
           description: What fulfilment does; `deletion` and `dataExport` fan out through the cross-region DSAR.
         stages:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           description: Ordered workflow steps inside `inProgress`. Suggested default received, verifyIdentity,
@@ -29556,6 +29649,7 @@ components:
           format: uuid
           readOnly: true
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The person the request is about.
@@ -29717,6 +29811,7 @@ components:
       - results
       properties:
         requestId:
+          x-ticvai-references: marketing.privacy_request
           type: string
           format: uuid
         discoveredAt:
@@ -29724,6 +29819,8 @@ components:
           format: date-time
           readOnly: true
         results:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Record counts per source; the records themselves go only into the export package.
           items:
@@ -29790,6 +29887,8 @@ components:
               nullable: true
               description: The cross-region fan-out that assembled it.
         corrections:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           items:
@@ -29839,6 +29938,8 @@ components:
           format: uuid
           description: The privacy request (`setPrivacyRequest`); the natural key.
         identifiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Extra identifiers to search by; the request's subject is always included.
           items:
@@ -29935,6 +30036,8 @@ components:
               - deliver
               description: Moves the package through generated -> privacyReview -> approved -> delivered.
         corrections:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Correction requests to route to the system of record.
           items:
@@ -29977,6 +30080,7 @@ components:
           nullable: true
           readOnly: true
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         actionType:
@@ -29999,6 +30103,7 @@ components:
           type: boolean
           readOnly: true
         impact:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: Affected areas and what will happen to each, shown before execution.
@@ -30036,6 +30141,7 @@ components:
                 nullable: true
                 description: Required for `retain` and `hold`, e.g. the retention policy code.
         checks:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -30060,6 +30166,7 @@ components:
                 type: string
                 maxLength: 300
         approvals:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -30123,6 +30230,8 @@ components:
           - manualActionRequired
           - cancelled
         systemResults:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           description: The execution monitor, per system.
@@ -30440,6 +30549,7 @@ components:
             readOnly: true
             description: From the SLA policy for the severity (`setSlaPolicy`).
           timeline:
+            x-ticvai-persisted: false
             type: array
             readOnly: true
             items:
@@ -31614,6 +31724,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         kind:
@@ -31807,6 +31918,7 @@ components:
           format: uuid
           description: Required with `execute`; the action is recorded on this case.
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         lineIds:
@@ -31955,6 +32067,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         orderId:
@@ -32057,6 +32170,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         department:
@@ -32177,6 +32291,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         caseNumber:
@@ -33060,6 +33175,7 @@ components:
           format: uuid
           readOnly: true
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: The agent. The natural key.
@@ -33226,6 +33342,7 @@ components:
           type: string
           format: uuid
         agentPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         evaluatorPrincipalId:
@@ -33263,6 +33380,8 @@ components:
           - scored
           - acknowledged
         criteria:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           maxItems: 30
           items:
@@ -33307,6 +33426,8 @@ components:
           readOnly: true
           description: Criteria score as a percentage; 0 when any critical failure is recorded.
         aiFindings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           items:
@@ -33336,6 +33457,8 @@ components:
           maxLength: 2000
           nullable: true
         coachingActions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -34380,6 +34503,8 @@ components:
           type: integer
           minimum: 1
         sections:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:
@@ -34768,6 +34893,8 @@ components:
           description: A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`.
             No default.
         guardianThresholdByCountry:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -34990,6 +35117,8 @@ components:
           - beforeMembershipActivation
           - beforeActivityStart
         eligibility:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: All must hold (AND). Empty means every participant the association reaches.
           items:
@@ -35063,6 +35192,8 @@ components:
           default: false
           description: An authorised operator may admit the participant anyway; the override is recorded.
         reminders:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -35253,6 +35384,8 @@ components:
           maxLength: 10
           description: The language the legal text is written and reviewed in.
         languages:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           description: Every language the version is offered in, the source language included. Arabic
@@ -35384,6 +35517,7 @@ components:
           - expired
           - archived
         checklist:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -35457,6 +35591,7 @@ components:
                 - access
               description: What a missing signature would block, when `missingSignature` was set.
         aiFindings:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -35563,6 +35698,8 @@ components:
               format: date-time
               nullable: true
         history:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Every action with its comment, oldest first.
           items:
@@ -36524,6 +36661,7 @@ components:
           format: uuid
           readOnly: true
         submissionId:
+          x-ticvai-references: marketing.form_submission
           type: string
           format: uuid
           description: The `FormSubmission` reviewed; the natural key.
@@ -36850,6 +36988,7 @@ components:
           format: uuid
           description: Absent on a new request; set by the server.
         requirementId:
+          x-ticvai-references: marketing.waiver_requirement
           type: string
           format: uuid
         reasonCode:
@@ -37562,6 +37701,7 @@ components:
           format: uuid
           readOnly: true
         messageTriggerId:
+          x-ticvai-references: marketing.message_trigger
           type: string
           format: uuid
         dimension:
@@ -37615,6 +37755,7 @@ components:
           format: uuid
           readOnly: true
         messageTemplateId:
+          x-ticvai-references: marketing.message_template
           type: string
           format: uuid
         language:
@@ -37707,12 +37848,14 @@ components:
           format: uuid
           readOnly: true
         messageDispatchId:
+          x-ticvai-references: marketing.message_dispatch
           type: string
           description: The `MessageDispatch.id`.
         attemptNumber:
           type: integer
           minimum: 1
         communicationProviderId:
+          x-ticvai-references: marketing.communication_provider
           type: string
           format: uuid
         channel:
@@ -37792,6 +37935,7 @@ components:
           format: uuid
           readOnly: true
         consentRecordId:
+          x-ticvai-references: marketing.consent_record
           type: string
           description: The withdrawal's `ConsentRecord.id`.
         target:
@@ -38038,6 +38182,7 @@ components:
           format: uuid
           readOnly: true
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         reason:
@@ -38182,9 +38327,11 @@ components:
           format: uuid
           readOnly: true
         participantSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
           description: The booking.
@@ -38214,6 +38361,7 @@ components:
           format: uuid
           nullable: true
         formDefinitionId:
+          x-ticvai-references: marketing.form_definition
           type: string
           format: uuid
         formVersion:
@@ -38351,6 +38499,7 @@ components:
           format: uuid
           readOnly: true
         waiverRequirementId:
+          x-ticvai-references: marketing.waiver_requirement
           type: string
           format: uuid
         event:

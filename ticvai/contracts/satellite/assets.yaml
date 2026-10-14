@@ -282,6 +282,7 @@ paths:
                   type: array
                   items: { type: string }
                 collectionIds:
+                  x-ticvai-stored-as: assets.media_collection_member.collection_id
                   type: array
                   items: { type: string, format: uuid }
                   description: >
@@ -1426,6 +1427,8 @@ components:
         '
       properties:
         categories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1446,6 +1449,8 @@ components:
                 items:
                   type: string
         fields:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1467,6 +1472,8 @@ components:
                 items:
                   type: string
         keywordVocabularies:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1618,6 +1625,7 @@ components:
         isCurrent:
           type: boolean
         usageImpact:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -1682,6 +1690,13 @@ components:
           nullable: true
         scopePath:
           type: string
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: assets.media_asset
+          description: The media asset this is a rendition of, from the path of `requestMediaRendition`.
     MediaAssetApproval:
       type: object
       x-ticvai-persistence: assets.approval
@@ -1700,6 +1715,7 @@ components:
           - published
           - archived
         eligibility:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -2062,6 +2078,7 @@ components:
         - type: object
           properties:
             derivatives:
+              x-ticvai-persisted: false
               type: array
               description: >
                 Generated from the original, never uploaded separately. A new breakpoint is a
@@ -2079,6 +2096,7 @@ components:
               description: Every place this asset is referenced.
               items: { $ref: '#/components/schemas/MediaUsage' }
             collections:
+              x-ticvai-persisted: false
               type: array
               items:
                 type: object
@@ -2086,6 +2104,7 @@ components:
                   id: { type: string, format: uuid }
                   name: { type: string }
             previousVersions:
+              x-ticvai-persisted: false
               type: array
               items:
                 type: object
@@ -2225,8 +2244,8 @@ components:
       required: [id, collectionId, assetId]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        collectionId: { type: string, format: uuid }
-        assetId: { type: string, format: uuid }
+        collectionId: { type: string, format: uuid, x-ticvai-references: assets.media_collection }
+        assetId: { type: string, format: uuid, x-ticvai-references: assets.media_asset }
         addedByPrincipalId: { type: string, format: uuid, nullable: true }
         addedAt: { type: string, format: date-time }
 

@@ -493,6 +493,7 @@ paths:
 
                     '
                 recordedAt:
+                  x-ticvai-stored-as: resources.booking.checked_out_at
                   type: string
                   format: date-time
                   description: '**When the device handed it over**, not when the write reached the
@@ -584,6 +585,7 @@ paths:
                   - majorDamage
                   - notReturned
                 recordedAt:
+                  x-ticvai-stored-as: resources.booking.returned_at
                   type: string
                   format: date-time
                   description: '**When the device took it back**, not when the write reached the server.
@@ -728,6 +730,7 @@ paths:
       - query: marketing-crm#consentRecords
         route: in-process
         for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
+      x-ticvai-names-for-context: [catalogue.performance]
       x-ticvai-consumed-by:
         - "P08 BO-099 Performance Manifest"
       summary: Who is in a performance, in what order
@@ -1276,19 +1279,24 @@ paths:
               - state
               properties:
                 state:
+                  x-ticvai-stored-as: resources.resource.lifecycle_state
                   $ref: '#/components/schemas/ResourceLifecycleState'
                 reason:
+                  x-ticvai-stored-as: resources.resource.lifecycle_reason
                   type: string
                   nullable: true
                 effectiveFrom:
+                  x-ticvai-stored-as: resources.resource.lifecycle_effective_from
                   type: string
                   format: date-time
                   nullable: true
                 replacementResourceId:
+                  x-ticvai-stored-as: resources.resource.replacement_resource_id
                   type: string
                   format: uuid
                   nullable: true
                 disposal:
+                  x-ticvai-stored-as: resources.resource.disposal
                   type: object
                   nullable: true
                   additionalProperties: true
@@ -1993,6 +2001,7 @@ paths:
                   format: date-time
                   nullable: true
                 reason:
+                  x-ticvai-stored-as: resources.booking.change_reason
                   type: string
                   nullable: true
       responses:
@@ -2569,6 +2578,7 @@ paths:
   /experiences/{experienceId}/resource-requirements:
     parameters:
     - name: experienceId
+      x-ticvai-column: resources.resource_requirement.product_id
       in: path
       required: true
       description: The experience's catalogue `Product.id` (4 October 2026, CHG-FXC-010; BO-877).
@@ -3069,6 +3079,7 @@ paths:
           type: string
           format: uuid
       - name: variantId
+        x-ticvai-column: none
         in: query
         required: true
         description: The length variant; its `length` value's `durationMinutes` is the window.
@@ -3609,6 +3620,7 @@ components:
           readOnly: true
           description: '`open` on raise.'
         raisedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true
@@ -3654,6 +3666,7 @@ components:
           nullable: true
           description: Total cost over booked hours; null when nothing was booked.
     ResourceSelectionPolicy:
+      x-ticvai-retired-columns: [ticket_type_id]
       type: object
       x-ticvai-persistence: resources.selection_policy
       description: '**Whether the guest may choose the resource, per ticket type**: the body of
@@ -3670,6 +3683,8 @@ components:
           format: uuid
           readOnly: true
         ticketTypeId:
+          x-ticvai-column: ticket_product_id
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
           description: One policy per ticket type; a `PUT` for a ticket type that has one replaces it.
@@ -3713,6 +3728,7 @@ components:
           format: uuid
           readOnly: true
         resourceId:
+          x-ticvai-references: resources.resource
           type: string
           format: uuid
         kind:
@@ -3919,6 +3935,7 @@ components:
           type: string
           format: uuid
         mapId:
+          x-ticvai-references: venuemap.map
           type: string
           format: uuid
         resourceIds:
@@ -4225,6 +4242,7 @@ components:
       - relation
       properties:
         resourceId:
+          x-ticvai-references: resources.resource
           type: string
           format: uuid
         relation:
@@ -4438,6 +4456,7 @@ components:
       - primaryVenueId
       properties:
         primaryVenueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         secondaryVenueIds:
@@ -4467,6 +4486,13 @@ components:
           nullable: true
         scopePath:
           type: string
+        resourceId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: resources.resource
+          description: The resource assigned, from the path of `setResourceVenueAssignment`.
     ResourceSchedule:
       type: object
       x-ticvai-persistence: resources.resource_schedule
@@ -4485,6 +4511,8 @@ components:
           - scheduled
           - onRequest
         windows:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4526,6 +4554,8 @@ components:
           type: integer
           nullable: true
         exceptions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4564,6 +4594,7 @@ components:
           type: string
           format: uuid
         resourceId:
+          x-ticvai-references: resources.resource
           type: string
           format: uuid
         from:
@@ -4841,6 +4872,36 @@ components:
           description: '**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003).
             `kind` is the fixed family a type belongs to; this is the tenant''s own type within it, and the
             `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it.'
+        lifecycleState:
+          allOf:
+          - $ref: '#/components/schemas/ResourceLifecycleState'
+          nullable: true
+          readOnly: true
+          description: The lifecycle state `setResourceLifecycleState` set.
+        lifecycleEffectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the lifecycle state takes effect (`setResourceLifecycleState`).
+        lifecycleReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Why the lifecycle state changed (`setResourceLifecycleState`).
+        replacementResourceId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: resources.resource
+          description: The resource that replaces this one, where it was retired for a replacement.
+        disposal:
+          type: object
+          additionalProperties: true
+          nullable: true
+          readOnly: true
+          description: How a disposed resource left (`setResourceLifecycleState`), as given.
     ResourceCleaningPolicy:
       x-ticvai-persistence: none — columns on resources.resource
       type: object
@@ -4990,6 +5051,7 @@ components:
 
             '
         depositAuthorisationId:
+          x-ticvai-references: orders.stored_value_authorisation
           type: string
           format: uuid
           nullable: true
@@ -5025,6 +5087,11 @@ components:
             this is the server''s half of the pair naming-and-style 5.2 requires. Null while pending.
 
             '
+        changeReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Why the booking was last changed (`updateResourceBooking`).
     Qualification:
       type: object
       x-ticvai-persistence: resources.qualification
@@ -5101,10 +5168,12 @@ components:
           type: string
           format: uuid
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
           description: The `catalogue.performance` this participant is on (audit R165).
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         position:

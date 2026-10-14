@@ -1527,6 +1527,7 @@ paths:
               - action
               properties:
                 action:
+                  x-ticvai-stored-as: games.card.status
                   type: string
                   enum:
                   - block
@@ -1535,10 +1536,12 @@ paths:
                   - replace
                   - expire
                 replacementCardId:
+                  x-ticvai-persisted: false
                   type: string
                   format: uuid
                   nullable: true
                 reason:
+                  x-ticvai-stored-as: games.card.blocked_reason
                   type: string
                   nullable: true
       responses:
@@ -2281,6 +2284,8 @@ components:
           type: integer
           nullable: true
         operatingHours:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           nullable: true
           description: 'Weekly opening windows, in venue local time, in the same window shape as
@@ -2314,6 +2319,7 @@ components:
       - deviceId
       properties:
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           format: uuid
           description: '`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live
@@ -2687,6 +2693,8 @@ components:
           type: integer
           nullable: true
         trace:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2722,6 +2730,8 @@ components:
         vipPrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
         groupPricing:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2731,6 +2741,8 @@ components:
               pricePerPlayer:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         peakPricing:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2746,6 +2758,8 @@ components:
               price:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         calendarExceptions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2804,6 +2818,7 @@ components:
           type: string
           format: uuid
         gameId:
+          x-ticvai-references: games.game
           type: string
           format: uuid
         kind:
@@ -2880,6 +2895,8 @@ components:
           format: uuid
           nullable: true
         earnRules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3092,6 +3109,7 @@ components:
           type: string
           format: uuid
         readerId:
+          x-ticvai-references: games.reader
           type: string
           format: uuid
           x-ticvai-unique: tenant

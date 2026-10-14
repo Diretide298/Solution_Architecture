@@ -365,6 +365,7 @@ paths:
         format: uuid
     post:
       operationId: verifyCustomDomain
+      x-ticvai-names-for-context: [control.tenant_domain]
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
@@ -6389,6 +6390,7 @@ components:
           nullable: true
           description: The property `getStorefrontInsights` asks the reporting API about (a GA4 property id). Staff only.
         reportingCredentialRef:
+          x-ticvai-secret: vault-reference
           type: string
           maxLength: 200
           nullable: true
@@ -6593,6 +6595,7 @@ components:
           readOnly: true
           description: UUIDv7.
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
           readOnly: true
@@ -7647,6 +7650,7 @@ components:
           pattern: ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$
           description: The bundle id (Apple) or application id (Google) the app is signed with.
         apiCredentialSecretRef:
+          x-ticvai-secret: vault-reference
           type: string
           nullable: true
           writeOnly: true
@@ -7664,6 +7668,7 @@ components:
             Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate;
             CHG-R6-033). Apple entry only; a Google entry sending it is refused with 400.'
         passCertificateSecretRef:
+          x-ticvai-secret: vault-reference
           type: string
           nullable: true
           writeOnly: true
@@ -8014,6 +8019,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         hostname:
@@ -8404,7 +8410,7 @@ components:
         each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks`
         a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In
         the tenant''s own database, not the control plane (decided 28 September, audit R163)**: it moved
-        from `control.footer_config` and its two child tables.
+        from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.
 
         '
       required:
@@ -9462,6 +9468,7 @@ components:
           type: string
           pattern: ^#[0-9A-Fa-f]{6}$
         darkMode:
+          x-ticvai-persisted: false
           type: object
           deprecated: true
           description: '**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round;
@@ -10227,6 +10234,7 @@ components:
           format: uuid
           readOnly: true
         slug:
+          x-ticvai-unique: tenant
           type: string
           pattern: ^[a-z0-9-]+$
         title:
@@ -10381,6 +10389,7 @@ components:
           format: uuid
           readOnly: true
         kioskConfigId:
+          x-ticvai-references: whitelabel.kiosk_config
           type: string
           format: uuid
           readOnly: true
@@ -10913,6 +10922,8 @@ components:
         contentHash:
           type: string
         pendingBuildTimeChanges:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Changes in this version that will not reach guests until the next store release.
             Surfaced at publish so nobody expects a new icon tomorrow.

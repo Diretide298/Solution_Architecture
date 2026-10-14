@@ -2153,7 +2153,7 @@ components:
       required: [venueId]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        venueId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid, x-ticvai-references: platform.scope }
         scopePath: { type: string, readOnly: true }
         requireOpenApproval:
           type: boolean
@@ -2244,6 +2244,7 @@ components:
             required: [denominationId, count]
             properties:
               denominationId:
+                x-ticvai-references: platform.denomination
                 type: string
                 format: uuid
                 description: >
@@ -2482,6 +2483,7 @@ components:
             The movement this line counts, where `countKind` is `movement`. How
             `listCashMovements` rebuilds each movement's `denominations`.
         denominationId:
+          x-ticvai-references: platform.denomination
           type: string
           format: uuid
           description: "References `platform.denomination` — face value, kind and sort order live there."
@@ -2892,7 +2894,7 @@ components:
                 description: >
                   `open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from
                   `acceptShiftVariance`.
-              principalId: { type: string, format: uuid }
+              principalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
               at: { type: string, format: date-time }
               reason: { type: string }
 

@@ -1,0 +1,48 @@
+id: CHG-STO-008
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: Three stub tables no contract describes and nothing writes are retired, their readers reading the table that holds
+  the data; platform.tenant stays (the tenant database's own row).
+decision:
+  what: 'tools/derive-schema-history.py RETIRED_TABLES (platform.device_heartbeat: a heartbeat is platform.device lastHeartbeatAt
+    and status; orders.payment_tip: no field carries a tip; marketing.message_delivery: a delivery is marketing.message_dispatch),
+    read by tools/derive-schema.py (no graph edge re-creates them). Lineage: getWorkstationHealth, listOrderPaymentDetail
+    and getCampaignPerformance stop reading them (tools/applied/sto-lineage-14-october.py). tools/check-ddl-conventions.py
+    D-STUB-TABLE notes a retired stub whose drop migration-review lists.'
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-ddl-conventions/D-STUB-TABLE (4 at audit-base b93b5a87, 1 after), evidence audit/ticvai/runs/audit-1014/classes.json;
+  triage ruling "A table holding only keys gets its columns from its schema, or is removed." (R087).
+keys_touched:
+  operations:
+  - getWorkstationHealth
+  - listOrderPaymentDetail
+  - getCampaignPerformance
+  tables:
+  - platform.device_heartbeat
+  - orders.payment_tip
+  - marketing.message_delivery
+  - platform.tenant
+  files:
+  - tools/derive-schema-history.py
+  - tools/derive-schema.py
+  - tools/applied/sto-lineage-14-october.py
+  - handoff/api-data-lineage.json
+  - tools/check-ddl-conventions.py
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch STO. Keep: platform.tenant (id, home_region_id) is the tenant database''s own row, written by provisioning
+  in the control plane (ADR-0014 amendment of 14 August, action register L5); both its columns are keys, and what else provisioning
+  copies down is a control-plane decision outside this batch. Migration effect: three "table dropped" rows in handoff/migration-review.md
+  (empty tables).'

@@ -1,0 +1,40 @@
+id: CHG-STO-015
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'An enum stored in a column carries its CHECK: an HTTP redirect status is stored as an integer, and CookieScanPolicy.frequency
+  quotes ''off'' (YAML read it as false, so no CHECK was derived).'
+decision:
+  what: 'UrlRedirect.statusCode x-ticvai-persistence-column: integer (as CHG-CRD-002 did for pinLength); CookieScanPolicy.frequency
+    enum value ''off'' quoted; tools/check-contract-storage.py reads an integer enum stored as an integer as an int.'
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-contract-storage/ST-ENUM-CHECK (2 at audit-base b93b5a87, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json;
+  triage ruling "An enum in a text column gets its CHECK." (R151).
+keys_touched:
+  tables:
+  - control.url_redirect
+  - marketing.cookie_scan_policy
+  schemas:
+  - UrlRedirect
+  - CookieScanPolicy
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-contract-storage.py
+  - docs/active/breaking-changes.yaml
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Batch STO. Contract impact: CookieScanPolicy.frequency''s enum is now the string ''off'' the wire always meant (a
+  YAML 1.1 boolean before): breaking by the letter, approved as BC-280 (setCookieScanPolicy) and BC-281 (listCookieScanPolicies)
+  in docs/active/breaking-changes.yaml. Migration effect: two "column changed" rows in handoff/migration-review.md (status_code
+  text -> integer with its CHECK; frequency gains its CHECK).'

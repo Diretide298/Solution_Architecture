@@ -1,0 +1,41 @@
+id: CHG-STO-010
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: Every array of objects a persisted schema carries is stored whole with its row (a jsonb value object), stored as
+  its amounts (a Money list), or marked as worked out on read; SLICE_DEBT is empty.
+decision:
+  what: 'tools/applied/sto-storage-14-october.py: 115 arrays x-ticvai-persistence-kind: valueObject and x-ticvai-persistence-column:
+    jsonb (configuration lists read and written with the record that owns them, a job''s findings, a decision''s trace,
+    a record''s own history), three Money lists numeric(18,4)[] (DonationCampaign.fixedAmounts, GiftCardProduct.denominations,
+    WalletFundingRules.presetAmounts), and 22 x-ticvai-persisted: false (a view''s list read from the table that holds it,
+    or computed at read time: Cart.conflicts and consentQuestions, RentalBooking.readiness, the waiver workspace''s checklist
+    and AI findings, VisitPlan.days are visit_plan_item rows). ProductDisplayTag and TransportNetworkImportFinding said
+    jsonb and got no column: the field declares it. tools/check-storage-promises.py SLICE_DEBT emptied (only shrinks).'
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-storage-promises/SP-ARRAY-NOWHERE (138 at audit-base b93b5a87, 0 after; 35 of
+  them in the delivery slice), evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "An array of objects gets
+  a child table (or jsonb with a stated reason)." Same class as ADAM CR-073 (CHG-DDL-007) and R179.
+keys_touched:
+  files:
+  - contracts/
+  - tools/applied/sto-storage-14-october.py
+  - tools/check-storage-promises.py
+root_class: A15 STORAGE-GAP
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch STO. The stated reason is the valueObject kind (the form AiGovernanceRuleList and KitchenRoutingRules.categoryRules
+  already use): nothing queries one element on its own, and a child table would be rows nobody addresses. A list a caller
+  edits element by element or a report counts is a child table''s; none of these is. Contract impact: x-ticvai extensions
+  only. Migration effect: each jsonb or numeric[] column is an ADD COLUMN in V0104 (additive, nullable); a persisted:false
+  field that had a column on an r1 table is a "column dropped" row in handoff/migration-review.md.'

@@ -1,0 +1,174 @@
+id: CHG-STO-001
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Every NOT NULL key into its own database that was a naming convention is a declared reference on its
+  contract field (x-ticvai-references), so 900 has its foreign key and 920 scopes a child through its parent; the
+  tables written below tenant that sat at the tenant root because of an undeclared key follow their parent, and
+  FALLBACK_DEBT is empty.'
+decision:
+  what: 'x-ticvai-references on 394 contract fields (tools/applied/sto-keys-14-october.py, through
+    tools/applied/sto_markers.py), the convention target kept where it names the table the field means and corrected
+    where the name rule picked the wrong one (a media file is assets.media_asset, not maintenance.asset; a product a
+    recommendation or relationship points at is catalogue.product, not the recommendation table; a plan''s tier is
+    subscription.plan; an entitlement''s template is catalogue.entitlement_template; a waiver signature''s template is
+    the waiver''s marketing.form_definition; an outbox or inbox event_id, a tenant_id in a tenant database (ADR-0038),
+    an id held in another cell and a target product whose module targetService names are `none`). A key a
+    contract field cannot carry is declared in tools/derive-schema.py STORAGE_REFERENCES. Where a table gained a second
+    protected candidate, tools/derive-ddl.py ROW_OWNER names the row''s owner (a line, cell, point or option follows
+    the table it is the rows of), so no table loses the parent policy it had. tools/check-storage-promises.py:
+    FALLBACK_DEBT emptied (only shrinks).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit before r6, class check-storage-promises/SP-KEY-UNDECLARED (389 at audit-base b93b5a87, 0 after)
+  and SP-KEY-TENANT-FALLBACK (45, 2 of them new on the base: pricing.dynamic_price_action and
+  dynamic_price_condition, 0 after), evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "Every NOT
+  NULL key into its own database is declared (x-ticvai-references), as CHG-DDL-004 did" and "A child table follows
+  its parent''s scope by its declared key (the 21+2 tenant-root tables, class 1)" (tracker F29). Same class as ADAM
+  CR-069 (CHG-DDL-004) and CR-090 (CHG-CNS-002).'
+keys_touched:
+  tables:
+  - access.access_change
+  - assets.media_collection_member
+  - catalogue.plan_benefit
+  - fnb.allergen_verdict
+  - fnb.combo_slot_option
+  - fnb.kitchen_sla
+  - fnb.menu_item_modifier
+  - fnb.production_plan_line
+  - fnb.reservation_table
+  - fnb.substitution_rule
+  - inventory.count
+  - maintenance.asset_document
+  - maintenance.asset_status_change
+  - maintenance.incident_history
+  - maintenance.incident_media
+  - marketing.campaign_target
+  - marketing.loyalty_rule
+  - marketing.message_dispatch_attempt
+  - marketing.review_response
+  - orders.group_ticket_allocation
+  - orders.group_ticket_fulfillment
+  - orders.membership_renewal
+  - pricing.dynamic_price_action
+  - pricing.dynamic_price_condition
+  - promotions.coupon_code_batch
+  - promotions.partner_bundle_product
+  - rental.agreement_item
+  - rental.inspection_item
+  - transport.departure
+  - transport.fare_matrix_cell
+  - transport.fare_table
+  - transport.timetable
+  - wallet.balance
+  - workforce.staff_conversation_participant
+  - workforce.staff_message
+  files:
+  - contracts/
+  - tools/applied/sto-keys-14-october.py
+  - tools/applied/sto_markers.py
+  - tools/derive-schema.py
+  - tools/derive-ddl.py
+  - tools/check-storage-promises.py
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - MIG-AI (#27664)
+  - MIG-ASSETS (#27659)
+  - MIG-CATALOGUE (#27671)
+  - MIG-CONTROL (#27647)
+  - MIG-IDENTITY (#27657)
+  - MIG-LEDGER (#27672)
+  - MIG-MAINTENANCE (#27667)
+  - MIG-ORDERS (#27675)
+  - MIG-PARTITIONS (#27649)
+  - MIG-PII (#27650)
+  - MIG-PLATFORM (#27665)
+  - MIG-PROMOTIONS (#27674)
+  - MIG-REPORTING (#27660)
+  - MIG-RESOURCES (#27661)
+  - MIG-SEATING (#27668)
+  - MIG-TRANSPORT (#27653)
+  - MIG-WALLET (#27669)
+  - MIG-WHITELABEL (#27663)
+  - MIG-WORKFORCE (#27670)
+  unstarted:
+  - MIG-ACCESS (#27676)
+  - MIG-ACCESS-3 (#28367)
+  - MIG-ACCESS-5 (#28374)
+  - MIG-ACCESS-8 (#28453)
+  - MIG-APPROVALS-2 (#29042)
+  - MIG-APPROVALS-5 (#27828)
+  - MIG-APPROVALS-6 (#29419)
+  - MIG-CATALOGUE-10 (#29711)
+  - MIG-CATALOGUE-11 (#29717)
+  - MIG-CATALOGUE-12 (#29759)
+  - MIG-CATALOGUE-14 (#29889)
+  - MIG-CATALOGUE-15 (#29926)
+  - MIG-CATALOGUE-2 (#28172)
+  - MIG-CATALOGUE-4 (#28093)
+  - MIG-CATALOGUE-5 (#28173)
+  - MIG-CATALOGUE-6 (#28492)
+  - MIG-CATALOGUE-7 (#29679)
+  - MIG-CONTROL-10 (#29401)
+  - MIG-CONTROL-13 (#28006)
+  - MIG-CONTROL-3 (#28087)
+  - MIG-CONTROL-6 (#27991)
+  - MIG-CONTROL-7 (#27992)
+  - MIG-CONTROL-8 (#27993)
+  - MIG-CONTROL-9 (#27999)
+  - MIG-FNB (#27678)
+  - MIG-FNB-2 (#28095)
+  - MIG-FNB-4 (#28591)
+  - MIG-FOREIGN-KEYS (#27683)
+  - MIG-GAMES-2 (#28672)
+  - MIG-IDENTITY-3 (#27948)
+  - MIG-LEDGER-2 (#28406)
+  - MIG-MAINTENANCE-4 (#28649)
+  - MIG-MARKETING (#27677)
+  - MIG-MARKETING-10 (#28849)
+  - MIG-MARKETING-2 (#28830)
+  - MIG-MARKETING-3 (#28831)
+  - MIG-MARKETING-5 (#28888)
+  - MIG-MARKETING-6 (#28832)
+  - MIG-MARKETING-9 (#28932)
+  - MIG-ORDERS-2 (#28274)
+  - MIG-ORDERS-5 (#28275)
+  - MIG-ORDERS-6 (#28276)
+  - MIG-PRICING-2 (#28091)
+  - MIG-PROMOTIONS-2 (#28094)
+  - MIG-PROMOTIONS-3 (#29939)
+  - MIG-PROMOTIONS-4 (#29971)
+  - MIG-SEATING-2 (#29420)
+  - MIG-SUBSCRIPTION-3 (#29231)
+  - MIG-SYNC-2 (#29187)
+  - MIG-TENANCY-2 (#27798)
+  - MIG-VENUEMAP (#27681)
+  - MIG-WALLET-3 (#28318)
+  - MIG-WHITELABEL-2 (#35595)
+  - MIG-WORKFORCE-2 (#28452)
+  - MIG-WORKFORCE-5 (#28947)
+  - VM-MIG-ACCESS (#28366)
+  - VM-MIG-ACCREDITATION (#28361)
+  - VM-MIG-CONTROL (#27988)
+  - VM-MIG-INVENTORY (#28770)
+  - VM-MIG-LEDGER (#28264)
+  - VM-MIG-MAINTENANCE (#28449)
+  - VM-MIG-ORDERS (#28265)
+  - VM-MIG-PLATFORM (#27797)
+  - VM-MIG-RENTAL (#28630)
+  - VM-MIG-RESOURCES (#28448)
+  - VM-MIG-TENANCY (#27796)
+  - VM-MIG-WORKFORCE (#27947)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Batch STO. Contract impact: additive (x-ticvai extensions only). Migration effect: the foreign keys are
+  "constraint added" rows in handoff/migration-review.md for the migration owner (validate existing rows, NOT VALID
+  then VALIDATE); the policy swaps (drop_rls_policies, then apply_parent_rls) are written into V0104 by derive-ddl
+  (CHG-GEN-004). The full list of tables per MIG ticket is in the batch hand-back.'

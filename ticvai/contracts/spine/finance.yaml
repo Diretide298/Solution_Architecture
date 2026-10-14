@@ -4386,6 +4386,7 @@ paths:
   /tax-documents/{documentId}/rendition:
     parameters:
     - name: documentId
+      x-ticvai-column: ledger.tax_invoice.id
       in: path
       required: true
       description: A tax invoice id or a credit memo id.
@@ -5129,6 +5130,7 @@ components:
         status:
           $ref: '#/components/schemas/FinTaxInvoiceStatus'
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         templateId:
@@ -5398,6 +5400,7 @@ components:
           readOnly: true
           description: Server-assigned from the legal entity's credit memo series, in sequence without gaps.
         taxInvoiceId:
+          x-ticvai-references: ledger.tax_invoice
           type: string
           format: uuid
         taxInvoiceNumber:
@@ -5426,6 +5429,7 @@ components:
           format: uuid
           nullable: true
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         buyerSubjectId:
@@ -5561,6 +5565,7 @@ components:
           format: uuid
           readOnly: true
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         documentKind:
@@ -5669,6 +5674,7 @@ components:
           format: uuid
           readOnly: true
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         providerName:
@@ -5744,6 +5750,7 @@ components:
         documentNumber:
           type: string
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         providerId:
@@ -5908,6 +5915,8 @@ components:
         actualCost:
           $ref: ../shared/common.yaml#/components/schemas/Money
         costLines:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -6377,6 +6386,7 @@ components:
           description: A day in the region's time zone, local midnight to local midnight.
     TaxExemption:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by calculateTax, createTaxExemption, listTaxExemptions, verifyTaxExemption
+      x-ticvai-retired-columns: [evidence_document_id]
       x-ticvai-persistence: ledger.tax_exemption
       type: object
       description: 'Also the `createTaxExemption` body. **`id` is server-owned** (`readOnly`): a client does
@@ -6438,6 +6448,8 @@ components:
           description: 'Tax Exemption Evidence: reference, e.g. the exemption certificate, diplomatic card or
             export declaration number.'
         evidenceDocumentId:
+          x-ticvai-column: evidence_asset_id
+          x-ticvai-references: assets.media_asset
           type: string
           format: uuid
           nullable: true
@@ -6842,6 +6854,7 @@ components:
       - credit
       properties:
         accountId:
+          x-ticvai-references: ledger.account
           type: string
           format: uuid
         debit:
@@ -6880,6 +6893,7 @@ components:
           type: string
           format: uuid
         postingDate:
+          x-ticvai-stored-as: ledger.journal_entry.posting_date
           type: string
           format: date
           description: A day in the region's time zone, local midnight to local midnight.
@@ -6988,6 +7002,12 @@ components:
           type: string
           format: date-time
           nullable: true
+        postingDate:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: The accounting day the entry posts on, in the region's time zone (`createJournalEntry`).
     Posting:
       x-ticvai-persistence: ledger.posting
       type: object
@@ -7314,10 +7334,12 @@ components:
           description: Server-created when the obligation arises, so a UUID, as the `obligationId` path
             parameter types it.
         fromLegalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
           description: The selling entity. Holds the liability, and therefore the FX exposure.
         toLegalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
           description: The consuming entity, which provided the service at redemption.
@@ -7765,6 +7787,7 @@ components:
           nullable: true
           description: Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps.
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: Who took the step.

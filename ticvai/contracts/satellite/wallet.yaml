@@ -2875,6 +2875,7 @@ paths:
   /wallets/{walletId}/holds:
     get:
       operationId: listWalletHolds
+      x-ticvai-names-for-context: [control.rollout, seating.seat_reservation_item]
       summary: Funds held against a wallet
       description: >
         **A hold is the difference between a balance and a spendable balance**, and a guest refused
@@ -3385,10 +3386,12 @@ paths:
                   - suspended
                   - emergencyDisabled
                 reason:
+                  x-ticvai-stored-as: wallet.risk_rule.status_reason
                   type: string
                   maxLength: 500
                   description: Required unless `status` is `active`.
                 until:
+                  x-ticvai-stored-as: wallet.risk_rule.status_until
                   type: string
                   format: date-time
                   nullable: true
@@ -4053,6 +4056,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         action:
@@ -4107,6 +4111,8 @@ components:
       - tiers
       properties:
         tiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           maxItems: 20
           items:
@@ -4205,6 +4211,8 @@ components:
       - sources
       properties:
         sources:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:
@@ -4341,9 +4349,11 @@ components:
       - updatedAt
       properties:
         walletBalanceId:
+          x-ticvai-references: none
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         availableBalance:
@@ -4383,6 +4393,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         orderId:
@@ -4725,6 +4736,7 @@ components:
           type: string
           format: uuid
         creditTypeId:
+          x-ticvai-references: wallet.credit_type
           type: string
           format: uuid
         issuedAmount:
@@ -4851,6 +4863,7 @@ components:
         maximumTopUp:
           $ref: ../shared/common.yaml#/components/schemas/Money
         presetAmounts:
+          x-ticvai-persistence-column: 'numeric(18,4)[]'
           type: array
           items:
             $ref: ../shared/common.yaml#/components/schemas/Money
@@ -4870,6 +4883,8 @@ components:
             - corporateAccount
             - loyaltyConversion
         bonusRules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Board 2.3. *Top up 200, get 20.* **The bonus is a separate lot of a separate
             credit type**, which is how it can expire on different terms from the cash.
@@ -5008,6 +5023,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         kind:
@@ -5045,6 +5061,7 @@ components:
       - subjectId
       properties:
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         role:
@@ -5152,6 +5169,7 @@ components:
         name:
           type: string
         denominations:
+          x-ticvai-persistence-column: 'numeric(18,4)[]'
           type: array
           items:
             $ref: ../shared/common.yaml#/components/schemas/Money
@@ -5240,6 +5258,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         kind:
@@ -5378,6 +5397,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         kind:
@@ -5427,6 +5447,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         transactionIds:
@@ -5573,6 +5594,8 @@ components:
       description: 'Boards 9.2 and 9.3. **Different credit types are different liabilities.**'
       properties:
         mappings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -5746,6 +5769,8 @@ components:
           type: string
           nullable: true
         findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

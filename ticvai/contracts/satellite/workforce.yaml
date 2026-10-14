@@ -25,7 +25,7 @@ info:
 
     ## Rota is not a shift
 
-    `orders.shift` is a cash-handling session — a drawer opened, counted and closed, tied to a
+    `orders.pos_shift` is a cash-handling session — a drawer opened, counted and closed, tied to a
     workstation. **A rota assignment is a person expected somewhere at a time**, and most of
     the people on a rota never touch a till.
 
@@ -578,6 +578,7 @@ paths:
   /attendance/{recordId}/amend:
     parameters:
       - name: recordId
+        x-ticvai-column: workforce.attendance.id
         in: path
         required: true
         schema: { type: string, format: uuid }
@@ -1576,6 +1577,7 @@ paths:
           type: string
           format: uuid
       - name: leaveTypeId
+        x-ticvai-column: workforce.leave_balance.type_id
         in: query
         schema:
           type: string
@@ -2483,6 +2485,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -2499,6 +2502,7 @@ components:
           nullable: true
           description: Group conversations only; null on a direct one.
         createdByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         createdAt:
@@ -2521,9 +2525,11 @@ components:
       - joinedAt
       properties:
         staffConversationId:
+          x-ticvai-references: workforce.staff_conversation
           type: string
           format: uuid
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         joinedAt:
@@ -2555,9 +2561,11 @@ components:
           format: uuid
           description: The client-generated UUIDv7 from the send, the key an offline replay deduplicates on.
         staffConversationId:
+          x-ticvai-references: workforce.staff_conversation
           type: string
           format: uuid
         senderPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         body:
@@ -2826,6 +2834,7 @@ components:
           type: string
           format: uuid
         sourceId:
+          x-ticvai-references: workforce.integration_source
           type: string
           format: uuid
         startedAt:
@@ -2876,6 +2885,7 @@ components:
           type: string
           format: uuid
         sourceId:
+          x-ticvai-references: workforce.integration_source
           type: string
           format: uuid
         syncRunId:
@@ -2943,6 +2953,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         principalId:
@@ -3009,6 +3020,7 @@ components:
           type: string
           format: uuid
         employeeId:
+          x-ticvai-references: workforce.employee
           type: string
           format: uuid
         contractType:
@@ -3050,6 +3062,7 @@ components:
           format: uuid
         tenantId:
           readOnly: true
+          x-ticvai-references: none
           type: string
           format: uuid
         code:
@@ -3090,9 +3103,11 @@ components:
           type: string
           format: uuid
         employeeId:
+          x-ticvai-references: workforce.employee
           type: string
           format: uuid
         typeId:
+          x-ticvai-references: workforce.leave_type
           type: string
           format: uuid
         periodYear:
@@ -3126,6 +3141,7 @@ components:
           format: uuid
         tenantId:
           readOnly: true
+          x-ticvai-references: none
           type: string
           format: uuid
         code:
@@ -3163,6 +3179,7 @@ components:
           format: uuid
         tenantId:
           readOnly: true
+          x-ticvai-references: none
           type: string
           format: uuid
         code:
@@ -3202,9 +3219,11 @@ components:
           type: string
           format: uuid
         employeeId:
+          x-ticvai-references: workforce.employee
           type: string
           format: uuid
         jobTitleId:
+          x-ticvai-references: workforce.job_title
           type: string
           format: uuid
         scopePath:
@@ -3270,6 +3289,8 @@ components:
         endsAt:
           type: string
         breaks:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3575,6 +3596,7 @@ components:
           type: string
           format: uuid
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         kind:
@@ -3608,6 +3630,7 @@ components:
           - cancelled
           - taken
         coverageImpact:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -3664,6 +3687,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         departmentId:
@@ -3956,8 +3980,8 @@ components:
       properties:
         id: { type: string, format: uuid }
         assignmentId: { type: string, format: uuid }
-        fromPrincipalId: { type: string, format: uuid }
-        toPrincipalId: { type: string, format: uuid }
+        fromPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
+        toPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
         status:
           type: string
           enum: [awaitingPeer, awaitingApproval, approved, rejected, withdrawn]
@@ -4037,7 +4061,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         attendanceRecordId: { type: string, format: uuid, x-ticvai-references: workforce.attendance }
-        amendedByPrincipalId: { type: string, format: uuid }
+        amendedByPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
         amendedAt: { type: string, format: date-time }
         occurredAtBefore:
           type: string

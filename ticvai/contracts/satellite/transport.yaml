@@ -514,7 +514,7 @@ paths:
               required: [status]
               properties:
                 status: { $ref: '#/components/schemas/TransportRouteStatus' }
-                reason: { type: string, maxLength: 500 }
+                reason: { type: string, maxLength: 500, x-ticvai-stored-as: transport.route.status_reason }
       responses:
         '200':
           headers:
@@ -1285,6 +1285,7 @@ paths:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'seats sold on the departure (422 capacity-below-sold) (CHG-MOD-003)'
+      x-ticvai-names-for-context: [catalogue.channel_capacity]
       x-ticvai-consumed-by:
         - "P08 BO-1187 Transport Departure Board"
       x-ticvai-audience: [staff]
@@ -1891,7 +1892,7 @@ components:
       required: [id, venueId, format, sourceRef, status]
       properties:
         id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
-        venueId: { type: string, format: uuid, readOnly: true }
+        venueId: { type: string, format: uuid, readOnly: true, x-ticvai-references: platform.scope }
         format: { type: string, enum: [csvBundle, gtfs] }
         sourceRef:
           type: string
@@ -1911,6 +1912,8 @@ components:
             stopsToWrite: { type: integer, minimum: 0 }
             timetablesToCreate: { type: integer, minimum: 0 }
         findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           maxItems: 1000
@@ -1958,7 +1961,7 @@ components:
       type: object
       required: [venueId, code, name]
       properties:
-        venueId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid, x-ticvai-references: platform.scope }
         code:
           type: string
           maxLength: 32
@@ -1986,7 +1989,7 @@ components:
       type: object
       required: [stationId, offsetMinutes]
       properties:
-        stationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+        stationId: { $ref: '../shared/common.yaml#/components/schemas/Id', x-ticvai-references: transport.station }
         offsetMinutes:
           type: integer
           minimum: 0
@@ -2013,7 +2016,7 @@ components:
       type: object
       required: [venueId, code, name, stops]
       properties:
-        venueId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid, x-ticvai-references: platform.scope }
         code:
           type: string
           maxLength: 32
@@ -2073,6 +2076,12 @@ components:
               description: >
                 The one-way trip product (kind `timedAdmission`); one variant per passenger type.
                 Created with the route.
+            statusReason:
+              type: string
+              maxLength: 500
+              nullable: true
+              readOnly: true
+              description: Why the route's status last changed (`setTransportRouteStatus`).
 
     RouteMap:
       x-ticvai-persistence: "none — projection"
@@ -2166,8 +2175,8 @@ components:
             type: object
             required: [fromStationId, toStationId, fare]
             properties:
-              fromStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
-              toStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+              fromStationId: { $ref: '../shared/common.yaml#/components/schemas/Id', x-ticvai-references: transport.station }
+              toStationId: { $ref: '../shared/common.yaml#/components/schemas/Id', x-ticvai-references: transport.station }
               fare: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         passengerTypes:
           type: array
@@ -2184,7 +2193,7 @@ components:
           required: [id, routeId]
           properties:
             id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
-            routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+            routeId: { $ref: '../shared/common.yaml#/components/schemas/Id', x-ticvai-references: transport.route }
             effectiveTo:
               type: string
               format: date-time
@@ -2319,7 +2328,7 @@ components:
           required: [id, routeId, status]
           properties:
             id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
-            routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+            routeId: { $ref: '../shared/common.yaml#/components/schemas/Id', x-ticvai-references: transport.route }
             status: { $ref: '#/components/schemas/TransportTimetableStatus' }
             publishedAt: { type: string, format: date-time, nullable: true, readOnly: true }
             releasedThrough:
@@ -2336,9 +2345,10 @@ components:
       required: [id, routeId, timetableId, performanceId, serviceDate, departsAt, status, seatCapacity]
       properties:
         id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
-        routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
-        timetableId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+        routeId: { $ref: '../shared/common.yaml#/components/schemas/Id', x-ticvai-references: transport.route }
+        timetableId: { $ref: '../shared/common.yaml#/components/schemas/Id', x-ticvai-references: transport.timetable }
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
           description: The catalogue performance this departure is sold as. Cart lines carry it.
@@ -2385,7 +2395,7 @@ components:
       type: object
       required: [venueId, code, name, kind, fareMultiplier, referenceTrips, validityDays]
       properties:
-        venueId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid, x-ticvai-references: platform.scope }
         code:
           type: string
           maxLength: 32
@@ -2474,9 +2484,9 @@ components:
       description: Unique per guest, venue and ordered pair of stations.
       properties:
         id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
-        venueId: { type: string, format: uuid }
-        fromStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
-        toStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+        venueId: { type: string, format: uuid, x-ticvai-references: platform.scope }
+        fromStationId: { $ref: '../shared/common.yaml#/components/schemas/Id', x-ticvai-references: transport.station }
+        toStationId: { $ref: '../shared/common.yaml#/components/schemas/Id', x-ticvai-references: transport.station }
         fromStationName: { type: string, readOnly: true }
         toStationName: { type: string, readOnly: true }
         label: { type: string, nullable: true }

@@ -4187,6 +4187,7 @@ components:
           format: uuid
           readOnly: true
         workflowInstanceId:
+          x-ticvai-references: approvals.workflow_instance
           type: string
           format: uuid
         workflowStepExecutionId:
@@ -4215,6 +4216,7 @@ components:
           format: uuid
           nullable: true
         alternativeNodeId:
+          x-ticvai-references: none
           type: string
           nullable: true
         previousInput:
@@ -4243,6 +4245,7 @@ components:
           maxLength: 30
           nullable: true
         actorPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         actedAt:
@@ -4289,6 +4292,7 @@ components:
           type: string
           format: uuid
         approvalRequestId:
+          x-ticvai-references: approvals.request
           type: string
           format: uuid
         sourceModule:
@@ -4467,6 +4471,8 @@ components:
           type: string
           nullable: true
         policyVersions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**What the rules were at the time**, because they have changed since.'
           items:
@@ -4532,6 +4538,8 @@ components:
           format: uuid
           nullable: true
         reminders:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -4664,6 +4672,7 @@ components:
           - mutualTls
           default: oauthClientCredentials
         outboundCredential:
+          x-ticvai-secret: vault-reference
           type: string
           format: password
           writeOnly: true
@@ -4672,6 +4681,7 @@ components:
             replace that omits it. **Held in Key Vault**; the row's `outbound_credential` column keeps the secret's
             reference, never the value (CHG-R1S-020).
         signingSecret:
+          x-ticvai-secret: vault-reference
           type: string
           format: password
           writeOnly: true
@@ -4788,9 +4798,11 @@ components:
           type: string
           format: uuid
         requestId:
+          x-ticvai-references: approvals.request
           type: string
           format: uuid
         providerId:
+          x-ticvai-references: approvals.external_provider
           type: string
           format: uuid
         level:
@@ -5539,6 +5551,7 @@ components:
         totalLevels:
           type: integer
         pendingApprovers:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -7362,8 +7375,7 @@ components:
     UnifiedApprovalInboxDecisionWorkspaceInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
-        nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `approvals.decision` (with `approvals.request`, `platform.outbox`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Unified Approval Inbox & Decision Workspace submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -8302,6 +8314,7 @@ components:
           format: uuid
           readOnly: true
         workflowDefinitionId:
+          x-ticvai-references: approvals.workflow_definition
           type: string
           format: uuid
         version:
@@ -8439,6 +8452,7 @@ components:
           format: uuid
           readOnly: true
         workflowDefinitionId:
+          x-ticvai-references: approvals.workflow_definition
           type: string
           format: uuid
         triggerType:
@@ -8509,9 +8523,11 @@ components:
           format: uuid
           readOnly: true
         workflowDefinitionId:
+          x-ticvai-references: approvals.workflow_definition
           type: string
           format: uuid
         workflowVersionId:
+          x-ticvai-references: approvals.workflow_version
           type: string
           format: uuid
           description: The version the instance started on; never changes
@@ -8543,6 +8559,7 @@ components:
           maxLength: 30
           nullable: true
         currentNodeId:
+          x-ticvai-references: none
           type: string
           nullable: true
           description: The node of the version's graph the instance is at
@@ -8627,6 +8644,7 @@ components:
           format: uuid
           readOnly: true
         workflowInstanceId:
+          x-ticvai-references: approvals.workflow_instance
           type: string
           format: uuid
         nodeId:
@@ -8717,6 +8735,7 @@ components:
           format: uuid
           readOnly: true
         workflowInstanceId:
+          x-ticvai-references: approvals.workflow_instance
           type: string
           format: uuid
         workflowStepExecutionId:
@@ -8989,6 +9008,7 @@ components:
           format: uuid
           readOnly: true
         automationId:
+          x-ticvai-references: approvals.automation
           type: string
           format: uuid
         workflowInstanceId:

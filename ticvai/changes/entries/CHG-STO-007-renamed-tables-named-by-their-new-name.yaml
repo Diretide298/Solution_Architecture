@@ -1,0 +1,34 @@
+id: CHG-STO-007
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: Contract prose names ai.activity, queue.entry, whitelabel.footer_config and orders.pos_shift, not the names those
+  tables had before their declared renames.
+decision:
+  what: Eight description edits in ai, subscription, reporting, white-label and workforce (tools/applied/sto-children-and-names-14-october.py
+    TEXT_EDITS).
+  by: Chinmay
+  date: '2026-10-14'
+why: Block A audit before r6, class check-ddl-conventions/D-RENAME-RESIDUE (5 at audit-base b93b5a87, 0 after), evidence
+  audit/ticvai/runs/audit-1014/classes.json; triage ruling "Old table names replaced by the new ones in comments and descriptions."
+  (R160).
+keys_touched:
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/workforce.yaml
+root_class: A25 PROSE-QUALITY
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Batch STO. Contract impact: descriptions only. Migration effect: none.'
