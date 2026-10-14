@@ -529,3 +529,33 @@ changes:
     tag: r6
     producer-tickets: [SVC-IDENTITY-ADMINISTRATION-1]
     consumer-tickets: [APP-SETUP-BO-054, APP-CONSOLE-ADM-021]
+  # BC-089 and BC-090 (CHG-CNS-001) are numbered after ADAM CR-089, which raised both (CR-090 changes no
+  # operation). Breaking in declaration only: the fields leave the request schema, and a caller that still sends
+  # them is not refused (no additionalProperties: false); the server ignores them, as ticket 27922 is built to.
+  - id: BC-089
+    contract: marketing-crm
+    operation: updateConsentQuestion
+    change: "removed"
+    reason: >-
+      ADAM CR-089 (ticket 27922): the PATCH body was the whole ConsentQuestion with its required list, so a partial
+      update had to resend kind, text, scope, required, blockingAnswer and status, while the description and
+      CMS-018 send only what changes. The body is now UpdateConsentQuestionRequest (minProperties 1, no required,
+      no defaults), the package's partial-update shape (UpdateProductRequest). id, version, scopePath and updatedAt
+      were readOnly; kind is fixed once created.
+    approved-by: 'Chinmay Parab, 14 October 2026 (r6 settlement of the 14 October CRs: "pull all Crs and get them fixed")'
+    tag: r6
+    producer-tickets: [SVC-MARKETING-CONSENT-5]
+    consumer-tickets: [APP-WL-CMS-018]
+  - id: BC-090
+    contract: marketing-crm
+    operation: createConsentQuestion
+    change: "removed"
+    reason: >-
+      ADAM CR-089: createConsentQuestion took the same whole ConsentQuestion, so a create had to send status. The
+      body is now CreateConsentQuestionRequest (kind and text required; helpText, scope, required, blockingAnswer
+      optional with their defaults), as CMS-018's form says. id, version (1), status (active), scopePath and
+      updatedAt are the server's.
+    approved-by: 'Chinmay Parab, 14 October 2026 (r6 settlement of the 14 October CRs: "pull all Crs and get them fixed")'
+    tag: r6
+    producer-tickets: [SVC-MARKETING-CONSENT-1]
+    consumer-tickets: [APP-WL-CMS-018]

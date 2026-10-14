@@ -1692,13 +1692,18 @@
     "searchMedia",
     "searchTransportDepartures"
    ],
+   "C-PATCH-FULL-BODY": [
+    "updateDonationCampaign",
+    "updatePartnerAgreement",
+    "updateRotaAssignment",
+    "updateTableReservation"
+   ],
    "C-REQUEST-SERVER-FIELDS": [
     "awardBadge",
     "buildProductionPlan",
     "configureQueueFeed",
     "createAccessReviewCampaign",
     "createCombo",
-    "createConsentQuestion",
     "createDeviceFirmware",
     "createGame",
     "createInspectionTemplate",
@@ -1788,7 +1793,6 @@
     "submitOnboardingApplication",
     "updateAccessDevicePlacement",
     "updateAccreditationHolder",
-    "updateConsentQuestion",
     "updateResource",
     "updateTable"
    ],
@@ -15806,6 +15810,32 @@
     "resources.booking.deposit_authorisation_id",
     "subscription.membership_entitlement.pricing_rule_id"
    ],
+   "SP-KEY-TENANT-FALLBACK": [
+    "access.access_change.old_access_id",
+    "catalogue.plan_benefit.entitlement_template_id",
+    "fnb.combo_slot_option.menu_item_id",
+    "inventory.count.location_id",
+    "maintenance.asset_document.asset_id",
+    "maintenance.asset_status_change.asset_id",
+    "maintenance.incident_history.incident_id",
+    "maintenance.incident_media.incident_id",
+    "marketing.message_dispatch_attempt.communication_provider_id",
+    "marketing.message_dispatch_attempt.message_dispatch_id",
+    "marketing.review_response.review_id",
+    "orders.group_ticket_allocation.group_booking_id",
+    "orders.group_ticket_fulfillment.group_booking_id",
+    "orders.membership_renewal.entitlement_template_id",
+    "pricing.dynamic_price_action.dynamic_price_rule_id",
+    "pricing.dynamic_price_condition.dynamic_price_rule_id",
+    "promotions.partner_bundle_product.bundle_component_id",
+    "promotions.partner_bundle_product.external_product_id",
+    "rental.agreement_item.catalogue_product_id",
+    "rental.agreement_item.order_line_id",
+    "rental.agreement_item.rental_agreement_id",
+    "rental.inspection_item.rental_inspection_id",
+    "workforce.staff_conversation_participant.staff_conversation_id",
+    "workforce.staff_message.staff_conversation_id"
+   ],
    "SP-KEY-UNDECLARED": [
     "access.access_change.old_access_id",
     "access.access_incident.venue_id",
@@ -16030,7 +16060,6 @@
     "marketing.case_service_action.order_id",
     "marketing.communication_policy_decision.subject_id",
     "marketing.consent_propagation.consent_record_id",
-    "marketing.consent_question_version.question_id",
     "marketing.customer_badge.badge_id",
     "marketing.guest_extra_field.tenant_id",
     "marketing.guest_note.subject_id",
