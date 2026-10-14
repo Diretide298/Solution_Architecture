@@ -6811,6 +6811,7 @@ components:
           type: string
           maxLength: 200
         scopePath:
+          readOnly: true
           type: string
           description: '**The partition key** (ADR-0005), and what is reviewed: every grant at or below it. Inside the
             caller''s own scope. Operations write it at `venue` scope.'
@@ -9295,6 +9296,7 @@ components:
       - groupMappings
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         displayName:

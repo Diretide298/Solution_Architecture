@@ -4879,6 +4879,7 @@ components:
       - name
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         code:

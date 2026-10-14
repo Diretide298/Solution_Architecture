@@ -8852,6 +8852,7 @@ components:
       - isActive
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         outletId:
@@ -9232,6 +9233,7 @@ components:
       - lines
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         outletId:
@@ -9243,6 +9245,7 @@ components:
           description: The trading day this prep list is for, in the Region's time zone; a business date, closing at
             the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032).
         status:
+          readOnly: true
           type: string
           enum:
           - draft
@@ -9306,6 +9309,7 @@ components:
       - slots
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         outletId:
@@ -9845,6 +9849,7 @@ components:
       - status
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         recipeId:
@@ -9889,6 +9894,7 @@ components:
           type: string
           format: date-time
         status:
+          readOnly: true
           type: string
           enum:
           - planned
@@ -10003,6 +10009,7 @@ components:
           - highChair
           nullable: true
         status:
+          readOnly: true
           type: string
           enum:
           - waiting
@@ -11099,6 +11106,7 @@ components:
       - options
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         code:
@@ -11387,6 +11395,7 @@ components:
       - capacity
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         label:

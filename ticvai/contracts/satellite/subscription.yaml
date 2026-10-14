@@ -11622,6 +11622,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         partnerId:
@@ -11678,6 +11679,7 @@ components:
       - status
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         companyName:
@@ -11702,6 +11704,7 @@ components:
           type: string
           format: uuid
         status:
+          readOnly: true
           type: string
           enum:
           - submitted
@@ -11888,6 +11891,7 @@ components:
       - branchScopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         partnerId:
@@ -11965,6 +11969,7 @@ components:
       - status
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         channelName:

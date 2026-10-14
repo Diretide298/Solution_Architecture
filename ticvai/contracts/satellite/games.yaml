@@ -3168,6 +3168,7 @@ components:
       - name
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         name:
@@ -3421,6 +3422,7 @@ components:
       - status
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         code:
@@ -3458,6 +3460,7 @@ components:
           type: integer
           nullable: true
         status:
+          readOnly: true
           $ref: '#/components/schemas/GameStatus'
         playsToday:
           type: integer
@@ -3551,6 +3554,7 @@ components:
       - onHand
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         name:

@@ -15325,6 +15325,7 @@ components:
           format: uuid
           readOnly: true
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         enabled:
@@ -16893,6 +16894,7 @@ components:
       - decision
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         suggestionId:
@@ -17198,6 +17200,7 @@ components:
           - venue
           description: Tenant sets the default; a venue may narrow it and never widen it.
         scopePath:
+          readOnly: true
           type: string
           description: '**The node this row belongs to, and the key it is written under** — the tenant''s
             node where `scopeLevel` is `tenant`, a venue''s where it is `venue`. One row per `scopePath`;

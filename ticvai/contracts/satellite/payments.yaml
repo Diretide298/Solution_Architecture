@@ -2874,6 +2874,7 @@ components:
           type: string
           format: date-time
         createdAt:
+          readOnly: true
           type: string
           format: date-time
     PaymentsEligibilityRule:

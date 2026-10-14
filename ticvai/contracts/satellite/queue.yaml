@@ -1701,7 +1701,7 @@ components:
       type: object
       required: [id, queueId, adaptor, isEnabled]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         queueId: { type: string, format: uuid }
         adaptor: { $ref: '#/components/schemas/QueueFeedAdaptor' }
         adaptorName:

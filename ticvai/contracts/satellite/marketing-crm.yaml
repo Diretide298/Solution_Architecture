@@ -19687,6 +19687,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
         updatedAt:
@@ -19764,6 +19765,7 @@ components:
           format: date-time
           nullable: true
         status:
+          readOnly: true
           type: string
           maxLength: 20
     MarketingJourneyStep:
@@ -19868,6 +19870,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
     MarketingLoyaltyPoints:
@@ -20131,6 +20134,7 @@ components:
           format: uuid
           nullable: true
         status:
+          readOnly: true
           type: string
           maxLength: 30
         issuedAt:
@@ -20189,6 +20193,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
         updatedAt:
@@ -21287,6 +21292,7 @@ components:
           type: string
           nullable: true
         status:
+          readOnly: true
           type: string
           enum:
           - open
@@ -22337,6 +22343,7 @@ components:
       - occurredAt
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         subjectId:
@@ -31069,6 +31076,7 @@ components:
         - orderId
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: Client-generated UUIDv7; equals the `Idempotency-Key` header.
@@ -31225,6 +31233,7 @@ components:
         - reason
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: Client-generated UUIDv7; equals the `Idempotency-Key` header.
@@ -31326,6 +31335,7 @@ components:
         - escalationType
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: Client-generated UUIDv7; equals the `Idempotency-Key` header on the write.
@@ -32499,6 +32509,7 @@ components:
       - criteria
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         agentPrincipalId:

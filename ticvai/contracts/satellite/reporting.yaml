@@ -3772,6 +3772,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         name:
@@ -3848,6 +3849,7 @@ components:
         isActive:
           type: boolean
         scopePath:
+          readOnly: true
           type: string
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,

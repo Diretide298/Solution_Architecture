@@ -2661,6 +2661,7 @@ components:
           format: date-time
           nullable: true
         status:
+          readOnly: true
           type: string
           enum: [active, degraded, suspended]
         scopePath:
@@ -2946,6 +2947,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         code:
@@ -2961,6 +2963,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
         updatedAt:
@@ -3020,6 +3023,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         code:
@@ -3035,6 +3039,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
     WorkforceShift:
@@ -3055,6 +3060,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         code:
@@ -3124,9 +3130,11 @@ components:
         isPrimary:
           type: boolean
         status:
+          readOnly: true
           type: string
           maxLength: 30
         createdAt:
+          readOnly: true
           type: string
           format: date-time
     ShiftTemplate:

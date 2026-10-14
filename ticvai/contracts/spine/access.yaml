@@ -17927,6 +17927,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         triggerEvent:
@@ -17984,6 +17985,7 @@ components:
           nullable: true
           description: How the Virtual Ticket state change reaches every bound medium
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         createdAt:
@@ -18879,6 +18881,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         allowedMediaTypeIds:
@@ -18979,6 +18982,7 @@ components:
           maxLength: 100
           nullable: true
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         createdAt:
@@ -19530,6 +19534,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         fromStatus:
@@ -19588,6 +19593,7 @@ components:
             - api
             - scheduledProcess
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         createdAt:
@@ -19611,6 +19617,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: The policyId of listVerificationMethodSelection
@@ -19660,6 +19667,7 @@ components:
             `ticketCredentialFormat` (catalogue `SalesChannelProfile`), and that null, the platform''s signed QR.
             Wins over the channel when `issueOrderEntitlements` resolves the format.'
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         createdAt:
@@ -19825,6 +19833,7 @@ components:
         scopePath: &id001
           type: string
           description: ltree of the owning scope node (ADR-0005)
+          readOnly: true
         createdAt: &id002
           type: string
           format: date-time
@@ -19895,6 +19904,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -19944,6 +19954,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           $ref: ../shared/common.yaml#/components/schemas/Id
         venueId:
           type: string
@@ -20302,6 +20313,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -20425,6 +20437,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -20726,6 +20739,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         manufacturer:
@@ -20937,6 +20951,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -21118,6 +21133,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -21199,6 +21215,7 @@ components:
       - scopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -21866,6 +21883,7 @@ components:
       - scope
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -21873,6 +21891,7 @@ components:
           format: uuid
           nullable: true
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         name:
@@ -22266,6 +22285,7 @@ components:
       - status
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: The journeyProfileId
@@ -22275,6 +22295,7 @@ components:
           nullable: true
           description: Null is every park of the tenant
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         name:
@@ -22319,6 +22340,7 @@ components:
       - unlimited
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: The profileId the list shows
@@ -22327,6 +22349,7 @@ components:
           format: uuid
           nullable: true
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         name:
@@ -22834,9 +22857,11 @@ components:
       - evaluationMode
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node
         policyCategory:
@@ -23237,9 +23262,11 @@ components:
       - criticalThreshold
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         scopePath:
+          readOnly: true
           type: string
           description: ltree of the owning scope node; one row per scope
         mediumThreshold:

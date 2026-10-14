@@ -2087,6 +2087,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         cellId:
@@ -2189,6 +2190,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         cellId:
@@ -3006,6 +3008,7 @@ components:
       - name
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         kind:
@@ -3039,6 +3042,7 @@ components:
       - scheduledFor
       properties:
         tenantId:
+          readOnly: true
           type: string
           format: uuid
         tenantName:
@@ -3074,9 +3078,11 @@ components:
       - publishedAt
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         version:
+          readOnly: true
           type: string
         supportEndsAt:
           type: string

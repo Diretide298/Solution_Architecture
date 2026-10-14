@@ -2451,7 +2451,7 @@ components:
           readOnly: true
           description: >
             **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
-        tenantId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid, readOnly: true }
         licensedModules:
           type: array
           description: >

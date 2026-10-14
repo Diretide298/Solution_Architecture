@@ -18833,6 +18833,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
     CatalogueMembershipProgramme:
@@ -18862,6 +18863,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
         updatedAt:
@@ -38101,6 +38103,7 @@ components:
           nullable: true
           description: The change request whose publication is being rolled back.
         status:
+          readOnly: true
           type: string
           enum:
           - requested
@@ -40596,6 +40599,7 @@ components:
           type: string
           maxLength: 200
         version:
+          readOnly: true
           type: integer
           minimum: 1
         isDefault:

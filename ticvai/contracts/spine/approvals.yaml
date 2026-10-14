@@ -4880,6 +4880,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         approvalRequestId:
