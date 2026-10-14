@@ -2,9 +2,123 @@ Newest first. Each entry says what changed and, where there is one, what you hav
 
 Most changes need nothing from you: the pages are served from one place, so a reload is the whole
 upgrade. The exception is the **connector** — the part that runs on your own machine — which only
-changes when you run `/update-adam` in Claude Code and restart it.
+changes when you run `/update-adam` in Claude Code and restart it. The top of this page says whether
+any of your machines is behind.
+
+## 14 October 2026
+
+### The pages are rebuilt the way Tasks is
+
+Tasks was rebuilt first, and the other pages now work the same way. Each opens on one sentence
+answering the question it is opened for, with the figures it rests on underneath as a line of type
+rather than a row of boxes, one chart, and what to do next. One section shows at a time, picked from
+the list on the left. One filter covers the whole page, says in a sentence what it is showing, and
+is kept in the address, so a link you send opens on what you were looking at. A person's name leads
+to their page on Tasks.
+
+- **The menu** is grouped by when you reach for it: Every day, The package, Administration. The names are short, a count is a badge beside the name, and the page you are on is marked.
+- **Change requests**, **My work**, **Agent activity**, **People and projects** and **Audit** are rebuilt this way.
+- **Reviews** now holds what has been signed off as well as the review activity: one page instead of two that showed the same verdicts.
+- **Costing** has a budget, set on the page, and says how the spend compares with it.
+- **Domain lenses** is now **AI capabilities: who can use them**. It opens on how many AI operations no screen reaches, and the table under it can be searched. The flash sale lens has gone from it; the deployment map covers the flash sale.
+- **Ask about the package** opens on the question box with questions drawn from this package, names the sources under each answer as links, and sets the provider key in **Settings → AI answers**.
+
+### A blocker is always a change request
+
+When something stops a ticket, it is raised as a change request, the ticket goes On hold, and the
+agent takes the next ticket that nothing blocks. **My work** and the connector's board say which
+tickets an open blocking request affects, so a held ticket says why.
+
+### You are always on the latest release
+
+Pulling a ticket always pulls it at the release ADAM serves; nothing asks which release, and the
+ticket's README says what changed since your last pull. When a change request is settled, the ticket
+it came from is told: an open ticket gets one comment for the agent that pulls it, a closed one gets
+a child task. A child task somebody made by hand in OpenProject can be linked to its request rather
+than made twice.
+
+## 13 October 2026
+
+### Tasks counts Tasks, and shows each day and each person
+
+- **Count: Tasks or Tickets.** Every number on the Tasks page used to mix features, tasks and sub-tasks. It now counts OpenProject Tasks by default, with a switch for every ticket; every count says which unit it is in.
+- **One person.** Select a name and the page is everything about that developer: their sprint, what they hold, what waits for QA, what they finished and the testing gate. The address names them, so it is a link you can send.
+- **Finished each day** and **Daily expected**: who finished how many on each working day of the sprint, and what each person's sprint asks of them per day.
+
+### Pages open faster
+
+The Tasks page took over half a minute to open, most of it waiting for OpenProject to be read
+again. ADAM now keeps the last read, re-reads in the background, and answers at once; Tasks says
+when the numbers were read and Refresh redraws when a new read lands. Scripts are kept by your
+browser between visits.
+
+### Setup, for frontend developers and for agent activity
+
+- Setup on a new frontend folder makes a workspace you clone your app's repository into, and setup on a folder that already has code adds ADAM's missing files without touching yours.
+- Setup and `/update-adam` now install the usage hooks for a zip install too, so your sessions reach **Agent activity**. Before this only a plugin install had them, and the team installs from the zip, so the page stayed empty.
+
+## 12 October 2026
+
+### Tasks is the whole team's delivery dashboard
+
+The Tasks page opens on the current sprint: who has finished what, who is late, what waits for QA,
+and who is held on the testing gate. In progress, waiting for QA and stalled are told apart, and a
+move to QA counts as finished. Every member of the delivery team can open it; a client account still
+cannot.
+
+Through the connector, developers can see each other's work too (`adam_team`).
+
+### Change requests settle in a batch
+
+An administrator can settle a batch of change requests from a file on a workstation; each settled
+request leaves one comment on the OpenProject ticket it came from.
+
+## 7 October 2026
+
+### /update-adam finds your ADAM
+
+`/update-adam` used to look for ADAM on your own machine and fail for everybody. It now finds it
+where the connector does, and says where it looked.
+
+## 6 October 2026
+
+### Setup clones the team's repository
+
+For a TICVAI backend developer, setup clones the team's repository. It asks for your GitLab
+username first, because a private project answers "not found" to a clone that has not said who
+it is.
+
+## 5 October 2026
+
+### Tasks reads the whole project
+
+The Tasks page, Costing, the plan and My work read only the newest 2,000 tickets, which were almost
+all sub-tasks. They now read every ticket in the project.
+
+## 1 October 2026
+
+### Releases, and what changed since you pulled
+
+ADAM serves each package at its newest release. Pulling a ticket records the release you pulled it
+at, and when a newer one is served the pull says what changed in the parts that ticket touches.
+A change request now carries where it came from, who approved it, its effect on the contracts and
+its size, and the Change requests page shows them.
+
+Every ticket shows its build order again, read from the Priority_No. field.
+
+## 30 September 2026
+
+### The connector copes with a dropped connection and a long board
+
+A read that loses its connection is tried again, and when it still fails it says why. The board
+shows the first 30 tickets in build order and says how many follow, instead of an answer too large
+to send.
 
 ## 28 September 2026
+
+### Tasks is a dashboard, not a long scroll
+
+The Tasks page was one 26,000-pixel scroll. It is now a dashboard, with throughput as a chart.
 
 ### The connector installs as a Claude Code plugin
 
@@ -19,8 +133,8 @@ Claude Code then **asks you** for the ADAM address, your e-mail and your passwor
 password in your operating system's credential store rather than in a settings file. The old
 registration kept it in plain text where `claude mcp get` would print it.
 
-The plugin carries the connector, and also the **usage hooks** — the ones that fill the Agents page
-under Tasks. Those were a block of JSON in a README that people were asked to paste into
+The plugin carries the connector, and also the **usage hooks** — the ones that fill the Agent
+activity page (in the menu, under Every day). Those were a block of JSON in a README that people were asked to paste into
 `settings.json` by hand, which is to say they were mostly not installed at all. Installing the
 plugin installs them.
 
@@ -148,6 +262,5 @@ something wrong.
 
 ### Two fixes worth naming
 
-- ADAM would not start on any store with real history in it — an index named a column that the
-  migration had not added yet. Fresh installs never saw it; every real one did.
+- ADAM would not start on any store with real history in it — an index named a column that the migration had not added yet. Fresh installs never saw it; every real one did.
 - The avatar page is gone.

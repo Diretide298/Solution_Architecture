@@ -3153,6 +3153,11 @@ textarea.rt-sendback-note {
 @media (max-width: 640px) {
   .up-mascot { display: none; }
 }
+.up-title { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+.up-fleet { margin: 14px 0 6px; font-size: 13.5px; line-height: 1.6; color: var(--text); }
+.up-fleet .sh-badge { margin-right: 8px; vertical-align: 1px; }
+.up-fleet code { font-family: var(--mono); font-size: 12.5px; color: var(--accent-text); }
+.up-fleet-when { color: var(--text-dim); }
 
 /* ── Adam, docked in the corner ──────────────────────────────────────
    Geometry and colours from the design handoff: 180px square at right 20 /
