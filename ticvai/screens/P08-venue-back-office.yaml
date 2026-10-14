@@ -9449,6 +9449,7 @@ screens:
         impliedBy: listTicketReissueFulfillment
         notes: Carried from BO-320 (merged 28 September, audit R276) — tickets and media regenerated after
           an amendment, correction, loss or delivery failure. **Cursor pagination, never offset.**
+        operation: listTicketReissueFulfillment
       - kind: dataTable
         label: Credential replacements
         derived: true
@@ -9456,6 +9457,7 @@ screens:
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows. Carried from BO-652 (merged 28 September,
           audit R276).'
+        operation: listCredentialReplacementReissue
   states:
     loading: The reissue media replacement, read by `getMediaEntitlements`.
     error: Could not load. Names which read failed and leaves the reissue media replacement untouched.
@@ -36989,6 +36991,7 @@ screens:
         impliedBy: listVenueParkAccess
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOrgUnits
       - kind: primaryButton
         derived: true
         impliedBy: createOrgUnit
@@ -38026,6 +38029,7 @@ screens:
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
           one somebody presses meaning to save.'
         provenance: authored — required by check-screens for publishTopologyValidation
+        operation: publishTopologyValidation
       - kind: secondaryButton
         label: Rollback configuration version
         operation: rollbackConfigurationVersion
@@ -39375,6 +39379,7 @@ screens:
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
           one somebody presses meaning to save.'
         provenance: authored — required by check-screens for publishRuleConflictCheck
+        operation: publishRuleConflictCheck
       - kind: secondaryButton
         label: Submit for approval
         operation: createApprovalRequest
@@ -41785,6 +41790,7 @@ screens:
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
           one somebody presses meaning to save.'
         provenance: authored — required by check-screens for publishMediaCompatibilityTesting
+        operation: publishMediaCompatibilityTesting
     - name: contentBody
       components: []
   states:
@@ -48291,6 +48297,7 @@ screens:
         impliedBy: listShiftHandoverSummary
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listShiftHandoverSummary
   states:
     loading: The operations audit shift list.
     error: Could not load. Names which read failed and leaves the operations audit shift untouched.
@@ -66659,6 +66666,7 @@ screens:
         impliedBy: listApprovalRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApprovalRequests
   states:
     loading: The team shared approval list.
     error: Could not load. Names which read failed and leaves the team shared approval untouched.
@@ -66735,6 +66743,7 @@ screens:
         impliedBy: listApprovalRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApprovalRequests
       - kind: primaryButton
         derived: true
         impliedBy: decideApprovalRequest
@@ -66856,6 +66865,7 @@ screens:
         impliedBy: listApprovalRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApprovalRequests
   states:
     loading: The decision support list.
     error: Could not load. Names which read failed and leaves the decision support untouched.
@@ -66945,10 +66955,12 @@ screens:
         impliedBy: listApprovalRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApprovalRequests
       - kind: detailPanel
         derived: true
         impliedBy: getApprovalRequestScore
         notes: One record, read-only.
+        operation: getApprovalRequestScore
   states:
     loading: The high priority risk list.
     error: Could not load. Names which read failed and leaves the high priority risk untouched.
@@ -67037,7 +67049,7 @@ screens:
         - Previous actions
         - Next escalation level
         bindsTo: null
-        operation: null
+        operation: listSlaEscalationBottleneck
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 8 §Display
     - name: contextPanel
       slot: selection
@@ -67329,6 +67341,7 @@ screens:
         impliedBy: listWorkflowInstanceProcess
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWorkflowInstanceProcess
   states:
     loading: The approval activity notification list.
     error: Could not load. Names which read failed and leaves the approval activity notification untouched.
@@ -67773,6 +67786,7 @@ screens:
         impliedBy: listStepUpPolicies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listStepUpPolicies
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -68074,6 +68088,7 @@ screens:
         derived: true
         impliedBy: withdrawApprovalRequest
         notes: The act the screen exists for.
+        operation: withdrawApprovalRequest
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -68163,6 +68178,7 @@ screens:
         impliedBy: listApprovalControlPolicies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApprovalControlPolicies
   states:
     loading: The segregation duties four-eyes list.
     error: Could not load. Names which read failed and leaves the segregation duties four-eyes untouched.
@@ -68259,6 +68275,7 @@ screens:
         impliedBy: listWorkflowInstanceProcess
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWorkflowInstanceProcess
   states:
     loading: The approved action execution list.
     error: Could not load. Names which read failed and leaves the approved action execution untouched.
@@ -68368,6 +68385,7 @@ screens:
         derived: true
         impliedBy: getApprovalRecord
         notes: One record, read-only.
+        operation: getApprovalRecord
   states:
     loading: The decision record immutable list.
     error: Could not load. Names which read failed and leaves the decision record immutable untouched.
@@ -68769,6 +68787,7 @@ screens:
         impliedBy: listApprovalDelegations
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApprovalDelegations
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -69284,6 +69303,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “SLA Compliance”, “Average
           Response”, “Escalation Rate”, “Breach Rate”, “SLA by Department”, “Escalations by Reason”.'
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 47 §Identify
+        operation: getApprovalAnalytics
   states:
     loading: The sla escalation performance list.
     error: Could not load. Names which read failed and leaves the sla escalation performance untouched.
@@ -69951,6 +69971,7 @@ screens:
         impliedBy: updateGame
         label: Save game
         notes: The act the screen exists for.
+        operation: updateGame
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -70511,6 +70532,7 @@ screens:
         impliedBy: listGameEntitlements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listGameEntitlements
   states:
     loading: The game package entitlement list.
     error: Could not load. Names which read failed and leaves the game package entitlement untouched.
@@ -70917,7 +70939,7 @@ screens:
         - Configuration Status
         - Last Communication
         bindsTo: null
-        operation: null
+        operation: listReaders
         provenance: pack Game_and_Ride_Module.pdf, page 14 §Directory Columns
       - kind: dataTable
         label: Devices
@@ -71437,6 +71459,7 @@ screens:
         impliedBy: setReaderConfiguration
         label: Save reader configuration
         notes: The act the screen exists for.
+        operation: setReaderConfiguration
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -72030,7 +72053,7 @@ screens:
         columns:
         - Top-Ups
         bindsTo: null
-        operation: null
+        operation: listWalletTransactions
         provenance: pack Game_and_Ride_Module.pdf, page 23 §Show
     - name: contextPanel
       slot: selection
@@ -72043,6 +72066,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Page 23 of 105”, “Break
           down wallet value into”.'
         provenance: pack Game_and_Ride_Module.pdf, page 23 §Show
+        operation: getWallet
   states:
     loading: The wallet credit list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the wallet credit untouched.
@@ -72246,6 +72270,7 @@ screens:
       - kind: secondaryButton
         label: Block Wallet
         provenance: pack Game_and_Ride_Module.pdf, page 25 §Actions
+        operation: suspendWallet
     - name: contentBody
       components: []
   states:
@@ -72973,6 +72998,7 @@ screens:
         impliedBy: listWalletTransactions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWalletTransactions
   states:
     loading: The wallet credit transaction list.
     error: Could not load. Names which read failed and leaves the wallet credit transaction untouched.
@@ -73584,6 +73610,7 @@ screens:
         impliedBy: createGameEntitlement
         label: Create game entitlement
         notes: The act the screen exists for.
+        operation: createGameEntitlement
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -73678,6 +73705,7 @@ screens:
         impliedBy: listGameEntitlements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listGameEntitlements
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -74516,6 +74544,7 @@ screens:
         impliedBy: setGamePricing
         label: Save game pricing
         notes: The act the screen exists for.
+        operation: setGamePricing
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -74703,6 +74732,7 @@ screens:
         impliedBy: listRulePriorityConflict
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRulePriorityConflict
   states:
     loading: The price priority conflict list.
     error: Could not load. Names which read failed and leaves the price priority conflict untouched.
@@ -75507,6 +75537,7 @@ screens:
         derived: true
         impliedBy: getWallet
         notes: One record, read-only.
+        operation: getWallet
   states:
     loading: The redemption wallet balance list.
     error: Could not load. Names which read failed and leaves the redemption wallet balance untouched.
@@ -75592,7 +75623,7 @@ screens:
         - ↓
         - 'Redemption Balance: 2,450'
         bindsTo: null
-        operation: null
+        operation: listPrizes
         provenance: pack Game_and_Ride_Module.pdf, page 58 §Scan / Tap Customer Card
     - name: contextPanel
       slot: selection
@@ -75747,6 +75778,7 @@ screens:
         impliedBy: listPrizes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listPrizes
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -76496,6 +76528,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Linked Values”, “Page 65
           of 105”.'
         provenance: pack Game_and_Ride_Module.pdf, page 65 §Card Information
+        operation: getGameCard
   states:
     loading: The card credential profile list.
     error: Could not load. Names which read failed and leaves the card credential profile untouched.
@@ -76663,6 +76696,7 @@ screens:
         derived: true
         impliedBy: getGameCard
         notes: One record, read-only.
+        operation: getGameCard
   states:
     loading: The last recharge last list.
     error: Could not load. Names which read failed and leaves the last recharge last untouched.
@@ -77207,6 +77241,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Customer View”, “Redemption
           Credits”, “Free Games”, “Entitlements”.'
         provenance: pack Game_and_Ride_Module.pdf, page 71 §Card Information
+        operation: getGameCard
   states:
     loading: The customer balance credential list.
     error: Could not load. Names which read failed and leaves the customer balance credential untouched.
@@ -77294,7 +77329,7 @@ screens:
         - 05 Mar 2026
         - 18 Apr 2026
         bindsTo: null
-        operation: null
+        operation: listGameplayTransactions
         provenance: pack Game_and_Ride_Module.pdf, page 72 §Card Issued
     - name: contextPanel
       slot: selection
@@ -77514,7 +77549,7 @@ screens:
         - Authorization result
         - Response time
         bindsTo: null
-        operation: null
+        operation: listGameplayTransactions
         provenance: pack Game_and_Ride_Module.pdf, page 75 §Selecting a transaction should show
     - name: contextPanel
       slot: selection
@@ -77624,10 +77659,12 @@ screens:
         impliedBy: listReaders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listReaders
       - kind: detailPanel
         derived: true
         impliedBy: getDeviceTelemetry
         notes: One record, read-only.
+        operation: getDeviceTelemetry
   states:
     loading: The reader device health list.
     error: Could not load. Names which read failed and leaves the reader device health untouched.
@@ -77821,7 +77858,7 @@ screens:
         - Rejections by reason
         - Rejection trend
         bindsTo: null
-        operation: null
+        operation: listGameplayTransactions
         provenance: pack Game_and_Ride_Module.pdf, page 78 §Time Attraction Card Reason Reader
     - name: contextPanel
       slot: selection
@@ -77926,6 +77963,7 @@ screens:
         impliedBy: listWalletTransactions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWalletTransactions
   states:
     loading: The wallet deduction transaction list.
     error: Could not load. Names which read failed and leaves the wallet deduction transaction untouched.
@@ -78893,6 +78931,7 @@ screens:
         derived: true
         impliedBy: deployReaderConfiguration
         notes: The act the screen exists for.
+        operation: deployReaderConfiguration
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -79192,6 +79231,7 @@ screens:
         derived: true
         impliedBy: deployReaderConfiguration
         notes: The act the screen exists for.
+        operation: deployReaderConfiguration
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -79291,6 +79331,7 @@ screens:
         derived: true
         impliedBy: testReader
         notes: The act the screen exists for.
+        operation: testReader
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -79913,6 +79954,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “WELCOME”, “Identification
           Methods”, “Customer Tap”, “Invalid Results”.'
         provenance: pack Game_and_Ride_Module.pdf, page 98 §Validate Card Status
+        operation: getGameCard
   states:
     loading: The customer card wallet list.
     error: Could not load. Names which read failed and leaves the customer card wallet untouched.
@@ -80731,6 +80773,7 @@ screens:
         notes: '**Puts the product on sale**, at the locations it is enabled for, from its effective date.
           Existing bookings are unaffected; the next guest sees the new rules.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishRentalProduct
     - name: contentBody
       slot: headline
       components:
@@ -80764,6 +80807,7 @@ screens:
       - kind: primaryButton
         label: + Create Rental Product
         provenance: pack Rental_Management.pdf, page 6 §Actions
+        operation: createRentalProduct
   states:
     loading: The rental product list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the rental product untouched.
@@ -81007,6 +81051,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Product Header”, “Display
           tabs”, “Missing”.'
         provenance: pack Rental_Management.pdf, page 8 §Show
+        operation: getRentalProduct
   states:
     loading: The rental product profile list.
     error: Could not load. Names which read failed and leaves the rental product profile untouched.
@@ -81107,6 +81152,7 @@ screens:
         impliedBy: listRentalCategories
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRentalCategories
       - kind: primaryButton
         derived: true
         impliedBy: createRentalCategory
@@ -81724,6 +81770,7 @@ screens:
         notes: '**Puts the product on sale**, at the locations it is enabled for, from its effective date.
           Existing bookings are unaffected; the next guest sees the new rules.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishRentalProduct
     - name: actionBar
       slot: publish
       components:
@@ -82123,6 +82170,7 @@ screens:
         derived: true
         impliedBy: getAsset
         notes: One record, read-only.
+        operation: getAsset
       - kind: primaryButton
         derived: true
         impliedBy: updateAsset
@@ -82332,6 +82380,7 @@ screens:
         derived: true
         impliedBy: getAsset
         notes: One record, read-only.
+        operation: getAsset
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -82428,6 +82477,7 @@ screens:
         impliedBy: lookupAsset
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
+        operation: lookupAsset
   states:
     loading: The barcode equipment identification list.
     error: Could not load. Names which read failed and leaves the barcode equipment identification untouched.
@@ -82511,6 +82561,7 @@ screens:
         impliedBy: listStockLocations
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listStockLocations
   states:
     loading: The inventory location allocation list.
     error: Could not load. Names which read failed and leaves the inventory location allocation untouched.
@@ -82724,6 +82775,7 @@ screens:
         impliedBy: listStockMovements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listStockMovements
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -82838,6 +82890,7 @@ screens:
           Station”, “The board should visually demonstrate”, “Serialized Asset”, “Pooled Inventory”, “Integration
           Boundaries”.'
         provenance: pack Rental_Management.pdf, page 24 §Display
+        operation: getStockPositions
     - name: actionBar
       slot: rowActions
       components:
@@ -83961,6 +84014,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “North Station”, “Important
           Availability Formula”, “Allocated Physical Inventory”.'
         provenance: pack Rental_Management.pdf, page 34 §Display
+        operation: getRentalAvailability
   states:
     loading: The availability intelligence forecasting list.
     error: Could not load. Names which read failed and leaves the availability intelligence forecasting
@@ -84122,6 +84176,7 @@ screens:
       - kind: primaryButton
         label: + Create Pricing Profile
         provenance: pack Rental_Management.pdf, page 38 §Actions
+        operation: createRentalPricingProfile
   states:
     loading: The rental pricing list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the rental pricing untouched.
@@ -85771,6 +85826,7 @@ screens:
         derived: true
         impliedBy: getRentalBooking
         notes: One record, read-only.
+        operation: getRentalBooking
   states:
     loading: The reservation confirmation voucher list.
     error: Could not load. Names which read failed and leaves the reservation confirmation voucher untouched.
@@ -86221,6 +86277,7 @@ screens:
         derived: true
         impliedBy: getRentalBooking
         notes: One record, read-only.
+        operation: getRentalBooking
   states:
     loading: The voucher scan reservation list.
     error: Could not load. Names which read failed and leaves the voucher scan reservation untouched.
@@ -86303,6 +86360,7 @@ screens:
         derived: true
         impliedBy: getRentalBooking
         notes: One record, read-only.
+        operation: getRentalBooking
   states:
     loading: The checkout readiness validation list.
     error: Could not load. Names which read failed and leaves the checkout readiness validation untouched.
@@ -86485,12 +86543,14 @@ screens:
         impliedBy: assignRentalEquipment
         label: Assign rental equipment
         notes: The act the screen exists for.
+        operation: assignRentalEquipment
       - kind: searchField
         derived: true
         impliedBy: lookupAsset
         label: Search
         notes: Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012).
           A search that returns nothing must say so differently from a search not yet run.
+        operation: lookupAsset
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -87194,6 +87254,7 @@ screens:
         derived: true
         impliedBy: getRentalBooking
         notes: One record, read-only.
+        operation: getRentalBooking
   states:
     loading: The active rental detail list.
     error: Could not load. Names which read failed and leaves the active rental detail untouched.
@@ -87662,6 +87723,7 @@ screens:
         impliedBy: listOverdueRentals
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOverdueRentals
   states:
     loading: The due soon customer list.
     error: Could not load. Names which read failed and leaves the due soon customer untouched.
@@ -87749,6 +87811,7 @@ screens:
         impliedBy: listOverdueRentals
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOverdueRentals
   states:
     loading: The overdue rental list.
     error: Could not load. Names which read failed and leaves the overdue rental untouched.
@@ -87823,6 +87886,7 @@ screens:
         derived: true
         impliedBy: getRentalBooking
         notes: One record, read-only.
+        operation: getRentalBooking
   states:
     loading: The active group rental list.
     error: Could not load. Names which read failed and leaves the active group rental untouched.
@@ -87900,7 +87964,7 @@ screens:
         - Extension demand
         kind: dataTable
         label: Every active rental intelligence
-        operation: null
+        operation: listOverdueRentals
         provenance: pack Rental_Management.pdf, page 87 §Display
       name: contentBody
       slot: collection
@@ -88176,6 +88240,7 @@ screens:
         derived: true
         impliedBy: getRentalBooking
         notes: One record, read-only.
+        operation: getRentalBooking
   states:
     loading: The return scan rental list.
     error: Could not load. Names which read failed and leaves the return scan rental untouched.
@@ -89397,6 +89462,7 @@ screens:
         impliedBy: listWorkOrders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWorkOrders
       - kind: detailPanel
         derived: true
         impliedBy: getWorkOrder
@@ -89629,6 +89695,7 @@ screens:
         derived: true
         impliedBy: startWorkOrder
         notes: The act the screen exists for.
+        operation: startWorkOrder
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -89922,6 +89989,7 @@ screens:
         derived: true
         impliedBy: getAssetHistory
         notes: One record, read-only.
+        operation: getAssetHistory
   states:
     loading: The asset maintenance history list.
     error: Could not load. Names which read failed and leaves the asset maintenance history untouched.
@@ -90127,6 +90195,7 @@ screens:
         derived: true
         impliedBy: getAssetHistory
         notes: One record, read-only.
+        operation: getAssetHistory
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -90242,6 +90311,7 @@ screens:
           simply saying”, “Every 30 Days”, “Every 50 Rentals”, “Every 100 Rental Hours”, “Whichever Happens
           First”.'
         provenance: pack Rental_Management.pdf, page 118 §Display
+        operation: getDueMaintenance
   states:
     loading: The maintenance intelligence predictive list.
     error: Could not load. Names which read failed and leaves the maintenance intelligence predictive
@@ -91216,6 +91286,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Audit Table”, “Export”,
           “Rental Operator”, “Maintenance”, “Finance”, “Manager”.'
         provenance: pack Rental_Management.pdf, page 131 §Track
+        operation: getResourceAuditTrail
   states:
     loading: The audit governance operational list.
     error: Could not load. Names which read failed and leaves the audit governance operational untouched.
@@ -91394,6 +91465,7 @@ screens:
         impliedBy: listTenants
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listTenants
   states:
     loading: The environment ready handoff configuration as saved.
     error: Could not load. Names which read failed and leaves the environment ready handoff untouched.
@@ -91617,6 +91689,7 @@ screens:
         - Manual configuration available
         notes: null
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 85 §Each Task Shows
+        operation: getGoLiveReadiness
   states:
     loading: The guided plan list.
     error: Could not load. Names which read failed and leaves the guided plan untouched.
@@ -92349,6 +92422,7 @@ screens:
         derived: true
         impliedBy: runGoLiveValidation
         notes: The act the screen exists for.
+        operation: runGoLiveValidation
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -93601,6 +93675,7 @@ screens:
         impliedBy: listAccreditationApplications
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationApplications
       - kind: dataTable
         label: Active credentials
         bindsTo: AccreditationCredential
@@ -93719,7 +93794,7 @@ screens:
         - Credential status
         - Expiry date
         bindsTo: null
-        operation: null
+        operation: listAccreditationApplications
         provenance: pack ACCREDITATION.pdf, page 4 §Each application record shall display
     - name: contextPanel
       slot: selection
@@ -94050,6 +94125,7 @@ screens:
         impliedBy: listAccreditationProgrammes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationProgrammes
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -94440,7 +94516,7 @@ screens:
         - Applications requiring review
         - SLA ageing
         bindsTo: null
-        operation: null
+        operation: listAccreditationApplications
         provenance: pack ACCREDITATION.pdf, page 8 §The screen shall show
       - kind: dataTable
         label: Duplicate candidates
@@ -94723,7 +94799,7 @@ screens:
         - Accreditation status
         - Credential status
         bindsTo: null
-        operation: null
+        operation: listAccreditationHolders
         provenance: pack ACCREDITATION.pdf, page 10 §Each holder record shall display
     - name: contextPanel
       slot: selection
@@ -94841,6 +94917,7 @@ screens:
         derived: true
         impliedBy: getAccreditationHolder
         notes: One record, read-only.
+        operation: getAccreditationHolder
   states:
     loading: The accreditation holder profile list.
     error: Could not load. Names which read failed and leaves the accreditation holder profile untouched.
@@ -95308,6 +95385,7 @@ screens:
         impliedBy: listAccreditationIdentityConflicts
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationIdentityConflicts
     - name: actionBar
       slot: rowActions
       components:
@@ -95514,6 +95592,7 @@ screens:
         derived: true
         impliedBy: getAccreditationHolder
         notes: One record, read-only.
+        operation: getAccreditationHolder
   states:
     loading: The profile completeness compliance list.
     error: Could not load. Names which read failed and leaves the profile completeness compliance untouched.
@@ -95739,7 +95818,7 @@ screens:
         - SLA ageing
         - Risk / exception indicator
         bindsTo: null
-        operation: null
+        operation: listAccreditationApplications
         provenance: pack ACCREDITATION.pdf, page 20 §Each record shall show
     - name: contextPanel
       slot: selection
@@ -96916,6 +96995,7 @@ screens:
         impliedBy: listAccreditationCredentials
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationCredentials
   states:
     loading: The credential generation list.
     error: Could not load. Names which read failed and leaves the credential generation untouched.
@@ -98781,6 +98861,7 @@ screens:
         impliedBy: listAccreditationHolders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationHolders
   states:
     loading: The accreditation lifecycle list.
     error: Could not load. Names which read failed and leaves the accreditation lifecycle untouched.
@@ -99584,10 +99665,12 @@ screens:
         impliedBy: listAccreditationHolders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationHolders
       - kind: primaryButton
         derived: true
         impliedBy: renewAccreditation
         notes: The act the screen exists for.
+        operation: renewAccreditation
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -99695,10 +99778,12 @@ screens:
         impliedBy: listAccreditationHolders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationHolders
       - kind: primaryButton
         derived: true
         impliedBy: renewAccreditation
         notes: The act the screen exists for.
+        operation: renewAccreditation
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -100603,6 +100688,7 @@ screens:
         impliedBy: listAccreditationAudit
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationAudit
   states:
     loading: The delivery batch operational list.
     error: Could not load. Names which read failed and leaves the delivery batch operational untouched.
@@ -100715,7 +100801,7 @@ screens:
         - Organization
         - Date range
         bindsTo: null
-        operation: null
+        operation: listAccreditationHolders
         provenance: pack ACCREDITATION.pdf, page 65 §Dashboard filters shall include
     - name: contextPanel
       slot: selection
@@ -100734,6 +100820,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Scope of Work”, “Visualizations
           should include”, “Key requirements”.'
         provenance: pack ACCREDITATION.pdf, page 65 §Dashboard filters shall include
+        operation: getKpiValues
   states:
     loading: The accreditation executive list.
     error: Could not load. Names which read failed and leaves the accreditation executive untouched.
@@ -100822,6 +100909,7 @@ screens:
         impliedBy: listAccreditationHolders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationHolders
   states:
     loading: The accreditation status portfolio list.
     error: Could not load. Names which read failed and leaves the accreditation status portfolio untouched.
@@ -100907,7 +100995,7 @@ screens:
         - Utilization by venue
         - Utilization by event
         bindsTo: null
-        operation: null
+        operation: listAccreditationAccessActivity
         provenance: pack ACCREDITATION.pdf, page 67 §Metrics shall include
     - name: contextPanel
       slot: selection
@@ -101013,6 +101101,7 @@ screens:
         impliedBy: listAccreditationAccessActivity
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationAccessActivity
   states:
     loading: The accreditation access activity list.
     error: Could not load. Names which read failed and leaves the accreditation access activity untouched.
@@ -101227,6 +101316,7 @@ screens:
         impliedBy: listAccreditationAudit
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationAudit
   states:
     loading: The accreditation audit reporting list.
     error: Could not load. Names which read failed and leaves the accreditation audit reporting untouched.
@@ -101403,6 +101493,7 @@ screens:
         impliedBy: listApiClients
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApiClients
   states:
     loading: The accreditation api list.
     error: Could not load. Names which read failed and leaves the accreditation api untouched.
@@ -101585,6 +101676,7 @@ screens:
         impliedBy: listAccreditationAudit
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAccreditationAudit
   states:
     loading: The integration data exchange list.
     error: Could not load. Names which read failed and leaves the integration data exchange untouched.
@@ -101676,6 +101768,7 @@ screens:
         impliedBy: listEvents
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listEvents
   states:
     loading: The event catalogue list.
     error: Could not load. Names which read failed and leaves the event catalogue untouched.
@@ -102336,6 +102429,7 @@ screens:
         impliedBy: listSpaces
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSpaces
   states:
     loading: The venue space list.
     error: Could not load. Names which read failed and leaves the venue space untouched.
@@ -103159,7 +103253,7 @@ screens:
         - AI Proposal
         - Existing / Approved Configuration
         bindsTo: null
-        operation: null
+        operation: listAccessProfiles
         provenance: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display
     - name: contextPanel
       slot: selection
@@ -103395,6 +103489,7 @@ screens:
         derived: true
         impliedBy: getEventResourcePlan
         notes: One record, read-only.
+        operation: getEventResourcePlan
   states:
     loading: The event resource list.
     error: Could not load. Names which read failed and leaves the event resource untouched.
@@ -103826,6 +103921,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Administrators can”, “Critical
           Governance Principle”.'
         provenance: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display
+        operation: getStaffingCoverage
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -104617,6 +104713,7 @@ screens:
         impliedBy: listPerformanceTemplates
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listPerformanceTemplates
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -104715,6 +104812,7 @@ screens:
         impliedBy: listCreditTypes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCreditTypes
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -105012,6 +105110,7 @@ screens:
         impliedBy: listPerformanceTemplates
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listPerformanceTemplates
       - kind: dataTable
         label: Performances
         operation: listPerformances
@@ -105458,6 +105557,7 @@ screens:
         impliedBy: listOutletTemplates
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOutletTemplates
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -105648,7 +105748,7 @@ screens:
         columns:
         - Terminal Outlet Type Cashier Payment Printer Status
         bindsTo: null
-        operation: null
+        operation: listOutlets
         provenance: pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 8 §Device cards/table
       - kind: dataTable
         label: Devices
@@ -105962,11 +106062,13 @@ screens:
         impliedBy: searchGuests
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
+        operation: searchGuests
       - kind: dataTable
         derived: true
         impliedBy: listSegments
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSegments
   states:
     loading: The crm list.
     error: Could not load. Names which read failed and leaves the crm untouched.
@@ -106059,10 +106161,12 @@ screens:
         impliedBy: searchGuests
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
+        operation: searchGuests
       - kind: detailPanel
         derived: true
         impliedBy: getGuestProfile
         notes: One record, read-only.
+        operation: getGuestProfile
       - kind: detailPanel
         label: The loyalty position
         bindsTo: LoyaltyPosition
@@ -106378,6 +106482,7 @@ screens:
         impliedBy: listCustomerServiceProfile
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCustomerServiceProfile
       - kind: detailPanel
         label: Profile
         bindsTo: GuestProfileDetail
@@ -106525,6 +106630,7 @@ screens:
         derived: true
         impliedBy: getGuestProfile
         notes: One record, read-only.
+        operation: getGuestProfile
       - kind: dataTable
         label: Activity timeline
         bindsTo: GuestTimelineEvent
@@ -106629,11 +106735,13 @@ screens:
         derived: true
         impliedBy: getGuestTimeline
         notes: One record, read-only.
+        operation: getGuestTimeline
       - kind: dataTable
         derived: true
         impliedBy: listGuestIdentityVerifications
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listGuestIdentityVerifications
       - kind: primaryButton
         derived: true
         impliedBy: decideGuestIdentityVerification
@@ -106753,6 +106861,7 @@ screens:
         derived: true
         impliedBy: getGuestProfile
         notes: One record, read-only.
+        operation: getGuestProfile
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -106889,6 +106998,7 @@ screens:
         derived: true
         impliedBy: getGuestRelationships
         notes: One record, read-only.
+        operation: getGuestRelationships
       - kind: primaryButton
         derived: true
         impliedBy: setGuestRelationships
@@ -107235,6 +107345,7 @@ screens:
         impliedBy: listPrivacyCompliance
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listPrivacyCompliance
   states:
     loading: The data governance list.
     error: Could not load. Names which read failed and leaves the data governance untouched.
@@ -107468,6 +107579,7 @@ screens:
           a venue''s busiest hour is a list that skips rows. **Only unverified matches arrive here** (decided
           28 September, audit R120 (b)): a verified contact match attaches the order to the guest automatically
           at checkout, so this queue holds the matches no guest has proved.'
+        operation: listDuplicateCandidates
       - kind: primaryButton
         derived: true
         impliedBy: decideDuplicateCandidate
@@ -107583,6 +107695,7 @@ screens:
         impliedBy: listConsentPurposes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listConsentPurposes
       - kind: primaryButton
         derived: true
         impliedBy: setConsentPurposes
@@ -107859,6 +107972,7 @@ screens:
         derived: true
         impliedBy: getGuestConsents
         notes: One record, read-only.
+        operation: getGuestConsents
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -107959,6 +108073,7 @@ screens:
         impliedBy: listDataSubjectCustomer
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listDataSubjectCustomer
       - kind: primaryButton
         derived: true
         impliedBy: setDataDiscoveryAccess
@@ -108091,6 +108206,7 @@ screens:
         impliedBy: listDataRetentionSettings
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listDataRetentionSettings
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -108203,6 +108319,7 @@ screens:
         impliedBy: listPrivacy
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listPrivacy
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -108298,6 +108415,7 @@ screens:
         impliedBy: listPrivacyEvidenceCompliance
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listPrivacyEvidenceCompliance
   states:
     loading: The compliance audit list.
     error: Could not load. Names which read failed and leaves the compliance audit untouched.
@@ -108427,6 +108545,7 @@ screens:
         impliedBy: listSegments
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSegments
   states:
     loading: The audience intelligence list.
     error: Could not load. Names which read failed and leaves the audience intelligence untouched.
@@ -108733,6 +108852,7 @@ screens:
         impliedBy: listAudienceLists
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAudienceLists
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -109255,6 +109375,7 @@ screens:
         impliedBy: listAudienceDiscoveryTargeting
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAudienceDiscoveryTargeting
       - kind: primaryButton
         derived: true
         impliedBy: proposeLookalikeSegment
@@ -109472,6 +109593,7 @@ screens:
         impliedBy: listAudienceActivations
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAudienceActivations
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -109622,6 +109744,7 @@ screens:
         impliedBy: listCampaigns
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCampaigns
   states:
     loading: The campaign list.
     error: Could not load. Names which read failed and leaves the campaign untouched.
@@ -110213,6 +110336,7 @@ screens:
         impliedBy: listMessageTemplates
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listMessageTemplates
       - kind: primaryButton
         derived: true
         impliedBy: updateCampaign
@@ -110408,6 +110532,7 @@ screens:
         derived: true
         impliedBy: getCampaign
         notes: One record, read-only.
+        operation: getCampaign
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -110778,6 +110903,7 @@ screens:
         derived: true
         impliedBy: getCampaignPerformance
         notes: One record, read-only.
+        operation: getCampaignPerformance
   states:
     loading: The attribution audit list.
     error: Could not load. Names which read failed and leaves the attribution audit untouched.
@@ -110906,6 +111032,7 @@ screens:
         impliedBy: listJourneys
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listJourneys
       - kind: detailPanel
         label: Journey performance
         bindsTo: JourneyPerformance
@@ -111115,6 +111242,7 @@ screens:
         impliedBy: listMessageTriggers
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listMessageTriggers
       - kind: primaryButton
         derived: true
         impliedBy: setMessageTrigger
@@ -111315,6 +111443,7 @@ screens:
         impliedBy: listAbandonedCarts
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAbandonedCarts
   states:
     loading: The abandoned cart recovery list.
     error: Could not load. Names which read failed and leaves the abandoned cart recovery untouched.
@@ -111573,6 +111702,7 @@ screens:
         derived: true
         impliedBy: getJourneyPerformance
         notes: One record, read-only.
+        operation: getJourneyPerformance
   states:
     loading: The cross-sell service recovery list.
     error: Could not load. Names which read failed and leaves the cross-sell service recovery untouched.
@@ -111661,6 +111791,7 @@ screens:
         impliedBy: listJourneys
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listJourneys
       - kind: primaryButton
         derived: true
         impliedBy: decideAiInsight
@@ -111777,6 +111908,7 @@ screens:
         impliedBy: listJourneys
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listJourneys
       - kind: detailPanel
         label: Journey analytics
         bindsTo: JourneyPerformance
@@ -111912,6 +112044,7 @@ screens:
         impliedBy: listCommunicationService
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCommunicationService
   states:
     loading: The communications list.
     error: Could not load. Names which read failed and leaves the communications untouched.
@@ -112502,6 +112635,7 @@ screens:
         impliedBy: listSystemTransactionalTemplate
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSystemTransactionalTemplate
       - kind: primaryButton
         derived: true
         impliedBy: setMessageTrigger
@@ -112605,6 +112739,7 @@ screens:
         impliedBy: listRoutingPriorityThrottling
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRoutingPriorityThrottling
   states:
     loading: The scheduling priority approval list.
     error: Could not load. Names which read failed and leaves the scheduling priority approval untouched.
@@ -112687,10 +112822,12 @@ screens:
         impliedBy: listDeliveryQueueFailure
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listDeliveryQueueFailure
       - kind: primaryButton
         derived: true
         impliedBy: retryMessageDispatch
         notes: The act the screen exists for.
+        operation: retryMessageDispatch
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -112791,6 +112928,7 @@ screens:
         impliedBy: listProviderHealthUsage
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listProviderHealthUsage
   states:
     loading: The deliverability analytics list.
     error: Could not load. Names which read failed and leaves the deliverability analytics untouched.
@@ -113030,6 +113168,7 @@ screens:
         impliedBy: listConversations
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listConversations
   states:
     loading: The omnichannel list.
     error: Could not load. Names which read failed and leaves the omnichannel untouched.
@@ -113112,11 +113251,13 @@ screens:
         impliedBy: listConversations
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listConversations
       - kind: primaryButton
         derived: true
         impliedBy: claimConversation
         label: Claim conversation
         notes: The act the screen exists for.
+        operation: claimConversation
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -113213,6 +113354,7 @@ screens:
         derived: true
         impliedBy: getConversation
         notes: One record, read-only.
+        operation: getConversation
   states:
     loading: The guest conversation 360 list.
     error: Could not load. Names which read failed and leaves the guest conversation 360 untouched.
@@ -113821,11 +113963,13 @@ screens:
         impliedBy: setIntelligentRoutingSkill
         label: Save
         notes: The act the screen exists for.
+        operation: setIntelligentRoutingSkill
       - kind: dataTable
         derived: true
         impliedBy: listAgentWorkloadAvailability
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAgentWorkloadAvailability
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -114095,6 +114239,7 @@ screens:
         impliedBy: listQualityAgentEvaluation
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listQualityAgentEvaluation
       - kind: primaryButton
         derived: true
         impliedBy: escalateCase
@@ -114198,6 +114343,7 @@ screens:
         impliedBy: listUnifiedInteractionCommunication
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listUnifiedInteractionCommunication
   states:
     loading: The chat analytics audit list.
     error: Could not load. Names which read failed and leaves the chat analytics audit untouched.
@@ -114326,6 +114472,7 @@ screens:
         impliedBy: listCases
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCases
   states:
     loading: The case list.
     error: Could not load. Names which read failed and leaves the case untouched.
@@ -114407,6 +114554,7 @@ screens:
         impliedBy: listCases
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCases
       - kind: textField
         label: Parent category id
         operation: listCaseCategories
@@ -114547,6 +114695,7 @@ screens:
         impliedBy: createCase
         label: Create case
         notes: The act the screen exists for.
+        operation: createCase
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -114810,6 +114959,7 @@ screens:
         impliedBy: listAgentWorkloadAvailability
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAgentWorkloadAvailability
       - kind: toggle
         label: Is active
         operation: listServiceQueues
@@ -114946,6 +115096,7 @@ screens:
         impliedBy: listSlaPolicyService
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSlaPolicyService
       - kind: primaryButton
         derived: true
         impliedBy: setSlaPolicy
@@ -115046,6 +115197,7 @@ screens:
         impliedBy: listEscalationCriticalCase
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listEscalationCriticalCase
   states:
     loading: The escalation rules list.
     error: Could not load. Names which read failed and leaves the escalation rules untouched.
@@ -115127,6 +115279,7 @@ screens:
         derived: true
         impliedBy: getCase
         notes: One record, read-only.
+        operation: getCase
       - kind: primaryButton
         derived: true
         impliedBy: addCaseMessage
@@ -115320,6 +115473,7 @@ screens:
         impliedBy: listCases
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCases
   states:
     loading: The case analytics audit list.
     error: Could not load. Names which read failed and leaves the case analytics audit untouched.
@@ -115437,6 +115591,7 @@ screens:
         impliedBy: listCustomerSatisfactionFeedback
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCustomerSatisfactionFeedback
   states:
     loading: The voice customer list.
     error: Could not load. Names which read failed and leaves the voice customer untouched.
@@ -115776,6 +115931,7 @@ screens:
         impliedBy: listCustomerSatisfactionFeedback
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCustomerSatisfactionFeedback
   states:
     loading: The survey responses insights list.
     error: Could not load. Names which read failed and leaves the survey responses insights untouched.
@@ -115858,6 +116014,7 @@ screens:
         impliedBy: listReviews
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listReviews
   states:
     loading: The review collection rating list.
     error: Could not load. Names which read failed and leaves the review collection rating untouched.
@@ -116033,6 +116190,7 @@ screens:
         impliedBy: listCustomerSatisfactionFeedback
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCustomerSatisfactionFeedback
   states:
     loading: The sentiment topic analysis list.
     error: Could not load. Names which read failed and leaves the sentiment topic analysis untouched.
@@ -116198,6 +116356,7 @@ screens:
         impliedBy: listServiceRootCause
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listServiceRootCause
   states:
     loading: The voc analytics audit list.
     error: Could not load. Names which read failed and leaves the voc analytics audit untouched.
@@ -117602,6 +117761,7 @@ screens:
         derived: true
         impliedBy: getGuestIntelligence
         notes: One record, read-only.
+        operation: getGuestIntelligence
   states:
     loading: The engagement optimization list.
     error: Could not load. Names which read failed and leaves the engagement optimization untouched.
@@ -117701,10 +117861,12 @@ screens:
         impliedBy: listLoyaltyProgrammes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listLoyaltyProgrammes
       - kind: detailPanel
         derived: true
         impliedBy: getDashboard
         notes: One record, read-only.
+        operation: getDashboard
   states:
     loading: The gamification analytics audit list.
     error: Could not load. Names which read failed and leaves the gamification analytics audit untouched.
@@ -118221,6 +118383,7 @@ screens:
         impliedBy: listContentPages
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listContentPages
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -118785,6 +118948,7 @@ screens:
         notes: '**Goes live on the tenant’s own domains**, for every guest, at once. The previous version
           stays restorable.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishTenantConfig
   states:
     loading: The publishing analytics audit list.
     error: Could not load. Names which read failed and leaves the publishing analytics audit untouched.
@@ -118908,6 +119072,7 @@ screens:
         impliedBy: listWaiver
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWaiver
   states:
     loading: The waiver list.
     error: Could not load. Names which read failed and leaves the waiver untouched.
@@ -119112,6 +119277,7 @@ screens:
         impliedBy: listWaiverTemplateMaster
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWaiverTemplateMaster
       - kind: dataTable
         label: Assignment rules
         operation: listWaiverTriggerEligibility
@@ -119500,6 +119666,7 @@ screens:
         impliedBy: listMinorGuardianGroup
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listMinorGuardianGroup
       - kind: dataTable
         label: Participants to chase
         operation: listParticipantWaiverStatus
@@ -119592,6 +119759,7 @@ screens:
         impliedBy: listParticipantWaiverStatus
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listParticipantWaiverStatus
   states:
     loading: The verification access list.
     error: Could not load. Names which read failed and leaves the verification access untouched.
@@ -119678,6 +119846,7 @@ screens:
         derived: true
         impliedBy: getWaiverStatus
         notes: One record, read-only.
+        operation: getWaiverStatus
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -119788,6 +119957,7 @@ screens:
         impliedBy: listComplianceEvidenceWaiver
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listComplianceEvidenceWaiver
   states:
     loading: The legal evidence audit list.
     error: Could not load. Names which read failed and leaves the legal evidence audit untouched.
@@ -120690,6 +120860,7 @@ screens:
         derived: true
         impliedBy: getResourceHierarchy
         notes: One record, read-only.
+        operation: getResourceHierarchy
       - kind: primaryButton
         derived: true
         impliedBy: setResourceHierarchy
@@ -120803,6 +120974,7 @@ screens:
         - Unavailable dependent resources
         notes: 'The pack groups this record''s detail under its own headings: “Private Ski Lesson”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 13 §The system shall display
+        operation: getResourceDependencies
   states:
     loading: The resource dependency rules list.
     error: Could not load. Names which read failed and leaves the resource dependency rules untouched.
@@ -121137,6 +121309,7 @@ screens:
         derived: true
         impliedBy: getResource
         notes: One record, read-only.
+        operation: getResource
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -122424,6 +122597,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Event A”, “Event B”, “Events
           may be assigned”, “Resource allocation can consider”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 29 §The screen shall display
+        operation: getResourceCalendar
   states:
     loading: The multi-event resource planning list.
     error: Could not load. Names which read failed and leaves the multi-event resource planning untouched.
@@ -123834,6 +124008,7 @@ screens:
           System Master”, “For example”, “Board 3 Shared Governance”, “Board 3 End-to-End Outcome”, “The
           platform understands”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 45 §Display
+        operation: getFieldOwnership
     - name: actionBar
       slot: rowActions
       components:
@@ -124035,6 +124210,7 @@ screens:
         impliedBy: listRotaAssignments
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRotaAssignments
   states:
     loading: The workforce roster list.
     error: Could not load. Names which read failed and leaves the workforce roster untouched.
@@ -124525,6 +124701,7 @@ screens:
         impliedBy: listOpenShifts
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOpenShifts
       - kind: dataTable
         label: Swap requests
         bindsTo: ShiftSwap
@@ -124619,7 +124796,7 @@ screens:
         - Attendance exceptions
         - Planned vs Actual
         bindsTo: null
-        operation: null
+        operation: listAttendance
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 55 §Display
     - name: contextPanel
       slot: selection
@@ -125036,6 +125213,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Cost Calculation”, “Managers
           shall understand”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 59 §Display
+        operation: getLabourCost
     - name: actionBar
       slot: rowActions
       components:
@@ -125877,6 +126055,7 @@ screens:
         impliedBy: setResourceSelectionPolicy
         label: Save
         notes: The act the screen exists for.
+        operation: setResourceSelectionPolicy
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -126091,6 +126270,7 @@ screens:
         derived: true
         impliedBy: allocateResources
         notes: The act the screen exists for.
+        operation: allocateResources
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -127855,6 +128035,7 @@ screens:
           “Projector P-17”, “Retirement may require”, “Stroller S-084”, “Typical operational states include”,
           “Board 6 shall integrate with”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 93 §Track
+        operation: getAssetHistory
     - name: actionBar
       slot: rowActions
       components:
@@ -128101,6 +128282,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Corporate Gala”, “Concert
           A”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 99 §Display
+        operation: getEventResourcePlan
   states:
     loading: The event resource planning list.
     error: Could not load. Names which read failed and leaves the event resource planning untouched.
@@ -128325,7 +128507,7 @@ screens:
         - Associated resources
         - Operational restrictions
         bindsTo: null
-        operation: null
+        operation: listSpaces
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 102 §Display
     - name: contextPanel
       slot: selection
@@ -129016,6 +129198,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Budget Variance”, “Estimated
           saving”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 108 §Display
+        operation: getEventResourcePlan
     - name: actionBar
       slot: rowActions
       components:
@@ -129272,6 +129455,7 @@ screens:
         derived: true
         impliedBy: getEventResourcePlan
         notes: One record, read-only.
+        operation: getEventResourcePlan
       - kind: primaryButton
         derived: true
         impliedBy: createApprovalRequest
@@ -129412,7 +129596,7 @@ screens:
         - Estimated optimization opportunity
         - Time Horizons
         bindsTo: null
-        operation: null
+        operation: listResources
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 117 §Display
     - name: contextPanel
       slot: selection
@@ -129599,6 +129783,7 @@ screens:
         impliedBy: listOperationalRequirements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOperationalRequirements
       - kind: primaryButton
         derived: true
         impliedBy: requestSuggestion
@@ -129686,7 +129871,7 @@ screens:
         - Forecast
         - Actual
         bindsTo: null
-        operation: null
+        operation: listOperationalRequirements
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 121 §Display
     - name: contextPanel
       slot: selection
@@ -129701,6 +129886,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Expected Visitors”, “Expected
           Lesson Participants”, “Available”, “Confidence”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 121 §Display
+        operation: getForecast
   states:
     loading: The resource demand forecasting list.
     error: Could not load. Names which read failed and leaves the resource demand forecasting untouched.
@@ -130114,6 +130300,7 @@ screens:
         impliedBy: listProposedActions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listProposedActions
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -130387,6 +130574,7 @@ screens:
         impliedBy: listAiConversations
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAiConversations
       - kind: primaryButton
         derived: true
         impliedBy: createAiConversation
@@ -130541,7 +130729,7 @@ screens:
         - Smart Operational Card
         - “What am I supposed to do now?”
         bindsTo: null
-        operation: null
+        operation: listResourceBookings
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 136 §The screen shall display
     - name: contextPanel
       slot: selection
@@ -130774,7 +130962,7 @@ screens:
         - Priority
         - Operational Information
         bindsTo: null
-        operation: null
+        operation: listResourceBookings
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 138 §Display
     - name: contextPanel
       slot: selection
@@ -130795,6 +130983,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Depending on assignment
           type”, “Where appropriate, provide”, “Equipment Required”, “Customer Information”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 138 §Display
+        operation: getResource
     - name: actionBar
       slot: rowActions
       components:
@@ -131272,6 +131461,7 @@ screens:
         impliedBy: listShiftSwapRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listShiftSwapRequests
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -131373,6 +131563,7 @@ screens:
         impliedBy: listApprovalRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApprovalRequests
       - kind: primaryButton
         derived: true
         impliedBy: decideApprovalRequest
@@ -131708,7 +131899,7 @@ screens:
         - AI recommendations implemented
         - Resource Breakdown
         bindsTo: null
-        operation: null
+        operation: listResources
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 153 §Display
     - name: contextPanel
       slot: selection
@@ -131734,6 +131925,7 @@ screens:
         - Resource Breakdown
         notes: null
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 153 §Display
+        operation: getResourceUtilisation
     - name: actionBar
       slot: rowActions
       components:
@@ -132327,6 +132519,7 @@ screens:
         - Owner
         notes: 'The pack groups this record''s detail under its own headings: “Target”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 158 §KPI Library
+        operation: getResourceUtilisation
   states:
     loading: The resource kpi sla list.
     error: Could not load. Names which read failed and leaves the resource kpi sla untouched.
@@ -132506,7 +132699,7 @@ screens:
         - AI recommendation
         - Required approver
         bindsTo: null
-        operation: null
+        operation: listMemberExceptionOverride
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 160 §Each request shall
           show
     - name: contextPanel
@@ -132747,7 +132940,7 @@ screens:
         - Errors
         - Latency
         bindsTo: null
-        operation: null
+        operation: listAnalyticsPipelines
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 163 §Display
     - name: contextPanel
       slot: selection
@@ -132918,6 +133111,7 @@ screens:
           Cost”.'
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 165 §Each recommendation
           shall show
+        operation: getResourceUtilisation
   states:
     loading: The executive resource intelligence list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the executive resource intelligence untouched.
@@ -133037,6 +133231,7 @@ screens:
         impliedBy: listSeatMaps
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatMaps
   states:
     loading: The seat map list.
     error: Could not load. Names which read failed and leaves the seat map untouched.
@@ -133124,6 +133319,7 @@ screens:
         derived: true
         impliedBy: getSeatMap
         notes: One record, read-only.
+        operation: getSeatMap
       - kind: primaryButton
         derived: true
         impliedBy: createSeatMap
@@ -133272,11 +133468,13 @@ screens:
         derived: true
         impliedBy: getSeatMap
         notes: One record, read-only.
+        operation: getSeatMap
       - kind: primaryButton
         derived: true
         impliedBy: setMapZones
         label: Save map zones
         notes: The act the screen exists for.
+        operation: setMapZones
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -133410,6 +133608,7 @@ screens:
         impliedBy: listSeats
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeats
       - kind: primaryButton
         derived: true
         impliedBy: updateSeats
@@ -134074,6 +134273,7 @@ screens:
         impliedBy: listSeatMapTemplates
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatMapTemplates
       - kind: primaryButton
         derived: true
         impliedBy: createSeatMapTemplate
@@ -134089,6 +134289,7 @@ screens:
         notes: '**Replaces the map every channel sells from.** Seats already sold keep their labels; seats
           that no longer exist in the new map are listed before this proceeds.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishSeatMap
   states:
     loading: The templates validation publish list.
     error: Could not load. Names which read failed and leaves the templates validation publish untouched.
@@ -134256,6 +134457,7 @@ screens:
         derived: true
         impliedBy: getSeatMapImport
         notes: One record, read-only.
+        operation: getSeatMapImport
   states:
     loading: The import list.
     error: Could not load. Names which read failed and leaves the import untouched.
@@ -134357,6 +134559,7 @@ screens:
         derived: true
         impliedBy: getImportJob
         notes: One record, read-only.
+        operation: getImportJob
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -134464,6 +134667,7 @@ screens:
         derived: true
         impliedBy: getImportJob
         notes: One record, read-only.
+        operation: getImportJob
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -134570,6 +134774,7 @@ screens:
         derived: true
         impliedBy: getImportJob
         notes: One record, read-only.
+        operation: getImportJob
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -134671,10 +134876,12 @@ screens:
         derived: true
         impliedBy: getSeatMapImport
         notes: One record, read-only.
+        operation: getSeatMapImport
       - kind: primaryButton
         derived: true
         impliedBy: validateSeatMap
         notes: The act the screen exists for.
+        operation: validateSeatMap
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -134776,6 +134983,7 @@ screens:
         derived: true
         impliedBy: getSeatMapImport
         notes: One record, read-only.
+        operation: getSeatMapImport
       - kind: primaryButton
         derived: true
         impliedBy: updateSeats
@@ -134883,6 +135091,7 @@ screens:
         derived: true
         impliedBy: getSeatMapImport
         notes: One record, read-only.
+        operation: getSeatMapImport
       - kind: primaryButton
         derived: true
         impliedBy: setMapZones
@@ -134998,6 +135207,7 @@ screens:
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
+        operation: getActionPlan
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -135113,10 +135323,12 @@ screens:
         derived: true
         impliedBy: validateSeatMap
         notes: The act the screen exists for.
+        operation: validateSeatMap
       - kind: detailPanel
         derived: true
         impliedBy: getSeatMapImport
         notes: One record, read-only.
+        operation: getSeatMapImport
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -135225,6 +135437,7 @@ screens:
         derived: true
         impliedBy: commitImportJob
         notes: The act the screen exists for.
+        operation: commitImportJob
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -135235,6 +135448,7 @@ screens:
         notes: '**Replaces the map every channel sells from.** Seats already sold keep their labels; seats
           that no longer exist in the new map are listed before this proceeds.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishSeatMap
       - kind: detailPanel
         label: Import progress and findings
         bindsTo: ImportJob
@@ -135389,6 +135603,7 @@ screens:
         impliedBy: listSeatMaps
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatMaps
   states:
     loading: The layout list.
     error: Could not load. Names which read failed and leaves the layout untouched.
@@ -135472,6 +135687,7 @@ screens:
         impliedBy: listSeatMapTemplates
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatMapTemplates
       - kind: primaryButton
         derived: true
         impliedBy: createSeatMapTemplate
@@ -135569,11 +135785,13 @@ screens:
         derived: true
         impliedBy: getSeatMap
         notes: One record, read-only.
+        operation: getSeatMap
       - kind: primaryButton
         derived: true
         impliedBy: publishSeatMap
         label: Publish seat map
         notes: The act the screen exists for.
+        operation: publishSeatMap
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -135965,6 +136183,7 @@ screens:
         impliedBy: listSeatMaps
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatMaps
       - kind: publishGate
         label: What publishing changes
         notes: '**Replaces the map every channel sells from.** Seats already sold keep their labels; seats
@@ -136095,6 +136314,7 @@ screens:
         impliedBy: listSeatHoldPools
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatHoldPools
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -136197,6 +136417,7 @@ screens:
         impliedBy: listSeatHoldTypes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatHoldTypes
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -136419,6 +136640,7 @@ screens:
         derived: true
         impliedBy: validateSeatMap
         notes: The act the screen exists for.
+        operation: validateSeatMap
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -136429,6 +136651,7 @@ screens:
         notes: '**Replaces the map every channel sells from.** Seats already sold keep their labels; seats
           that no longer exist in the new map are listed before this proceeds.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishSeatMap
       - kind: detailPanel
         label: Read a seat map with its structure
         bindsTo: SeatMap
@@ -136874,6 +137097,7 @@ screens:
         impliedBy: listSeatCategories
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatCategories
       - kind: primaryButton
         derived: true
         impliedBy: createSeatCategory
@@ -136971,6 +137195,7 @@ screens:
         derived: true
         impliedBy: getSeatAvailability
         notes: One record, read-only.
+        operation: getSeatAvailability
   states:
     loading: The availability tracker list.
     error: Could not load. Names which read failed and leaves the availability tracker untouched.
@@ -137058,10 +137283,12 @@ screens:
         impliedBy: listSeatBlocks
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatBlocks
       - kind: detailPanel
         derived: true
         impliedBy: getSeatHold
         notes: One record, read-only.
+        operation: getSeatHold
   states:
     loading: The hold tracker list.
     error: Could not load. Names which read failed and leaves the hold tracker untouched.
@@ -137314,6 +137541,7 @@ screens:
         impliedBy: listSeatHoldPools
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatHoldPools
   states:
     loading: The sales allocation tracker list.
     error: Could not load. Names which read failed and leaves the sales allocation tracker untouched.
@@ -137512,6 +137740,7 @@ screens:
         impliedBy: listSeats
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeats
   states:
     loading: The seat history list.
     error: Could not load. Names which read failed and leaves the seat history untouched.
@@ -137786,6 +138015,7 @@ screens:
         derived: true
         impliedBy: getSeatingRules
         notes: One record, read-only.
+        operation: getSeatingRules
       - kind: primaryButton
         derived: true
         impliedBy: setSeatingRules
@@ -137890,6 +138120,7 @@ screens:
         derived: true
         impliedBy: getSeatAvailability
         notes: One record, read-only.
+        operation: getSeatAvailability
       - kind: primaryButton
         derived: true
         impliedBy: createSeatHold
@@ -138101,6 +138332,7 @@ screens:
         derived: true
         impliedBy: getSeatAvailability
         notes: One record, read-only.
+        operation: getSeatAvailability
   states:
     loading: The filters interactive legend list.
     error: Could not load. Names which read failed and leaves the filters interactive legend untouched.
@@ -138377,12 +138609,14 @@ screens:
         derived: true
         impliedBy: getSeatHold
         notes: One record, read-only.
+        operation: getSeatHold
       - kind: destructiveButton
         derived: true
         impliedBy: relinquishSeatHold
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — which
           seat hold is affected and what goes with it, in the screen''s own words; *are you sure* is not
           a confirmation.'
+        operation: relinquishSeatHold
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -138486,6 +138720,7 @@ screens:
         derived: true
         impliedBy: getSeatAvailability
         notes: One record, read-only.
+        operation: getSeatAvailability
   states:
     loading: The mobile accessible selection list.
     error: Could not load. Names which read failed and leaves the mobile accessible selection untouched.
@@ -138834,6 +139069,7 @@ screens:
         impliedBy: listSeatHoldPools
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatHoldPools
   states:
     loading: The hold list.
     error: Could not load. Names which read failed and leaves the hold untouched.
@@ -138917,6 +139153,7 @@ screens:
         impliedBy: listSeatHoldTypes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatHoldTypes
       - kind: primaryButton
         derived: true
         impliedBy: setSeatHoldType
@@ -139560,6 +139797,7 @@ screens:
         impliedBy: listSeatHoldPools
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatHoldPools
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -139653,6 +139891,7 @@ screens:
         impliedBy: listSeatHoldPools
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatHoldPools
       - kind: primaryButton
         derived: true
         impliedBy: setSeatHoldType
@@ -139756,6 +139995,7 @@ screens:
         impliedBy: listSeatHoldPools
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatHoldPools
   states:
     loading: The hold utilization audit list.
     error: Could not load. Names which read failed and leaves the hold utilization audit untouched.
@@ -141016,6 +141256,7 @@ screens:
         impliedBy: listGroupSeatRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listGroupSeatRequests
   states:
     loading: The group reservation list.
     error: Could not load. Names which read failed and leaves the group reservation untouched.
@@ -141104,6 +141345,7 @@ screens:
         impliedBy: listGroupSeatRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listGroupSeatRequests
   states:
     loading: The group type list.
     error: Could not load. Names which read failed and leaves the group type untouched.
@@ -141288,6 +141530,7 @@ screens:
         derived: true
         impliedBy: allocateGroupSeats
         notes: The act the screen exists for.
+        operation: allocateGroupSeats
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -141395,6 +141638,7 @@ screens:
         derived: true
         impliedBy: allocateGroupSeats
         notes: The act the screen exists for.
+        operation: allocateGroupSeats
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -141611,6 +141855,7 @@ screens:
         impliedBy: listGroupSeatRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listGroupSeatRequests
       - kind: primaryButton
         derived: true
         impliedBy: recordDeposit
@@ -141713,6 +141958,7 @@ screens:
         impliedBy: listGroupSeatRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listGroupSeatRequests
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -141916,6 +142162,7 @@ screens:
         impliedBy: listGroupSeatRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listGroupSeatRequests
   states:
     loading: The group reporting audit list.
     error: Could not load. Names which read failed and leaves the group reporting audit untouched.
@@ -143144,6 +143391,7 @@ screens:
         impliedBy: listRevenue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRevenue
   states:
     loading: The revenue list.
     error: Could not load. Names which read failed and leaves the revenue untouched.
@@ -143231,6 +143479,7 @@ screens:
         impliedBy: listDynamicPricingStrategy
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listDynamicPricingStrategy
   states:
     loading: The dynamic seat pricing list.
     error: Could not load. Names which read failed and leaves the dynamic seat pricing untouched.
@@ -143510,6 +143759,7 @@ screens:
         impliedBy: listDemandBookingCurve
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listDemandBookingCurve
   states:
     loading: The inventory forecasting list.
     error: Could not load. Names which read failed and leaves the inventory forecasting untouched.
@@ -143593,6 +143843,7 @@ screens:
         impliedBy: listDemandBookingCurve
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listDemandBookingCurve
   states:
     loading: The section revenue forecast list.
     error: Could not load. Names which read failed and leaves the section revenue forecast untouched.
@@ -143862,6 +144113,7 @@ screens:
         impliedBy: listRevenue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRevenue
   states:
     loading: The revenue analytics audit list.
     error: Could not load. Names which read failed and leaves the revenue analytics audit untouched.
@@ -143984,6 +144236,7 @@ screens:
         impliedBy: listSeats
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeats
   states:
     loading: The seat analytics list.
     error: Could not load. Names which read failed and leaves the seat analytics untouched.
@@ -144496,6 +144749,7 @@ screens:
         impliedBy: listSeatCategories
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSeatCategories
   states:
     loading: The revenue seat category list.
     error: Could not load. Names which read failed and leaves the revenue seat category untouched.
@@ -144806,6 +145060,7 @@ screens:
         impliedBy: listDemandBookingCurve
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listDemandBookingCurve
   states:
     loading: The sales pace pick list.
     error: Could not load. Names which read failed and leaves the sales pace pick untouched.
@@ -145128,6 +145383,7 @@ screens:
         impliedBy: listVenueMaps
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listVenueMaps
   states:
     loading: The platform list.
     error: Could not load. Names which read failed and leaves the platform untouched.
@@ -145506,6 +145762,7 @@ screens:
         derived: true
         impliedBy: getRegionSettings
         notes: One record, read-only.
+        operation: getRegionSettings
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -146515,6 +146772,7 @@ screens:
         impliedBy: listApiClients
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApiClients
   states:
     loading: The integration list.
     error: Could not load. Names which read failed and leaves the integration untouched.
@@ -146703,6 +146961,7 @@ screens:
         impliedBy: listApiClients
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApiClients
   states:
     loading: The api access oauth list.
     error: Could not load. Names which read failed and leaves the api access oauth untouched.
@@ -146797,6 +147056,7 @@ screens:
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows. Lists the tenant''s subscriptions; an API
           client filter passes `?clientId=` (decided 28 September, audit R214 (4)).'
+        operation: listWebhookSubscriptions
       - kind: primaryButton
         derived: true
         impliedBy: createWebhookSubscription
@@ -146899,6 +147159,7 @@ screens:
         impliedBy: listApiVersions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWebhookEventTypes
   states:
     loading: The seat event catalog list.
     error: Could not load. Names which read failed and leaves the seat event catalog untouched.
@@ -147062,6 +147323,7 @@ screens:
         impliedBy: listWebhookSubscriptions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWebhookSubscriptions
   states:
     loading: The mapping transformation list.
     error: Could not load. Names which read failed and leaves the mapping transformation untouched.
@@ -147145,6 +147407,7 @@ screens:
         impliedBy: listWebhookDeliveries
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWebhookDeliveries
   states:
     loading: The monitoring retry reconciliation list.
     error: Could not load. Names which read failed and leaves the monitoring retry reconciliation untouched.
@@ -149121,6 +149384,7 @@ screens:
         notes: '**Takes effect at every till and reader immediately.** Credit types, consumption order
           and funding rules change for balances that already exist, not only for new ones.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishWalletConfiguration
       - kind: dataTable
         label: Wallet configuration versions, newest first
         operation: listWalletConfigurationVersions
@@ -151828,6 +152092,7 @@ screens:
         notes: '**Takes effect at every till and reader immediately.** Credit types, consumption order
           and funding rules change for balances that already exist, not only for new ones.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishWalletConfiguration
       - kind: detailPanel
         label: Which credit is spent first
         bindsTo: CreditConsumptionPolicy
@@ -151982,7 +152247,7 @@ screens:
         - Suspended child/member access
         - Pending invitations/associations
         bindsTo: null
-        operation: null
+        operation: listSharedWallets
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 38 §Display
     - name: contextPanel
       slot: selection
@@ -153153,6 +153418,7 @@ screens:
         impliedBy: listSharedWallets
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listSharedWallets
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -154560,6 +154826,7 @@ screens:
         - Deferred liability
         notes: 'The pack groups this record''s detail under its own headings: “Break down by”.'
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 58 §Display
+        operation: getWalletLiability
   states:
     loading: The gift card balance list.
     error: Could not load. Names which read failed and leaves the gift card balance untouched.
@@ -154655,6 +154922,7 @@ screens:
         impliedBy: publishWalletConfiguration
         label: Publish wallet configuration
         notes: The act the screen exists for.
+        operation: publishWalletConfiguration
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -155994,6 +156262,7 @@ screens:
         impliedBy: listWalletTransactions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWalletTransactions
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -157501,6 +157770,7 @@ screens:
         impliedBy: listWalletDisputes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWalletDisputes
   states:
     loading: The operations simulator approval list.
     error: Could not load. Names which read failed and leaves the operations simulator approval untouched.
@@ -158106,7 +158376,7 @@ screens:
         - Reset Credential
         - Block Wallet
         bindsTo: null
-        operation: null
+        operation: listWalletDisputes
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 93 §Track
     - name: contextPanel
       slot: selection
@@ -158585,6 +158855,7 @@ screens:
         - Confirm Fraud
         notes: null
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 96 §Display
+        operation: getRiskCase
   states:
     loading: The fraud alert investigation list.
     error: Could not load. Names which read failed and leaves the fraud alert investigation untouched.
@@ -158845,6 +159116,7 @@ screens:
         notes: '**Takes effect at every till and reader immediately.** Credit types, consumption order
           and funding rules change for balances that already exist, not only for new ones.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishWalletConfiguration
       - kind: dataTable
         label: Risk rules
         bindsTo: WalletRiskRules.rules
@@ -159151,6 +159423,7 @@ screens:
         - Alerts
         notes: 'The pack groups this record''s detail under its own headings: “Highlight”.'
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 102 §Display
+        operation: getWalletLiability
   states:
     loading: The wallet finance liability list.
     error: Could not load. Names which read failed and leaves the wallet finance liability untouched.
@@ -159723,6 +159996,7 @@ screens:
         - Status
         notes: 'The pack groups this record''s detail under its own headings: “Workflow”.'
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 106 §Display
+        operation: getWalletReconciliation
   states:
     loading: The reconciliation exception resolution list.
     error: Could not load. Names which read failed and leaves the reconciliation exception resolution
@@ -159872,6 +160146,7 @@ screens:
         - Aging Analysis
         notes: null
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 107 §Display
+        operation: getWalletLiability
   states:
     loading: The gift card liability list.
     error: Could not load. Names which read failed and leaves the gift card liability untouched.
@@ -160244,6 +160519,7 @@ screens:
         - AI Insights
         notes: null
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 110 §Compare
+        operation: getWalletLiability
   states:
     loading: The wallet analytics reporting list.
     error: Could not load. Names which read failed and leaves the wallet analytics reporting untouched.
@@ -160335,7 +160611,7 @@ screens:
         - Finance Interface Control Total
         - Configuration Audit
         bindsTo: null
-        operation: null
+        operation: listFiscalPeriods
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Compare
     - name: contextPanel
       slot: selection
@@ -160576,6 +160852,7 @@ screens:
         notes: '**Takes effect at every till and reader immediately.** Credit types, consumption order
           and funding rules change for balances that already exist, not only for new ones.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishWalletConfiguration
     - name: contentBody
       slot: headline
       components:
@@ -160631,7 +160908,7 @@ screens:
         - Suspended
         - Maintenance
         bindsTo: null
-        operation: null
+        operation: listWebhookSubscriptions
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Each integration displays
     - name: contextPanel
       slot: selection
@@ -161697,6 +161974,7 @@ screens:
         notes: '**Takes effect at every till and reader immediately.** Credit types, consumption order
           and funding rules change for balances that already exist, not only for new ones.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishWalletConfiguration
       - kind: dataTable
         label: Wallet configuration versions, newest first
         operation: listWalletConfigurationVersions
@@ -161816,6 +162094,7 @@ screens:
         notes: '**Takes effect at every till and reader immediately.** Credit types, consumption order
           and funding rules change for balances that already exist, not only for new ones.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: publishWalletConfiguration
       - kind: dataTable
         label: Wallet configuration versions, newest first
         operation: listWalletConfigurationVersions
@@ -161965,6 +162244,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Healthy”, “Search across”,
           “Every record should contain”, “Authorized super administrators can”.'
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Display
+        operation: getWalletLiability
   states:
     loading: The wallet platform health list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the wallet platform health untouched.
@@ -165481,6 +165761,7 @@ screens:
         impliedBy: listCommercialPricingStructure
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCommercialPricingStructure
   states:
     loading: The commercial pricing structure list.
     error: Could not load. Names which read failed and leaves the commercial pricing structure untouched.
@@ -177595,6 +177876,7 @@ screens:
         impliedBy: listPromotionLifecycleStatus
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listPromotionLifecycleStatus
       - kind: publishGate
         impliedBy: publishPromotion
         operation: publishPromotion
@@ -180255,6 +180537,7 @@ screens:
         impliedBy: listCodeEligibilityRestriction
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCodeEligibilityRestriction
   states:
     loading: The code eligibility restriction list.
     error: Could not load. Names which read failed and leaves the code eligibility restriction untouched.
@@ -180446,6 +180729,7 @@ screens:
         impliedBy: listValidityDateTime
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listValidityDateTime
   states:
     loading: The validity date time list.
     error: Could not load. Names which read failed and leaves the validity date time untouched.
@@ -183670,6 +183954,7 @@ screens:
         derived: true
         impliedBy: getInventoryKitDefinition
         notes: One record, read-only.
+        operation: getInventoryKitDefinition
   states:
     loading: The component inventory availability list.
     error: Could not load. Names which read failed and leaves the component inventory availability untouched.
@@ -185643,6 +185928,7 @@ screens:
         impliedBy: listAudienceDiscoveryTargeting
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listAudienceDiscoveryTargeting
   states:
     loading: The audience discovery targeting list.
     error: Could not load. Names which read failed and leaves the audience discovery targeting untouched.
@@ -186694,6 +186980,7 @@ screens:
         impliedBy: listConflict
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listConflict
   states:
     loading: The conflict simulation optimization list.
     error: Could not load. Names which read failed and leaves the conflict simulation optimization untouched.
@@ -193616,6 +193903,7 @@ screens:
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
           one somebody presses meaning to save.'
         provenance: authored — required by check-screens for publishChannelReadinessValidation
+        operation: publishChannelReadinessValidation
   states:
     loading: The channel publication readiness configuration as saved.
     error: Could not load. Names which read failed and leaves the channel publication readiness untouched.
@@ -200731,7 +201019,7 @@ screens:
         - Credit card
         - Debit card
         bindsTo: null
-        operation: null
+        operation: listPaymentMethods
         provenance: pack Payment_Payment_Orchestration.pdf, page 6 §Cards
     - name: contextPanel
       slot: selection
@@ -201862,7 +202150,7 @@ screens:
         - Failed Value
         - Rerouted Value
         bindsTo: null
-        operation: null
+        operation: listPaymentProviderConnections
         provenance: pack Payment_Payment_Orchestration.pdf, page 25 §Display
     - name: contextPanel
       slot: selection
@@ -201879,6 +202167,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Provider Value Success
           Status”, “Provider AED”, “Provider AED Warnin”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 25 §Display
+        operation: getPaymentProviderHealth
   states:
     loading: The payment orchestration \t27 list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the payment orchestration \t27 untouched.
@@ -202275,6 +202564,7 @@ screens:
         impliedBy: listPaymentProviderConnections
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listPaymentProviderConnections
   states:
     loading: The gateway capability payment list.
     error: Could not load. Names which read failed and leaves the gateway capability payment untouched.
@@ -202713,6 +203003,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Health State”, “Authorization
           Rate”, “Normal Baseline”, “Change”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 33 §Compare
+        operation: getPaymentProviderHealth
   states:
     loading: The provider health sla list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the provider health sla untouched.
@@ -203391,6 +203682,7 @@ screens:
         impliedBy: setDeviceAssignment
         label: Save device assignment
         notes: The act the screen exists for.
+        operation: setDeviceAssignment
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -203650,6 +203942,7 @@ screens:
           “Terminal Integration Layer”, “Payment Terminal”, “Payment Server / Provider”, “Depending on
           integration”, “Health Indicators”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 53 §Show
+        operation: getDeviceTelemetry
     - name: actionBar
       slot: rowActions
       components:
@@ -203784,7 +204077,7 @@ screens:
         - Processing duration
         - Status
         bindsTo: null
-        operation: null
+        operation: listPaymentTerminals
         provenance: pack Payment_Payment_Orchestration.pdf, page 54 §Display
     - name: contextPanel
       slot: selection
@@ -203904,7 +204197,7 @@ screens:
         - Retry status
         - Synchronization state
         bindsTo: null
-        operation: null
+        operation: listStoredForwardTransactions
         provenance: pack Payment_Payment_Orchestration.pdf, page 55 §Show
     - name: contextPanel
       slot: selection
@@ -204402,6 +204695,7 @@ screens:
         - Partner/API
         notes: 'The pack groups this record''s detail under its own headings: “Show by”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 70 §Compare
+        operation: getPaymentPerformance
   states:
     loading: The digital payments \t71 list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the digital payments \t71 untouched.
@@ -204849,10 +205143,12 @@ screens:
         derived: true
         impliedBy: resendPaymentLink
         notes: The act the screen exists for.
+        operation: resendPaymentLink
       - kind: detailPanel
         derived: true
         impliedBy: getPaymentLink
         notes: One record, read-only.
+        operation: getPaymentLink
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -205889,6 +206185,7 @@ screens:
         impliedBy: setMultiPaymentSplit
         label: Save multi payment split
         notes: The act the screen exists for.
+        operation: setMultiPaymentSplit
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -206485,7 +206782,7 @@ screens:
         - AED 200 ✓
         - AED 800 ✕
         bindsTo: null
-        operation: null
+        operation: listDunningCases
         provenance: pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card
     - name: contextPanel
       slot: selection
@@ -206499,6 +206796,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “AED 200 successfully consumed”,
           “Partial Payment States”, “Timeout”, “Partially Paid”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card
+        operation: getDunningPolicy
   states:
     loading: The partial payment failure list.
     error: Could not load. Names which read failed and leaves the partial payment failure untouched.
@@ -206709,7 +207007,7 @@ screens:
         - No clear recovery process
         - → Cash
         bindsTo: null
-        operation: null
+        operation: listB2bCreditAccounts
         provenance: pack Payment_Payment_Orchestration.pdf, page 101 §Gift Card
     - name: contextPanel
       slot: selection
@@ -207019,6 +207317,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Find original transaction
           using”, “Before allowing the refund”, “Eligible for Refund”, “Refund Restricted”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 116 §Display
+        operation: getRefundPolicy
     - name: actionBar
       slot: rowActions
       components:
@@ -207492,7 +207791,7 @@ screens:
         - Requester
         - Age
         bindsTo: null
-        operation: null
+        operation: listFraudRules
         provenance: pack Payment_Payment_Orchestration.pdf, page 120 §Show
     - name: contextPanel
       slot: selection
@@ -207854,7 +208153,7 @@ screens:
         - Finance posting
         - Final status
         bindsTo: null
-        operation: null
+        operation: listOrderPaymentDetail
         provenance: pack Payment_Payment_Orchestration.pdf, page 123 §Card AED 800
     - name: contextPanel
       slot: selection
@@ -208316,7 +208615,7 @@ screens:
         - Related refund/reversal
         - Match result
         bindsTo: null
-        operation: null
+        operation: listSettlementExceptions
         provenance: pack Payment_Payment_Orchestration.pdf, page 142 §Show
     - name: contextPanel
       slot: selection
@@ -208452,7 +208751,7 @@ screens:
         - Currency
         - Settlement Date
         bindsTo: null
-        operation: null
+        operation: listSettlements
         provenance: pack Payment_Payment_Orchestration.pdf, page 143 §Display
     - name: contextPanel
       slot: selection
@@ -208611,6 +208910,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Provider Fee”, “Where currencies
           differ, show”, “Important Boundary”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 144 §Compare
+        operation: getPaymentProviderEconomics
     - name: actionBar
       slot: rowActions
       components:
@@ -209100,6 +209400,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Chargebacks”, “Expected
           Settlement Date”, “Date”, “Sep 04AED 980K”, “Sep 06AED 760K”, “Refund”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 149 §Forecast
+        operation: getUnifiedReconciliation
   states:
     loading: The reconciliation simulator forecast list.
     error: Could not load. Names which read failed and leaves the reconciliation simulator forecast untouched.
@@ -209288,6 +209589,7 @@ screens:
         - False positives
         notes: 'The pack groups this record''s detail under its own headings: “Breakdown”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 165 §Show
+        operation: getPaymentPerformance
   states:
     loading: The payment risk fraud list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the payment risk fraud untouched.
@@ -209950,7 +210252,7 @@ screens:
         - Response deadline
         - Status
         bindsTo: null
-        operation: null
+        operation: listChargebacks
         provenance: pack Payment_Payment_Orchestration.pdf, page 171 §Display
     - name: contextPanel
       slot: selection
@@ -210286,6 +210588,7 @@ screens:
         derived: true
         impliedBy: getEntityRisk
         notes: One record, read-only.
+        operation: getEntityRisk
       - kind: primaryButton
         derived: true
         impliedBy: configureRiskStrategy
@@ -210295,6 +210598,7 @@ screens:
         impliedBy: listRiskAlerts
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRiskAlerts
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -210592,7 +210896,7 @@ screens:
         - AI Warning
         - Suspended
         bindsTo: null
-        operation: null
+        operation: listRecommendationStrategies
         provenance: pack Upsell,CrossSellEngine.pdf, page 7 §Display
     - name: contextPanel
       slot: selection
@@ -210623,6 +210927,7 @@ screens:
         - Suspended
         notes: 'The pack groups this record''s detail under its own headings: “Break down by”.'
         provenance: pack Upsell,CrossSellEngine.pdf, page 7 §Display
+        operation: getRecommendationPerformance
   states:
     loading: The recommendation list.
     error: Could not load. Names which read failed and leaves the recommendation untouched.
@@ -210722,6 +211027,7 @@ screens:
         impliedBy: listRecommendationStrategies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRecommendationStrategies
       - kind: primaryButton
         derived: true
         impliedBy: createRecommendationStrategy
@@ -211540,6 +211846,7 @@ screens:
         impliedBy: listRecommendationStrategies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRecommendationStrategies
     - name: actionBar
       components:
       - kind: secondaryButton
@@ -212947,7 +213254,7 @@ screens:
         columns:
         - Recommendations → Acceptances → Purchases → Revenue
         bindsTo: null
-        operation: null
+        operation: listUpsellCrossSell
         provenance: pack Upsell,CrossSellEngine.pdf, page 64 §Show
     - name: contextPanel
       slot: selection
@@ -212960,6 +213267,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Break down by”, “Relationships
           classified”.'
         provenance: pack Upsell,CrossSellEngine.pdf, page 64 §Show
+        operation: getRecommendationPerformance
   states:
     loading: The cross-sell list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the cross-sell untouched.
@@ -213289,6 +213597,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Water Park Admission”,
           “Purchase Rate”, “Photo”, “Package”, “Suggested new relationship”.'
         provenance: pack Upsell,CrossSellEngine.pdf, page 70 §Analyze
+        operation: getProductAffinity
   states:
     loading: The frequently bought together list.
     error: Could not load. Names which read failed and leaves the frequently bought together untouched.
@@ -214800,7 +215109,7 @@ screens:
         - Suppressed
         - Expired
         bindsTo: null
-        operation: null
+        operation: listRecommendationStrategies
         provenance: pack Upsell,CrossSellEngine.pdf, page 106 §Track
     - name: contextPanel
       slot: selection
@@ -215233,6 +215542,7 @@ screens:
         derived: true
         impliedBy: getGuestProfile
         notes: One record, read-only.
+        operation: getGuestProfile
       - kind: primaryButton
         derived: true
         impliedBy: explainRecommendation
@@ -215474,6 +215784,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Membershi”, “Family”, “Meal”,
           “Propensity Bands”, “Important”.'
         provenance: pack Upsell,CrossSellEngine.pdf, page 129 §Show
+        operation: getRecommendationPerformance
   states:
     loading: The propensity model customer list.
     error: Could not load. Names which read failed and leaves the propensity model customer untouched.
@@ -216457,6 +216768,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Strategy”, “Max”, “Relevance”,
           “Cart conversion”, “Checkout conversion”.'
         provenance: pack Upsell,CrossSellEngine.pdf, page 155 §Compare
+        operation: getRecommendationPerformance
   states:
     loading: The recommendation strategy placement list.
     error: Could not load. Names which read failed and leaves the recommendation strategy placement untouched.
@@ -216663,6 +216975,7 @@ screens:
         impliedBy: listRecommendationExperiments
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRecommendationExperiments
       - kind: primaryButton
         derived: true
         impliedBy: concludeRecommendationExperiment
@@ -216902,6 +217215,7 @@ screens:
         - Product mix change
         notes: 'The pack groups this record''s detail under its own headings: “Models Could Include”.'
         provenance: pack Upsell,CrossSellEngine.pdf, page 161 §Show
+        operation: getRecommendationPerformance
   states:
     loading: The model performance drift list.
     error: Could not load. Names which read failed and leaves the model performance drift untouched.
@@ -216988,7 +217302,7 @@ screens:
         columns:
         - ↓
         bindsTo: null
-        operation: null
+        operation: listRecommendationStrategies
         provenance: pack Upsell,CrossSellEngine.pdf, page 162 §Monitor
     - name: contextPanel
       slot: selection
@@ -219112,6 +219426,7 @@ screens:
         impliedBy: listConditionDecisionLogic
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listConditionDecisionLogic
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -219572,6 +219887,7 @@ screens:
         impliedBy: listRuleWorkflow
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listRuleWorkflow
   states:
     loading: The workflow versioning change list.
     error: Could not load. Names which read failed and leaves the workflow versioning change untouched.
@@ -220508,6 +220824,7 @@ screens:
         impliedBy: listApprovalMatrices
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listApprovalMatrices
   states:
     loading: The routing advisor optimization list.
     error: Could not load. Names which read failed and leaves the routing advisor optimization untouched.
@@ -221383,6 +221700,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “APR-10543”, “Integrity
           Information”.'
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 55 §Display
+        operation: getApprovalRecord
   states:
     loading: The immutable approval record list.
     error: Could not load. Names which read failed and leaves the immutable approval record untouched.
@@ -221909,6 +222227,7 @@ screens:
         impliedBy: listCrossModuleOrchestration
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listCrossModuleOrchestration
   states:
     loading: The module integration registry list.
     error: Could not load. Names which read failed and leaves the module integration registry untouched.
@@ -222680,6 +222999,7 @@ screens:
         impliedBy: listWorkflowExceptionFailure
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWorkflowExceptionFailure
   states:
     loading: The integration monitoring error list.
     error: Could not load. Names which read failed and leaves the integration monitoring error untouched.
@@ -222768,6 +223088,7 @@ screens:
         impliedBy: listWorkflowProcessPerformance
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listWorkflowProcessPerformance
   states:
     loading: The integration analytics health list.
     error: Could not load. Names which read failed and leaves the integration analytics health untouched.
@@ -223521,6 +223842,7 @@ screens:
         derived: true
         impliedBy: getApprovalRequestScore
         notes: One record, read-only.
+        operation: getApprovalRequestScore
   states:
     loading: The approval intelligence list.
     error: Could not load. Names which read failed and leaves the approval intelligence untouched.

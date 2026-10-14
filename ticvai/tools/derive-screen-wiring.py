@@ -204,9 +204,254 @@ def fix_permission(s: dict, ops: dict, log: list, keeps: list, platform: dict | 
     log.append(f"{s['id']}: permission {perm}")
 
 
+# ── S-OP-UNREACHED ──────────────────────────────────────────────────────────────────────────────
+# A declared operation no component, overlay or transition reaches. The control or panel that calls it is almost
+# always on the screen already, unbound: a `derive-components` proposal that records the operation it was proposed
+# for (`impliedBy`) but never said it calls it; a panel bound to the schema the read returns; a form whose fields
+# are the write's body; a button labelled with the operation's verb and object; the one table or panel the screen
+# has for the one read it loads. Each is bound (`operation`), which is invisible. A shell beacon that no person
+# triggers runs in the background. What is left has no control on the approved screen and is reported as a keep.
+
+SCHEMAS: dict = {}
+DATA_KINDS = {"dataTable", "cardList", "timeline", "chart", "list", "detailPanel", "kpiRow", "seatMap", "calendar",
+              "map", "board"}
+LIST_KINDS = {"dataTable", "cardList", "timeline", "chart", "list", "kpiRow", "calendar", "map", "board", "seatMap"}
+CHECK_INPUTS = FILTERS | {"textField", "numberField", "fileUpload", "consentBlock", "scanTarget"}
+INPUT_KINDS = {"textField", "numberField", "selectField", "multiSelect", "datePicker", "toggle", "searchField",
+               "fileUpload", "consentBlock", "scanTarget"}
+BEACON = re.compile(r"^record\w*(Events|Beacon|Heartbeat)$|^(send|report)\w*Heartbeat$")
+VERBS = {"set": {"save", "set", "update", "apply", "configure", "edit"},
+         "update": {"save", "update", "edit", "apply", "change"},
+         "create": {"create", "add", "new", "raise", "open"}, "add": {"add", "create", "new", "attach"},
+         "delete": {"delete", "remove"}, "remove": {"remove", "delete", "unlink"},
+         "decide": {"approve", "reject", "decide"}, "approve": {"approve", "accept"}, "reject": {"reject", "decline"},
+         "export": {"export", "download"}, "simulate": {"simulate", "preview", "run", "test"},
+         "validate": {"validate", "check", "test", "verify"}, "test": {"test", "check", "run"},
+         "publish": {"publish", "activate", "go"}, "relinquish": {"release"}, "revoke": {"revoke", "remove"},
+         "cancel": {"cancel"}, "void": {"void"}, "close": {"close"}, "open": {"open", "start"},
+         "generate": {"generate", "create"}, "run": {"run", "start"}, "send": {"send", "resend"},
+         "submit": {"submit", "send"}, "import": {"import", "upload"}, "upload": {"upload", "import"},
+         "assign": {"assign"}, "suspend": {"suspend", "pause", "block"}, "resume": {"resume", "unblock"},
+         "pause": {"pause", "suspend"}, "retry": {"retry"}, "deploy": {"deploy", "push"},
+         "rollback": {"rollback", "roll"}, "transition": {"move", "change", "transition"}}
+STOP = {"the", "a", "an", "to", "of", "for", "and", "&", "on", "in", "by", "with", "or", "all", "this", "new"}
+
+
+def _schemas() -> dict:
+    if not SCHEMAS:
+        SCHEMAS.update(G.load_contracts(ROOT)[1])
+    return SCHEMAS
+
+
+def returned(op: dict) -> set:
+    """Schema names a 2xx response carries, and the names those schemas refer to one level down."""
+    found = set()
+    for code, r in (op.get("responses") or {}).items():
+        if str(code).startswith("2"):
+            found |= set(re.findall(r"#/components/schemas/(\w+)", json.dumps(r, default=str)))
+    for n in list(found):
+        found |= set(re.findall(r"#/components/schemas/(\w+)", json.dumps(_schemas().get(n) or {}, default=str)))
+    return found - {"Page", "Paged", "Cursor", "PageMeta", "Envelope", "Problem"}
+
+
+def family(name: str) -> str:
+    return re.sub(r"(Summary|Detail|Details|View|Row|Item|Line|Record|Response|Page|List)$", "", str(name))
+
+
+def words(text: str) -> list:
+    return [w for w in re.findall(r"[a-z0-9]+", str(text).lower()) if w not in STOP]
+
+
+def op_words(op: str) -> tuple[str, list]:
+    m = re.match(r"^([a-z]+)([A-Z].*)?$", op)
+    if not m:
+        return op, []
+    return m.group(1), [w for w in G.noun_for(m.group(2) or "").lower().split() if w not in STOP]
+
+
+def label_fits(label: str, op: str) -> int:
+    """How well a button label names an operation: 0 when it does not; more when more of the object is named."""
+    lw = words(label)
+    if not lw:
+        return 0
+    verb, noun = op_words(op)
+    if lw[0] not in VERBS.get(verb, {verb}):
+        return 0
+    if not noun:
+        return 1
+    hit = sum(1 for n in noun if any(w[:5] == n[:5] for w in lw[1:]))
+    return hit if hit == len(noun) or (hit and len(lw) == 1 + hit) else 0
+
+
+def reached(s: dict) -> set:
+    refs = {c.get("operation") for _, c in comps(s) if c.get("operation")}
+    for o in s.get("overlays") or []:
+        for k in ("confirm", "dismiss"):
+            if isinstance(o, dict) and isinstance(o.get(k), dict) and o[k].get("operation"):
+                refs.add(o[k]["operation"])
+    for t in ((s.get("navigation") or {}).get("transitions") or []):
+        if isinstance(t, dict) and t.get("operation"):
+            refs.add(t["operation"])
+    return refs
+
+
+def is_cancel(c: dict) -> bool:
+    return str(c.get("label") or "").strip().lower() in ("cancel", "close", "back", "dismiss")
+
+
+def fix_unreached(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    sid = s["id"]
+    refs = reached(s)
+    todo = [a for a in apis(s) if a["operationId"] not in refs and a.get("trigger") not in ("background", "onInterval")
+            and a["operationId"] in ops]
+    if not todo:
+        return
+    free = [c for _, c in comps(s) if not c.get("operation")]
+    has_inputs = any(c.get("kind") in CHECK_INPUTS for _, c in comps(s))
+    collected = {(o.get("confirm") or {}).get("operation") for o in (s.get("overlays") or [])
+                 if isinstance(o, dict) and isinstance(o.get("confirm"), dict)}
+
+    def uncollected(c, op):
+        """A button for a write whose body nothing on the screen collects (S-BUTTON-FORM): not bound here."""
+        f = ops[op]
+        rb = f["op"].get("requestBody")
+        needs = isinstance(rb, dict) and (bool(rb.get("required")) or "$ref" in rb)
+        return ("Button" in str(c.get("kind")) and f["method"] in WRITES and needs and op not in collected
+                and not has_inputs)
+
+    blocked: set = set()
+
+    def bind(c, op, why):
+        c["operation"] = op
+        free.remove(c)
+        log.append(f"{sid}: {c.get('kind')} {str(c.get('label') or '')[:40]!r} binds {op} ({why})")
+
+    left = []
+    for a in todo:
+        op = a["operationId"]
+        f = ops[op]
+        read = f["method"] == "get" or op.startswith(("list", "get", "search"))
+        # 1. the component proposed for it
+        mine = [c for c in free if c.get("impliedBy") == op and not is_cancel(c)]
+        got = [c for c in mine if not uncollected(c, op)]
+        if mine and not got:
+            blocked.add(op)
+        for c in got:
+            bind(c, op, "the component proposed for it")
+        if got:
+            continue
+        # 2. bound to the schema it returns (a read) or collects (a write's form)
+        if read:
+            names = {family(n) for n in returned(f["op"])}
+            got = [c for c in free if c.get("kind") not in ("metricTile",) and "Button" not in str(c.get("kind"))
+                   and family(str(c.get("bindsTo") or "").replace("[]", "").split(".")[0]) in names]
+        else:
+            body = G.body_fields(f, _schemas())[0]
+            got = [c for c in free if body and c.get("kind") in INPUT_KINDS
+                   and str(c.get("bindsTo") or "").split(".")[0] == body]
+        for c in got:
+            bind(c, op, "bound to its schema")
+        if got:
+            continue
+        # 3. a button that names it
+        scored = sorted(((label_fits(c.get("label"), op), i, c) for i, c in enumerate(free)
+                         if "Button" in str(c.get("kind")) and not is_cancel(c)), key=lambda t: (-t[0], t[1]))
+        if scored and scored[0][0] > 0 and uncollected(scored[0][2], op):
+            blocked.add(op)
+            scored = []
+        if scored and scored[0][0] > 0 and (len(scored) == 1 or scored[1][0] < scored[0][0]):
+            bind(scored[0][2], op, "its label names it")
+            continue
+        gates = [c for c in free if c.get("kind") == "publishGate"]
+        if op.startswith("publish") and len(gates) == 1:
+            bind(gates[0], op, "the screen's one publish gate")
+            continue
+        left.append(a)
+    # 4. the one unbound table or panel the screen has, for the one read of its kind that nothing shows
+    for kinds, pick in ((LIST_KINDS, lambda o: o.startswith(("list", "search"))),
+                        ({"detailPanel"}, lambda o: o.startswith("get"))):
+        reads = [a for a in left if pick(a["operationId"]) and ops[a["operationId"]]["method"] == "get"]
+        slots = [c for c in free if c.get("kind") in kinds and not c.get("bindsTo")]
+        if len(reads) == 1 and len(slots) == 1:
+            bind(slots[0], reads[0]["operationId"], "the screen's one unbound panel for its one unshown read")
+            left.remove(reads[0])
+    for a in left:
+        op = a["operationId"]
+        if BEACON.match(op) and ops[op]["method"] == "post":
+            a["trigger"] = "background"
+            log.append(f"{sid}: {op} runs in the background (a beacon no person triggers)")
+            continue
+        keeps.append((sid, "S-OP-UNREACHED", f"{op} ({a.get('trigger')}): " + (
+            "its control on the approved screen collects nothing for the body it needs" if op in blocked else
+            "no control on the approved screen reaches it") + " (client-approved UI)"))
+
+
+# ── S-METRIC-NO-OP ──────────────────────────────────────────────────────────────────────────────
+# A metric tile the client's board drew, with no read behind it. The tile stays (client-approved UI); it binds the
+# read that computes it: a read the screen declares whose response carries the measure by name (`bindsTo`
+# Schema.field), else the scorecard read the screen already calls (`getKpiValues`, by KPI code). A tile no declared
+# read computes is reported: binding it needs a read or a KPI the contract does not yet have.
+
+TILE_STOP = STOP | {"total", "count", "number", "no", "avg", "average", "today", "current", "percent", "pct",
+                    "of", "per", "%", "#"}
+
+
+def fields_of(name: str, depth: int = 0) -> dict:
+    """`{field path: words}` of a schema, nested one level (rows of a page, a summary's sub-objects)."""
+    out = {}
+    for p, body in G.schema_fields(name, _schemas()).items():
+        out[p] = set(words(G.noun_for(p))) - TILE_STOP
+        ref = re.findall(r"#/components/schemas/(\w+)", json.dumps(body, default=str))
+        if ref and depth < 1:
+            for q, w in fields_of(ref[0], depth + 1).items():
+                out[f"{p}.{q}"] = w
+    return out
+
+
+def fix_metrics(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    sid = s["id"]
+    tiles = [c for _, c in comps(s) if c.get("kind") == "metricTile" and not c.get("operation")
+             and not c.get("bindsTo") and not c.get("derived")]
+    if not tiles:
+        return
+    reads = [a["operationId"] for a in apis(s) if a["operationId"] in ops
+             and (ops[a["operationId"]]["method"] == "get" or a["operationId"].startswith(("get", "list", "search")))]
+    shapes = []
+    for o in reads:
+        for n in G.response_schemas(ops[o]["op"])[:1]:
+            # A measure is read off one object (a summary, a view, a health record), never off a row of a list.
+            if o.startswith("get") or re.search(r"(View|Analytics|Performance|Health|Insights|Summary|Totals|Kpis?)$", n):
+                flds = {p: w for p, w in fields_of(n).items()
+                        if not re.search(r"(Id|Ids|Identifier|At|Allowed|Enabled)$", p.split(".")[-1])}
+                shapes.append((o, n, flds))
+    for c in tiles:
+        want = set(words(c.get("label"))) - TILE_STOP
+        best = None
+        if want:
+            for o, n, flds in shapes:
+                for path, w in flds.items():
+                    if not w:
+                        continue
+                    hit = len({x for x in want if any(x[:5] == y[:5] for y in w)})
+                    score = (hit / len(want), hit / len(w))
+                    if hit and score[0] == 1 and score[1] >= 0.66 and (best is None or score > best[0]):
+                        best = (score, o, f"{n}.{path}")
+        if best:
+            c["operation"], c["bindsTo"] = best[1], best[2]
+            log.append(f"{sid}: tile {str(c.get('label'))[:40]!r} binds {best[2]} ({best[1]})")
+        elif "getKpiValues" in reads:
+            c["operation"] = "getKpiValues"
+            log.append(f"{sid}: tile {str(c.get('label'))[:40]!r} binds getKpiValues (the screen's scorecard read)")
+        else:
+            keeps.append((sid, "S-METRIC-NO-OP", f"tile {c.get('label')!r}: no read the screen declares computes it "
+                          f"(needs a read or a KPI the contract does not have; the tile stays: client-approved UI)"))
+
+
 STEPS = {
     "S-STATE-BOILERPLATE": fix_states,
     "S-SCREEN-PERMISSION": fix_permission,
+    "S-METRIC-NO-OP": fix_metrics,
+    "S-OP-UNREACHED": fix_unreached,
 }
 
 
