@@ -2723,6 +2723,7 @@ components:
           format: uuid
           readOnly: true
         credentialId:
+          x-ticvai-references: accreditation.credential
           type: string
           format: uuid
         holderId:
@@ -3242,6 +3243,7 @@ components:
         reference:
           type: string
         programmeId:
+          x-ticvai-references: accreditation.programme
           type: string
           format: uuid
         categoryCode:
@@ -3439,6 +3441,7 @@ components:
         requirementCode:
           type: string
         assetId:
+          x-ticvai-references: assets.media_asset
           type: string
           format: uuid
         submittedAt:
@@ -3554,6 +3557,7 @@ components:
           type: string
           format: uuid
         holderId:
+          x-ticvai-references: accreditation.holder
           type: string
           format: uuid
         kind:

@@ -3850,6 +3850,7 @@ components:
           type: string
           format: uuid
         ruleId:
+          x-ticvai-references: reporting.alert_rule
           type: string
           format: uuid
         ruleName:
@@ -5312,6 +5313,7 @@ components:
 
             '
         askedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         askedAt:

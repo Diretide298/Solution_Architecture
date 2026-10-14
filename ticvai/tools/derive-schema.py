@@ -302,6 +302,14 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
 # `line_total`, `balance` …) need a gross/net decision per column; `*_at` columns typed `date`
 # need a decision on whether the field is a day or an instant; index and policy names are
 # `derive-ddl.py`'s.
+# **The keys of columns no contract field describes** (CHG-STO-002, 14 October 2026, check-storage-promises
+# SP-KEY-UNDECLARED and SP-KEY-GUESSED): `(table, column) -> target table`, or `none` for a column that is not a key.
+# A contract-described column is declared on its field (`x-ticvai-references`); these have no field to carry it.
+STORAGE_REFERENCES = {
+    ("pii.subject", "erasure_request_id"): "approvals.request",    # the erasure request (identity.yaml deleteGuestAccount)
+    ("wallet.wallet_transaction", "subject_id"): "pii.subject",    # the guest whose wallet moved (relationship graph)
+}
+
 _RESERVED_RENAME = {"from": "valid_from", "to": "valid_to", "order": "sort_order",
                     "table": "table_name"}
 _ASSERTING = {"is", "has", "have", "can", "requires", "require", "should", "allows", "allow",
@@ -1047,7 +1055,24 @@ def main() -> int:
             else:
                 continue
             _xrefs += 1
-    print(f"  contract-declared references read from x-ticvai-references: {_xrefs}")
+    # **A column no contract field describes is declared here** (CHG-STO-002, 14 October 2026): a storage-only column
+    # (`pii.subject`, kept as-is) or one the relationship graph added has no property to carry `x-ticvai-references`,
+    # so its key stayed the name rule's guess (`pii.subject.erasure_request_id` -> `approvals.request` is what the
+    # erasure flow says it is; the rule had it by convention only).
+    _sref = 0
+    for (_t, _col), _v in STORAGE_REFERENCES.items():
+        for _c in existing.get(_t, []):
+            if _c.get("column") != _col or str(_c.get("source", "")).count(".") >= 2 \
+                    and not str(_c.get("source", "")).startswith(("relationship-graph", "storage only")):
+                continue
+            if _v == "none":
+                for _k in ("references", "referenceKind", "referenceHow", "enforced"):
+                    _c.pop(_k, None)
+            elif _v in existing:
+                _c.update({"references": _v, "referenceKind": "foreignKey", "referenceHow": "declared",
+                           "enforced": "yes"})
+            _sref += 1
+    print(f"  contract-declared references read from x-ticvai-references: {_xrefs}; storage-only keys declared: {_sref}")
 
     def _from_contract(c) -> bool:
         return str(c.get("source", "")).count(".") >= 2 and not str(c.get("source", "")).startswith(

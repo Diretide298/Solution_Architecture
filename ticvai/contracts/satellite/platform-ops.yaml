@@ -2050,6 +2050,7 @@ components:
           maxLength: 200
           description: The consumer's stable name (`<service>.<handler>`); one event is processed once per consumer.
         eventId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: The envelope's `eventId`, which is the producing outbox row's id (UUIDv7).
@@ -2455,9 +2456,11 @@ components:
       - status
       properties:
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         cellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         databaseName:
@@ -2510,6 +2513,7 @@ components:
       - status
       properties:
         rolloutId:
+          x-ticvai-references: control.rollout
           type: string
           format: uuid
           description: 'The rollout this row belongs to (`control.rollout`).'
@@ -2565,6 +2569,7 @@ components:
       - status
       properties:
         cellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         cellName:
@@ -2874,6 +2879,7 @@ components:
           type: string
           format: uuid
         planId:
+          x-ticvai-references: control.migration_plan
           type: string
           format: uuid
         status:
@@ -3018,6 +3024,7 @@ components:
       - scheduledFor
       properties:
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         tenantName:
@@ -3170,6 +3177,7 @@ components:
           type: string
           format: uuid
         eventId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: '**The envelope''s event id, which is this row''s `id`** (ADR-0058; UUIDv7, ADR-0056). The
@@ -3183,6 +3191,7 @@ components:
           minimum: 1
           description: The event's `version`, carried in the envelope so a consumer on an older version can tell.
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: The tenant the change belongs to (envelope field, SD-030).

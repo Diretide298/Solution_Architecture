@@ -16807,6 +16807,7 @@ components:
           - product
           - mediaTemplate
         scopeId:
+          x-ticvai-references: platform.scope
           type: string
           description: ID of the tenant, brand, venue, event, product or media template at that level; unique with level
         parentScopeId:
@@ -16994,10 +16995,12 @@ components:
           format: uuid
           description: The credential binding id (credentialBindingId / bindingId in the views)
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
           description: The Virtual Ticket the medium resolves to
         mediaTypeId:
+          x-ticvai-references: access.media_type
           type: string
           format: uuid
           description: access.media_type row of the medium
@@ -17134,6 +17137,7 @@ components:
           format: uuid
           description: Client-generated delivery attempt id (CredentialDeliveryInput.id)
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         credentialBindingId:
@@ -17412,6 +17416,7 @@ components:
           type: string
           format: uuid
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         credentialBindingId:
@@ -17780,6 +17785,7 @@ components:
           - bulkOperation
           - scheduledProcess
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         credentialBindingId:
@@ -17788,6 +17794,7 @@ components:
           nullable: true
           description: The credential generated, once bound
         mediaTypeId:
+          x-ticvai-references: access.media_type
           type: string
           format: uuid
         mediaTemplateId:
@@ -18026,6 +18033,7 @@ components:
           nullable: true
           description: The guest (pii.subject)
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         credentialBindingId:
@@ -18033,6 +18041,7 @@ components:
           format: uuid
           nullable: true
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           maxLength: 200
         deviceReference:
@@ -18632,10 +18641,12 @@ components:
           type: string
           format: uuid
         mediaTypeId:
+          x-ticvai-references: access.media_type
           type: string
           format: uuid
           description: The media profile being published (mediaProfileId)
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         parkId:
@@ -19035,6 +19046,7 @@ components:
           type: string
           format: uuid
         mediaTemplateId:
+          x-ticvai-references: access.media_template
           type: string
           format: uuid
         version:
@@ -19243,6 +19255,7 @@ components:
           format: uuid
           description: The policyId of listVerificationMethodSelection
         productId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
           description: Unique per scope
@@ -19477,9 +19490,11 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         mapId:
+          x-ticvai-references: venuemap.map
           type: string
           description: The venue map this digital twin is drawn on (venuemap.map)
         sourceFileType:
@@ -19526,6 +19541,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         name:
@@ -19574,6 +19590,7 @@ components:
         id:
           $ref: ../shared/common.yaml#/components/schemas/Id
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         deviceId:
@@ -19725,6 +19742,7 @@ components:
           nullable: true
           description: State after the change
         changedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: Actor
@@ -19858,9 +19876,11 @@ components:
           type: string
           format: uuid
         accessPointId:
+          x-ticvai-references: access.access_point
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         name:
@@ -19933,6 +19953,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         maxOfflineDurationHours:
@@ -20056,6 +20077,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         dayType:
@@ -20138,10 +20160,12 @@ components:
           type: string
           format: uuid
         accessPointId:
+          x-ticvai-references: access.access_point
           type: string
           format: uuid
           description: The access point configured; unique
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         passThroughTimeoutSeconds:
@@ -20208,6 +20232,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         outcome:
@@ -20279,6 +20304,7 @@ components:
       - results
       properties:
         modelId:
+          x-ticvai-references: access.hardware_model
           type: string
           format: uuid
           description: The `AccessHardwareModel` certified.
@@ -20421,6 +20447,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         configurationKind:
@@ -20568,6 +20595,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         mode:
@@ -20618,6 +20646,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         nodeType:
@@ -20677,6 +20706,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         version:
@@ -20749,6 +20779,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         podiumType:
@@ -20788,9 +20819,11 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         operatorPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         role:
@@ -20881,9 +20914,11 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         accessPointId:
+          x-ticvai-references: access.access_point
           type: string
           format: uuid
         fromMode:
@@ -20919,6 +20954,7 @@ components:
           format: date-time
           nullable: true
         changedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: Operator
@@ -20943,6 +20979,7 @@ components:
           type: string
           format: uuid
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         incidentType:
@@ -21012,6 +21049,7 @@ components:
           type: string
           format: uuid
         attractionId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: The attraction this row configures; unique per tenant
@@ -21019,6 +21057,7 @@ components:
           type: string
           maxLength: 200
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -21110,6 +21149,7 @@ components:
           - faceMatch
           description: verification is written by setBiometricVerificationProfile, facePassEnrolment by setFacePassEnrollment (one per venue), faceTagEnrolment by setFaceTagTemporaryEnrollment, faceMatch by setFaceMatchingVerification
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -21329,6 +21369,7 @@ components:
           format: uuid
           description: The ruleId setGuestCompanionEligibility is keyed by
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -21414,6 +21455,7 @@ components:
           format: uuid
           description: The profileId / ruleId the operations show
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -21593,12 +21635,14 @@ components:
           format: uuid
           description: The attemptId the list shows
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
           type: string
           description: ltree of the owning scope node
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The guest (pii.subject)
@@ -21678,6 +21722,7 @@ components:
           format: uuid
           description: The eventId the list shows
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -22279,6 +22324,7 @@ components:
           type: string
           format: uuid
         dynamicPolicyId:
+          x-ticvai-references: access.dynamic_policy
           type: string
           format: uuid
         scopePath:
@@ -22397,6 +22443,7 @@ components:
           type: string
           format: uuid
         dynamicPolicyId:
+          x-ticvai-references: access.dynamic_policy
           type: string
           format: uuid
           description: The operation's policyId
@@ -22413,6 +22460,7 @@ components:
           - attraction
           - accessPoint
         scopeId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         policyCategory:
@@ -22696,6 +22744,7 @@ components:
           type: string
           description: ltree of the owning scope node
         entitlementId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
           description: The credential (the list's credentialId)
@@ -22764,6 +22813,7 @@ components:
           type: string
           description: ltree of the owning scope node
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The locked identity (the list's identityId, pii.subject)
@@ -24247,6 +24297,7 @@ components:
       - escalateAfterAttempts
       properties:
         venueId:
+          x-ticvai-references: platform.scope
           type: string
         automaticRetry:
           type: boolean
@@ -24438,9 +24489,11 @@ components:
           type: string
           format: uuid
         oldAccessId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
         newAccessId:
+          x-ticvai-references: access.entitlement
           type: string
           format: uuid
           nullable: true
@@ -24482,6 +24535,7 @@ components:
           format: uuid
           readOnly: true
         accessPointId:
+          x-ticvai-references: access.access_point
           type: string
           format: uuid
         isActive:
@@ -24581,6 +24635,7 @@ components:
 
             '
         templateId:
+          x-ticvai-references: catalogue.entitlement_template
           type: string
           format: uuid
           description: 'The definition it was issued against. **Pinned at issue** — a template edited
@@ -26618,6 +26673,7 @@ components:
           format: uuid
           description: The accreditation credential's id (`credentialId` on the events).
         holderId:
+          x-ticvai-references: accreditation.holder
           type: string
           format: uuid
         programmeId:

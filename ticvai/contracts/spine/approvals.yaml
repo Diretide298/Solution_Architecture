@@ -4000,6 +4000,7 @@ components:
           format: uuid
           readOnly: true
         workflowInstanceId:
+          x-ticvai-references: approvals.workflow_instance
           type: string
           format: uuid
         workflowStepExecutionId:
@@ -4028,6 +4029,7 @@ components:
           format: uuid
           nullable: true
         alternativeNodeId:
+          x-ticvai-references: none
           type: string
           nullable: true
         previousInput:
@@ -4056,6 +4058,7 @@ components:
           maxLength: 30
           nullable: true
         actorPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         actedAt:
@@ -4102,6 +4105,7 @@ components:
           type: string
           format: uuid
         approvalRequestId:
+          x-ticvai-references: approvals.request
           type: string
           format: uuid
         sourceModule:
@@ -4598,9 +4602,11 @@ components:
           type: string
           format: uuid
         requestId:
+          x-ticvai-references: approvals.request
           type: string
           format: uuid
         providerId:
+          x-ticvai-references: approvals.external_provider
           type: string
           format: uuid
         level:
@@ -8104,6 +8110,7 @@ components:
           format: uuid
           readOnly: true
         workflowDefinitionId:
+          x-ticvai-references: approvals.workflow_definition
           type: string
           format: uuid
         version:
@@ -8241,6 +8248,7 @@ components:
           format: uuid
           readOnly: true
         workflowDefinitionId:
+          x-ticvai-references: approvals.workflow_definition
           type: string
           format: uuid
         triggerType:
@@ -8311,9 +8319,11 @@ components:
           format: uuid
           readOnly: true
         workflowDefinitionId:
+          x-ticvai-references: approvals.workflow_definition
           type: string
           format: uuid
         workflowVersionId:
+          x-ticvai-references: approvals.workflow_version
           type: string
           format: uuid
           description: The version the instance started on; never changes
@@ -8345,6 +8355,7 @@ components:
           maxLength: 30
           nullable: true
         currentNodeId:
+          x-ticvai-references: none
           type: string
           nullable: true
           description: The node of the version's graph the instance is at
@@ -8429,6 +8440,7 @@ components:
           format: uuid
           readOnly: true
         workflowInstanceId:
+          x-ticvai-references: approvals.workflow_instance
           type: string
           format: uuid
         nodeId:
@@ -8519,6 +8531,7 @@ components:
           format: uuid
           readOnly: true
         workflowInstanceId:
+          x-ticvai-references: approvals.workflow_instance
           type: string
           format: uuid
         workflowStepExecutionId:
@@ -8791,6 +8804,7 @@ components:
           format: uuid
           readOnly: true
         automationId:
+          x-ticvai-references: approvals.automation
           type: string
           format: uuid
         workflowInstanceId:

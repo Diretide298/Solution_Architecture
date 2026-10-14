@@ -18042,6 +18042,7 @@ components:
           format: uuid
           readOnly: true
         deviceConsentId:
+          x-ticvai-references: marketing.device_consent
           type: string
           format: uuid
           description: The `DeviceConsent` row it was captured with.
@@ -19197,6 +19198,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         name:
@@ -19326,6 +19328,7 @@ components:
           type: string
           format: uuid
         campaignId:
+          x-ticvai-references: marketing.campaign
           type: string
           format: uuid
         domain:
@@ -19359,6 +19362,7 @@ components:
           type: string
           format: uuid
         badgeId:
+          x-ticvai-references: marketing.badge
           type: string
           format: uuid
         challengeId:
@@ -19566,6 +19570,7 @@ components:
           type: string
           format: uuid
         campaignId:
+          x-ticvai-references: marketing.campaign
           type: string
           format: uuid
         type:
@@ -19656,6 +19661,7 @@ components:
           type: string
           format: uuid
         reviewId:
+          x-ticvai-references: marketing.review
           type: string
           format: uuid
         text:
@@ -19734,6 +19740,7 @@ components:
           type: string
           format: uuid
         rewardId:
+          x-ticvai-references: marketing.reward
           type: string
           format: uuid
         code:
@@ -19829,6 +19836,7 @@ components:
           type: string
           format: uuid
         templateId:
+          x-ticvai-references: marketing.form_definition
           type: string
           format: uuid
         customerId:
@@ -20496,6 +20504,7 @@ components:
           type: string
           format: uuid
         segmentId:
+          x-ticvai-references: marketing.segment
           type: string
           format: uuid
         destination:
@@ -20650,6 +20659,7 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           readOnly: true
@@ -21843,6 +21853,7 @@ components:
           type: string
           format: uuid
         referrerSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         refereeSubjectId:
@@ -22247,6 +22258,7 @@ components:
 
             '
         templateId:
+          x-ticvai-references: marketing.message_template
           type: string
           format: uuid
         offsetMinutes:
@@ -23178,6 +23190,7 @@ components:
           readOnly: true
           description: The guest who saved it. The wishlist is keyed by subject; there is no parent wishlist row.
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         productName:
@@ -23974,6 +23987,7 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         kind:
@@ -25187,13 +25201,16 @@ components:
           type: string
           format: uuid
         journeyId:
+          x-ticvai-references: marketing.journey
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The guest. `pii.subject`, never duplicated here.
         stepId:
+          x-ticvai-references: marketing.journey_step
           type: string
           format: uuid
           description: Where they are now.
@@ -25575,6 +25592,7 @@ components:
           pattern: '^[A-Z]{2}$'
           description: ISO 3166-1 alpha-2 (required for sms and whatsapp).
         providerId:
+          x-ticvai-references: marketing.communication_provider
           type: string
           format: uuid
           description: The marketing.communication_provider row this identity is registered with.
@@ -25997,6 +26015,7 @@ components:
           type: string
           description: marketing.message_dispatch id.
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         messageClass:
@@ -28454,6 +28473,7 @@ components:
           format: uuid
           readOnly: true
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The person the request is about.
@@ -28615,6 +28635,7 @@ components:
       - results
       properties:
         requestId:
+          x-ticvai-references: marketing.privacy_request
           type: string
           format: uuid
         discoveredAt:
@@ -28875,6 +28896,7 @@ components:
           nullable: true
           readOnly: true
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         actionType:
@@ -30511,6 +30533,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         kind:
@@ -30703,6 +30726,7 @@ components:
           format: uuid
           description: Required with `execute`; the action is recorded on this case.
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         lineIds:
@@ -30850,6 +30874,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         orderId:
@@ -30951,6 +30976,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         department:
@@ -31071,6 +31097,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         caseNumber:
@@ -31954,6 +31981,7 @@ components:
           format: uuid
           readOnly: true
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: The agent. The natural key.
@@ -32119,6 +32147,7 @@ components:
           type: string
           format: uuid
         agentPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         evaluatorPrincipalId:
@@ -35417,6 +35446,7 @@ components:
           format: uuid
           readOnly: true
         submissionId:
+          x-ticvai-references: marketing.form_submission
           type: string
           format: uuid
           description: The `FormSubmission` reviewed; the natural key.
@@ -35743,6 +35773,7 @@ components:
           format: uuid
           description: Absent on a new request; set by the server.
         requirementId:
+          x-ticvai-references: marketing.waiver_requirement
           type: string
           format: uuid
         reasonCode:
@@ -36455,6 +36486,7 @@ components:
           format: uuid
           readOnly: true
         messageTriggerId:
+          x-ticvai-references: marketing.message_trigger
           type: string
           format: uuid
         dimension:
@@ -36508,6 +36540,7 @@ components:
           format: uuid
           readOnly: true
         messageTemplateId:
+          x-ticvai-references: marketing.message_template
           type: string
           format: uuid
         language:
@@ -36600,12 +36633,14 @@ components:
           format: uuid
           readOnly: true
         messageDispatchId:
+          x-ticvai-references: marketing.message_dispatch
           type: string
           description: The `MessageDispatch.id`.
         attemptNumber:
           type: integer
           minimum: 1
         communicationProviderId:
+          x-ticvai-references: marketing.communication_provider
           type: string
           format: uuid
         channel:
@@ -36685,6 +36720,7 @@ components:
           format: uuid
           readOnly: true
         consentRecordId:
+          x-ticvai-references: marketing.consent_record
           type: string
           description: The withdrawal's `ConsentRecord.id`.
         target:
@@ -36931,6 +36967,7 @@ components:
           format: uuid
           readOnly: true
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         reason:
@@ -37075,9 +37112,11 @@ components:
           format: uuid
           readOnly: true
         participantSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
           description: The booking.
@@ -37107,6 +37146,7 @@ components:
           format: uuid
           nullable: true
         formDefinitionId:
+          x-ticvai-references: marketing.form_definition
           type: string
           format: uuid
         formVersion:
@@ -37244,6 +37284,7 @@ components:
           format: uuid
           readOnly: true
         waiverRequirementId:
+          x-ticvai-references: marketing.waiver_requirement
           type: string
           format: uuid
         event:

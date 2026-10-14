@@ -7125,6 +7125,7 @@ components:
           format: uuid
           readOnly: true
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         subjectDocumentId:
@@ -7344,9 +7345,11 @@ components:
           format: uuid
           readOnly: true
         customerMembershipId:
+          x-ticvai-references: identity.customer_membership
           type: string
           format: uuid
         membershipBenefitId:
+          x-ticvai-references: catalogue.membership_benefit
           type: string
           format: uuid
         quantity:
@@ -7391,6 +7394,7 @@ components:
           type: string
           format: uuid
         entitlementTemplateId:
+          x-ticvai-references: catalogue.entitlement_template
           type: string
           format: uuid
         number:
@@ -7454,6 +7458,7 @@ components:
           type: string
           format: uuid
         customerMembershipId:
+          x-ticvai-references: identity.customer_membership
           type: string
           format: uuid
         fromStatus:
@@ -7602,6 +7607,7 @@ components:
           type: string
           format: uuid
         moduleId:
+          x-ticvai-references: identity.module
           type: string
           format: uuid
         code:
@@ -7642,6 +7648,7 @@ components:
           type: string
           format: uuid
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         hash:
@@ -7809,7 +7816,7 @@ components:
         the operation''s audience disagreed. The hash is the self-describing PHC string ADR-0071 decides.'
       required: [subjectId, passwordHash, failedAttempts]
       properties:
-        subjectId: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid, x-ticvai-references: pii.subject }
         passwordHash: { type: string, writeOnly: true, description: 'Argon2id, with its parameters, never the password: the self-describing PHC string (ADR-0071).' }
         failedAttempts: { type: integer, minimum: 0 }
         lockedUntil: { type: string, format: date-time, nullable: true }
@@ -8433,6 +8440,7 @@ components:
           type: string
           format: uuid
         operatorPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true

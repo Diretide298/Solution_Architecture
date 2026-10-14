@@ -611,6 +611,15 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
             p.counts["other"] += 1
             continue
         rc_ = rls_call(s)
+        if rc_ and rc_[0] != "drop_rls_policies" and rc_[1] in new_tables:
+            # **A new table's policy is written with the table** (CHG-STO-003, 14 October 2026). A parent policy names
+            # its parent too (`apply_parent_rls(child, 'outlet_id', 'platform.outlet', 'id')`), so the "every table it
+            # names is new" rule above missed it: `platform.outlet_opening_hour` was created by V0104 with no policy at
+            # all, listed as "statement added" for a person, and the next run wrote the policy into a V0105 because by
+            # then the table existed. A forward migration that grows on a second run is not one migration.
+            p.statements.append(stmt)
+            p.counts["other"] += 1
+            continue
         if rc_ and rc_[0] != "drop_rls_policies" and rc_[1] in old.tables:
             # **A policy change on a table that already exists is written, not listed** (CHG-GEN-004). The call is
             # the generated helper the baseline used for every table: it drops what was there and creates the

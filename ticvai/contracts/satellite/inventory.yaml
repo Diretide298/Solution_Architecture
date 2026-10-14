@@ -3668,6 +3668,7 @@ components:
           type: string
           format: uuid
         supplierId:
+          x-ticvai-references: inventory.supplier
           type: string
           format: uuid
         number:
@@ -4346,6 +4347,7 @@ components:
           type: string
           format: uuid
         locationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         locationName:
@@ -4519,9 +4521,11 @@ components:
         transferNumber:
           type: string
         fromLocationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         toLocationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         status:

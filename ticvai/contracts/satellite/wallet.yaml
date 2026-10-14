@@ -3889,6 +3889,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         action:
@@ -4177,9 +4178,11 @@ components:
       - updatedAt
       properties:
         walletBalanceId:
+          x-ticvai-references: none
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         availableBalance:
@@ -4219,6 +4222,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         orderId:
@@ -4558,6 +4562,7 @@ components:
           type: string
           format: uuid
         creditTypeId:
+          x-ticvai-references: wallet.credit_type
           type: string
           format: uuid
         issuedAmount:
@@ -4841,6 +4846,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         kind:
@@ -4878,6 +4884,7 @@ components:
       - subjectId
       properties:
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         role:
@@ -5072,6 +5079,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         kind:
@@ -5204,6 +5212,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         kind:
@@ -5253,6 +5262,7 @@ components:
           type: string
           format: uuid
         walletId:
+          x-ticvai-references: wallet.wallet
           type: string
           format: uuid
         transactionIds:

@@ -1196,6 +1196,7 @@ components:
           type: string
           format: uuid
         guestLinkId:
+          x-ticvai-references: sync.guest_link
           type: string
           format: uuid
         type:
@@ -1468,6 +1469,7 @@ components:
 
             '
         authorisationId:
+          x-ticvai-references: none
           type: string
         guestLinkId:
           type: string

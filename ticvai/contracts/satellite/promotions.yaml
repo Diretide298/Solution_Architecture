@@ -8112,9 +8112,11 @@ components:
           type: string
           format: uuid
         fromProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         toProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         kind:
@@ -8889,6 +8891,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         code:
@@ -9055,6 +9058,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         promotionId:
@@ -9240,6 +9244,7 @@ components:
             format: uuid
             readOnly: true
           venueId:
+            x-ticvai-references: platform.scope
             type: string
             format: uuid
     PromotionConflict:
@@ -9264,6 +9269,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         conflictType:
@@ -9327,9 +9333,11 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
           description: The order (`orders.sales_order`) in the order service.
@@ -9400,6 +9408,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         promotionId:
@@ -9515,6 +9524,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         entityType:
@@ -9612,6 +9622,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         promotionId:
@@ -9888,6 +9899,7 @@ components:
           readOnly: true
           description: The `batchId` that `generateCouponCodes` returned.
         campaignId:
+          x-ticvai-references: promotions.campaign
           type: string
           format: uuid
         quantity:
@@ -10233,6 +10245,7 @@ components:
                 format: uuid
                 readOnly: true
               variantId:
+                x-ticvai-references: catalogue.variant
                 type: string
                 format: uuid
               quantity:
@@ -10271,6 +10284,7 @@ components:
 
             '
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         componentKind:
@@ -10368,6 +10382,7 @@ components:
 
             '
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         percentage:
@@ -10609,12 +10624,14 @@ components:
           format: uuid
           readOnly: true
         bundleComponentId:
+          x-ticvai-references: promotions.bundle_component
           type: string
           format: uuid
         partnerId:
           type: string
           format: uuid
         externalProductId:
+          x-ticvai-references: none
           type: string
           maxLength: 128
         productName:
@@ -10690,6 +10707,7 @@ components:
           format: uuid
           readOnly: true
         bundleId:
+          x-ticvai-references: promotions.bundle
           type: string
           format: uuid
         channel:

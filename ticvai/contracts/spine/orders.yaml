@@ -15391,6 +15391,7 @@ components:
       - milestones
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -16010,6 +16011,7 @@ components:
       - allocations
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -16039,6 +16041,7 @@ components:
                 format: uuid
                 readOnly: true
               productId:
+                x-ticvai-references: catalogue.product
                 type: string
                 format: uuid
               quantity:
@@ -16100,6 +16103,7 @@ components:
       - recipients
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -16692,10 +16696,12 @@ components:
           format: uuid
           readOnly: true
         customerMembershipId:
+          x-ticvai-references: identity.customer_membership
           type: string
           format: uuid
           description: The membership in the path. Taken from the path on `renewMembership`.
         entitlementTemplateId:
+          x-ticvai-references: catalogue.entitlement_template
           type: string
           format: uuid
         orderId:
@@ -16806,6 +16812,7 @@ components:
           type: string
           format: uuid
         originalOrderLineId:
+          x-ticvai-references: orders.order_line
           type: string
           format: uuid
         newOrderLineId:
@@ -17424,6 +17431,7 @@ components:
           maxLength: 50
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         orderLineId:
@@ -17675,9 +17683,11 @@ components:
           format: uuid
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         relatedOrderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         relationshipType:
@@ -18074,6 +18084,7 @@ components:
           format: uuid
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         paymentId:
@@ -18102,6 +18113,7 @@ components:
           maxLength: 60
           nullable: true
         merchantId:
+          x-ticvai-references: payments.merchant_account
           type: string
           maxLength: 60
           nullable: true
@@ -18830,6 +18842,7 @@ components:
           type: string
           format: uuid
         leaderSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         organisationName:
@@ -19029,6 +19042,7 @@ components:
           type: string
           format: uuid
         sellerSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         askPrice:
@@ -19565,6 +19579,7 @@ components:
           format: uuid
           description: Unique; one settlement per sold listing.
         sellerSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         listingPrice:
@@ -20334,6 +20349,7 @@ components:
           - community
           - trade
         offeredByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         issuedByPrincipalId:
@@ -21310,6 +21326,7 @@ components:
           format: uuid
           description: Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these.
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         recommendationId:
@@ -23155,6 +23172,7 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         creditLimit:

@@ -8626,6 +8626,7 @@ components:
       - trigger
       properties:
         menuItemId:
+          x-ticvai-references: fnb.menu_item
           type: string
           format: uuid
         matches:
@@ -8906,9 +8907,11 @@ components:
           type: string
           format: uuid
         fromInventoryItemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
         toInventoryItemId:
+          x-ticvai-references: inventory.inventory_item
           type: string
           format: uuid
         substitutionRatio:
@@ -8947,9 +8950,11 @@ components:
       - isActive
       properties:
         itemId:
+          x-ticvai-references: fnb.menu_item
           type: string
           format: uuid
         groupId:
+          x-ticvai-references: fnb.modifier_group
           type: string
           format: uuid
         sortOrder:
@@ -8977,6 +8982,7 @@ components:
           type: string
           nullable: true
         sourceProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         sourceVariantId:
@@ -8990,6 +8996,7 @@ components:
           type: string
           maxLength: 30
         targetProductId:
+          x-ticvai-references: none
           type: string
           format: uuid
         targetVariantId:
@@ -9034,6 +9041,7 @@ components:
       - createdAt
       properties:
         reservationId:
+          x-ticvai-references: fnb.table_reservation
           type: string
           format: uuid
         tableId:
@@ -9079,6 +9087,7 @@ components:
           type: string
           format: uuid
         recipeId:
+          x-ticvai-references: fnb.recipe
           type: string
           format: uuid
           description: '**The recipe the rule applies to** (decided 28 September, audit R125 (10)). Not a menu
@@ -9086,9 +9095,11 @@ components:
 
             '
         fromIngredientId:
+          x-ticvai-references: fnb.recipe_ingredient
           type: string
           format: uuid
         toIngredientId:
+          x-ticvai-references: fnb.recipe_ingredient
           type: string
           format: uuid
         ratio:
@@ -9178,6 +9189,7 @@ components:
             - plannedQuantity
             properties:
               itemId:
+                x-ticvai-references: fnb.menu_item
                 type: string
                 format: uuid
               suggestedQuantity:
@@ -9285,6 +9297,7 @@ components:
             - menuItemId
             properties:
               menuItemId:
+                x-ticvai-references: fnb.menu_item
                 type: string
                 format: uuid
               upcharge:
@@ -9372,6 +9385,7 @@ components:
           type: string
           format: uuid
         menuItemId:
+          x-ticvai-references: fnb.menu_item
           type: string
           format: uuid
         offAt:
@@ -9433,6 +9447,7 @@ components:
           type: string
           format: uuid
         visitId:
+          x-ticvai-references: fnb.table_visit
           type: string
           format: uuid
         label:
@@ -10476,6 +10491,7 @@ components:
           format: uuid
           readOnly: true
         outletId:
+          x-ticvai-references: platform.outlet
           type: string
           format: uuid
         collectionEnabled:
@@ -11104,6 +11120,7 @@ components:
           type: string
           format: uuid
         menuItemId:
+          x-ticvai-references: fnb.menu_item
           type: string
           format: uuid
         quantity:
@@ -11682,6 +11699,7 @@ components:
           type: string
           format: uuid
         orderId:
+          x-ticvai-references: fnb.service_order
           type: string
           format: uuid
           description: The F&B order the ticket was created from on acceptance (`FnbOrder.id`).
@@ -11903,6 +11921,7 @@ components:
                 type: string
                 format: uuid
         defaultStationId:
+          x-ticvai-references: fnb.kitchen_station
           type: string
           format: uuid
           description: Where a line that matches no item rule and no category rule goes (workbook Q190). Never
@@ -12391,6 +12410,7 @@ components:
         '
       properties:
         outletId:
+          x-ticvai-references: platform.outlet
           type: string
           format: uuid
           readOnly: true
@@ -12596,6 +12616,7 @@ components:
           format: uuid
           readOnly: true
         menuId:
+          x-ticvai-references: fnb.menu
           type: string
           format: uuid
         version:
@@ -12661,6 +12682,7 @@ components:
           format: uuid
           readOnly: true
         menuId:
+          x-ticvai-references: fnb.menu
           type: string
           format: uuid
         effectiveAt:

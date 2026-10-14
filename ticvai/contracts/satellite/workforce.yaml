@@ -2312,6 +2312,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         scopePath:
@@ -2328,6 +2329,7 @@ components:
           nullable: true
           description: Group conversations only; null on a direct one.
         createdByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         createdAt:
@@ -2350,9 +2352,11 @@ components:
       - joinedAt
       properties:
         staffConversationId:
+          x-ticvai-references: workforce.staff_conversation
           type: string
           format: uuid
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         joinedAt:
@@ -2384,9 +2388,11 @@ components:
           format: uuid
           description: The client-generated UUIDv7 from the send, the key an offline replay deduplicates on.
         staffConversationId:
+          x-ticvai-references: workforce.staff_conversation
           type: string
           format: uuid
         senderPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         body:
@@ -2654,6 +2660,7 @@ components:
           type: string
           format: uuid
         sourceId:
+          x-ticvai-references: workforce.integration_source
           type: string
           format: uuid
         startedAt:
@@ -2704,6 +2711,7 @@ components:
           type: string
           format: uuid
         sourceId:
+          x-ticvai-references: workforce.integration_source
           type: string
           format: uuid
         syncRunId:
@@ -2771,6 +2779,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         principalId:
@@ -2837,6 +2846,7 @@ components:
           type: string
           format: uuid
         employeeId:
+          x-ticvai-references: workforce.employee
           type: string
           format: uuid
         contractType:
@@ -2877,6 +2887,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         code:
@@ -2916,9 +2927,11 @@ components:
           type: string
           format: uuid
         employeeId:
+          x-ticvai-references: workforce.employee
           type: string
           format: uuid
         typeId:
+          x-ticvai-references: workforce.leave_type
           type: string
           format: uuid
         periodYear:
@@ -2951,6 +2964,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         code:
@@ -2986,6 +3000,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         code:
@@ -3025,9 +3040,11 @@ components:
           type: string
           format: uuid
         employeeId:
+          x-ticvai-references: workforce.employee
           type: string
           format: uuid
         jobTitleId:
+          x-ticvai-references: workforce.job_title
           type: string
           format: uuid
         scopePath:
@@ -3396,6 +3413,7 @@ components:
           type: string
           format: uuid
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         kind:
@@ -3485,6 +3503,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         departmentId:
@@ -3727,8 +3746,8 @@ components:
       properties:
         id: { type: string, format: uuid }
         assignmentId: { type: string, format: uuid }
-        fromPrincipalId: { type: string, format: uuid }
-        toPrincipalId: { type: string, format: uuid }
+        fromPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
+        toPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
         status:
           type: string
           enum: [awaitingPeer, awaitingApproval, approved, rejected, withdrawn]
@@ -3808,7 +3827,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         attendanceRecordId: { type: string, format: uuid, x-ticvai-references: workforce.attendance }
-        amendedByPrincipalId: { type: string, format: uuid }
+        amendedByPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
         amendedAt: { type: string, format: date-time }
         occurredAtBefore:
           type: string

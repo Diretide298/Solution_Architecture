@@ -10202,9 +10202,11 @@ components:
           description: '**Gapless, per issuing legal entity, in its own sequence** (the R152 rule for invoices, decided 28
             September, applied to credit notes): assigned at issue, never reused.'
         invoiceId:
+          x-ticvai-references: control.invoice
           type: string
           description: The invoice credited.
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         reasonCode:
@@ -10681,6 +10683,7 @@ components:
           type: string
           format: uuid
         tierId:
+          x-ticvai-references: subscription.plan
           type: string
           format: uuid
         code:
@@ -10722,6 +10725,7 @@ components:
           type: string
           format: uuid
         tierId:
+          x-ticvai-references: subscription.plan
           type: string
           format: uuid
         code:
@@ -11321,6 +11325,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         unit:
@@ -12728,6 +12733,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -12824,6 +12830,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -12944,6 +12951,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13026,6 +13034,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13135,6 +13144,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13228,6 +13238,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13330,10 +13341,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -13510,10 +13523,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -13658,10 +13673,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -13778,6 +13795,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13876,10 +13894,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -13983,10 +14003,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -14201,6 +14223,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -14303,6 +14326,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -14467,6 +14491,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -14571,10 +14596,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -14701,6 +14728,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -14780,6 +14808,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -15791,6 +15820,7 @@ components:
           type: string
           format: uuid
         cellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         name:
@@ -15912,12 +15942,15 @@ components:
           type: string
           format: uuid
         cellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         instanceId:
+          x-ticvai-references: control.cell_instance
           type: string
           format: uuid
           description: Which instance of the cell holds this database. **Required, not nullable** — a
@@ -16168,9 +16201,11 @@ components:
           type: string
           format: uuid
         fromCellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         toCellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         fromKind:
@@ -16516,6 +16551,7 @@ components:
 
             '
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         periodStart:
@@ -18944,6 +18980,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19014,6 +19051,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19098,6 +19136,7 @@ components:
           description: 'Benefit Dependencies (pack p.11): valid only with a valid visit the same day, e.g.
             parking'
         pricingRuleId:
+          x-ticvai-references: none
           type: string
           nullable: true
           description: 'For a discount benefit (F&B, retail, rental): the central pricing rule that calculates
@@ -19133,6 +19172,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19253,6 +19293,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19409,6 +19450,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19548,6 +19590,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19594,6 +19637,7 @@ components:
           format: uuid
           nullable: true
         changedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         scopePath:

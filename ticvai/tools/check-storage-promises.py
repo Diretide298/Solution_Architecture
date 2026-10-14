@@ -100,14 +100,7 @@ white-label.ConfigVersion.pendingBuildTimeChanges
 # (`x-ticvai-references`, as CR-090 did for `marketing.consent_question_version`) or decide the owner in
 # derive-ddl.py ROW_OWNER, then remove its line. Only shrinks.
 FALLBACK_DEBT = frozenset(k + "@slice" for k in """
-assets.media_collection_member.asset_id assets.media_collection_member.collection_id fnb.allergen_verdict.menu_item_id
-fnb.kitchen_sla.outlet_id fnb.menu_item_modifier.group_id fnb.menu_item_modifier.item_id
-fnb.production_plan_line.item_id fnb.reservation_table.reservation_id fnb.substitution_rule.from_ingredient_id
-fnb.substitution_rule.recipe_id fnb.substitution_rule.to_ingredient_id marketing.campaign_target.campaign_id
-marketing.loyalty_rule.campaign_id promotions.coupon_code_batch.campaign_id transport.departure.performance_id
-transport.departure.route_id transport.fare_matrix_cell.from_station_id transport.fare_matrix_cell.to_station_id
-transport.fare_table.route_id transport.timetable.route_id wallet.balance.wallet_id
-""".split())
+""".split())   # emptied by CHG-STO-001: every member's key is declared
 DEBT = {"SP-ARRAY-NOWHERE": SLICE_DEBT, "SP-KEY-TENANT-FALLBACK": FALLBACK_DEBT}
 
 

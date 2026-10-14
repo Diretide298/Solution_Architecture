@@ -302,6 +302,21 @@ ROW_OWNER = {
     # (subject policy, as at r1); `provider_id` names who issued it and must not make it the provider's row.
     "venuemap.placed_resource": "map_id",         # CHG-DDL-004
     "payments.token": "subject_id",               # CHG-DDL-004: no protected owner, so the subject rule applies
+    # CHG-STO-001 (Block A storage audit, 14 October 2026): declaring every NOT NULL key (SP-KEY-UNDECLARED) gave these
+    # a second protected candidate, and the rule picked the one protected first, which is not the row's owner: a line,
+    # a cell, a point or an option is its parent's (the table it is the rows of); the other key names what it is about.
+    "access.entry_rule_point": "admission_profile_id",        # a rule's points; the access point is where
+    "fnb.menu_item_modifier": "item_id",                      # a menu item's attachment of a (tenant) modifier group
+    "fnb.substitution_rule": "recipe_id",                     # a recipe's rule; the ingredients are what it swaps
+    "fnb.sub_bill": "bill_split_id",                          # a split's sub-bill, as at r1; the visit is what it bills
+    "marketing.wishlist_item": "subject_id",                  # the guest's own row, as at r1 (the subject rule applies)
+    "orders.group_ticket_allocation_line": "group_ticket_allocation_id",   # the allocation's line; the product sold
+    "orders.membership_renewal": "customer_membership_id",    # the membership renewed; the template it renews to
+    "orders.upgrade": "order_id",                             # the order upgraded, as at r1; the line it replaced
+    "promotions.bundle_choice_option": "bundle_choice_group_id",   # the group's option, as at r1; the variant offered
+    "transport.departure": "timetable_id",                    # the timetable's departure; route and performance named
+    "transport.fare_matrix_cell": "fare_table_id",            # the fare table's cell; the stations are its axes
+    "transport.route_stop": "route_id",                       # the route's stop, as at r1; the station is where
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------

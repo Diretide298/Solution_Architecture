@@ -2171,8 +2171,8 @@ components:
       required: [id, collectionId, assetId]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        collectionId: { type: string, format: uuid }
-        assetId: { type: string, format: uuid }
+        collectionId: { type: string, format: uuid, x-ticvai-references: assets.media_collection }
+        assetId: { type: string, format: uuid, x-ticvai-references: assets.media_asset }
         addedByPrincipalId: { type: string, format: uuid, nullable: true }
         addedAt: { type: string, format: date-time }
 

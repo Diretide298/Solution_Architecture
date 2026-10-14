@@ -4825,6 +4825,7 @@ components:
         status:
           $ref: '#/components/schemas/FinTaxInvoiceStatus'
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         templateId:
@@ -5094,6 +5095,7 @@ components:
           readOnly: true
           description: Server-assigned from the legal entity's credit memo series, in sequence without gaps.
         taxInvoiceId:
+          x-ticvai-references: ledger.tax_invoice
           type: string
           format: uuid
         taxInvoiceNumber:
@@ -5122,6 +5124,7 @@ components:
           format: uuid
           nullable: true
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         buyerSubjectId:
@@ -5257,6 +5260,7 @@ components:
           format: uuid
           readOnly: true
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         documentKind:
@@ -5365,6 +5369,7 @@ components:
           format: uuid
           readOnly: true
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         providerName:
@@ -5440,6 +5445,7 @@ components:
         documentNumber:
           type: string
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         providerId:
@@ -6120,6 +6126,7 @@ components:
           description: 'Tax Exemption Evidence: reference, e.g. the exemption certificate, diplomatic card or
             export declaration number.'
         evidenceDocumentId:
+          x-ticvai-references: assets.media_asset
           type: string
           format: uuid
           nullable: true
@@ -6518,6 +6525,7 @@ components:
       - credit
       properties:
         accountId:
+          x-ticvai-references: ledger.account
           type: string
           format: uuid
         debit:
@@ -6990,10 +6998,12 @@ components:
           description: Server-created when the obligation arises, so a UUID, as the `obligationId` path
             parameter types it.
         fromLegalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
           description: The selling entity. Holds the liability, and therefore the FX exposure.
         toLegalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
           description: The consuming entity, which provided the service at redemption.
@@ -7439,6 +7449,7 @@ components:
           nullable: true
           description: Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps.
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: Who took the step.

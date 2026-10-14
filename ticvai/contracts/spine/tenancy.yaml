@@ -3908,6 +3908,7 @@ components:
           format: uuid
           readOnly: true
         firmwareId:
+          x-ticvai-references: tenancy.device_firmware
           type: string
           format: uuid
         targetScopePath:
@@ -4073,6 +4074,7 @@ components:
           format: uuid
           readOnly: true
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           format: uuid
         kind:
@@ -4217,6 +4219,7 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         profileId:
+          x-ticvai-references: platform.configuration_profile
           type: string
           format: uuid
           readOnly: true

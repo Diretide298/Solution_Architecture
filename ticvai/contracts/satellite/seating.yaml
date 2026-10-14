@@ -3139,6 +3139,7 @@ components:
           format: uuid
           x-ticvai-references: seating.seat_block
         seatId:
+          x-ticvai-references: seating.seat
           type: string
           format: uuid
         createdAt:
@@ -3162,6 +3163,7 @@ components:
           format: uuid
           x-ticvai-references: seating.seat_reservation
         seatId:
+          x-ticvai-references: seating.seat
           type: string
           format: uuid
         heldPrice:
@@ -3242,9 +3244,11 @@ components:
           type: string
           format: uuid
         holdTypeId:
+          x-ticvai-references: seating.hold_type
           type: string
           format: uuid
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
         seatIds:
@@ -3456,6 +3460,7 @@ components:
         reference:
           type: string
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
         organisationId:

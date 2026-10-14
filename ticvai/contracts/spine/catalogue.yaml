@@ -18260,6 +18260,7 @@ components:
           format: uuid
           readOnly: true
         recommendationId:
+          x-ticvai-references: catalogue.pricing_recommendation
           type: string
           format: uuid
           description: A `catalogue.pricing_recommendation` (29 September, data model DM3).
@@ -18309,6 +18310,7 @@ components:
           description: >-
             The `createLiveDynamicPrice` execution that carried it out, once it has.
         decidedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true
@@ -18491,9 +18493,11 @@ components:
       - createdAt
       properties:
         entitlementTemplateId:
+          x-ticvai-references: catalogue.entitlement_template
           type: string
           format: uuid
         membershipBenefitId:
+          x-ticvai-references: catalogue.membership_benefit
           type: string
           format: uuid
         usageLimit:
@@ -18523,6 +18527,7 @@ components:
           type: string
           format: uuid
         dynamicPriceRuleId:
+          x-ticvai-references: pricing.dynamic_price_rule
           type: string
           format: uuid
         type:
@@ -18552,6 +18557,7 @@ components:
           type: string
           format: uuid
         dynamicPriceRuleId:
+          x-ticvai-references: pricing.dynamic_price_rule
           type: string
           format: uuid
         type:
@@ -18840,6 +18846,7 @@ components:
           format: uuid
           description: The dynamic pricing strategy that decides when to move (`setDynamicPricingStrategy`).
         seatMapId:
+          x-ticvai-references: seating.seat_map
           type: string
           format: uuid
         performanceId:
@@ -18976,6 +18983,7 @@ components:
           type: string
           format: uuid
         venueMapZoneId:
+          x-ticvai-references: none
           type: string
           format: uuid
           nullable: true
@@ -19757,6 +19765,7 @@ components:
           type: string
           format: date-time
         publishedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         note:
@@ -22491,6 +22500,7 @@ components:
           format: uuid
           x-ticvai-references: catalogue.performance
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
           readOnly: true
@@ -37135,6 +37145,7 @@ components:
           format: uuid
           nullable: true
         requestedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true
@@ -37308,6 +37319,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         productId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         venueId:
@@ -37443,6 +37455,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         productId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         salesChannelId:
@@ -37538,6 +37551,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         sourceProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         dependencyType:
@@ -37722,6 +37736,7 @@ components:
           - cancelled
           default: requested
         requestedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true
@@ -38196,13 +38211,16 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
         participantId:
+          x-ticvai-references: catalogue.event_registration
           type: string
           format: uuid
           description: 'The participant as the request names them: a `catalogue.event_registration`.'
         assetId:
+          x-ticvai-references: assets.media_asset
           type: string
           format: uuid
           description: A `MediaAsset` of `assets.yaml`.
@@ -38520,6 +38538,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         salesChannelId:
+          x-ticvai-references: catalogue.sales_channel
           type: string
           format: uuid
         connectorName:
@@ -38650,6 +38669,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         salesChannelId:
+          x-ticvai-references: catalogue.sales_channel
           type: string
           format: uuid
         channelConnectionId:
@@ -38749,6 +38769,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         salesChannelId:
+          x-ticvai-references: catalogue.sales_channel
           type: string
           format: uuid
         productId:
@@ -38998,6 +39019,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         salesChannelId:
+          x-ticvai-references: catalogue.sales_channel
           type: string
           format: uuid
         channelConnectionId:
@@ -39202,9 +39224,11 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         priceListId:
+          x-ticvai-references: catalogue.price_list
           type: string
           format: uuid
         priceCategoryId:
+          x-ticvai-references: catalogue.price_category
           type: string
           format: uuid
         rateTypeId:
@@ -39294,6 +39318,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         priceListId:
+          x-ticvai-references: catalogue.price_list
           type: string
           format: uuid
         objectType:
@@ -39441,6 +39466,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         productId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         recordKind:
@@ -39986,6 +40012,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         taxCodeId:
+          x-ticvai-references: ledger.tax_code
           type: string
           format: uuid
           description: The `ledger.tax_code` holding rate, country, inclusivity and compounding.
@@ -40494,6 +40521,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         priceListId:
+          x-ticvai-references: catalogue.price_list
           type: string
           format: uuid
         version:
@@ -40581,6 +40609,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         changeRequestId:
+          x-ticvai-references: catalogue.change_request
           type: string
           format: uuid
         priceListVersionId:
@@ -41098,6 +41127,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
         dynamicPricingStrategyId:
+          x-ticvai-references: catalogue.dynamic_pricing_strategy
           type: string
           format: uuid
         basePriceSource:

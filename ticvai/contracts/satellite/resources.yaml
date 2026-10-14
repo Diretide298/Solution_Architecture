@@ -3552,6 +3552,7 @@ components:
           readOnly: true
           description: '`open` on raise.'
         raisedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           readOnly: true
@@ -3613,6 +3614,7 @@ components:
           format: uuid
           readOnly: true
         ticketTypeId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
           description: One policy per ticket type; a `PUT` for a ticket type that has one replaces it.
@@ -3656,6 +3658,7 @@ components:
           format: uuid
           readOnly: true
         resourceId:
+          x-ticvai-references: resources.resource
           type: string
           format: uuid
         kind:
@@ -3862,6 +3865,7 @@ components:
           type: string
           format: uuid
         mapId:
+          x-ticvai-references: venuemap.map
           type: string
           format: uuid
         resourceIds:
@@ -4162,6 +4166,7 @@ components:
       - relation
       properties:
         resourceId:
+          x-ticvai-references: resources.resource
           type: string
           format: uuid
         relation:
@@ -4374,6 +4379,7 @@ components:
       - primaryVenueId
       properties:
         primaryVenueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         secondaryVenueIds:
@@ -4500,6 +4506,7 @@ components:
           type: string
           format: uuid
         resourceId:
+          x-ticvai-references: resources.resource
           type: string
           format: uuid
         from:
@@ -4924,6 +4931,7 @@ components:
 
             '
         depositAuthorisationId:
+          x-ticvai-references: orders.stored_value_authorisation
           type: string
           format: uuid
           nullable: true
@@ -5035,10 +5043,12 @@ components:
           type: string
           format: uuid
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
           description: The `catalogue.performance` this participant is on (audit R165).
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         position:

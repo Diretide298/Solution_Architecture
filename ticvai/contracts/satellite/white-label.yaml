@@ -6279,6 +6279,7 @@ components:
           readOnly: true
           description: UUIDv7.
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
           readOnly: true
@@ -7694,6 +7695,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         hostname:
@@ -10058,6 +10060,7 @@ components:
           format: uuid
           readOnly: true
         kioskConfigId:
+          x-ticvai-references: whitelabel.kiosk_config
           type: string
           format: uuid
           readOnly: true

@@ -1,0 +1,36 @@
+id: CHG-STO-003
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'A table created by a forward migration gets its row-level-security policy in the same migration, so a
+  second derive does not grow the release''s forward migration.'
+decision:
+  what: 'tools/ddl_forward.py diff: a generated apply_*_rls call on a table the migration creates is written with the
+    table. A parent policy names its parent too, so the "every table it names is new" rule missed it.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Found verifying the Block A audit fixes (batch STO) against the instruction that a second derive must not grow
+  V0104: on audit-base b93b5a87 itself, re-running derive-ddl wrote a V0105 holding only the policy of
+  platform.outlet_opening_hour (created by V0104 with no policy at all; CHG-DDL-007, ADAM CR-073), which the first run
+  had listed as "statement added" for a person. Evidence audit/ticvai/runs/audit-1014/classes.json (the storage
+  classes this batch fixes add tables of the same shape).'
+keys_touched:
+  tables:
+  - platform.outlet_opening_hour
+  files:
+  - tools/ddl_forward.py
+root_class: 'new: forward-migration-stability'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::diff
+status: open
+notes: 'Batch STO. Verified: derive-ddl with V0104 removed, then derive-ddl again, writes nothing the second time
+  ("no additive change since the baseline and the forward migrations"). Migration effect: V0104 creates
+  platform.outlet_opening_hour with its parent policy through platform.outlet.'

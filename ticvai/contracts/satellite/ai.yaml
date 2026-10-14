@@ -10388,6 +10388,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         dataKind:
@@ -10507,6 +10508,7 @@ components:
           format: uuid
           x-ticvai-references: ai.history_import
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         dataKind:
@@ -15243,6 +15245,7 @@ components:
           format: uuid
           readOnly: true
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         enabled:
@@ -15324,6 +15327,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         trigger:
@@ -16814,6 +16818,7 @@ components:
           type: string
           format: uuid
         suggestionId:
+          x-ticvai-references: ai.suggestion
           type: string
           format: uuid
         decision:

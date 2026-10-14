@@ -2237,6 +2237,7 @@ components:
       - deviceId
       properties:
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           format: uuid
           description: '`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live
@@ -2720,6 +2721,7 @@ components:
           type: string
           format: uuid
         gameId:
+          x-ticvai-references: games.game
           type: string
           format: uuid
         kind:
@@ -3008,6 +3010,7 @@ components:
           type: string
           format: uuid
         readerId:
+          x-ticvai-references: games.reader
           type: string
           format: uuid
           x-ticvai-unique: tenant

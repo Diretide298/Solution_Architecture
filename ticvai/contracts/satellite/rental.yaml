@@ -2331,12 +2331,15 @@ components:
           type: string
           format: uuid
         rentalAgreementId:
+          x-ticvai-references: rental.agreement
           type: string
           format: uuid
         orderLineId:
+          x-ticvai-references: orders.order_line
           type: string
           format: uuid
         catalogueProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         trackingMode:
@@ -2403,9 +2406,11 @@ components:
           type: string
           format: uuid
         rentalInspectionId:
+          x-ticvai-references: rental.inspection
           type: string
           format: uuid
         rentalAgreementItemId:
+          x-ticvai-references: rental.agreement_item
           type: string
           format: uuid
         componentCode:
@@ -2637,6 +2642,7 @@ components:
       - locationId
       properties:
         locationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         enabled:
@@ -3184,6 +3190,7 @@ components:
           type: string
           format: uuid
         productId:
+          x-ticvai-references: rental.product
           type: string
           format: uuid
           description: The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted.
@@ -3537,6 +3544,7 @@ components:
         reference:
           type: string
         productId:
+          x-ticvai-references: rental.product
           type: string
           format: uuid
         locationId:
@@ -3589,6 +3597,7 @@ components:
           format: date-time
           nullable: true
         depositAuthorisationId:
+          x-ticvai-references: orders.stored_value_authorisation
           type: string
           format: uuid
           nullable: true
@@ -3740,6 +3749,7 @@ components:
           type: string
           format: uuid
         assetId:
+          x-ticvai-references: maintenance.asset
           type: string
           format: uuid
           description: A `maintenance.Asset`, which is also a `resources` resource where the product is
