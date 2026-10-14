@@ -27,6 +27,13 @@ same kind that nothing held:
   C-SEGREGATION-409        a write whose description cites `SegregationRule` declares no 409 carrying the
                            `segregation-breach` problem type, or a response carries that type with a status
                            other than 409 (ADAM CR-079, CHG-IDR-003: one rule, one type, one status)
+  C-PATCH-FULL-BODY        a PATCH whose body is a persisted resource schema with a `required` list naming a
+                           field the caller may send, so a partial update has to resend the whole resource
+                           (ADAM CR-089, CHG-CNS-001). The package's partial update is an `Update<X>Request`:
+                           `minProperties: 1`, no `required`, no defaults, `x-ticvai-persistence: none — request
+                           only` (UpdateProductRequest, UpdateParkingEntitlementRequest). C-REQUEST-SERVER-FIELDS
+                           saw `updateConsentQuestion` only for `status` and it was baselined; the client-owned
+                           required fields (`kind`, `text`, ...) are what a PATCH must not require.
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -66,6 +73,7 @@ RULES = {
     "C-NAME-LOCALISED": "an entity localises other text but not its name (CHG-R4-011)",
     "C-SERIES-WINDOW": "a series repeating every N minutes has no last start time of the day (DI-995, CHG-R4-014)",
     "C-SEGREGATION-409": "a segregation check answered other than 409 segregation-breach (ADAM CR-079, CHG-IDR-003)",
+    "C-PATCH-FULL-BODY": "a PATCH body is the full resource schema with its required list (ADAM CR-089, CHG-CNS-001)",
 }
 # CHG-IDR-003: a write that says it runs the segregation check names the rule schema in its description.
 SEGREGATION = re.compile(r"\bSegregationRule\b")
@@ -234,6 +242,13 @@ def main() -> int:
                 if bad and persisted:
                     guard.add("C-REQUEST-SERVER-FIELDS", oid,
                               f"{oid}: request body requires server-owned {', '.join(bad)}")
+                # CR-089: a partial update names only what changes; the resource's required list is the response's.
+                sent = sorted(p for p in req if not (isinstance(props.get(p), dict) and props[p].get("readOnly")))
+                if m == "patch" and persisted and sent:
+                    guard.add("C-PATCH-FULL-BODY", oid,
+                              f"{oid}: PATCH body is the persisted schema "
+                              f"{g.ref_name(str((sch or {}).get('$ref') or '')) or '(inline)'} and requires "
+                              f"{', '.join(sent)}; use an Update<X>Request with minProperties: 1 and no required")
                 if node.get("type") == "object" and not props and not node.get("allOf") \
                         and not node.get("oneOf") and not node.get("anyOf") \
                         and not isinstance(node.get("additionalProperties"), dict):

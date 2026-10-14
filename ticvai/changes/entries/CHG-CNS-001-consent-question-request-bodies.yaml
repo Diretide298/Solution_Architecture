@@ -1,0 +1,75 @@
+id: CHG-CNS-001
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'updateConsentQuestion takes UpdateConsentQuestionRequest (only what changes: minProperties 1, no required,
+  no defaults) and createConsentQuestion takes CreateConsentQuestionRequest (kind and text required); ConsentQuestion
+  stays the response, and check-contract-shapes C-PATCH-FULL-BODY refuses a PATCH whose body is a persisted resource
+  schema with a required list.'
+decision:
+  what: 'contracts/satellite/marketing-crm.yaml: new schemas CreateConsentQuestionRequest (required kind, text;
+    helpText, scope, required, blockingAnswer optional with ConsentQuestion''s defaults; no id, version, status,
+    scopePath, updatedAt) and UpdateConsentQuestionRequest (text, helpText, scope, required, blockingAnswer, status;
+    minProperties 1; no required list and no defaults, so a field left out keeps its stored value; helpText null
+    clears it; kind not sendable, fixed once created), both `x-ticvai-persistence: none — request only`; the two
+    request bodies point at them; the descriptions say the server sets id, version, status and scopePath.
+    docs/active/breaking-changes.yaml BC-089 (updateConsentQuestion) and BC-090 (createConsentQuestion): fields removed
+    from the request, breaking in declaration only (no additionalProperties: false, so a full body is still
+    accepted and the extra fields ignored). tools/check-contract-shapes.py: rule C-PATCH-FULL-BODY.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-089 (Chinmay Patkar, ticket 27922), audited 14 October 2026 against r6-integrate (594e51a2). TRUE: both
+  bodies were $ref ConsentQuestion (marketing-crm.yaml:16131, 16184) whose required list is id, kind, text, version,
+  scope, required, blockingAnswer, status (18559-18567); the description says the server raises version and CMS-018
+  formUpdateConsentQuestion sends only text, helpText, scope, required, blockingAnswer, status
+  (screens/P13-white-label-cms.yaml:4247-4252); formCreateConsentQuestion requires kind and text (4225-4232). PARTLY:
+  id and version are readOnly, which OpenAPI 3.0 applies to responses only, so a strict client was not made to send
+  them; status, kind and the four question fields were required and not readOnly, and scope/required/blockingAnswer
+  /status carried defaults a generated PATCH client could resend, resetting a value. Missed: C-REQUEST-SERVER-FIELDS
+  caught both operations for status but they were baselined (handoff/audit-baseline.json, check-contract-shapes);
+  four more PATCH operations take their whole resource with its required list (updateDonationCampaign,
+  updatePartnerAgreement, updateRotaAssignment, updateTableReservation; the last two are in the delivery slice).
+  The package''s partial update is Update<X>Request with minProperties 1 (UpdateProductRequest catalogue.yaml,
+  UpdateEntitlementTemplateRequest CHG-R6-040, UpdateParkingEntitlementRequest access.yaml); 57 of 69 PATCH bodies
+  are inline required-less objects.'
+keys_touched:
+  screens:
+  - CMS-018
+  operations:
+  - createConsentQuestion
+  - updateConsentQuestion
+  schemas:
+  - ConsentQuestion
+  - CreateConsentQuestionRequest
+  - UpdateConsentQuestionRequest
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-contract-shapes.py
+  - handoff/audit-baseline.json
+root_class: A18 API-CONVENTIONS
+tickets:
+  started:
+  - SVC-MARKETING-CONSENT-5 (#27922)
+  unstarted:
+  - SVC-MARKETING-CONSENT-1 (#27738)
+  - APP-WL-CMS-018 (#28846)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-089
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
+  CNS. Option A of the CR, the package''s own Create/Update split; lead to confirm two details chosen here: kind cannot
+  change after create (the CR and CMS-018 both leave it out), and status is not sent on create (a question is created
+  active). Contract impact: request schemas only; responses unchanged; BC-089/BC-090 approved for r6, producer
+  SVC-MARKETING-CONSENT-5 and -1, consumer APP-WL-CMS-018 (CMS-018''s text already describes these bodies, so no screen
+  change). Migration effect: none. New rule C-PATCH-FULL-BODY in check-contract-shapes (already registered in
+  run-checks.py): run on the parent commit 594e51a2 (its marketing-crm.yaml with this check) FAIL, 1 new
+  (updateConsentQuestion; C-REQUEST-SERVER-FIELDS also 2 new once their baseline entries left); on this branch PASS.
+  The four other PATCH operations are baselined for their owners to raise (updateRotaAssignment and
+  updateTableReservation are delivery-slice); createConsentQuestion and updateConsentQuestion left the
+  C-REQUEST-SERVER-FIELDS baseline. #27922 is started: it gets this through its CR (agent comment), not a rewrite.'

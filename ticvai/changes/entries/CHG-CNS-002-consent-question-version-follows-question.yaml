@@ -1,0 +1,72 @@
+id: CHG-CNS-002
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'marketing.consent_question_version.question_id is a declared key to marketing.consent_question, so the
+  version takes its question''s scope by the parent rule instead of the tenant-root policy, and a venue can reword its
+  own question; check-storage-promises SP-KEY-TENANT-FALLBACK holds the class.'
+decision:
+  what: 'contracts/satellite/marketing-crm.yaml ConsentQuestionVersion.questionId: `x-ticvai-references:
+    marketing.consent_question` with a description, as CHG-DDL-004 settled CR-069. derive-ddl then emits the foreign
+    key (handoff/migration-review.md "constraint added", NOT VALID then VALIDATE, by a person: frozen r1 baseline) and
+    writes the policy swap into the next forward migration (CHG-GEN-004): drop_rls_policies, then apply_parent_rls(
+    question_id -> marketing.consent_question.id). No new column, no backfill, no ROW_OWNER entry (question_id is the
+    only NOT NULL reference). tools/check-storage-promises.py: rule SP-KEY-TENANT-FALLBACK, with FALLBACK_DEBT.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-090 (Chinmay Patkar, ticket 27922, blocking), audited 14 October 2026 against r6-integrate (594e51a2).
+  TRUE: backend/tenant/920-row-level-security.sql:1178 apply_tenant_rls(consent_question_version) "no scope column
+  and no declared owner"; 910-indexes.sql:1506 "convention, not declared" and no 900 key; the question is
+  apply_scope_rls (920:574); updateConsentQuestion and createConsentQuestion are venue-level GUEST_MANAGE and both
+  write the version (api-data-lineage), so a venue create fails too, not only a reword. Same class as CR-069
+  (CHG-DDL-004). Missed: SP-KEY-UNDECLARED did list question_id, but it was one of 391 keys baselined at CHG-DDL-004
+  (handoff/audit-baseline.json) because that rule cannot tell which undeclared keys cost a table its policy;
+  check-rls-scope-fit RF-TENANT-ROOT baselined the same operations. 45 more NOT NULL convention keys leave a table
+  written below tenant at the tenant root while its parent is scoped, 21 of them written by delivery-slice operations
+  (fnb.menu_item_modifier, fnb.substitution_rule, fnb.reservation_table, transport.timetable, wallet.balance,
+  marketing.campaign_target, promotions.coupon_code_batch and others). The version table has no unique (question_id,
+  version) either.'
+keys_touched:
+  operations:
+  - createConsentQuestion
+  - updateConsentQuestion
+  schemas:
+  - ConsentQuestionVersion
+  tables:
+  - marketing.consent_question_version
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-storage-promises.py
+  - handoff/audit-baseline.json
+  tickets:
+  - MIG-MARKETING
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - SVC-MARKETING-CONSENT-5 (#27922)
+  unstarted:
+  - MIG-MARKETING (#27677)
+  - SVC-MARKETING-CONSENT-1 (#27738)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-090
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
+  CNS. Option A of the CR. Contract impact: additive (an x-ticvai extension only; check-contract-compat PASS).
+  Migration effect: MIG-MARKETING (#27677, V0028__marketing.sql): the generated forward migration drops
+  consent_question_version''s tenant-root policies and applies apply_parent_rls through marketing.consent_question;
+  the foreign key consent_question_version_question_id_fkey is listed in migration-review.md for a person (validate
+  existing rows). #27922''s skipped test A_venue_manager_rewords_a_question_of_their_venue becomes its acceptance test.
+  New rule SP-KEY-TENANT-FALLBACK in check-storage-promises (already registered in run-checks.py): a NOT NULL
+  convention key whose table has the tenant-root policy while the target has a scope, venue, parent or subject
+  policy, and a below-tenant staff or partner operation writes the table. Not baselinable for a table a
+  delivery-slice operation writes: the 21 slice keys of 14 October are held in code (FALLBACK_DEBT, only shrinks),
+  the 24 others baselined. Run on the parent 594e51a2 after derive-schema, derive-relationships and derive-ddl:
+  FAIL, 46 new, consent_question_version.question_id among the 22 unbaselinable; on this branch after the same
+  derivers: PASS. The slice members are blockers of the same kind for their own modules (fnb, transport, wallet,
+  assets, marketing, promotions); lead to decide whether to raise them now. Not done here: unique (question_id,
+  version) on the version table.'

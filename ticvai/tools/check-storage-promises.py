@@ -26,6 +26,14 @@ the derived database could not keep. Each is a rule here, read against `handoff/
   SP-KEY-GUESSED       (CR-070) a convention reference whose target the name rule picked from another module
                        than the column's own and its own module has no such table: `refund.tax_reversal_entry_id`
                        -> `queue.entry`. Known ones baselined; a new guess fails until it is declared or refused.
+  SP-KEY-TENANT-FALLBACK (CR-090) SP-KEY-UNDECLARED's consequence: a NOT NULL convention key whose table fell back to
+                       the tenant-root policy (no scope column, no declared owner) while the table it points at is
+                       scoped, and an operation below tenant that a staff or partner principal calls writes the
+                       table. A venue's write fails with 42501 (`consent_question_version`, #27922). Declaring the
+                       key gives the row its parent's policy. **Not baselinable for a table a delivery-slice
+                       operation writes**: the 14 October members are held in code (FALLBACK_DEBT) and only shrink.
+                       SP-KEY-UNDECLARED saw `consent_question_version.question_id` and it was baselined with 391
+                       others at CHG-DDL-004, because that rule does not know which undeclared keys cost a policy.
 
 Read-only. Exit 1 on a finding not in handoff/audit-baseline.json (tools/audit_guard.py).
 
@@ -44,7 +52,14 @@ RULES = {
     "SP-REQUEST-NOT-NULL": "a NOT NULL column sourced only from a request schema beside the row's own (CR-065)",
     "SP-KEY-UNDECLARED": "a NOT NULL key into its own database is a naming convention, not declared (CR-069, CR-013)",
     "SP-KEY-GUESSED": "a convention key the name rule pointed into another module's table (CR-070, CR-013)",
+    "SP-KEY-TENANT-FALLBACK": "an undeclared key left a table written below tenant at the tenant-root policy while "
+                              "its parent is scoped (CR-090)",
 }
+BELOW_TENANT = {"region", "brand", "venue", "workstation"}
+JUDGED_AUDIENCE = {"staff", "partner"}
+# The policies derive-ddl's parent rule passes on to a child. A split parent (read-beneath, grant-holder-read)
+# passes none (SPLIT_CHILDREN), so a key to it (`identity.principal`) names who, not an owner.
+PARENT_POLICIES = {"apply_scope_rls", "apply_venue_rls", "apply_parent_rls", "apply_subject_rls"}
 # A rule whose findings may not be baselined for an operation the first release builds.
 SLICE_RULES = {"SP-ARRAY-NOWHERE"}
 DUPLICATE = re.compile(r"\b(already (?:in use|exists?|taken|used)|duplicate|not unique|is taken)\b", re.I)
@@ -79,22 +94,53 @@ white-label.ConfigVersion.pendingBuildTimeChanges
 """.split())
 
 
+# **The tables a delivery-slice operation writes below tenant that an undeclared key left at the tenant root, on
+# 14 October 2026** (SP-KEY-TENANT-FALLBACK, CHG-CNS-002). Same rule as SLICE_DEBT: held here, never in the
+# baseline file, and a new member fails. Each is a venue write that answers 42501 today: declare the key
+# (`x-ticvai-references`, as CR-090 did for `marketing.consent_question_version`) or decide the owner in
+# derive-ddl.py ROW_OWNER, then remove its line. Only shrinks.
+FALLBACK_DEBT = frozenset(k + "@slice" for k in """
+assets.media_collection_member.asset_id assets.media_collection_member.collection_id fnb.allergen_verdict.menu_item_id
+fnb.kitchen_sla.outlet_id fnb.menu_item_modifier.group_id fnb.menu_item_modifier.item_id
+fnb.production_plan_line.item_id fnb.reservation_table.reservation_id fnb.substitution_rule.from_ingredient_id
+fnb.substitution_rule.recipe_id fnb.substitution_rule.to_ingredient_id marketing.campaign_target.campaign_id
+marketing.loyalty_rule.campaign_id promotions.coupon_code_batch.campaign_id transport.departure.performance_id
+transport.departure.route_id transport.fare_matrix_cell.from_station_id transport.fare_matrix_cell.to_station_id
+transport.fare_table.route_id transport.timetable.route_id wallet.balance.wallet_id
+""".split())
+DEBT = {"SP-ARRAY-NOWHERE": SLICE_DEBT, "SP-KEY-TENANT-FALLBACK": FALLBACK_DEBT}
+
+
 class SliceGuard(g.Guard):
-    """A Guard whose SP-ARRAY-NOWHERE slice members are never read from or written to the baseline file."""
+    """A Guard whose slice members (SP-ARRAY-NOWHERE, SP-KEY-TENANT-FALLBACK) are never read from or written to
+    the baseline file: the code holds them."""
 
     def _baseline(self) -> dict:
         base = dict(super()._baseline())
-        rule = [k for k in (base.get("SP-ARRAY-NOWHERE") or []) if not k.endswith("@slice")]
-        base["SP-ARRAY-NOWHERE"] = rule + sorted(SLICE_DEBT)
+        for r, debt in DEBT.items():
+            rule = [k for k in (base.get(r) or []) if not k.endswith("@slice")]
+            base[r] = rule + sorted(debt)
         return base
 
     def _write_baseline(self):
-        kept = self.found.get("SP-ARRAY-NOWHERE") or {}
-        self.found["SP-ARRAY-NOWHERE"] = {k: v for k, v in kept.items() if not k.endswith("@slice")}
+        kept = {r: self.found.get(r) or {} for r in DEBT}
+        for r in DEBT:
+            self.found[r] = {k: v for k, v in kept[r].items() if not k.endswith("@slice")}
         try:
             super()._write_baseline()
         finally:
-            self.found["SP-ARRAY-NOWHERE"] = kept
+            self.found.update(kept)
+
+
+def rls_policies() -> dict:
+    """table -> the apply_*_rls helper the databases get (the baseline, then every forward migration), read the
+    way check-rls-scope-fit reads it. Derive before check: derive-ddl writes a policy change into the next V-file."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "rls_scope_fit", str(Path(__file__).resolve().parent / "check-rls-scope-fit.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return {t: helper for t, (helper, _) in mod.policies(g.ROOT / "backend").items()}
 
 
 def deref(node, stem, by, depth=0):
@@ -337,6 +383,36 @@ def main() -> int:
                     and (tshort not in "_".join(words) or (tshort in GENERIC and len(words) > 1)):
                 guard.add("SP-KEY-GUESSED", f"{t}.{c['column']}",
                           f"{t}.{c['column']} -> {to}: the name rule's pick from another module")
+
+    # ---- SP-KEY-TENANT-FALLBACK (CR-090) ------------------------------------------------------------
+    # A table at the tenant-root policy (apply_tenant_rls) with a NOT NULL convention key to a table that has any
+    # other policy (scope, venue, parent, subject): had the key been declared, the parent rule would have scoped
+    # it. Judged only where an operation below tenant that staff or partners call writes the table.
+    pol = rls_policies()
+    lin = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
+    writers: dict = {}
+    for oid, e in lin.items():
+        if not isinstance(e, dict) or e.get("scope") not in BELOW_TENANT \
+                or not (set(e.get("audience") or []) & JUDGED_AUDIENCE):
+            continue
+        for t in e.get("writes") or []:
+            writers.setdefault(t, []).append(oid)
+    for t, cs in sorted(cols.items()):
+        if pol.get(t) != "apply_tenant_rls" or t not in writers:
+            continue
+        for c in cs:
+            to = c.get("references")
+            if not to or c.get("enforced") == "yes" or c.get("required") != "yes" or to not in cols \
+                    or area(to) != area(t) or pol.get(to) not in PARENT_POLICIES:
+                continue
+            ws = sorted(writers[t])
+            sl = [o for o in ws if o in slice_ops]
+            key = f"{t}.{c['column']}" + ("@slice" if sl else "")
+            guard.add("SP-KEY-TENANT-FALLBACK", key,
+                      f"{t} is tenant-root only; {c['column']} -> {to} ({pol.get(to)}) is a convention, not a "
+                      f"declared key, and {', '.join((sl or ws)[:3])}" + (" (delivery slice)" if sl else "")
+                      + " writes it below tenant",
+                      strict=bool(sl) and key not in FALLBACK_DEBT)
     return guard.finish()
 
 

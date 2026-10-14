@@ -16113,7 +16113,8 @@ paths:
         (`perBooking`); `required` whether checkout waits for it; `blockingAnswer` which answer, if any,
         stops the booking (a `no` to "Are you able to swim?" on a deep-water product). Attaching it to a
         product is the catalogue's (`catalogue.Product.consentQuestionIds`), and to a booking flow the
-        white-label flow configuration's. Created at version 1.
+        white-label flow configuration's. Created at version 1, `active`. The body is
+        `CreateConsentQuestionRequest` (ADAM CR-089): the server sets `id`, `version`, `status` and `scopePath`.
       tags:
       - consent
       x-ticvai-permission: GUEST_MANAGE
@@ -16128,7 +16129,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConsentQuestion'
+              $ref: '#/components/schemas/CreateConsentQuestionRequest'
       responses:
         '201':
           headers:
@@ -16166,7 +16167,10 @@ paths:
         3 REV3-26). Changing `text`, `scope`, `required` or `blockingAnswer` raises `version` by one; every
         answer already given keeps the version it was given against, which is the evidence if the answer
         is ever questioned. A cart that asked the old version asks the new one on its next read. Setting
-        `status` to `retired` stops it being asked and changes no version.
+        `status` to `retired` stops it being asked and changes no version. **The body carries only what
+        changes** (`UpdateConsentQuestionRequest`, ADAM CR-089): a field left out keeps its value, `kind` is
+        fixed once created, and `version` is the server's to raise. A venue writes the new version row
+        beside its question: `consent_question_version` follows its question's scope (ADAM CR-090).
       tags:
       - consent
       x-ticvai-permission: GUEST_MANAGE
@@ -16181,7 +16185,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConsentQuestion'
+              $ref: '#/components/schemas/UpdateConsentQuestionRequest'
       responses:
         '200':
           headers:
@@ -18619,6 +18623,84 @@ components:
           type: string
           format: date-time
           readOnly: true
+    CreateConsentQuestionRequest:
+      type: object
+      x-ticvai-persistence: none — request only; applied to marketing.consent_question and marketing.consent_question_version
+      description: '**The body of `createConsentQuestion`** (ADAM CR-089, CHG-CNS-001). Each field means what it
+        means on `ConsentQuestion`. `id`, `version` (1), `status` (`active`), `scopePath` and `updatedAt` are the
+        server''s and are not sent.'
+      required:
+      - kind
+      - text
+      properties:
+        kind:
+          $ref: '#/components/schemas/ConsentQuestionKind'
+        text:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          description: The question as the guest reads it, per locale.
+        helpText:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        scope:
+          type: string
+          enum:
+          - perPerson
+          - perBooking
+          default: perPerson
+          description: Asked for each declared person, or once for the whole booking.
+        required:
+          type: boolean
+          default: true
+          description: Checkout waits until it is answered.
+        blockingAnswer:
+          type: string
+          enum:
+          - 'yes'
+          - 'no'
+          - none
+          default: none
+          description: The answer that stops the booking, for the person or the booking it covers.
+    UpdateConsentQuestionRequest:
+      type: object
+      x-ticvai-persistence: none — request only; applied to marketing.consent_question and marketing.consent_question_version
+      description: '**The body of `updateConsentQuestion`: only what changes** (ADAM CR-089, CHG-CNS-001). A partial
+        update, so a field left out keeps its stored value; no field has a default here, so leaving one out never
+        resets it. Each field means what it means on `ConsentQuestion`. `kind` is fixed once created; `id`,
+        `version`, `scopePath` and `updatedAt` are the server''s. `helpText: null` clears the help text.'
+      minProperties: 1
+      properties:
+        text:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          description: The question as the guest reads it, per locale. A change raises `version` by one.
+        helpText:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        scope:
+          type: string
+          enum:
+          - perPerson
+          - perBooking
+          description: A change raises `version` by one.
+        required:
+          type: boolean
+          description: A change raises `version` by one.
+        blockingAnswer:
+          type: string
+          enum:
+          - 'yes'
+          - 'no'
+          - none
+          description: A change raises `version` by one.
+        status:
+          type: string
+          enum:
+          - active
+          - retired
+          description: '`retired` stops the question being asked and changes no version.'
     ConsentQuestionVersion:
       type: object
       x-ticvai-persistence: marketing.consent_question_version
@@ -18634,6 +18716,10 @@ components:
         questionId:
           type: string
           format: uuid
+          x-ticvai-references: marketing.consent_question
+          description: The question this is a wording of. **A declared key** (ADAM CR-090, CHG-CNS-002), so a
+            version is read and written exactly where its question is (the parent rule), never only at the
+            tenant root.
         version:
           type: integer
           minimum: 1
