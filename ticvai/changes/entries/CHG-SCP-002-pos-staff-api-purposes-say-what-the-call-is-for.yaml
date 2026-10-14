@@ -1,0 +1,62 @@
+id: CHG-SCP-002
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Eleven operation purposes on POS and staff-app screens that were the operationId or the template "Add
+  something" now say what the call is for on that screen.'
+decision:
+  what: 'screens/P04-point-of-sale.yaml (POS-001 getWorkstationHealth and listDenominations, POS-002, POS-021 and
+    POS-023 addCartLine, POS-007 listDenominations, POS-011 listSerialisedItems) and screens/P06-staff-app.yaml
+    (EMP-065 logColdChain, EMP-067 logTemperature and signCorrectiveAction, EMP-069 listSerialisedItems): `apis[].purpose`
+    written from the contract summary and the screen''s use of it. Invisible metadata; nothing on the screen changes.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+  S-PURPOSE-TEMPLATE (R260) had 11 members on P04 and P06, 0 after. Ruling (the lead, 14 October 2026, "go with
+  your recommendation"): each api purpose says what the call is for (from the contract summary). addCartLine''s own
+  contract summary is "Add something", so its three purposes say what each sale screen puts in the cart.'
+keys_touched:
+  screens:
+  - POS-001
+  - POS-002
+  - POS-007
+  - POS-011
+  - POS-021
+  - POS-023
+  - EMP-065
+  - EMP-067
+  - EMP-069
+  operations:
+  - getWorkstationHealth
+  - listDenominations
+  - addCartLine
+  - listSerialisedItems
+  - logColdChain
+  - logTemperature
+  - signCorrectiveAction
+  other:
+  - S-PURPOSE-TEMPLATE
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-001 (#28536)
+  - APP-POS-POS-002 (#28342)
+  - APP-POS-POS-007 (#28537)
+  - APP-POS-POS-011 (#28620)
+  - APP-POS-POS-021 (#28565)
+  - APP-POS-POS-023 (#28617)
+  - APP-SETUP-EMP-065 (#28719)
+  - APP-SETUP-EMP-065-REST (#28775)
+  - APP-SETUP-EMP-067 (#28720)
+  - APP-SETUP-EMP-067-REST (#28583)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCP, 14 October 2026. The contract summary of orders.addCartLine ("Add something") is itself a
+  template; the contract is not this batch''s to edit (it is a contract-shapes matter) and is left as it is.'

@@ -1,0 +1,51 @@
+id: CHG-SCP-009
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Three staff-app incident screens send a file reference (recordAuthorityNotification''s and updateIncident''s
+  attachmentRefs) and uploaded nothing; their incident forms now request the signed upload through
+  uploadIncidentMedia, the incident''s own upload (CHG-RUL-013), with no control of its own.'
+decision:
+  what: 'screens/P06-staff-app.yaml: EMP-003 Home - on duty, EMP-027 Incident detail and EMP-050 Post-incident
+    restore declare maintenance.uploadIncidentMedia, trigger background (requested when the form that attaches the
+    file is sent). The forms (formRecordAuthorityNotification, formUpdateIncident) already collect the attachment;
+    nothing visible changes. The other four P06 members are kept: EMP-005 and EMP-006 (attachWorkOrderEvidence
+    assetRef) and EMP-028 and EMP-029 (addCaseMessage attachmentRefs) have no upload a technician or steward may
+    call (assets.createUpload needs ASSET_LIBRARY_MANAGE). Each needs a module-owned upload like uploadIncidentMedia
+    (proposed: maintenance uploadWorkOrderMedia, marketing-crm uploadCaseAttachment); tried here and withdrawn, because
+    each needs a storage decision (its own media row and table, as incident_media, or a `pure` lineage judgement)
+    and, on EMP-006, EMP-028 and EMP-029, offline wording that names the upload as online-only (batch OFL), neither
+    of which this batch may make.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring S-UPLOAD
+  (R196) had 7 members on P06 (none on P04): 3 fixed here, 4 kept for a contract decision. Ruling (the lead, 14
+  October 2026, "go with your recommendation"): a write taking a file reference has an upload on its screen; the
+  approved UI is fixed, so the upload is the forms'' background call, not a new control.'
+keys_touched:
+  screens:
+  - EMP-003
+  - EMP-027
+  - EMP-050
+  operations:
+  - uploadIncidentMedia
+  - recordAuthorityNotification
+  - updateIncident
+  other:
+  - S-UPLOAD
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-STAFF-EMP-003 (#28652)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCP, 14 October 2026. maintenance.uploadIncidentMedia''s x-ticvai-consumed-by gains the three screens at
+  the next derive. After link-screens-contracts and build-service-docs, check-ticket-scope shows no finding for them
+  (uploadIncidentMedia is built by SVC-VENUEOPS-INCIDENT-3).'

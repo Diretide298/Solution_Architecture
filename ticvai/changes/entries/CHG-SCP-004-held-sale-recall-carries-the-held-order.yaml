@@ -1,0 +1,41 @@
+id: CHG-SCP-004
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Recalling a held sale (POS-006 to POS-002) carried six fields of the prototype''s cart (cart, cartHoldExpiresAt,
+  guest, discount, table, orderType) that POS-006 never holds; it now resumes the held order and carries its orderId
+  and the guest''s subjectId, and POS-002 reads the rest with the order.'
+decision:
+  what: 'screens/P04-point-of-sale.yaml, POS-006 transition to POS-002 ("Recall this held sale"): `operation:
+    resumeOrder` (already on the screen, behind its Resume order button) and `carries: [orderId, subjectId]`, in place
+    of the six cart fields. The parked cart is the held order (CHG-SPO-015): its lines, discounts, hold clock
+    (`heldUntil`), table and order type are fields of the Order that resumeOrder returns and POS-002 reads by
+    `orderId`, so the hold clock still travels with the sale. The transition, its trigger and its control are
+    unchanged; nothing on either screen changes.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-navigation
+  N-CARRIES-HELD (R251 R262) had 6 members on P04 (all this one edge), 0 after. Ruling (the lead, 14 October 2026, "go
+  with your recommendation"): a transition carries only ids the source screen holds.'
+keys_touched:
+  screens:
+  - POS-006
+  - POS-002
+  operations:
+  - resumeOrder
+  other:
+  - N-CARRIES-HELD
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-006 (#28256)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: open
+notes: 'Batch SCP, 14 October 2026.'

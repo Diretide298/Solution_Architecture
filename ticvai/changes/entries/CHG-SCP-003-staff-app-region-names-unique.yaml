@@ -1,0 +1,39 @@
+id: CHG-SCP-003
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'EMP-005 Task detail named two of its regions contextPanel; the second (the parts reserved for the task) is
+  now partsPanel. The regions, their components and their order are unchanged.'
+decision:
+  what: 'screens/P06-staff-app.yaml: EMP-005 renames its second contextPanel to `partsPanel`. The other four P06
+    members (EMP-071, EMP-081, EMP-083, EMP-091, contentBody twice) are left as they are: each is a copy of its P08
+    twin (`source.sameAs` BO-544, BO-554, BO-556, BO-564), check-screens fails any drift between the two
+    (tools/applied/apply-rental-staff-app.py copies layout, states, apis and the rest from P08), and the P08 screens
+    are batch SCR''s. They clear when SCR renames the twins'' regions and re-runs the copy. Where a repeated name is
+    contentBody, the first should be the one renamed: tools/derive-wireframes.py renders the region named contentBody
+    and with two it takes the last, so the derived wireframes stay as drawn.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+  S-DUP-REGION (R253) had 5 members on P06 (none on P04); 1 fixed here, 4 follow their P08 twins (batch SCR). Ruling (the lead, 14 October 2026, "go with your
+  recommendation"): region names unique per screen. A region name is an identifier in the record, not text on the
+  screen.'
+keys_touched:
+  screens:
+  - EMP-005
+  other:
+  - S-DUP-REGION
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-STAFF-EMP-005 (#28662)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCP, 14 October 2026. EMP-071 to EMP-100 (the rental boards on the staff app) are not in Block A.'

@@ -955,6 +955,12 @@ screens:
     trigger: onAction
     invalidates:
     - listIncidents
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: 'The signed upload for a photo or document the incident form attaches, requested when
+      the form is sent; no control of its own'
+    trigger: background
+    provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
     params:
     - name: incidentId
@@ -1373,6 +1379,8 @@ screens:
   - id: confirmSuspendShift
     component: confirmDialog
     trigger: Suspend shift
+    confirm:
+      operation: suspendShift
     body: '**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than
       the verb. A end shift this affects should be identified in the dialog, not just counted. **Collects
       what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.'
@@ -1678,11 +1686,6 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
-  - operationId: verifyAccreditationCredential
-    contract: accreditation
-    purpose: 'Verify a presented accreditation: photo, name, category, zones allowed now, validity'
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - ScanEvent.id
@@ -3172,7 +3175,7 @@ screens:
         label: Resume work order
         operation: resumeWorkOrder
         provenance: contract maintenance.yaml POST /work-orders/{workOrderId}/resume
-    - name: contextPanel
+    - name: partsPanel
       slot: selection
       components:
       - kind: dataTable
@@ -6867,6 +6870,12 @@ screens:
     trigger: onAction
     invalidates:
     - listIncidents
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: 'The signed upload for a photo or document the incident form attaches, requested when
+      the form is sent; no control of its own'
+    trigger: background
+    provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
     params:
     - name: incidentId
@@ -8240,6 +8249,12 @@ screens:
     purpose: Record that an external authority was notified, where required
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: 'The signed upload for a photo or document the incident form attaches, requested when
+      the form is sent; no control of its own'
+    trigger: background
+    provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
     params:
     - name: incidentId
@@ -9145,8 +9160,8 @@ screens:
     trigger: onLoad
   - operationId: getVenueMapLive
     contract: venue-map
-    purpose: The map with live operational state on it
-    trigger: onLoad
+    purpose: 'The live operational state on the venue map, refreshed while the map is open'
+    trigger: onInterval
   entryState:
     params:
     - name: mapId
@@ -10410,7 +10425,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTableReservations` reads the population and `getTableMap` reads one of them — list,
     select, act'
-  purpose: Restaurant Service Command Center — from the client design board, 20 August.
+  purpose: 'See a service period at a glance for one outlet: its table bookings, the F&B orders in
+    flight and the table map with each table''s live state.'
   layout:
     template: split
     regions:
@@ -10563,7 +10579,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getTableMap` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Floor Plan & Table Map — from the client design board, 20 August.
+  purpose: 'Show the outlet''s floor as it is laid out, with each table''s live state, so a host can
+    see where to seat a party.'
   layout:
     template: detail
     regions:
@@ -10670,7 +10687,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`setTableLayout`) and no read of a population — it is
     settings, not a list
-  purpose: Table & Seating Configuration — from the client design board, 20 August.
+  purpose: 'Set out the outlet''s tables (label, capacity, zone, position and shape) and which
+    tables can be pushed together, and to what capacity.'
   layout:
     template: form
     regions:
@@ -10830,7 +10848,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTableReservations` reads a population and nothing reads one of them; the detail
     is the row until a `get` exists'
-  purpose: Reservation Calendar & Timeline — from the client design board, 20 August.
+  purpose: 'See an outlet''s table bookings for a date, on a calendar and as a list, with the double
+    bookings still to resolve.'
   layout:
     template: split
     regions:
@@ -10967,7 +10986,9 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`createTableReservation`) and no read of a population
     — it is settings, not a list
-  purpose: Create / Edit Reservation — from the client design board, 20 August.
+  purpose: 'Book a table for a guest at the host stand (party size, time, tables, seating preference
+    and occasion) after checking whether the guest already has a record, then send the
+    confirmation.'
   layout:
     template: form
     regions:
@@ -11190,7 +11211,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`joinRestaurantWaitlist`) and no read of a population
     — it is settings, not a list
-  purpose: Walk-In & Waitlist Management — from the client design board, 20 August.
+  purpose: 'Put a walk-in party on the outlet''s waitlist, quote them a wait, tell them when their
+    table is ready, or take them off the list.'
   layout:
     template: form
     regions:
@@ -11370,7 +11392,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getGuestProfile` reads one of them — list, select,
     act'
-  purpose: Guest Profile & Dining History — from the client design board, 20 August.
+  purpose: 'Read a guest''s profile and their orders at the venue, and find and merge duplicate
+    records of the same person once somebody has decided.'
   layout:
     template: split
     regions:
@@ -11638,7 +11661,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`openTableVisit`, `updateTableVisit`, `mergeTableVisits`)
     and no read of a population — it is settings, not a list
-  purpose: Live Table & Service Management — from the client design board, 20 August.
+  purpose: 'Run a table during service: open the visit or seat a booked party, change covers, server
+    or table, move the meal on a stage, place an order and fire or hold a course.'
   layout:
     template: form
     regions:
@@ -12045,7 +12069,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getBill` reads one record and nothing reads a population — the screen is about that
     one thing'
-  purpose: Table Order, Bill & Payment Management — from the client design board, 20 August.
+  purpose: 'Settle a table: read the bill, add an order, split the bill, comp or move items, take
+    payment and close the visit.'
   layout:
     template: detail
     regions:
@@ -12325,7 +12350,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTableReservations` reads the population and `getTableMap` reads one of them — list,
     select, act'
-  purpose: Reservation & Table Performance — from the client design board, 20 August.
+  purpose: 'See how the outlet''s bookings and tables perform: turn time, no-shows, covers and
+    wait-quote accuracy, beside the bookings and the table map.'
   layout:
     template: split
     regions:
@@ -12473,7 +12499,8 @@ screens:
   pattern: listDetail
   patternReason: '`listStockMovements` reads the population and `getStockPositions` reads one of them
     — list, select, act'
-  purpose: Retail Inventory Command Center — from the client design board, 20 August.
+  purpose: 'See a store''s stock on hand and the movements behind it, by item, location and kind,
+    from the floor.'
   layout:
     template: split
     regions:
@@ -12571,26 +12598,6 @@ screens:
     contract: inventory
     purpose: The movement ledger
     trigger: onLoad
-  - operationId: getKpiValues
-    contract: reporting
-    purpose: Today's takings and revenue KPIs on the phone
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getDashboard
-    contract: reporting
-    purpose: Store manager's mobile dashboard
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listAlerts
-    contract: reporting
-    purpose: Daily revenue alerts (also pushed, deliverTo push)
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: acknowledgeAlert
-    contract: reporting
-    purpose: Acknowledge an alert
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -12655,7 +12662,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getStockPositions` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: Store Stock & SKU Availability — from the client design board, 20 August.
+  purpose: 'Check what an outlet has in stock, low stock first and beside its sibling outlets, and
+    scan an item for its price and stock.'
   gaps:
   - operation: getHaccpStatus
     why: '**`getHaccpStatus` declares its response inline**, so the component that shows it names fields
@@ -12797,7 +12805,8 @@ screens:
   pattern: listDetail
   patternReason: '`listRequisitions` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Requisition & Smart Store Replenishment — from the client design board, 20 August.
+  purpose: 'Raise a requisition for the store, starting from the suggested below-par items, and
+    change its lines before it is approved.'
   layout:
     template: split
     regions:
@@ -12989,7 +12998,8 @@ screens:
   pattern: listDetail
   patternReason: '`listStockLocations` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Store-to-Store & Warehouse Transfers — from the client design board, 20 August.
+  purpose: 'Send stock to another store or the warehouse, and receive inbound transfers against
+    their manifest.'
   layout:
     template: split
     regions:
@@ -13198,7 +13208,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getStockTransfer` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Receiving & Store Put-Away — from the client design board, 20 August.
+  purpose: 'Receive the expected supplier deliveries and inbound transfers, log the temperature a
+    chilled delivery arrived at, and reject goods that fail.'
   layout:
     template: detail
     regions:
@@ -13340,7 +13351,7 @@ screens:
     trigger: onAction
   - operationId: logColdChain
     contract: fnb
-    purpose: logColdChain
+    purpose: 'The temperature a chilled delivery arrived at, and what was decided about it'
     trigger: onAction
   - operationId: getStockTransfer
     contract: inventory
@@ -13429,7 +13440,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getCountVariance` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Stock Count & Cycle Count Management — from the client design board, 20 August.
+  purpose: 'Start a stock count, enter what is on the shelf line by line, and set which items are
+    counted every day.'
   layout:
     template: detail
     regions:
@@ -13645,7 +13657,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`recordWaste`, `createStockMovement`, `logTemperature`)
     and no read of a population — it is settings, not a list
-  purpose: Damage, Loss, Shrinkage & Stock Adjustment — from the client design board, 20 August.
+  purpose: 'Record waste and stock adjustments with a reason, log food-safety temperatures, and sign
+    the corrective actions waiting for a supervisor.'
   layout:
     template: form
     regions:
@@ -13744,11 +13757,11 @@ screens:
     trigger: onAction
   - operationId: logTemperature
     contract: fnb
-    purpose: logTemperature
+    purpose: 'Record a food-safety temperature check, in range or not'
     trigger: onAction
   - operationId: signCorrectiveAction
     contract: fnb
-    purpose: signCorrectiveAction
+    purpose: 'Say what was done about a food-safety finding, and put a name to it'
     trigger: onAction
   - operationId: getHaccpStatus
     contract: fnb
@@ -13885,7 +13898,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getStockPositions` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: Reservation, Allocation & Omnichannel Inventory — from the client design board, 20 August.
+  purpose: 'Hold an item for a guest to collect, see the stock it comes from, and mark the hold
+    collected or release it.'
   layout:
     template: detail
     regions:
@@ -14042,7 +14056,8 @@ screens:
   pattern: listDetail
   patternReason: '`listSerialisedItems` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Barcode, RFID, Serialized Stock & Traceability — from the client design board, 20 August.
+  purpose: 'Find where each serialised item is, by serial or status, and scan a barcode for its
+    price and stock.'
   layout:
     template: split
     regions:
@@ -14114,7 +14129,7 @@ screens:
   apis:
   - operationId: listSerialisedItems
     contract: inventory
-    purpose: listSerialisedItems
+    purpose: 'Where each serialised item is, found by serial or status'
     trigger: onLoad
   - operationId: lookupMerchandise
     contract: retail
@@ -14173,7 +14188,8 @@ screens:
   pattern: listDetail
   patternReason: '`listAlerts` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Inventory Exceptions, AI Replenishment & Action Center — from the client design board, 20 August.
+  purpose: 'Work the inventory alerts raised at the venue: acknowledge each one, and raise a
+    requisition where stock needs replenishing.'
   layout:
     template: split
     regions:

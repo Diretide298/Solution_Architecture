@@ -1,0 +1,39 @@
+id: CHG-SCP-010
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'Tried and withdrawn: naming getWorkstationHealth''s inline response WorkstationHealth so POS-001''s Workstation
+  health panel can bind it. A named schema with a status enum is read by check-states as a lifecycle with no state
+  model, a new warning; the batch rule is 0 new.'
+decision:
+  what: 'No change kept. Commit da85ce61 named the schema in contracts/spine/tenancy.yaml and bound the panel on POS-001;
+    commit 8ab42559 reverts it. S-PANEL-ENTITY POS-001 (the denomination table and the shift panel are not a list and
+    its detail; the Workstation health panel cannot bind until the response is named) stays open for the lead: name
+    the response with a state-model exemption for a health status, or accept the warning.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit before r6 (audit/ticvai/runs/audit-1014/classes.json): check-screen-wiring
+  S-PANEL-ENTITY (R256), 1 member on P04 (POS-001); still 1. With the schema named, check-states warned
+  "tenancy.WorkstationHealth.status is a lifecycle with 4 states and no state model".'
+keys_touched:
+  screens:
+  - POS-001
+  schemas:
+  - WorkstationHealth
+  other:
+  - S-PANEL-ENTITY
+root_class: A31 SCREEN-WRONG-OP
+tickets:
+  started: []
+  unstarted:
+  - APP-POS-POS-001 (#28536)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: defer
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: closed
+closed_by_commit: 8ab42559
+notes: 'Batch SCP, 14 October 2026. Closed as withdrawn: the commit that closes it is the revert.'
