@@ -453,7 +453,7 @@ CREATE TABLE IF NOT EXISTS ticket_pin_log (
   external_key  TEXT    NOT NULL,
   from_tag      TEXT    NOT NULL DEFAULT '',
   to_tag        TEXT    NOT NULL,
-  -- pull | accept | breaking
+  -- pull | auto (a pull moved a pin that was behind to the latest release) | accept | breaking
   reason        TEXT    NOT NULL,
   note          TEXT    NOT NULL DEFAULT '',
   at            TEXT    NOT NULL

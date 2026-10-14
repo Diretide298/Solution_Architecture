@@ -367,6 +367,11 @@ const pause = (ms) => (ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)
 
 let nextId = 1200;
 const created = [];
+// Comments posted to each work package, by its number: read back by GET
+// .../activities and listed whole at /_comments.
+const comments = new Map();
+// How many of the next creates to make and then answer 502 (/_lose-create).
+let LOSE_CREATES = 0;
 
 const read = (req) => new Promise((resolve) => {
   const parts = [];
@@ -386,6 +391,33 @@ createServer(async (req, res) => {
   // What the check reads afterwards. Outside /api/v3 so it cannot be mistaken
   // for something OpenProject offers.
   if (path === '/_created') return json(res, 200, { created });
+  // A work package made on the server, the way tools/op-create.rb makes one: ADAM never sees
+  // the create. Kept out of `created`, which is what ADAM sent (CHG-ADM-003).
+  if (path === '/_make') {
+    const id = nextId++;
+    const parent = url.searchParams.get('parent');
+    packages.set(String(id), {
+      id, subject: url.searchParams.get('subject') ?? `Made on the server ${id}`, lockVersion: 1, percentageDone: 0,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+      _links: {
+        project: { href: `/api/v3/projects/${url.searchParams.get('project') ?? PROJECT.id}`, title: PROJECT.name },
+        type: { href: '/api/v3/types/1', title: 'Task' },
+        status: { href: '/api/v3/statuses/1', title: 'New' },
+        ...(parent ? { parent: { href: `/api/v3/work_packages/${parent}`, title: `Ticket ${parent}` } } : {}),
+      },
+    });
+    return json(res, 200, { id });
+  }
+  // The next N creates are made, and answered 502 as a proxy that timed out would: the
+  // ticket exists and the caller is told it does not (CHG-ADM-003).
+  if (path === '/_lose-create') {
+    LOSE_CREATES = Number(url.searchParams.get('n') ?? 1);
+    return json(res, 200, { lose: LOSE_CREATES });
+  }
+  if (path === '/_comments') {
+    return json(res, 200, { comments: Object.fromEntries([...comments].map(([k, list]) =>
+      [k, list.map((c) => ({ text: c.comment.raw, notify: c.notify }))])) });
+  }
   if (path === '/_slow') {
     if (url.searchParams.has('page')) PAGE_MS = Number(url.searchParams.get('page')) || 0;
     if (url.searchParams.has('call')) CALL_MS = Number(url.searchParams.get('call')) || 0;
@@ -508,7 +540,12 @@ createServer(async (req, res) => {
 
   const one = path.match(/^\/api\/v3\/work_packages\/(\d+)$/);
   if (one && req.method === 'GET') {
-    return json(res, 200, ensure(one[1]));
+    // With its children's links, titled with their subjects, as OpenProject sends them.
+    const wp = ensure(one[1]);
+    const href = `/api/v3/work_packages/${one[1]}`;
+    const kids = [...packages.values()].filter((p) => p._links?.parent?.href === href)
+      .map((p) => ({ href: `/api/v3/work_packages/${p.id}`, title: p.subject }));
+    return json(res, 200, { ...wp, _links: { ...wp._links, ...(kids.length ? { children: kids } : {}) } });
   }
   if (one && req.method === 'PATCH') {
     const found = ensure(one[1]);
@@ -544,19 +581,31 @@ createServer(async (req, res) => {
   }
   const activity = path.match(/^\/api\/v3\/work_packages\/(\d+)\/activities$/);
   if (activity && req.method === 'POST') {
-    await read(req);
-    return json(res, 201, { _type: 'Activity', id: nextId++ });
+    const body = await read(req);
+    // Kept, so a second read of the thread sees it: a settled change request's
+    // comment is posted once (cr_notice.py), and that is only testable if the
+    // stand-in remembers what it was sent. `notify` is kept too, for the check
+    // that settlement comments are sent without mail.
+    const id = nextId++;
+    if (!comments.has(activity[1])) comments.set(activity[1], []);
+    comments.get(activity[1]).push({
+      _type: 'Activity::Comment', id, createdAt: new Date().toISOString(),
+      comment: { raw: body?.comment?.raw ?? '' }, notify: url.searchParams.get('notify'),
+      _links: { user: { href: `/api/v3/users/${userOf(req) || 5}`, title: userName(userOf(req) || 5) } },
+    });
+    return json(res, 201, { _type: 'Activity', id });
   }
-  // The thread under a ticket. Only a held ticket says anything: it is the
-  // reason the delivery overview shows beside it (main.py `_held_reasons`).
+  // The thread under a ticket. Only a held ticket says anything of its own: it
+  // is the reason the delivery overview shows beside it (main.py
+  // `_held_reasons`). Then whatever was posted to it.
   if (activity && req.method === 'GET') {
     const wp = packages.get(activity[1]);
     const held = /hold/i.test(wp?._links?.status?.title ?? '');
-    return json(res, 200, { _type: 'Collection', _embedded: { elements: held ? [{
+    return json(res, 200, { _type: 'Collection', _embedded: { elements: [...(held ? [{
       _type: 'Activity::Comment', createdAt: '2026-10-07T07:29:15Z',
       comment: { raw: 'Waiting on the payments provider to confirm gift-card refunds.' },
       _links: { user: { href: '/api/v3/users/9', title: 'Hrushikant Patkar' } },
-    }] : [] } });
+    }] : []), ...(comments.get(activity[1]) ?? [])] } });
   }
 
   const make = path.match(/^\/api\/v3\/projects\/(\d+)\/work_packages$/);
@@ -587,6 +636,10 @@ createServer(async (req, res) => {
       type: typeHref || null,
       project: Number(make[1]),
     });
+    if (LOSE_CREATES > 0) {
+      LOSE_CREATES -= 1;
+      return json(res, 502, { message: 'Bad gateway: the origin did not answer in time' });
+    }
     return json(res, 201, made);
   }
 

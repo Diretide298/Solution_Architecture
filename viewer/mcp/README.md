@@ -212,8 +212,8 @@ building.
 | `adam_work` | `key` | one work package, live, plus the artefacts it touches |
 | `adam_links` | `kind`, `id` | what work is scheduled against one artefact |
 | `adam_link` | `kind`, `id`, `key` — or `remove` + `linkId` | **writes**: records that a work package is about an artefact |
-| `adam_pull` | `key` (or nothing, for the whole board), `dir`, `limit` | **writes local files**: `.adam/work/<key>/` and `.adam/board.md`; pins the ticket to the release served, and writes `spec-diff.md` when a later release changed it |
-| `adam_repin` | `key`, `dir`, `breaking`, `note` | moves your pin to the release served ("take the change") and pulls again. Changes nothing in OpenProject |
+| `adam_pull` | `key` (or nothing, for the whole board), `dir`, `limit` | **writes local files**: `.adam/work/<key>/` and `.adam/board.md`; always at the latest release ADAM serves; when the release moved since the ticket's previous pull, README.md says what changed and `spec-diff.md` has the diffs; README.md lists the change requests raised from the ticket |
+| `adam_repin` | `key`, `dir`, `breaking`, `note` | **not needed** (every pull is at the latest release); kept for older instructions: moves the ticket to the latest release and pulls again. Changes nothing in OpenProject |
 | `adam_propose` | `key`, and `status` / `percentDone` / `comment` | the change that would be made, and a one-use code. **Changes nothing** |
 | `adam_apply` | `key`, `proposal`, `dir` | **changes OpenProject**, as you, with that code — after you said yes |
 | `adam_changes` | none, or `id`, `status`, `kind` + `target`, `ticket`; or `from` / `to` release tags | the project's change requests; one in full; or the release notes between two tags |
@@ -229,17 +229,25 @@ ADAM's **Changes** page (`/changes.html`) by an admin or a reviewer on the proje
 person who raised it unless they are an admin: open → accepted or rejected (a rejection needs a
 reason) → done, with what fixed it. The page exports what it shows as CSV.
 
-**Releases (C2, C9).** ADAM serves the package at its newest release tag (`r1`, `r2`, … in the
-package repository; `viewer/lib/releases.mjs`), not at whatever the working tree holds. The first
-`adam_pull` of a ticket records the tag in force as your pin on it. A later pull, once ADAM serves a
-newer tag, compares every artefact the ticket is linked to between the pin and the served tag — the
-same records the tools return, at each tag — keeps the linked files at the pinned release, and says
-in README.md what changed, with the diffs in `spec-diff.md`. You either take the change
-(`adam_repin`) or raise a change request and keep building against the pin. A breaking contract
-change listed in `docs/active/breaking-changes.yaml` since the pin makes the re-pin **required** for
-a ticket that produces the operation (linked to it, its contract or its service) or consumes it
-(linked to a screen or journey that calls it). `adam_board` shows each ticket's pin as `r1 -> r2`
-when the served release has moved on.
+**Releases (C2, C9; always the latest from 14 October, CHG-ADM-001).** ADAM serves the package at
+its newest release tag (`r1`, `r2`, … in the package repository; `viewer/lib/releases.mjs`), not at
+whatever the working tree holds, and **every pull is at that release**: you are always on the latest
+release, and nobody chooses between releases. The first `adam_pull` of a ticket records the tag in force
+as its pin; a later pull, once ADAM serves a newer tag, moves the pin to it (the service does it, logged
+`auto`, so an older connector is moved too), compares every artefact the ticket is linked to between the
+previous pull's tag and the latest, and says in README.md what changed, with the diffs in `spec-diff.md`.
+The linked files are always the latest release. A breaking contract change listed in
+`docs/active/breaking-changes.yaml` is called out for a ticket that produces the operation or consumes
+it, so code written before the pull can be checked. `adam_board` shows `r1 -> r2` for a ticket last
+pulled at an older release; its next pull is at the latest. `adam_repin` is kept for older instructions
+and is never needed.
+
+**Change requests reach the ticket (CHG-ADM-002).** When a request is settled (accepted, done or
+rejected), the ticket it was raised from is told: an open ticket gets one comment written for the agent
+that pulls it (what was decided, which release carries it, what to do now); a closed ticket gets a child
+task for the change (one per request, at most; filed before the request is marked Done). `adam_pull` lists every
+request raised from the ticket near the top of README.md, under "Change requests on this ticket", with
+its decision and release: follow the settled ones, wait on the open ones.
 
 **Change request intake (C8).** A draft carries where the change came from (`source`: minutes,
 answer, design, developer, audit, and `sourceRef`, the line that finds it again — a developer's

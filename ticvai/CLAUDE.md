@@ -21,10 +21,16 @@ stop and ask the lead (Chinmay). Do not work around it.
 5. Run `python3 tools/check-changelog.py` before you hand work back. It gates.
 
 ## Tickets
-6. **A started ticket is never rewritten.** A fix to one is a comment plus a linked delta ticket, and ADAM
-   keeps serving the developer the release tag they started on.
-7. An unstarted ticket picks the fix up at the next tag, through its pointer body. Never edit OpenProject
-   text to carry a spec change.
+6. **Developers and agents always build against the latest release.** Every ADAM pull serves the release
+   ADAM serves now and moves the ticket to it; nobody chooses or asks between releases, and `/ticket` says
+   what changed since the ticket's previous pull (CHG-ADM-001; Chinmay, 14 October 2026: "we always want
+   agents to pull the latest"). **A started ticket's OpenProject text is never rewritten.**
+7. **A settled CR reaches its ticket** (CHG-ADM-002). A ticket that is not closed gets a comment written for
+   the AI agent that pulls it (and `/ticket` lists the CR, its decision and its release); a closed ticket gets
+   a **child task** for the change, created before the CR is marked Done. A CR's work is one child task of
+   the ticket it was raised from; migration work it causes is a child task of the affected MIG-* ticket,
+   assigned to the migration owner (`docs/active/team.json` `migrations.owner`). An unstarted ticket picks the
+   fix up at the next tag, through its pointer body. Never edit OpenProject text to carry a spec change.
 
 ## Releases and the plan
 8. Releases go out on **Tuesday and Friday** only. No spec edits on the day before a release.

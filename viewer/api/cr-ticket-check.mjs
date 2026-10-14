@@ -264,5 +264,62 @@ check('a type the project does not offer is refused, and the real ones listed',
   badType.status === 400 && /Task/.test(String(badType.data?.detail)),
   String(badType.data?.detail));
 
+// ── a child task made outside ADAM (CHG-ADM-003) ─────────────────────
+//
+// 14 October: every apply answered 502 behind the proxy, so the lead made the
+// CR child tasks on the OpenProject server (tools/op-create.rb, "[CR-nnn] ...").
+// ADAM must be able to record them, and a create must not make a second one.
+
+const onServer = async (parent, subject) =>
+  (await (await fetch(`${PMS}/_make?parent=${parent}&subject=${encodeURIComponent(subject)}`)).json()).id;
+
+const outside = await file('harness.lead', { ticket: '880', title: 'Made on the server' });
+const OUT = outside.data.change.id;
+const outsideKey = String(await onServer('880', `[${OUT}] Made on the server`));
+const elsewhereKey = String(await onServer('7001', `[${OUT}] Under the wrong ticket`));
+const before = (await sent()).length;
+
+const linkByLead = await as('harness.lead', 'POST', `/api/changes/${OUT}/ticket/link`, { key: outsideKey });
+check('only an admin records an existing work package as a CR\'s child', linkByLead.status === 403,
+  `${linkByLead.status}`);
+const misplaced = await as('boss', 'POST', `/api/changes/${OUT}/ticket/link`, { key: elsewhereKey });
+check('and not one that hangs under another ticket',
+  misplaced.status === 409 && /hangs under #7001, not #880/.test(String(misplaced.data?.detail)),
+  `${misplaced.status} ${String(misplaced.data?.detail)}`);
+const taken = await as('boss', 'POST', `/api/changes/${OUT}/ticket/link`, { key: made.data.ticket.key });
+check('nor one that is already another CR\'s ticket',
+  taken.status === 409 && /already the ticket of/.test(String(taken.data?.detail)), `${taken.status}`);
+const linkedOutside = await as('boss', 'POST', `/api/changes/${OUT}/ticket/link`, { key: outsideKey });
+check('an admin links the child task made on the server',
+  linkedOutside.status === 200 && linkedOutside.data?.change?.childTicket === outsideKey,
+  `${linkedOutside.status} ${JSON.stringify(linkedOutside.data?.detail ?? linkedOutside.data?.change?.childTicket)}`);
+const linkedLinks = await as('boss', 'GET', '/api/links?target_kind=screen&target_id=POS-002&project_id=ticvai');
+check('and the artefact is linked to it, as a created one would be',
+  (linkedLinks.data?.links ?? []).some((l) => l.key === outsideKey), '');
+const linkTwice = await as('boss', 'POST', `/api/changes/${OUT}/ticket/link`, { key: outsideKey });
+check('a second link is refused: one request, one ticket', linkTwice.status === 409, `${linkTwice.status}`);
+check('and linking created nothing in OpenProject', (await sent()).length === before, `${(await sent()).length}`);
+
+const already = await file('harness.lead', { ticket: '880', title: 'Already on the server' });
+const alreadyKey = String(await onServer('880', `[${already.data.change.id}] Already on the server`));
+const alreadyView = await as('harness.lead', 'POST', `/api/changes/${already.data.change.id}/ticket/preview`, {});
+const alreadyMade = await as('harness.lead', 'POST',
+  `/api/changes/${already.data.change.id}/ticket/${alreadyView.data?.proposal}/apply`, {});
+check('applying a CR whose child task already exists links it instead of making a second',
+  alreadyMade.status === 200 && alreadyMade.data?.how === 'linked' && alreadyMade.data?.ticket?.key === alreadyKey
+    && (await sent()).length === before,
+  `${alreadyMade.status} ${alreadyMade.data?.how} ${alreadyMade.data?.ticket?.key} vs ${alreadyKey}`);
+
+const lost = await file('harness.lead', { ticket: '880', title: 'The answer was lost' });
+const lostView = await as('harness.lead', 'POST', `/api/changes/${lost.data.change.id}/ticket/preview`, {});
+await fetch(`${PMS}/_lose-create?n=1`);
+const lostMade = await as('harness.lead', 'POST',
+  `/api/changes/${lost.data.change.id}/ticket/${lostView.data?.proposal}/apply`, {});
+const afterLost = await sent();
+check('a create whose answer is lost behind the proxy is found again, not reported as a failure',
+  lostMade.status === 200 && lostMade.data?.how === 'recovered'
+    && lostMade.data?.change?.childTicket === String(afterLost.at(-1)?.id) && afterLost.length === before + 1,
+  `${lostMade.status} ${lostMade.data?.how} ${JSON.stringify(lostMade.data?.detail ?? '')}`);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

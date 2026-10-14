@@ -10,17 +10,14 @@ Work ticket $ARGUMENTS, following "Working a ticket (ADAM)" in CLAUDE.md:
    what you found, and ask before linking it.
    **Read its Comments section too**, the newest last: a clarification or QA's reason for sending
    it back overrides the description where they differ - say so when it does.
-2. **Check which release you are on.** The README's `Release` line names the release tag ADAM
-   serves (r1, r2, …); your first pull pinned this ticket to it. If README.md has a section
-   **Spec changed since you pulled at rA (now rB)**, stop and show it to me before building. The
-   linked files are still the release you are pinned to, and `spec-diff.md` has every diff.
-   - **Re-pin required** means a breaking contract change on an operation this ticket produces or
-     consumes: the producer and the consumer have to build against the same release. Say that it
-     is required, then run `adam_repin` with `breaking: true` and `dir` set to this folder, and read
-     the new README.md. Do not build against the old release.
-   - Otherwise it is my choice: take the change (`adam_repin` with `dir`, which pulls the ticket again
-     at the new release), or keep building against the pinned release and raise a change request
-     (`/cr`, source developer) if the change is wrong for this ticket. Ask me; do not choose.
+2. **You are always on the latest release** (the README's `Release` line names it: r1, r2, …).
+   Every pull is at it, so there is no release to choose and nothing to re-pin. If README.md has a
+   section **What changed since your previous pull (rA -> rB)**, tell me in one line what changed
+   (`spec-diff.md` has every diff) and build against the files as they are now. If a change is wrong
+   for this ticket, raise a change request (`/cr`, source developer) and build the rest.
+   **Read "Change requests on this ticket"** near the top of README.md: a settled decision overrides
+   the description where they differ; an open request means that part waits - build the rest and
+   say what waits on it.
 3. If the ticket and its contract disagree, or the package contradicts itself, follow
    "When the package is wrong" in CLAUDE.md instead of guessing.
 4. Build what the ticket and its contract describe, in the repository for the ticket's platform (the table

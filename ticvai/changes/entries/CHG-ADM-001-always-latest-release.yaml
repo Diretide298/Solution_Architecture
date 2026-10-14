@@ -1,0 +1,68 @@
+id: CHG-ADM-001
+date: '2026-10-14'
+source: cr
+kind: process
+summary: 'Developers and agents always build against the latest release: every ADAM pull serves the release ADAM
+  serves and moves the ticket''s pin to it by itself, README.md says what changed since the ticket''s previous pull,
+  and nothing ADAM or the rule docs say asks anyone to choose or ask between releases.'
+decision:
+  what: 'Replace the pin-and-ask release model. The accounts service''s pin route (viewer/api/main.py set_pin) moves
+    a pin that is behind to the served tag on every pull, logs the move with the reason `auto` and answers
+    `movedFrom`, so an agent on an older connector is moved too. adam_pull always writes the latest release''s
+    files; when the release moved since the previous pull, README.md has "What changed since your previous pull
+    (rA -> rB)" and spec-diff.md the diffs, and a breaking contract change is called out for the producer and the
+    consumer. adam_repin stays for compatibility and says it is not needed. Every tool description, next step,
+    server instruction, setup command (/ticket, /board, /cr) and CLAUDE.md starter says "you are always on the
+    latest release (rN)". ticvai/CLAUDE.md rule 6, release-runbook.md R5 and section 6, developer-brief.md and
+    changes/README.md say the same. A started ticket''s OpenProject text is still never rewritten.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Lead decision, Chinmay, 14 October 2026, in his words: "the release system is creating confusion among the
+  agents they ask if r3 or r4. we always want agents to pull the latest." At 1eb1d063 (r5) adam_pull kept a ticket
+  at the release of its first pull, wrote "Spec changed since you pulled at rA" and its next step told the agent to
+  ask the person whether to adam_repin or keep building against the old tag (viewer/mcp/tools.mjs adam_pull and
+  releaseSection; setup commands/ticket.md step 2: "Ask me; do not choose"); ticvai/CLAUDE.md rule 6 and
+  release-runbook R5 said ADAM keeps serving the developer the tag they started on (council of 2 October, C2/C9).'
+keys_touched:
+  files:
+  - viewer/api/main.py
+  - viewer/api/db.py
+  - viewer/mcp/tools.mjs
+  - viewer/mcp/server.mjs
+  - viewer/mcp/setup/starters/backend/.claude/commands/ticket.md
+  - viewer/mcp/setup/starters/frontend/.claude/commands/ticket.md
+  - viewer/mcp/setup/starters/backend/.claude/commands/board.md
+  - viewer/mcp/setup/starters/frontend/.claude/commands/board.md
+  - viewer/mcp/setup/starters/backend/CLAUDE.md
+  - viewer/mcp/setup/starters/frontend/CLAUDE.md
+  - viewer/api/release-check.mjs
+  - CLAUDE.md
+  - docs/active/release-runbook.md
+  - docs/active/developer-brief.md
+  - changes/README.md
+  - tools/check-adam-latest-release.py
+  - tools/run-checks.py
+  tickets: []
+root_class: 'new: release-choice-asked-of-agents'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-adam-latest-release.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  source is `cr`, the closest allowed value for a decision the lead made directly (the lead''s instruction). triage
+  blocker is this batch''s choice: agents were asking which release on live tickets. The new check
+  tools/check-adam-latest-release.py (LR-CHOOSE, LR-LATEST, LR-AUTO) was run on the parent commit 1eb1d063 (r5):
+  FAIL, 43 new findings (the tool text, the /ticket and /board commands, the starters, ticvai/CLAUDE.md, the
+  runbook, the developer brief, set_pin); on this branch: PASS, 0 findings. It reads ../viewer the way
+  check-frontend-repos does. The behaviour itself is covered by viewer/api/release-check.mjs (85 assertions,
+  self-contained; pass). /update-adam ships the connector (its build is a hash of the files, so it changes by
+  itself); the setup commands and CLAUDE.md starters reach a developer only through the setup zip, so until it is
+  rebuilt the tool''s own next step says older /ticket instructions about re-pinning are out of date. The ticvai
+  repos/* mirrors of the runbook and the brief are derived and regenerate at the lead''s gate.'

@@ -68,12 +68,12 @@ ADAM is connected for this folder. It holds the contracts, tables and screens; O
    rather than guessing a name or a shape.
    **Read its Comments section too**, the newest last: a clarification or QA's reason for sending
    it back overrides the description where they differ - say so when it does.
-   **Read its Release line too.** ADAM serves the package at a release tag (r1, r2, …) and the first
-   pull pins the ticket to it. If README.md says **Spec changed since you pulled at rA (now rB)**,
-   stop and tell the person: the linked files are still the pinned release, `spec-diff.md` has the
-   diffs, and they choose between taking the change (`adam_repin`) and raising a change request.
-   **Re-pin required** - a breaking contract change on an operation this ticket produces or
-   consumes - is not a choice: say so, then `adam_repin` with `breaking: true` before building.
+   **You are always on the latest release.** ADAM serves the package at its latest release tag
+   (r1, r2, …) and every pull is at it; there is no release to choose and nothing to re-pin. If
+   README.md says **What changed since your previous pull (rA -> rB)**, tell the person in one line
+   (`spec-diff.md` has the diffs) and build against the files as they are now.
+   **Read "Change requests on this ticket" too**, near the top of README.md: follow a settled
+   decision where it differs from the description, and wait on the part an open request covers.
 2. Build exactly what the ticket and its linked artefacts describe. Nothing outside the ticket.
 3. Add tests for the success case and each error the contract lists. `dotnet test` must pass.
 4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and

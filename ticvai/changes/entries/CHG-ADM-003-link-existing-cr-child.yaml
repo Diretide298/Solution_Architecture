@@ -1,0 +1,58 @@
+id: CHG-ADM-003
+date: '2026-10-14'
+source: cr
+kind: process
+summary: 'ADAM can record a CR child task that already exists in OpenProject (made on the server with
+  tools/op-create.rb, "[CR-nnn] ..."), and its ticket apply links such a child instead of making a second one and
+  survives a create whose answer is lost behind the proxy.'
+decision:
+  what: 'Add POST /api/changes/{n}/ticket/link {project_id, key}, admin only: records an existing work package as the
+    CR''s child (child_key, child_at, child_by and the artefact link), refused when the CR already has one, was raised
+    from no ticket, when the work package is another CR''s, or when its parent is not the CR''s external_key. The
+    apply (and the settlement''s child task, CHG-ADM-002) first looks for a child of the source ticket whose subject
+    starts "[CR-nnn]" (or is exactly the subject it would send) and links it; after a create that errors it looks
+    again before reporting the failure. settle_changes.py --link-existing links such a child before it would file
+    one, and comments on it once. The release runbook section 6 says how to use it.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'The lead''s instruction through the coordinator, 14 October 2026: ADAM''s
+  /api/changes/{n}/ticket/{proposal}/apply answered 502 for every CR that day (the preview worked; the create to
+  OpenProject failed or timed out behind Cloudflare), so the lead is creating the nine CR child tasks on the
+  OpenProject server with tools/op-create.rb, and ADAM would have no child_key for them. Follows CHG-ADM-002 (a CR''s
+  work is one child task of its source ticket) on this branch at b3ea0ff9.'
+keys_touched:
+  files:
+  - viewer/api/main.py
+  - viewer/api/openproject.py
+  - viewer/api/settle_changes.py
+  - viewer/api/fake-openproject.mjs
+  - viewer/api/cr-ticket-check.mjs
+  - viewer/api/README.md
+  - docs/active/release-runbook.md
+  - tools/check-adam-cr-settlement.py
+  tickets: []
+  other:
+  - CHG-ADM-002
+root_class: 'new: cr-settlement-misses-ticket'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-adam-cr-settlement.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  A separate entry rather than folded into CHG-ADM-002, because it is a separate failure (the proxy) with its own
+  route. The prevention is the CS-LINK rule added to tools/check-adam-cr-settlement.py (settle_changes.py
+  --link-existing against stand-ins; the admin link route; the apply looking for an existing child before and after
+  a create): run on the previous commit b3ea0ff9 it fails with 3 findings, and passes here. viewer/api/cr-ticket-check.mjs
+  gained 9 assertions (49 pass): only an admin links, not under another ticket, not another CR''s ticket, the link
+  and its artefact link, no second link, nothing created; an apply with a "[CR-nnn]" child already there links it;
+  a create whose answer is lost (the stand-in makes it and answers 502) is recovered. Children are read from the
+  parent''s `children` links (titled with the subject), with a parent filter where an instance leaves them out. A
+  child whose subject is exactly the CR''s title is also taken as its own, unless it is already another CR''s
+  child.'
