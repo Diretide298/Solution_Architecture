@@ -354,6 +354,7 @@ screens:
       components:
       - kind: iconButton
         label: Search
+        operation: searchCatalogue
         provenance: carried from the previous definition
       - kind: secondaryButton
         label: Sign in
@@ -417,6 +418,12 @@ screens:
       session; bound on the home screen as the shell's entry)
     trigger: background
     provenance: build, 29 September 2026
+  - operationId: searchCatalogue
+    contract: catalogue
+    purpose: 'Find something by name: the header search opens the results (WEB-003) with what was typed,
+      as GST-001''s search does'
+    trigger: onAction
+    provenance: 'Block A audit, 14 October 2026: N-TWIN-OPS (CHG-SCG-008)'
   entryState:
     coldEntry: '**A cold arrival is the ordinary case.** **The venue comes from the device** (decided
       28 September, audit R267): on first open the guest picks one, it is remembered on the device and
@@ -6853,8 +6860,8 @@ screens:
       components:
       - kind: detailPanel
         label: How to reach the venue
-        bindsTo: PublishedTenantConfig.contact
-        operation: getPublishedTenantConfig
+        bindsTo: VenueContact
+        operation: getTenantAppStatus
         notes: '**From `getTenantAppStatus.contact`** (decided 28 September, audit R073 (f)): phone, email,
           WhatsApp, address and opening hours, set from CMS-001 through `setMaintenanceMode`. Each is
           optional and a missing one is left out rather than shown blank.'
@@ -6871,10 +6878,12 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getPublishedTenantConfig
+  - operationId: getTenantAppStatus
     contract: white-label
-    purpose: The published contact details, readable without signing in
+    purpose: 'How to reach the venue: phone, email, WhatsApp, address, opening hours, without signing in
+      (decided 28 September, audit R073 (f))'
     trigger: onLoad
+    provenance: 'Block A audit, 14 October 2026: N-TWIN-OPS, as GST-029 (CHG-SCG-008)'
   wireframe:
     status: review
     provenance: client-verified
@@ -8995,6 +9004,7 @@ screens:
         provenance: contract queue.yaml GET /queues/wait-times
       - kind: cardList
         label: Virtual Queue
+        operation: listQueues
         provenance: carried from the previous definition
       - kind: detailPanel
         label: Detail
@@ -9044,6 +9054,11 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  - operationId: listQueues
+    contract: queue
+    purpose: Which virtual queues are running
+    trigger: onLoad
+    provenance: 'Block A audit, 14 October 2026: N-TWIN-OPS, as GST-023 (CHG-SCG-008)'
   entryState:
     params:
     - name: subjectId

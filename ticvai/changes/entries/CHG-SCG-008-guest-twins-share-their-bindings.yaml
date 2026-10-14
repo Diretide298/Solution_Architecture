@@ -1,0 +1,38 @@
+id: CHG-SCG-008
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: Where the guest web and guest app show the same thing, they now call the same operation; every remaining
+  twin difference is a control or panel one shell's client-approved UI has and the other's lacks.
+decision:
+  what: 'Align bindings without changing anything visible (decision 4, 14 October 2026): the web Home header Search
+    calls searchCatalogue as GST-001''s search does; the app cart (GST-041) is started by the runtime with createCart
+    as WEB-010''s is; WEB-040''s existing Virtual Queue list reads listQueues as GST-023''s does (group virtual-queue
+    now identical); WEB-028''s How to reach the venue reads getTenantAppStatus (VenueContact) as GST-029 does and as
+    its own component note already said (audit R073 (f)). CHG-SCG-004 and CHG-SCG-005 aligned more (instalments,
+    wallet exit, two-step removal, ID verification, transfer follow-up). The 29 groups left differ only by
+    components drawn on one shell: each needs the lead''s written sanction in screens/_guest-pairs.yaml or a design
+    change, so they are kept (client-approved UI) and listed in the batch hand-back.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, finding class check-navigation N-TWIN-OPS (R281; lead''s decision 4 of 14
+  October: "Guest web and guest app twins call the same operations unless a difference is sanctioned in writing";
+  the approved UI is fixed). Evidence: audit/ticvai/runs/audit-1014/classes.json. 30 groups before, 29 after (all
+  keeps, each by a visible control on one shell only).'
+keys_touched:
+  screens: [WEB-001, WEB-028, WEB-040, GST-041]
+  operations: [searchCatalogue, createCart, listQueues, getTenantAppStatus, getPublishedTenantConfig]
+  files: [screens/P01-guest-web-storefront.yaml, screens/P02-guest-mobile-app.yaml]
+root_class: A32 NAVIGATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: open
+notes: Batch SCG, 14 October 2026. screens/_guest-pairs.yaml is untouched; a sanction is the lead's to write.
