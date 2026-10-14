@@ -158,6 +158,10 @@ CHECKS = [
     # lineage writes, a write into a key-only table brings its fields a column, and a credential is kept only as a
     # hash (ADR-0071). A ratchet over the 22 known; reads the schema reference, so it runs after derive-schema.
     "check-stored-request-fields",
+    # 14 October (ADAM CR-084, CHG-GDL-001): a 4xx whose description names another module's record (an order, an
+    # entitlement, a shift, a variant) declares its problem types and an x-ticvai-read-via to the owner's declared
+    # query (a ratchet over the 160 known); batch GEN's check-cross-module-reads covers the lineage side.
+    "check-error-sources",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

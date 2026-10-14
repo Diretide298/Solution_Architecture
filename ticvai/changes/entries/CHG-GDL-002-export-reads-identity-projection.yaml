@@ -1,0 +1,59 @@
+id: CHG-GDL-002
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: exportSubjectData lists the guest's orders and entitlements from Identity's projection identity.subject_holding
+  instead of reading access.entitlement and orders.sales_order, and its requestId is the approvals.request raised
+  through createApprovalRequest, with createDsarRequest called only for a guest linked across cells.
+decision:
+  what: 'Apply CR-084''s decision to exportSubjectData: the lineage drops access.entitlement and orders.sales_order and
+    reads identity.subject_holding (CHG-GDL-001); x-ticvai-read-via names access#liveEntitlementsForSubject and
+    orders#openOrdersForSubject (route projection) for which entitlements and orders the export reports as live or open;
+    requestId is the approvals.request id (createApprovalRequest, in-process, ADR-0055 rule 3; no mandatory human
+    approval step, the tenant matrix may add one); platform.dsar_request is no longer an unconditional write: the export
+    job calls cross-region createDsarRequest (kind access, serviceAuth) only when GuestSession.guestLinkId is set;
+    estimatedCompletionAt stays nullable and says why it is null. The 202 keeps its shape (required requestId and
+    format).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-084 (ticket 30654) and its audit: exportSubjectData claims the same 202 shape as deleteGuestAccount
+  (identity.yaml r5 761-763, required [requestId], estimatedCompletionAt nullable 770-781), and its lineage read
+  access.entitlement and orders.sales_order raw and wrote platform.dsar_request, though Identity is Foundation and
+  reads nothing above it (ADR-0028:113), Access is another deployable (ADR-0055 rule 4) and dsar_request.guest_link_id
+  is NOT NULL (010-platform.sql:186). Same root as CHG-GDL-001.'
+keys_touched:
+  operations:
+  - exportSubjectData
+  tables:
+  - identity.subject_holding
+  - access.entitlement
+  - orders.sales_order
+  - approvals.request
+  - platform.dsar_request
+  files:
+  - contracts/spine/identity.yaml
+  - handoff/api-data-lineage.json
+  - tools/applied/r6-cr084-delete-guest-account.py
+root_class: A22 LINEAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-084
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+
+
+  The prevention is batch GEN''s check-cross-module-reads (branch cr/r6-gen-rules: every cross-module lineage read is a
+  view named for the reader or covered by x-ticvai-read-via), which is not on this branch; the lead closes this entry
+  once both are merged and the check passes. The export now reads only its own schemas for orders and entitlements.
+  STILL OPEN: it reads marketing.consent_record, marketing.form_submission, marketing.guest_document and
+  marketing.guest_profile raw (Marketing is in the operations deployable), which the decision did not cover; GEN''s check
+  will name them. The export is built by SVC-IDENTITY-IDENTITY-1 (OpenProject 30720 for exportSubjectData in
+  pms-map.json); whether that ticket is started was not visible from the package: if it is, it gets a comment and a
+  linked delta, as 30654 does (CHG-GDL-001 notes).'

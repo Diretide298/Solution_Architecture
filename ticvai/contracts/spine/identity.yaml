@@ -867,7 +867,29 @@ paths:
         Includes what is held and where it came from. **Excludes another guest''s data even where the
         two share a booking**, which is the case that makes this harder than a table dump.
 
+
+        **The orders and entitlements it lists come from Identity''s own projection** (ADAM CR-084, decided
+        14 October 2026, CHG-GDL-002): `identity.subject_holding` (`SubjectHolding`), kept from the order and
+        entitlement events, gives each order and entitlement the guest holds with its status and validity.
+        Identity is Foundation and reads nothing above it (ADR-0028), and Access is another deployable
+        (ADR-0055 rule 4), so the export reads neither orders.sales_order nor access.entitlement.
+
+
+        **The request is an Approvals request, as for `deleteGuestAccount`.** `requestId` is the
+        `approvals.request` id, raised through Approvals'' in-process `createApprovalRequest` (ADR-0055 rule
+        3); the guest''s own export needs no human approval step and the tenant''s matrix may add one. Only
+        where the guest is linked across cells (`GuestSession.guestLinkId`; ADR-0010) does the export job also
+        call cross-region `createDsarRequest` (`kind: access`, `serviceAuth`), which raises the cross-cell
+        platform.dsar_request; an unlinked guest raises no DSAR record.
+
         '
+      x-ticvai-read-via:
+      - query: access#liveEntitlementsForSubject
+        route: projection
+        for: which entitlements the export reports as live
+      - query: orders#openOrdersForSubject
+        route: projection
+        for: which orders the export reports as open
       tags:
       - identity
       x-ticvai-permission: GUEST_VIEW_PII
@@ -899,9 +921,10 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: 'Export started, as a data-subject request (`platform.dsar_request`). The same
-            shape `deleteGuestAccount` returns for an erasure request, so a guest''s two privacy requests
-            read alike.
+          description: 'Export started, as an Approvals request (and, for a guest linked across cells, a
+            cross-cell platform.dsar_request raised by `createDsarRequest`). The same shape
+            `deleteGuestAccount` returns for an erasure request, so a guest''s two privacy requests read
+            alike.
 
             '
           content:
@@ -914,7 +937,8 @@ paths:
                 properties:
                   requestId:
                     type: string
-                    description: The data-subject request raised for this export.
+                    description: The `approvals.request` id of the export request (raised through Approvals'
+                      `createApprovalRequest`), CHG-GDL-002.
                   format:
                     type: string
                     enum:
@@ -926,6 +950,9 @@ paths:
                     type: string
                     format: date-time
                     nullable: true
+                    description: Null until a response period reaches Identity, as for `deleteGuestAccount`
+                      (the periods are marketing-crm `setPrivacyRequestTypes` `deadlines[].responseDays`, which
+                      Identity does not read).
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/delegations:
@@ -2831,6 +2858,13 @@ paths:
         **Only orders whose contact detail matches the now-verified identifier.** Attaching on an unverified
         claim would hand someone else''s booking history to whoever asked for it.
 
+
+        **Each attached order is announced as `order.linkedToGuest`** (ADAM CR-084, decided 14 October 2026,
+        CHG-GDL-003), one event per order with its `subjectId` and current status, written to `platform.outbox`
+        in the attaching transaction (ADR-0033). Identity''s projection identity.subject_holding consumes it, so an
+        attached order and the entitlements issued from it block `deleteGuestAccount` like any other the guest
+        holds; without it a guest could erase an account holding a valid ticket bought before registering.
+
         '
       tags:
       - guestAuth
@@ -2888,12 +2922,46 @@ paths:
       x-ticvai-audience:
       - guest
       summary: Self-service account deletion
-      description: 'Raises an erasure request rather than deleting immediately. PII is removed from the
+      description: >-
+        Raises an erasure request rather than deleting immediately. PII is removed from the
         erasable store; ledger entries keep their opaque subject reference and stay intact.
 
-        Where the guest is linked across cells, the request fans out (ADR-0010).
 
-        '
+        **What blocks it, and where Identity reads it from** (ADAM CR-084, decided 14 October 2026,
+        CHG-GDL-001). The request is refused with `409` while the guest still holds something a deletion
+        would strand: an **open order** (`open-orders-remain`: an order whose status is `pending`, `held`,
+        `partiallyPaid` or `paid`, the rule `orders#openOrdersForSubject` states) or a **live entitlement**
+        (`live-entitlement-remains`: an entitlement whose status is `issued` or `partiallyConsumed` and whose
+        `validTo` is still ahead, the rule `access#liveEntitlementsForSubject` states; a frozen or suspended
+        pass is still `issued`). Identity is Foundation and reads nothing above it (ADR-0028), and Access is
+        another deployable (ADR-0055 rule 4), so neither orders.sales_order nor access.entitlement is
+        read: Identity answers from `identity.subject_holding`, its own projection of the order and
+        entitlement events (`SubjectHolding`). **The erasure job checks the same two conditions again when it
+        runs**, against the projection as it stands then; if a blocking holding appeared after the `202`, it
+        erases nothing and closes the request unfulfilled, naming the problem type that held.
+
+
+        **The request is an Approvals request.** `requestId` is the `approvals.request` id, raised in the
+        same transaction through Approvals' in-process `createApprovalRequest` (Approvals is in the Tenancy
+        module, in `commerce` with Identity; ADR-0055 rule 3). A guest's own erasure needs no human approval
+        step (ADR-0047 section 7); the tenant's approval matrix may add one, and then the erasure job waits
+        for the decision.
+
+
+        **Every guest is erased locally; only a linked guest fans out.** The job tombstones the guest's
+        `pii.subject` row (`is_erased`, `erased_at`, and `erasure_request_id` = `requestId`; ADR-0047), for
+        every guest. Only where the guest is linked across cells (the session's
+        `GuestSession.guestLinkId` is set; ADR-0010) does it also call cross-region `createDsarRequest`
+        (`kind: erasure`, `serviceAuth`), which raises the cross-cell platform.dsar_request and fans out. A
+        guest who never transacted across regions has no link (cross-region.yaml) and raises no DSAR record.
+
+      x-ticvai-read-via:
+      - query: access#liveEntitlementsForSubject
+        route: projection
+        for: 409 live-entitlement-remains (and the erasure job's re-check)
+      - query: orders#openOrdersForSubject
+        route: projection
+        for: 409 open-orders-remain (and the erasure job's re-check)
       tags:
       - guestAuth
       x-ticvai-permission: null
@@ -2910,22 +2978,40 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Erasure request raised
+          description: >-
+            Erasure request raised. The same shape `exportSubjectData` returns for an export, so a guest's
+            two privacy requests read alike.
           content:
             application/json:
               schema:
                 type: object
+                required:
+                - requestId
                 properties:
                   requestId:
                     type: string
+                    description: >-
+                      The `approvals.request` id of the erasure request (raised through Approvals'
+                      `createApprovalRequest`), which the tombstone records as `pii.subject.erasure_request_id`.
                   estimatedCompletionAt:
                     type: string
                     format: date-time
+                    nullable: true
+                    description: >-
+                      Null until a response period reaches Identity. The package's response periods are the
+                      privacy request types' per-jurisdiction `deadlines[].responseDays` (marketing-crm
+                      `setPrivacyRequestTypes`, which give `PrivacyRequest.dueAt`); Identity, as Foundation,
+                      does not read them, so today this is always null and the deadline a venue works to is
+                      the privacy queue's `dueAt`.
         '409':
-          description: 'Open orders or an unexpired entitlement exist. Deleting an account with a valid
-            ticket in it strands the guest at a gate.
-
-            '
+          description: >-
+            The guest still holds something a deletion would strand. An open order remains
+            (`open-orders-remain`: status `pending`, `held`, `partiallyPaid` or `paid`), or a live entitlement
+            remains (`live-entitlement-remains`: status `issued` or `partiallyConsumed` with `validTo` still
+            ahead). Deleting an account with a valid ticket in it strands the guest at a gate. Read from
+            `identity.subject_holding`, never from the orders or access tables; `detail` names the order or
+            entitlement ids that block.
+          x-ticvai-problem-types: [open-orders-remain, live-entitlement-remains]
           content:
             application/problem+json:
               schema:
@@ -7813,6 +7899,89 @@ components:
           format: date-time
           nullable: true
           description: When the supervisor's PIN unlocks, where `refusal` is `credentialLocked`.
+    SubjectHolding:
+      x-ticvai-persistence: identity.subject_holding
+      # One row per order or entitlement: an entitlement has one holder at a time (CHG-GDL-001).
+      x-ticvai-unique-together:
+      - [holdingKind, holdingId]
+      type: object
+      description: >-
+        **What a guest still holds, as Identity knows it** (ADAM CR-084, decided 14 October 2026, CHG-GDL-001).
+        A projection Identity keeps of the orders and entitlements each subject holds, so that
+        `deleteGuestAccount` can refuse while an open order or a live entitlement remains, and
+        `exportSubjectData` can list them, without reading `orders.sales_order` or `access.entitlement`
+        (Identity is Foundation and reads nothing above it, ADR-0028; Access is another deployable, ADR-0055 rule
+        4). **Never returned by any operation**: this schema exists to say where the projection lives, like
+        `GuestCredential`. No operation writes it; Identity's consumers of the order and entitlement events do,
+        as `identity.membership_history` is written from `entitlement.statusChanged`.
+
+
+        **Fed by** (each event file lists the identity consumer): `order.created` (a `pending` row, when the
+        order names a subject, or with no subject yet for a guest checkout), `order.linkedToGuest` (the subject
+        set on a guest-checkout order's row and its entitlements' rows when `linkGuestCheckout` attaches it,
+        CHG-GDL-003), `order.paid` (`paid`), `order.completed` (`completed`), `order.cancelled`
+        (`voided`), `order.lapsed` (`failed`, or `voided` when the payment window passed or a parked sale
+        expired), `order.refunded`
+        (`refunded` or `partiallyRefunded`, and the refunded lines' entitlement rows `cancelled`),
+        `entitlement.issued` (an `issued` row with `validTo`), `entitlement.voided` (`cancelled`),
+        `entitlement.transferred` (the row moves to the new holder), `entitlement.reissued` (the old row
+        `cancelled`, a new `issued` row for the same holder), `entitlement.statusChanged` (the new `validTo`)
+        and `guest.merged` (the merged subject's rows move to the survivor). Status changes no event carries
+        (a scan using up a pass, an expiry) are left to `validTo`: a pass used up before its `validTo` still
+        counts as live until then, which errs on the side of not stranding a guest.
+
+
+        **The rules are the owners'**: `orders#openOrdersForSubject` (open = `pending`, `held`,
+        `partiallyPaid`, `paid`) and `access#liveEntitlementsForSubject` (live = `issued` or
+        `partiallyConsumed` with `validTo` ahead), declared in their contracts with `served: [projection]`.
+      required: [holdingKind, holdingId, status, updatedAt]
+      properties:
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          # A declared reference, so the derived DDL gives subject_id its foreign key and its index: the erasure
+          # check and the export look rows up by subject (CHG-GDL-003). pii.subject is tombstoned, never deleted.
+          x-ticvai-references: pii.subject
+          description: The guest who holds it (`pii.subject`). Null only for a guest-checkout order, and the
+            entitlements issued from it, not yet attached to an account; `order.linkedToGuest` sets it. The table
+            is under subject row-level security, so a row with no subject is seen only by a tenant-root session,
+            which is how the event consumers run.
+        holdingKind:
+          type: string
+          enum: [order, entitlement]
+        holdingId:
+          type: string
+          format: uuid
+          description: The order id (`orders.sales_order.id`) or the entitlement id (`access.entitlement.id`).
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For an entitlement, the order it was issued from (null for one an invitation issued), so a
+            refund of that order reaches its entitlements.
+        orderLineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For an entitlement, the order line it was issued from, so a partial refund reaches only its lines.
+        status:
+          type: string
+          maxLength: 40
+          description: The owner's status value as the last event applied gave it, an `OrderStatus` value for an
+            order and an `EntitlementStatus` value for an entitlement.
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: For an entitlement, the end of its validity; null for an order.
+        lastEventAt:
+          type: string
+          format: date-time
+          description: The `occurredAt` of the event last applied to the row; an older redelivery changes nothing.
+        updatedAt:
+          type: string
+          format: date-time
     AccessCondition:
       type: object
       description: '**One attribute, one operator, one value** — and the attribute names are an enum
