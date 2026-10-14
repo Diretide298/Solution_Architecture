@@ -15,4 +15,8 @@ the latest release: `r1 -> r2` means the last pull was at r1 and the next `/tick
 says what changed; say that in one line under the table. Blank means not pulled yet, which is not a
 problem.
 
-End with the first ticket in that order that is not blocked, and why, in one sentence.
+The `blocked` column names the open blocking change requests that affect a ticket; blank means it can be
+finished now. End with `firstWorkable`, the first ticket in that order that no blocking CR affects, and
+why, in one sentence, and say in one line which CR holds back each ticket above it. If I hit a blocker
+on a ticket, it is a change request (`/cr`, blocking), the ticket goes On hold, and we move to that next
+workable one - never a workaround.

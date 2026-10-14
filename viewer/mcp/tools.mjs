@@ -75,6 +75,19 @@ const run = promisify(execFile);
 const MAX_HITS = 25;
 
 /**
+ * What an agent does when the package blocks its ticket (CHG-ADM-004; Chinmay,
+ * 14 October 2026: "if there is blocker we log it as CR always. and than scour
+ * for next tasks that can be completed and if existing blockers effect it").
+ * One sentence, said the same way wherever an agent meets a blocker.
+ */
+export const BLOCKER_RULE = 'When the package blocks the ticket (a contradiction, missing storage, an undefined '
+  + 'rule), always raise a change request with blocking: true (adam_draft_change, show the person, '
+  + 'adam_raise_change only after they say yes) and propose the ticket On hold naming the CR (adam_propose, '
+  + 'applied only after a yes). Never work around a blocker and never build a guess. Then find the next ticket '
+  + 'you can finish: adam_board with only: "workable" lists, in board order, the tickets no open blocking CR '
+  + 'affects; propose the first, and say which CR holds back each ticket you skip.';
+
+/**
  * What the working tree is at, if this is a repository at all.
  *
  * **The one thing this process can see that the service cannot.** ADAM has no
@@ -375,7 +388,10 @@ function changeSection(changes) {
       + `- **Decision:** ${String(c.resolution ?? '').trim() || (c.status === 'open' ? '_none yet_' : '_no note given_')}\n`
       + `- **Release that carries it:** ${release}\n`
       + (c.childTicket ? `- **Its own ticket:** #${c.childTicket}${c.childUrl ? ` (${c.childUrl})` : ''}\n` : '')
-      + `- **What to do:** ${c.status === 'open'
+      + `- **What to do:** ${c.status === 'open' && c.blocking
+        ? 'it blocks this ticket: do not build it or work around it; the ticket goes On hold naming it, and you '
+          + 'move to the next ticket you can finish (adam_board with only: "workable")'
+        : c.status === 'open'
         ? 'wait on the part it covers: build the rest, and say this part waits on it'
         : c.status === 'rejected'
           ? 'build as the ticket and its linked files say; the request changes nothing'
@@ -386,7 +402,22 @@ function changeSection(changes) {
   return out;
 }
 
-function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined) {
+/**
+ * The open blocking change requests that affect this ticket (CHG-ADM-004),
+ * from the service's lookup: above "Change requests on this ticket", because
+ * it decides whether the ticket can be built at all right now.
+ */
+function blockedSection(blockedBy) {
+  if (!Array.isArray(blockedBy) || !blockedBy.length) return '';
+  let out = `\n## Blocked by (${blockedBy.length})\n\n`
+    + '**Do not build the blocked part, and do not work around it.** These open blocking change requests '
+    + 'affect this ticket:\n\n';
+  for (const c of blockedBy) out += `- **${c.id}** (${c.status}) ${String(c.title ?? '').trim()} - via ${c.via}\n`;
+  out += `\n${BLOCKER_RULE}\n`;
+  return out;
+}
+
+function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined, blockedBy = []) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
   out += line('Project', wp.project) + line('Type', wp.type) + line('Status', wp.status)
@@ -401,6 +432,7 @@ function ticketReadme(wp, files, missing, when, decisions = [], release = null, 
       + 'release to choose and nothing to re-pin.';
   }
   out += '\n';
+  out += blockedSection(blockedBy);
   out += changeSection(changes);
   out += releaseSection(release);
   out += '\n';
@@ -534,7 +566,7 @@ async function pullOne(client, key, base, when) {
   const answer = await client.service(`/api/work-packages/${encodeURIComponent(key)}?${await scoped(client)}`);
   if (answer.status === 428) return { key, needsSetup: true, error: answer.data?.detail };
   if (!answer.ok) return { key, error: answer.data?.detail ?? `HTTP ${answer.status}` };
-  const { workPackage: wp, touches = [] } = answer.data;
+  const { workPackage: wp, touches = [], blockedBy = [] } = answer.data;
   const release = await releaseFor(client, wp.key, touches)
     .catch((error) => ({ available: false, why: error.message }));
   const changes = await changesFor(client, wp.key).catch(() => null);
@@ -570,8 +602,9 @@ async function pullOne(client, key, base, when) {
     pulledAt: when, workPackage: wp, touches,
     ...(release.available ? { release: { current: release.current, previous: release.previous } } : {}),
     ...(Array.isArray(changes) ? { changeRequests: changes } : {}),
+    ...(blockedBy.length ? { blockedBy } : {}),
   }));
-  await writeFile(path.join(folder, 'README.md'), ticketReadme(wp, files, missing, when, decisions, release, changes));
+  await writeFile(path.join(folder, 'README.md'), ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
@@ -591,6 +624,7 @@ async function pullOne(client, key, base, when) {
       } : {}),
       ...(release.diffError ? { diffError: release.diffError } : {}),
     } } : {}),
+    ...(blockedBy.length ? { blockedBy: blockedBy.map((c) => ({ id: c.id, status: c.status, title: c.title, via: c.via })) } : {}),
     ...(Array.isArray(changes) && changes.length ? { changeRequests: {
       total: changes.length,
       open: changes.filter((c) => c.status === 'open').map((c) => c.id),
@@ -611,11 +645,11 @@ function boardReadme(pulled, project, when) {
     + "plan's build order. Each ticket has a folder under work/ with its description and "
     + 'everything it is linked to, at the latest release ADAM serves.\n';
   for (const [name, tickets] of groups) {
-    out += `\n## ${name}\n\n| Ticket | Status | Due | Linked | Release | Folder |\n|---|---|---|---|---|---|\n`;
+    out += `\n## ${name}\n\n| Ticket | Status | Due | Linked | Release | Blocked by | Folder |\n|---|---|---|---|---|---|---|\n`;
     for (const t of tickets) {
       const r = t.release;
       const tag = !r ? '' : r.movedFrom ? `${r.current} (moved from ${r.movedFrom}; see README.md)` : (r.current ?? '');
-      out += `| #${t.key} ${t.subject.replace(/\|/g, '/')} | ${t.status} | ${t.due ?? ''} | ${t.linked} | ${tag} | [work/${safeName(t.key)}](work/${safeName(t.key)}/README.md) |\n`;
+      out += `| #${t.key} ${t.subject.replace(/\|/g, '/')} | ${t.status} | ${t.due ?? ''} | ${t.linked} | ${tag} | ${(t.blockedBy ?? []).map((c) => c.id).join(', ')} | [work/${safeName(t.key)}](work/${safeName(t.key)}/README.md) |\n`;
     }
   }
   const failed = pulled.filter((t) => t.error);
@@ -1084,10 +1118,18 @@ export const TOOLS = [
       + 'module each one comes from. Use at the start of a session to see what you are meant to '
       + 'be doing, or when a branch name or a ticket number turns up and you need the context '
       + 'behind it. Subtasks and the artefacts each ticket touches come back with it and are '
-      + 'held rather than shown — ask for them by ticket when you want them.',
+      + 'held rather than shown — ask for them by ticket when you want them. Each row says which open '
+      + 'blocking change requests affect it (`blocked`: the CR ids; blank is workable). '
+      + BLOCKER_RULE,
     inputSchema: {
       type: 'object',
       properties: {
+        only: {
+          type: 'string',
+          enum: ['workable', 'blocked'],
+          description: '"workable": only the tickets no open blocking change request affects - the ones you can '
+            + 'finish now, in board order. "blocked": only the ones one does. Leave out for the whole board.',
+        },
         subtasks: {
           type: 'boolean',
           description:
@@ -1103,7 +1145,8 @@ export const TOOLS = [
       },
     },
     async run(client, args = {}) {
-      const answer = await client.service(`/api/board/mine?${await scoped(client)}`);
+      const only = ['workable', 'blocked'].includes(args?.only) ? args.only : '';
+      const answer = await client.service(`/api/board/mine?${await scoped(client, only ? { only } : {})}`);
       // 428 is "connect OpenProject first" — a thing to go and do, not a
       // failure. Relayed as the sentence the server wrote rather than flattened
       // into "the tool failed".
@@ -1143,7 +1186,16 @@ export const TOOLS = [
         percent: t.percentDone ?? 0,
         subtasks: (t.subtasks ?? []).length,
         ...(served ? { release: t.pin ? (t.pinStale ? `${t.pin} -> ${served}` : t.pin) : '' } : {}),
+        // The open blocking CRs that affect it (CHG-ADM-004). Blank is workable now.
+        blocked: (t.blockedBy ?? []).map((c) => c.id).join(', '),
       }));
+      const blockedNotes = {};
+      for (const t of items) {
+        if ((t.blockedBy ?? []).length) {
+          blockedNotes[t.key] = t.blockedBy.map((c) => `${c.id} (${c.status}) "${c.title}" - via ${c.via}`);
+        }
+      }
+      const firstWorkable = items.find((t) => !(t.blockedBy ?? []).length) ?? null;
 
       // Held back rather than left out. Fetching them costs nothing extra —
       // they come from the same project read — so the choice is only about
@@ -1174,8 +1226,13 @@ export const TOOLS = [
         // assigned" is never mistaken for "nothing assigned anywhere".
         ...(board.openproject ? { openprojectProject: board.openproject } : {}),
         columns: served
-          ? ['order', 'ticket', 'task', 'module', 'status', 'due', 'release']
-          : ['order', 'ticket', 'task', 'module', 'status', 'due'],
+          ? ['order', 'ticket', 'task', 'module', 'status', 'due', 'release', 'blocked']
+          : ['order', 'ticket', 'task', 'module', 'status', 'due', 'blocked'],
+        // How many of the whole board no open blocking CR affects, and how many one does (CHG-ADM-004).
+        ...(board.workable !== undefined ? { workable: board.workable, blockedCount: board.blocked } : {}),
+        ...(only ? { only } : {}),
+        ...(Object.keys(blockedNotes).length ? { blockedBy: blockedNotes } : {}),
+        ...(firstWorkable ? { firstWorkable: firstWorkable.key } : {}),
         ...(served ? {
           release: served,
           releaseNote: `You are always on the latest release (${served}). A release like r1 -> ${served} means the `
@@ -1197,7 +1254,9 @@ export const TOOLS = [
             + 'If `more` is present, say it in one line under the table.'
           : 'Show `rows` as a markdown table using `columns`, and if `more` is present say it in one '
             + 'line under the table; if any `release` reads "rN -> rM", say in one line that the next pull of '
-            + 'those tickets is at the latest release and shows what changed; nothing else. Do not list the '
+            + 'those tickets is at the latest release and shows what changed; if any `blocked` is filled, say in '
+            + 'one line that those wait on the CRs named (`blockedBy` says how each is affected) and that '
+            + '`firstWorkable` is the first ticket that can be finished now; nothing else. Do not list the '
             + 'subtasks or the touched artefacts, and do not summarise them — the `subtasks` '
             + 'column already gives the count. Call this tool again with subtasks: true if the '
             + 'person asks to see them.',
@@ -1677,7 +1736,10 @@ export const TOOLS = [
       + 'the latest release: every pull serves the release ADAM serves now (r1, r2, …), and when that release is '
       + 'newer than the ticket\'s previous pull, README.md says what changed and spec-diff.md has the diffs. There '
       + 'is no release to choose and nothing to ask about it. README.md also lists, near the top, every change '
-      + 'request raised from the ticket with its decision and the release that carries it. With no `key`, pulls '
+      + 'request raised from the ticket with its decision and the release that carries it, and above them a '
+      + '"Blocked by" section naming the open blocking change requests that affect the ticket (`blockedBy`). '
+      + 'A blocked ticket is not built: always raise a CR for a new blocker, propose the ticket On hold naming '
+      + 'the CR, and move to the next ticket you can finish (adam_board with only: "workable"). With no `key`, pulls '
       + 'every open ticket assigned to you and writes .adam/board.md grouped by milestone. **Use '
       + 'this at the start of work on a ticket**, then read the files you need instead of holding '
       + 'everything in the conversation. Always pass `dir`: the absolute path of the folder you are '
@@ -1721,6 +1783,12 @@ export const TOOLS = [
             + ' under "Change requests on this ticket": follow the settled decisions'
             + `${crs.open.length ? `, and wait on the part ${crs.open.join(', ')} cover${crs.open.length === 1 ? 's' : ''}` : ''}.`;
         }
+        if (one.blockedBy?.length) {
+          next = `Blocked: ${one.blockedBy.map((c) => `${c.id} (${c.status}, via ${c.via})`).join('; ')}. `
+            + 'Read the "Blocked by" section of README.md. Do not build the blocked part and do not work around it: '
+            + 'propose the ticket On hold naming the CR (adam_propose, applied only after the person says yes), then '
+            + 'find the next ticket you can finish with adam_board only: "workable". ' + next;
+        }
         if (r?.current) {
           next += ' Older /ticket instructions that mention re-pinning are out of date: there is nothing to re-pin.';
         }
@@ -1744,8 +1812,9 @@ export const TOOLS = [
         found: pulled.length > 0,
         board,
         total: answer.data.total,
-        pulled: pulled.map(({ key: k, subject, status, milestone, linked, error }) =>
-          ({ key: k, subject, status, milestone, linked, ...(error ? { error } : {}) })),
+        pulled: pulled.map(({ key: k, subject, status, milestone, linked, blockedBy, error }) =>
+          ({ key: k, subject, status, milestone, linked,
+            ...(blockedBy?.length ? { blockedBy: blockedBy.map((c) => c.id) } : {}), ...(error ? { error } : {}) })),
         ...(answer.data.total > items.length
           ? { more: `${answer.data.total - items.length} more assigned; raise limit or pull them by key` }
           : {}),
@@ -2000,7 +2069,7 @@ export const TOOLS = [
       + 'resolve such a thing in code; draft this instead.** Files nothing: returns the draft, a '
       + '`draft` code, and any open requests already on the same artefact. Show the person the '
       + 'draft; call adam_raise_change only if they clearly say yes. Quote the conflicting passages '
-      + 'in `evidence` and give the ways it could be settled in `options`.',
+      + 'in `evidence` and give the ways it could be settled in `options`. ' + BLOCKER_RULE,
     inputSchema: {
       type: 'object',
       properties: {
@@ -2087,8 +2156,9 @@ export const TOOLS = [
     description:
       '**Files a change request in ADAM**, from a draft made by adam_draft_change. Call it only after '
       + 'the person has seen that draft in this conversation and clearly said yes. Returns its id '
-      + '(CR-007). If the ticket is blocked by it, offer to propose the ticket On hold with the id in '
-      + 'the comment. Draft codes work once and for 30 minutes.',
+      + '(CR-007). If the ticket is blocked by it, propose the ticket On hold with the id in the comment '
+      + '(applied only after a yes), never work around it, and then find the next ticket you can finish '
+      + '(adam_board with only: "workable"). Draft codes work once and for 30 minutes.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -2108,7 +2178,10 @@ export const TOOLS = [
         filed: true,
         change,
         next: change.blocking && change.ticket
-          ? `Filed as ${change.id}. Offer to propose #${change.ticket} On hold with "Blocked by ${change.id}" as the comment.`
+          ? `Filed as ${change.id}. Propose #${change.ticket} On hold with "Blocked by ${change.id}" as the comment `
+            + '(adam_propose; apply only after the person says yes). Do not build the blocked part and do not work '
+            + 'around it. Then find the next ticket you can finish: adam_board with only: "workable", and propose '
+            + 'the first one it lists.'
           : `Filed as ${change.id}. It shows on ADAM's Changes page for the team to settle.`,
       };
     },

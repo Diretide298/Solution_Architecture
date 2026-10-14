@@ -520,6 +520,57 @@ try {
   check('and says so in its answer and its next step',
     withCrs.changeRequests?.total >= 1 && /Change requests on this ticket/.test(withCrs.next ?? ''), JSON.stringify(withCrs.changeRequests));
   check('and the comment is in the thread it pulled', readmeCr.includes(head(full.id, 'accepted')));
+
+  // ── a blocker is a CR, and the board says what is workable (CHG-ADM-004) ──
+  const onScreen = await raise({ source: 'developer', title: 'Borrow screen has no due date to show',
+    target_kind: 'screen', target_id: 'WEB-001', blocking: true });
+  // The lineage of the release served: borrowBook writes lending.loan. Written into r2's export the way
+  // the package's handoff/api-data-lineage.json is exported with it.
+  await mkdir(path.join(RELEASES, 'r2', 'handoff'), { recursive: true });
+  await writeFile(path.join(RELEASES, 'r2', 'handoff', 'api-data-lineage.json'), JSON.stringify({
+    borrowBook: { contract: 'lending', reads: ['lending.book', 'lending.loan'], writes: ['lending.loan', 'cache:idempotency'] },
+  }));
+  const onTable = await raise({ source: 'developer', title: 'loan has no column for the due date',
+    target_kind: 'table', target_id: 'lending.loan', blocking: true });
+  const notBlocking = await raise({ source: 'developer', title: 'A wording nit on the member screen',
+    target_kind: 'screen', target_id: 'WEB-002' });
+  const mine = await call('GET', '/api/board/mine?project_id=ticvai');
+  const item = (k) => (mine.data?.items ?? []).find((i) => String(i.key) === k) ?? {};
+  check('the board names the open blocking CR that affects a ticket through a linked screen',
+    (item('7001').blockedBy ?? []).map((c) => c.id).includes(onScreen.data?.change?.id), JSON.stringify(item('7001').blockedBy));
+  check('and through a table its operation writes, by the lineage',
+    (item('7002').blockedBy ?? []).some((c) => c.id === onTable.data?.change?.id && /lending\.loan/.test(c.via)),
+    JSON.stringify(item('7002').blockedBy));
+  check('a CR that is not blocking blocks nothing', (item('7003').blockedBy ?? []).length === 0
+    && !JSON.stringify(mine.data?.items ?? []).includes(notBlocking.data?.change?.id), JSON.stringify(item('7003').blockedBy));
+  check('and the board counts workable and blocked', mine.data?.blocked >= 2 && mine.data?.workable >= 1,
+    `${mine.data?.workable} / ${mine.data?.blocked}`);
+  const workable = await tool('adam_board', { only: 'workable' });
+  const workableKeys = (workable.rows ?? []).map((r) => String(r.ticket));
+  check('adam_board with only workable leaves the blocked tickets out, in board order',
+    !workableKeys.includes('7001') && !workableKeys.includes('7002') && workableKeys.includes('7003')
+      && String(workable.firstWorkable) === workableKeys[0], JSON.stringify({ workableKeys, first: workable.firstWorkable }));
+  const whole = await tool('adam_board', {});
+  check('and the whole board has a blocked column naming the CR',
+    whole.columns?.includes('blocked') && (whole.rows ?? []).find((r) => String(r.ticket) === '7001')?.blocked.includes(onScreen.data.change.id),
+    JSON.stringify(whole.columns));
+  const blockedPull = await tool('adam_pull', { key: '7001', dir: WORK });
+  const readmeBlocked = await readFile(path.join(WORK, '.adam', 'work', '7001', 'README.md'), 'utf8');
+  const at = readmeBlocked.indexOf('## Blocked by');
+  check('the pull of a blocked ticket has "Blocked by" above "Change requests on this ticket"',
+    at > 0 && at < readmeBlocked.indexOf('## Change requests on this ticket') && readmeBlocked.includes(onScreen.data.change.id)
+      && /always raise a change request with blocking: true/.test(readmeBlocked), readmeBlocked.slice(0, 1600));
+  check('and its next step says do not work around it, put it On hold, and find the next workable ticket',
+    /^Blocked: /.test(blockedPull.next ?? '') && /On hold/.test(blockedPull.next ?? '') && /only: "workable"/.test(blockedPull.next ?? ''),
+    blockedPull.next);
+  await settle(onTable.data.change.id, 'accepted', 'Add due_at to lending.loan.');
+  await call('POST', `/api/changes/${onTable.data.change.id}/resolve`,
+    { project_id: 'ticvai', status: 'accepted', resolution: 'Add due_at to lending.loan.', ref: 'r2' });
+  await settle(onScreen.data.change.id, 'done', 'Shown from r2.');
+  const after = await call('GET', '/api/board/mine?project_id=ticvai&only=workable');
+  const afterKeys = (after.data?.items ?? []).map((i) => String(i.key));
+  check('once a release ADAM serves carries it, and once it is done, a CR blocks nothing',
+    afterKeys.includes('7001') && afterKeys.includes('7002'), JSON.stringify(afterKeys));
 } catch (error) {
   check('the harness ran to the end', false, error.stack ?? error.message);
   for (const child of children) {

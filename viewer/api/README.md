@@ -197,6 +197,17 @@ send, and links it instead of creating (`how: linked`); after a create that erro
 reporting the failure, because OpenProject sometimes made the ticket and only the answer was lost
 (`how: recovered`). `settle_changes.py --link-existing` links such a child before it would file one.
 
+**Which open blocking CRs affect a ticket** (CHG-ADM-004; Chinmay, 14 October 2026: "if there is blocker we
+log it as CR always. and than scour for next tasks that can be completed and if existing blockers effect
+it"). `blockers.py` answers it for `GET /api/board/mine` (every item carries `blockedBy`; `?only=workable`
+or `?only=blocked` narrows the items, and `workable` / `blocked` count the whole board) and for
+`GET /api/work-packages/{key}` (the pull's "Blocked by"). A CR blocks while it is `blocking` and open, or
+accepted and not yet in a served release (`resolved_ref` above the served tag, or none); it affects a ticket
+it was raised from (not its own child task), a ticket linked to one of its artefacts (target and
+`artefact_ids`; operations compared by operationId), or a ticket whose linked operation reads or writes a
+table it names, by `handoff/api-data-lineage.json` of the tree served (cached by modification time). One
+query per board. `python api/blockers-check.py` holds the matching on stand-in data.
+
 **Intake.** A change request carries `source` (minutes, answer, design, developer, audit) with
 `source_ref`, the line that finds it again; `approver`; `triage` (clarification, scope, defect) and
 `when` (now, later); `artefact_ids`; `contract_impact` (none, additive, breaking);
