@@ -158,12 +158,33 @@ tag, `r1`, `r2`, … (`viewer/lib/releases.mjs`), and on start writes what it ch
 `<releases>` is the project's `releases` entry in `projects.json`, `.releases/<id>` beside it when
 there is none; `api/releases.py` reads both files and nothing else about the package.
 
-**A pin is per person and ticket** (`ticket_pin`, and `ticket_pin_log` for every move). The first
-`/ticket` pull records the tag in `served.json`; the caller never supplies one, so a pin says what
-was actually served. While the viewer serves its working tree there is no tag and nothing is
-recorded — the pull says so. A re-pin (`accept`, or `breaking` when a breaking contract change made
-it required) moves the pin to the tag in force. The connector works out what changed and whether the
-re-pin is required, from the viewer's `release-diff`; this service only holds the pin.
+**A pin is per person and ticket** (`ticket_pin`, and `ticket_pin_log` for every move), and it is
+always the latest release (CHG-ADM-001; Chinmay, 14 October 2026: "we always want agents to pull the
+latest"). The first `/ticket` pull records the tag in `served.json`; the caller never supplies one, so a
+pin says what was actually served. A later pull of a ticket whose pin is behind moves it to the tag in
+force, logs the move with the reason `auto`, and answers `movedFrom`, so an agent on any connector is
+on the latest release and nobody is asked to choose. While the viewer serves its working tree there is
+no tag and nothing is recorded — the pull says so. `accept` and `breaking` (adam_repin, kept for older
+connectors) move the pin the same way. The connector works out what changed since the previous pull,
+from the viewer's `release-diff`; this service only holds the pin.
+
+**A settled request reaches its ticket** (CHG-ADM-002; Chinmay, 14 October 2026: "whenever we have a cr
+we should create new tickets if ticket is closed. if not then add comment for the AI agent when he
+pulls"). `POST /api/changes/<n>/resolve` (and the CSV bulk settle) then tell the ticket the request was
+raised from, as the settler with their own OpenProject token (`cr_notice.py` decides and words it):
+**open** in OpenProject, one comment headed `ADAM CR-nnn · <status> — read before building`, written for
+the agent that pulls it, sent without mail; **closed**, a child task for the change under the
+closed one, whose description is `_ticket_text` with the decision and the release, recorded as the
+request's `child_key` (one per request, claimed before it is sent) and given the same comment. A
+rejection on a closed ticket gets the comment only. Once a request has its ticket, later settlements
+tell that ticket. Never twice: a thread that already starts the request's comment for that status is
+left alone. The answer carries `ticketFollowUp` (what was done, or why nothing was, e.g. no OpenProject
+token); the settle never fails because of it. `tell_ticket: false` turns it off, which
+`settle_changes.py` sends because it tells the ticket itself, after its dry run. The ticket is told
+**before** the status is written, so the child task ("we create child tasks for CR remember that",
+Chinmay, 14 October) is filed while the request is not yet Done; the preview/apply guard still refuses a
+ticket for a Done request. Migration work a request causes is a child task of the affected MIG-* ticket,
+assigned to the migration owner (`ticvai/docs/active/team.json` `migrations.owner`), filed by the lead.
 
 **Intake.** A change request carries `source` (minutes, answer, design, developer, audit) with
 `source_ref`, the line that finds it again; `approver`; `triage` (clarification, scope, defect) and
@@ -181,9 +202,11 @@ compared as instants (git writes the tagger's offset, this service writes UTC). 
 the tag served; no `from` means everything up to `to`.
 
 **Settling a batch of requests from a workstation** (12 October): `settle_changes.py decisions.json
-[--apply]` resolves each request through `POST /api/changes/<n>/resolve` as `ADAM_EMAIL`, puts one
-comment headed `ADAM CR-nnn · <status>` on the ticket it was raised from (OpenProject's API,
-`TICVAI_OP_TOKEN`, no mail unless `--notify`), and can attach files to that ticket, from disk or as
+[--apply]` resolves each request through `POST /api/changes/<n>/resolve` as `ADAM_EMAIL`, tells the
+ticket it was raised from the same way the route does (an open ticket: one comment for the agent,
+OpenProject's API, `TICVAI_OP_TOKEN`, no mail unless `--notify`; a closed ticket: a new ticket through
+`/api/changes/<n>/ticket/preview` and `/apply`, which uses the OpenProject token `ADAM_EMAIL` connected in
+ADAM), and can attach files to that ticket, from disk or as
 a release tag holds them (`{"git": "r4:ticvai/handoff/api-data-lineage.json"}`). Dry run by default;
 a second run changes nothing. The package's tickets follow with `ticvai/tools/op-release-api.py`.
 
@@ -248,7 +271,7 @@ verdict on an artefact is simply its newest row.
 | `POST /api/changes/import/preview` | admin only. What an edited change request file would settle. Writes nothing. |
 | `POST /api/changes/import/apply` | admin only. Settles it, on the preview's checksum. |
 | `GET /api/work-packages/{key}/pin` | the release tag you pulled a ticket at, the one being served, and the pin's history |
-| `POST /api/work-packages/{key}/pin` | `reason: pull` records the tag in force if there is no pin; `accept` / `breaking` move it to the tag in force |
+| `POST /api/work-packages/{key}/pin` | `reason: pull` records the tag in force, or moves a pin that is behind to it (logged `auto`, answered with `movedFrom`): every pull is at the latest release; `accept` / `breaking` (older connectors) move it the same way |
 | `POST /api/changes/{n}/intake` | complete or correct a request's intake. Whoever may settle it, or its raiser while open |
 | `GET /api/changes/release-notes` | `from` / `to` release tags: the requests settled (accepted or done) between them, with a markdown note |
 

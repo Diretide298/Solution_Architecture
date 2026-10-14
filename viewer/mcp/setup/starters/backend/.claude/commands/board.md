@@ -10,10 +10,9 @@ Do not list the subtasks and do not summarise them: the `subtasks` column gives 
 they are only worth reading when I ask. If I do ask, run `adam_board` again with
 `subtasks: true` and show them under their ticket.
 
-If `columns` includes `release`, it is the release tag each ticket was pulled at. `r1 -> r2` means
-I pulled it at r1 and ADAM now serves r2: say in one line under the table that `/ticket <n>` shows
-what changed for those. Blank means not pulled yet, which is not a problem.
+If `columns` includes `release`, it is the release tag each ticket was last pulled at. I am always on
+the latest release: `r1 -> r2` means the last pull was at r1 and the next `/ticket <n>` is at r2 and
+says what changed; say that in one line under the table. Blank means not pulled yet, which is not a
+problem.
 
-End with the first ticket in that order that is not blocked, and why, in one sentence. A ticket
-whose last pull said **Re-pin required** is not blocked, but it has to be re-pinned first
-(`/ticket <n>` does it).
+End with the first ticket in that order that is not blocked, and why, in one sentence.

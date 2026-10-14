@@ -257,16 +257,20 @@ try {
 
   await mkdir(WORK, { recursive: true });
   const first = await tool('adam_pull', { key: '7001', dir: WORK });
-  check('the first pull pins the ticket at r1',
-    first.found && first.release?.current === 'r1' && first.release?.pinned === 'r1' && !first.release?.stale,
+  check('the first pull is at r1, the latest release',
+    first.found && first.release?.current === 'r1' && first.release?.latest === true && !first.release?.movedFrom,
     JSON.stringify(first.release ?? first));
   const readme1 = await readFile(path.join(WORK, '.adam', 'work', '7001', 'README.md'), 'utf8');
-  check('and README.md names the release', /\*\*Release:\*\* r1 \(pinned by this pull\)/.test(readme1), readme1.slice(0, 400));
+  check('and README.md names the release as the latest', /\*\*Release:\*\* r1, the latest release/.test(readme1)
+    && /You are always on the latest release \(r1\)/.test(readme1), readme1.slice(0, 600));
   const file1 = JSON.parse(await readFile(path.join(WORK, '.adam', 'work', '7001', 'screen-WEB-001.json'), 'utf8'));
   check('and each linked file says which release it is', file1.release === 'r1', JSON.stringify(file1).slice(0, 200));
   const again = await call('POST', '/api/work-packages/7001/pin', { project_id: 'ticvai', reason: 'pull' });
   check('a second pull at the same release records nothing new', again.data?.recorded === false && again.data?.pin?.tag === 'r1');
   for (const k of ['7002', '7003']) await tool('adam_pull', { key: k, dir: WORK });
+  // 7010 is pulled at r1 the way a connector from before 14 October pulls: it posts `pull`
+  // and nothing else. At r2 the same call has to move it (CHG-ADM-001).
+  await call('POST', '/api/work-packages/7010/pin', { project_id: 'ticvai', reason: 'pull' });
 
   // A request raised from a ticket while it is pinned at r1 records r1.
   const gap = await tool('adam_draft_change', {
@@ -297,62 +301,80 @@ try {
   const noTag = await client.packageJson('release-diff', { from: 'r9', to: 'r2' });
   check('and one with a tag that does not exist is a 409 that says so', noTag.status === 409 && /r9/.test(noTag.data?.error ?? ''));
 
+  // The board first, while 7001 is still at the release of its last pull.
+  const board = await tool('adam_board', {});
+  const row = (k) => board.rows?.find((r) => String(r.ticket) === k);
+  check('the board has a release column once a release is served', board.columns?.includes('release'), JSON.stringify(board.columns));
+  check('and shows a ticket last pulled at an older release as r1 -> r2', row('7001')?.release === 'r1 -> r2', JSON.stringify(row('7001')));
+  check('and a ticket never pulled as blank', row('7004')?.release === '', JSON.stringify(row('7004')));
+  check('and its note says the next pull is at the latest, with nothing to choose',
+    /always on the latest release \(r2\)/.test(board.releaseNote ?? '') && /Nothing to choose/.test(board.releaseNote ?? ''),
+    board.releaseNote);
+
+  // ── every pull is at the latest release (CHG-ADM-001) ────────────
   const consumer = await tool('adam_pull', { key: '7001', dir: WORK });
-  check('a pull after the release moved on says the spec changed',
-    consumer.release?.stale === true && consumer.release?.pinned === 'r1' && consumer.release?.current === 'r2',
+  check('a pull after the release moved on is at the latest release, and says it moved from r1',
+    consumer.release?.current === 'r2' && consumer.release?.movedFrom === 'r1' && consumer.release?.latest === true,
     JSON.stringify(consumer.release));
-  check('and the breaking change makes the re-pin required for the consumer',
-    consumer.release?.repinRequired === true && consumer.release?.breaking?.[0] === 'BC-001 (consumer)',
-    JSON.stringify(consumer.release));
-  check('and the next step says so, as required', /requires this ticket to move off r1/.test(consumer.next ?? ''), consumer.next);
+  check('and names the breaking change for the consumer',
+    consumer.release?.breaking?.[0] === 'BC-001 (consumer)', JSON.stringify(consumer.release));
+  check('and the next step says always the latest and asks nothing',
+    /always on the latest release \(r2\)/.test(consumer.next ?? '') && /moved the ticket from r1/.test(consumer.next ?? '')
+      && !/adam_repin|whether to|keep building against|Ask the person/i.test(consumer.next ?? ''), consumer.next);
   const dir1 = path.join(WORK, '.adam', 'work', '7001');
   const readme2 = await readFile(path.join(dir1, 'README.md'), 'utf8');
-  check('README.md has the section, with r1 and r2 in its title',
-    readme2.includes('## Spec changed since you pulled at r1 (now r2)'), readme2.slice(0, 600));
-  check('and marks the re-pin required, naming the change and the role',
-    /Re-pin required/.test(readme2) && /BC-001/.test(readme2) && /\*\*consumer\*\*, via screen WEB-001/.test(readme2));
-  const pinnedScreen = JSON.parse(await readFile(path.join(dir1, 'screen-WEB-001.json'), 'utf8'));
-  check('the linked file stays at the pinned release until the change is taken',
-    pinnedScreen.release === 'r1' && pinnedScreen.screen?.purpose === 'A member borrows a book from the shelf.',
-    JSON.stringify(pinnedScreen).slice(0, 300));
+  check('README.md says what changed since the previous pull, with r1 and r2 in its title',
+    readme2.includes('## What changed since your previous pull (r1 -> r2)')
+      && /\*\*Release:\*\* r2, the latest release \(this pull moved the ticket from r1\)/.test(readme2), readme2.slice(0, 900));
+  check('and names the breaking change and the role, without asking for a re-pin',
+    /BC-001/.test(readme2) && /\*\*consumer\*\*, via screen WEB-001/.test(readme2)
+      && !/Re-pin required|Spec changed since|adam_repin|keep building against/i.test(readme2));
+  const nowScreen = JSON.parse(await readFile(path.join(dir1, 'screen-WEB-001.json'), 'utf8'));
+  check('the linked file is the latest release, r2',
+    nowScreen.release === 'r2' && /21 days/.test(nowScreen.screen?.purpose ?? ''), JSON.stringify(nowScreen).slice(0, 300));
   const specDiff = await readFile(path.join(dir1, 'spec-diff.md'), 'utf8').catch(() => '');
-  check('spec-diff.md holds the diff of what the developer was handed',
+  check('spec-diff.md holds the diff since the previous pull',
     /-\s+"purpose": "A member borrows a book from the shelf\."/.test(specDiff)
       && /\+\s+"purpose": "A member borrows a book; the loan is for 21 days\."/.test(specDiff), specDiff.slice(0, 800));
+  const history = await call('GET', '/api/work-packages/7001/pin?project_id=ticvai');
+  check('the pin history keeps the first pull and the automatic move',
+    history.data?.log?.[0]?.reason === 'auto' && history.data?.log?.[0]?.from === 'r1' && history.data?.log?.[0]?.to === 'r2'
+      && history.data?.log?.[1]?.reason === 'pull' && history.data?.pin?.tag === 'r2' && history.data?.stale === false,
+    JSON.stringify(history.data));
+  const again2 = await tool('adam_pull', { key: '7001', dir: WORK });
+  check('a second pull at r2 moves nothing and says nothing changed',
+    again2.release?.current === 'r2' && !again2.release?.movedFrom
+      && !(await stat(path.join(dir1, 'spec-diff.md')).catch(() => null)), JSON.stringify(again2.release));
 
   const producer = await tool('adam_pull', { key: '7002', dir: WORK });
-  check('the producer of the operation must re-pin too',
-    producer.release?.repinRequired === true && producer.release?.breaking?.[0] === 'BC-001 (producer)',
+  check('the producer of the operation is moved to r2 too, and told of the breaking change',
+    producer.release?.movedFrom === 'r1' && producer.release?.breaking?.[0] === 'BC-001 (producer)',
     JSON.stringify(producer.release));
   const opDiff = await readFile(path.join(WORK, '.adam', 'work', '7002', 'spec-diff.md'), 'utf8');
   check('and its diff shows the operation\'s summary moving',
     /-\s+"title": "Borrow a book",/.test(opDiff) && /\+\s+"title": "Borrow a book for 21 days",/.test(opDiff), opDiff.slice(0, 800));
 
   const bystander = await tool('adam_pull', { key: '7003', dir: WORK });
-  check('a ticket whose artefacts did not change is told the release moved, with nothing changed',
-    bystander.release?.stale === true && bystander.release?.changed === 0 && bystander.release?.repinRequired === false,
+  check('a ticket whose artefacts did not change is moved to r2, with nothing changed',
+    bystander.release?.movedFrom === 'r1' && bystander.release?.changed === 0 && bystander.release?.breaking?.length === 0,
     JSON.stringify(bystander.release));
   const readme3 = await readFile(path.join(WORK, '.adam', 'work', '7003', 'README.md'), 'utf8');
-  check('and not told to re-pin', !/Re-pin required/.test(readme3) && /None of the artefacts/.test(readme3));
+  check('and README.md says none of its artefacts changed', /None of the artefacts/.test(readme3)
+    && !/breaking contract change/i.test(readme3));
 
-  const board = await tool('adam_board', {});
-  const row = (k) => board.rows?.find((r) => String(r.ticket) === k);
-  check('the board has a release column once a release is served', board.columns?.includes('release'), JSON.stringify(board.columns));
-  check('and shows a pin behind the served release as r1 -> r2', row('7001')?.release === 'r1 -> r2', JSON.stringify(row('7001')));
-  check('and a ticket never pulled as blank', row('7004')?.release === '', JSON.stringify(row('7004')));
+  const oldConnector = await call('POST', '/api/work-packages/7010/pin', { project_id: 'ticvai', reason: 'pull' });
+  check('a pull from a connector older than the rule is moved to the latest release by the service',
+    oldConnector.data?.recorded === true && oldConnector.data?.movedFrom === 'r1' && oldConnector.data?.pin?.tag === 'r2'
+      && oldConnector.data?.stale === false && oldConnector.data?.log?.[0]?.reason === 'auto', JSON.stringify(oldConnector.data));
 
-  const moved = await tool('adam_repin', { key: '7001', dir: WORK, breaking: true, note: 'BC-001' });
-  check('adam_repin moves the pin to r2', moved.ok && moved.moved && moved.pinned === 'r2' && moved.from === 'r1', JSON.stringify(moved));
-  check('and pulls again, so the files are r2', moved.pulled?.release?.stale === false, JSON.stringify(moved.pulled));
-  const nowScreen = JSON.parse(await readFile(path.join(dir1, 'screen-WEB-001.json'), 'utf8'));
-  check('the linked file is the new release now',
-    nowScreen.release === 'r2' && /21 days/.test(nowScreen.screen?.purpose ?? ''), JSON.stringify(nowScreen).slice(0, 200));
-  const history = await call('GET', '/api/work-packages/7001/pin?project_id=ticvai');
-  check('the pin history keeps the pull and the forced move',
-    history.data?.log?.[0]?.reason === 'breaking' && history.data?.log?.[0]?.from === 'r1'
-      && history.data?.log?.[1]?.reason === 'pull', JSON.stringify(history.data?.log));
-  const twice = await tool('adam_repin', { key: '7001' });
-  check('re-pinning at the served release changes nothing and says so', twice.ok && !twice.moved && /Already pinned/.test(twice.note ?? ''));
+  const repin = await tool('adam_repin', { key: '7001' });
+  check('adam_repin is still there, changes nothing at the latest release, and says it is not needed',
+    repin.ok && !repin.moved && repin.pinned === 'r2' && /nothing to re-pin/.test(repin.note ?? '')
+      && /never needed/.test(repin.next ?? ''), JSON.stringify(repin));
+  check('and its description says it is not needed', /^Not needed/.test(BY_NAME.get('adam_repin').description));
+  check('adam_pull\'s description says the agent is always on the latest release',
+    /You are always on the latest release/.test(BY_NAME.get('adam_pull').description)
+      && !/repinRequired|adam_repin/.test(BY_NAME.get('adam_pull').description));
   const nonsense = await call('POST', '/api/work-packages/7001/pin', { project_id: 'ticvai', reason: 'because' });
   check('a pin reason outside pull, accept and breaking is refused', nonsense.status === 400);
 
@@ -403,7 +425,8 @@ try {
 
   // ── release notes ────────────────────────────────────────────────
   const settle = (id, status, resolution = '') => call('POST', `/api/changes/${id}/resolve`, { project_id: 'ticvai', status, resolution });
-  check('a request is accepted', (await settle(full.id, 'accepted')).status === 200);
+  const accepted = await settle(full.id, 'accepted', 'Notices say 21 days from r2.');
+  check('a request is accepted', accepted.status === 200);
   check('another is done', (await settle(filed.change.id, 'done')).status === 200);
   check('one is rejected, which is not in any release', (await settle(legacy, 'rejected', 'Not a change.')).status === 200);
   const early = await raise({ source: 'audit', source_ref: 'R016' });
@@ -429,6 +452,74 @@ try {
     (await call('GET', '/api/changes/release-notes?project_id=ticvai&from=r7')).status === 404);
   const viaTool = await tool('adam_changes', { from: 'r1', to: 'r2' });
   check('adam_changes with from and to answers the same release note', viaTool.total === 2 && /# Release r2/.test(viaTool.markdown ?? ''));
+
+  // ── a settled request reaches its ticket (CHG-ADM-002) ───────────
+  const said = async () => (await (await fetch(`${PMS}/_comments`)).json()).comments ?? {};
+  const madeList = async () => (await (await fetch(`${PMS}/_created`)).json()).created ?? [];
+  const head = (id, status) => `**ADAM ${id} · ${status} — read before building**`;
+  // 7001 is open (In progress): the accept above commented on it, for the agent.
+  let thread = (await said())['7001'] ?? [];
+  const onOpen = thread.filter((c) => c.text.startsWith(head(full.id, 'accepted')));
+  check('settling a request raised from an open ticket comments on it, once, for the agent',
+    accepted.data?.ticketFollowUp?.action === 'comment' && accepted.data.ticketFollowUp.ok === true && onOpen.length === 1,
+    JSON.stringify(accepted.data?.ticketFollowUp));
+  check('the comment says what was decided, what changed and what to do, and sends no mail',
+    /For the AI agent that pulls #7001/.test(onOpen[0]?.text ?? '') && /\*\*What was decided:\*\* Notices say 21 days/.test(onOpen[0]?.text ?? '')
+      && /\*\*What to do now:\*\*/.test(onOpen[0]?.text ?? '') && onOpen[0]?.notify === 'false', onOpen[0]?.text);
+  const twiceSettled = await settle(full.id, 'accepted', 'Notices say 21 days from r2.');
+  thread = (await said())['7001'] ?? [];
+  check('settling it the same way again does not comment twice',
+    twiceSettled.data?.ticketFollowUp?.already === true
+      && thread.filter((c) => c.text.startsWith(head(full.id, 'accepted'))).length === 1, JSON.stringify(twiceSettled.data?.ticketFollowUp));
+
+  // 7005 is closed: a request raised from it gets a child task, carrying the decision and the release.
+  const fromClosed = await raise({ source: 'developer', ticket: '7005', title: 'Receipt shows the old loan period' });
+  const before = (await madeList()).length;
+  const settledClosed = await call('POST', `/api/changes/${fromClosed.data.change.id}/resolve`,
+    { project_id: 'ticvai', status: 'accepted', resolution: 'Show 21 days on the receipt.', ref: 'r2' });
+  const child = settledClosed.data?.ticketFollowUp ?? {};
+  const created = await madeList();
+  const newest = created[created.length - 1] ?? {};
+  check('settling a request raised from a closed ticket files a child task of it',
+    child.action === 'ticket' && child.ok === true && created.length === before + 1
+      && String(newest.parent ?? '').endsWith('/7005') && settledClosed.data?.change?.childTicket === String(child.ticket),
+    JSON.stringify({ child, newest, change: settledClosed.data?.change?.childTicket }));
+  check('the child task carries the request, the decision and the release',
+    /\*\*Decision \(CR-\d+ · accepted\)\*\*/.test(newest.description ?? '') && /Show 21 days on the receipt\./.test(newest.description ?? '')
+      && /release `r2`/.test(newest.description ?? '') && /Opened because #7005/.test(newest.description ?? ''), newest.description);
+  check('and its thread has the same comment for the agent',
+    ((await said())[String(child.ticket)] ?? []).some((c) => c.text.startsWith(head(fromClosed.data.change.id, 'accepted'))));
+  const doneClosed = await call('POST', `/api/changes/${fromClosed.data.change.id}/resolve`,
+    { project_id: 'ticvai', status: 'done', resolution: 'Show 21 days on the receipt.', ref: 'r2' });
+  check('marking it done files no second ticket, and tells the child task instead',
+    (await madeList()).length === before + 1 && doneClosed.data?.ticketFollowUp?.action === 'comment'
+      && doneClosed.data.ticketFollowUp.key === String(child.ticket), JSON.stringify(doneClosed.data?.ticketFollowUp));
+  const doneTicket = await call('POST', `/api/changes/${fromClosed.data.change.id}/ticket/preview`, { project_id: 'ticvai' });
+  check('and the guard still refuses a ticket for a done request', doneTicket.status === 409);
+
+  const rejectClosed = await raise({ source: 'developer', ticket: '7006', title: 'Shipped one is wrong' });
+  const rejected = await call('POST', `/api/changes/${rejectClosed.data.change.id}/resolve`,
+    { project_id: 'ticvai', status: 'rejected', resolution: 'It is right as shipped.' });
+  check('a rejection on a closed ticket comments, and files nothing',
+    rejected.data?.ticketFollowUp?.action === 'comment' && (await madeList()).length === before + 1,
+    JSON.stringify(rejected.data?.ticketFollowUp));
+  const quiet = await raise({ source: 'developer', ticket: '7002', title: 'Told elsewhere' });
+  const off = await call('POST', `/api/changes/${quiet.data.change.id}/resolve`,
+    { project_id: 'ticvai', status: 'accepted', resolution: 'Fine.', tell_ticket: false });
+  check('tell_ticket false tells nothing', off.data?.ticketFollowUp?.action === 'none'
+    && !((await said())['7002'] ?? []).some((c) => c.text.includes(quiet.data.change.id)));
+
+  // The agent sees it on pull.
+  const withCrs = await tool('adam_pull', { key: '7001', dir: WORK });
+  const readmeCr = await readFile(path.join(WORK, '.adam', 'work', '7001', 'README.md'), 'utf8');
+  const crAt = readmeCr.indexOf('## Change requests on this ticket');
+  check('adam_pull lists the change requests raised from the ticket, near the top',
+    crAt > 0 && crAt < readmeCr.indexOf('## Description') && readmeCr.includes(`### ${full.id} · accepted`)
+      && /\*\*Decision:\*\* Notices say 21 days from r2\./.test(readmeCr) && /follow the decision above/.test(readmeCr),
+    readmeCr.slice(0, 1500));
+  check('and says so in its answer and its next step',
+    withCrs.changeRequests?.total >= 1 && /Change requests on this ticket/.test(withCrs.next ?? ''), JSON.stringify(withCrs.changeRequests));
+  check('and the comment is in the thread it pulled', readmeCr.includes(head(full.id, 'accepted')));
 } catch (error) {
   check('the harness ran to the end', false, error.stack ?? error.message);
   for (const child of children) {

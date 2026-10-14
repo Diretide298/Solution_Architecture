@@ -367,6 +367,9 @@ const pause = (ms) => (ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)
 
 let nextId = 1200;
 const created = [];
+// Comments posted to each work package, by its number: read back by GET
+// .../activities and listed whole at /_comments.
+const comments = new Map();
 
 const read = (req) => new Promise((resolve) => {
   const parts = [];
@@ -386,6 +389,10 @@ createServer(async (req, res) => {
   // What the check reads afterwards. Outside /api/v3 so it cannot be mistaken
   // for something OpenProject offers.
   if (path === '/_created') return json(res, 200, { created });
+  if (path === '/_comments') {
+    return json(res, 200, { comments: Object.fromEntries([...comments].map(([k, list]) =>
+      [k, list.map((c) => ({ text: c.comment.raw, notify: c.notify }))])) });
+  }
   if (path === '/_slow') {
     if (url.searchParams.has('page')) PAGE_MS = Number(url.searchParams.get('page')) || 0;
     if (url.searchParams.has('call')) CALL_MS = Number(url.searchParams.get('call')) || 0;
@@ -544,19 +551,31 @@ createServer(async (req, res) => {
   }
   const activity = path.match(/^\/api\/v3\/work_packages\/(\d+)\/activities$/);
   if (activity && req.method === 'POST') {
-    await read(req);
-    return json(res, 201, { _type: 'Activity', id: nextId++ });
+    const body = await read(req);
+    // Kept, so a second read of the thread sees it: a settled change request's
+    // comment is posted once (cr_notice.py), and that is only testable if the
+    // stand-in remembers what it was sent. `notify` is kept too, for the check
+    // that settlement comments are sent without mail.
+    const id = nextId++;
+    if (!comments.has(activity[1])) comments.set(activity[1], []);
+    comments.get(activity[1]).push({
+      _type: 'Activity::Comment', id, createdAt: new Date().toISOString(),
+      comment: { raw: body?.comment?.raw ?? '' }, notify: url.searchParams.get('notify'),
+      _links: { user: { href: `/api/v3/users/${userOf(req) || 5}`, title: userName(userOf(req) || 5) } },
+    });
+    return json(res, 201, { _type: 'Activity', id });
   }
-  // The thread under a ticket. Only a held ticket says anything: it is the
-  // reason the delivery overview shows beside it (main.py `_held_reasons`).
+  // The thread under a ticket. Only a held ticket says anything of its own: it
+  // is the reason the delivery overview shows beside it (main.py
+  // `_held_reasons`). Then whatever was posted to it.
   if (activity && req.method === 'GET') {
     const wp = packages.get(activity[1]);
     const held = /hold/i.test(wp?._links?.status?.title ?? '');
-    return json(res, 200, { _type: 'Collection', _embedded: { elements: held ? [{
+    return json(res, 200, { _type: 'Collection', _embedded: { elements: [...(held ? [{
       _type: 'Activity::Comment', createdAt: '2026-10-07T07:29:15Z',
       comment: { raw: 'Waiting on the payments provider to confirm gift-card refunds.' },
       _links: { user: { href: '/api/v3/users/9', title: 'Hrushikant Patkar' } },
-    }] : [] } });
+    }] : []), ...(comments.get(activity[1]) ?? [])] } });
   }
 
   const make = path.match(/^\/api\/v3\/projects\/(\d+)\/work_packages$/);

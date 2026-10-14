@@ -4,15 +4,33 @@
 Runs anywhere with network access (no server login): ADAM through its HTTP API as the account in ADAM_EMAIL and
 ADAM_PASSWORD, OpenProject through its REST API with TICVAI_OP_TOKEN. For each decision:
 
-  1. ADAM: POST /api/changes/<n>/resolve (status, resolution, ref) -- what the developer reads in ADAM.
-  2. OpenProject: one comment on the ticket the request was raised from, headed "ADAM CR-011 · accepted", so the
-     ticket's history says what was decided without opening ADAM.
+  1. ADAM: POST /api/changes/<n>/resolve (status, resolution, ref) -- what the developer reads in ADAM. Sent with
+     tell_ticket false, so this script tells the ticket itself and its dry run shows that first.
+  2. The ticket the request was raised from is told (cr_notice.py, CHG-ADM-002; Chinmay, 14 October 2026: "whenever
+     we have a cr we should create new tickets if ticket is closed. if not then add comment for the AI agent when
+     he pulls"):
+       - **still open** in OpenProject: one comment, headed "ADAM CR-011 · accepted — read before building",
+         written for the AI agent that pulls it next (what was decided, which release carries it, what to do now).
+         adam_pull puts it, and a "Change requests on this ticket" section, in the ticket's README.md;
+       - **closed**: a CHILD TASK of the closed ticket for the change ("we create child tasks for CR remember
+         that", Chinmay, 14 October), through ADAM's own /api/changes/<n>/ticket/preview and /apply (so ADAM
+         records it as the request's child_key, and the description is ADAM's _ticket_text: the request, the
+         decision and the release). That uses the OpenProject token ADAM_EMAIL connected in ADAM. ADAM refuses a
+         ticket for a Done request, so the request is first settled as accepted with its decision, the child is
+         filed, and only then is it marked done. The same comment goes on the child task. A rejection on a
+         closed ticket gets the comment only: there is nothing to build;
+       - once a request has its child task, later settlements tell that task instead.
+     Step 2 runs before step 1's final write, for that reason. The ticket's own description is never rewritten.
+     Migration work a request causes is a child task of the affected MIG-* ticket, assigned to the migration
+     owner (ticvai/docs/active/team.json `migrations.owner`); this script does not file it (one child per
+     request is ADAM's guard), the lead does, and the decision should name it.
   3. Optionally, files attached to that ticket (from disk, or `git show <ref>:<path>` so the file is the one the
      release tag holds), e.g. a derived file a developer's build needs.
 
 **Dry run unless --apply**, and safe to run again: a request already at that status with that resolution is not
-resolved twice, a ticket that already has the comment's heading is not commented twice, and a file already attached
-under that name is not attached twice. OpenProject mail is off unless --notify.
+resolved twice, a ticket whose thread already starts a comment for that request and status is not commented twice
+(the shorter heading written before 14 October counts too), a request that has a ticket never gets a second one,
+and a file already attached under that name is not attached twice. OpenProject mail is off unless --notify.
 
 Decisions file (JSON):
 
@@ -29,12 +47,15 @@ Decisions file (JSON):
    ]}
 
   status: open | accepted | rejected | done. `ref` (per item, else the file's) is recorded on the request as what
-  settled it. `comment: false` skips the OpenProject comment for that item. An item with `raise` instead of `cr`
-  files the request first (POST /api/changes, the fields of ChangeIn) unless one whose title starts with `match`
-  is already there -- the way a decision made outside ADAM gets its ADAM record -- and then settles it.
+  settled it, and is the release the comment names. `comment: false` skips telling the ticket for that item (no
+  comment and no new ticket). An item with `raise` instead of `cr` files the request first (POST /api/changes, the
+  fields of ChangeIn) unless one whose title starts with `match` is already there -- the way a decision made
+  outside ADAM gets its ADAM record -- and then settles it.
 
   python3 settle_changes.py decisions.json            # dry run: what would change
   python3 settle_changes.py decisions.json --apply
+
+The branches are tested without a network by ticvai/tools/check-adam-cr-settlement.py (in run-checks.py).
 """
 from __future__ import annotations
 
@@ -51,6 +72,11 @@ import urllib.parse
 import urllib.request
 import uuid
 from pathlib import Path
+
+# The wording and the decision are shared with ADAM's resolve route (main.py), from the file beside this one.
+# Added explicitly because `python -I` leaves the script's own folder off sys.path.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cr_notice  # noqa: E402
 
 STATUSES = ("open", "accepted", "rejected", "done")
 UA = "curl/8.0"  # the OpenProject host's firewall refuses Python's default agent
@@ -92,7 +118,14 @@ class Adam:
 
     def resolve(self, project: str, number: int, status: str, resolution: str, ref: str) -> dict:
         return self._post(f"/api/changes/{number}/resolve",
-                          {"project_id": project, "status": status, "resolution": resolution, "ref": ref})
+                          {"project_id": project, "status": status, "resolution": resolution, "ref": ref,
+                           "tell_ticket": False})
+
+    def new_ticket(self, project: str, number: int) -> dict:
+        """The request's ticket, through ADAM's own preview and apply: ADAM records it as the child."""
+        shown = self._post(f"/api/changes/{number}/ticket/preview", {"project_id": project})
+        made = self._post(f"/api/changes/{number}/ticket/{shown['proposal']}/apply", {"project_id": project})
+        return made["ticket"]
 
 
 class OpenProject:
@@ -117,6 +150,16 @@ class OpenProject:
     def comment(self, wp: str, text: str, notify: bool) -> None:
         self._req("POST", f"/work_packages/{wp}/activities?notify={'true' if notify else 'false'}",
                   json.dumps({"comment": {"raw": text}}).encode())
+
+    def is_closed(self, wp: str) -> bool:
+        """By OpenProject's own isClosed, never by the status's name."""
+        got = self._req("GET", f"/work_packages/{wp}")
+        embedded = (got.get("_embedded") or {}).get("status") or {}
+        if "isClosed" in embedded:
+            return bool(embedded["isClosed"])
+        href = (((got.get("_links") or {}).get("status")) or {}).get("href") or ""
+        sid = href.rstrip("/").rsplit("/", 1)[-1]
+        return bool(self._req("GET", f"/statuses/{sid}").get("isClosed")) if sid.isdigit() else False
 
     def attachment_names(self, wp: str) -> set:
         got = self._req("GET", f"/work_packages/{wp}/attachments")
@@ -145,7 +188,40 @@ def read_attachment(spec: dict, repo: Path) -> tuple[str, bytes]:
 
 
 def heading(cr: str, status: str) -> str:
-    return f"**ADAM {cr} · {status}**"
+    return cr_notice.heading(cr, status)
+
+
+def tell_ticket(adam, op, project: str, row: dict, cr: str, status: str, resolution: str, ref: str,
+                apply: bool, notify: bool, prepare=None) -> list:
+    """Step 2 for one request: the lines to print. Changes nothing unless `apply`. Raises on a failure.
+
+    `prepare` runs just before a child task is filed: it settles the request as accepted with its
+    decision, so the child's description carries the decision and the request is not yet Done when
+    ADAM files it (ADAM refuses a ticket for a Done request)."""
+    ticket = str(row.get("ticket") or "").lstrip("#")
+    child = str(row.get("childTicket") or "").lstrip("#")
+    step = cr_notice.plan(status, ticket, child, closed=False)
+    if step["action"] == "none":
+        return [f"      ticket: nothing to tell ({step['why']})"]
+    step = cr_notice.plan(status, ticket, child, op.is_closed(step["key"]))
+    text = lambda key: cr_notice.comment_text(  # noqa: E731
+        cr, row.get("title") or "", status, resolution, ref, key, "", row.get("artefacts") or [])
+
+    if step["action"] == "ticket":
+        if not apply:
+            return [f"      #{ticket}: closed -> a child task under it, with the request, the decision and the release"]
+        if prepare:
+            prepare()
+        made = adam.new_ticket(project, row["number"])
+        op.comment(str(made["key"]), text(str(made["key"])), notify)
+        return [f"      #{ticket}: closed -> child task #{made['key']} under it (commented)"]
+
+    there = cr_notice.already_told(op.comments(step["key"]), cr, status)
+    lines = [f"      #{step['key']}: comment for the agent" + (" (already there)" if there else "")
+             + f" -- {step['why']}"]
+    if not there and apply:
+        op.comment(step["key"], text(step["key"]), notify)
+    return lines
 
 
 def main() -> int:
@@ -165,9 +241,12 @@ def main() -> int:
             die(f"{need} is not set")
     adam = Adam(a.adam, os.environ["ADAM_EMAIL"], os.environ["ADAM_PASSWORD"])
     op = OpenProject(a.pms, os.environ["TICVAI_OP_TOKEN"])
-    current = adam.changes(project)
+    return settle(adam, op, spec, project, default_ref, a.apply, a.notify, Path(a.repo))
 
-    mode = "APPLY" if a.apply else "dry run (--apply to change)"
+
+def settle(adam, op, spec: dict, project: str, default_ref: str, apply: bool, notify: bool, repo: Path) -> int:
+    current = adam.changes(project)
+    mode = "APPLY" if apply else "dry run (--apply to change)"
     print(f"settle_changes: {len(spec['items'])} decision(s) for {project}; {mode}")
     failed = 0
     for it in spec["items"]:
@@ -176,7 +255,7 @@ def main() -> int:
             found = [c for c in current.values() if c["title"].startswith(want["match"])]
             if found:
                 it = dict(it, cr=found[0]["id"])
-            elif a.apply:
+            elif apply:
                 made = adam.raise_change(project, want)
                 row = made.get("change") or made
                 current[row["id"]] = row
@@ -196,33 +275,44 @@ def main() -> int:
             print(f"  {cr}: not in ADAM's {project} requests"); failed += 1; continue
         wp = str(row.get("ticket") or "").lstrip("#")
         try:
-            # 1. ADAM
             same = (row["status"] == status and (row.get("resolution") or "").strip() == resolution
                     and (status == "open" or (row.get("resolvedRef") or "") == ref))
             print(f"  {cr} ({row['title'][:60]}): ADAM {row['status']} -> {status}"
                   + (" (already)" if same else ""))
-            if not same and a.apply:
+            settled = {"done": same}
+
+            def prepare(row=row, status=status, resolution=resolution, ref=ref, settled=settled):
+                # Before a child task is filed: the request says what was decided and is not Done yet.
+                if (row["status"] == "accepted" and (row.get("resolution") or "").strip() == resolution
+                        and (row.get("resolvedRef") or "") == ref):
+                    return
+                adam.resolve(project, row["number"], "accepted", resolution, ref)
+                if status == "accepted":
+                    settled["done"] = True
+
+            # 2 first, then 1: the ticket is told (a comment for the agent when it is open, a child task
+            # when it is closed) before the request is written as settled, so a child task is filed while
+            # the request is not yet Done. A failure here is reported and the request is still settled.
+            if it.get("comment", True):
+                try:
+                    for line in tell_ticket(adam, op, project, row, cr, status, resolution, ref, apply, notify,
+                                            prepare=prepare if status in ("accepted", "done") else None):
+                        print(line)
+                except Exception as e:  # noqa: BLE001
+                    print(f"      ticket FAILED: {e}"); failed += 1
+            # 1. ADAM
+            if not settled["done"] and apply:
                 adam.resolve(project, row["number"], status, resolution, ref)
-            # 2. OpenProject comment
-            if wp and it.get("comment", True):
-                head = heading(cr, status)
-                there = any(c.startswith(head) for c in op.comments(wp))
-                print(f"      #{wp}: comment" + (" (already there)" if there else ""))
-                if not there and a.apply:
-                    text = (f"{head}\n\n{resolution}\n\n"
-                            + (f"Settled at release `{ref}`. " if ref and status == "done" else "")
-                            + f"Pull it again in ADAM: `/ticket {wp}`.")
-                    op.comment(wp, text, a.notify)
             # 3. attachments
             for att in it.get("attach") or []:
-                name, blob = read_attachment(att, Path(a.repo))
+                name, blob = read_attachment(att, repo)
                 there = name in op.attachment_names(wp) if wp else True
                 print(f"      #{wp}: attach {name} ({len(blob) // 1024} KB)" + (" (already there)" if there else ""))
-                if not there and a.apply:
+                if not there and apply:
                     op.attach(wp, name, blob)
         except Exception as e:  # one bad request must not stop the rest
             print(f"      FAILED: {e}"); failed += 1
-    print(f"settle_changes: {'done' if a.apply else 'nothing changed'}; {failed} failed")
+    print(f"settle_changes: {'done' if apply else 'nothing changed'}; {failed} failed")
     return 1 if failed else 0
 
 

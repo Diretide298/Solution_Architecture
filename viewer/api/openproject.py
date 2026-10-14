@@ -482,10 +482,33 @@ def create(endpoint: str, token: str, project_id: int, subject: str,
     return summarise(raw, endpoint, token)
 
 
-def comment(endpoint: str, token: str, key: str, text: str) -> None:
-    """Add a comment to the work package's activity, as the owner of `token`."""
+def comment(endpoint: str, token: str, key: str, text: str, notify: Optional[bool] = None) -> None:
+    """Add a comment to the work package's activity, as the owner of `token`.
+
+    `notify=False` asks OpenProject not to mail it: a change request's settlement comment
+    (cr_notice.py) is read by the agent that pulls the ticket, and mail stays off unless asked,
+    as in settle_changes.py. None leaves the instance's default, which is what adam_apply sends.
+    """
     call(endpoint, token, f"work_packages/{key}/activities",
+         params=None if notify is None else {"notify": "true" if notify else "false"},
          method="POST", body={"comment": {"raw": text}})
+
+
+def is_closed(endpoint: str, token: str, key: str) -> bool:
+    """Whether the work package's status is a closing one, by OpenProject's own `isClosed`.
+
+    Never by the status's name. The status is embedded in a work package on current instances;
+    where it is not, it is looked up in the instance's status list by the id in its link.
+    """
+    raw = call(endpoint, token, f"work_packages/{key}")
+    embedded = ((raw.get("_embedded") or {}).get("status") or {})
+    if "isClosed" in embedded:
+        return bool(embedded["isClosed"])
+    sid = _id_from_href((((raw.get("_links") or {}).get("status")) or {}).get("href"))
+    for st in statuses(endpoint, token):
+        if st["id"] == sid:
+            return st["isClosed"]
+    return False
 
 
 def projects(endpoint: str, token: str) -> list:

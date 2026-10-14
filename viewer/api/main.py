@@ -37,7 +37,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from . import db, decisions, llm, netaddr, openproject, releases, secrets, security
+from . import cr_notice, db, decisions, llm, netaddr, openproject, releases, secrets, security
 
 app = FastAPI(
     title="TICVAI viewer — accounts and validation",
@@ -2018,16 +2018,19 @@ def read_work_package(
 
 # ── which release a ticket is being built against ────────────────────
 #
-# ADAM serves the package at its newest release tag (viewer/lib/releases.mjs).
-# The first `/ticket` pull records the tag in force; every pull after that shows
-# what changed between it and the tag being served; the developer either accepts
-# the change — moves the pin to the served tag — or raises a change request. A
-# breaking contract change makes the move required for the tickets that produce
-# or consume that operation. The connector works out which (it holds the diff);
-# this holds the pin and its history.
+# ADAM serves the package at its newest release tag (viewer/lib/releases.mjs),
+# and **every pull is at that release** (CHG-ADM-001; Chinmay, 14 October 2026:
+# "the release system is creating confusion among the agents they ask if r3 or
+# r4. we always want agents to pull the latest."). A pull records the tag in
+# force as the ticket's pin; when the pin is behind, the same pull moves it to
+# the tag in force and logs the move with the reason `auto`, and answers with
+# `movedFrom` so the connector can say what changed since the previous pull.
+# Server-side, so a developer on an older connector is moved too. Nobody is
+# asked to choose between releases; `accept` and `breaking` (adam_repin) still
+# work, for older connectors, and are never needed.
 #
 # **The tag is never the caller's to say.** A pull records the tag in
-# served.json and a re-pin moves to it. A pin somebody could set to anything
+# served.json and every move is to it. A pin somebody could set to anything
 # would not say what they were building against.
 
 PIN_REASONS = ("pull", "accept", "breaking")
@@ -2035,8 +2038,8 @@ PIN_REASONS = ("pull", "accept", "breaking")
 
 class PinIn(BaseModel):
     project_id: str = ""
-    # `pull` records the tag in force if there is no pin yet and otherwise
-    # changes nothing; `accept` and `breaking` move the pin to the tag in force.
+    # `pull` records the tag in force, or moves a pin that is behind to it (logged
+    # as `auto`); `accept` and `breaking` move the pin to the tag in force too.
     reason: str = "pull"
     note: str = Field(default="", max_length=1000)
 
@@ -2078,7 +2081,11 @@ def read_pin(key: str, project_id: str = Query(default=""),
 
 @app.post("/api/work-packages/{key}/pin")
 def set_pin(key: str, body: PinIn, account: dict = Depends(require_account)):
-    """Record the tag a ticket was pulled at, or move it to the tag in force.
+    """Record the tag a ticket is pulled at: the latest release, always.
+
+    A first pull records the tag in force; a pull of a ticket pinned at an
+    older tag moves it to the tag in force (logged as `auto`) and says where it
+    moved from. Nothing here asks anybody to choose a release.
 
     No OpenProject read: the pull that calls this has just read the work
     package, and a pin is this person's own note about their own work — it
@@ -2097,11 +2104,13 @@ def set_pin(key: str, body: PinIn, account: dict = Depends(require_account)):
     row = db.one(
         "SELECT * FROM ticket_pin WHERE account_id = ? AND project_id = ? AND external_key = ?",
         (account["id"], project, number))
-    if reason == "pull" and row:
-        return {**_pin_state(account["id"], project, number), "recorded": False}
-    if reason != "pull" and row and row["tag"] == current["tag"]:
+    if row and row["tag"] == current["tag"]:
         return {**_pin_state(account["id"], project, number), "recorded": False,
-                "note": f"Already pinned at {current['tag']}, the release being served."}
+                **({} if reason == "pull" else {
+                    "note": f"Already on {current['tag']}, the latest release. Every pull serves the "
+                            "latest release, so there is nothing to re-pin."})}
+    # A pull of a ticket whose pin is behind: moved to the latest release, logged as `auto`.
+    logged = "auto" if reason == "pull" and row else reason
 
     now = security.stamp()
     with db.cursor(commit=True) as cur:
@@ -2119,8 +2128,12 @@ def set_pin(key: str, body: PinIn, account: dict = Depends(require_account)):
             "INSERT INTO ticket_pin_log (account_id, project_id, external_key, from_tag, to_tag, "
             "reason, note, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (account["id"], project, number, row["tag"] if row else "", current["tag"],
-             reason, body.note.strip(), now))
-    return {**_pin_state(account["id"], project, number), "recorded": True}
+             logged, body.note.strip(), now))
+    return {**_pin_state(account["id"], project, number), "recorded": True,
+            # The release the previous pull was at, when this call moved the pin: what the
+            # connector diffs against to say what changed since then. Absent on a first pin.
+            **({"movedFrom": row["tag"]} if row else {}),
+            "latest": True}
 
 
 # **A board reads in the order the work is finished in, and the same way every time.** It used to come
@@ -4964,6 +4977,11 @@ class ResolveIn(BaseModel):
     status: str
     resolution: str = Field(default="", max_length=4000)
     ref: str = Field(default="", max_length=300)
+    # Tell the ticket the request was raised from (cr_notice.py, CHG-ADM-002): a comment for
+    # the agent when it is open, a new ticket when it is closed. As the settler, with their own
+    # OpenProject token; without one, nothing is sent and the answer says so. settle_changes.py
+    # sends false and tells the ticket itself, so its dry run shows it first.
+    tell_ticket: bool = True
 
 
 def _change_project(account: dict, project_id: str) -> dict:
@@ -5760,15 +5778,27 @@ def resolve_change(number: str, body: ResolveIn, account: dict = Depends(require
     note = body.resolution.strip()
     if status == "rejected" and not note:
         raise HTTPException(400, "Say why it is rejected - that is what the person who raised it reads.")
+    # The settlement reaches the ticket (CHG-ADM-002), **before** the status is written: a
+    # request's work is one child task of the ticket it came out of, and a child is filed while
+    # the request is not yet Done (Chinmay, 14 October: "we create child tasks for CR remember
+    # that"). Told with the values being decided, so the child task and the comment carry the
+    # decision and the release. Never the reason a settle fails: the request is settled either
+    # way, and the answer says what happened to the ticket.
+    decided = {**{k: row[k] for k in row.keys()}, "status": status,
+               "resolution": note if status == "open" else (note or row["resolution"]),
+               "resolved_ref": "" if status == "open" else (body.ref.strip() or row["resolved_ref"])}
+    told = (_tell_ticket(account, scope["project"], decided, status)
+            if body.tell_ticket else {"action": "none", "why": "tell_ticket was false"})
     if status == "open":
         db.write("UPDATE change_request SET status = 'open', resolution = ?, resolved_ref = '', "
                  "resolved_by = NULL, resolved_at = NULL WHERE id = ?", (note, row["id"]))
     else:
         db.write("UPDATE change_request SET status = ?, resolution = ?, resolved_ref = ?, "
                  "resolved_by = ?, resolved_at = ? WHERE id = ?",
-                 (status, note or row["resolution"], body.ref.strip() or row["resolved_ref"],
+                 (status, decided["resolution"], decided["resolved_ref"],
                   account["id"], security.stamp(), row["id"]))
-    return {"ok": True, "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],)))}
+    return {"ok": True, "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],))),
+            "ticketFollowUp": told}
 
 
 # ── a change request becomes a ticket ────────────────────────────────
@@ -5814,7 +5844,7 @@ def _may_file_ticket(account: dict, project_role: str, scopes: list, row) -> boo
     return bool(row["picked_by"]) and row["picked_by"] == account["id"]
 
 
-def _ticket_text(row) -> str:
+def _ticket_text(row, closed_key: str = "") -> str:
     """What the ticket will say, built from the request rather than retyped.
 
     Everything a developer needs to start is already written down in the change
@@ -5858,6 +5888,12 @@ def _ticket_text(row) -> str:
         intake.append(f"- Raised against release {row['raised_tag']}")
     if intake:
         parts.append("**Intake**\n\n" + "\n".join(intake))
+    # The decision and the release that carries it, once there is one (CHG-ADM-002): a
+    # ticket filed for a settled request is built to what was decided, not to the problem.
+    if row["status"] in ("accepted", "done") and (row["resolution"] or "").strip():
+        parts.append(cr_notice.ticket_section(
+            f"CR-{row['number']:03d}", row["status"], row["resolution"],
+            row["resolved_ref"] or "", closed_key))
     where = (f"{TAG_LABEL.get(row['tag'], row['tag'])}"
              + (f" · {row['platform']}" if row["platform"] else "")) if row["tag"] else ""
     tail = f"Raised in ADAM as CR-{row['number']:03d}"
@@ -5903,6 +5939,7 @@ def preview_ticket(number: str, body: TicketIn, account: dict = Depends(require_
     endpoint, token = _pms_for(account["id"])
 
     parent = None
+    parent_closed = False
     try:
         # The parent is read rather than assumed, for two answers at once: that
         # it still exists, and that it is in this ADAM project's OpenProject
@@ -5911,6 +5948,10 @@ def preview_ticket(number: str, body: TicketIn, account: dict = Depends(require_
         if row["external_key"]:
             parent = openproject.work_package(endpoint, token, row["external_key"])
             _same_pms_project(parent, pms, row["external_key"])
+            # Whether this is the new ticket a settled request gets because its
+            # ticket is closed (CHG-ADM-002); the description then says so.
+            if row["status"] in ("accepted", "done"):
+                parent_closed = openproject.is_closed(endpoint, token, row["external_key"])
         kinds = openproject.types(endpoint, token, pms["pmsId"])
     except openproject.Blocked as exc:
         raise HTTPException(502, str(exc))
@@ -5925,17 +5966,12 @@ def preview_ticket(number: str, body: TicketIn, account: dict = Depends(require_
                 f"This project has no type {body.type_id}. It offers "
                 f"{', '.join(k['name'] for k in kinds) or 'none'}."))
     else:
-        # OpenProject's own default, then a Task, then whatever is first. Not a
-        # hardcoded name: a project that has renamed or disabled Task would get
-        # a 422 at the moment of creation, after the person had said yes.
-        chosen = (next((k for k in kinds if k["isDefault"]), None)
-                  or next((k for k in kinds if k["name"].lower() == "task"), None)
-                  or (kinds[0] if kinds else None))
+        chosen = _default_type(kinds)
     if not chosen:
         raise HTTPException(502, "OpenProject offers this project no work package types.")
 
     subject = body.subject.strip() or row["title"].strip()
-    text = _ticket_text(row)
+    text = _ticket_text(row, row["external_key"] if parent_closed else "")
     proposal = security.new_token()
     now = security.now()
     db.write(
@@ -6012,13 +6048,35 @@ def apply_ticket(number: str, proposal: str, body: FileIn,
         raise HTTPException(422 if exc.status == 422 else 502, str(exc))
 
     db.write("UPDATE wp_proposal SET result_key = ? WHERE id = ?", (made["key"], held["id"]))
-    # Written last and guarded, so that two applies racing past the claim above
-    # still leave one ticket recorded rather than the second overwriting the
-    # first. A CR whose child_key is already set is refused by _ticket_guard.
-    db.change("UPDATE change_request SET child_key = ?, child_at = ?, child_by = ? "
-              "WHERE id = ? AND child_key = ''",
-              (made["key"], security.stamp(), account["id"], row["id"]))
+    _record_child(scope["project"], row, made, account)
 
+    return {
+        "ok": True,
+        "ticket": {k: made.get(k) for k in ("key", "subject", "status", "type", "url")},
+        "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],))),
+    }
+
+
+def _default_type(kinds: list):
+    """OpenProject's own default, then a Task, then whatever is first. Not a
+    hardcoded name: a project that has renamed or disabled Task would get a 422
+    at the moment of creation, after the person had said yes."""
+    return (next((k for k in kinds if k["isDefault"]), None)
+            or next((k for k in kinds if k["name"].lower() == "task"), None)
+            or (kinds[0] if kinds else None))
+
+
+def _record_child(project: str, row, made: dict, account: dict, claimed: str = "") -> None:
+    """Record the ticket filed from a request, and link it to the request's artefact.
+
+    The update is guarded on what `child_key` held when the caller decided to
+    file (blank, or the settlement's claim), so two racing filings leave one
+    ticket recorded rather than the second overwriting the first. A CR whose
+    child_key is already set is refused by _ticket_guard.
+    """
+    db.change("UPDATE change_request SET child_key = ?, child_at = ?, child_by = ? "
+              "WHERE id = ? AND child_key = ?",
+              (made["key"], security.stamp(), account["id"], row["id"], claimed))
     # Linked as well as recorded. `child_key` answers "does this request have a
     # ticket"; the link answers "what work is scheduled against this artefact",
     # which is the question the boards ask and which the column cannot reach.
@@ -6027,16 +6085,99 @@ def apply_ticket(number: str, proposal: str, body: FileIn,
         "external_system, external_key, url, cached_subject, cached_status, "
         "cached_type, cached_assignee, synced_at, created_at, created_by) "
         "VALUES (?, ?, ?, 'openproject', ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        (scope["project"], row["target_kind"], row["target_id"], made["key"],
+        (project, row["target_kind"], row["target_id"], made["key"],
          made.get("url", ""), made.get("subject", ""), made.get("status", ""),
          made.get("type", ""), made.get("assignee", ""),
          security.stamp(), security.stamp(), account["id"]))
 
-    return {
-        "ok": True,
-        "ticket": {k: made.get(k) for k in ("key", "subject", "status", "type", "url")},
-        "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],))),
-    }
+
+# ── a settled change request reaches its ticket (CHG-ADM-002) ─────────
+#
+# Chinmay, 14 October 2026: "whenever we have a cr we should create new tickets
+# if ticket is closed. if not then add comment for the AI agent when he pulls".
+# cr_notice.py decides and words it; this sends it, as the person settling, with
+# their own OpenProject token. Settling is the person's confirmation: they chose
+# the status, and what the ticket is told follows from it alone.
+#
+# **Never twice.** A comment is not posted when the thread already starts one
+# with the same request and status; a ticket is not filed when the request has
+# one (`child_key`, claimed before anything is sent). After a ticket is filed,
+# later settlements of the same request comment on that ticket instead.
+#
+# **Never the reason a settle fails.** The request is settled before this runs,
+# and every outcome — including "no OpenProject token" — comes back as
+# `ticketFollowUp`, so the page and settle_changes.py can say what happened.
+
+_SETTLE_CLAIM = "filing"
+
+
+def _tell_ticket(account: dict, project: str, row, status: str) -> dict:
+    cr = f"CR-{row['number']:03d}"
+    ticket, child = (row["external_key"] or ""), (row["child_key"] or "")
+    if child == _SETTLE_CLAIM:
+        return {"action": "none", "key": ticket, "why": "a ticket for this request is being filed right now"}
+    step = cr_notice.plan(status, ticket, child, closed=False)
+    if step["action"] == "none":
+        return step
+    try:
+        endpoint, token = _pms_for(account["id"])
+    except HTTPException as exc:
+        return {"action": "none", "key": step["key"],
+                "why": f"{exc.detail} The ticket was not told; settle_changes.py can tell it."}
+    try:
+        step = cr_notice.plan(status, ticket, child, openproject.is_closed(endpoint, token, step["key"]))
+        served = releases.served(project)
+
+        def say(key: str) -> None:
+            openproject.comment(
+                endpoint, token, key,
+                cr_notice.comment_text(cr, row["title"], status, row["resolution"], row["resolved_ref"],
+                                       key, served["tag"] if served else "",
+                                       _json_list(row["artefact_ids"])),
+                notify=False)
+
+        if step["action"] == "ticket":
+            made = _file_settlement_ticket(account, project, row, endpoint, token)
+            if made is None:
+                return {**step, "action": "none", "why": "the request already has a ticket"}
+            # The same comment on the new ticket, so its thread carries the decision the agent
+            # reads on pull, and settling the same status again finds it there and does nothing.
+            say(made["key"])
+            return {**step, "ok": True, "ticket": made["key"], "url": made.get("url", "")}
+        if cr_notice.already_told(openproject.comments(endpoint, token, step["key"]), cr, status):
+            return {**step, "ok": True, "already": True}
+        say(step["key"])
+        return {**step, "ok": True}
+    except (openproject.Blocked, openproject.Refused) as exc:
+        return {**step, "ok": False, "error": str(exc)}
+    except HTTPException as exc:
+        return {**step, "ok": False, "error": str(exc.detail)}
+
+
+def _file_settlement_ticket(account: dict, project: str, row, endpoint: str, token: str):
+    """The new ticket a settled request gets because its ticket is closed: a child of
+    the closed one, built by `_ticket_text` with the decision and the release. None
+    when the request already has one."""
+    pms = _pms_scope(account, project)
+    parent = openproject.work_package(endpoint, token, row["external_key"])
+    _same_pms_project(parent, pms, row["external_key"])
+    chosen = _default_type(openproject.types(endpoint, token, pms["pmsId"]))
+    if not chosen:
+        raise HTTPException(502, "OpenProject offers this project no work package types.")
+    # Claimed before anything is sent, so two settles at once cannot make two tickets.
+    if not db.change("UPDATE change_request SET child_key = ? WHERE id = ? AND child_key = ''",
+                     (_SETTLE_CLAIM, row["id"])):
+        return None
+    try:
+        made = openproject.create(endpoint, token, pms["pmsId"], row["title"].strip(),
+                                  _ticket_text(row, row["external_key"]),
+                                  type_id=chosen["id"], parent_key=row["external_key"])
+    except Exception:
+        db.write("UPDATE change_request SET child_key = '' WHERE id = ? AND child_key = ?",
+                 (row["id"], _SETTLE_CLAIM))
+        raise
+    _record_child(project, row, made, account, claimed=_SETTLE_CLAIM)
+    return made
 
 
 # ── the plan: modules on a chart, dragged, then shipped ──────────────
@@ -8075,6 +8216,18 @@ def apply_changes(
         raise HTTPException(400, (
             "That confirmation belongs to a different file than the one just "
             "uploaded. Preview this file and apply the result of that."))
+
+    # As the single route does, each request's ticket is told first (CHG-ADM-002), with the
+    # values being decided, so a child task is filed before its request is marked Done. One at
+    # a time; nothing here can stop the settle below.
+    plan["tickets"] = []
+    for item in _written_rows(plan):
+        stored = db.one("SELECT * FROM change_request WHERE id = ?", (item["id"],))
+        if stored:
+            decided = {**{k: stored[k] for k in stored.keys()}, "status": item["decision"],
+                       "resolution": item["because"], "resolved_ref": item["reference"]}
+            plan["tickets"].append({"id": f"CR-{stored['number']:03d}",
+                                    **_tell_ticket(admin, stored["project_id"], decided, item["decision"])})
 
     at = security.stamp()
     with db.cursor(commit=True) as cur:
