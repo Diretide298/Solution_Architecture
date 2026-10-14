@@ -3011,6 +3011,7 @@ components:
           type: string
           format: uuid
           x-ticvai-unique: tenant
+          x-ticvai-unique-compare: exact
         pendingTransactions:
           type: integer
           minimum: 0

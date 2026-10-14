@@ -8013,6 +8013,8 @@ components:
 
     CapabilityTemplate:
       x-ticvai-persistence: identity.capability_template
+      # CHG-GEN-005: presets sit at the tenant's path; a venue's ROLE_MANAGE reads them to build a role (CR-076).
+      x-ticvai-rls: read-beneath
       type: object
       description: >
         3.3.23, BL-110. **A named tick-set — a role, with nothing depending on the name.**
@@ -8076,6 +8078,8 @@ components:
     SegregationRule:
       type: object
       x-ticvai-persistence: identity.segregation_rule
+      # CHG-GEN-005: rules sit at the tenant's path; a venue's createRole and grant checks read them (CR-076).
+      x-ticvai-rls: read-beneath
       description: 'BL-147, 3.3.31 and 11.1.24. **The package enforced segregation of duties in exactly
         one place** — the product lifecycle guard requiring the approver not be the author — and there
         was no general rule.
@@ -8482,6 +8486,8 @@ components:
           format: date-time
     Principal:
       x-ticvai-persistence: identity.principal
+      # CHG-GEN-005: any staff grant reads principals; writes stay at the tenant root (CR-076).
+      x-ticvai-rls: grant-holder-read
       type: object
       required:
       - id
@@ -8552,6 +8558,8 @@ components:
             format: uuid
     Role:
       x-ticvai-persistence: identity.role
+      # CHG-GEN-005: roles are tenant-wide (R108): any staff grant reads them, writes stay at the tenant root; role_permission follows the role (CR-076).
+      x-ticvai-rls: grant-holder-read
       type: object
       required:
       - id

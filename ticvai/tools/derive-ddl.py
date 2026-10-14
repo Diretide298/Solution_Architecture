@@ -69,7 +69,9 @@ column DEFAULT (storage-design.md, "Enum agreement": the database holds the same
 contract). **Uniqueness is carried where the contract marks it**: a property with
 `x-ticvai-unique: tenant` or `venue` becomes a `<table>_<columns>_uniq` unique index (audit R108,
 28 September). A contract schema's `x-ticvai-unique-together: [[a, b, ...]]` is a unique index over
-several columns, each named by property or by column (CHG-R6-006). Uniqueness and immutability rules
+several columns, each named by property or by column (CHG-R6-006). **A text member of either is
+indexed as `lower(column)`**, so a code is unique whatever its case, as common.yaml says; an opaque
+external id marked `x-ticvai-unique-compare: exact` is not (CHG-GEN-001). Uniqueness and immutability rules
 the contracts state only in prose are not -- there is nothing machine-readable to derive them from.
 **A storage-only column carries its own `enum`** (and `maxLength`, `default`) on its schema-reference
 record, and gets the same CHECK (CHG-R6-001).
@@ -77,7 +79,9 @@ record, and gets the same CHECK (CHG-R6-001).
 **Row-level security, by rule** (920): `scope_path`, else `venue_id`, else through the NOT NULL declared
 reference that owns the row (`ROW_OWNER` decides where two could), else by subject or at the tenant
 root -- except an `APPEND_AUDIT` trail, which any grant appends to and only the tenant root reads
-(CHG-R6-002).
+(CHG-R6-002). A contract schema marked `x-ticvai-rls: read-beneath` (rows readable by grants beneath their
+`scope_path` too) or `grant-holder-read` (any staff grant reads) keeps its base rule for writes, and a child that
+follows it through the parent rule follows it for reading only (CHG-GEN-005, `RLS_MARKS`, `SPLIT_CHILDREN`).
 
 **Frozen once the git tag `r1` exists** (plan item 1C, C3, 1 October). From then on this does not
 rewrite a baseline `.sql` file under `backend/`: databases were built from them. It writes the
@@ -283,6 +287,12 @@ ROW_OWNER = {
     "inventory.movement": "item_id",              # CHG-R6-015
     "inventory.stock_earmark": "item_id",         # CHG-R6-015
     "inventory.goods_receipt": "purchase_order_id",   # CHG-R6-015
+    # CHG-GEN-007 (ADAM CR-071, 14 October 2026): a till sale belongs to the outlet that rang it up. With two protected
+    # owners (`order_id -> orders.sales_order`, `outlet_id -> platform.outlet`) it fell to the subject rule, and its
+    # lines, returns and return lines to the tenant root ("its owner has no policy"), so a cashier could write a sale
+    # and none of its lines, and no venue role could record a return. Following the outlet, the sale is the venue's,
+    # and sale_line, return and return_line follow it by their NOT NULL keys.
+    "retail.sale": "outlet_id",                  # CHG-GEN-007 (CR-071)
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------
@@ -577,6 +587,145 @@ END
 $$;
 """
 
+# **A policy change reaches the databases in the forward migration** (CHG-GEN-004, 14 October 2026). CR-005's
+# append-only policies were listed in handoff/migration-review.md for a person and never reached a database: the
+# review row was read as done, and 920 at r5 still gave platform.audit_record the tenant-root policy. ddl_forward now
+# writes a policy change on an existing table into the next forward migration as this call, then the table's
+# generated helper call: every policy on the table goes, and the helper creates its own again. Idempotent, and it
+# touches no row. It is needed because the helpers name their policies differently (`<t>_scope` for one policy,
+# `<t>_append`, `<t>_read`... for one per command), and none drops the other's.
+RLS_RESET = """
+-- Drops every policy on a table, so a forward migration can apply a different generated policy to it
+-- (CHG-GEN-004). Row-level security stays enabled and forced: until the next call creates a policy the
+-- table returns no rows, and both run in the migration's one transaction.
+CREATE OR REPLACE FUNCTION platform.drop_rls_policies(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    pol record;
+BEGIN
+    FOR pol IN SELECT polname FROM pg_policy WHERE polrelid = target LOOP
+        EXECUTE format('DROP POLICY IF EXISTS %I ON %s', pol.polname, target);
+    END LOOP;
+END
+$$;
+"""
+
+# **Read beneath the owner, and read by any grant holder** (CHG-GEN-005, ADAM CR-076, audit R183, 14 October 2026).
+# The scope rule makes a row visible at and beneath the path that owns it, and the tenant-root rule only to the root,
+# so a row owned above the caller was invisible to every grant below: a venue's ROLE_MANAGE read no roles, no
+# capability presets and no segregation rules (identity.role tenant root, capability_template and segregation_rule at
+# the tenant's path), and no venue could read a supplier owned at tenant or an upsell rule owned at region (R183,
+# "owned above, read below", decided 28 September and never built). Two schema-level marks open SELECT and leave
+# every write where the base rule put it:
+#
+#   * `x-ticvai-rls: read-beneath` (a table with `scope_path`): a row is readable at and beneath its path, as
+#     before, and also by a grant beneath it, `scope_path @> ANY (current_scope_paths())`;
+#   * `x-ticvai-rls: grant-holder-read`: any staff connection holding a grant (scope paths set, no guest subject)
+#     may read every row.
+#
+# One policy per command, as the append-only trail has, because one FOR ALL policy cannot give SELECT a wider
+# check than INSERT, UPDATE and DELETE. A table that follows such a row through the parent rule follows it for
+# reading only: its writes need the parent's write check, so its policy is split the same way (otherwise opening
+# a parent's SELECT would open its children's writes, since the parent rule's WITH CHECK is "the parent is
+# visible"). A tenant-root table is not a parent of anything, so marking one does not make tables that reference
+# it follow it, except where SPLIT_CHILDREN says so.
+RLS_MARKS = ("read-beneath", "grant-holder-read")
+
+# **A child that follows a split parent which the parent rule would not otherwise pick** (the parent sits at the tenant
+# root, so it is no owner). `identity.role_permission` is the rows of a role's permission set (CR-076 decision:
+# "role_permission follows role via the parent rule once role has a policy"): readable where the role is, written
+# only where the role may be written.
+SPLIT_CHILDREN = {
+    "identity.role_permission": "role_id",   # CHG-GEN-005 (CR-076)
+}
+
+RLS_SPLIT = """
+-- **Read beneath the owner, read by any grant holder** (CHG-GEN-005): SELECT opened, writes unchanged.
+-- A staff connection holding a grant: scope paths set and no guest subject (a guest's session names its
+-- own subject and reads only its own rows).
+CREATE OR REPLACE FUNCTION platform.grant_holder()
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT cardinality(platform.current_scope_paths()) > 0
+       AND NULLIF(current_setting('ticvai.subject_id', true), '') IS NULL;
+$$;
+
+-- True when the row sits at or above one of the granted paths: owned above, read below (audit R183).
+CREATE OR REPLACE FUNCTION platform.above_scope(row_scope_path ltree)
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT row_scope_path IS NOT NULL
+       AND cardinality(platform.current_scope_paths()) > 0
+       AND row_scope_path @> ANY (platform.current_scope_paths());
+$$;
+
+-- One policy per command: SELECT on `read_check`, INSERT, UPDATE and DELETE on `write_check`.
+CREATE OR REPLACE FUNCTION platform.apply_split_rls(target regclass, read_check text, write_check text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    base text := (SELECT left(c.relname, 55) FROM pg_class c WHERE c.oid = target);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    PERFORM platform.drop_rls_policies(target);
+    EXECUTE format('CREATE POLICY %I ON %s FOR SELECT USING (%s)', base || '_read', target, read_check);
+    EXECUTE format('CREATE POLICY %I ON %s FOR INSERT WITH CHECK (%s)', base || '_append', target, write_check);
+    EXECUTE format('CREATE POLICY %I ON %s FOR UPDATE USING (%s) WITH CHECK (%s)',
+                   base || '_update', target, write_check, write_check);
+    EXECUTE format('CREATE POLICY %I ON %s FOR DELETE USING (%s)', base || '_delete', target, write_check);
+END
+$$;
+
+-- `x-ticvai-rls: read-beneath` on a table with scope_path: read at, beneath and above a grant; write at and
+-- beneath it, as apply_scope_rls does.
+CREATE OR REPLACE FUNCTION platform.apply_read_beneath_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    PERFORM platform.apply_split_rls(target,
+        'platform.in_scope(scope_path) OR platform.above_scope(scope_path)',
+        'platform.in_scope(scope_path)');
+END
+$$;
+
+-- `x-ticvai-rls: grant-holder-read`: any staff grant reads; `write_check` is the table's base rule.
+CREATE OR REPLACE FUNCTION platform.apply_grant_holder_read_rls(target regclass, write_check text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    PERFORM platform.apply_split_rls(target, 'platform.grant_holder()', write_check);
+END
+$$;
+
+-- A child of a split row: read where the parent is visible, written only where the parent may be written
+-- (`parent_write`, the parent's write check on the alias `parent_row`).
+CREATE OR REPLACE FUNCTION platform.apply_parent_split_rls(target regclass, fk_column text, parent regclass,
+                                                           parent_key text, parent_write text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    link text := format('parent_row.%I = %s.%I', parent_key, target, fk_column);
+BEGIN
+    PERFORM platform.apply_split_rls(target,
+        format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s)', parent, link),
+        format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s AND (%s))', parent, link, parent_write));
+END
+$$;
+"""
+
 # Where the venue half of RLS_HEAD starts; the control database's file is cut here.
 VENUE_MARKER = "-- **{n_venue} tables carry `venue_id`"
 assert VENUE_MARKER in RLS_HEAD
@@ -752,13 +901,15 @@ CREATE TABLE IF NOT EXISTS platform.schema_version (
 def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: list,
              total: int, has_scope_table: bool, shared: dict | None = None,
              by_subject: list | None = None, tenant_only: list | None = None,
-             append_audit: list | None = None) -> str:
+             append_audit: list | None = None, split: list | None = None) -> str:
     """The functions, then one call per table -- by `scope_path` where it has one, by `venue_id`
     where it does not, and through its owning parent where it has neither.
 
     `by_parent` is `(table, fk_column, parent, parent_key)`; `unscoped` is `(table, why)`;
     `shared` maps a scoped table to the second path column that also admits a caller;
-    `append_audit` is `(table, why)` for an APPEND_AUDIT trail (CHG-R6-002)."""
+    `append_audit` is `(table, why)` for an APPEND_AUDIT trail (CHG-R6-002); `split` is `(table, call, why)` for a
+    table marked `x-ticvai-rls` (CHG-GEN-005), and a `by_parent` entry with a fifth member, the parent's write check,
+    follows a split parent for reading only."""
     shared = shared or {}
     head = RLS_HEAD.replace("{n_venue}", str(len(by_venue)))
     if db != "tenant":
@@ -770,16 +921,19 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         # control file carries no venue functions and no venue policies.
         cut = head.index(VENUE_MARKER.replace("{n_venue}", str(len(by_venue))))
         head = head[:cut].replace("-- Row-level security.", "-- Row-level security, control database.")
-    body = [head]
+    body = [head, RLS_RESET]
     by_subject = by_subject or []
     tenant_only = tenant_only or []
     append_audit = append_audit or []
+    split = split or []
     if by_parent:
         body.append(RLS_PARENT)
     if by_subject or tenant_only or append_audit:
         body.append(RLS_TENANT)
     if append_audit:
         body.append(RLS_APPEND_AUDIT)
+    if split or any(len(e) > 4 for e in by_parent):
+        body.append(RLS_SPLIT)
     n_venue = len(by_venue) if db == "tenant" else 0
     # **Counted, not asserted.** The line this replaced called every table with neither column
     # "reference data, a registry, or the migration log", and the audit of 26 September found
@@ -790,6 +944,7 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         f"{len(by_parent)} through the parent that owns them, {len(by_subject)} by subject, "
         f"{len(tenant_only)} to the tenant root only, "
         + (f"{len(append_audit)} append-only audit trail(s), " if append_audit else "")
+        + (f"{len(split)} read beneath their owner or by any grant holder, " if split else "")
         + f"{len(unscoped)} with no policy.**\n"
         "-- A table with no policy is listed at the end of this file with the reason. It is not\n"
         "-- claimed to be reference data: for most of them that is a scoping decision nobody has\n"
@@ -822,12 +977,22 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     elif by_venue:
         body.append("\n-- Scoped by venue, resolved through the scope tree.")
         body += [f"SELECT platform.apply_venue_rls('{qual(t)}'::regclass);" for t in by_venue]
+    if split:
+        body.append("\n-- Read beneath the owner, or by any grant holder; written as the base rule says (CHG-GEN-005,\n"
+                    "-- x-ticvai-rls on the contract schema).")
+        body += [f"{call}  -- {why}" for t, call, why in split]
     if by_parent:
         # **In dependency order**, parents before children: a child's policy reads its parent, and
         # the parent's policy has to exist for that read to be scoped at all.
         body.append("\n-- Scoped through the parent that owns the row (a NOT NULL declared foreign key).")
-        body += [f"SELECT platform.apply_parent_rls('{qual(t)}'::regclass, '{col}', "
-                 f"'{qual(par)}'::regclass, '{key}');" for t, col, par, key in by_parent]
+        for t, col, par, key, *rest in by_parent:
+            if rest:
+                # follows a split parent for reading; written where the parent may be written (CHG-GEN-005)
+                body.append(f"SELECT platform.apply_parent_split_rls('{qual(t)}'::regclass, '{col}', "
+                            f"'{qual(par)}'::regclass, '{key}', {sql_literal(rest[0])});")
+            else:
+                body.append(f"SELECT platform.apply_parent_rls('{qual(t)}'::regclass, '{col}', "
+                            f"'{qual(par)}'::regclass, '{key}');")
     if by_subject:
         body.append("\n-- By subject (SD-015): the session's own subject, or the tenant root.")
         body += [f"SELECT platform.apply_subject_rls('{qual(t)}'::regclass);" for t, _ in by_subject]
@@ -1020,6 +1185,11 @@ def table_marks(cols: dict, tables) -> dict:
             entry["unique_together"] = [
                 [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group]
                 for group in ut if isinstance(group, list) and group]
+        # **Who may read a row the scope rule would hide** (CHG-GEN-005): `x-ticvai-rls: read-beneath` or
+        # `grant-holder-read` on the schema; see RLS_MARKS.
+        rls = marks.get("x-ticvai-rls")
+        if rls is not None:
+            entry["rls"] = str(rls).strip()
         if len(entry) > 1:
             out[t] = entry
     return out
@@ -1085,6 +1255,20 @@ def pg_type(t: str | None) -> str:
         return "text"
     return TYPE_MAP.get(t, t)
 
+
+
+# **Case-insensitive uniqueness** (CHG-GEN-001, ADAM CR-079, CR-066): the property mark that keeps a value exact.
+UNIQUE_COMPARE = "x-ticvai-unique-compare"
+
+
+def unique_key(col: str, col_type: dict, src_of: dict) -> str:
+    """One member of a unique index: `lower(col)` for a text column, unless its contract property says
+    `x-ticvai-unique-compare: exact` (an opaque external id); the column as it is otherwise. common.yaml
+    (`Problem`, the uniqueness rule) states the same rule, and check-ddl-conventions D-UNIQUE-CASE holds the
+    index to it."""
+    if col_type.get(col) == "text" and str((src_of.get(col) or {}).get(UNIQUE_COMPARE) or "") != "exact":
+        return f"lower({q(col)})"
+    return q(col)
 
 
 # `table -> [columns]` from `x-ticvai-primary-key`, filled in `main` before any key is asked for.
@@ -1213,6 +1397,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         c = p.counts
         print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {c['tables']} table(s), "
               f"{c['columns']} column(s), {c['indexes']} index(es), {c['other']} other"
+              + (f", {c['policies']} row-level security polic(ies) re-applied" if c.get("policies") else "")
               + ("" if apply else " (not written, pass --apply)"))
     if not written:
         print("  no additive change since the baseline and the forward migrations; nothing to write")
@@ -1326,6 +1511,8 @@ def main() -> int:
         tgt = f"{mreq.group(1)}.{mreq.group(2)}.{mreq.group(3)}"
         if tgt in contract_props and "x-ticvai-unique" not in contract_props[tgt]:
             contract_props[tgt] = {**contract_props[tgt], "x-ticvai-unique": lvl}
+            if spec.get(UNIQUE_COMPARE) and UNIQUE_COMPARE not in contract_props[tgt]:
+                contract_props[tgt][UNIQUE_COMPARE] = spec[UNIQUE_COMPARE]
 
     # ---- ADR-0056 and ADR-0058, accepted 30 September ---------------------------------------
     # **What the contract schema says about a table as a whole**: a named key
@@ -1454,6 +1641,7 @@ def main() -> int:
             out.append(f"CREATE TABLE IF NOT EXISTS {q(schema)}.{q(short)} (")
 
             body = []
+            col_type: dict = {}   # column -> its DDL type, for the case-insensitive unique indexes below
             names = [c["column"] for c in cols[t]]
             # **The key is whatever `key_of` says it is, not whatever is called `id`.** Until
             # 3 September this line read `if col == "id"`, so 84 tables reached Postgres with no
@@ -1519,6 +1707,7 @@ def main() -> int:
                 # into its type -- `requires_corrective_action_on_breachboolean` -- and five
                 # CREATE TABLE statements in four files could not be parsed.
                 body.append(f"    {q(col):<33} {typ}{pk}{nn}{rules}")
+                col_type[col] = typ
                 n_cols += 1
 
                 ref = c.get("references")
@@ -1651,6 +1840,13 @@ def main() -> int:
                     f"ON {q(schema)}.{q(short)} USING gist ({q(second)});"))
                 n_idx += 1
 
+            # **A code is unique whatever its case** (CHG-GEN-001, ADAM CR-079 and CR-066, 14 October 2026).
+            # common.yaml says a value under `x-ticvai-unique` is compared case-insensitively, and every index
+            # derived from it was a plain one, so `VIP` and `vip` were two role codes and two promotion codes.
+            # A text column in a unique index is indexed as `lower(column)`; an opaque external id whose property
+            # says `x-ticvai-unique-compare: exact` (a provider's event id, what a gate reads off a credential)
+            # is compared as it is. A key that is not text (`venue_id`, `scope_path`) is never wrapped.
+            src_of = {c["column"]: contract_props.get(str(c.get("source") or ""), {}) for c in cols[t]}
             # **Uniqueness the contract marks, as a unique index** (audit R108, 28 September).
             # `x-ticvai-unique: tenant` is unique within the tenant database -- one tenant per
             # database (ADR-0038), so the column alone, or with `tenant_id` where a table carries
@@ -1683,7 +1879,7 @@ def main() -> int:
                 idx_lines.append((schema,
                     f"-- unique per {level} (x-ticvai-unique): {t}.{col}\n"
                     f"CREATE UNIQUE INDEX IF NOT EXISTS {uname} ON {q(schema)}.{q(short)} "
-                    f"({', '.join(q(k) for k in keycols)}){where};"))
+                    f"({', '.join(unique_key(k, col_type, src_of) for k in keycols)}){where};"))
                 n_uniq += 1
 
             # **Uniqueness over several columns the contract schema names** (`x-ticvai-unique-together`,
@@ -1701,7 +1897,7 @@ def main() -> int:
                 idx_lines.append((schema,
                     f"-- unique together (x-ticvai-unique-together): {t} ({', '.join(group)})\n"
                     f"CREATE UNIQUE INDEX IF NOT EXISTS {uname} ON {q(schema)}.{q(short)} "
-                    f"({', '.join(q(k) for k in keycols)});"))
+                    f"({', '.join(unique_key(k, col_type, src_of) for k in keycols)});"))
                 n_uniq += 1
 
             if not inline_pk and pk_cols:
@@ -1857,6 +2053,74 @@ def main() -> int:
             protected[t] = "parent"
             by_parent.append((t, col, par, key))
 
+    # **`x-ticvai-rls` on the contract schema** (CHG-GEN-005, ADAM CR-076, audit R183): SELECT opened beneath the
+    # owner, or to any grant holder; every write keeps the check the base rule gives it. See RLS_MARKS.
+    def tq(t: str) -> str:
+        sch, n = t.split(".", 1)
+        return f"{q(sch)}.{q(n)}"
+
+    split_calls: dict = {}    # table -> (call, why)
+    split_write: dict = {}    # table -> its write check, `{a}` standing for the row's alias
+    split_depth: dict = {}
+    parent_of = {p[0]: p for p in by_parent}
+    for t in sorted(real):
+        mark = (marks.get(t) or {}).get("rls")
+        if not mark:
+            continue
+        if mark not in RLS_MARKS:
+            print(f"  ! {t}: x-ticvai-rls {mark!r} is not one of {', '.join(RLS_MARKS)}; the base rule stands")
+            continue
+        if area(t.split(".")[0]) != "tenant" or SCOPE_TABLE not in real:
+            print(f"  ! {t}: x-ticvai-rls applies in the tenant database only; the base rule stands")
+            continue
+        if t in shared_scope or t in parent_of or t in APPEND_AUDIT or t == SCOPE_TABLE:
+            print(f"  ! {t}: x-ticvai-rls {mark} on a shared-scope, parent-owned or append-only table is not "
+                  "defined; the base rule stands")
+            continue
+        has = {c["column"] for c in cols[t]}
+        if t in scoped:
+            base, write = "scope_path", "platform.in_scope({a}scope_path)"
+        elif t in venue_only:
+            base, write = "venue_id", "platform.venue_in_scope({a}venue_id)"
+        elif "subject_id" in has:
+            base, write = "subject", "platform.subject_in_scope({a}subject_id)"
+        else:
+            base, write = "tenant root", "platform.tenant_root_in_scope()"
+        if mark == "read-beneath":
+            if base != "scope_path":
+                print(f"  ! {t}: x-ticvai-rls read-beneath needs a scope_path (its rows are owned by {base}); "
+                      "use grant-holder-read, or give the schema a scopePath. The base rule stands")
+                continue
+            call = f"SELECT platform.apply_read_beneath_rls('{tq(t)}'::regclass);"
+        else:
+            call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
+                    f"{sql_literal(write.format(a=''))});")
+        split_calls[t] = (call, f"x-ticvai-rls: {mark}, written by {base} ({(marks.get(t) or {}).get('schema')})")
+        split_write[t] = write.format(a="{a}.")
+        split_depth[t] = 0
+    # A child the parent rule would not pick, because its split parent sits at the tenant root (SPLIT_CHILDREN).
+    for t, col in sorted(SPLIT_CHILDREN.items()):
+        own = [o for o in owners.get(t, []) if o[0] == col]
+        if t not in real or t in protected:
+            continue
+        if not own or own[0][1] not in split_write:
+            print(f"  ! SPLIT_CHILDREN names {t}.{col}, which is not a NOT NULL declared reference to a table "
+                  "marked x-ticvai-rls; the table keeps its base rule")
+            continue
+        by_parent.append((t, col, own[0][1], own[0][2]))
+        protected[t] = "parent"
+    # A child of a split row follows it for reading only: its writes take the parent's write check, down the chain.
+    for i, (t, col, par, key, *_rest) in enumerate(list(by_parent)):
+        if par not in split_write:
+            continue
+        d = split_depth[par] + 1
+        by_parent[i] = (t, col, par, key, split_write[par].format(a="parent_row"))
+        alias = f"p{d}"
+        split_write[t] = (f"EXISTS (SELECT 1 FROM {tq(par)} {alias} WHERE {alias}.{q(key)} = {{a}}.{q(col)} AND ("
+                          + split_write[par].format(a=alias) + "))")
+        split_depth[t] = d
+    n_split_parent = sum(1 for e in by_parent if len(e) > 4)
+
     def why_unscoped(t: str) -> str:
         own = owners.get(t, [])
         prot = [o for o in own if o[1] in protected]
@@ -1884,13 +2148,15 @@ def main() -> int:
     unscoped_all = [t for t in sorted(real)
                     if t not in protected and t not in venue_only and t != SCOPE_TABLE]
     for db in ("tenant", CONTROL):
-        mine = [t for t in scoped if area(t.split(".")[0]) == db]
-        vmine = [t for t in venue_only if area(t.split(".")[0]) == db]
+        mine = [t for t in scoped if area(t.split(".")[0]) == db and t not in split_calls]
+        vmine = [t for t in venue_only if area(t.split(".")[0]) == db and t not in split_calls]
         pmine = [p for p in by_parent if area(p[0].split(".")[0]) == db]
         umine = [(t, why_unscoped(t)) for t in unscoped_all if area(t.split(".")[0]) == db]
         smine, tmine, amine = [], [], []
         if db == "tenant" and SCOPE_TABLE in real:
             for t, why in umine:
+                if t in split_calls:
+                    continue
                 if t in APPEND_AUDIT:
                     amine.append((t, why))
                 elif any(c["column"] == "subject_id" for c in cols[t]):
@@ -1906,7 +2172,8 @@ def main() -> int:
             db, mine, vmine, pmine, umine, total,
             has_scope_table=(SCOPE_TABLE in real and db == "tenant"),
             shared={t: c for t, c in shared_scope.items() if t in mine},
-            by_subject=smine, tenant_only=tmine, append_audit=amine)
+            by_subject=smine, tenant_only=tmine, append_audit=amine,
+            split=[(t, c, w) for t, (c, w) in sorted(split_calls.items()) if area(t.split(".")[0]) == db])
 
     # **Range partitioning by month** (ADR-0056). The tables declare `PARTITION BY RANGE` where they
     # are created; this file holds each one's DEFAULT partition and the months ahead.
@@ -1963,7 +2230,8 @@ def main() -> int:
     print(f"  row-level security: {len(scoped)} by scope_path · {len(venue_only)} carry venue_id · "
           f"{len(by_parent)} through their owner · {n_subject_rls[0]} by subject · "
           f"{n_tenant_rls[0]} tenant root only · {n_append_rls[0]} append-only audit · "
-          f"{len(unscoped_all) - n_subject_rls[0] - n_tenant_rls[0] - n_append_rls[0]} with no policy")
+          f"{len(split_calls)} read beneath or by any grant holder (+{n_split_parent} children) · "
+          f"{len(unscoped_all) - n_subject_rls[0] - n_tenant_rls[0] - n_append_rls[0] - len(set(unscoped_all) & set(split_calls))} with no policy")
     print(f"  {len(by_schema.get(CONTROL) or [])} control tables · "
           f"{n_tenant_tables} tenant tables in {len(tenant_schemas)} schemas")
     if n_xdb:

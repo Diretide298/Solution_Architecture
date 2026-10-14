@@ -159,12 +159,19 @@ class Guard:
         self.rules = rules          # rule id -> one line: what it catches and the roots it closes
         self.found: dict = {r: {} for r in rules}
         self.notes: list = []
+        # (rule, key) findings that can never be baselined: they fail whether or not the baseline lists them,
+        # and --update-baseline leaves them out (CHG-GEN-003: a stub table the lineage writes).
+        self.strict: set = set()
         args = sys.argv[1:]
         self.show_all = "--all" in args
         self.update = "--update-baseline" in args
 
-    def add(self, rule: str, key: str, message: str):
+    def add(self, rule: str, key: str, message: str, strict: bool = False):
+        """`strict`: this finding fails even when the baseline lists it, and is never written into the baseline
+        (CHG-GEN-003). For a member of a class whose debt may not wait: a written table that holds only keys."""
         self.found.setdefault(rule, {})[str(key)] = message
+        if strict:
+            self.strict.add((rule, str(key)))
 
     def note(self, text: str):
         self.notes.append(text)
@@ -183,7 +190,8 @@ class Guard:
         data[self.name] = {
             "updated": datetime.date.today().isoformat(),
             "commit": head_commit(),
-            "rules": {r: sorted(k) for r, k in sorted(self.found.items()) if k},
+            "rules": {r: sorted(x for x in k if (r, x) not in self.strict)
+                      for r, k in sorted(self.found.items()) if any((r, x) not in self.strict for x in k)},
         }
         ordered = {"_about": data["_about"]}
         for k in sorted(k for k in data if k != "_about"):
@@ -200,7 +208,7 @@ class Guard:
         for rule, desc in self.rules.items():
             cur = self.found.get(rule) or {}
             known = set(base.get(rule) or [])
-            new = sorted(k for k in cur if k not in known)
+            new = sorted(k for k in cur if k not in known or (rule, k) in self.strict)
             gone = sorted(k for k in known if k not in cur)
             total_new += len(new)
             total_known += len(cur) - len(new)
@@ -212,7 +220,7 @@ class Guard:
                 new_rules.append(rule)
             shown = sorted(cur) if self.show_all else new
             for k in shown[:limit if not self.show_all else None]:
-                tag = "NEW " if k in new else "    "
+                tag = ("NEW*" if (rule, k) in self.strict else "NEW ") if k in new else "    "
                 print(f"       {tag}{cur[k]}")
             if not self.show_all and len(new) > limit:
                 print(f"       ... and {len(new) - limit} more new (--all lists every one)")

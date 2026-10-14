@@ -140,6 +140,12 @@ CHECKS = [
     # 12 October (ADAM CR-002 on DB-ROLES, CHG-R6-020): a write into another deployable's schema goes by event or by
     # the owner's operation (x-ticvai-write-via) or is a dated exception; the kernel grants are exactly the four agreed.
     "check-cross-deployable-writes",
+    # 14 October (ADAM CR-081, CR-083, CR-084; ADR-0055 amended 14 October, CHG-GEN-009): a read of another module's
+    # data is a view named for the reader inside one deployable, or a declared query (x-ticvai-read-via) by a route
+    # the deployables allow; Identity reads nothing above it but a projection.
+    "check-cross-module-reads",
+    # 14 October (ADAM CR-076, CHG-GEN-010): a table's row-level security lets in the scope its operations run at.
+    "check-rls-scope-fit",
     # 12 October (CHG-R6-030): a screen is gated on a permission its operations require; the ticket media designers
     # take the product permission (BC-034..BC-037).
     "check-screen-permissions",

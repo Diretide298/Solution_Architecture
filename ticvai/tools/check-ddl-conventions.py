@@ -27,7 +27,7 @@ RULES = {
     "D-SCOPE-LTREE": "scope_path not typed ltree (R092)",
     "D-SCOPE-NOTNULL": "scope_path nullable on a table under row-level security (R180)",
     "D-RUN-TOGETHER": "a column line whose name and type run together (R247)",
-    "D-STUB-TABLE": "a table holding only keys (R087)",
+    "D-STUB-TABLE": "a table holding only keys (R087); one the lineage writes cannot be baselined (CHG-GEN-003, CR-078 CR-080)",
     "D-DOUBLE-KEY": "a second key to one parent for one concept, or a key named for a renamed table (R102 R160)",
     "D-DESC-CUT": "a column description that is a cut-off prefix of its contract field's (R019)",
     "D-HEADER-COUNT": "a DDL header's table count disagrees with the file (R170 R043)",
@@ -45,6 +45,8 @@ RULES = {
                      "bans in DDL, not a recorded exception (3.3) (CHG-R6-012, CR-011 CR-012 CR-014)",
     "D-RENAME-APPLIED": "a table or column rename declared in derive-schema-history.py that the schema reference "
                         "does not show (CHG-R6-010)",
+    "D-UNIQUE-CASE": "a unique index whose text column is compared otherwise than common.yaml says: lower() unless "
+                     "the property is x-ticvai-unique-compare: exact (CHG-GEN-001, CR-079 CR-066)",
 }
 
 # **Words naming-and-style bans in DDL** (CHG-R6-012, ADAM CR-011, CR-012 and CR-014, 12 October 2026). The
@@ -226,6 +228,144 @@ def check_banned_names(guard, tables: dict, ref_cols: dict, by: dict) -> None:
                     guard.add("D-BANNED-NAME", f"{t}.{col}={v}",
                               f"{t}.{col}: value '{v}' carries '{bad[0]}', banned in DDL; a wire value is "
                               "recorded in naming-and-style 3.3 or renamed in the contract")
+def effective_tables(backend) -> dict:
+    """`table -> [columns]` as the databases have them: the frozen baseline files, then each forward migration in
+    order (its ADD COLUMN, DROP COLUMN, renames and new tables), read by tools/ddl_forward.py the way derive-ddl
+    reads them."""
+    import ddl_forward as fwd
+    out = {}
+    for db in ("tenant", "control"):
+        d = backend / db
+        if not d.exists():
+            continue
+        model = fwd.Model()
+        for f in sorted(p for p in d.glob("*.sql") if not p.name.startswith("V")):
+            model.add_file(f.read_text(encoding="utf-8"))
+        for f in sorted((p for p in d.glob("V*.sql") if re.match(r"V\d+__", p.name)),
+                        key=lambda p: int(re.match(r"V(\d+)", p.name).group(1))):
+            model.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", f.read_text(encoding="utf-8"), maxsplit=1,
+                                         flags=re.M)[0])
+        for t, tab in model.tables.items():
+            out[t] = list(tab.cols)
+    return out
+
+
+def check_stub_tables(guard, backend) -> None:
+    """D-STUB-TABLE (R087). **A table the lineage writes may not hold only keys, and that cannot be baselined**
+    (CHG-GEN-003, ADAM CR-078 and CR-080, 14 October 2026). Twelve stubs (an `id` and one `*_id`) sat in the
+    baseline while operations wrote them: `identity.principal_credential` was where every staff credential was to be
+    stored and `platform.sale_board_tile` where every till button was, and a developer building either had nowhere
+    to put a single field. A stub nothing writes is still baselined debt; a written one fails every run until it has
+    its columns. Read from the tables the databases will have (baseline plus forward migrations), so a column added
+    after r1 counts."""
+    lineage = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
+    writers: dict = {}
+    for op, e in lineage.items():
+        for t in (e or {}).get("writes") or []:
+            writers.setdefault(t, []).append(op)
+    for t, names in sorted(effective_tables(backend).items()):
+        if names and len(names) <= 2 and all(c == "id" or c.endswith("_id") for c in names):
+            w = sorted(writers.get(t, []))
+            if w:
+                guard.add("D-STUB-TABLE", t, f"{t}: only {', '.join(names)}, and written by {', '.join(w[:4])}"
+                          + (f" and {len(w) - 4} more" if len(w) > 4 else "") + " (cannot be baselined)", strict=True)
+            else:
+                guard.add("D-STUB-TABLE", t, f"{t}: only {', '.join(names)}")
+
+
+UNIQUE_COMPARE = "x-ticvai-unique-compare"
+
+
+def _exact_props(by: dict) -> set:
+    """`module.Schema.property` for every property marked `x-ticvai-unique-compare: exact`, as derive-ddl reads them:
+    through a local `allOf`, and from `Create<X>Request` / `Update<X>Request` onto `<X>`."""
+    def props(stem, s, depth=0):
+        out = {}
+        if not isinstance(s, dict) or depth > 6:
+            return out
+        for part in s.get("allOf") or []:
+            ref = str((part or {}).get("$ref") or "")
+            if ref.startswith("#/components/schemas/"):
+                out.update(props(stem, by.get((stem, ref.rsplit("/", 1)[-1])), depth + 1))
+            else:
+                out.update(props(stem, part, depth + 1))
+        out.update(s.get("properties") or {})
+        return out
+    exact = set()
+    for (stem, name), s in by.items():
+        for p, spec in props(stem, s).items():
+            if isinstance(spec, dict) and str(spec.get(UNIQUE_COMPARE) or "") == "exact":
+                exact.add(f"{stem}.{name}.{p}")
+                m = re.match(r"^(?:Create|Update)(\w+)Request$", name)
+                if m:
+                    exact.add(f"{stem}.{m.group(1)}.{p}")
+    return exact
+
+
+def check_unique_case(guard, backend, ref_cols: dict, by: dict) -> None:
+    """D-UNIQUE-CASE. **One rule for uniqueness, in common.yaml and in the indexes** (CHG-GEN-001, ADAM CR-079 and
+    CR-066, 14 October 2026). common.yaml said a value under `x-ticvai-unique` is compared case-insensitively and
+    every derived unique index was plain, so `VIP` and `vip` were two role codes. The indexes the databases have
+    (the frozen baseline, then each forward migration in order, with the DROP INDEX a person writes) are read
+    back: a text column is `lower(column)` unless its contract property is `x-ticvai-unique-compare: exact`, and an
+    exact one is not lowered. The r1 indexes stay plain until the forward migration a person writes from
+    handoff/migration-review.md ("index changed"), so they are baselined and leave the baseline when it lands."""
+    import ddl_forward as fwd
+    common = (g.ROOT / "contracts" / "shared" / "common.yaml").read_text(encoding="utf-8")
+    flat = " ".join(common.split())
+    if "compared case-insensitively" not in flat or f"{UNIQUE_COMPARE}: exact" not in flat:
+        guard.add("D-UNIQUE-CASE", "common.yaml", "contracts/shared/common.yaml no longer states the rule "
+                  "(text compared case-insensitively; an opaque external id marked x-ticvai-unique-compare: exact)")
+    exact_props = _exact_props(by)
+    exact_cols = {(t, c.get("column")) for t, cols in ref_cols.items() for c in cols
+                  if str(c.get("source") or "") in exact_props}
+    for db in ("tenant", "control"):
+        d = backend / db
+        if not d.exists():
+            continue
+        files = sorted(p for p in d.glob("*.sql") if not p.name.startswith("V"))
+        files += sorted((p for p in d.glob("V*.sql")), key=lambda p: int(re.match(r"V(\d+)", p.name).group(1)))
+        types, uniq = {}, {}
+        for f in files:
+            text = re.split(r"^-- =+\n-- ROLLBACK\b", f.read_text(encoding="utf-8"), maxsplit=1, flags=re.M)[0]
+            for st in fwd.split_statements(text):
+                s = fwd.norm(st)
+                m = re.match(r"CREATE TABLE (?:IF NOT EXISTS )?([a-z_]+\.\"?[a-z_0-9]+\"?)\s*\((.*)\)", s, re.S)
+                if m:
+                    t = m.group(1).replace('"', "")
+                    for item in fwd.top_level_split(m.group(2)):
+                        parts = item.split()
+                        if len(parts) > 1 and not item.upper().startswith(fwd.TABLE_LEVEL):
+                            types[(t, parts[0].replace('"', ""))] = parts[1].lower()
+                    continue
+                for t, c, typ in re.findall(r"ALTER TABLE ([a-z_]+\.[a-z_0-9]+) ADD COLUMN (?:IF NOT EXISTS )?"
+                                            r"\"?([a-z_0-9]+)\"? (\S+)", s):
+                    types[(t, c)] = typ.lower()
+                m = re.match(r"CREATE UNIQUE INDEX (?:IF NOT EXISTS )?(\S+) ON (?:ONLY )?([a-z_]+\.\"?[a-z_0-9]+\"?)"
+                             r"(?: USING \w+)?\s*\((.*)\)(?: WHERE .*)?$", s)
+                if m:
+                    uniq[m.group(1)] = (m.group(2).replace('"', ""), m.group(3))
+                    continue
+                m = re.match(r"DROP INDEX (?:CONCURRENTLY )?(?:IF EXISTS )?(?:[a-z_]+\.)?(\S+)", s)
+                if m:
+                    uniq.pop(m.group(1), None)
+        for name, (t, inner) in sorted(uniq.items()):
+            for member in fwd.top_level_split(inner):
+                lowered = re.match(r"^lower\(\s*\"?([a-z_0-9]+)\"?\s*\)$", member)
+                plain = re.match(r"^\"?([a-z_0-9]+)\"?$", member)
+                col = (lowered or plain).group(1) if (lowered or plain) else None
+                if not col or types.get((t, col)) != "text":
+                    continue
+                exact = (t, col) in exact_cols
+                if plain and not exact:
+                    guard.add("D-UNIQUE-CASE", f"{name}:{col}",
+                              f"{name} on {t}: {col} is text and compared case-sensitively; common.yaml says "
+                              "case-insensitively (lower(), or mark an opaque external id x-ticvai-unique-compare: exact)")
+                elif lowered and exact:
+                    guard.add("D-UNIQUE-CASE", f"{name}:{col}",
+                              f"{name} on {t}: {col} is x-ticvai-unique-compare: exact and indexed lower()")
+
+
 # `require_` beside `requires_`, as `allow_` beside `allows_` (CHG-GTRB-006: till_shift_policy.require_open_approval).
 BOOL_OK = re.compile(r"^(is|has|can|require|requires|allows|allow|should|was|were|did|does|must|needs|include|includes|"
                      r"show|shows|auto|use|uses|supports|accepts|enable|enabled|send|notify|override)_|"
@@ -345,9 +485,7 @@ def main() -> int:
                 guard.add("D-SCOPE-LTREE", t, f"{t}.scope_path is not ltree: {line[:60]!r}")
             if t in rls and "NOT NULL" not in line and "shared" not in line.lower():
                 guard.add("D-SCOPE-NOTNULL", t, f"{t}.scope_path is nullable under row-level security")
-        names = list(cols)
-        if names and len(names) <= 2 and all(c == "id" or c.endswith("_id") for c in names):
-            guard.add("D-STUB-TABLE", t, f"{t}: only {', '.join(names)}")
+    check_stub_tables(guard, backend)
 
     # R019: a column description that is its contract field's description, cut.
     ref = g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}
@@ -523,6 +661,9 @@ def main() -> int:
 
     # CHG-R6-012 (ADAM CR-011, CR-012, CR-014, 12 October 2026): banned words in what the DDL takes after r1.
     check_banned_names(guard, tables, ref_cols, by)
+
+    # CHG-GEN-001 (ADAM CR-079, CR-066, 14 October 2026): a unique value is compared as common.yaml says.
+    check_unique_case(guard, backend, ref_cols, by)
 
     # R160: a renamed table's old name left in DDL comments and contract prose.
     renames = [(str(r.get("from")), str(r.get("to"))) for r in

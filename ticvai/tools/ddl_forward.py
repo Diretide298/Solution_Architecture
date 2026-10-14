@@ -14,6 +14,12 @@ because each one has a data question behind it (backfill, rewrite, which rows su
 generator cannot answer. `backend/MIGRATIONS.md`: *additive first -- add column, backfill, switch
 reads, drop old -- four migrations, not one.*
 
+**A row-level-security policy change on an existing table is written too** (CHG-GEN-004, 14 October 2026):
+`SELECT platform.drop_rls_policies(t)` and then the table's generated `SELECT platform.apply_*_rls(t, ...)`
+call, with the old call as its rollback. It touches no row and can be run twice, so it has no data question
+for a person; listed for one instead, CR-005's append-only audit policies stayed off the databases while the
+review row was read as done. The old call it replaces is not listed as dropped.
+
 **A NOT NULL column without a default is added nullable** and listed: added as NOT NULL it fails on
 the first table that already has rows. Setting NOT NULL after the backfill is the person's migration.
 
@@ -317,6 +323,16 @@ class Model:
             self.add(stmt)
 
 
+RLS_CALL = re.compile(r"^SELECT platform\.(apply_\w*rls|drop_rls_policies)\('([^']+)'::regclass", re.I)
+
+
+def rls_call(stmt: str):
+    """`(helper, table)` for a generated row-level-security call (`SELECT platform.apply_*_rls('t'::regclass ...)`),
+    else None."""
+    m = RLS_CALL.match(norm(stmt))
+    return (m.group(1).lower(), unq(m.group(2)), m.group(2)) if m else None
+
+
 def tables_named(stmt: str, known: set) -> set:
     return {unq(x) for x in re.findall(rf"(?<![\w.]){QNAME}(?![\w(])", stmt)} & known
 
@@ -439,7 +455,14 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                     p.rollback.append(f"ALTER TABLE {t} DROP COLUMN IF EXISTS {c};")
                     p.counts["columns"] += 1
                     new_cols.setdefault(t, set()).add(c)
-                    if add != d:
+                    if add != d and c == "scope_path":
+                        # CHG-GEN-008: a row with no scope_path is invisible to every grant once the table's policy reads
+                        # it, so the backfill is due in the same release as the column, not later.
+                        review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL, and row-"
+                               "level security reads it", "backfill each row's owning path in the forward migration "
+                               "that adds it (a row with a null scope_path is invisible to every grant), then ALTER "
+                               "COLUMN ... SET NOT NULL")
+                    elif add != d:
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL",
                                "backfill, then ALTER COLUMN ... SET NOT NULL in a forward migration")
                 elif a.cols[c] != d and (t, c) not in old.handled:
@@ -476,6 +499,15 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
             if k not in old.stmts:
                 p.statements.append(stmt)
                 p.rollback.append(f"DROP INDEX IF EXISTS {k[1]};")
+                p.counts["indexes"] += 1
+            elif re.sub(r"lower\(\s*(\"?\w+\"?)\s*\)", r"\1", new.stmts[k]) == old.stmts[k]:
+                # **A unique index made case-insensitive is written** (CHG-GEN-006, ADAM CR-066 and CR-079): the same
+                # index on lower(column), as common.yaml promises. It touches no row; if two rows differ only in case
+                # the CREATE fails and the migration's transaction rolls back, which is the person's signal to merge
+                # them. Rollback puts the case-sensitive index back.
+                p.statements.append(f"DROP INDEX IF EXISTS {k[1]}")
+                p.statements.append(stmt)
+                p.rollback.append(f"DROP INDEX IF EXISTS {k[1]}; {old.stmts[k].rstrip(';')};")
                 p.counts["indexes"] += 1
             else:
                 review("index changed", k[1], f"`{old.stmts[k]}` -> `{new.stmts[k]}`",
@@ -534,6 +566,22 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
         if refs and refs <= new_tables:
             p.statements.append(stmt)
             p.counts["other"] += 1
+            continue
+        rc_ = rls_call(s)
+        if rc_ and rc_[0] != "drop_rls_policies" and rc_[1] in old.tables:
+            # **A policy change on a table that already exists is written, not listed** (CHG-GEN-004). The call is
+            # the generated helper the baseline used for every table: it drops what was there and creates the
+            # policy again, so it is idempotent and touches no row. Listing it for a person is how CR-005's
+            # policies stayed off the databases: the review row was read as done, and 920 still said tenant root.
+            t = rc_[1]
+            was = [old.stmts[k] for k in old.stmts if k[0] == "stmt" and (rls_call(old.stmts[k]) or ("", "", ""))[1] == t
+                   and rls_call(old.stmts[k])[0] != "drop_rls_policies"]
+            p.statements.append(f"SELECT platform.drop_rls_policies('{rc_[2]}'::regclass)")
+            p.statements.append(stmt)
+            p.rollback.append(f"SELECT platform.drop_rls_policies('{rc_[2]}'::regclass); "
+                              + " ".join(w.rstrip(";") + ";" for w in was))
+            p.counts["policies"] = p.counts.get("policies", 0) + 1
+            continue
         else:
             review("statement added", ", ".join(sorted(refs)) or "(database)", f"`{s[:160]}`",
                    "touches objects that already exist: write it into a forward migration by hand")
@@ -548,10 +596,15 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                    "these names (ALTER INDEX / ALTER TABLE ... RENAME CONSTRAINT) and apply its row-level "
                    "security again")
     renamed_new_stmts = {new.stmts[nk] for nk in new.stmts}
+    # Tables the new side applies a policy to: their old policy call is replaced, not dropped (CHG-GEN-004).
+    reapplied = {c[1] for c in (rls_call(new.stmts[nk]) for nk in new.stmts if nk[0] == "stmt") if c}
     for k in old.stmts:
         if k in new.stmts:
             continue
         kind = k[0]
+        old_call = rls_call(old.stmts[k]) if kind == "stmt" else None
+        if old_call and (old_call[0] == "drop_rls_policies" or old_call[1] in reapplied):
+            continue
         if kind == "table" and k[1] in renamed_away:
             continue
         if kind in ("constraint", "stmt") and subst(old.stmts[k]) in renamed_new_stmts:
@@ -587,7 +640,8 @@ def render(p: Plan, version: str, baseline: str, stamp: str) -> str:
     body = "\n\n".join(s.rstrip().rstrip(";") + ";" for s in p.statements)
     checksum = hashlib.sha256(body.encode("utf-8")).hexdigest()
     what = (f"{p.counts['tables']} table(s), {p.counts['columns']} column(s), {p.counts['indexes']} index(es), "
-            f"{p.counts['other']} other statement(s)")
+            f"{p.counts['other']} other statement(s)"
+            + (f", {p.counts['policies']} row-level security polic(ies) re-applied" if p.counts.get("policies") else ""))
     desc = f"after {baseline}: {what}"
     lines = [
         f"-- {version} -- {p.area} database, after {baseline} ({stamp}).",

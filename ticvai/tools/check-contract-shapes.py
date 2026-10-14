@@ -21,7 +21,8 @@ same kind that nothing held:
   C-EVENT-NAME             an event not named <aggregate>.<pastTenseVerb> (R186, rule changed 1 October)
   C-MONEY-NUMBER           a money-named field typed number/integer instead of Money (R122, R177)
   C-UNTYPED-BODY           a request or 2xx body that is a bare object with no properties (R088)
-  C-PAGED-ORDER            a cursor-paged list that says nothing about its order (R154)
+  C-PAGED-ORDER            a cursor-paged list that says nothing about its order, or an order that names
+                           no field ("most recent first" alone) (R154, CHG-GEN-002, CR-077)
   C-PROSE-SPLIT            a word split by line-wrap or find-and-replace (`s ervice`) (R138)
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
@@ -47,7 +48,7 @@ RULES = {
     "C-EVENT-NAME": "an event name breaks <aggregate>.<pastTenseVerb> (R186)",
     "C-MONEY-NUMBER": "a money-named field typed number/integer, not Money (R122 R177)",
     "C-UNTYPED-BODY": "a request or 2xx body that is a bare object (R088)",
-    "C-PAGED-ORDER": "a cursor-paged list that states no order (R154)",
+    "C-PAGED-ORDER": "a cursor-paged list that states no order naming the field it sorts on (R154, CHG-GEN-002)",
     "C-PROSE-SPLIT": "a word split in contract prose (R138)",
     "C-TWO-IDEMPOTENCY": "a body idempotency key beside the Idempotency-Key header (R153)",
     "C-SEARCH-PARAM": "a search/q parameter that says nothing about what it matches (R182)",
@@ -98,6 +99,88 @@ def body_schema(container):
         if isinstance(media, dict) and media.get("schema") is not None:
             return media["schema"]
     return None
+
+
+def response_props(op, doc) -> set:
+    """Every property name reachable from an operation's 200 body (local refs, allOf, array items): the fields a
+    list can be ordered on."""
+    out, seen = set(), set()
+
+    def walk(node, depth=0):
+        if depth > 8 or not isinstance(node, dict):
+            return
+        if "$ref" in node:
+            if node["$ref"] in seen:
+                return
+            seen.add(node["$ref"])
+            node, _ = deref(node, doc)
+            if not isinstance(node, dict):
+                return
+        for k in ("allOf", "oneOf", "anyOf"):
+            for part in node.get(k) or []:
+                walk(part, depth + 1)
+        if isinstance(node.get("items"), dict):
+            walk(node["items"], depth + 1)
+        for p, v in (node.get("properties") or {}).items():
+            out.add(str(p))
+            walk(v, depth + 1)
+
+    walk(body_schema(((op.get("responses") or {}).get("200")) or {}) or {})
+    return out
+
+
+# An order statement and the field it names: "sorted by `openedAt` descending", "ordered by name", "openedAt
+# descending", "most recent first, by `startedAt`", "newest `resolvedAt` first", "ordered by creation (`id`, a
+# UUIDv7)", "keyset on (startsAt, id)", "... then `name`".
+_TOK = r"[`(]*[A-Za-z_][A-Za-z0-9_.']*[`),]*"
+ORDER_WORD = re.compile(r"\b(?:sorted|ordered|order|sort|sorts|keyset|newest|oldest|most recent|latest|earliest|"
+                        r"soonest|ascending|descending|in the order)\b", re.I)
+ORDER_BY = re.compile(r"\b(?:sorted|ordered|order|sort|sorts|keyset|newest|oldest|most recent|latest|earliest|"
+                      r"soonest|first|last|in the order)\b(?:[\s,]+\w+){0,3}?[\s,]+(?:by|on|of)\s+"
+                      r"(?:the\s+|its\s+|their\s+)?((?:" + _TOK + r"\s*){1,3})", re.I)
+FIRST_FIELD = re.compile(r"\b(?:newest|oldest|most recent|latest|earliest|soonest|highest|lowest)\s+`?"
+                         r"([A-Za-z_][A-Za-z0-9_]*)`?\s+first\b", re.I)
+FIELD_DIRECTION = re.compile(r"(" + _TOK + r")\s*,?\s*\(?(?:ascending|descending|asc|desc|alphabetical(?:ly)?)\b",
+                             re.I)
+THEN_FIELD = re.compile(r"\bthen\s+(?:by\s+)?((?:" + _TOK + r"\s*){1,3})", re.I)
+NOT_A_FIELD = {"the", "a", "an", "its", "their", "which", "what", "when", "default", "order", "them", "it",
+               "this", "that", "date", "time", "most", "recent", "first", "last", "and", "or", "then", "by",
+               "creation", "age", "value", "uuidv7", "row", "rows"}
+
+
+def order_names_field(text: str, props: set) -> bool:
+    """True when an order statement in `text` names a field: a property of the listed items (one word, or two or
+    three run together: "visit date" is `visitDate`), a backticked name, or a camelCase / snake_case identifier."""
+    text = text.replace("**", "")
+    lowered = {p.lower() for p in props}
+
+    def names_field(chunk: str, backtick_ok: bool = True) -> bool:
+        toks = re.findall(r"`?[A-Za-z_][A-Za-z0-9_.']*`?", chunk)
+        words = [t.strip("`").split(".")[-1].removesuffix("'s").strip("'") for t in toks]
+        for i, (raw, w) in enumerate(zip(toks, words)):
+            if not w or w.lower() in NOT_A_FIELD:
+                continue
+            if w.lower() in lowered or re.search(r"[a-z][A-Z]|_", w) or (backtick_ok and raw.startswith("`")):
+                return True
+            for n in (2, 3):
+                if "".join(words[i:i + n]).lower() in lowered and len(words[i:i + n]) == n:
+                    return True
+        return False
+
+    for m in ORDER_BY.finditer(text):
+        if names_field(m.group(1)):
+            return True
+    for m in FIRST_FIELD.finditer(text):
+        if names_field(m.group(1), backtick_ok=False):
+            return True
+    for m in FIELD_DIRECTION.finditer(text):
+        if names_field(m.group(1)):
+            return True
+    if ORDER_WORD.search(text):
+        for m in THEN_FIELD.finditer(text):
+            if names_field(m.group(1)):
+                return True
+    return False
 
 
 def walk_enums(node, where, out, depth=0):
@@ -194,10 +277,12 @@ def main() -> int:
         refs = {g.ref_name(p.get("$ref", "")) for p in (op.get("parameters") or []) if isinstance(p, dict)}
         if m == "get" and ("PageCursor" in refs or "cursor" in pnames):
             text = " ".join(str(op.get(k) or "") for k in ("description", "summary", "x-ticvai-note"))
+            # **The order names the field it sorts on** (CHG-GEN-002, ADAM CR-077, 14 October 2026). "Most recent
+            # first" passed this rule while naming no column, so listOwnPlatformStaffGrants and
+            # listPlatformStaffGrants could be built in any order a developer guessed (identity.yaml:4273,4641).
             if not ({"sort", "orderBy", "order", "sortBy"} & pnames) and \
-                    not re.search(r"\b(sorted|ordered|order(ed)? by|newest|oldest|most recent|"
-                                  r"ascending|descending|keyset|in the order)\b", text, re.I):
-                guard.add("C-PAGED-ORDER", oid, f"{oid}: paged by cursor and states no order")
+                    not order_names_field(text, response_props(op, doc)):
+                guard.add("C-PAGED-ORDER", oid, f"{oid}: paged by cursor and states no order that names a field")
         prose.append((f"{oid}", " ".join(str(op.get(k) or "") for k in ("description", "summary"))))
 
     for (stem, name), s in sorted(g.schemas()[0].items()):

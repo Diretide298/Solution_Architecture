@@ -1,0 +1,69 @@
+id: CHG-GEN-001
+date: '2026-10-14'
+source: developer
+kind: spec
+summary: 'A unique code is unique whatever its case: derive-ddl indexes every text member of an x-ticvai-unique or
+  x-ticvai-unique-together index as lower(column), an opaque external id marked x-ticvai-unique-compare: exact is
+  compared as it is, and common.yaml says which is which.'
+decision:
+  what: 'tools/derive-ddl.py (unique_key) wraps each text column of a derived unique index in lower(); a key that is
+    not text (venue_id, scope_path, a uuid) is never wrapped. A property marked `x-ticvai-unique-compare: exact`
+    beside `x-ticvai-unique` keeps its index exact; the mark is on payments ProviderEvent.providerEventId, access
+    AccreditationCredential.encodedIdentifier and BlacklistEntry.mediaCode (what a gate reads off media) and games
+    readerId (a uuid, so exact anyway). contracts/shared/common.yaml (Problem, the uniqueness rule) says text is
+    compared case-insensitively, each text member of a unique-together set too, and an opaque external id is exact
+    only through the mark. Package-wide: role code (CR-079) and promotion code (CR-066) included, 26 indexes.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-079 (identity.role code, ticket 27764) and ADAM CR-066 (promotion code, ticket 27674): common.yaml:645-648
+  promised "compared case-insensitively" and every derived unique index was plain (backend/tenant/910-indexes.sql:4257
+  role_code_uniq, V0101 promotion_code_uniq, the CHG-R6-017 set in V0102), so ADMIN and admin, SUMMER10 and summer10
+  were both accepted by the database. The audit of 14 October (CR-079 decision) asked for one generator rule in
+  derive-ddl.py:1655-1686 with the opaque external ids exempt, and common.yaml to stop calling those case-insensitive.'
+keys_touched:
+  tables:
+  - identity.role
+  - promotions.promotion
+  - payments.provider_event
+  - access.accreditation_credential
+  - access.blacklist
+  - games.reader_sync_status
+  schemas:
+  - payments.ProviderEvent
+  - access.AccreditationCredential
+  - access.BlacklistEntry
+  files:
+  - contracts/shared/common.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/spine/access.yaml
+  - contracts/satellite/games.yaml
+  - tools/derive-ddl.py
+  - tools/check-ddl-conventions.py
+  - handoff/audit-baseline.json
+  tickets:
+  - '27764'
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - '27764'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-079 (ADAM)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  The databases already hold the 26 plain indexes (r1 910 and V0101/V0102); the forward migration replaces each
+  (DROP INDEX, CREATE UNIQUE INDEX ... (lower(...))) since CHG-GEN-006 taught ddl_forward that change. If two rows
+  differ only in case the CREATE fails and the migration rolls back: merge them first. A handler''s ON CONFLICT
+  names the same expression. CR-066 (promotion code) has its own entry, CHG-GEN-006. New check rule
+  check-ddl-conventions D-UNIQUE-CASE reads the indexes the databases have (baseline, then each forward migration,
+  with DROP INDEX) against common.yaml: a text member is lower() unless its property is exact, and common.yaml still
+  states the rule. Run on the parent commit (r5, 1eb1d063) it fails (28 plain text members, plus the three exact
+  ids had they no mark); the 28 are baselined in handoff/audit-baseline.json and go when the gate writes the forward
+  migration. Choice left open by the decision: the exemption is a property mark rather than a list in the
+  generator, so the contract says it where the field is described.
+  mediaCode is exempt with the two ids the decision names: it is the same space as encodedIdentifier.'

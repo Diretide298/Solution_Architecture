@@ -1,0 +1,78 @@
+id: CHG-GEN-005
+date: '2026-10-14'
+source: developer
+kind: spec
+summary: 'Two row-level-security marks open SELECT where the scope rule hid rows owned above the caller and leave
+  writes as they were: x-ticvai-rls read-beneath (identity CapabilityTemplate and SegregationRule, inventory Supplier,
+  promotions UpsellRule, which gains its scopePath) and grant-holder-read (identity Role and Principal); role_permission
+  follows its role for reading only.'
+decision:
+  what: 'tools/derive-ddl.py reads `x-ticvai-rls` from the contract schema (RLS_MARKS) and generates platform.grant_holder()
+    (scope paths set, no guest subject), platform.above_scope(path) (`path @> ANY (current_scope_paths())`),
+    platform.apply_split_rls (one policy per command), platform.apply_read_beneath_rls (SELECT in_scope(scope_path) OR
+    above_scope(scope_path); INSERT/UPDATE/DELETE in_scope(scope_path)), platform.apply_grant_holder_read_rls (SELECT
+    grant_holder(); writes the base rule: tenant root for role and principal) and platform.apply_parent_split_rls (a
+    child readable where its parent is, written only where the parent may be written). A child the parent rule already
+    gave a split parent is converted to the split form, down the chain, so opening a parent''s SELECT never opens its
+    children''s writes; a tenant-root table stays nobody''s owner except where SPLIT_CHILDREN names it
+    (identity.role_permission -> role_id, the CR-076 decision). promotions UpsellRule gains `scopePath` (readOnly, the
+    owning region''s path) so it can be owned at region and read at venue. tools/check-migrations.py counts the two new
+    helpers as protection. The policy swaps reach the forward migration by CHG-GEN-004.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-076 (ticket 27764): listRoles, createRole and listPrincipals are venue-level (identity.yaml:1301-1318,
+  1558-1594, 1623-1642) and identity.role, role_permission and principal had apply_tenant_rls
+  (920-row-level-security.sql:1148,1151,1152), so a venue ROLE_MANAGE / USER_MANAGE caller read nothing;
+  capability_template and segregation_rule (920:532,538) sit at the tenant''s path, invisible beneath it. The lead
+  decided on 14 October: SELECT on role, role_permission, capability_template and segregation_rule open to venue
+  grants, role writes at the tenant root, principal readable by any staff grant with writes as they are, and
+  role_permission following role through the parent rule. Audit R183 (docs/registers/audit-decisions.md:599, decided
+  28 September) "owned above, read below" was never implemented: inventory.supplier apply_scope_rls (920:545),
+  promotions.upsell_rule tenant root (920:1232).'
+keys_touched:
+  tables:
+  - identity.role
+  - identity.role_permission
+  - identity.principal
+  - identity.capability_template
+  - identity.segregation_rule
+  - inventory.supplier
+  - promotions.upsell_rule
+  schemas:
+  - identity.Role
+  - identity.Principal
+  - identity.CapabilityTemplate
+  - identity.SegregationRule
+  - inventory.Supplier
+  - promotions.UpsellRule
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/promotions.yaml
+  - tools/derive-ddl.py
+  - tools/check-migrations.py
+root_class: A23 AUTH-SCOPE
+tickets:
+  started:
+  - '27764'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-076 (ADAM)
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::RLS_MARKS
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Verified on this branch: derive-schema, then derive-ddl --apply wrote V0104 with the six helpers, the 16 policy
+  swaps (six marked tables, role_permission, and the nine of CHG-GEN-004), upsell_rule.scope_path added nullable with
+  its GiST index, and a "not null" review row for its backfill (each rule takes its region''s path, from regionId);
+  the derived files were restored before the commit. Choices left open by the decision: (1) role_permission follows
+  role by the parent rule in split form rather than by its own mark, because the plain parent rule''s WITH CHECK is
+  "the parent is visible", which would have opened role_permission writes to every grant once role is readable;
+  (2) a guest session (ticvai.subject_id set) is not a grant holder, since the decision says "any staff grant";
+  (3) read-beneath on a table without scope_path is refused with a message, not widened. Operations are not touched
+  (batch IDR moves createRole/updateRole to tenant). deleteUpsellRule is venue-level and a venue grant cannot write
+  a region-owned rule; R183 decided ownership at region, so its scope level is for the lead to settle. Expected
+  check: the RLS-fit check of this batch passes these tables.'

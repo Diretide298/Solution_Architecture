@@ -1,0 +1,48 @@
+id: CHG-GEN-006
+date: '2026-10-14'
+source: developer
+kind: spec
+summary: 'A promotion code is unique whatever its case in the database, not only in the API: promotion_code_uniq becomes
+  a unique index on lower(code), and the forward migration writes the swap (with every other unique index made
+  case-insensitive) instead of listing it for a person.'
+decision:
+  what: 'CR-066 option 1: CREATE UNIQUE INDEX promotion_code_uniq ON promotions.promotion (lower(code)), from the generator
+    rule of CHG-GEN-001. tools/ddl_forward.py writes an existing unique index whose only change is lower() around its
+    columns into the next forward migration as DROP INDEX IF EXISTS and the new CREATE UNIQUE INDEX, with the old index
+    as its rollback; any other index change stays a review row. So V0104 (at the lead''s gate) replaces
+    promotion_code_uniq, role_code_uniq and the other 24, and handoff/migration-review.md loses their "index changed"
+    rows.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-066 (ticket 27674, MIG-PROMOTIONS): CR-029 made a promotion code unique per tenant and common.yaml:645-648
+  says unique values are compared case-insensitively, but V0101 created promotion_code_uniq on code as typed, so
+  SUMMER10 and summer10 were both accepted and the 409 duplicate-code rule rested on the API alone; an import or an
+  offline replay could break it. The lead decided on 14 October that CR-066 ships in r6 through the GEN rules.'
+keys_touched:
+  tables:
+  - promotions.promotion
+  files:
+  - tools/ddl_forward.py
+  tickets:
+  - '27674'
+root_class: A17 DDL-DERIVATION
+tickets:
+  started:
+  - '27674'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-066 (ADAM)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Verified on this branch: derive-ddl --apply wrote V0104 with DROP INDEX IF EXISTS promotions.promotion_code_uniq and
+  CREATE UNIQUE INDEX IF NOT EXISTS promotion_code_uniq ON promotions.promotion (lower(code)), 25 such swaps in the
+  tenant database and one in control (tenant_domain hostname), and migration-review.md had no "index changed" row
+  left; check-ddl-conventions D-UNIQUE-CASE then reported its 28 baseline entries gone. Derived files restored before
+  the commit. The swap is not destructive: it touches no row, and if two codes differ only in case the CREATE fails
+  and the migration''s transaction rolls back, so dedupe first. createPromotion''s duplicate check and any ON CONFLICT
+  compare lower(code).'

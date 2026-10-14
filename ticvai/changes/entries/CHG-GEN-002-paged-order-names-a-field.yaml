@@ -1,0 +1,44 @@
+id: CHG-GEN-002
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'check-contract-shapes C-PAGED-ORDER now asks a cursor-paged list''s order statement to name the field it sorts
+  on ("most recent first" alone fails); the 25 lists that passed only on an order word are baselined, except the two
+  Identity grant lists batch IDR fixes.'
+decision:
+  what: 'C-PAGED-ORDER passes a list with a sort parameter, or an order statement that names a field: after "sorted /
+    ordered / keyset ... by|on", in "newest <field> first", before ascending/descending, or after "then"; the field is
+    a property of the listed items (one word, or two or three run together), a backticked name, or a camelCase /
+    snake_case identifier. 25 lists newly found are added to handoff/audit-baseline.json; 4 baseline members that now
+    name a field leave it. listOwnPlatformStaffGrants and listPlatformStaffGrants are not baselined: CR-077 orders
+    them by openedAt, and batch IDR writes that.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-077 (ticket 27764): identity.yaml:4273 and 4641 said "most recent first" and named no column, and the
+  check''s regex accepted "most recent" without one (check-contract-shapes.py:197-200), so the rule meant to catch R154
+  passed both. The audit of 14 October (CR-077 prevention) asked to tighten it to a named field.'
+keys_touched:
+  operations:
+  - listOwnPlatformStaffGrants
+  - listPlatformStaffGrants
+  files:
+  - tools/check-contract-shapes.py
+  - handoff/audit-baseline.json
+root_class: A18 API-CONVENTIONS
+tickets:
+  started:
+  - '27764'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-077 (ADAM)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Run on the parent commit (r5, 1eb1d063) the tightened rule fails (41 new before the field forms were complete, 25
+  with them); on this branch it fails only on listOwnPlatformStaffGrants and listPlatformStaffGrants, on purpose,
+  until batch IDR (cr/076-077-079-identity-roles) names openedAt; it passes once that branch is merged. The rule reads
+  description, summary and x-ticvai-note, as before.'

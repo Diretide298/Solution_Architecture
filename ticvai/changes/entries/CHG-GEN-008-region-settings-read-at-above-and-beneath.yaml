@@ -1,0 +1,61 @@
+id: CHG-GEN-008
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'Region settings are read by everyone at, above and beneath their region and written by the region and the
+  levels above it: RegionSettings gains scopePath (the region''s path, server-set) and x-ticvai-rls read-beneath, so a
+  venue''s createOutlet reads the languages its region requires.'
+decision:
+  what: 'CR-075 option A, built with the read-beneath rule of CHG-GEN-005. tenancy RegionSettings gains `scopePath`
+    (readOnly, the path of the region in `regionId`, set when updateRegionSettings first saves the row) and
+    `x-ticvai-rls: read-beneath`. platform.region_settings gets scope_path ltree with its GiST index, and the policy
+    apply_read_beneath_rls: SELECT where the row is at or beneath a grant or above it (`scope_path @> ANY
+    (current_scope_paths())`), INSERT/UPDATE/DELETE at or beneath a grant, so updateRegionSettings and setFxProvider
+    at region level now pass and a venue cannot write. tools/ddl_forward.py words the backfill row for a new
+    scope_path as due in the same migration, because a row with a null scope_path is invisible to every grant.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-075 (ticket 30795): createOutlet and updateOutlet must refuse an outlet whose nameTranslations lacks a
+  language RegionSettings.localLanguageNameLocales requires (422 local-name-required), at venue scope
+  (tenancy.yaml createOutlet, x-ticvai-scope-level venue), and platform.region_settings had the tenant-root policy
+  (920-row-level-security.sql:1223, "was: only nullable references"), so a region- or venue-scoped caller read no row
+  and the 422 never fired; the same for time zone and currency scale (calculateTax, listDenominations at venue). The
+  CR recommends option A: visible at, above or below the region, written only from above. The table had no
+  scope_path, and the region''s platform.scope row is itself invisible to a grant beneath it (scope_scope policy), so
+  the rule needs the path on the row. The lead decided on 14 October that CR-075 ships in r6 through the GEN rules.'
+keys_touched:
+  operations:
+  - createOutlet
+  - updateOutlet
+  - getRegionSettings
+  - updateRegionSettings
+  tables:
+  - platform.region_settings
+  schemas:
+  - tenancy.RegionSettings
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/ddl_forward.py
+  tickets:
+  - '30795'
+root_class: A23 AUTH-SCOPE
+tickets:
+  started:
+  - '30795'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-075 (ADAM)
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::RLS_MARKS
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Blocker: it blocks the 422 of createOutlet and updateOutlet on #30795. Verified on this branch: derive-schema, then
+  derive-ddl --apply wrote into V0104 the column (added nullable), its GiST index and the swap to
+  apply_read_beneath_rls, and migration-review.md a "not null" row asking for the backfill in the same migration:
+  UPDATE platform.region_settings rs SET scope_path = s.path FROM platform.scope s WHERE s.id = rs.org_unit_id (a
+  row with no org_unit_id takes the tenant root''s path), then SET NOT NULL. Derived files restored before the commit.
+  Additive to the contract (a readOnly response field; check-contract-compat passes). Other regions'' settings stay
+  invisible to a venue (not grant-holder-read), as option A says.'

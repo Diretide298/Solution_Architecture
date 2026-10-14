@@ -5444,9 +5444,21 @@ components:
 
     RegionSettings:
       x-ticvai-persistence: "platform.region_settings"
+      # CHG-GEN-008 (ADAM CR-075): settings govern everything beneath their region, so everyone working at, above or
+      # beneath it reads them; the region and the levels above it write them.
+      x-ticvai-rls: read-beneath
       type: object
       required: [countryCode, currencyCode, currencyScale, timeZone, fiscalYearStartMonth]
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: >
+            **The partition key** (ADR-0005): the path of the region in `regionId`, set by the server when
+            `updateRegionSettings` first saves the row, and ignored on input. Row-level security reads the row
+            at, above and beneath that path (`x-ticvai-rls: read-beneath`, CHG-GEN-008, ADAM CR-075), so a venue's
+            `createOutlet` reads the languages its region requires, and only the region or a level above it writes
+            the row.
         countryCode:
           type: string
           pattern: '^[A-Z]{2}$'

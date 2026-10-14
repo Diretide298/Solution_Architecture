@@ -1,0 +1,57 @@
+id: CHG-GEN-010
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'New check check-rls-scope-fit joins each operation''s scope level with the row-level-security class of the
+  tables it reads and writes: an operation below tenant on a tenant-root table, and a read below tenant of a
+  scope_path table written only at tenant, are findings; today''s debt is baselined and the tables of CHG-GEN-005,
+  007 and 008 pass.'
+decision:
+  what: 'tools/check-rls-scope-fit.py (run-checks.py) reads the policy each tenant table gets from backend/tenant (the
+    baseline, then every forward migration in order; the last apply_*_rls call wins), resolves parent and split
+    policies to (who reads, who writes), and judges every staff or partner operation at region, brand, venue or
+    workstation level: RF-TENANT-ROOT (reads or writes a table only the tenant root may), RF-OWNED-ABOVE (reads a
+    scope_path table whose writers all run at tenant, without read-beneath). Guests (subject) and workers (service or
+    device audience only) are not judged. 934 findings at the state the gate produces are baselined in
+    handoff/audit-baseline.json, except createRole and updateRole writing identity.role and role_permission at venue
+    level, which batch IDR fixes by moving them to tenant.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-076 (ticket 27764), prevention the audit of 14 October asked for: "a new check joining lineage
+  scope-level with the 920 policy class: (a) op below tenant on a tenant-root table, (b) read below tenant of a
+  scope_path table written only at tenant. Baseline current findings; allow-list system-scope workers." The audit
+  counted 520 operations below tenant touching 142 tenant-root tables and 47 scope_path tables written only at tenant
+  and read below; CR-071, CR-075 and R183 were members of the same class.'
+keys_touched:
+  operations:
+  - createRole
+  - updateRole
+  files:
+  - tools/check-rls-scope-fit.py
+  - tools/run-checks.py
+  - handoff/audit-baseline.json
+root_class: A23 AUTH-SCOPE
+tickets:
+  started:
+  - '27764'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-076 (ADAM)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Derive before check: the check reads the forward migration, so it is run after derive-ddl. On the parent commit
+  (r5, 1eb1d063) it fails with 1,084 findings (953 RF-TENANT-ROOT, 131 RF-OWNED-ABOVE). Baselined at the gate''s
+  state on this branch (derive-schema and derive-ddl --apply run, V0104 written, then restored): the reads of
+  identity.role, role_permission, principal, capability_template and segregation_rule, inventory.supplier,
+  promotions.upsell_rule, platform.region_settings and retail.sale, sale_line, return and return_line by operations
+  below tenant all pass (123 findings on those tables before). Expected to fail until merged: createRole and
+  updateRole (venue) writing identity.role / role_permission, fixed by batch IDR; and, on this branch before the gate
+  writes V0104, the reads of the tables above. Baselined and still open, for the lead: createPrincipal and
+  updatePrincipal (venue) write identity.principal, whose writes stay at the tenant root by the CR-076 decision
+  ("writes checked on a NOT NULL home_scope_id" is not built); identity.principal_credential (batch CRD) and
+  inventory.supplier_contract (tenant root, read at venue and region).'
