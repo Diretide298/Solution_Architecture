@@ -141,6 +141,10 @@ CHECKS = [
     "check-screen-permissions",
     # 12 October (CHG-R6-031..038): a promise has its operation, field, binding or reader; one business day.
     "check-promises-kept",
+    # 14 October (ADAM CR-084, CHG-GDL-001): a 4xx whose description names another module's record (an order, an
+    # entitlement, a shift, a variant) declares its problem types and an x-ticvai-read-via to the owner's declared
+    # query (a ratchet over the 160 known); batch GEN's check-cross-module-reads covers the lineage side.
+    "check-error-sources",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

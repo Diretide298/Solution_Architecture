@@ -4950,12 +4950,13 @@
   "path": "/auth/guest/account",
   "reads": [
    "cache:idempotency",
+   "identity.subject_holding",
    "pii.subject"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
-   "pii.subject",
-   "platform.dsar_request"
+   "pii.subject"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4970,7 +4971,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "fixNote": "14 October 2026 (ADAM CR-084, CHG-GDL-001): the 409's open orders and live entitlements are read from Identity's projection identity.subject_holding (read-via orders#openOrdersForSubject and access#liveEntitlementsForSubject, route projection); requestId is the approvals.request raised through Approvals' in-process createApprovalRequest; the job tombstones pii.subject for every guest and calls cross-region createDsarRequest (serviceAuth), which writes platform.dsar_request, only when guestLinkId is set"
  },
  "listSsoProviders": {
   "contract": "identity",
@@ -24750,18 +24752,17 @@
   "verb": "POST",
   "path": "/guests/{subjectId}/data-export",
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
+   "identity.subject_holding",
    "marketing.consent_record",
    "marketing.form_submission",
    "marketing.guest_document",
    "marketing.guest_profile",
-   "orders.sales_order",
    "pii.subject"
   ],
   "writes": [
-   "cache:idempotency",
-   "platform.dsar_request"
+   "approvals.request",
+   "cache:idempotency"
   ],
   "routing": "",
   "scope": "tenant",
@@ -24779,7 +24780,7 @@
    "guest"
   ],
   "guestCallable": true,
-  "fixNote": "4 October 2026 (CHG-FXC-004): the 202 raises a dsar_request"
+  "fixNote": "14 October 2026 (ADAM CR-084, CHG-GDL-002): the orders and entitlements it lists come from Identity's projection identity.subject_holding, not access.entitlement or orders.sales_order (ADR-0028); requestId is the approvals.request raised through createApprovalRequest; cross-region createDsarRequest, which writes platform.dsar_request, is called only when guestLinkId is set"
  },
  "simulatePromotion": {
   "contract": "promotions",

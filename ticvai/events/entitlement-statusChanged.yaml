@@ -40,7 +40,11 @@ payload:
   type: timestamp
 consumers:
 - context: identity
-  purpose: Append the episode to identity.membership_history (freeze and suspension treatment, new expiry)
+  purpose: Append the episode to identity.membership_history (freeze and suspension treatment, new expiry), and
+    set the new validTo on the entitlement's identity.subject_holding row (ADAM CR-084, CHG-GDL-001)
+  writes:
+  - identity.membership_history
+  - identity.subject_holding
   idempotencyKey: entitlementId + changedAt
   onFailure: retryThenDeadLetter
   isCritical: false

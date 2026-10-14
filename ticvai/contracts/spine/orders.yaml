@@ -90,6 +90,23 @@ tags:
 - name: reservation
 - name: policy
 - name: sync
+x-ticvai-queries:
+  # Rule questions other modules ask Orders, answered by the owner (ADR-0055 amendment, 14 October 2026; the shape is
+  # the r6 shared convention: module, inputs, returns, rule, served). An asking operation names one in
+  # `x-ticvai-read-via`.
+  openOrdersForSubject:
+    module: orders
+    inputs:
+      subjectId: {type: string, format: uuid, description: The guest (pii.subject).}
+    returns:
+      orderIds: {type: array, items: {type: string, format: uuid}, description: The guest's open orders; empty when none.}
+    rule: >-
+      An order is open while its status (`OrderStatus`, states/order.yaml) is `pending`, `held`, `partiallyPaid` or
+      `paid`: not yet paid, or paid and not yet fulfilled. `completed`, `voided`, `refunded`, `partiallyRefunded` and
+      `failed` are not open (ADAM CR-084, CHG-GDL-001).
+    served: [projection]
+    # projection: Identity's identity.subject_holding, fed by order.created, order.paid, order.completed,
+    # order.cancelled, order.lapsed, order.refunded and guest.merged (each lists the identity consumer).
 paths:
   /carts:
     post:

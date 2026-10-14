@@ -1,0 +1,150 @@
+id: CHG-GDL-001
+date: '2026-10-14'
+source: developer
+kind: contract
+summary: 'deleteGuestAccount says what blocks it and where Identity reads it: open-orders-remain and live-entitlement-remains
+  (409, problem types) answered from a new Identity projection identity.subject_holding fed by the order and entitlement
+  events, with the rules declared by their owners (orders#openOrdersForSubject, access#liveEntitlementsForSubject,
+  x-ticvai-read-via route projection); requestId is the approvals.request raised through createApprovalRequest; every
+  guest is tombstoned locally and only a linked guest calls createDsarRequest. A new check fails a 4xx naming another
+  module''s record without problem types and a read-via.'
+decision:
+  what: 'Part 1: an order blocks when its status is pending, held, partiallyPaid or paid; an entitlement blocks when its
+    status is issued or partiallyConsumed and valid_to > now() (the enum values in states/order.yaml and
+    states/entitlement-status.yaml / access.entitlement CHECK; unchanged from the decision). The 409 lists problem types
+    open-orders-remain (the slug shift.yaml''s closeShift 409 already uses for its open orders) and
+    live-entitlement-remains. Identity reads neither orders.sales_order nor access.entitlement: a new never-returned
+    schema SubjectHolding persists to identity.subject_holding (subject_id, holding_kind order|entitlement, holding_id,
+    order_id, order_line_id, status, valid_to, last_event_at, updated_at; unique (holding_kind, holding_id)), written
+    by Identity consumers added to entitlement.issued, .voided, .transferred, .reissued, .statusChanged, order.created,
+    .paid, .completed, .cancelled, .refunded and guest.merged, as entitlement.statusChanged already feeds
+    identity.membership_history. The owners declare the rules in top-level x-ticvai-queries (access.yaml
+    liveEntitlementsForSubject, orders.yaml openOrdersForSubject, served [projection]) and deleteGuestAccount names
+    them in x-ticvai-read-via. The erasure job re-checks both conditions when it runs and erases nothing if one holds.
+    Part 3: requestId (now required) is the approvals.request id, raised in-process through Approvals''
+    createApprovalRequest (ADR-0055 rule 3); no mandatory human approval for the guest''s own request (ADR-0047 section
+    7), the tenant matrix may add one; estimatedCompletionAt nullable, null until a response period reaches Identity.
+    Part 2: the job tombstones pii.subject (is_erased, erased_at, erasure_request_id = requestId) for every guest and
+    calls cross-region createDsarRequest (kind erasure, serviceAuth) only when GuestSession.guestLinkId is set; the
+    lineage drops platform.dsar_request and adds identity.subject_holding (read) and approvals.request (write), so
+    IdentityService.md (derived from the lineage) follows at the refresh; XDW-011 now names createDsarRequest as the
+    only writer.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-084 (ticket 30654, settled at the r6 settlement on 14 October 2026). Evidence: the 409 at
+  contracts/spine/identity.yaml (r5) 2601-2603 named no problem type and defined neither "open orders" nor "unexpired
+  entitlement"; access.entitlement status and valid_to are 010-access.sql:835,838; order statuses
+  states/order.yaml:11-16. Identity is Foundation and "reads nothing above" (ADR-0028:113); Access is another deployable
+  (ADR-0055:60, rule 4); the lineage read only cache:idempotency and pii.subject, while ticket 30654''s done-when says
+  "reads and writes only the tables its spec lists" (handoff/service-docs/tasks.csv:105). createDsarRequest requires
+  guestLinkId (cross-region.yaml:856-859), platform.dsar_request.guest_link_id is NOT NULL, GuestSession.guestLinkId is
+  nullable (identity.yaml:7592-7595) and "a guest who never transacts across regions never acquires a link"
+  (cross-region.yaml:91), yet the lineage and IdentityService.md:549 listed platform.dsar_request as an unconditional
+  write. The tombstone exists (010-pii.sql:28-30, ADR-0047:29-31,166-167) and pii.subject.erasure_request_id references
+  approvals.request (910:2034). The projection precedent is events/entitlement-statusChanged.yaml:43,57-58.'
+keys_touched:
+  operations:
+  - deleteGuestAccount
+  tables:
+  - identity.subject_holding
+  - pii.subject
+  - approvals.request
+  - platform.dsar_request
+  schemas:
+  - SubjectHolding
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/orders.yaml
+  - events/entitlement-issued.yaml
+  - events/entitlement-voided.yaml
+  - events/entitlement-transferred.yaml
+  - events/entitlement-reissued.yaml
+  - events/entitlement-statusChanged.yaml
+  - events/order-created.yaml
+  - events/order-paid.yaml
+  - events/order-completed.yaml
+  - events/order-cancelled.yaml
+  - events/order-refunded.yaml
+  - events/order-lapsed.yaml
+  - events/guest-merged.yaml
+  - states/order.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - handoff/cross-deployable-writes.md
+  - handoff/api-data-lineage.json
+  - handoff/audit-baseline.json
+  - tools/applied/r6-cr084-delete-guest-account.py
+  - tools/check-error-sources.py
+  - tools/run-checks.py
+  tickets:
+  - '30654'
+  other:
+  - x-ticvai-queries access#liveEntitlementsForSubject
+  - x-ticvai-queries orders#openOrdersForSubject
+  - event order.lapsed (new)
+  - XDW-011
+root_class: A19 ERRORS-AND-STATES
+tickets:
+  started:
+  - '30654'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-084
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+
+
+  PREVENTION: tools/check-error-sources.py (registered in run-checks.py) fails a 4xx response whose description names
+  a record another module owns (order, entitlement, shift, variant, product, performance, payment, ... each mapped to its
+  table; the owner read from handoff/service-decomposition.json) unless the response declares x-ticvai-problem-types
+  (E-PROBLEM-TYPE) and the operation has an x-ticvai-read-via to a query that module declares (E-READ-VIA); E-QUERY
+  fails a read-via naming an undeclared query or a route it does not serve. Run on the parent commit r5 (1eb1d063: the
+  r5 identity, access and orders contracts and lineage restored over this branch) it FAILS with deleteGuestAccount 409
+  in both rules ("names entitlement (AccessService), order (OrderService)"); on this branch it PASSES with 160 other
+  pre-existing findings baselined in handoff/audit-baseline.json (65 E-PROBLEM-TYPE, 95 E-READ-VIA: among them
+  configureWorkstation CR-083, createSaleBoard and updateSaleBoard CR-081, rescheduleOrder, transferOrderTickets,
+  modifyOrder, addToWishlist, transitionProductLifecycle, planTenantMigration from the audit''s hidden-refusal list).
+  deleteGuestAccount is not baselined. Batch GEN''s check-cross-module-reads covers the lineage side; the two share the
+  x-ticvai-queries / x-ticvai-read-via shape of the r6 convention.
+
+
+  DETAILS CHOSEN (the decision left them open): (1) order.lapsed is a new event (pending -> failed on createPayment,
+  held -> voided on the hold timer; states/order.yaml emits it): those were the only ways out of an open order with no
+  event, so without it a declined checkout would block the guest''s erasure for ever. Not order.cancelled, which the AI
+  reads as a cashier''s void. (2) entitlement.issued gains an optional orderLineId (additive) so a partial refund''s
+  lineIds reach only their entitlements. (3) Consumption is not projected (access.validated carries no status): a pass
+  used up before its validTo counts as live until validTo, which errs towards refusing. (4) createDsarRequest is not
+  declared as x-ticvai-write-via: platform.dsar_request is in the platform schema TenancyService owns in commerce, the
+  same deployable as Identity, so check-cross-deployable-writes would call the route stale (X-STALE) and name the wrong
+  owner (X-OPERATION); the call is stated in the description and the lineage fixNote. XDW-011 stays for createDsarRequest
+  itself (CrossRegion in operations writing the platform schema), now a plain misplaced table; the Identity half is
+  closed. (5) estimatedCompletionAt: the package''s response periods are marketing-crm setPrivacyRequestTypes
+  deadlines[].responseDays (PrivacyRequest.dueAt); Identity does not read them, so it is always null for now.
+
+
+  OPEN FOR THE LEAD: (a) a pending order with no payment attempt never leaves pending (states/order.yaml has no
+  timer out of pending), so an abandoned checkout blocks the guest''s erasure under the decided rule; (b)
+  linkGuestCheckout attaches guest-checkout orders to the account without an event, so those orders and their
+  entitlements reach the projection only through later order events; (c) exportSubjectData still reads four marketing.*
+  tables (CHG-GDL-002); (d) createDsarRequest takes no requestId although platform.dsar_request.request_id references
+  approvals.request: the Block B ticket should add it (additive); (e) check-problem-types now counts 706 (ceiling 707):
+  lower CEILING at the merge, with the other batches'' reductions; (f) [DB] the forward migration (derive-ddl:
+  identity.subject_holding, its unique index, apply_subject_rls) is written by the gate.
+
+
+  TICKET SPLIT the lead should make in OpenProject (30654 is started: a comment plus linked delta tickets, never a
+  rewrite): (1) now, after access.issueOrderEntitlements exists (it publishes entitlement.issued): the local path, the
+  202 with the approvals.request, the 409 with both problem types read from identity.subject_holding, the projection
+  consumers and the erasure job''s local tombstone and re-check; (2) Block B, with cross-region createDsarRequest and
+  createGuestLink: the fan-out for a linked guest. MODULE TEST: deleteGuestAccount is built by SVC-IDENTITY-GUESTAUTH-1
+  in AM-IDENTITY-SECURITY-P01, but its screens WEB-024 and GST-066 sit in AM-MARKETING-CRM-P01/P02, and
+  tools/build-service-docs.py (CHG-FXP-006) lists in a module test only the operations its own screens call, so neither
+  TEST-AM-IDENTITY-SECURITY-P01 (tasks.csv:118) nor the Marketing module tests list it. tasks.csv is generated, not
+  authored, and changing that rule changes every module test: not done here. Recommendation: the delta ticket''s
+  done-when names TEST-AM-MARKETING-CRM-P01 (WEB-024) as the module test that exercises deleteGuestAccount''s 202 and
+  both 409s.'

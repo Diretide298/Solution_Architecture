@@ -69,6 +69,26 @@ tags:
 - name: validation
 - name: sync
 - name: accessPoint
+x-ticvai-queries:
+  # Rule questions other modules ask Access, answered by the owner (ADR-0055 amendment, 14 October 2026; the shape is
+  # the r6 shared convention: module, inputs, returns, rule, served). An asking operation names one in
+  # `x-ticvai-read-via`.
+  liveEntitlementsForSubject:
+    module: access
+    inputs:
+      subjectId: {type: string, format: uuid, description: The guest (pii.subject).}
+    returns:
+      entitlementIds: {type: array, items: {type: string, format: uuid}, description: The guest's live entitlements; empty when none.}
+    rule: >-
+      An entitlement is live while its status is `issued` or `partiallyConsumed` and its `validTo` is after now. A frozen
+      or suspended pass is still `issued` (states/entitlement-status.yaml), so it is live. `fullyConsumed`, `expired`,
+      `cancelled` and `surrendered` are not. Deleting a guest's account while one is live strands the guest at a gate
+      (ADAM CR-084, CHG-GDL-001).
+    served: [projection]
+    # projection: Identity's identity.subject_holding, fed by entitlement.issued, entitlement.voided,
+    # entitlement.transferred, entitlement.reissued, entitlement.statusChanged, order.refunded and guest.merged (each
+    # lists the identity consumer). A pass used up before its validTo stays live there until validTo (access.validated
+    # carries no status), which errs towards refusing a deletion.
 paths:
   /access/validate:
     post:

@@ -150,10 +150,12 @@ exceptions:
   operation: createDsarRequest
   table: platform.dsar_request
   kind: misplaced-table
-  reason: 'CrossRegionService''s DSAR record (source cross-region.DsarRequest) in the platform schema; Identity (commerce)
-    also raises one from deleteGuestAccount and exportSubjectData. No commerce operation raises a cross-cell DSAR
-    for CrossRegion to call. Removed with the platform-schema decision above, or when Identity publishes an
-    operation that raises a DSAR and createDsarRequest calls it.'
+  reason: 'CrossRegionService''s DSAR record (source cross-region.DsarRequest) in the platform schema, which TenancyService
+    owns in commerce. Since 14 October 2026 (ADAM CR-084, CHG-GDL-001) createDsarRequest is its only writer:
+    deleteGuestAccount and exportSubjectData no longer write it, they raise an approvals.request and call
+    createDsarRequest (serviceAuth) only for a guest linked across cells, so the Identity half of this entry is
+    closed. What is left is a misplaced table like XDW-006 to XDW-010: removed with the platform-schema decision above
+    (the table moving into sync, or a table-level grant to the operations role).'
   added: '2026-10-12'
   removal_release: r5
 - id: XDW-012
