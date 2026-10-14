@@ -10517,6 +10517,13 @@ screens:
     invalidates:
     - searchMedia
     - getMediaUsageAnalytics
+  - operationId: analyseMediaAsset
+    contract: assets
+    purpose: Auto-tag on ingest
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - getMediaAsset
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-063
@@ -11058,6 +11065,11 @@ screens:
     contract: assets
     purpose: Its revisions
     trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: getMediaDistribution
+    contract: assets
+    purpose: Where it is used
+    trigger: onLoad
     provenance: board reading, 19 September 2026
   entryState:
     preloaded:
@@ -11626,6 +11638,13 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates:
     - searchMedia
+    - getMediaAsset
+  - operationId: analyseMediaAsset
+    contract: assets
+    purpose: Auto-tag and describe
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
     - getMediaAsset
   wireframe:
     status: notStarted

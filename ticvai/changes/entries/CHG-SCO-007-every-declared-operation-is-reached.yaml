@@ -3,25 +3,26 @@ date: '2026-10-14'
 source: audit
 kind: spec
 summary: 'On P07 and P09 to P17, every operation a screen declares is reached by one of its existing components, or
-  leaves the screen because nothing on the approved screen calls or shows it; 135 stay as keeps (client-approved UI).'
+  leaves the screen because nothing on the approved screen calls or shows it; 160 stay as keeps (client-approved UI).'
 decision:
   what: 'For each unreached operation on the other platforms'' screens (498): a read binds the unbound display
     components that show its response (by the schema they name, then by their label; "The selected X" with the read
     behind "Every X"; a screen''s tiles with the read that computes them), a write binds the unbound button whose
     label says its verb, the screen''s one unlabelled primary act, or, on an editor, the unbound inputs that collect
     its body; one confirm dialog that already collects a body names its operation. An operation nothing on the
-    approved screen calls or shows leaves the screen''s apis (144). No component is added, removed, moved or
-    relabelled. An operation stays (a keep, 135) where removing it would leave the screen binding nothing (the NP
+    approved screen calls or shows leaves the screen''s apis (119). No component is added, removed, moved or
+    relabelled. An operation stays (a keep, 160) where removing it would leave the screen binding nothing (the NP
     ratchet), make a read or no-access finding (READ, P3), leave one operation read off the title, break a flow or a
-    carried id, split or make an identical screen group, or where its button has nothing on the approved screen to
+    carried id, split or make an identical screen group, move its backend task under a feature none of whose screens calls it
+    (check-ticket-scope S-FEATURE-OP-UNUSED, through the plan composition rule), or where its button has nothing on the approved screen to
     collect the body, or the approved design-r1 frame of a Block A screen draws it.'
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, class check-screen-wiring S-OP-UNREACHED (R273; audit root class A30
-  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
   your recommendation"): an operation no component reaches: wire onLoad reads to the load; otherwise remove it from
   the screen. The approved UI is fixed (lead, 14 October), so wiring uses only components the approved screen
-  already has. On these platforms: 498 members before, 135 after, all keeps (listed with reasons in the batch
+  already has. On these platforms: 498 members before, 160 after, all keeps (listed with reasons in the batch
   hand-back).'
 keys_touched:
   screens: [ACC-002, ACC-003, ACC-004, ACC-006, ACC-007, ACC-008, ADM-004, ADM-009, ADM-037, ADM-068, ADM-369,

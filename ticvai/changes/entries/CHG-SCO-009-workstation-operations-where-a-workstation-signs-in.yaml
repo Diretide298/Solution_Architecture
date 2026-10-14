@@ -20,7 +20,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, class check-screen-wiring S-WORKSTATION-OP (R100; audit root class A31
-  SCREEN-WRONG-OP), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  SCREEN-WRONG-OP), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
   your recommendation"): a workstation-scoped operation is called only from a platform that signs a workstation in.
   On these platforms: 34 members before, 12 after (P10, keeps).'
 keys_touched:

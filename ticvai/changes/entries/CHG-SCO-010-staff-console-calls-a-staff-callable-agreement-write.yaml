@@ -14,7 +14,7 @@ decision:
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, classes check-screen-wiring S-STAFF-AUDIENCE (R254, CHG-WIR-001) and
   check-audience-match AM-STAFF-OP (audit root class A31 SCREEN-WRONG-OP), evidence
-  audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with your recommendation"): staff
+  the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with your recommendation"): staff
   screens call the staff variant of a guest operation; S-STAFF-AUDIENCE as AM-STAFF-OP. On these platforms: 1 member
   of each before, 0 after.'
 keys_touched:

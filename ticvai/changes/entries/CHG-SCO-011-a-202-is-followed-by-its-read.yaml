@@ -3,8 +3,7 @@ date: '2026-10-14'
 source: audit
 kind: spec
 summary: 'The CMS content screens follow their asynchronous AI drafts: CMS-008 polls listProposedActions after
-  proposeMarketingContent and decideProposedAction answer 202; the 202 analyses on CMS-063 and CMS-072 left with
-  their unreached operations (CHG-SCO-007).'
+  proposeMarketingContent and decideProposedAction answer 202; four stay as keeps.'
 decision:
   what: 'CMS-008 declares listProposedActions (onInterval): each draft proposeMarketingContent queues is an
     ai.proposed_action, and decideProposedAction routes one to Approvals; the read follows them until applied or
@@ -14,9 +13,10 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, class check-screen-wiring S-ASYNC-POLL (R288; audit root class A30
-  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
   your recommendation"): a 202 operation''s screen reads the job or record that follows it. On these platforms: 6
-  members before, 2 after (CMS-007, keeps).'
+  members before, 4 after (keeps: CMS-007 twice; CMS-063 and CMS-072 analyseMediaAsset, whose approved screens show no
+  asset to read and which stay because removing the operation moves its backend task, CHG-SCO-007).'
 keys_touched:
   screens: [CMS-008]
   operations: [listProposedActions, proposeMarketingContent, decideProposedAction]

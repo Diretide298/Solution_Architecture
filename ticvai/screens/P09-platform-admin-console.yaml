@@ -11913,6 +11913,11 @@ screens:
     purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
+  - operationId: scoreVsiAssessment
+    contract: subscription
+    purpose: Their VSI and model
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Customers by VSI
@@ -12763,6 +12768,11 @@ screens:
     purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
+  - operationId: getPlanRecommendations
+    contract: subscription
+    purpose: Commercial recommendations beside the enforcement position
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Active Customers
@@ -13916,6 +13926,11 @@ screens:
     purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
+  - operationId: listLicensingModels
+    contract: subscription
+    purpose: The rules engine
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-389
@@ -20467,6 +20482,11 @@ screens:
     purpose: Right-sizing options
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getPlanRecommendations
+    contract: subscription
+    purpose: Upgrade, downgrade and right-sizing recommendations for the tenant, priced
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-465
@@ -20666,6 +20686,16 @@ screens:
     purpose: Credits against the tenant's invoices
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: cancelInvoice
+    contract: subscription
+    purpose: Credit or cancel
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: disputeInvoice
+    contract: subscription
+    purpose: Raise a dispute
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-467
@@ -21004,6 +21034,11 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: attachConfigurationSource
+    contract: ai
+    purpose: Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Museum
@@ -21227,6 +21262,16 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: attachConfigurationSource
+    contract: ai
+    purpose: Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listConfigurationSources
+    contract: ai
+    purpose: Attached documents with extraction status and what they could not read
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-470
@@ -22599,6 +22644,16 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: attachConfigurationSource
+    contract: ai
+    purpose: Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listConfigurationSources
+    contract: ai
+    purpose: Attached documents with extraction status and what they could not read
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-477
@@ -26020,6 +26075,11 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: retryActionStep
+    contract: ai
+    purpose: Retry a failed step
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Venue ✓
@@ -27644,6 +27704,11 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: configureForecastSignalSource
+    contract: ai
+    purpose: Set up a forecast signal
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-501
@@ -37300,6 +37365,16 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: exportAiEvidencePackage
+    contract: ai
+    purpose: Export an evidence package
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: searchAiDecisions
+    contract: ai
+    purpose: Find AI decisions
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-547
@@ -37482,6 +37557,11 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: replayAiDecision
+    contract: ai
+    purpose: Re-simulate a decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Model v3.2
@@ -37992,6 +38072,16 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: listAiRiskRegister
+    contract: ai
+    purpose: The AI risk register
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setAiRiskRegisterEntry
+    contract: ai
+    purpose: Record or update a risk register entry
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-550
@@ -39617,6 +39707,16 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: exportAiEvidencePackage
+    contract: ai
+    purpose: Export an evidence package
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiRiskRegister
+    contract: ai
+    purpose: The AI risk register
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-557
@@ -39776,6 +39876,11 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: listAiRiskRegister
+    contract: ai
+    purpose: The AI risk register
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-558

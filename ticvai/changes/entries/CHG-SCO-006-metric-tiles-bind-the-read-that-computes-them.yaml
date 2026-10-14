@@ -16,7 +16,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, class check-screen-wiring S-METRIC-NO-OP (R283; audit root class A30
-  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
   your recommendation"): a metric tile binds the read that computes it, or is removed. The approved UI is fixed
   (lead, 14 October), so no tile is removed: where the read did not exist, the contract gains it (AUDIT-FIX-RULES:
   a contract operation only where the approved UI needs one). On these platforms: 410 members before, 0 after.'

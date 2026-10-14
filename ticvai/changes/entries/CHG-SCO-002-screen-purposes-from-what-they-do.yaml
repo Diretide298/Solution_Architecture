@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, class check-screen-wiring S-PURPOSE-BOILERPLATE (CHG-WIR-003; audit root
-  class A30 SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October:
+  class A30 SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October:
   "go with your recommendation"): a screen purpose written from what the screen does, not the template. A partner
   portal screen saying "for this venue" names a scope its user does not have, and two app homes said only that they
   were homes. On these platforms: 11 members before, 0 after.'

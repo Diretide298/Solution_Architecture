@@ -18,7 +18,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, class check-screen-wiring S-NO-READ (R265; audit root class A30
-  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
   your recommendation"): a screen that edits a record reads it first. The approved UI is fixed (lead, 14 October),
   so a read is added only where a component of the approved screen shows what it returns. On these platforms: 41
   members before (3 left with the writes removed under CHG-SCO-007), 36 after, all keeps.'

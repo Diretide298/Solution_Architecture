@@ -12,7 +12,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, class check-screen-wiring S-EXPORT (R293; audit root class A30
-  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
   your recommendation"): an Export control binds an export operation, or is removed; the approved UI is fixed (lead,
   14 October), so the control stays and is bound where an operation exists. On these platforms: 2 members before,
   1 after (CMS-054, a keep).'

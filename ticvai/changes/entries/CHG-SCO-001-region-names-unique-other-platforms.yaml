@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit of 14 October 2026, class check-screen-wiring S-DUP-REGION (R253, audit root class A30
-  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  SCREEN-GENERATED), evidence the classes.json of the Block A audit run audit-1014. Ruling (triage, lead 14 October: "go with
   your recommendation"): region names unique per screen, rename the second. A second `contentBody` is invisible to
   every reader that keys regions by name, which is how a generated table disappeared from a wireframe. The approved
   UI is fixed (lead, 14 October), so the regions are renamed rather than merged. On these platforms: 48 members
