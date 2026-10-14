@@ -619,9 +619,8 @@ screens:
       - kind: detailPanel
         label: Workstation health
         operation: getWorkstationHealth
-        bindsTo: WorkstationHealth
-        notes: Shows `score`, `status`, `contributors` from `getWorkstationHealth` (tenancy
-          `WorkstationHealth`, named in the Block A audit, CHG-SCP-011).
+        notes: Shows `score`, `status`, `contributors` from `getWorkstationHealth`'s inline response.
+          **The response has no named schema**, so this cannot bind until the contract names one.
         provenance: contract tenancy.yaml GET /workstations/{workstationId}/health
       - kind: detailPanel
         label: The shift
