@@ -95,7 +95,6 @@ LINEAGE = {
     "getSeatInventory": {"reads+": ["seating.section_row"]},
     "deleteBanner": {"writes+": ["whitelabel.banner"]},
     "deleteContentPage": {"writes+": ["whitelabel.content_page"]},
-    "getGuestMenu": {"reads+": ["fnb.menu"]},
     "getOutletStock": {"reads+": ["retail.merchandise"]},
     "searchMedia": {"reads+": ["assets.media_collection_member"]},
     "cancelMerchandiseReservation": {"writes+": ["retail.reservation"]},

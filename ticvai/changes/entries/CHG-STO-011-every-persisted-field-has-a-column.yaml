@@ -6,12 +6,12 @@ summary: A persisted schema's every field has a column, a child table or a state
   shares Orders' Invitation's name, and EntitlementSummary is a projection.
 decision:
   what: 'marketing-crm Invitation renamed CampaignInvitation (its one $ref follows; the wire is unchanged), so derive-schema
-    stops reading Orders'' complimentary Invitation into marketing.invitation; Orders'' graph keys left there are retired.
-    orders.EntitlementSummary persistence ''none - projection of access.entitlement and its product'' (it named catalogue.entitlement_template).
-    tools/check-contract-storage.py ST-FIELD-NO-COLUMN reads storage as derive-schema and SP-ARRAY-NOWHERE do: a child table
-    built from the array (`<Schema>.<prop>[]` sources), items that are rows of a table of their own, or a $ref to a shape
-    the contract says is computed. tools/ddl_forward.py SCOPE_FILL_FROM: orders.invitation''s new scope_path is backfilled
-    from its product (it followed the product at r1).'
+    stops reading Orders'' complimentary Invitation into marketing.invitation; Orders'' graph keys left there are retired;
+    states/invitation.yaml names the enum''s schema. orders.EntitlementSummary persistence ''none - projection of access.entitlement
+    and its product'' (it named catalogue.entitlement_template). tools/check-contract-storage.py ST-FIELD-NO-COLUMN reads
+    storage as derive-schema and SP-ARRAY-NOWHERE do: a child table built from the array (`<Schema>.<prop>[]` sources),
+    items that are rows of a table of their own, or a $ref to a shape the contract says is computed. tools/ddl_forward.py
+    SCOPE_FILL_FROM: orders.invitation''s new scope_path is backfilled from its product (it followed the product at r1).'
   by: Chinmay
   date: '2026-10-14'
 why: 'Block A audit before r6, class check-contract-storage/ST-FIELD-NO-COLUMN (171 at audit-base b93b5a87, 0 after; most
@@ -30,6 +30,7 @@ keys_touched:
   files:
   - contracts/satellite/marketing-crm.yaml
   - contracts/spine/orders.yaml
+  - states/invitation.yaml
   - tools/applied/sto-storage-14-october.py
   - tools/check-contract-storage.py
   - tools/ddl_forward.py

@@ -15,7 +15,7 @@ decision:
     a role in front (effectiveForVenueId).'
   by: Chinmay
   date: '2026-10-14'
-why: 'Block A audit before r6, class check-parameter-columns/P-PARAM-NO-COLUMN (102 at audit-base b93b5a87, 13 after: keeps),
+why: 'Block A audit before r6, class check-parameter-columns/P-PARAM-NO-COLUMN (102 at audit-base b93b5a87, 14 after: keeps),
   evidence audit/ticvai/runs/audit-1014/classes.json; triage ruling "An <x>Id parameter matches a column in the operation''s
   lineage." (Sprint 1-2 judging, CHG-FXC-003).'
 keys_touched:
@@ -37,10 +37,12 @@ prevention:
   type: check
   ref: tools/check-parameter-columns.py
 status: open
-notes: 'Batch STO. Keeps (13), each a cross-module data path or an undecided store, in the hand-back: getBillingStatement.statementId
-  (no table holds a billing statement), listBookableVenueMaps.productId (the product''s variants are Catalogue''s), listCustomerSatisfactionFeedback
-  eventId and productId, listEscalationCriticalCase.eventId, listServiceRootCause compareId, eventId and productId, listPrivacyCompliance.productId
-  (each through the order''s lines, Orders'' tables), listPrivacyConsent.policyId (White label''s policies), listMembershipUpgradeDowngrade.bulkMigrationId
+notes: 'Batch STO. Keeps (14), each a cross-module data path, an undecided store or a plan change, in the hand-back: getGuestMenu.outletId
+  (its lineage omits fnb.menu, the outlet''s menu; naming it moves SVC-FNB-MENU-1 from AM-FOOD-BEVERAGE-P04 to AM-ORDERS-RESERVATIONS-P02,
+  a plan change for the lead), getBillingStatement.statementId (no table holds a billing statement), listBookableVenueMaps.productId
+  (the product''s variants are Catalogue''s), listCustomerSatisfactionFeedback eventId and productId, listEscalationCriticalCase.eventId,
+  listServiceRootCause compareId, eventId and productId, listPrivacyCompliance.productId (each through the order''s lines,
+  Orders'' tables), listPrivacyConsent.policyId (White label''s policies), listMembershipUpgradeDowngrade.bulkMigrationId
   (orders.membership_migration), reconcileBurstEnvironment.burstEnvironmentId (sync.rejection keys a workstation, CF-162),
   resolveProductByCode.partnerId (no partner SKU mapping is stored). A cross-module read needs the owner''s declared query
   (batch MOD, XR-UNCOVERED). Migration effect: the new keys are nullable ADD COLUMNs in V0104 (with their indexes and, for

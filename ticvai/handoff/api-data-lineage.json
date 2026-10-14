@@ -15787,7 +15787,6 @@
   "verb": "GET",
   "path": "/outlets/{outletId}/guest-menu",
   "reads": [
-   "fnb.menu",
    "fnb.modifier_group",
    "fnb.modifier_option"
   ],
