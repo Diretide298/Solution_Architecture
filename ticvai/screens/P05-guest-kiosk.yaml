@@ -1630,6 +1630,11 @@ screens:
     why: '**`getAvailability` declares its response inline**, so the component that shows it names fields
       but binds to no schema. The contract should name the shape.'
     source: contract catalogue.yaml GET /availability
+  - operation: recordAnswerFeedback
+    removed: true
+    why: The client-approved screen has no Helpful / Not helpful control.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
   layout:
     template: split
     regions:
@@ -1699,11 +1704,6 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
-  - operationId: recordAnswerFeedback
-    contract: ai
-    purpose: Say whether an answer helped
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: createAiConversation
     contract: ai
     purpose: Opened silently on the first tap; the kiosk session is the scope

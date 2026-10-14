@@ -672,23 +672,9 @@ screens:
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)
   - operationId: getCookieConsentRuntime
     contract: marketing-crm
-    purpose: Tracking consent prompt on first launch and the SDK gate
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: recordDeviceConsent
-    contract: marketing-crm
-    purpose: Accept, reject or customise tracking on first launch
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: decideRecommendations
-    contract: ai
-    purpose: 'Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)'
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: recordRecommendationEvents
-    contract: ai
-    purpose: Report impressions, clicks and declines of recommended items
-    trigger: onAction
+    purpose: 'Read by the app shell, not a control: which tracking categories this device has granted,
+      so SDKs and the tag loader start only for those (none until granted)'
+    trigger: background
     provenance: build, 29 September 2026
   - operationId: recordStorefrontSessionEvents
     contract: white-label
@@ -760,6 +746,24 @@ screens:
     why: Replaced by `getMyProfile`, the guest's own profile; `getGuestProfile` is the staff read by subject
       and returns the CRM fields (engagement score, lifetime value, tags).
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+  - operation: decideRecommendations
+    removed: true
+    why: The client-approved Home has no recommendation slot, so nothing shows a decision;
+      recommendations show in the cart slot (WEB-008, GST-048).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: recordRecommendationEvents
+    removed: true
+    why: 'Goes with decideRecommendations: no recommended item is shown here to report on.'
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: recordDeviceConsent
+    removed: true
+    why: The client-approved UI has no tracking-consent banner or prompt, so nothing records a decision
+      here and tracking stays off (getCookieConsentRuntime). A consent prompt needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-002
   name: Explore
   module: Discovery & Browse
@@ -1964,8 +1968,10 @@ screens:
     trigger: onAction
   - operationId: getCart
     contract: orders
-    purpose: The cart's `consentQuestions` after the time is added
-    trigger: onAction
+    purpose: 'Read by the screen right after addCartLine, not a control: the cart''s consentQuestions,
+      which open the consent questions pop-up; with the guest session the device already holds: signed
+      in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
+    trigger: background
   - operationId: recordConsentAnswers
     contract: marketing-crm
     purpose: Record the answers to the booking's consent questions
@@ -2932,7 +2938,7 @@ screens:
       - kind: toggle
         label: Auto top-up
         bindsTo: WalletAutoReloadSetting.enabled
-        operation: setWalletAutoReloadSetting
+        operation: getWalletAutoReloadSetting
         provenance: contract wallet.yaml WalletAutoReloadSetting.enabled (defined 4 October 2026, CHG-FXS-003)
       - kind: numberField
         label: When the balance falls below
@@ -2990,16 +2996,6 @@ screens:
     purpose: Set auto top-up
     trigger: onAction
     provenance: build, 29 September 2026
-  - operationId: getWalletExitBalance
-    contract: wallet
-    purpose: Balance due / refundable at exit
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: settleWalletAtExit
-    contract: wallet
-    purpose: Settle the wallet at exit
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: getGameCard
     contract: games
     purpose: Balance on a game card
@@ -3050,6 +3046,17 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  gaps:
+  - operation: getWalletExitBalance
+    removed: true
+    why: The client-approved wallet screen shows no balance due or refundable at exit.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: settleWalletAtExit
+    removed: true
+    why: The client-approved wallet screen has no control to settle the wallet at exit.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-012
   name: My Tickets
   module: Account & Self-Service
@@ -3840,16 +3847,6 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  - operationId: listInstalmentPlans
-    contract: payments
-    purpose: Instalment plans and schedule
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: createInstalmentPlan
-    contract: payments
-    purpose: Pay in instalments
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     params:
     - name: guestLinkId
@@ -3943,6 +3940,16 @@ screens:
     removed: true
     why: The staff-shaped membership list; the guest's own are `getMyMemberships`.
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+  - operation: listInstalmentPlans
+    removed: true
+    why: The client-approved membership screen shows no instalment plans.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: createInstalmentPlan
+    removed: true
+    why: The client-approved membership screen has no control to pay in instalments.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-016
   name: My Reservations
   module: Ticketing
@@ -6867,11 +6874,6 @@ screens:
     contract: marketing-crm
     purpose: Pass an assistant conversation to a person
     trigger: onAction
-  - operationId: recordAnswerFeedback
-    contract: ai
-    purpose: Say whether an answer helped
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     params:
     - name: cartId
@@ -6985,6 +6987,12 @@ screens:
       - summary
       - preferredQueueId
     provenance: client-verified
+  gaps:
+  - operation: recordAnswerFeedback
+    removed: true
+    why: The client-approved screen has no Helpful / Not helpful control (GST-031 has it).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-033
   name: AI Concierge – Contextual Help
   module: Engagement & Support
@@ -7526,6 +7534,17 @@ screens:
     why: '**`getLoyaltyPosition` declares its response inline**, so the component that shows it names
       fields but binds to no schema. The contract should name the shape.'
     source: contract marketing-crm.yaml GET /loyalty/position
+  - operation: decideRecommendations
+    removed: true
+    why: The client-approved Loyalty & Rewards has no recommendation slot, so nothing shows a decision;
+      recommendations show in the cart slot (WEB-008, GST-048).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: recordRecommendationEvents
+    removed: true
+    why: 'Goes with decideRecommendations: no recommended item is shown here to report on.'
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
   layout:
     template: split
     regions:
@@ -7621,16 +7640,6 @@ screens:
     contract: promotions
     purpose: List promotions
     trigger: onLoad
-  - operationId: decideRecommendations
-    contract: ai
-    purpose: 'Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)'
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: recordRecommendationEvents
-    contract: ai
-    purpose: Report impressions, clicks and declines of recommended items
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listRewards
     contract: marketing-crm
     purpose: What points can be turned into
@@ -9069,9 +9078,9 @@ screens:
     - getGuestSession
   - operationId: createMfaChallenge
     contract: identity
-    purpose: 'Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at
-      a venue with guest two-step verification on'
-    trigger: onAction
+    purpose: 'Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step
+      verification on (action signIn), not a control: the code is then typed in Verification code'
+    trigger: background
   - operationId: verifyMfaChallenge
     contract: identity
     purpose: Check the code and release the session
@@ -9080,8 +9089,9 @@ screens:
     - getGuestSession
   - operationId: claimDeviceConsent
     contract: marketing-crm
-    purpose: Attach this device's tracking decision to the guest after sign-in or registration
-    trigger: onAction
+    purpose: 'Sent by the screen after sign-in or registration, not a control: attaches this device''s
+      tracking decision to the guest'
+    trigger: background
     provenance: build, 29 September 2026
   entryState:
     params:
@@ -9816,8 +9826,9 @@ screens:
     provenance: build, 29 September 2026
   - operationId: recordRecommendationEvents
     contract: ai
-    purpose: Report what happened to recommended items
-    trigger: onAction
+    purpose: 'Sent by the Suggested for you list, not a control: impressions, clicks, add-to-cart and
+      declines of the recommended items, batched'
+    trigger: background
     provenance: build, 29 September 2026
   - operationId: getCart
     contract: orders
@@ -10024,9 +10035,10 @@ screens:
     trigger: onLoad
   - operationId: relinquishSeatHold
     contract: seating
-    purpose: Release the seats held for the old performance when the guest switches time on the time bar
-      (decided 29 September, rev 3 REV3-6); a guest releases only their own hold
-    trigger: onAction
+    purpose: 'Sent by the time bar when the guest switches time, not a control: releases the seats held
+      for the old performance (decided 29 September), with the guest session the device already holds:
+      signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
+    trigger: background
   entryState:
     params:
     - name: performanceId
@@ -10432,10 +10444,6 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getWaitTimes
-    contract: queue
-    purpose: Wait times across a venue
-    trigger: onLoad
   - operationId: listProducts
     contract: catalogue
     purpose: List products
@@ -10469,6 +10477,13 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  gaps:
+  - operation: getWaitTimes
+    removed: true
+    why: The client-approved Plan questions show no wait time; the plan is built from them by
+      generateVisitPlan.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-052
   name: Suggested Itineraries
   module: Engagement & Support
@@ -10820,16 +10835,6 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getCart
-    contract: orders
-    purpose: 'The cart, priced and checked, right now With the guest session the device already holds:
-      signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided
-      2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).'
-    trigger: onLoad
-  - operationId: listProducts
-    contract: catalogue
-    purpose: List products
-    trigger: onLoad
   - operationId: getWaitTimes
     contract: queue
     purpose: Wait times across a venue
@@ -10883,6 +10888,19 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  gaps:
+  - operation: getCart
+    removed: true
+    why: The client-approved Your Plan shows no cart; Book this plan returns the cart and opens it
+      (GST-041).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: listProducts
+    removed: true
+    why: Nothing on the client-approved Your Plan lists products; swaps and additions come from
+      listVisitPlanAlternatives.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-054
   name: AI Planner
   module: Engagement & Support
@@ -11050,17 +11068,15 @@ screens:
     provenance: decided 29 September 2026, MOB-6
   - operationId: createAiConversation
     contract: ai
-    purpose: Opened on the first message to the planner, never on opening the Plan tab (a conversation
-      is billed); the plan loads without it
-    trigger: onAction
+    purpose: Opened by the screen on the first message to the planner, not a control, and only when
+      signed in; never on opening the Plan tab (a conversation is billed)
+    trigger: background
     provenance: decided 29 September 2026, MOB-6
   - operationId: requestSuggestion
     contract: ai
-    purpose: 'A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent''s
-      proposal for the plan, applied through `updateVisitPlan`. Later (CHG-RONEP-010): the planner agent''s
-      refinement in chat (AI-ENGINE-PLANNER); the rules plan still answers in A1 ships in Block A2 (Chinmay,
-      3 October); until then the control shows ''Later''.'
-    trigger: onAction
+    purpose: 'Read by the Ask the planner panel after an answer, not a control, and only when signed in:
+      the planner''s itinerary proposal that Apply this change applies'
+    trigger: background
     provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
@@ -12483,26 +12499,6 @@ screens:
     contract: marketing-crm
     purpose: Read a guest's consent state
     trigger: onLoad
-  - operationId: getCookieConsentRuntime
-    contract: marketing-crm
-    purpose: 'Tracking preferences: categories and the current decision'
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listPublishedTrackingTechnologies
-    contract: marketing-crm
-    purpose: Each SDK and tracker the app uses
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getDeviceConsentHistory
-    contract: marketing-crm
-    purpose: My tracking decisions so far
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: recordDeviceConsent
-    contract: marketing-crm
-    purpose: Change or withdraw tracking preferences
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: recordConsent
     contract: marketing-crm
     purpose: 'Withdraw or give a consent from the privacy page: withdrawal as easy as granting'
@@ -12541,6 +12537,35 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  gaps:
+  - operation: getCookieConsentRuntime
+    removed: true
+    why: The client-approved privacy screen has no tracking preference centre (categories, the trackers,
+      past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: listPublishedTrackingTechnologies
+    removed: true
+    why: The client-approved privacy screen has no tracking preference centre (categories, the trackers,
+      past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: getDeviceConsentHistory
+    removed: true
+    why: The client-approved privacy screen has no tracking preference centre (categories, the trackers,
+      past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: recordDeviceConsent
+    removed: true
+    why: The client-approved privacy screen has no tracking preference centre (categories, the trackers,
+      past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-067
   name: Refunds & Resale
   module: Account & Self-Service
@@ -13977,20 +14002,6 @@ screens:
     trigger: onAction
     invalidates:
     - listMfaMethods
-  - operationId: removeMfaMethod
-    contract: identity
-    purpose: Remove a method
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: createMfaChallenge
-    contract: identity
-    purpose: Step-up before a sensitive act at a venue that has it on
-    trigger: onAction
-  - operationId: verifyMfaChallenge
-    contract: identity
-    purpose: Check the step-up code
-    trigger: onAction
   entryState:
     params:
     - name: subjectId
@@ -14066,6 +14077,24 @@ screens:
       discards:
       - methodId
     provenance: client-verified
+  gaps:
+  - operation: removeMfaMethod
+    removed: true
+    why: The client-approved screen has no control to remove a two-step method.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: createMfaChallenge
+    removed: true
+    why: The client-approved Security & Sign-in screen asks for no step-up code; sign-in asks for the
+      second factor (GST-042).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: verifyMfaChallenge
+    removed: true
+    why: The client-approved Security & Sign-in screen asks for no step-up code; sign-in asks for the
+      second factor (GST-042).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-074
   name: Map Booking — Cabanas & Spots
   module: Booking & Selection
@@ -14811,10 +14840,6 @@ screens:
       readable with their age; the street map needs the connection. Searching departures, buying a trip
       or a pass and saving a favourite route need the connection.'
   apis:
-  - operationId: getTransportRoute
-    contract: transport
-    purpose: The route and its stops
-    trigger: onLoad
   - operationId: getTransportRouteMap
     contract: transport
     purpose: Stop list, line and bounds for the map
@@ -14866,6 +14891,13 @@ screens:
         the passengers sit under the departures on the same screen (Plan your trip).
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
+  gaps:
+  - operation: getTransportRoute
+    removed: true
+    why: 'Nothing on the client-approved screen shows it: the stops and the map come from
+      getTransportRouteMap.'
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-078
   name: Intercity Trip — Multi-trip Passes
   module: Transport
