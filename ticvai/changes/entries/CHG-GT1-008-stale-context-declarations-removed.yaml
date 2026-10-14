@@ -1,0 +1,36 @@
+id: CHG-GT1-008
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: Three operations stop declaring tables named for context that their descriptions no longer name.
+decision:
+  what: 'contracts/spine/identity.yaml recordConsentIdentifier (marketing.device_consent, platform.outbox) and updateGuestSubjectDetails
+    (platform.outbox), contracts/satellite/platform-ops.yaml replayDeadLetter (platform.outbox): x-ticvai-names-for-context
+    removed.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Class check-parameter-columns/P-NAMED-TABLE (CHG-STO-020): 4 new at the r6 release gate on r6-gate1 (23eb3d98, every
+  r6 batch merged and fully derived), 0 after (evidence docs/active/audit-runs/audit-1014/classes.json). A merge interaction:
+  CHG-STO-020 (fd792254) declared the names the descriptions then carried, and CHG-GTE-003 (987755ae) reworded those descriptions
+  to name only the owner''s tables (''the outbox'', `recordDeviceConsent`), so the declarations named nothing.'
+keys_touched:
+  operations:
+  - recordConsentIdentifier
+  - updateGuestSubjectDetails
+  - replayDeadLetter
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/platform-ops.yaml
+root_class: A22 LINEAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: 'Batch GT1. Not breaking: x-ticvai metadata only.'

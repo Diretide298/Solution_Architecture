@@ -366,10 +366,11 @@ screens:
   - id: formConfigureQueueFeed
     component: modal
     trigger: Configure queue feed
-    body: '**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`,
-      `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing
-      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in
-      the contract): `health` (3 October 2026, CHG-SPF-001).'
+    body: '**Collects what `configureQueueFeed` sends before it is called.** Required: `queueId`, `adaptor`,
+      `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the
+      contract): `health` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly
+      in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: QueueFeed
     confirm:
       label: Configure queue feed
@@ -377,7 +378,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - queueId
       - adaptor
       - isEnabled
@@ -1073,10 +1073,11 @@ screens:
   - id: formConfigureQueueFeed
     component: modal
     trigger: Configure queue feed
-    body: '**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`,
-      `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing
-      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in
-      the contract): `health` (3 October 2026, CHG-SPF-001).'
+    body: '**Collects what `configureQueueFeed` sends before it is called.** Required: `queueId`, `adaptor`,
+      `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the
+      contract): `health` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly
+      in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: QueueFeed
     confirm:
       label: Configure queue feed
@@ -1084,7 +1085,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - queueId
       - adaptor
       - isEnabled
@@ -5128,10 +5128,11 @@ screens:
   - id: formSetChannelListing
     component: modal
     trigger: Save channel listing
-    body: '**Collects what `setChannelListing` sends before it is called.** Required: `id`, `channelName`,
+    body: '**Collects what `setChannelListing` sends before it is called.** Required: `channelName`,
       `productId`, `status`. Optional: `externalProductRef`, `allocationUnits`, `priceListId`, `adapter`,
       `adapterCredentialRef`, `pushIntervalMinutes`, `guestDataScope`, `lastPushedAt`, `scopePath`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly
+      in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: ChannelListing
     confirm:
       label: Save channel listing
@@ -5139,7 +5140,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - channelName
       - productId
       - status
@@ -11670,10 +11670,12 @@ screens:
   - id: formSetOfflinePolicy
     component: modal
     trigger: Save offline policy
-    body: '**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional:
-      `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`,
-      `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked,
-      because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
+    body: '**Collects what `setOfflinePolicy` sends before it is called.** Nothing in the body is required.
+      Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`,
+      `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is
+      unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October
+      2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14
+      October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).'
     bindsTo: OfflinePolicy
     confirm:
       label: Save offline policy
@@ -11681,7 +11683,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - scopePath
       - maxOfflineHours
       - allowedOffline
       - offlineValueCeiling
@@ -20961,9 +20962,11 @@ screens:
   - id: formCreateMaintenancePlan
     component: modal
     trigger: Create maintenance plan
-    body: '**Collects what `createMaintenancePlan` sends before it is called.** Required: `id`, `name`,
+    body: '**Collects what `createMaintenancePlan` sends before it is called.** Required: `name`,
       `assetId`, `taskTemplate`. Optional: `assetCategoryId`, `intervalDays`, `usageInterval`, `leadTimeDays`,
-      `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.'
+      `lastCompletedAt`, `nextDueAt`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005):
+      `id` (CHG-GT1-002).'
     bindsTo: MaintenancePlan
     confirm:
       label: Create maintenance plan
@@ -20971,7 +20974,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - name
       - assetId
       - taskTemplate
@@ -24006,10 +24008,11 @@ screens:
   - id: formCreateSupplier
     component: modal
     trigger: Create supplier
-    body: '**Collects what `createSupplier` sends before it is called.** Required: `id`, `code`, `name`.
+    body: '**Collects what `createSupplier` sends before it is called.** Required: `code`, `name`.
       Optional: `contactName`, `contactEmail`, `contactPhone`, `taxRegistrationNumber`, `paymentTermsDays`,
       `leadTimeDays`, `currency`, `accountId`, `isActive`, `status`, `statusReason`, `minimumOrderValue`
-      and 1 more. Dismissing sends nothing; the screen behind is unchanged.'
+      and 1 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the
+      server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: Supplier
     confirm:
       label: Create supplier
@@ -24017,7 +24020,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - code
       - name
       - contactName
@@ -25649,15 +25651,16 @@ screens:
   - id: formSetAiPolicy
     component: modal
     trigger: Save AI policy
-    body: '**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `scopePath`
-      (from the session, not typed), `enabledCapabilities`. Optional: `allowedRoleIds`, `maskedFields`,
-      `requiresApprovalFor`, `ceilingBehaviour`, `ceilingWarningPercent`, `guestCapabilityScope`, `cacheAnswers`,
-      `cacheTtlMinutes`. **Not drawn:** `retainInteractionsDays` (deprecated 29 September, AI-D05; retention
-      is a tenant setting per data class) and the engine tuning (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`,
-      `negativeCacheTtlSeconds`, chunking, quantisation, hnsw, cascade), which is platform tuning left
-      to the console, not a venue manager''s decision. The money ceiling is set with Save spend ceiling.
-      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it
-      (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
+    body: '**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `enabledCapabilities`.
+      Optional: `allowedRoleIds`, `maskedFields`, `requiresApprovalFor`, `ceilingBehaviour`, `ceilingWarningPercent`,
+      `guestCapabilityScope`, `cacheAnswers`, `cacheTtlMinutes`. **Not drawn:** `retainInteractionsDays`
+      (deprecated 29 September, AI-D05; retention is a tenant setting per data class) and the engine
+      tuning (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`, `negativeCacheTtlSeconds`, chunking,
+      quantisation, hnsw, cascade), which is platform tuning left to the console, not a venue manager''s
+      decision. The money ceiling is set with Save spend ceiling. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3
+      October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since
+      14 October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).'
     bindsTo: AiPolicy
     confirm:
       label: Save AI policy
@@ -25666,7 +25669,6 @@ screens:
       label: Cancel
       discards:
       - scopeLevel
-      - scopePath
       - enabledCapabilities
       - allowedRoleIds
       - maskedFields
@@ -26777,10 +26779,11 @@ screens:
   - id: formCreateResource
     component: modal
     trigger: Create resource
-    body: '**Collects what `createResource` sends before it is called.** Required: `id`, `code`, `name`,
-      `kind`, `venueId`. Optional: `scopePath`, `parentResourceId`, `principalId`, `attributes`, `setupMinutes`,
+    body: '**Collects what `createResource` sends before it is called.** Required: `code`, `name`, `kind`,
+      `venueId`. Optional: `scopePath`, `parentResourceId`, `principalId`, `attributes`, `setupMinutes`,
       `teardownMinutes`, `requiresQualification`, `depositAmount`, `status`, `isActive`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+      nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the
+      contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: Resource
     confirm:
       label: Create resource
@@ -26788,7 +26791,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - code
       - name
       - kind
@@ -31458,10 +31460,12 @@ screens:
     component: modal
     trigger: Plan production run
     body: '**Collects what `planProductionRun` sends before it is called.** Required: `recipeId`, `plannedQuantity`.
-      Optional: `stationId`, `producingOutletId`, `forOutletIds`, `scheduledFor`. `id` is a client UUIDv7
+      Optional: `stationId`, `producingOutletId`, `forOutletIds`, `scheduledFor`. is a client UUIDv7
       generated silently, never asked. The recipe, producing outlet and the outlets it serves are pickers
-      by name; `status` is the server''s (planned); actual quantity and variance belong to completing
-      the run (BO-138), not to planning. Dismissing sends nothing; the screen behind is unchanged.'
+      by name; is the server''s (planned); actual quantity and variance belong to completing the run
+      (BO-138), not to planning. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`,
+      `status` (CHG-GT1-002).'
     confirm:
       label: Plan production run
       operation: planProductionRun
@@ -33279,10 +33283,11 @@ screens:
     component: modal
     trigger: Save configuration profile
     body: '**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`.
-      Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status`
+      Optional: `scopePath`, `settings`. **Not asked:** is a client UUIDv7 generated silently; `status`
       is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen
       behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`,
-      `publishedAt` (3 October 2026, CHG-SPF-001).'
+      `publishedAt` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in
+      the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: ConfigurationProfile
     confirm:
       label: Save configuration profile
@@ -34334,10 +34339,11 @@ screens:
     component: modal
     trigger: Save configuration profile
     body: '**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`.
-      Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status`
+      Optional: `scopePath`, `settings`. **Not asked:** is a client UUIDv7 generated silently; `status`
       is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen
       behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`,
-      `publishedAt` (3 October 2026, CHG-SPF-001).'
+      `publishedAt` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in
+      the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     bindsTo: ConfigurationProfile
     confirm:
       label: Save configuration profile
@@ -34573,10 +34579,12 @@ screens:
   - id: formSetOfflinePolicy
     component: modal
     trigger: Save offline policy
-    body: '**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional:
-      `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`,
-      `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked,
-      because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).'
+    body: '**Collects what `setOfflinePolicy` sends before it is called.** Nothing in the body is required.
+      Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`,
+      `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is
+      unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October
+      2026, CHG-SPF-001). Not asked, because the server sets it (readOnly in the contract since 14
+      October 2026, CHG-SHP-005): `scopePath` (CHG-GT1-002).'
     bindsTo: OfflinePolicy
     confirm:
       label: Save offline policy
@@ -34584,7 +34592,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - scopePath
       - maxOfflineHours
       - allowedOffline
       - offlineValueCeiling
@@ -35157,10 +35164,11 @@ screens:
   - id: formSetAlertRule
     component: modal
     trigger: Save alert rule
-    body: '**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`,
-      `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`,
+    body: '**Collects what `setAlertRule` sends before it is called.** Required: `name`, `metric`,
+      `comparator`, `threshold`, `severity`, `isActive`. Optional: `thresholdUpper`, `windowMinutes`,
       `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October
+      2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AlertRule
     confirm:
       label: Save alert rule
@@ -35168,14 +35176,12 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - name
       - metric
       - comparator
       - threshold
       - severity
       - isActive
-      - scopePath
       - thresholdUpper
       - windowMinutes
       - deliverTo
@@ -36698,10 +36704,12 @@ screens:
     trigger: Save store rules
     body: '**Collects what `setStoreRules` sends before it is called.** Nothing in the body is required.
       Optional: `outletId`, `kind`, `thresholdAmount`, `limitKind`, `thresholdPercent`, `minimumAgeYears`,
-      `requiresPermission`, `enabled`. `id` is a client UUIDv7 generated silently, never asked. **Each
-      discount or price-override limit is a percentage or an amount, chosen per limit by the venue (decided
-      2 October 2026 by Chinmay, DEC-195; CHG-CSA-019):** `limitKind` picks which of `thresholdPercent`
-      and `thresholdAmount` applies. Dismissing sends nothing; the screen behind is unchanged.'
+      `requiresPermission`, `enabled`. is a client UUIDv7 generated silently, never asked. **Each discount
+      or price-override limit is a percentage or an amount, chosen per limit by the venue (decided 2
+      October 2026 by Chinmay, DEC-195; CHG-CSA-019):** `limitKind` picks which of `thresholdPercent`
+      and `thresholdAmount` applies. Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`
+      (CHG-GT1-002).'
     confirm:
       label: Save store rules
       operation: setStoreRules
@@ -37876,9 +37884,10 @@ screens:
   - id: formSetAccessPointGroup
     component: modal
     trigger: Save access point group
-    body: '**Collects what `setAccessPointGroup` sends before it is called.** Required: `id`, `venueId`,
-      `name`, `scopePath`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the
-      screen behind is unchanged.'
+    body: '**Collects what `setAccessPointGroup` sends before it is called.** Required: `venueId`,
+      `name`. Optional: `parentGroupId`, `accessPointIds`. Dismissing sends nothing; the screen behind
+      is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October
+      2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessAccessPointGroup
     confirm:
       label: Save access point group
@@ -37886,10 +37895,8 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - venueId
       - name
-      - scopePath
       - parentGroupId
       - accessPointIds
     provenance: contract access.yaml PUT /access-point-groups
@@ -38041,10 +38048,11 @@ screens:
   - id: formSetOperatingCalendarEntry
     component: modal
     trigger: Save operating calendar entry
-    body: '**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`,
-      `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`,
+    body: '**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `venueId`,
+      `dayType`, `startsAt`, `endsAt`. Optional: `name`, `ticketValidationRequired`, `admissionType`,
       `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October
+      2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessOperatingCalendarEntry
     confirm:
       label: Save operating calendar entry
@@ -38052,12 +38060,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - venueId
       - dayType
       - startsAt
       - endsAt
-      - scopePath
       - name
       - ticketValidationRequired
       - admissionType
@@ -38778,9 +38784,10 @@ screens:
   - id: formSetJourneySequenceRule
     component: modal
     trigger: Save journey sequence rule
-    body: '**Collects what `setJourneySequenceRule` sends before it is called.** Required: `id`, `scopePath`,
-      `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setJourneySequenceRule` sends before it is called.** Required: `scope`.
+      Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessJourneySequenceRule
     confirm:
       label: Save journey sequence rule
@@ -38788,8 +38795,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - scope
       - venueId
       - name
@@ -40545,8 +40550,10 @@ screens:
     component: modal
     trigger: Save credential event propagation rule
     body: '**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required:
-      `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`,
-      `propagation`. Dismissing sends nothing; the screen behind is unchanged.'
+      `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`,
+      `propagation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`,
+      `scopePath` (CHG-GT1-002).'
     bindsTo: AccessCredentialEventPropagationRule
     confirm:
       label: Save credential event propagation rule
@@ -40554,9 +40561,7 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - triggerEvent
-      - scopePath
       - revocationAction
       - propagationTargets
       - monitoredConditions
@@ -41365,12 +41370,13 @@ screens:
   - id: formSetVerificationMethodPolicy
     component: modal
     trigger: Save verification method policy
-    body: '**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`,
-      `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`.
-      Optional: `reasonCodes`, and `credentialFormatOverride`, drawn as "Ticket credential for this product"
-      (Channel default, Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off
-      a VIP invitation or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031).
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `productId`,
+      `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`. Optional: `reasonCodes`,
+      and `credentialFormatOverride`, drawn as "Ticket credential for this product" (Channel default,
+      Static signed QR, RFID card): the MOM-0330 override that takes dynamic QR off a VIP invitation
+      or a B2B ticket type even in a fully dynamic event (12 October 2026, CHG-R6-031). Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the
+      contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessVerificationMethodPolicy
     confirm:
       label: Save verification method policy
@@ -41378,12 +41384,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - productId
       - availableMethods
       - lockOnFirstSuccessfulAccess
       - changeAfterLock
-      - scopePath
       - reasonCodes
       - credentialFormatOverride
     provenance: contract access.yaml PUT /verification-method-policies
@@ -43703,11 +43707,12 @@ screens:
   - id: formSetHardwareModel
     component: modal
     trigger: Save hardware model
-    body: '**Collects what `setHardwareModel` sends before it is called.** Required: `id`, `manufacturer`,
-      `model`, `deviceCategory`, `hardwareType`, `scopePath`. Optional: `supportedTechnologies`, `connectivity`,
+    body: '**Collects what `setHardwareModel` sends before it is called.** Required: `manufacturer`,
+      `model`, `deviceCategory`, `hardwareType`. Optional: `supportedTechnologies`, `connectivity`,
       `offlineCapability`, `screenCapability`, `soundCapability`, `lightCapability`, `relayControllerSupport`,
       `paymentCapability`, `firmwareSoftwareInformation`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October
+      2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessHardwareModel
     confirm:
       label: Save hardware model
@@ -43715,12 +43720,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - manufacturer
       - model
       - deviceCategory
       - hardwareType
-      - scopePath
       - supportedTechnologies
       - connectivity
       - offlineCapability
@@ -43916,11 +43919,12 @@ screens:
   - id: formRegisterAccessDevice
     component: modal
     trigger: Register access device
-    body: '**Collects what `placeAccessDevice` sends before it is called.** Required: `id`, `venueId`,
-      `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`,
-      `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`.
-      The device itself (serial, hardware model, versions) is registered in `platform.device` first, with
-      tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `placeAccessDevice` sends before it is called.** Required: `venueId`, `deviceId`,
+      `role`, `isActive`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`, `deviceGroupId`,
+      `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device itself (serial,
+      hardware model, versions) is registered in `platform.device` first, with tenancy `registerDevice`
+      (ADR-0067). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server
+      sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessDevicePlacement
     confirm:
       label: Register access device
@@ -43928,12 +43932,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - venueId
       - deviceId
       - role
       - isActive
-      - scopePath
       - accessAreaId
       - accessPointId
       - gateLaneId
@@ -43946,11 +43948,13 @@ screens:
   - id: formUpdateAccessDevice
     component: modal
     trigger: Save access device
-    body: '**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`,
-      `venueId`, `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`,
-      `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`.
-      The device itself (serial, hardware model, versions) is registered in `platform.device` first, with
-      tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `venueId`,
+      `deviceId`, `role`, `isActive`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`,
+      `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device
+      itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy
+      `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged. Not asked,
+      because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`,
+      `scopePath` (CHG-GT1-002).'
     bindsTo: AccessDevicePlacement
     confirm:
       label: Save access device
@@ -43958,12 +43962,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - venueId
       - deviceId
       - role
       - isActive
-      - scopePath
       - accessAreaId
       - accessPointId
       - gateLaneId
@@ -44566,9 +44568,11 @@ screens:
   - id: formSetGateModePolicy
     component: modal
     trigger: Save gate mode policy
-    body: '**Collects what `setGateModePolicy` sends before it is called.** Required: `id`, `venueId`,
-      `mode`, `scopePath`. Optional: `whoCanActivate`, `accessPointGroupId`, `reasonRequired`, `emergencyCode`,
-      `automaticNotification`, `createsIncident`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setGateModePolicy` sends before it is called.** Required: `venueId`, `mode`.
+      Optional: `whoCanActivate`, `accessPointGroupId`, `reasonRequired`, `emergencyCode`, `automaticNotification`,
+      `createsIncident`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath`
+      (CHG-GT1-002).'
     bindsTo: AccessGateModePolicy
     confirm:
       label: Save gate mode policy
@@ -44576,10 +44580,8 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - venueId
       - mode
-      - scopePath
       - whoCanActivate
       - accessPointGroupId
       - reasonRequired
@@ -46189,9 +46191,10 @@ screens:
   - id: formSetJourneyProfile
     component: modal
     trigger: Save journey profile
-    body: '**Collects what `setJourneyProfile` sends before it is called.** Required: `id`, `scopePath`,
-      `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+    body: '**Collects what `setJourneyProfile` sends before it is called.** Required: `name`, `status`.
+      Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the
+      screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract
+      since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessJourneyProfile
     confirm:
       label: Save journey profile
@@ -46199,8 +46202,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - name
       - status
       - venueId
@@ -46935,9 +46936,11 @@ screens:
   - id: formSetFastPassProfile
     component: modal
     trigger: Save fast pass profile
-    body: '**Collects what `setFastPassProfile` sends before it is called.** Required: `id`, `scopePath`,
-      `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`,
-      `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setFastPassProfile` sends before it is called.** Required: `name`,
+      `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`,
+      `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets them (readOnly in the contract since 14 October 2026,
+      CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessFastPassProfile
     confirm:
       label: Save fast pass profile
@@ -46945,8 +46948,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - name
       - unlimited
       - venueId
@@ -47056,10 +47057,11 @@ screens:
   - id: formSetOperatingCalendarEntry
     component: modal
     trigger: Save operating calendar entry
-    body: '**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`,
-      `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`,
+    body: '**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `venueId`,
+      `dayType`, `startsAt`, `endsAt`. Optional: `name`, `ticketValidationRequired`, `admissionType`,
       `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      is unchanged. Not asked, because the server sets them (readOnly in the contract since 14 October
+      2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessOperatingCalendarEntry
     confirm:
       label: Save operating calendar entry
@@ -47067,12 +47069,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - venueId
       - dayType
       - startsAt
       - endsAt
-      - scopePath
       - name
       - ticketValidationRequired
       - admissionType
@@ -47538,9 +47538,10 @@ screens:
   - id: formSetPodium
     component: modal
     trigger: Save podium
-    body: '**Collects what `setPodium` sends before it is called.** Required: `id`, `venueId`, `podiumType`,
-      `name`, `scopePath`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is
-      unchanged.'
+    body: '**Collects what `setPodium` sends before it is called.** Required: `venueId`, `podiumType`,
+      `name`. Optional: `accessPointIds`. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005):
+      `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessPodium
     confirm:
       label: Save podium
@@ -47548,11 +47549,9 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - venueId
       - podiumType
       - name
-      - scopePath
       - accessPointIds
     provenance: contract access.yaml PUT /podiums
   - id: confirmDeletePodium
@@ -47795,9 +47794,10 @@ screens:
   - id: formSetReasonCode
     component: modal
     trigger: Save reason code
-    body: '**Collects what `setReasonCode` sends before it is called.** Required: `id`, `code`, `name`,
-      `operationalResponse`, `scopePath`. Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setReasonCode` sends before it is called.** Required: `code`, `name`, `operationalResponse`.
+      Optional: `venueId`, `guestMessage`, `operatorMessage`, `followUpAction`. Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract
+      since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessReasonCode
     confirm:
       label: Save reason code
@@ -47805,11 +47805,9 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - code
       - name
       - operationalResponse
-      - scopePath
       - venueId
       - guestMessage
       - operatorMessage
@@ -49451,9 +49449,10 @@ screens:
   - id: formSetPolicyEvaluationSetting
     component: modal
     trigger: Save policy evaluation setting
-    body: '**Collects what `setPolicyEvaluationSetting` sends before it is called.** Required: `id`, `scopePath`,
-      `policyCategory`, `evaluationMode`. Optional: `supportedLocations`, `offlineBehaviour`, `maxDataAgeMinutes`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setPolicyEvaluationSetting` sends before it is called.** Required: `policyCategory`,
+      `evaluationMode`. Optional: `supportedLocations`, `offlineBehaviour`, `maxDataAgeMinutes`. Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessPolicyEvaluationSetting
     confirm:
       label: Save policy evaluation setting
@@ -49461,8 +49460,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - policyCategory
       - evaluationMode
       - supportedLocations
@@ -50801,9 +50798,10 @@ screens:
   - id: formSetRiskScoringConfig
     component: modal
     trigger: Save risk scoring config
-    body: '**Collects what `setRiskScoringConfig` sends before it is called.** Required: `id`, `scopePath`,
-      `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+    body: '**Collects what `setRiskScoringConfig` sends before it is called.** Required: `mediumThreshold`,
+      `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends nothing; the screen
+      behind is unchanged. Not asked, because the server sets them (readOnly in the contract since 14
+      October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessRiskScoringConfig
     confirm:
       label: Save risk scoring config
@@ -50811,8 +50809,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - mediumThreshold
       - highThreshold
       - criticalThreshold
@@ -62609,9 +62605,10 @@ screens:
   - id: formSetTicketStatusTransition
     component: modal
     trigger: Save ticket status transition
-    body: '**Collects what `setTicketStatusTransition` sends before it is called.** Required: `id`, `fromStatus`,
-      `toStatus`, `allowed`, `requiresAuthorizedException`, `scopePath`. Optional: `originatingSources`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setTicketStatusTransition` sends before it is called.** Required: `fromStatus`,
+      `toStatus`, `allowed`, `requiresAuthorizedException`. Optional: `originatingSources`. Dismissing
+      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
+      in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessTicketStatusTransition
     confirm:
       label: Save ticket status transition
@@ -62619,12 +62616,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - fromStatus
       - toStatus
       - allowed
       - requiresAuthorizedException
-      - scopePath
       - originatingSources
     provenance: contract access.yaml PUT /ticket-status-transitions
   notes: '**The pack''s 13 Virtual Ticket status names map onto the entitlement model (decided 2 October
@@ -62897,11 +62892,12 @@ screens:
   - id: formSetMediaBindingRule
     component: modal
     trigger: Save media binding rule
-    body: '**Collects what `setMediaBindingRule` sends before it is called.** Required: `id`, `scopePath`.
+    body: '**Collects what `setMediaBindingRule` sends before it is called.** Nothing in the body is required.
       Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`,
       `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`,
       `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10
-      more. Dismissing sends nothing; the screen behind is unchanged.'
+      more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets
+      them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`, `scopePath` (CHG-GT1-002).'
     bindsTo: AccessMediaBindingRule
     confirm:
       label: Save media binding rule
@@ -62909,8 +62905,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - scopePath
       - allowedMediaTypeIds
       - mandatoryMediaTypeIds
       - optionalMediaTypeIds
@@ -63139,8 +63133,10 @@ screens:
     component: modal
     trigger: Save credential event propagation rule
     body: '**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required:
-      `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`,
-      `propagation`. Dismissing sends nothing; the screen behind is unchanged.'
+      `triggerEvent`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`,
+      `propagation`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because
+      the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id`,
+      `scopePath` (CHG-GT1-002).'
     bindsTo: AccessCredentialEventPropagationRule
     confirm:
       label: Save credential event propagation rule
@@ -63148,9 +63144,7 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - triggerEvent
-      - scopePath
       - revocationAction
       - propagationTargets
       - monitoredConditions
@@ -70171,9 +70165,11 @@ screens:
     component: modal
     trigger: Create
     body: '**Collects what `createGame` sends before it is called.** Required: `code`, `name`, `venueId`,
-      `creditCost`, `status`. Optional: `zone`, `assetId`, `readerId`, `minPointsAwarded`, `maxPointsAwarded`,
-      `heightRequirementCm`, `playsToday`, `creditsTakenToday`, `pointsAwardedToday`. `id` is a client
-      UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.'
+      `creditCost`. Optional: `zone`, `assetId`, `readerId`, `minPointsAwarded`, `maxPointsAwarded`,
+      `heightRequirementCm`, `playsToday`, `creditsTakenToday`, `pointsAwardedToday`. is a client
+      UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.
+      Not asked, because the server sets them (readOnly in the contract since 14 October 2026, CHG-SHP-005):
+      `id`, `status` (CHG-GT1-002).'
     confirm:
       label: Create
       operation: createGame
@@ -70184,7 +70180,6 @@ screens:
       - name
       - venueId
       - creditCost
-      - status
       - zone
       - assetId
       - readerId
@@ -78601,8 +78596,9 @@ screens:
     body: '**Collects what `setGateOfflinePolicy` sends before it is called.** Required: `venueId`. Optional:
       `maxOfflineDurationHours`, `offlineChecks`, `afterThresholdBehavior`, `revocationTriggerEvents`,
       `revocationMaxAllowedAgeMinutes`, `revocationStalenessAction`, `operatingModes`, `centralUnavailableAfterSeconds`,
-      `edgeUnavailableAfterSeconds`, `automaticSwitch`. `id` is a client UUIDv7 generated silently, never
-      asked. Dismissing sends nothing; the screen behind is unchanged.'
+      `edgeUnavailableAfterSeconds`, `automaticSwitch`. is a client UUIDv7 generated silently, never
+      asked. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server
+      sets it (readOnly in the contract since 14 October 2026, CHG-SHP-005): `id` (CHG-GT1-002).'
     confirm:
       label: Set maximum offline duration
       operation: setGateOfflinePolicy
@@ -171201,11 +171197,12 @@ screens:
     component: modal
     trigger: Request pricing rollback
     body: '**Collects what `requestPricingRollback` sends before it is called.** Required: `subject`,
-      `actionType`, `reason`, `status`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`,
+      `actionType`, `reason`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`,
       `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`,
       `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged.
       Not asked, because the server sets them (readOnly in the contract): `id`, `requestedAt`, `requestedByPrincipalId`,
-      `scopePath` (3 October 2026, CHG-SPF-001).'
+      `scopePath` (3 October 2026, CHG-SPF-001). Not asked, because the server sets it (readOnly
+      in the contract since 14 October 2026, CHG-SHP-005): `status` (CHG-GT1-002).'
     bindsTo: CatalogueRollbackAction
     confirm:
       label: Request pricing rollback
@@ -171216,7 +171213,6 @@ screens:
       - subject
       - actionType
       - reason
-      - status
       - productId
       - priceListId
       - fromVersion
