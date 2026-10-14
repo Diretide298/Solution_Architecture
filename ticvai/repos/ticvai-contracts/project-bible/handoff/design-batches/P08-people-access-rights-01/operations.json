@@ -83,7 +83,7 @@
   "permission": "ROLE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -706,6 +706,55 @@
     "name": "departmentId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listShifts": {
+  "method": "GET",
+  "path": "/shifts",
+  "contract": "shift",
+  "summary": "List shifts",
+  "permission": "REPORT_VIEW_WORKSTATION",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "businessDate",
+    "in": "query",
+    "required": false
    },
    {
     "name": null,

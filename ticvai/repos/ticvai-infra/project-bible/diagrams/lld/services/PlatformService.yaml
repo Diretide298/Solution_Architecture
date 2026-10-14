@@ -840,7 +840,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_VIEW
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: previewSubscriptionChange
     verb: POST
@@ -1500,7 +1500,7 @@ operationsByContract:
     permission: PLATFORM_CELL_MANAGE
     offline: false
     reads: 1
-    writes: 3
+    writes: 2
   - operation: republishOutbox
     verb: POST
     path: /outbox-republishes
@@ -2894,7 +2894,7 @@ readsFrom:
 - service: CatalogueService
   operations: 33
 - service: OrderService
-  operations: 31
+  operations: 32
 - service: TenancyService
   operations: 25
 - service: LedgerService
@@ -2947,7 +2947,6 @@ writesOutside:
   - operation: replayDeadLetter
     tables:
     - platform.dead_letter
-    - platform.outbox
   - operation: republishOutbox
     tables:
     - platform.audit_record

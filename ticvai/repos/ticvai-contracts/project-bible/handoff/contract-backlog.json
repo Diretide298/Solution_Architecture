@@ -1903,8 +1903,8 @@
     "16"
    ],
    "blockedNote": "Device Management is walked at domain 16 and may own the display binding.",
-   "closed": "2026-08-18",
-   "closedBy": "ConfigureWorkstationRequest cashierInputMode and guestDisplayContent. **A till operator who touch-types is slower on a touchscreen and a new starter is faster**, so the mode is per workstation because the operator is. **A second screen showing nothing is one the guest ignores when it does show something.**"
+   "closed": "2026-10-14",
+   "closedBy": "ConfigureWorkstationRequest cashierInputMode and guestDisplayContent. **A till operator who touch-types is slower on a touchscreen and a new starter is faster**, so the mode is per workstation because the operator is. **A second screen showing nothing is one the guest ignores when it does show something.** **Reopened and closed again 14 October 2026** (ADAM CR-082, CHG-TEN-003): until then the two fields were on the request alone and nothing stored them; they are now `Workstation.cashierInputMode` and `Workstation.guestDisplayContent`, columns of `platform.workstation`, returned by `getWorkstation` and `configureWorkstation`."
   },
   {
    "id": "BL-062",
@@ -2889,7 +2889,7 @@
     "2.16.16"
    ],
    "lane": "deferred",
-   "status": "done",
+   "status": "open",
    "contracts": [
     "tenancy",
     "inventory"
@@ -2900,14 +2900,15 @@
    ],
    "what": "Media stock is not modelled — neither which stock a printer is loaded with, nor how much of it is left.",
    "why": "`wristbandEncoder` is a device kind and `mediaKind` includes wristband, so encoding is covered and **the physical substrate is not**. A printer loaded with bronze, silver and gold ribbon cannot be told which to use, and 2.16.16 asks for stock levels of cards, wristbands and ticket rolls across locations. `RegisteredDevice.status` reaches `consumableLow` — a flag, not a count. The state model already says why it matters: *a wristband printer that runs out at 10am on a Saturday closes a gate.*",
-   "fix": "Model media stock as inventory, and name the loaded stock on the device.",
+   "fix": "Model media stock as inventory, and name the loaded stock on the printer device (`platform.device`, `DeviceBinding`), not on the till: which stock it is loaded with, and a remaining count decremented on issue.",
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [
     "15"
    ],
-   "closed": "2026-08-18",
-   "closedBy": "ConfigureWorkstationRequest loadedMediaStockId and mediaStockRemaining. **A till that runs out of wristbands mid-queue is an outage nobody predicted.** Read-only, because the count comes from what was printed rather than from somebody estimate."
+   "blockedNote": "**Reopened 14 October 2026** (ADAM CR-082, CHG-TEN-003). It was closed on 18 August by `ConfigureWorkstationRequest.loadedMediaStockId` and `mediaStockRemaining`, two request fields nothing stored (`mediaStockRemaining` read-only on a request, so never readable); both are now deprecated. The stock belongs to the printer, so the record goes on `platform.device`, and it waits on the client's BOCA stock answer (CHG-R4-002, DEVICE-BOCA-FGL): which media a BOCA printer reports and whether it can count what is left.",
+   "closed": null,
+   "closedBy": null
   },
   {
    "id": "BL-096",

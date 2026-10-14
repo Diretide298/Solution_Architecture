@@ -1802,7 +1802,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.index_entry
-  columns: 2
+  columns: 10
   store: postgres
   parent: null
   writtenBy:

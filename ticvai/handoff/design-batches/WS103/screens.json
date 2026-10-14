@@ -807,6 +807,30 @@
        "label": "Audit Logging Enabled",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
        "notes": "A progress output of initialisation, not an input."
+      },
+      {
+       "kind": "selectField",
+       "label": "PIN length",
+       "bindsTo": "PasswordPolicy.pinLength",
+       "operation": "setPasswordPolicy",
+       "notes": "**A drop-down: 4, 6 or 8 digits**, the new tenant's PIN rule (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002). Sent with the security baseline (`setPasswordPolicy`). Default 4.",
+       "provenance": "contract identity.yaml PasswordPolicy.pinLength (CHG-CRD-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "PIN reuse",
+       "bindsTo": "PasswordPolicy.pinReusePrevention",
+       "operation": "setPasswordPolicy",
+       "notes": "**A drop-down: allow reuse, not the last 3, not the last 5** (`none`, `last3`, `last5`; CHG-CRD-002). PINs only; passwords keep `reusePreventionCount` (audit R132). Default not the last 5.",
+       "provenance": "contract identity.yaml PasswordPolicy.pinReusePrevention (CHG-CRD-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Lock a PIN after",
+       "bindsTo": "PasswordPolicy.pinLockoutAfterAttempts",
+       "operation": "setPasswordPolicy",
+       "notes": "**A drop-down: 3, 5 or 10 wrong PINs** (CHG-CRD-002), then a lock for the policy's lockout minutes. Default 5.",
+       "provenance": "contract identity.yaml PasswordPolicy.pinLockoutAfterAttempts (CHG-CRD-002)"
       }
      ]
     },
@@ -939,7 +963,7 @@
     "id": "formSetPasswordPolicy",
     "component": "modal",
     "trigger": "Set security baseline",
-    "body": "**Collects what `setPasswordPolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPasswordPolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged. **The tenant's PIN rule is three drop-downs** (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): PIN length (`PasswordPolicy.pinLength`: 4, 6 or 8 digits, default 4), PIN reuse (`pinReusePrevention`: allow, not the last 3, not the last 5; default not the last 5) and lock after (`pinLockoutAfterAttempts`: 3, 5 or 10 wrong PINs; default 5). They sit beside the password rules, whose R126 floor (minimum length 8) never applies to a PIN.",
     "confirm": {
      "label": "Set security baseline",
      "operation": "setPasswordPolicy"

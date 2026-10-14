@@ -600,6 +600,7 @@
     "description": "The order whose renewal failed."
    },
    "amount": {
+    "x-ticvai-column": "overdue_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "state": {
@@ -1301,6 +1302,7 @@
     "format": "date"
    },
    "amount": {
+    "x-ticvai-column": "due_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "status": {
@@ -1348,6 +1350,7 @@
     "format": "uuid"
    },
    "orderId": {
+    "x-ticvai-references": "orders.sales_order",
     "type": "string",
     "format": "uuid"
    },
@@ -1378,9 +1381,11 @@
     ]
    },
    "total": {
+    "x-ticvai-column": "gross_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "paidToDate": {
+    "x-ticvai-column": "paid_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "nextDueDate": {
@@ -1426,6 +1431,7 @@
     "format": "uuid"
    },
    "providerId": {
+    "x-ticvai-references": "payments.provider",
     "type": "string",
     "format": "uuid"
    },

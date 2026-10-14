@@ -14,10 +14,10 @@
 
 | | writes |
 |---|---:|
-| Cross-deployable writes in the lineage (69 operations) | 78 |
+| Cross-deployable writes in the lineage (58 operations) | 67 |
 | by event | 29 |
-| by the owner's operation | 32 |
-| on the exception list | 17 |
+| by the owner's operation | 38 |
+| on the exception list | 0 |
 
 ## The kernel tables every deployable is granted directly
 
@@ -75,25 +75,14 @@ Sorted by the owning deployable, then the table.
 | `checkInResource` | operations / VenueOpsService | `orders.stored_value_authorisation` | commerce / OrderService | operation `captureStoredValue` |
 | `checkOutResource` | operations / VenueOpsService | `orders.stored_value_authorisation` | commerce / OrderService | operation `authoriseStoredValue` |
 | `redeemLoyaltyPoints` | operations / MarketingService | `orders.stored_value_authorisation` | commerce / OrderService | operation `authoriseStoredValue` |
-| `recordDeviceConsent` | operations / MarketingService | `pii.consent_identifier` | commerce / IdentityService | exception XDW-016 (until r5) |
+| `recordDeviceConsent` | operations / MarketingService | `pii.consent_identifier` | commerce / IdentityService | operation `recordConsentIdentifier` |
 | `mergeGuests` | operations / MarketingService | `pii.subject` | commerce / IdentityService | event `guest.merged` |
-| `updateMyProfile` | operations / MarketingService | `pii.subject` | commerce / IdentityService | exception XDW-017 (until r5) |
+| `updateMyProfile` | operations / MarketingService | `pii.subject` | commerce / IdentityService | operation `updateGuestSubjectDetails` |
 | `enrolFacePass` | access / AccessService | `pii.subject_biometric` | commerce / IdentityService | event `biometric.enrolmentChanged` |
 | `enrolFaceTag` | access / AccessService | `pii.subject_biometric` | commerce / IdentityService | event `biometric.enrolmentChanged` |
 | `reviewFaceReenrolment` | access / AccessService | `pii.subject_biometric` | commerce / IdentityService | event `biometric.enrolmentChanged` |
 | `revokeFacePass` | access / AccessService | `pii.subject_biometric` | commerce / IdentityService | event `biometric.enrolmentChanged` |
-| `consumeCrossRegionEntitlement` | operations / CrossRegionService | `platform.cross_region_entitlement` | commerce / TenancyService | exception XDW-001 (until r5) |
-| `propagateCrossRegionEntitlement` | operations / CrossRegionService | `platform.cross_region_entitlement` | commerce / TenancyService | exception XDW-002 (until r5) |
-| `reconcileRedemptions` | operations / CrossRegionService | `platform.cross_region_entitlement` | commerce / TenancyService | exception XDW-003 (until r5) |
-| `revokeCrossRegionEntitlement` | operations / CrossRegionService | `platform.cross_region_entitlement` | commerce / TenancyService | exception XDW-004 (until r5) |
-| `replayDeadLetter` | operations / PlatformService | `platform.dead_letter` | commerce / TenancyService | exception XDW-012 (until r5) |
-| `createDsarRequest` | operations / CrossRegionService | `platform.dsar_request` | commerce / TenancyService | exception XDW-011 (until r5) |
-| `createGuestLink` | operations / CrossRegionService | `platform.guest_link` | commerce / TenancyService | exception XDW-009 (until r5) |
-| `revokeGuestLink` | operations / CrossRegionService | `platform.guest_link` | commerce / TenancyService | exception XDW-010 (until r5) |
-| `authoriseWalletSpend` | operations / CrossRegionService | `platform.wallet_authorisation` | commerce / TenancyService | exception XDW-005 (until r5) |
-| `captureWalletAuthorisation` | operations / CrossRegionService | `platform.wallet_authorisation` | commerce / TenancyService | exception XDW-006 (until r5) |
-| `relinquishWalletAuthorisation` | operations / CrossRegionService | `platform.wallet_authorisation` | commerce / TenancyService | exception XDW-007 (until r5) |
-| `setWalletAllocationPolicy` | operations / CrossRegionService | `platform.wallet_authorisation` | commerce / TenancyService | exception XDW-008 (until r5) |
+| `replayDeadLetter` | operations / PlatformService | `platform.dead_letter` | commerce / TenancyService | operation `requeueDeadLetter` |
 | `setBiometricLifecycleRetention` | access / AccessService | `tenancy.data_retention_setting` | commerce / TenancyService | operation `setDataRetentionSetting` |
 | `decideApprovalRequest` | commerce / TenancyService | `control.partner_agreement` | operations / PlatformService | event `approval.granted` |
 | `decideApprovalRequest` | commerce / TenancyService | `control.partner_application` | operations / PlatformService | event `approval.granted` |
@@ -109,9 +98,9 @@ Sorted by the owning deployable, then the table.
 | `resendPaymentLink` | commerce / OrderService | `marketing.message_dispatch` | operations / MarketingService | operation `sendTransactionalMessage` |
 | `verifyGuestEmail` | commerce / IdentityService | `marketing.message_dispatch` | operations / MarketingService | operation `sendTransactionalMessage` |
 | `decideApprovalRequest` | commerce / TenancyService | `marketing.privacy_notice_governance` | operations / MarketingService | event `approval.granted` |
-| `resolveSyncRejection` | commerce / OrderService | `sync.rejection` | operations / CrossRegionService | exception XDW-014 (until r5) |
-| `syncOrders` | commerce / OrderService | `sync.rejection` | operations / CrossRegionService | exception XDW-013 (until r5) |
-| `syncScans` | access / AccessService | `sync.rejection` | operations / CrossRegionService | exception XDW-015 (until r5) |
+| `resolveSyncRejection` | commerce / OrderService | `sync.rejection` | operations / CrossRegionService | operation `recordSyncRejectionResolution` |
+| `syncOrders` | commerce / OrderService | `sync.rejection` | operations / CrossRegionService | operation `recordSyncRejection` |
+| `syncScans` | access / AccessService | `sync.rejection` | operations / CrossRegionService | operation `recordSyncRejection` |
 | `askReportingQuestion` | operations / ReportingService | `ai.activity` | ticvai-ai / AiService | event `reporting.questionAnswered` |
 | `saveNaturalLanguageQuery` | operations / ReportingService | `ai.activity` | ticvai-ai / AiService | event `reporting.definitionPublished` |
 
@@ -119,20 +108,3 @@ Sorted by the owning deployable, then the table.
 
 | Id | Operation | Table | Kind | Added | Removed by | Reason |
 |---|---|---|---|---|---|---|
-| XDW-001 | `consumeCrossRegionEntitlement` | `platform.cross_region_entitlement` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-002 | `propagateCrossRegionEntitlement` | `platform.cross_region_entitlement` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-003 | `reconcileRedemptions` | `platform.cross_region_entitlement` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-004 | `revokeCrossRegionEntitlement` | `platform.cross_region_entitlement` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-005 | `authoriseWalletSpend` | `platform.wallet_authorisation` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-006 | `captureWalletAuthorisation` | `platform.wallet_authorisation` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-007 | `relinquishWalletAuthorisation` | `platform.wallet_authorisation` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-008 | `setWalletAllocationPolicy` | `platform.wallet_authorisation` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-009 | `createGuestLink` | `platform.guest_link` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-010 | `revokeGuestLink` | `platform.guest_link` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's own record (schema-reference source cross-region.*), kept in the platform schema, which TenancyService owns in commerce. No commerce operation writes it, so there is no owner to route to: the writer is the de facto owner. Removed when the lead decides between moving the table into sync (CrossRegionService's schema; a forward migration) and a table-level grant to the operations role. |
-| XDW-011 | `createDsarRequest` | `platform.dsar_request` | misplaced-table | 2026-10-12 | r5 | CrossRegionService's DSAR record (source cross-region.DsarRequest) in the platform schema; Identity (commerce) also raises one from deleteGuestAccount and exportSubjectData. No commerce operation raises a cross-cell DSAR for CrossRegion to call. Removed with the platform-schema decision above, or when Identity publishes an operation that raises a DSAR and createDsarRequest calls it. |
-| XDW-012 | `replayDeadLetter` | `platform.dead_letter` | misplaced-table | 2026-10-12 | r5 | PlatformService's dead-letter record (source platform-ops.DeadLetter) in the platform schema; the relay in workers writes it, and replayDeadLetter in operations marks the replay. No commerce operation touches it. Removed with the platform-schema decision above (the table moving to control or a table-level grant to the operations role). |
-| XDW-013 | `syncOrders` | `sync.rejection` | misplaced-table | 2026-10-12 | r5 | OrderService's offline-replay rejection (source orders.SyncRejection) kept in the sync schema, which CrossRegionService owns in operations. syncOrders and resolveSyncRejection (commerce) and syncScans (access) write it; CrossRegion has no operation for it. Removed when the table moves into orders (a forward migration) or the lead grants it table by table. |
-| XDW-014 | `resolveSyncRejection` | `sync.rejection` | misplaced-table | 2026-10-12 | r5 | OrderService's offline-replay rejection (source orders.SyncRejection) kept in the sync schema, which CrossRegionService owns in operations. syncOrders and resolveSyncRejection (commerce) and syncScans (access) write it; CrossRegion has no operation for it. Removed when the table moves into orders (a forward migration) or the lead grants it table by table. |
-| XDW-015 | `syncScans` | `sync.rejection` | misplaced-table | 2026-10-12 | r5 | OrderService's offline-replay rejection (source orders.SyncRejection) kept in the sync schema, which CrossRegionService owns in operations. syncOrders and resolveSyncRejection (commerce) and syncScans (access) write it; CrossRegion has no operation for it. Removed when the table moves into orders (a forward migration) or the lead grants it table by table. |
-| XDW-016 | `recordDeviceConsent` | `pii.consent_identifier` | owner-operation-missing | 2026-10-12 | r5 | MarketingService's consent-capture record (source marketing-crm.ConsentCaptureIdentifier) kept in the pii schema. Its columns are the visitor's IP address and user agent, which an event would copy into platform.outbox, and Identity publishes no operation that stores one. Removed when Identity publishes that operation and recordDeviceConsent calls it. |
-| XDW-017 | `updateMyProfile` | `pii.subject` | owner-operation-missing | 2026-10-12 | r5 | A guest correcting their own name and contact details writes pii.subject, which Identity owns in commerce. The values are personal data, which an event would copy into platform.outbox, and Identity publishes no operation that updates a guest subject's details. Removed when Identity publishes that operation and updateMyProfile calls it. |

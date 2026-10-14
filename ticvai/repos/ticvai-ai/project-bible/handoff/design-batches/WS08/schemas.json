@@ -640,6 +640,7 @@
     }
    },
    "parentQueueId": {
+    "x-ticvai-references": "queue.queue",
     "type": "string",
     "format": "uuid",
     "nullable": true,

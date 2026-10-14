@@ -175,9 +175,10 @@
   ],
   "properties": {
    "sku": {
-    "x-ticvai-unique": "tenant",
+    "x-ticvai-unique": "venue",
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "description": "Unique within the item's venue, as the 409 says (ADAM CR-068, CHG-DDL-003): an inventory item is something one venue stocks (`venueId` is required), so two venues of a chain keep their own row for the same syrup under the same SKU. The index is (venue_id, sku).\n"
    },
    "barcode": {
     "type": "string",
@@ -1996,12 +1997,13 @@
     "type": "string",
     "maxLength": 512,
     "writeOnly": true,
-    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in."
    }
   }
  },
  "Supplier": {
   "x-ticvai-persistence": "inventory.supplier",
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "required": [
    "id",

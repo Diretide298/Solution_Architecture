@@ -2204,7 +2204,7 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`, or the venue's next business-day cut-off (`VenueSettings.businessDayCutoff`) when the cashier sent none (CHG-GDL-003). Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -2679,7 +2679,8 @@
     "minLength": 8,
     "maxLength": 256,
     "writeOnly": true,
-    "description": "Optional. OTP-only accounts are supported and are the default."
+    "x-ticvai-stored-as": "identity.guest_credential.password_hash",
+    "description": "Optional. OTP-only accounts are supported and are the default. Stored only as `GuestCredential.passwordHash`, the PHC string of ADR-0071 (CHG-CRD-003)."
    },
    "preferredLanguage": {
     "type": "string",
@@ -3006,64 +3007,87 @@
    },
    "items": {
     "type": "array",
-    "x-ticvai-persistence": "marketing.wishlist_item",
+    "description": "Newest first: ordered by `addedAt` descending, `id` as the tiebreak (CHG-MKT-002).",
     "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "variantId",
-      "addedAt",
-      "isAvailable"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "productName": {
-       "type": "string"
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "performanceStartsAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "price": {
-       "x-ticvai-column": "list_price",
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "The variant's current list price when the wishlist is read. Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column); the wire keeps `price`."
-      },
-      "imageAssetRef": {
-       "type": "string",
-       "nullable": true
-      },
-      "isAvailable": {
-       "type": "boolean",
-       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
-      },
-      "unavailableReason": {
-       "type": "string",
-       "nullable": true
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      },
-      "addedAt": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
+     "$ref": "#/components/schemas/WishlistItem"
     }
+   }
+  }
+ },
+ "WishlistItem": {
+  "x-ticvai-persistence": "marketing.wishlist_item",
+  "x-ticvai-unique-together": [
+   [
+    "subjectId",
+    "variantId",
+    "performanceId"
+   ]
+  ],
+  "x-ticvai-unique-nulls": "not-distinct",
+  "type": "object",
+  "required": [
+   "id",
+   "subjectId",
+   "variantId",
+   "addedAt",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The guest who saved it. The wishlist is keyed by subject; there is no parent wishlist row."
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productName": {
+    "type": "string",
+    "description": "**Catalogue's, not Marketing's.** Taken from Catalogue's `variantListingFacts` when the item is saved, and replaced by Catalogue's current value each time the wishlist is read (CHG-MKT-002)."
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceStartsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The saved performance's start, from Catalogue's `variantListingFacts`; null for a date-less entry."
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The variant's current list price when the wishlist is read: the price Catalogue's guest listing shows for the variant on the guest's channel (`variantListingFacts.listPrice`). Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column), the amount alone as every Money column is (`numeric(18,4)`; the currency resolves from the variant's venue, ADR-0018); the wire keeps `price`. **The stored value is the price when the item was saved**, kept for segmentation (a price drop on a saved item is a signal) and returned only when Catalogue cannot be reached (CHG-MKT-002)."
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The product's primary media, from Catalogue's `variantListingFacts`."
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken. **Computed when the wishlist is read** from Catalogue's `variantListingFacts` (`sellable`) and the performance's start; the stored value is the answer when the item was saved (CHG-MKT-002).\n"
+   },
+   "unavailableReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why `isAvailable` is false, in Catalogue's words (`variantListingFacts.reason`), or `performancePassed`; null when available."
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "addedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -3150,6 +3174,16 @@
      "thin"
     ],
     "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
+   },
+   "pinLength": {
+    "type": "integer",
+    "enum": [
+     4,
+     6,
+     8
+    ],
+    "readOnly": true,
+    "description": "**The tenant's `PasswordPolicy.pinLength`, carried to the device** (14 October 2026, CHG-CRD-002, ADAM CR-078). A device door draws its PIN keypad, and its supervisor step-up prompt, at this many digits; the device keeps it with the workstation context of the last session on it, so the door needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the server decides. Read from `identity.password_policy`, not stored on the workstation."
    }
   }
  }

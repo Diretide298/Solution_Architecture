@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 212 operations, 110 tables
+title: TenancyService — 213 operations, 107 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -21,14 +21,14 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 212
+  operations: 213
   inAFlow: 50
-  percent: 24%
+  percent: 23%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: platform
-  tables: 27
+  tables: 24
   stores:
   - postgres
   largestTable: platform.device
@@ -107,7 +107,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 2
+    reads: 3
     writes: 1
   - operation: cancelApprovalRequest
     verb: POST
@@ -115,7 +115,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 1
   - operation: createApprovalDelegation
     verb: POST
@@ -139,8 +139,8 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 7
-    writes: 2
+    reads: 8
+    writes: 3
   - operation: createAutomationAutonomouAction
     verb: POST
     path: /automation-autonomou-action
@@ -155,7 +155,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 5
+    reads: 6
     writes: 8
   - operation: escalateApprovalRequest
     verb: POST
@@ -163,7 +163,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 4
+    reads: 5
     writes: 4
   - operation: evaluateApprovalRequirement
     verb: POST
@@ -195,7 +195,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 2
+    reads: 3
     writes: 0
   - operation: issueAccreditationBadge
     verb: POST
@@ -259,7 +259,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 2
+    reads: 3
     writes: 0
   - operation: listApprovedActionExecutions
     verb: GET
@@ -379,7 +379,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 6
+    reads: 7
     writes: 5
   - operation: reopenApprovalRequest
     verb: POST
@@ -387,8 +387,8 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 2
-    writes: 1
+    reads: 3
+    writes: 2
   - operation: resolveApprovedActionExecution
     verb: POST
     path: /approved-action-executions/{executionId}/resolve
@@ -403,8 +403,8 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 3
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: revokeApprovalDelegation
     verb: DELETE
     path: /delegations/{delegationId}
@@ -515,7 +515,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 4
+    reads: 5
     writes: 3
   - operation: withdrawApprovalRequest
     verb: POST
@@ -523,10 +523,10 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
 - contract: tenancy
-  count: 57
+  count: 58
   operations:
   - operation: approveDevice
     verb: POST
@@ -542,7 +542,7 @@ operationsByContract:
     scope: venue
     permission: WORKSTATION_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: createDeviceFirmware
     verb: POST
@@ -566,15 +566,15 @@ operationsByContract:
     scope: venue
     permission: REGION_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: createSaleBoard
     verb: POST
     path: /sale-boards
     scope: venue
     permission: WORKSTATION_CONFIGURE
     offline: false
-    reads: 2
+    reads: 6
     writes: 4
   - operation: deployConfigurationProfile
     verb: POST
@@ -662,7 +662,7 @@ operationsByContract:
     scope: venue
     permission: SCOPE_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getRegionSettings
     verb: GET
@@ -790,7 +790,7 @@ operationsByContract:
     scope: venue
     permission: SCOPE_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listProfileDeployments
     verb: GET
@@ -839,6 +839,14 @@ operationsByContract:
     permission: DEVICE_CONFIGURE
     offline: false
     reads: 2
+    writes: 2
+  - operation: requeueDeadLetter
+    verb: POST
+    path: /internal/dead-letters/{deadLetterId}/replays
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
     writes: 2
   - operation: resolveTenantHost
     verb: GET
@@ -966,8 +974,8 @@ operationsByContract:
     scope: venue
     permission: REGION_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: updateRegionSettings
     verb: PUT
     path: /regions/{regionId}/settings
@@ -982,7 +990,7 @@ operationsByContract:
     scope: venue
     permission: WORKSTATION_CONFIGURE
     offline: false
-    reads: 2
+    reads: 6
     writes: 4
 - contract: workforce
   count: 49
@@ -2298,9 +2306,9 @@ tables:
   - approvals
   foreignWriters: null
 - table: approvals.escalation
-  columns: 2
+  columns: 9
   store: postgres
-  parent: null
+  parent: approvals.request
   writtenBy:
   - approvals
   foreignWriters: null
@@ -2338,9 +2346,13 @@ tables:
   parent: null
   writtenBy:
   - approvals
+  - finance
+  - identity
   - subscription
   - workforce
   foreignWriters:
+  - finance
+  - identity
   - subscription
 - table: approvals.retention_policy
   columns: 9
@@ -2445,6 +2457,7 @@ tables:
   parent: null
   writtenBy:
   - finance
+  - identity
   - inventory
   - orders
   - payments
@@ -2452,6 +2465,7 @@ tables:
   - tenancy
   foreignWriters:
   - finance
+  - identity
   - inventory
   - orders
   - payments
@@ -2476,20 +2490,13 @@ tables:
   writtenBy:
   - tenancy
   foreignWriters: null
-- table: platform.cross_region_entitlement
-  columns: 16
-  store: postgres
-  parent: null
-  writtenBy:
-  - cross-region
-  foreignWriters:
-  - cross-region
 - table: platform.dead_letter
   columns: 11
   store: postgres
   parent: null
   writtenBy:
   - platform-ops
+  - tenancy
   foreignWriters:
   - platform-ops
 - table: platform.denomination
@@ -2513,24 +2520,6 @@ tables:
   parent: platform.device
   writtenBy: []
   foreignWriters: null
-- table: platform.dsar_request
-  columns: 7
-  store: postgres
-  parent: null
-  writtenBy:
-  - cross-region
-  - identity
-  foreignWriters:
-  - cross-region
-  - identity
-- table: platform.guest_link
-  columns: 5
-  store: postgres
-  parent: null
-  writtenBy:
-  - cross-region
-  foreignWriters:
-  - cross-region
 - table: platform.idempotency_record
   columns: 11
   store: postgres
@@ -2575,7 +2564,6 @@ tables:
   - marketing-crm
   - orders
   - payments
-  - platform-ops
   - promotions
   - reporting
   - seating
@@ -2595,7 +2583,6 @@ tables:
   - marketing-crm
   - orders
   - payments
-  - platform-ops
   - promotions
   - reporting
   - seating
@@ -2610,6 +2597,13 @@ tables:
   writtenBy:
   - tenancy
   foreignWriters: null
+- table: platform.outlet_opening_hour
+  columns: 6
+  store: postgres
+  parent: platform.outlet
+  writtenBy:
+  - tenancy
+  foreignWriters: null
 - table: platform.profile_deployment
   columns: 12
   store: postgres
@@ -2618,7 +2612,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.region_settings
-  columns: 19
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -2641,9 +2635,9 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.sale_board_tile
-  columns: 2
+  columns: 10
   store: postgres
-  parent: null
+  parent: platform.sale_board_page
   writtenBy:
   - tenancy
   foreignWriters: null
@@ -2673,16 +2667,8 @@ tables:
   writtenBy:
   - tenancy
   foreignWriters: null
-- table: platform.wallet_authorisation
-  columns: 25
-  store: postgres
-  parent: null
-  writtenBy:
-  - cross-region
-  foreignWriters:
-  - cross-region
 - table: platform.workstation
-  columns: 20
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -2942,9 +2928,13 @@ readsFrom:
   operations: 3
 - service: PlatformService
   operations: 3
+- service: CatalogueService
+  operations: 2
 - service: VenueOpsService
   operations: 2
 - service: MarketingService
+  operations: 1
+- service: OrderService
   operations: 1
 writesOutside:
 - service: MarketingService

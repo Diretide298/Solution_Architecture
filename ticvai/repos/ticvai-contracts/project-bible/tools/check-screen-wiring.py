@@ -14,6 +14,17 @@ are the operationId (R260) and offline texts promising writes no operation can q
 `check-screens.py` validates each record against the schema; this reads the record against itself
 and against the contracts.
 
+**Offline writes against frontend-patterns 4.4** (14 October 2026, CHG-SWP-004, the sweep after #27741). In an
+offline app a write the contract marks `x-ticvai-offline-capable: true` goes through the one offline store's outbox,
+and every other write is disabled offline with the reason on screen; a web app queues nothing. S-OFFLINE-CLAIM
+caught a screen whose every write is online-only; these catch the rest of the contradiction:
+
+    S-OFFLINE-REFUSED   on an offline app, the screen refuses offline (`offline: false`, or an offline state that
+                        refuses and promises nothing) a write its contract marks offline-capable
+    S-OFFLINE-QUEUED    the offline state promises to queue or sync, refuses nothing and does not name a write that
+                        is not offline-capable (4.4: disabled offline), on a screen with other offline-capable
+                        writes; or a web app's screen (no offline store) promises to queue its writes
+
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
     python3 tools/check-screen-wiring.py [--all] [--update-baseline]
@@ -50,6 +61,8 @@ RULES = {
     "S-STAFF-AUDIENCE": "a staff screen calls an operation whose audience has no staff: guest-, device-, service- or partner-only (R254, CHG-WIR-001)",
     "S-PURPOSE-BOILERPLATE": "a screen purpose that is a generator template or a pasted board placeholder (CHG-WIR-003)",
     "S-MEDIA-LIBRARY": "a screen about the media a guest carries calls the digital-asset library (CF-114, CHG-WIR-025, CHG-R4-013)",
+    "S-OFFLINE-REFUSED": "an offline app's screen refuses offline a write its contract marks offline-capable (4.4, CHG-SWP-004)",
+    "S-OFFLINE-QUEUED": "a screen promises to queue a write that is not offline-capable, or a web app's screen queues (4.4, CHG-SWP-004)",
 }
 # **Two things are called media** (glossary; orders.yaml `getMediaEntitlements`): the QR, wristband or card a
 # guest carries, which orders and access read and write, and the images, video and documents of the asset
@@ -92,6 +105,13 @@ FILTERS = {"searchField", "selectField", "multiSelect", "datePicker", "toggle"}
 INPUTS = FILTERS | {"textField", "numberField", "fileUpload", "consentBlock", "scanTarget"}
 OFFLINE_PROMISE = re.compile(r"\b(queue[sd]?|queued|kept and sent|sends? (it )?when|syncs?|"
                              r"works offline|saved locally|replay)", re.I)
+# CHG-SWP-004: a narrower promise (no "queue" the noun: "New queue calls arrive") and the words of a refusal.
+QUEUE_PROMISE = re.compile(r"\b(queued|queues? (it|them|the|locally|offline|and)|kept and sent|sends? (it )?when|"
+                           r"syncs?|on sync|works offline|saved locally|replay|outbox)\b", re.I)
+OFFLINE_REFUSAL = re.compile(r"(not offered|not available|nothing here is offered|online only|\bdisabled\b|refused|"
+                             r"cannot (be )?(open|done|made)|needs? (a |the )?(connection|network|server|gateway|primary)|"
+                             r"requires? (a |the )?(connection|network|primary)|waits? for the connection|"
+                             r"with the reason|connect to)", re.I)
 
 
 def required_body(op: dict) -> bool:
@@ -110,6 +130,7 @@ def main() -> int:
         path_index.add((f["method"].upper(), re.sub(r"\{[^}]+\}", "{}", f["path"]).rstrip("/")))
 
     all_screens = g.screens()
+    offline_platforms = {stem: bool(p.get("offlineCapable")) for stem, p in g.platforms().items()}
     by_schema, _ = g.schemas()
     # Platforms that sign a workstation in: some screen takes workstationId from the session.
     ws_platforms = {plat for plat, s in all_screens
@@ -332,6 +353,29 @@ def main() -> int:
                 guard.add("S-OFFLINE-CLAIM", sid,
                           f"{sid}: offline state promises to queue or sync and none of its "
                           f"{len(writes)} write(s) is x-ticvai-offline-capable")
+        # --- CHG-SWP-004 offline writes against frontend-patterns 4.4 ---------------------------
+        writes = [o for o, f in facts.items() if f and f["method"] in WRITES]
+        capable = [o for o in writes if facts[o]["op"].get("x-ticvai-offline-capable") is True]
+        offline_app = bool(offline_platforms.get(plat))
+        refuses = bool(off and OFFLINE_REFUSAL.search(off))
+        promises = bool(off and QUEUE_PROMISE.search(off))
+        if offline_app and capable and (s.get("offline") is False or (refuses and not promises)):
+            for o in capable:
+                guard.add("S-OFFLINE-REFUSED", f"{sid}:{o}",
+                          f"{sid} ({plat[:3]}): {o} is offline-capable (outbox, 4.4); the screen refuses it offline: "
+                          + ("offline: false" if s.get("offline") is False else off[:100]))
+        if promises and not refuses:
+            if offline_app and capable:
+                for o in writes:
+                    if o not in capable and o not in off:
+                        guard.add("S-OFFLINE-QUEUED", f"{sid}:{o}",
+                                  f"{sid} ({plat[:3]}): offline state promises to queue or sync and does not say "
+                                  f"{o} (not offline-capable) is disabled offline: {off[:90]}")
+            elif not offline_app:
+                for o in writes:
+                    guard.add("S-OFFLINE-QUEUED", f"{sid}:{o}",
+                              f"{sid} ({plat[:3]}): a web app has no offline store, and its offline state queues "
+                              f"{o}: {off[:90]}")
     pairs = g.load_yaml(g.SCREENS / "_guest-pairs.yaml") or {}
     for (plat, sig), ids in sorted(sigs.items(), key=lambda kv: kv[1]):
         if len(ids) > 1:

@@ -177,22 +177,22 @@ screens:
         bindsTo: LoginRequest.method
       - kind: numberField
         label: PIN or password
-        notes: 'Goes into `LoginRequest.credential`, with `method: pin` (a keypad of the tenant''s PIN length)
-          or `method: password` (a text field), as the switch above it says. **The PIN length is the tenant''s
-          choice, not fixed at 4** (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): the keypad takes
-          exactly `WorkstationContext.pinLength` digits (`PasswordPolicy.pinLength`: 4, 6 or 8), which the till keeps
-          from its last session; a till never signed into accepts 4 to 8 digits and the server decides. The denied
-          state counts against `PasswordPolicy.pinLockoutAfterAttempts`; a locked PIN (429 `credential-locked`) says
-          until when.'
+        notes: 'Goes into `LoginRequest.credential`, with `method: pin` (a keypad of the tenant''s PIN
+          length) or `method: password` (a text field), as the switch above it says. **The PIN length
+          is the tenant''s choice, not fixed at 4** (decided by Chinmay, 14 October 2026, ADAM CR-078;
+          CHG-CRD-002): the keypad takes exactly `WorkstationContext.pinLength` digits (`PasswordPolicy.pinLength`:
+          4, 6 or 8), which the till keeps from its last session; a till never signed into accepts 4 to
+          8 digits and the server decides. The denied state counts against `PasswordPolicy.pinLockoutAfterAttempts`;
+          a locked PIN (429 `credential-locked`) says until when.'
         bindsTo: LoginRequest.credential
       - kind: textField
         label: New PIN
         operation: changeOwnCredential
         bindsTo: ChangeCredentialRequest.newCredential
-        notes: 'Shown when `LoginResponse.mustChangeCredential` is true (a new or reset PIN is temporary; CHG-CRD-001):
-          the new PIN twice, exactly the tenant''s PIN length, before anything else. Reuse follows the tenant''s
-          `PasswordPolicy.pinReusePrevention` (none, last 3 or last 5); 422 `credential-reused`, `policy-not-met` or
-          `current-credential-wrong` each say which.'
+        notes: 'Shown when `LoginResponse.mustChangeCredential` is true (a new or reset PIN is temporary;
+          CHG-CRD-001): the new PIN twice, exactly the tenant''s PIN length, before anything else. Reuse
+          follows the tenant''s `PasswordPolicy.pinReusePrevention` (none, last 3 or last 5); 422 `credential-reused`,
+          `policy-not-met` or `current-credential-wrong` each say which.'
         provenance: contract identity.yaml POST /auth/credential
       - kind: primaryButton
         label: Sign in
@@ -6756,15 +6756,15 @@ screens:
     trigger: Configure workstation
     body: '**Collects what `configureWorkstation` sends before it is called.** Required: `name`. Optional:
       `saleBoardId` (absent or null, the till uses its outlet''s board; DEC-183, CHG-CSP-006), `outletId`,
-      `cashDrawerLimit` (null inherits the venue''s; DEC-179, CHG-CSP-016), `cashierInputMode`,
-      `guestDisplayContent`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`,
-      `isActive`. **The form opens filled with the workstation as `getWorkstation` returns it and sends it
-      back whole**: the call replaces the configuration, so a field left out takes its default
-      (`cashierInputMode` `hybrid`, `guestDisplayContent` line items only, `isActive` on) or is cleared
-      (ADAM CR-082, CHG-TEN-003). Dismissing sends nothing; the screen behind is unchanged. Not asked:
-      `loadedMediaStockId` and `mediaStockRemaining`, deprecated and stored nowhere until BL-095 (the media
-      stock record, on the printer device, waits on the BOCA stock answer; CHG-TEN-003). Refused `409
-      shift-open` while a shift is open on the till, naming the shift (CHG-TEN-004).'
+      `cashDrawerLimit` (null inherits the venue''s; DEC-179, CHG-CSP-016), `cashierInputMode`, `guestDisplayContent`,
+      `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. **The
+      form opens filled with the workstation as `getWorkstation` returns it and sends it back whole**:
+      the call replaces the configuration, so a field left out takes its default (`cashierInputMode` `hybrid`,
+      `guestDisplayContent` line items only, `isActive` on) or is cleared (ADAM CR-082, CHG-TEN-003).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked: `loadedMediaStockId` and `mediaStockRemaining`,
+      deprecated and stored nowhere until BL-095 (the media stock record, on the printer device, waits
+      on the BOCA stock answer; CHG-TEN-003). Refused `409 shift-open` while a shift is open on the till,
+      naming the shift (CHG-TEN-004).'
     bindsTo: ConfigureWorkstationRequest
     confirm:
       label: Configure workstation

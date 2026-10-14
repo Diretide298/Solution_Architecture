@@ -274,7 +274,7 @@
  },
  "ApprovalRequest": {
   "type": "object",
-  "x-ticvai-persistence": "approvals.request",
+  "x-ticvai-persistence": "approvals.request + approvals.escalation",
   "required": [
    "id",
    "kind",
@@ -378,16 +378,24 @@
    },
    "escalations": {
     "type": "array",
-    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
+    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n\n**Stored as `approvals.escalation` rows, one per escalation, in order** (14 October 2026, CHG-CRD-006, ADAM CR-078: the table held only `id` and `request_id`, so `escalateApprovalRequest` wrote nothing the escalation reports could read). Written by `escalateApprovalRequest` (manual, `wasAutomatic` false) and by the SLA job on a breach (`wasAutomatic` true); read by `getApprovalAnalytics` and the SLA and escalation monitors. Append-only: an escalation is never edited.\n",
     "items": {
      "type": "object",
+     "required": [
+      "at",
+      "toLevel",
+      "wasAutomatic"
+     ],
      "properties": {
       "at": {
        "type": "string",
-       "format": "date-time"
+       "format": "date-time",
+       "x-ticvai-column": "escalated_at"
       },
       "reason": {
-       "type": "string"
+       "type": "string",
+       "maxLength": 300,
+       "description": "The requester's or approver's reason; for an automatic escalation, the SLA rule that fired."
       },
       "fromLevel": {
        "type": "integer"
@@ -397,6 +405,18 @@
       },
       "wasAutomatic": {
        "type": "boolean"
+      },
+      "escalatedByPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "Who escalated it by hand (`escalateApprovalRequest`'s caller); null for an automatic one."
+      },
+      "addedApproverPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "The approver the escalation added at `toLevel`; the original approver stays in the chain."
       }
      }
     }

@@ -66,6 +66,11 @@ CHECKS = [
     "check-ticket-text", "check-screen-wiring", "check-navigation", "check-contract-shapes",
     "check-ddl-conventions", "check-contract-storage", "check-starter-fit", "check-glossary-terms",
     "check-wireframe-coverage",
+    # 14 October (ADAM CR-065..CR-074, batch DDL, CHG-DDL-001..008): what an operation promises about storage, the
+    # derived DDL keeps -- an array a slice operation takes is stored, a 409 for a duplicate code has its unique
+    # index at the level it names, a request does not make the row's column NOT NULL, NOT NULL keys are declared,
+    # and the name rule's cross-module guesses do not grow.
+    "check-storage-promises",
     # 1 October: the process design notes (handoff/design-notes/*.yaml) reach every design session through
     # BUNDLE.md; every rule there must carry a source that exists. Passes while the folder is empty.
     "check-design-notes",
@@ -120,6 +125,13 @@ CHECKS = [
     # 13 October (Chinmay, r5, CHG-R6-059): the frontend is one GitLab repository per app; every screen platform and
     # frontend app has its entry in docs/active/frontend-repos.yaml, and ADAM setup's table names the same ones.
     "check-frontend-repos",
+    # 14 October (Chinmay, r6, CHG-ADM-001 and CHG-ADM-002): developers and agents are always on the latest release
+    # (nothing ADAM says asks them to choose one), and a settled CR reaches its ticket: a comment for the agent while
+    # it is open, a child task when it is closed. Both read ../viewer, the way check-frontend-repos does.
+    "check-adam-latest-release", "check-adam-cr-settlement",
+    # 14 October (Chinmay, CHG-ADM-004): a blocker is always a CR, the ticket goes On hold, and the agent takes the next
+    # ticket no open blocking CR affects; every text an agent reads says so and ADAM answers it on the board and the pull.
+    "check-adam-blocker-rule",
     # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
     # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
     "check-parameter-columns",
@@ -136,11 +148,33 @@ CHECKS = [
     # 12 October (ADAM CR-002 on DB-ROLES, CHG-R6-020): a write into another deployable's schema goes by event or by
     # the owner's operation (x-ticvai-write-via) or is a dated exception; the kernel grants are exactly the four agreed.
     "check-cross-deployable-writes",
+    # 14 October (ADAM CR-081, CR-083, CR-084; ADR-0055 amended 14 October, CHG-GEN-009): a read of another module's
+    # data is a view named for the reader inside one deployable, or a declared query (x-ticvai-read-via) by a route
+    # the deployables allow; Identity reads nothing above it but a projection.
+    "check-cross-module-reads",
+    # 14 October (ADAM CR-076, CHG-GEN-010): a table's row-level security lets in the scope its operations run at.
+    "check-rls-scope-fit",
     # 12 October (CHG-R6-030): a screen is gated on a permission its operations require; the ticket media designers
     # take the product permission (BC-034..BC-037).
     "check-screen-permissions",
     # 12 October (CHG-R6-031..038): a promise has its operation, field, binding or reader; one business day.
     "check-promises-kept",
+    # 14 October (ADAM CR-082, CHG-TEN-005): a configuration write's request field is on its persisted resource,
+    # has a column in a table it writes, or says x-ticvai-persisted: false; no readOnly field on a request-only schema.
+    "check-request-fields-stored",
+    # 14 October (ADAM CR-078, CHG-CRD-009): a request field the contract says is stored reaches a column the
+    # lineage writes, a write into a key-only table brings its fields a column, and a credential is kept only as a
+    # hash (ADR-0071). A ratchet over the 22 known; reads the schema reference, so it runs after derive-schema.
+    "check-stored-request-fields",
+    # 14 October (ADAM CR-084, CHG-GDL-001): a 4xx whose description names another module's record (an order, an
+    # entitlement, a shift, a variant) declares its problem types and an x-ticvai-read-via to the owner's declared
+    # query (a ratchet over the 160 known); batch GEN's check-cross-module-reads covers the lineage side. Since ADAM
+    # CR-085 (CHG-FIN-012) it also reads the refusal its response schema defines (E-SCHEMA-READ-VIA: closeFiscalPeriod's
+    # close checks named Orders' shifts and Wallet's checks only in PeriodCloseResult).
+    "check-error-sources",
+    # 14 October (ADAM CR-004 on DB-READ-VIEWS, CHG-LIN-001): a read of personal data by another module names its
+    # columns, so its view is narrow; every read's column list is the derived one (tools/derive-read-columns.py).
+    "check-read-columns",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
@@ -164,8 +198,9 @@ REPORT_ONLY = {
     # current findings are the guest fixes (public theme and policy reads, staff fields off guest screens)
     # and the POS loyalty swap, which are in flight. When those land, the lead records the baseline
     # (--update-baseline) and takes each out of this list; from then a new finding blocks.
-    "check-audience-match":
-        "gates once the guest fixes land and the lead records its baseline (council of 2 October)",
+    # check-audience-match gates since 14 October 2026 (CHG-SWP-002): the guest fixes have landed (AM-GUEST-OP,
+    # AM-GUEST-FIELD and AM-GUEST-PERMISSION find nothing on r6), its baseline is recorded, and it gained
+    # AM-TICKET-OP (a staff operation on a guest app's feature ticket, #27741).
     "check-preauth-session":
         "gates once the public theme and policy reads land and the lead records its baseline",
     "check-subject":

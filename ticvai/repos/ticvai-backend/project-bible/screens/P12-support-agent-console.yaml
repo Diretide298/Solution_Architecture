@@ -254,8 +254,11 @@ screens:
       - kind: textField
         label: New password
         operation: changeOwnCredential
-        notes: 'Only when the credential was reset and is temporary: a new one is set before anything
-          else, twice, and the last five cannot be reused (audit R132).'
+        notes: 'Shown when `LoginResponse.mustChangeCredential` is true (the credential was issued or
+          reset and is temporary; CHG-CRD-001): a new one is set before anything else, twice, and the
+          last five cannot be reused (audit R132). A refusal names its cause (422 `policy-not-met`, `credential-reused`,
+          `current-credential-wrong`); a principal who signs in through the tenant''s single sign-on never
+          sees it.'
         provenance: contract identity.yaml POST /auth/credential
   states:
     loading: Checking the credential. The form stays visible and disabled.

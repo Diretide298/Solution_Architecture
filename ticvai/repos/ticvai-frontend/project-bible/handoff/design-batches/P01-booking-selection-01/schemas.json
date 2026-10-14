@@ -2099,6 +2099,7 @@
     "readOnly": true
    },
    "mapId": {
+    "x-ticvai-references": "venuemap.map",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -3678,11 +3679,13 @@
    },
    "fromPointId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "venuemap.point"
    },
    "toPointId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "venuemap.point"
    },
    "geometry": {
     "type": "string",
@@ -3705,6 +3708,7 @@
     "default": false
    },
    "restrictedByPointId": {
+    "x-ticvai-references": "venuemap.point",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -4063,64 +4067,87 @@
    },
    "items": {
     "type": "array",
-    "x-ticvai-persistence": "marketing.wishlist_item",
+    "description": "Newest first: ordered by `addedAt` descending, `id` as the tiebreak (CHG-MKT-002).",
     "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "variantId",
-      "addedAt",
-      "isAvailable"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "productName": {
-       "type": "string"
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "performanceStartsAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "price": {
-       "x-ticvai-column": "list_price",
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "The variant's current list price when the wishlist is read. Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column); the wire keeps `price`."
-      },
-      "imageAssetRef": {
-       "type": "string",
-       "nullable": true
-      },
-      "isAvailable": {
-       "type": "boolean",
-       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
-      },
-      "unavailableReason": {
-       "type": "string",
-       "nullable": true
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      },
-      "addedAt": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
+     "$ref": "#/components/schemas/WishlistItem"
     }
+   }
+  }
+ },
+ "WishlistItem": {
+  "x-ticvai-persistence": "marketing.wishlist_item",
+  "x-ticvai-unique-together": [
+   [
+    "subjectId",
+    "variantId",
+    "performanceId"
+   ]
+  ],
+  "x-ticvai-unique-nulls": "not-distinct",
+  "type": "object",
+  "required": [
+   "id",
+   "subjectId",
+   "variantId",
+   "addedAt",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The guest who saved it. The wishlist is keyed by subject; there is no parent wishlist row."
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productName": {
+    "type": "string",
+    "description": "**Catalogue's, not Marketing's.** Taken from Catalogue's `variantListingFacts` when the item is saved, and replaced by Catalogue's current value each time the wishlist is read (CHG-MKT-002)."
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceStartsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The saved performance's start, from Catalogue's `variantListingFacts`; null for a date-less entry."
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The variant's current list price when the wishlist is read: the price Catalogue's guest listing shows for the variant on the guest's channel (`variantListingFacts.listPrice`). Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column), the amount alone as every Money column is (`numeric(18,4)`; the currency resolves from the variant's venue, ADR-0018); the wire keeps `price`. **The stored value is the price when the item was saved**, kept for segmentation (a price drop on a saved item is a signal) and returned only when Catalogue cannot be reached (CHG-MKT-002)."
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The product's primary media, from Catalogue's `variantListingFacts`."
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken. **Computed when the wishlist is read** from Catalogue's `variantListingFacts` (`sellable`) and the performance's start; the stored value is the answer when the item was saved (CHG-MKT-002).\n"
+   },
+   "unavailableReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why `isAvailable` is false, in Catalogue's words (`variantListingFacts.reason`), or `performancePassed`; null when available."
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "addedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  }

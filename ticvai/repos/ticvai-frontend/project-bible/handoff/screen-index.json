@@ -1242,12 +1242,17 @@
   ],
   "reads": [
    "cache:idempotency",
-   "marketing.guest_profile",
+   "catalogue.performance",
+   "catalogue.price",
+   "catalogue.price_assignment",
+   "catalogue.price_list",
+   "catalogue.product",
+   "catalogue.product_media",
+   "catalogue.variant",
    "marketing.wishlist_item"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.guest_profile",
    "marketing.wishlist_item"
   ],
   "storedProcedures": [],
@@ -2311,7 +2316,13 @@
    "access.entitlement",
    "cache:idempotency",
    "catalogue.entitlement_template",
+   "catalogue.performance",
+   "catalogue.price",
+   "catalogue.price_assignment",
+   "catalogue.price_list",
    "catalogue.product",
+   "catalogue.product_media",
+   "catalogue.variant",
    "identity.delegated_access",
    "marketing.challenge",
    "marketing.challenge_progress",
@@ -3220,11 +3231,18 @@
    "cache:idempotency",
    "cache:resolution",
    "catalogue.entitlement_template",
+   "catalogue.performance",
+   "catalogue.price",
+   "catalogue.price_assignment",
+   "catalogue.price_list",
    "catalogue.product",
+   "catalogue.product_media",
+   "catalogue.variant",
    "identity.delegated_access",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
    "identity.principal",
+   "identity.subject_holding",
    "marketing.consent_purpose",
    "marketing.consent_purpose_channel",
    "marketing.consent_record",
@@ -3238,12 +3256,12 @@
    "marketing.guest_profile",
    "marketing.tracking_technology",
    "marketing.wishlist_item",
-   "orders.sales_order",
    "pii.subject",
    "pii.subject_biometric"
   ],
   "writes": [
    "access.biometric_audit_event",
+   "approvals.request",
    "cache:idempotency",
    "cache:resolution",
    "identity.mfa_method",
@@ -3252,11 +3270,11 @@
    "marketing.consent_record",
    "marketing.device_consent",
    "marketing.device_consent_category",
+   "marketing.guest_device",
    "marketing.guest_profile",
    "pii.consent_identifier",
    "pii.subject",
    "pii.subject_biometric",
-   "platform.dsar_request",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -4065,6 +4083,7 @@
    "catalogue.channel_capacity",
    "catalogue.inventory_reservation",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "ledger.fx_rate",
    "marketing.consent_question",
@@ -4340,6 +4359,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "fnb.delivery_location",
    "fnb.delivery_location_outlet",
@@ -4735,6 +4755,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -4834,6 +4855,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -5267,6 +5289,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "maintenance.work_order",
    "marketing.consent_question",
@@ -5486,6 +5509,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -8304,12 +8328,17 @@
   ],
   "reads": [
    "cache:idempotency",
-   "marketing.guest_profile",
+   "catalogue.performance",
+   "catalogue.price",
+   "catalogue.price_assignment",
+   "catalogue.price_list",
+   "catalogue.product",
+   "catalogue.product_media",
+   "catalogue.variant",
    "marketing.wishlist_item"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.guest_profile",
    "marketing.wishlist_item"
   ],
   "storedProcedures": [],
@@ -8818,6 +8847,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "inventory.movement",
    "inventory.stock_earmark",
@@ -8961,6 +8991,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -9434,6 +9465,7 @@
    "catalogue.channel_capacity",
    "catalogue.inventory_reservation",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "fnb.delivery_location",
    "fnb.delivery_policy",
@@ -11144,6 +11176,7 @@
    "catalogue.channel_capacity",
    "catalogue.inventory_reservation",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -12070,6 +12103,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -12681,9 +12715,9 @@
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
    "cache:resolution",
+   "identity.subject_holding",
    "marketing.consent_purpose",
    "marketing.consent_purpose_channel",
    "marketing.consent_record",
@@ -12694,10 +12728,10 @@
    "marketing.guest_document",
    "marketing.guest_profile",
    "marketing.tracking_technology",
-   "orders.sales_order",
    "pii.subject"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
    "cache:resolution",
    "marketing.consent_propagation",
@@ -12707,7 +12741,6 @@
    "marketing.guest_profile",
    "pii.consent_identifier",
    "pii.subject",
-   "platform.dsar_request",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -13090,6 +13123,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "fnb.dining_table",
    "fnb.reservation_table",
@@ -13571,9 +13605,10 @@
    "identity.mfa_method",
    "identity.mfa_recovery_code",
    "identity.otp_challenge",
+   "identity.password_policy",
    "identity.principal",
+   "identity.session",
    "marketing.guest_device",
-   "marketing.guest_profile",
    "pii.subject"
   ],
   "writes": [
@@ -13585,7 +13620,6 @@
    "identity.otp_challenge",
    "identity.session",
    "marketing.guest_device",
-   "marketing.guest_profile",
    "marketing.message_dispatch",
    "pii.subject",
    "platform.outbox"
@@ -13694,6 +13728,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "maintenance.work_order",
    "marketing.consent_question",
@@ -13993,6 +14028,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -14098,6 +14134,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -14276,6 +14313,7 @@
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.role",
    "identity.session",
    "platform.workstation"
@@ -14285,7 +14323,9 @@
    "cache:resolution",
    "identity.mfa_challenge",
    "identity.mfa_recovery_code",
+   "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.refresh_token",
    "identity.session",
    "platform.outbox"
@@ -14403,9 +14443,9 @@
   "transitions": [
    {
     "to": "POS-002",
-    "trigger": "Open shift, after the four-digit PIN and the float count",
+    "trigger": "Open shift, after the PIN (the tenant's PIN length) and the float count",
     "control": "primaryButton#openShift",
-    "precondition": "pin.length == 4 and openingFloat.counted",
+    "precondition": "pin.length == workstation.pinLength and openingFloat.counted",
     "guard": "sale.create",
     "carries": [
      "shiftId",
@@ -14676,6 +14716,7 @@
    "access.entitlement",
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -14727,6 +14768,7 @@
    "whitelabel.guided_choice_answer"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "catalogue.channel_capacity",
@@ -17930,6 +17972,7 @@
    "orders.deposit_box",
    "orders.deposit_box_foreign_holding",
    "orders.deposit_box_opening_denomination",
+   "orders.pos_shift",
    "platform.device",
    "platform.workstation",
    "tenancy.device_assignment"
@@ -18004,7 +18047,7 @@
     "id": "formConfigureWorkstation",
     "component": "modal",
     "trigger": "Configure workstation",
-    "body": "**Collects what `configureWorkstation` sends before it is called.** Required: `name`, `saleBoardId`. Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `mediaStockRemaining` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `configureWorkstation` sends before it is called.** Required: `name`. Optional: `saleBoardId` (absent or null, the till uses its outlet's board; DEC-183, CHG-CSP-006), `outletId`, `cashDrawerLimit` (null inherits the venue's; DEC-179, CHG-CSP-016), `cashierInputMode`, `guestDisplayContent`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. **The form opens filled with the workstation as `getWorkstation` returns it and sends it back whole**: the call replaces the configuration, so a field left out takes its default (`cashierInputMode` `hybrid`, `guestDisplayContent` line items only, `isActive` on) or is cleared (ADAM CR-082, CHG-TEN-003). Dismissing sends nothing; the screen behind is unchanged. Not asked: `loadedMediaStockId` and `mediaStockRemaining`, deprecated and stored nowhere until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer; CHG-TEN-003). Refused `409 shift-open` while a shift is open on the till, naming the shift (CHG-TEN-004).",
     "bindsTo": "ConfigureWorkstationRequest",
     "confirm": {
      "label": "Configure workstation",
@@ -18015,9 +18058,10 @@
      "discards": [
       "name",
       "saleBoardId",
+      "outletId",
+      "cashDrawerLimit",
       "cashierInputMode",
       "guestDisplayContent",
-      "loadedMediaStockId",
       "departmentId",
       "accessPointId",
       "devices",
@@ -18328,6 +18372,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -18342,6 +18387,7 @@
   ],
   "writes": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "control.partner_agreement",
@@ -18510,6 +18556,7 @@
    "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.price_list",
+   "catalogue.product",
    "catalogue.variant",
    "fnb.menu_item",
    "fnb.modifier_group",
@@ -18519,6 +18566,7 @@
    "orders.cart",
    "orders.cart_line",
    "platform.outlet",
+   "platform.outlet_opening_hour",
    "promotions.coupon_code",
    "promotions.promotion",
    "promotions.promotion_rule"
@@ -18852,6 +18900,7 @@
    "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.price_list",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -19838,6 +19887,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "ledger.credit_memo",
    "ledger.legal_entity",
@@ -20521,6 +20571,7 @@
    "catalogue.channel_capacity",
    "catalogue.inventory_reservation",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -21458,6 +21509,7 @@
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.variant",
    "inventory.movement",
    "inventory.stock_earmark",
@@ -21601,6 +21653,7 @@
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.role",
    "identity.session",
    "identity.sso_group_mapping",
@@ -21614,6 +21667,7 @@
    "identity.mfa_recovery_code",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.refresh_token",
    "identity.session",
    "platform.outbox"
@@ -25125,6 +25179,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "identity.principal",
@@ -31431,6 +31486,7 @@
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.role",
    "identity.session"
   ],
@@ -31439,7 +31495,9 @@
    "cache:resolution",
    "identity.mfa_challenge",
    "identity.mfa_recovery_code",
+   "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.refresh_token",
    "identity.session",
    "platform.outbox"
@@ -31638,14 +31696,14 @@
    "identity.principal",
    "orders.sales_order",
    "pii.subject",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "writes": [
    "access.biometric_audit_event",
    "access.scan_event",
    "cache:idempotency",
-   "platform.cross_region_entitlement",
-   "platform.outbox"
+   "platform.outbox",
+   "sync.cross_region_entitlement"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -32137,11 +32195,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.cross_region_entitlement"
+   "sync.cross_region_entitlement"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -35253,8 +35311,9 @@
    "catalogue.published_bundle",
    "catalogue.variant",
    "control.channel_listing",
-   "platform.sale_board",
-   "platform.sale_board_tile",
+   "platform.sale_board_for_catalogue",
+   "platform.sale_board_page_for_catalogue",
+   "platform.sale_board_tile_for_catalogue",
    "whitelabel.guided_choice_answer"
   ],
   "writes": [
@@ -35478,8 +35537,9 @@
    "catalogue.product_media",
    "catalogue.published_bundle",
    "catalogue.variant",
-   "platform.sale_board",
-   "platform.sale_board_tile",
+   "platform.sale_board_for_catalogue",
+   "platform.sale_board_page_for_catalogue",
+   "platform.sale_board_tile_for_catalogue",
    "whitelabel.guided_choice_answer"
   ],
   "writes": [
@@ -36354,7 +36414,8 @@
    "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "writes": [
    "cache:idempotency",
@@ -38579,6 +38640,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "orders.pos_shift",
    "platform.device",
    "platform.device_heartbeat",
    "platform.workstation",
@@ -38671,7 +38733,7 @@
     "id": "formConfigureWorkstation",
     "component": "modal",
     "trigger": "Configure workstation",
-    "body": "**Collects what `configureWorkstation` sends before it is called.** Required: `name`, `saleBoardId`. Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `mediaStockRemaining` (3 October 2026, CHG-SPF-001).",
+    "body": "**Collects what `configureWorkstation` sends before it is called.** Required: `name`. Optional: `saleBoardId` (absent or null, the till uses its outlet's board; DEC-183, CHG-CSP-006), `outletId`, `cashDrawerLimit` (null inherits the venue's; DEC-179, CHG-CSP-016), `cashierInputMode`, `guestDisplayContent`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. **The form opens filled with the workstation as `getWorkstation` returns it and sends it back whole**: the call replaces the configuration, so a field left out takes its default (`cashierInputMode` `hybrid`, `guestDisplayContent` line items only, `isActive` on) or is cleared (ADAM CR-082, CHG-TEN-003). Dismissing sends nothing; the screen behind is unchanged. Not asked: `loadedMediaStockId` and `mediaStockRemaining`, deprecated and stored nowhere until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer; CHG-TEN-003). Refused `409 shift-open` while a shift is open on the till, naming the shift (CHG-TEN-004).",
     "bindsTo": "ConfigureWorkstationRequest",
     "confirm": {
      "label": "Configure workstation",
@@ -38682,9 +38744,10 @@
      "discards": [
       "name",
       "saleBoardId",
+      "outletId",
+      "cashDrawerLimit",
       "cashierInputMode",
       "guestDisplayContent",
-      "loadedMediaStockId",
       "departmentId",
       "accessPointId",
       "devices",
@@ -38734,8 +38797,9 @@
    "orders.sales_order",
    "platform.device",
    "platform.offline_policy",
-   "platform.sale_board",
-   "platform.sale_board_tile",
+   "platform.sale_board_for_catalogue",
+   "platform.sale_board_page_for_catalogue",
+   "platform.sale_board_tile_for_catalogue",
    "platform.workstation",
    "sync.rejection"
   ],
@@ -39561,6 +39625,7 @@
    "fnb.temperature_log",
    "identity.principal",
    "platform.outlet",
+   "platform.outlet_opening_hour",
    "retail.return_policy"
   ],
   "writes": [
@@ -39571,6 +39636,7 @@
    "fnb.delivery_policy",
    "fnb.dining_table",
    "platform.outlet",
+   "platform.outlet_opening_hour",
    "retail.return_policy"
   ],
   "storedProcedures": [],
@@ -39786,6 +39852,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -39806,9 +39873,11 @@
    "fnb.substitution_rule",
    "identity.principal",
    "inventory.inventory_item",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "cache:resolution",
@@ -40434,6 +40503,7 @@
    "catalogue.variant",
    "inventory.inventory_item",
    "platform.outlet",
+   "platform.outlet_opening_hour",
    "retail.merchandise",
    "whitelabel.guided_choice_answer"
   ],
@@ -40971,11 +41041,13 @@
    "listActiveSessions",
    "forceLogout",
    "revokeAllSessions",
+   "listShifts",
    "createMfaChallenge",
    "verifyMfaChallenge"
   ],
   "services": [
    "IdentityService",
+   "OrderService",
    "TenancyService"
   ],
   "stores": [
@@ -40989,11 +41061,17 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
    "identity.role",
    "identity.role_permission",
+   "identity.segregation_rule",
    "identity.session",
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident",
+   "platform.scope",
    "platform.workstation",
    "workforce.employee",
    "workforce.job_title",
@@ -41001,10 +41079,13 @@
   ],
   "writes": [
    "cache:idempotency",
+   "cache:resolution",
+   "identity.delegated_access",
    "identity.mfa_challenge",
    "identity.mfa_recovery_code",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.session",
    "platform.outbox",
    "workforce.job_title",
@@ -41050,7 +41131,7 @@
     "id": "formCreatePrincipal",
     "component": "modal",
     "trigger": "Create principal",
-    "body": "**Collects what `createPrincipal` sends before it is called.** Required: `username`, `displayName`. Optional: `initialCredential`, `mustChangeCredential`, `validTo`, `roleIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPrincipal` sends before it is called.** Required: `username`, `displayName`. Optional: `initialCredential`, `mustChangeCredential`, `validTo`, `homeScopePath`, `roleIds`. The home scope defaults to the caller's own and is picked from the nodes the caller's `USER_MANAGE` reaches; each chosen role is granted there, the first becoming the primary role (14 October 2026, ADAM CR-077; CHG-IDR-002). A `409 segregation-breach` names the rule and the two roles' permissions and keeps the form as typed (ADAM CR-079; CHG-IDR-003). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreatePrincipalRequest",
     "confirm": {
      "label": "Create principal",
@@ -41064,6 +41145,7 @@
       "initialCredential",
       "mustChangeCredential",
       "validTo",
+      "homeScopePath",
       "roleIds"
      ]
     },
@@ -41181,7 +41263,7 @@
    "error": "Could not load. Names which read failed and leaves the role assignment untouched.",
    "emptyFirstRun": "No role assignment yet. Offers Create role (`createRole`).",
    "emptyNoResults": "Never shown: `listRoles` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PERMISSION_VIEW` and say so in their own panels). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`."
+   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PERMISSION_VIEW` and say so in their own panels). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`. **A venue-scoped `ROLE_MANAGE` sees every role read-only**: Create role, Save role permissions and saving a preset (`createRole`, `setRolePermissions`, `setCapabilityTemplate`) need `ROLE_MANAGE` at the tenant scope and are shown disabled, naming the tenant scope (14 October 2026, ADAM CR-076; CHG-IDR-001)."
   },
   "overlays": [
    {
@@ -41230,7 +41312,7 @@
     "id": "formCreateRole",
     "component": "modal",
     "trigger": "Create role",
-    "body": "**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional: `description`, `presetCodes`, `permissions`. `presetCodes` fills the checklist from the chosen presets; `permissions` is the edited result. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional: `description`, `presetCodes`, `permissions`. `presetCodes` fills the checklist from the chosen presets; `permissions` is the edited result. Dismissing sends nothing; the screen behind is unchanged. A `409` stays in the dialog with what was typed: `duplicate-code` names the role already holding the code (compared case-insensitively), `segregation-breach` names the rule and both permissions, so one tick can be removed (14 October 2026, ADAM CR-079; CHG-IDR-003).",
     "confirm": {
      "label": "Create role",
      "operation": "createRole"
@@ -41481,7 +41563,10 @@
    "redis"
   ],
   "reads": [
+   "identity.delegated_access",
    "identity.principal",
+   "identity.role",
+   "platform.scope",
    "workforce.training_record"
   ],
   "writes": [],
@@ -42476,11 +42561,13 @@
    "cache:idempotency",
    "cache:resolution",
    "platform.outlet",
+   "platform.outlet_opening_hour",
    "platform.venue_settings"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -45350,6 +45437,7 @@
   "reads": [
    "ai.approval_request_score",
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -45486,6 +45574,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -45493,6 +45582,7 @@
   ],
   "writes": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "control.partner_agreement",
@@ -46029,6 +46119,7 @@
    "redis"
   ],
   "reads": [
+   "approvals.rule",
    "cache:idempotency",
    "ledger.account",
    "ledger.event_budget",
@@ -46042,9 +46133,12 @@
    "ledger.recognition_schedule",
    "ledger.settlement",
    "ledger.settlement_exception",
-   "ledger.tax_code"
+   "ledger.tax_code",
+   "orders.pos_shift",
+   "wallet.balance"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
    "ledger.fiscal_period",
    "ledger.fiscal_period_event",
@@ -49531,6 +49625,7 @@
    "accreditation.holder",
    "accreditation.validity",
    "cache:resolution",
+   "identity.delegated_access",
    "identity.role",
    "identity.role_permission",
    "platform.venue_settings",
@@ -50028,6 +50123,8 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.product",
+   "catalogue.variant",
    "fnb.menu",
    "fnb.menu_item",
    "fnb.menu_section",
@@ -50674,6 +50771,8 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.product",
+   "catalogue.variant",
    "platform.device",
    "platform.sale_board",
    "platform.sale_board_page",
@@ -51428,6 +51527,8 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.product",
+   "catalogue.variant",
    "platform.configuration_profile",
    "platform.device",
    "platform.profile_deployment",
@@ -51584,7 +51685,10 @@
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
+   "catalogue.variant",
    "platform.sale_board",
+   "platform.sale_board_page",
+   "platform.sale_board_tile",
    "whitelabel.guided_choice_answer"
   ],
   "writes": [
@@ -51669,6 +51773,8 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.product",
+   "catalogue.variant",
    "identity.principal",
    "platform.audit_record",
    "platform.configuration_profile",
@@ -52439,7 +52545,8 @@
    "cache:idempotency",
    "fnb.kitchen_sla",
    "fnb.kitchen_station",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "writes": [
    "cache:idempotency",
@@ -54776,6 +54883,7 @@
    "access.entry_rule_point",
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -54786,6 +54894,7 @@
   "writes": [
    "access.configuration_change",
    "access.configuration_version",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -60575,6 +60684,7 @@
    "access.scan_event",
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -60586,6 +60696,7 @@
    "access.dynamic_policy",
    "access.dynamic_policy_version",
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "control.partner_agreement",
@@ -63479,6 +63590,8 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.password_policy",
+   "identity.session",
    "subscription.membership_eligibility_rule",
    "subscription.membership_entitlement",
    "subscription.membership_household_policy",
@@ -64226,6 +64339,8 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.password_policy",
+   "identity.session",
    "subscription.membership_eligibility_rule",
    "subscription.membership_entitlement",
    "subscription.membership_household_policy",
@@ -64810,6 +64925,7 @@
    "access.entitlement",
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -64819,6 +64935,7 @@
   ],
   "writes": [
    "access.entitlement",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "orders.member_exception",
@@ -69146,6 +69263,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request"
   ],
   "writes": [],
@@ -69203,6 +69321,7 @@
   "reads": [
    "ai.approval_request_score",
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -69271,6 +69390,7 @@
   "reads": [
    "ai.approval_request_score",
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request"
   ],
   "writes": [],
@@ -69327,6 +69447,7 @@
   "reads": [
    "ai.approval_request_score",
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request"
   ],
   "writes": [],
@@ -69442,6 +69563,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request"
   ],
   "writes": [],
@@ -69609,6 +69731,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -69760,6 +69883,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.evidence_package",
    "approvals.request"
   ],
@@ -69895,6 +70019,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "approvals.signature",
@@ -69964,6 +70089,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -70030,10 +70156,12 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -70088,6 +70216,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -84060,6 +84189,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "orders.pos_shift",
    "platform.device",
    "platform.workstation"
   ],
@@ -86570,6 +86700,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency"
@@ -91279,6 +91410,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -91286,6 +91418,7 @@
    "identity.principal"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -91803,7 +91936,8 @@
    "postgres"
   ],
   "reads": [
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -92031,11 +92165,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.outlet"
+   "platform.outlet",
+   "platform.outlet_opening_hour"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -92103,6 +92239,7 @@
   "reads": [
    "platform.device",
    "platform.outlet",
+   "platform.outlet_opening_hour",
    "tenancy.device_assignment"
   ],
   "writes": [
@@ -94869,6 +95006,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -94880,6 +95018,7 @@
    "marketing.segment_criterion"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -101631,7 +101770,10 @@
    "redis"
   ],
   "reads": [
+   "identity.delegated_access",
    "identity.principal",
+   "identity.role",
+   "platform.scope",
    "workforce.job_title",
    "workforce.work_assignment"
   ],
@@ -101745,7 +101887,10 @@
    "redis"
   ],
   "reads": [
+   "identity.delegated_access",
    "identity.principal",
+   "identity.role",
+   "platform.scope",
    "resources.resource",
    "workforce.employee",
    "workforce.employment",
@@ -104959,6 +105104,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -104967,6 +105113,7 @@
    "identity.principal"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -106242,6 +106389,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -110751,6 +110899,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -110759,6 +110908,7 @@
    "seating.hold_pool"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -112018,6 +112168,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -112025,6 +112176,7 @@
    "identity.principal"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -115095,6 +115247,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -115102,6 +115255,7 @@
    "identity.principal"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency"
   ],
@@ -120864,24 +121018,29 @@
    "redis"
   ],
   "reads": [
+   "approvals.rule",
    "cache:idempotency",
    "ledger.fiscal_period",
    "ledger.fiscal_period_event",
    "ledger.journal_entry",
    "ledger.journal_line",
+   "ledger.legal_entity",
    "ledger.posting",
    "ledger.price_variance",
    "ledger.recognition_schedule",
    "ledger.settlement",
    "ledger.settlement_exception",
    "orders.payment",
+   "orders.pos_shift",
    "wallet.accounting_mapping",
+   "wallet.balance",
    "wallet.credit_lot",
    "wallet.credit_type",
    "wallet.reconciliation_source",
    "wallet.wallet_transaction"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
    "ledger.fiscal_period",
    "ledger.fiscal_period_event",
@@ -121509,6 +121668,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -121529,6 +121689,7 @@
    "wallet.wallet_type"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "wallet.configuration_version",
@@ -128793,6 +128954,7 @@
   "reads": [
    "access.entitlement",
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "catalogue.approval_policy",
@@ -129920,6 +130082,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -134852,6 +135015,7 @@
   ],
   "reads": [
    "approvals.decision",
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "promotions.promotion"
@@ -136313,7 +136477,9 @@
    "cache:idempotency",
    "identity.mfa_challenge",
    "identity.mfa_method",
-   "identity.mfa_recovery_code"
+   "identity.mfa_recovery_code",
+   "identity.password_policy",
+   "identity.session"
   ],
   "writes": [
    "approvals.request",
@@ -141676,6 +141842,7 @@
   "reads": [
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -141687,6 +141854,7 @@
    "payments.method"
   ],
   "writes": [
+   "approvals.escalation",
    "approvals.request",
    "cache:idempotency",
    "payments.currency_rule",
@@ -153697,7 +153865,9 @@
    "control.partner_credit_profile",
    "identity.mfa_challenge",
    "identity.mfa_method",
-   "identity.mfa_recovery_code"
+   "identity.mfa_recovery_code",
+   "identity.password_policy",
+   "identity.session"
   ],
   "writes": [
    "cache:idempotency",
@@ -153788,7 +153958,9 @@
    "control.partner_rate",
    "identity.mfa_challenge",
    "identity.mfa_method",
-   "identity.mfa_recovery_code"
+   "identity.mfa_recovery_code",
+   "identity.password_policy",
+   "identity.session"
   ],
   "writes": [
    "approvals.request",
@@ -153881,7 +154053,9 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.password_policy",
    "identity.principal",
+   "identity.session",
    "ledger.posting",
    "orders.payment",
    "orders.sales_order"
@@ -154251,6 +154425,8 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.password_policy",
+   "identity.session",
    "ledger.fx_rate",
    "ledger.legal_entity",
    "orders.order_line",
@@ -154372,6 +154548,7 @@
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.role",
    "identity.session",
    "identity.sso_group_mapping",
@@ -154386,6 +154563,7 @@
    "identity.mfa_recovery_code",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.refresh_token",
    "identity.session",
    "platform.outbox"
@@ -157583,11 +157761,19 @@
   "reads": [
    "cache:idempotency",
    "control.tenant",
+   "identity.delegated_access",
+   "identity.password_policy",
    "identity.platform_staff_grant",
-   "identity.principal"
+   "identity.principal",
+   "identity.role",
+   "identity.role_permission",
+   "identity.segregation_rule",
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
+   "cache:resolution",
+   "identity.delegated_access",
    "identity.platform_staff_grant",
    "identity.principal",
    "identity.principal_credential"
@@ -157719,6 +157905,7 @@
    "cache:idempotency",
    "control.tenant",
    "identity.capability_template",
+   "identity.delegated_access",
    "identity.permission",
    "identity.platform_staff_grant",
    "identity.role",
@@ -157730,7 +157917,8 @@
    "cache:resolution",
    "identity.platform_staff_grant",
    "identity.role",
-   "identity.role_permission"
+   "identity.role_permission",
+   "platform.audit_record"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -157842,6 +158030,7 @@
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.session"
   ],
   "writes": [
@@ -157849,7 +158038,9 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.session",
    "platform.outbox"
   ],
@@ -158781,7 +158972,9 @@
    "control.environment",
    "identity.mfa_challenge",
    "identity.mfa_method",
-   "identity.mfa_recovery_code"
+   "identity.mfa_recovery_code",
+   "identity.password_policy",
+   "identity.session"
   ],
   "writes": [
    "cache:idempotency",
@@ -160092,8 +160285,7 @@
    "cache:idempotency",
    "control.outbox_republish",
    "platform.audit_record",
-   "platform.dead_letter",
-   "platform.outbox"
+   "platform.dead_letter"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -163528,16 +163720,23 @@
    "cache:idempotency",
    "control.licence_add_on",
    "control.tenant",
+   "identity.delegated_access",
    "identity.password_policy",
    "identity.platform_staff_grant",
    "identity.principal",
+   "identity.role",
+   "identity.role_permission",
+   "identity.segregation_rule",
+   "platform.scope",
    "subscription.contract",
    "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
+   "cache:resolution",
    "control.licence_add_on",
    "control.licence_add_on_limit",
+   "identity.delegated_access",
    "identity.password_policy",
    "identity.platform_staff_grant",
    "identity.principal",
@@ -163604,7 +163803,7 @@
     "id": "formSetPasswordPolicy",
     "component": "modal",
     "trigger": "Set security baseline",
-    "body": "**Collects what `setPasswordPolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPasswordPolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged. **The tenant's PIN rule is three drop-downs** (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): PIN length (`PasswordPolicy.pinLength`: 4, 6 or 8 digits, default 4), PIN reuse (`pinReusePrevention`: allow, not the last 3, not the last 5; default not the last 5) and lock after (`pinLockoutAfterAttempts`: 3, 5 or 10 wrong PINs; default 5). They sit beside the password rules, whose R126 floor (minimum length 8) never applies to a PIN.",
     "confirm": {
      "label": "Set security baseline",
      "operation": "setPasswordPolicy"
@@ -172359,6 +172558,7 @@
    "ai.proposed_action",
    "approvals.decision",
    "approvals.delegation",
+   "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
    "approvals.rule",
@@ -175254,6 +175454,7 @@
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.role",
    "identity.session",
    "identity.sso_group_mapping",
@@ -175268,6 +175469,7 @@
    "identity.mfa_recovery_code",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.refresh_token",
    "identity.session",
    "platform.outbox"
@@ -175702,10 +175904,18 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.delegated_access",
+   "identity.password_policy",
+   "identity.principal",
+   "identity.role",
+   "identity.role_permission",
+   "identity.segregation_rule",
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
+   "cache:resolution",
+   "identity.delegated_access",
    "identity.principal",
    "identity.principal_credential"
   ],
@@ -176508,6 +176718,7 @@
    "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.price_list",
+   "catalogue.product",
    "catalogue.variant",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -177745,7 +177956,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.delegated_access"
+   "identity.delegated_access",
+   "identity.module_access",
+   "identity.role",
+   "identity.role_permission",
+   "identity.segregation_rule"
   ],
   "writes": [
    "cache:idempotency",
@@ -178458,6 +178673,8 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.password_policy",
+   "identity.session",
    "orders.sales_order"
   ],
   "writes": [
@@ -178854,7 +179071,9 @@
    "control.partner_commercial_exception",
    "identity.mfa_challenge",
    "identity.mfa_method",
-   "identity.mfa_recovery_code"
+   "identity.mfa_recovery_code",
+   "identity.password_policy",
+   "identity.session"
   ],
   "writes": [
    "approvals.request",
@@ -180203,6 +180422,7 @@
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.role",
    "identity.session",
    "identity.sso_group_mapping",
@@ -180217,6 +180437,7 @@
    "identity.mfa_recovery_code",
    "identity.principal",
    "identity.principal_credential",
+   "identity.principal_credential_history",
    "identity.refresh_token",
    "identity.session",
    "platform.outbox"
@@ -185275,9 +185496,11 @@
   ],
   "reads": [
    "cache:idempotency",
+   "identity.delegated_access",
    "identity.principal",
    "identity.role",
-   "identity.role_permission"
+   "identity.role_permission",
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
@@ -189622,6 +189845,7 @@
   ],
   "reads": [
    "identity.authorisation_policy",
+   "identity.delegated_access",
    "identity.role",
    "identity.role_permission"
   ],
@@ -193612,8 +193836,11 @@
   ],
   "reads": [
    "cache:idempotency",
+   "identity.delegated_access",
    "identity.principal",
+   "identity.role",
    "platform.device",
+   "platform.scope",
    "reporting.alert",
    "reporting.alert_rule",
    "reporting.dashboard",

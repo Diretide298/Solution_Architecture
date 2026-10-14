@@ -628,7 +628,7 @@
 | `BO-050` | Stock Position & Valuation | Stock & Supply | 2 | 2 | yes |
 | `BO-051` | Purchase Orders | Stock & Supply | 2 | 7 | yes |
 | `BO-052` | Goods Receipt | Stock & Supply | 2 | 5 | yes |
-| `BO-053` | Staff Directory | People & Access Rights | 1 | 15 | yes |
+| `BO-053` | Staff Directory | People & Access Rights | 1 | 16 | yes |
 | `BO-054` | Role Assignment | People & Access Rights | 1 | 11 | yes |
 | `BO-055` | Rota & Scheduling | People & Access Rights | 1 | 5 | yes |
 | `BO-056` | Time & Attendance | People & Access Rights | 2 | 2 | yes |

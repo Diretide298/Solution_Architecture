@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/build-white-label-map.py",
- "generated": "2026-10-13",
+ "generated": "2026-10-14",
  "note": "Derived from the configuring operations' request schemas and the screens. Never edit; rerun the tool.",
  "elements": [
   {
@@ -2428,10 +2428,9 @@
     }
    ],
    "reach": "web",
-   "reachesText": "GST-018, GST-066, WEB-018",
+   "reachesText": "GST-018, WEB-018",
    "specific": [
     "GST-018",
-    "GST-066",
     "WEB-018"
    ],
    "channel": "",
@@ -13156,7 +13155,6 @@
   },
   "GST-066": {
    "specific": [
-    "footer.socialLinks[].platform",
     "cookieBanner.brandId",
     "cookieBanner.inheritsFromId",
     "cookieBanner.channel",

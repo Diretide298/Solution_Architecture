@@ -188,6 +188,7 @@
     "description": "The order whose renewal failed."
    },
    "amount": {
+    "x-ticvai-column": "overdue_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "state": {
@@ -640,6 +641,7 @@
     }
    },
    "minimumOrderValue": {
+    "x-ticvai-column": "minimum_order_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "allowedFrequencies": {
@@ -663,6 +665,7 @@
     "maximum": 100
    },
    "instalmentFee": {
+    "x-ticvai-column": "instalment_fee_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "requireStoredCard": {

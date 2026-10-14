@@ -63,7 +63,7 @@ servicesCalled:
 - service: TenancyService
   operationCalls: 496
 - service: OrderService
-  operationCalls: 423
+  operationCalls: 424
 - service: AccessService
   operationCalls: 298
 - service: MarketingService
@@ -1824,6 +1824,7 @@ screens:
   - listActiveSessions
   - listJobTitles
   - listPrincipals
+  - listShifts
   - listWorkAssignments
   - resetPrincipalCredential
   - revokeAllSessions

@@ -553,7 +553,7 @@
  },
  "ApprovalRequest": {
   "type": "object",
-  "x-ticvai-persistence": "approvals.request",
+  "x-ticvai-persistence": "approvals.request + approvals.escalation",
   "required": [
    "id",
    "kind",
@@ -657,16 +657,24 @@
    },
    "escalations": {
     "type": "array",
-    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
+    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n\n**Stored as `approvals.escalation` rows, one per escalation, in order** (14 October 2026, CHG-CRD-006, ADAM CR-078: the table held only `id` and `request_id`, so `escalateApprovalRequest` wrote nothing the escalation reports could read). Written by `escalateApprovalRequest` (manual, `wasAutomatic` false) and by the SLA job on a breach (`wasAutomatic` true); read by `getApprovalAnalytics` and the SLA and escalation monitors. Append-only: an escalation is never edited.\n",
     "items": {
      "type": "object",
+     "required": [
+      "at",
+      "toLevel",
+      "wasAutomatic"
+     ],
      "properties": {
       "at": {
        "type": "string",
-       "format": "date-time"
+       "format": "date-time",
+       "x-ticvai-column": "escalated_at"
       },
       "reason": {
-       "type": "string"
+       "type": "string",
+       "maxLength": 300,
+       "description": "The requester's or approver's reason; for an automatic escalation, the SLA rule that fired."
       },
       "fromLevel": {
        "type": "integer"
@@ -676,6 +684,18 @@
       },
       "wasAutomatic": {
        "type": "boolean"
+      },
+      "escalatedByPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "Who escalated it by hand (`escalateApprovalRequest`'s caller); null for an automatic one."
+      },
+      "addedApproverPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "The approver the escalation added at `toLevel`; the original approver stays in the chain."
       }
      }
     }
@@ -1168,6 +1188,7 @@
  },
  "CapabilityTemplate": {
   "x-ticvai-persistence": "identity.capability_template",
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "description": "3.3.23, BL-110. **A named tick-set — a role, with nothing depending on the name.**\n",
   "required": [
@@ -1245,18 +1266,27 @@
    "initialCredential": {
     "type": "string",
     "maxLength": 512,
-    "writeOnly": true
+    "writeOnly": true,
+    "x-ticvai-stored-as": "identity.principal_credential.credential_hash",
+    "description": "**Stored hashed, never as sent** (14 October 2026, CHG-CRD-001): `createPrincipal` writes one `identity.principal_credential` row with `method: password` and `credentialHash` the PHC string of this value (ADR-0071). Held to `setPasswordPolicy`. Omitted for a principal who will sign in only through the tenant's single sign-on, who then has no local credential until `resetPrincipalCredential` issues one."
    },
    "mustChangeCredential": {
     "type": "boolean",
-    "default": true
+    "default": true,
+    "description": "Stored on the principal (`Principal.mustChangeCredential`, CHG-CRD-001) and returned at `login`; cleared by the principal's first successful `changeOwnCredential`."
    },
    "validTo": {
     "type": "string",
     "format": "date-time"
    },
+   "homeScopePath": {
+    "type": "string",
+    "x-ticvai-persisted": false,
+    "description": "The `platform.scope` path the person works from. **Resolved, not kept:** the path is resolved to the `platform.scope` row at it, whose id is `identity.principal.home_scope_id`; the path itself has no column (CHG-R6G-009). Omitted: the caller's own home scope. At or beneath a node where the caller holds `USER_MANAGE`, or `403` (14 October 2026, ADAM CR-077; CHG-IDR-002)."
+   },
    "roleIds": {
     "type": "array",
+    "description": "Roles granted at once. **Each becomes one `identity.delegated_access` row** (ALLOW, at the home scope's path, granted by the caller), as `createDelegatedAccess` writes it and under the same segregation check; the first is the principal's `primaryRoleId` (14 October 2026, ADAM CR-077; CHG-IDR-002).",
     "items": {
      "type": "string",
      "format": "uuid"
@@ -1959,6 +1989,7 @@
  },
  "Principal": {
   "x-ticvai-persistence": "identity.principal",
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "required": [
    "id",
@@ -1999,6 +2030,8 @@
    },
    "roles": {
     "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**Read with the principal, never stored on it** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): one item per role the principal holds through a live grant, an `identity.delegated_access` row with this `principal_id`, a `role_id`, `effect` ALLOW, `revoked_at` null and now inside `valid_from`..`valid_to` (an open end is open), joined to `identity.role` for `code` and `name`. A role granted at several scopes appears once. `isPrimary` is `role.id = principal.primary_role_id`. Ordered by `name` ascending.",
     "items": {
      "$ref": "#/components/schemas/RoleSummary"
     }
@@ -2007,6 +2040,19 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "mustChangeCredential": {
+    "type": "boolean",
+    "default": true,
+    "description": "**The principal must replace their credential before the session is usable** (14 October 2026, CHG-CRD-001, ADAM CR-078; `createPrincipal` took it and nothing stored it). Set by `createPrincipal` (from `CreatePrincipalRequest.mustChangeCredential`, true unless the creator says otherwise) and by `resetPrincipalCredential` (always true: a reset credential is temporary). **Cleared only by a successful `changeOwnCredential`.** `login` returns it in `LoginResponse.mustChangeCredential`, and while it is true the session may call `changeOwnCredential`, `logout` and nothing else."
+   },
+   "ssoProviderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.sso_provider",
+    "description": "**Set when single sign-on provisioned this principal** (`completeSsoAuthorization`, from the tenant's `identity.sso_provider`; 14 October 2026, CHG-CRD-001). Such a principal has **no local password**: no `password` row in `identity.principal_credential`, a `password` `login` is refused 401 `sso-sign-in-required` (the door offers `startSsoAuthorization` instead), and `changeOwnCredential` with `method: password` is refused 409 `credential-managed-by-sso`. A till PIN may still be issued to them by `resetPrincipalCredential` (`method: pin`); until it is, a `pin` sign-in is refused the same way. Null for a principal created with `createPrincipal`."
    }
   }
  },
@@ -2030,7 +2076,8 @@
     "type": "string",
     "maxLength": 512,
     "writeOnly": true,
-    "description": "Issued to the principal out of band. Must be changed at next sign-in."
+    "x-ticvai-stored-as": "identity.principal_credential.credential_hash",
+    "description": "Issued to the principal out of band. Must be changed at next sign-in. Stored as the `credentialHash` of the principal's row for `method` (ADR-0071), and `Principal.mustChangeCredential` is set (CHG-CRD-001)."
    },
    "reason": {
     "type": "string",
@@ -2041,6 +2088,7 @@
  },
  "Role": {
   "x-ticvai-persistence": "identity.role",
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "required": [
    "id",
@@ -2055,7 +2103,7 @@
    "code": {
     "type": "string",
     "x-ticvai-unique": "tenant",
-    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"
+    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n**Compared case-insensitively** (`common.yaml`, `x-ticvai-unique`; ADAM CR-079, CHG-IDR-003): `ADMIN` and `admin` are one code, and the second is the duplicate. The code is kept as it was typed.\n"
    },
    "name": {
     "type": "string"
@@ -2065,7 +2113,7 @@
    },
    "permissions": {
     "type": "array",
-    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n",
+    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n**The role's own set, not revoked** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the `identity.role_permission` rows of this role with `is_active` true. A revoked row is history, not a permission. **Inherited permissions are not merged in**: a client reads `inheritsFromRoleId` and that role, the same shape `setRolePermissions` returns (`permissions` beside `inheritsFromRoleId`). The segregation check is the one place the two are taken together (ADAM CR-079).\n",
     "items": {
      "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
     }
@@ -2089,10 +2137,16 @@
     "description": "**The preset this role was started from, for the record only** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of `createRole.presetCodes`, or null for a role ticked by hand. It binds nothing; a later edit of the preset never changes this role.\n"
    },
    "principalCount": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the distinct principals holding this role through a live grant (`identity.delegated_access` with this `role_id`, a `principal_id`, `effect` ALLOW, `revoked_at` null, now inside its validity window). **Counted under row-level security**, so only the grants the caller's own grants let it read are counted: a venue manager sees the venue's holders, not the tenant's."
    },
    "grantCount": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the live grants of this role (the rows `principalCount` counts, one per grant, so a principal granted the role at two scopes counts twice). Counted under row-level security, as `principalCount`."
    }
   }
  },
@@ -2116,7 +2170,8 @@
     "type": "string"
    },
    "isPrimary": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002)."
    }
   }
  },
@@ -2319,6 +2374,301 @@
    "expired"
   ]
  },
+ "Shift": {
+  "x-ticvai-persistence": "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident",
+  "description": "**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n",
+  "type": "object",
+  "required": [
+   "id",
+   "workstationId",
+   "venueId",
+   "scopePath",
+   "principalId",
+   "status",
+   "currency",
+   "currencyScale",
+   "openedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Who opened it. Cash reconciles to a person and a drawer."
+   },
+   "principalDisplayName": {
+    "type": "string"
+   },
+   "incidents": {
+    "type": "array",
+    "description": "BL-097. **A till has exceptions and there was nowhere to write them** — a no-sale, a drawer opened without a transaction, a manager override, a guest dispute.\n**This is the log a cash-up investigation starts from**, and a shift that balances with four unexplained no-sales is not a shift that balanced.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "noSale",
+        "drawerOpen",
+        "override",
+        "voidAfterPayment",
+        "guestDispute",
+        "tillJam",
+        "priceQuery",
+        "other"
+       ]
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "status": {
+    "$ref": "#/components/schemas/ShiftStatus"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "depositBoxCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "bagNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "openingFloat": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "salesTotal": {
+    "x-ticvai-column": "gross_sales_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). **Shown to the shift's own cashier only as one total across every tender** (\"Sales this shift\" on POS-025; the lead, 3 October 2026, CHG-RONEC-002): with no cash share it cannot be turned into the expected cash, so the blind close holds (CHG-FIN-003). The cash share, the tender split, `expectedCash` and `variance` stay with the supervisor.\n"
+   },
+   "refundsTotal": {
+    "x-ticvai-column": "gross_refunded_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till paid back, as the guest was refunded it — tax included."
+   },
+   "liftsTotal": {
+    "x-ticvai-column": "lifted_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net."
+   },
+   "expectedCash": {
+    "x-ticvai-column": "expected_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept. **Null to the shift's own cashier on every read** (CHG-FIN-003, 2 October): returned only to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.\n"
+   },
+   "countedCash": {
+    "x-ticvai-column": "counted_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "What the close count found. Null until the shift is counted."
+   },
+   "variance": {
+    "x-ticvai-column": "variance_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short. Null to the shift's own cashier, as `expectedCash` (CHG-FIN-003)."
+   },
+   "cashierReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "tillError",
+     "unrecordedRefund",
+     "miscount",
+     "other"
+    ],
+    "description": "What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003).\n"
+   },
+   "cashierNote": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 1000,
+    "description": "The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003)."
+   },
+   "varianceReasonRequired": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed, not stored** (CHG-R4-019): true while the shift is `pendingClosure` because its count differs from the expected figure within the threshold and no `cashierReason` is recorded. The till shows \"Give a reason to close\" (POS-007, EMP-009), BO-040 and BO-043 list it as waiting for a reason; `giveShiftVarianceReason` or `approveShiftClose` clears it. Shown to the shift's own cashier, since it carries no figure (CHG-FIN-003).\n"
+   },
+   "heldLeaseCount": {
+    "type": "integer",
+    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "businessDate": {
+    "type": "string",
+    "format": "date",
+    "readOnly": true,
+    "description": "**The business day the shift belongs to** (12 October 2026, CHG-R6-032): the venue-local date of `openedAt` taken against the venue's `businessDayCutoff` (tenancy `VenueSettings`, inheriting the tenant default, default 00:00). Set once when the shift opens and never moved, so a shift opened at 23:00 and closed at 01:00 stays on the day it opened. The daily reconciliation (BO-043) lists the shifts of one business date, and the period close's `noOpenShifts` check reads it (finance).\n"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the device recorded the open. `openedAt` is the server's time."
+   },
+   "suspendedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "suspendReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The `reason` given to `suspendShift`. Cleared on resume."
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "closedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"
+   },
+   "recountRequestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set by `rejectShiftVariance`, cleared by the cashier's recount** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). While set, the shift is `pendingVariance` waiting for the cashier rather than the supervisor: the cashier's view says \"Recount requested\" instead of \"Under review\".\n"
+   },
+   "recountRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The supervisor who sent the count back (CHG-CSP-013)."
+   },
+   "recountReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 500,
+    "description": "The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003)."
+   },
+   "countNumber": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true,
+    "description": "How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). The latest is the one measured.\n"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Null while the shift has unsynced operations."
+   },
+   "approvals": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "principalId",
+      "at"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "open",
+        "close",
+        "variance"
+       ],
+       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "ShiftStatus": {
+  "type": "string",
+  "enum": [
+   "pendingApproval",
+   "open",
+   "suspended",
+   "pendingVariance",
+   "pendingClosure",
+   "closed",
+   "autoClosed"
+  ]
+ },
  "SuggestionBasis": {
   "type": "string",
   "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
@@ -2347,7 +2697,7 @@
     "type": "string",
     "maxLength": 512,
     "writeOnly": true,
-    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in."
    }
   }
  },
@@ -2592,6 +2942,16 @@
      "thin"
     ],
     "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
+   },
+   "pinLength": {
+    "type": "integer",
+    "enum": [
+     4,
+     6,
+     8
+    ],
+    "readOnly": true,
+    "description": "**The tenant's `PasswordPolicy.pinLength`, carried to the device** (14 October 2026, CHG-CRD-002, ADAM CR-078). A device door draws its PIN keypad, and its supervisor step-up prompt, at this many digits; the device keeps it with the workstation context of the last session on it, so the door needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the server decides. Read from `identity.password_policy`, not stored on the workstation."
    }
   }
  }

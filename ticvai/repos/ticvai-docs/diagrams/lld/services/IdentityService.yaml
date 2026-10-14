@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 94 operations, 39 tables
+title: IdentityService — 97 operations, 41 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -10,14 +10,14 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 94
+  operations: 97
   inAFlow: 21
   percent: 22%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 34
+  tables: 36
   stores:
   - postgres
   - redis
@@ -29,7 +29,7 @@ schemas:
   largestTable: pii.subject_biometric
 operationsByContract:
 - contract: identity
-  count: 94
+  count: 97
   operations:
   - operation: changeOwnCredential
     verb: POST
@@ -37,8 +37,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 4
-    writes: 3
+    reads: 5
+    writes: 5
   - operation: completeSsoAuthorization
     verb: POST
     path: /auth/sso/{providerId}/callback
@@ -69,7 +69,7 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_GRANT
     offline: false
-    reads: 2
+    reads: 6
     writes: 3
   - operation: createEmergencyAccessOverride
     verb: POST
@@ -85,7 +85,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
+    reads: 4
     writes: 2
   - operation: createPrincipal
     verb: POST
@@ -93,16 +93,16 @@ operationsByContract:
     scope: venue
     permission: USER_MANAGE
     offline: false
-    reads: 2
-    writes: 3
+    reads: 8
+    writes: 5
   - operation: createRole
     verb: POST
     path: /roles
-    scope: venue
+    scope: tenant
     permission: ROLE_MANAGE
     offline: false
     reads: 5
-    writes: 4
+    writes: 5
   - operation: decideAccessReviewItem
     verb: POST
     path: /access-review-items/{itemId}/decision
@@ -133,7 +133,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: endOwnSession
     verb: POST
@@ -165,7 +165,7 @@ operationsByContract:
     scope: tenant
     permission: GUEST_VIEW_PII
     offline: false
-    reads: 8
+    reads: 7
     writes: 2
   - operation: forceLogout
     verb: POST
@@ -173,8 +173,8 @@ operationsByContract:
     scope: venue
     permission: SESSION_FORCE_LOGOUT
     offline: false
-    reads: 6
-    writes: 2
+    reads: 7
+    writes: 3
   - operation: getAuthorisationPolicy
     verb: GET
     path: /authorisation-policies/{policyId}
@@ -245,7 +245,7 @@ operationsByContract:
     scope: venue
     permission: USER_MANAGE
     offline: false
-    reads: 1
+    reads: 4
     writes: 0
   - operation: getPrincipalModuleAccess
     verb: GET
@@ -310,7 +310,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: listAccessDecisions
     verb: GET
     path: /access-decisions/audit
@@ -485,7 +485,7 @@ operationsByContract:
     scope: venue
     permission: USER_MANAGE
     offline: false
-    reads: 1
+    reads: 4
     writes: 0
   - operation: listRoles
     verb: GET
@@ -493,7 +493,7 @@ operationsByContract:
     scope: venue
     permission: ROLE_MANAGE
     offline: true
-    reads: 2
+    reads: 3
     writes: 0
   - operation: listSegregationRules
     verb: GET
@@ -525,8 +525,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 6
-    writes: 4
+    reads: 7
+    writes: 5
   - operation: logout
     verb: POST
     path: /auth/logout
@@ -550,6 +550,14 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: true
     reads: 1
+    writes: 1
+  - operation: recordConsentIdentifier
+    verb: POST
+    path: /internal/consent-identifiers
+    scope: venue
+    permission: null
+    offline: false
+    reads: 0
     writes: 1
   - operation: refreshToken
     verb: POST
@@ -581,7 +589,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: resetPrincipalCredential
     verb: POST
@@ -589,8 +597,8 @@ operationsByContract:
     scope: venue
     permission: USER_MANAGE
     offline: false
-    reads: 3
-    writes: 4
+    reads: 4
+    writes: 6
   - operation: resolvePermissions
     verb: POST
     path: /permissions/resolve
@@ -661,7 +669,7 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_GRANT
     offline: false
-    reads: 1
+    reads: 4
     writes: 1
   - operation: setSegregationRules
     verb: PUT
@@ -727,6 +735,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: updateGuestSubjectDetails
+    verb: PATCH
+    path: /internal/guest-subjects/{subjectId}/details
+    scope: subject
+    permission: null
+    offline: false
+    reads: 1
+    writes: 1
   - operation: updatePrincipal
     verb: PATCH
     path: /principals/{principalId}
@@ -738,7 +754,7 @@ operationsByContract:
   - operation: updateRole
     verb: PATCH
     path: /roles/{roleId}
-    scope: venue
+    scope: tenant
     permission: ROLE_MANAGE
     offline: false
     reads: 1
@@ -758,14 +774,14 @@ operationsByContract:
     permission: null
     offline: false
     reads: 4
-    writes: 4
+    writes: 5
   - operation: verifyMfaChallenge
     verb: POST
     path: /auth/mfa/challenge/{challengeId}/verify
     scope: tenant
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 5
   - operation: verifyMfaEnrolment
     verb: POST
@@ -783,6 +799,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: verifySupervisorStepUp
+    verb: POST
+    path: /internal/step-up/verify
+    scope: venue
+    permission: null
+    offline: false
+    reads: 5
+    writes: 1
 tables:
 - store: cache:idempotency
   kind: cache
@@ -884,7 +908,7 @@ tables:
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    createRole:
+    createPrincipal:
       role: evicts
       resolvers: &id002
       - permissions
@@ -892,7 +916,7 @@ tables:
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    decideAccessReviewItem:
+    createRole:
       role: evicts
       resolvers: &id003
       - permissions
@@ -900,7 +924,7 @@ tables:
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    deleteDelegatedAccess:
+    decideAccessReviewItem:
       role: evicts
       resolvers: &id004
       - permissions
@@ -908,9 +932,17 @@ tables:
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
+    deleteDelegatedAccess:
+      role: evicts
+      resolvers: &id005
+      - permissions
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
     resolvePermissions:
       role: fills
-      resolvers: &id005
+      resolvers: &id006
       - permissions
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: null
@@ -927,6 +959,7 @@ tables:
   - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
   writtenBy:
   - createDelegatedAccess
+  - createPrincipal
   - createRole
   - decideAccessReviewItem
   - deleteDelegatedAccess
@@ -943,23 +976,30 @@ tables:
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    createRole:
+    createPrincipal:
       role: evicts
       resolvers: *id002
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    decideAccessReviewItem:
+    createRole:
       role: evicts
       resolvers: *id003
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    deleteDelegatedAccess:
+    decideAccessReviewItem:
       role: evicts
       resolvers: *id004
+      key: res:{tenantId}:{resolver}:{scopePath}
+      bump: INCR resver:{tenantId}:{resolver}
+      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
+        its ancestors and every descendant that inherits from it re-resolve on their next read'
+    deleteDelegatedAccess:
+      role: evicts
+      resolvers: *id005
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
@@ -973,7 +1013,7 @@ tables:
       affects: null
     resolvePermissions:
       role: fills
-      resolvers: *id005
+      resolvers: *id006
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: null
       affects: null
@@ -1089,7 +1129,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: identity.mfa_challenge
-  columns: 2
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -1103,9 +1143,9 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.mfa_recovery_code
-  columns: 2
+  columns: 5
   store: postgres
-  parent: null
+  parent: identity.principal
   writtenBy:
   - identity
   foreignWriters: null
@@ -1123,14 +1163,14 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.otp_challenge
-  columns: 2
+  columns: 12
   store: postgres
-  parent: null
+  parent: pii.subject
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.password_policy
-  columns: 13
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -1150,16 +1190,23 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.principal
-  columns: 9
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.principal_credential
-  columns: 2
+  columns: 7
   store: postgres
   parent: identity.principal
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.principal_credential_history
+  columns: 4
+  store: postgres
+  parent: identity.principal_credential
   writtenBy:
   - identity
   foreignWriters: null
@@ -1171,7 +1218,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.role
-  columns: 9
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1214,11 +1261,18 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.subject_holding
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: pii.consent_identifier
   columns: 6
   store: postgres
   parent: null
   writtenBy:
+  - identity
   - marketing-crm
   foreignWriters:
   - marketing-crm
@@ -1255,18 +1309,16 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: TenancyService
-  operations: 4
+  operations: 7
 - service: MarketingService
   operations: 2
 - service: OrderService
-  operations: 2
-- service: AccessService
   operations: 1
 - service: VenueOpsService
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 12
+  operations: 14
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -1276,12 +1328,15 @@ writesOutside:
   - operation: completeSsoAuthorization
     tables:
     - platform.outbox
+  - operation: createRole
+    tables:
+    - platform.audit_record
   - operation: deleteGuestAccount
     tables:
-    - platform.dsar_request
+    - approvals.request
   - operation: exportSubjectData
     tables:
-    - platform.dsar_request
+    - approvals.request
   - operation: guestPasswordLogin
     tables:
     - platform.outbox
@@ -1289,6 +1344,9 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: guestUaePassLogin
+    tables:
+    - platform.outbox
+  - operation: linkGuestCheckout
     tables:
     - platform.outbox
   - operation: login

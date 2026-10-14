@@ -501,11 +501,14 @@
      "hybrid"
     ],
     "default": "hybrid",
-    "description": "BL-061. **A till operator who touch-types is slower on a touchscreen and a new starter is faster.** The mode is per workstation because the operator is.\n"
+    "description": "BL-061. **A till operator who touch-types is slower on a touchscreen and a new starter is faster.** The mode is per workstation because the operator is. Stored as `Workstation.cashierInputMode` (ADAM CR-082; CHG-TEN-003); left out, it is `hybrid` (PUT replaces).\n"
    },
    "guestDisplayContent": {
     "type": "array",
-    "description": "**What the guest-facing screen shows while a sale is in progress.** Line items always; the rest is the venue's choice — and **a second screen showing nothing is a second screen the guest ignores when it does show something that matters.**\n",
+    "default": [
+     "lineItems"
+    ],
+    "description": "**What the guest-facing screen shows while a sale is in progress.** Line items always; the rest is the venue's choice — and **a second screen showing nothing is a second screen the guest ignores when it does show something that matters.** Stored as `Workstation.guestDisplayContent` (ADAM CR-082; CHG-TEN-003); left out, it is `[lineItems]`.\n",
     "items": {
      "type": "string",
      "enum": [
@@ -523,13 +526,17 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "BL-095. **Neither which stock a printer is loaded with nor how much is left.** A till that runs out of wristbands mid-queue is an outage nobody predicted, and the stock is inventory like anything else — this names which.\n"
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Deprecated: not stored until BL-095** (the media stock record, on the printer device, waits on the BOCA stock answer; ADAM CR-082, CHG-TEN-003). Ignored on input. BL-095. **Neither which stock a printer is loaded with nor how much is left.** A till that runs out of wristbands mid-queue is an outage nobody predicted. The stock belongs to the printer (`DeviceBinding`, `platform.device`), not to the till, which is where BL-095 will put it.\n"
    },
    "mediaStockRemaining": {
     "type": "integer",
     "nullable": true,
     "readOnly": true,
-    "description": "Decremented on issue. **The number that turns a surprise into a reorder**, and it is read-only because the count comes from what was printed rather than from somebody's estimate.\n"
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Deprecated: not stored until BL-095** (the media stock record, on the printer device, waits on the BOCA stock answer; ADAM CR-082, CHG-TEN-003). A read-only field on a request is never returned, so it was never readable. Decremented on issue, once BL-095 stores it on the printer.\n"
    },
    "name": {
     "type": "string",
@@ -1745,6 +1752,36 @@
     ],
     "nullable": true,
     "description": "**This till's drawer limit, overriding the venue's** (`VenueSettings.cashDrawerLimit`; DEC-179; CHG-CSP-016). Null inherits the venue's. Above it the till warns and offers a cash lift.\n"
+   },
+   "cashierInputMode": {
+    "type": "string",
+    "enum": [
+     "keyboard",
+     "touch",
+     "scanner",
+     "hybrid"
+    ],
+    "default": "hybrid",
+    "description": "BL-061. **How the cashier at this till enters a sale**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003): until then the request took it and nothing kept it.\n"
+   },
+   "guestDisplayContent": {
+    "type": "array",
+    "default": [
+     "lineItems"
+    ],
+    "description": "BL-061. **What the guest-facing screen shows while a sale is in progress**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003).\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "lineItems",
+      "total",
+      "loyaltyBalance",
+      "promotions",
+      "branding",
+      "upsell",
+      "queuePosition"
+     ]
+    }
    },
    "accessPointId": {
     "type": "string",

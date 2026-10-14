@@ -238,7 +238,7 @@ Set on `CMS-009` Navigation & Menus through `setFooter`. Reaches every website s
 | Legal links: cookie policy URL `footer.legalLinks.cookiePolicyUrl` | text field | no | — | — | every website screen | — | on publish (CMS-014): web at once, the app on its next launch |
 | Copyright text `footer.copyrightText` | text field | no | — | — | every website screen | — | on publish (CMS-014): web at once, the app on its next launch |
 | Social links `footer.socialLinks` | repeatable rows | no | — | — | every website screen | — | on publish (CMS-014): web at once, the app on its next launch |
-| Social links: platform `footer.socialLinks[].platform` | text field | no | — | — | GST-018, GST-066, WEB-018 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Social links: platform `footer.socialLinks[].platform` | text field | no | — | — | GST-018, WEB-018 | — | on publish (CMS-014): web at once, the app on its next launch |
 | Social links: uRL `footer.socialLinks[].url` | text field | no | — | — | every website screen | — | on publish (CMS-014): web at once, the app on its next launch |
 
 ### Languages and right-to-left
@@ -701,7 +701,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `GST-062` Shop & Drop Collection | the shell only |
 | `GST-063` Explore – Search Results | Booking settings (tenant, with per-venue overrides) (2) |
 | `GST-065` Newsletter & Preferences | the shell only |
-| `GST-066` Privacy & My Data | Footer (1); Cookie banner (22) |
+| `GST-066` Privacy & My Data | Cookie banner (22) |
 | `GST-067` Refunds & Resale | the shell only |
 | `GST-068` Help & My Cases | the shell only |
 | `GST-069` Face Pass | the shell only |

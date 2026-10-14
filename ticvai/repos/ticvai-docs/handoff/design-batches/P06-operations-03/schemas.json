@@ -1168,6 +1168,7 @@
     }
    },
    "parentQueueId": {
+    "x-ticvai-references": "queue.queue",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -2232,7 +2233,7 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`, or the venue's next business-day cut-off (`VenueSettings.businessDayCutoff`) when the cashier sent none (CHG-GDL-003). Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -2851,6 +2852,7 @@
     "readOnly": true
    },
    "mapId": {
+    "x-ticvai-references": "venuemap.map",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -3637,6 +3639,7 @@
     "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
    },
    "taxReversalEntryId": {
+    "x-ticvai-references": "ledger.journal_entry",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -4232,11 +4235,13 @@
    },
    "fromPointId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "venuemap.point"
    },
    "toPointId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "venuemap.point"
    },
    "geometry": {
     "type": "string",
@@ -4259,6 +4264,7 @@
     "default": false
    },
    "restrictedByPointId": {
+    "x-ticvai-references": "venuemap.point",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -4673,12 +4679,14 @@
     "description": "Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement, loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not `none`. Kept on the entry so a disputed priority can be explained afterwards.\n"
    },
    "priorityTierId": {
+    "x-ticvai-references": "marketing.programme_tier",
     "type": "string",
     "format": "uuid",
     "nullable": true,
     "description": "The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`."
    },
    "priorityPromotionId": {
+    "x-ticvai-references": "promotions.promotion",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -4722,6 +4730,7 @@
     "nullable": true
    },
    "overriddenByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "nullable": true,

@@ -408,6 +408,14 @@ the only thing it buys.
 tenancy obligation rather than a synchronisation mechanism. Neither goes. `sync` keeps cell
 plumbing — `cell_connection`, `cross_cell_request`, `rejection` — which is what it says.
 
+**Superseded 14 October 2026 (CHG-XDW-001): both went.** The call rested on both tables being
+TenancyService's. Since the cross-region contract went to CrossRegionService (in `operations`, ADR-0055),
+every operation that reads or writes `guest_link`, `dsar_request`, `cross_region_entitlement` and
+`wallet_authorisation` is CrossRegionService's, and in `platform` (TenancyService's schema, in `commerce`)
+the database refused them all (DB-ROLES; exceptions XDW-001 to XDW-011, expired at r5). Chinmay asked them
+removed on 14 October ("Remove them now ?"). The four moved to `sync` together, so the DSAR fan-out walks
+`guest_link` inside one service, the condition this call set.
+
 ## 11 · The DSAR duplicate — **drop theirs**
 
 `marketing.data_subject_request` against our `platform.dsar_request`.

@@ -38,6 +38,13 @@ consumers:
   idempotencyKey: entitlementId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: identity
+  purpose: Mark the entitlement's identity.subject_holding row cancelled, so it stops blocking deleteGuestAccount (ADAM CR-084, CHG-GDL-001)
+  writes:
+  - identity.subject_holding
+  idempotencyKey: entitlementId
+  onFailure: retryThenDeadLetter
+  isCritical: false
 retention: 30 days after publication
 notes: '**Added 12 October 2026 (ADAM CR-002, CHG-R6-020).** voidEntitlement runs in OrderService, in the
   `commerce` deployable, and access.entitlement is in the `access` schema, owned by AccessService in the `access`

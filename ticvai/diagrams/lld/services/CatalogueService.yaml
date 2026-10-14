@@ -1364,7 +1364,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 8
+    reads: 9
     writes: 2
   - operation: publishChannelAvailability
     verb: PUT
@@ -4814,7 +4814,7 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.upsell_rule
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:

@@ -1,0 +1,121 @@
+# Read columns the contract cannot show. AUTHORED: a person writes every entry.
+#
+# tools/derive-read-columns.py gives each read in handoff/api-data-lineage.json the columns it reads
+# (`readColumns`), from the response schemas, the parameters and the joins (ADAM CR-004, decided by Chinmay on
+# 12 October 2026 "Option C now, A later" and fixed in r6 on 14 October, CHG-LIN-001). DB-READ-VIEWS generates each
+# published view from those lists, so a view exposes only the columns its readers read.
+#
+# Some reads are invisible to the contract: an operation that sends a message reads the guest's name and language
+# and returns only the queued message; an analytics list counts enrolments by kind and returns only the counts. The
+# rows below are those reads, each with the fields or the description sentence that says what is read. They are
+# ADDED to whatever the derivation found, never instead of it. The deriver adds the row key `id`, the parameters'
+# columns and the join keys as it does for a derived list.
+#
+# **Every read of a `pii.*` table by another module needs a column list** (tools/check-read-columns.py, RC-PII-NO-
+# COLUMNS): a personal-data view is always narrow. The rows here are the cross-module pii reads the derivation
+# cannot reach. Nothing outside `pii.*` is listed: a non-pii read the contract cannot show keeps an all-column view
+# until its contract shows it. tools/check-read-columns.py fails on a row whose operation does not read the table or
+# whose column the table does not have (RC-OVERRIDE-STALE).
+#
+#   operation   the operationId that reads
+#   table       <schema>.<table>, one of its lineage reads
+#   columns     the columns it reads beyond what the deriver finds (the key `id` is always added)
+#   why         the fields or the sentence of the contract that says so
+
+reads:
+  # Messages to a guest: the name the message greets and the language it is written in (ADR-0023 keeps both in
+  # pii.subject). The address itself is a pii.subject_contact row, which these operations' lineage does not list yet.
+  - operation: sendBookingConfirmation
+    table: pii.subject
+    columns: [display_name, preferred_language]
+    why: Sends the reservation's confirmation and reminder to the guest; the response is only the queued message.
+  - operation: sendOrderNotification
+    table: pii.subject
+    columns: [display_name, preferred_language]
+    why: Tells the guest their F&B order is accepted, being made or ready; the operation returns nothing.
+  - operation: resendPaymentLink
+    table: pii.subject
+    columns: [display_name, preferred_language]
+    why: Re-sends the payment link to the guest (`sentTo`); the response is the link, not the message.
+
+  # Lists whose person fields carry no `subjectId` beside them, so the deriver cannot tell them from a product name.
+  - operation: listBuyerCheckoutInventory
+    table: pii.subject
+    columns: [display_name]
+    why: "`BuyerCheckoutInventoryHoldSecurePaymentView.name`: the buyer's name (lineageNote: buyer details)."
+  - operation: listBuyerPurchaseResale
+    table: pii.subject
+    columns: [display_name]
+    why: "`BuyerPurchaseResaleOrderManagementView.name`: the buyer's name."
+  - operation: setOrderDetailTransaction
+    table: pii.subject
+    columns: [display_name]
+    why: "`customer` on the 360 view of one order is the order's guest, shown by name."
+  - operation: listCredential
+    table: pii.subject
+    columns: [display_name]
+    why: "`customerParticipant` on each credential row is the guest it was issued to."
+  - operation: listCredentialDeliveryDistribution
+    table: pii.subject
+    columns: [display_name]
+    why: "`recipient` on each delivery attempt is the guest it went to."
+  - operation: listCredentialGenerationIssuance
+    table: pii.subject
+    columns: [display_name]
+    why: "`customer` on each issuance request is the guest it was generated for."
+  - operation: listDeviceBindingSession
+    table: pii.subject
+    columns: [display_name]
+    why: "`user` on each device binding is the guest whose device it is."
+  - operation: listFailedGenerationDelivery
+    table: pii.subject
+    columns: [display_name]
+    why: "`customer` on each credential exception is the guest it affects."
+  - operation: listGroupAttendancePartial
+    table: pii.subject
+    columns: [display_name]
+    why: "lineageNote: `leader from pii.subject` (the group leader's name on each wave)."
+  - operation: listUnifiedIdentityCredential
+    table: pii.subject
+    columns: []
+    why: "`identityId` is the locked identity (the list's identityId, pii.subject): the key alone."
+  - operation: recordPrivacyIncident
+    table: pii.subject
+    columns: []
+    why: The incident counts the subjects it touches (`affectedSubjectCount`); no personal field is returned.
+
+  # Identity verification: the holder's name against the document, the enrolment against the live capture.
+  - operation: verifyIdentity
+    table: pii.subject
+    columns: [display_name, given_name, family_name]
+    why: "lineageNote: `document-to-name reads the holder (pii.subject)`; nothing compared is returned or stored."
+  - operation: verifyIdentity
+    table: pii.subject_biometric
+    columns: [subject_id, entitlement_id, kind, is_active, expires_at]
+    why: "lineageNote: `biometric match reads the face reference (pii.subject_biometric, as enrolFacePass)`: the live enrolment of the entitlement presented."
+
+  # Biometric enrolments read by Access screens that return counts or references, never the enrolment.
+  - operation: listBiometricAccess
+    table: pii.subject_biometric
+    columns: [kind, is_active, captured_at, expires_at]
+    why: "Summary counts `activeFacePassProfiles`, `activeFaceTags`, `enrollmentsToday`, `profilesPendingDeletion`."
+  - operation: listBiometricIdentityIntegrity
+    table: pii.subject_biometric
+    columns: [subject_id, captured_at]
+    why: "`facePassId` and `originalEnrollmentAt` of the enrolment each anomaly concerns."
+  - operation: listFaceChangeEnrollment
+    table: pii.subject_biometric
+    columns: [subject_id]
+    why: "`existingProfileReference` is the prior enrolment's id and `guestId` its subject."
+  - operation: listTicketMedia
+    table: pii.subject_biometric
+    columns: [entitlement_id, kind, is_active]
+    why: "`faceCredentialAdoption`: the share of tickets with an active Face Pass."
+  - operation: revokeFacePass
+    table: pii.subject_biometric
+    columns: [subject_id]
+    why: "Deletes the enrolment named by `enrolmentId`; a guest caller is answered for their own only (`x-ticvai-self-scoped: subject`)."
+  - operation: setMediaBindingActivation
+    table: pii.subject_biometric
+    columns: [subject_id, entitlement_id, kind, is_active]
+    why: "Face binding stores only the biometric provider reference: it reads the ticket's live enrolment."

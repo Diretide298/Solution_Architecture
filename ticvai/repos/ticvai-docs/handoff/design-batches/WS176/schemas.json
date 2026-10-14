@@ -1167,8 +1167,10 @@
  },
  "RegionSettings": {
   "x-ticvai-persistence": "platform.region_settings",
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "required": [
+   "scopePath",
    "countryCode",
    "currencyCode",
    "currencyScale",
@@ -1176,6 +1178,11 @@
    "fiscalYearStartMonth"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005): the path of the region in `regionId`, set by the server when `updateRegionSettings` first saves the row, and ignored on input. **Always present, never null** (CHG-R6G-002): a row with no path is invisible to every grant under its policy, so the column is NOT NULL once the rows that predate it are backfilled from `org_unit_id` through `platform.scope.path` (handoff/migration-review.md). Row-level security reads the row at, above and beneath that path (`x-ticvai-rls: read-beneath`, CHG-GEN-008, ADAM CR-075), so a venue's `createOutlet` reads the languages its region requires, and only the region or a level above it writes the row.\n"
+   },
    "countryCode": {
     "type": "string",
     "pattern": "^[A-Z]{2}$",

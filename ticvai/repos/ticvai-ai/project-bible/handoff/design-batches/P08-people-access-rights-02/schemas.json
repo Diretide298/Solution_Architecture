@@ -177,6 +177,7 @@
  },
  "Role": {
   "x-ticvai-persistence": "identity.role",
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "required": [
    "id",
@@ -191,7 +192,7 @@
    "code": {
     "type": "string",
     "x-ticvai-unique": "tenant",
-    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"
+    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n**Compared case-insensitively** (`common.yaml`, `x-ticvai-unique`; ADAM CR-079, CHG-IDR-003): `ADMIN` and `admin` are one code, and the second is the duplicate. The code is kept as it was typed.\n"
    },
    "name": {
     "type": "string"
@@ -201,7 +202,7 @@
    },
    "permissions": {
     "type": "array",
-    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n",
+    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n**The role's own set, not revoked** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the `identity.role_permission` rows of this role with `is_active` true. A revoked row is history, not a permission. **Inherited permissions are not merged in**: a client reads `inheritsFromRoleId` and that role, the same shape `setRolePermissions` returns (`permissions` beside `inheritsFromRoleId`). The segregation check is the one place the two are taken together (ADAM CR-079).\n",
     "items": {
      "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
     }
@@ -225,10 +226,16 @@
     "description": "**The preset this role was started from, for the record only** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of `createRole.presetCodes`, or null for a role ticked by hand. It binds nothing; a later edit of the preset never changes this role.\n"
    },
    "principalCount": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the distinct principals holding this role through a live grant (`identity.delegated_access` with this `role_id`, a `principal_id`, `effect` ALLOW, `revoked_at` null, now inside its validity window). **Counted under row-level security**, so only the grants the caller's own grants let it read are counted: a venue manager sees the venue's holders, not the tenant's."
    },
    "grantCount": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the live grants of this role (the rows `principalCount` counts, one per grant, so a principal granted the role at two scopes counts twice). Counted under row-level security, as `principalCount`."
    }
   }
  },

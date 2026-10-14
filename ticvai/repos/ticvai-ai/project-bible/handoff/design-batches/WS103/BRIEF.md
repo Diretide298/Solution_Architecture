@@ -99,7 +99,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-419` | Provisioning Command Center | B | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-420` | Tenant & Organization Provisioning | B | 12 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-421` | Venue & Operational Structure Creation | B | 14 | 7 | 7 | 7 | 0 | 0 | — | notStarted (—) |
-| `ADM-422` | Administrator & Security Initialization | B | 27 | 6 | 7 | 15 | 0 | 0 | — | notStarted (—) |
+| `ADM-422` | Administrator & Security Initialization | B | 34 | 6 | 7 | 26 | 0 | 0 | — | notStarted (—) |
 | `ADM-423` | License & Entitlement Activation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-424` | Module Activation & Dependency Validation | A | 9 | 18 | 7 | 10 | 1 | 0 | configures | notStarted (—) |
 | `ADM-425` | Venue Template Application | B | 6 | 13 | 7 | 1 | 0 | 0 | — | notStarted (—) |

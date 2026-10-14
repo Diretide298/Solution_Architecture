@@ -2310,8 +2310,9 @@ operations:
   - catalogue.product
   - catalogue.published_bundle
   - catalogue.variant
-  - platform.sale_board
-  - platform.sale_board_tile
+  - platform.sale_board_for_catalogue
+  - platform.sale_board_page_for_catalogue
+  - platform.sale_board_tile_for_catalogue
   writes:
   - cache:idempotency
   - catalogue.published_bundle

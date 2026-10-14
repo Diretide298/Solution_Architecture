@@ -954,6 +954,7 @@
     "format": "uuid"
    },
    "paymentMethodId": {
+    "x-ticvai-references": "payments.method",
     "type": "string",
     "format": "uuid"
    },

@@ -2414,7 +2414,7 @@
     }
    ]
   },
-  "notes": "**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData` and `deleteGuestAccount` existed as guest-callable operations reachable from no guest surface — a promise the contracts made and the product did not keep.\n\n**Erasure is not a button.** `platform.dsar_request` carries a legal clock and a lifecycle; this screen starts it and shows where it has got to. **A request that silently fails is a regulatory failure with a timestamp on it** (ADR-0033).",
+  "notes": "**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData` and `deleteGuestAccount` existed as guest-callable operations reachable from no guest surface — a promise the contracts made and the product did not keep.\n\n**Erasure is not a button.** `sync.dsar_request` carries a legal clock and a lifecycle; this screen starts it and shows where it has got to. **A request that silently fails is a regulatory failure with a timestamp on it** (ADR-0033).",
   "density": "comfortable",
   "offline": false,
   "pattern": "statusTracker",

@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2796,
-  "tables": 62,
-  "ofTotalTables": 1129
+  "ofTotalOperations": 2802,
+  "tables": 63,
+  "ofTotalTables": 1132
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2764,
-    "tables": 1129,
+    "operations": 2770,
+    "tables": 1132,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 32,
-    "tables": 62,
+    "tables": 63,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -225,6 +225,17 @@
  ],
  "tables": [
   {
+   "table": "catalogue.product",
+   "schema": "catalogue",
+   "columns": 44,
+   "burstOperations": 6,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**What a venue sells** — admission, a session, a bundle, a membership, a locker. Not the instance: a product is the offer and `catalogue.performance` is the occasion"
+  },
+  {
    "table": "orders.sales_order",
    "schema": "orders",
    "columns": 26,
@@ -245,17 +256,6 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**How much of a performance each sales channel may sell.** Two hundred seats with eighty to the web, eighty to the box office and forty held back. Renamed from `envelope`, which was unguessable"
-  },
-  {
-   "table": "catalogue.product",
-   "schema": "catalogue",
-   "columns": 44,
-   "burstOperations": 5,
-   "written": false,
-   "contention": null,
-   "contended": false,
-   "contentionIndeterminate": false,
-   "note": "**What a venue sells** — admission, a session, a bundle, a membership, a locker. Not the instance: a product is the offer and `catalogue.performance` is the occasion"
   },
   {
    "table": "orders.payment",
@@ -657,6 +657,17 @@
    "note": "Every decision at every level. **Immutable once the request completes** — an approval is evidence **Hangs off**: reaches `approvals.request` through its keys; references `approvals.request`, `identity.principal`. **Reach"
   },
   {
+   "table": "approvals.escalation",
+   "schema": "approvals",
+   "columns": 9,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Who was asked, when, and why it moved up. The original approver stays in the record **Hangs off**: reaches `approvals.request` through its keys; references `approvals.request`. **Reached by**: 6 operations read it and 1 "
+  },
+  {
    "table": "approvals.request",
    "schema": "approvals",
    "columns": 30,
@@ -692,7 +703,7 @@
   {
    "table": "identity.principal",
    "schema": "identity",
-   "columns": 9,
+   "columns": 11,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -824,7 +835,7 @@
   {
    "table": "platform.workstation",
    "schema": "platform",
-   "columns": 20,
+   "columns": 22,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -1017,6 +1028,7 @@
    "reads": [
     "catalogue.channel_capacity",
     "catalogue.performance",
+    "catalogue.product",
     "catalogue.variant",
     "marketing.consent_question",
     "marketing.consent_question_version",
@@ -1175,12 +1187,14 @@
    "reads": [
     "approvals.decision",
     "approvals.delegation",
+    "approvals.escalation",
     "approvals.matrix",
     "approvals.request",
     "approvals.rule",
     "identity.principal"
    ],
    "writes": [
+    "approvals.escalation",
     "approvals.request"
    ],
    "lock": null

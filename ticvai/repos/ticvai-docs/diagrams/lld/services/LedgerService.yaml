@@ -64,8 +64,8 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 9
-    writes: 4
+    reads: 13
+    writes: 5
   - operation: createAccount
     verb: POST
     path: /accounts
@@ -464,8 +464,8 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 3
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: resolveObligationDispute
     verb: POST
     path: /inter-entity-obligations/{obligationId}/resolve
@@ -942,18 +942,18 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: OrderService
-  operations: 9
+  operations: 10
 - service: TenancyService
-  operations: 3
+  operations: 5
 - service: CatalogueService
+  operations: 2
+- service: WalletService
   operations: 2
 - service: PlatformService
   operations: 1
-- service: WalletService
-  operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 9
+  operations: 10
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -965,6 +965,7 @@ writesOutside:
     - platform.outbox
   - operation: closeFiscalPeriod
     tables:
+    - approvals.request
     - platform.outbox
   - operation: issueCreditMemo
     tables:
@@ -978,6 +979,9 @@ writesOutside:
     tables:
     - platform.idempotency_record
     - platform.outbox
+  - operation: reopenPeriod
+    tables:
+    - approvals.request
   - operation: setEInvoicingProvider
     tables:
     - platform.audit_record

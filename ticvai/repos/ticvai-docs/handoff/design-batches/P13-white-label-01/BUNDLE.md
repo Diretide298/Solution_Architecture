@@ -2879,7 +2879,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | Legal links: cookie policy URL (`footer.legalLinks.cookiePolicyUrl`) | — | — | every website screen | — |
 | Copyright text (`footer.copyrightText`) | — | — | every website screen | — |
 | Social links (`footer.socialLinks`) | — | — | every website screen | — |
-| Social links: platform (`footer.socialLinks[].platform`) | — | — | GST-018, GST-066, WEB-018 | — |
+| Social links: platform (`footer.socialLinks[].platform`) | — | — | GST-018, WEB-018 | — |
 | Social links: uRL (`footer.socialLinks[].url`) | — | — | every website screen | — |
 
 #### References

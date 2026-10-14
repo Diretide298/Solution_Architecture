@@ -62,6 +62,14 @@ consumers:
   idempotencyKey: refundId
   onFailure: retryThenDeadLetter
   isCritical: false
+- context: identity
+  purpose: Mark the order's identity.subject_holding row refunded or partiallyRefunded (isPartial), and the entitlement rows
+    issued from it (all of them, or those of lineIds) cancelled, because a refund cancels the entitlements it pays back (ADAM CR-084, CHG-GDL-001)
+  writes:
+  - identity.subject_holding
+  idempotencyKey: refundId
+  onFailure: retryThenDeadLetter
+  isCritical: false
 retention: 30 days after publication
 notes: A refund that reaches the ledger and not the entitlement leaves a guest holding a valid ticket
   for something they were paid back for.

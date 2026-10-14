@@ -40,7 +40,7 @@ to prevent it is the wrong trade.
 acquireInventoryHold      catalogue.inventory_reservation
 createSeatHold            seating.seat_reservation
 captureStoredValue        orders.stored_value_authorisation
-authoriseWalletSpend      platform.wallet_authorisation
+authoriseWalletSpend      sync.wallet_authorisation
 ```
 
 **These are the operations where two callers want the same row and both cannot have it.** Optimistic

@@ -20,7 +20,11 @@ It is exempt when it says it is not stored: `readOnly` with `x-ticvai-derived`,
 `x-ticvai-persisted: false`, or a `$ref` to a schema the reference lists as embedded/jsonb.
 
 Also: S-OFFLINE-RECORDED-AT (R113) -- a schema written by an offline-capable operation persists to
-a table with no `recorded_at`.
+a table with no `recorded_at`. ST-PROPERTY-PERSISTENCE and ST-STALE-COLUMN (CHG-MKT-002, ADAM CR-087) -- a
+persistence tag on a property, which derive-schema never reads, and a column the contract names or types otherwise
+(the table kept an older run's columns: `marketing.wishlist_item.price text` against `list_price` Money).
+ST-SECRET-FORM (CHG-MKT-001, CR-086) -- a stored write-only secret that does not say how it is stored
+(`x-ticvai-secret`, ADR-0063 as amended 14 October 2026, ADR-0071).
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -40,6 +44,11 @@ RULES = {
     "ST-TYPE-MISMATCH": "a field and its column disagree on type (integer[] vs text[], boolean vs text) (R227)",
     "ST-ENUM-CHECK": "an enum field stored in a text column with no CHECK (R151)",
     "ST-REQUIRED-MISMATCH": "a required field in a nullable column, or NOT NULL for an optional one (R089)",
+    "ST-PROPERTY-PERSISTENCE": "x-ticvai-persistence on a property, which derive-schema never reads (CHG-MKT-002, CR-087)",
+    "ST-STALE-COLUMN": "a column the contract names otherwise (x-ticvai-column) or a Money field in a non-numeric "
+                       "column: the table kept an older run's columns (CHG-MKT-002, CR-087)",
+    "ST-SECRET-FORM": "a stored write-only token, secret, credential, password or PIN that does not say how it is "
+                      "stored (x-ticvai-secret; ADR-0063, ADR-0071) (CHG-MKT-001, CR-086)",
 }
 SERVER_SET = {"id", "scope_path", "created_at", "updated_at", "tenant_id", "venue_id", "region_id",
               "created_by_principal_id", "updated_by_principal_id", "version", "status", "recorded_at"}
@@ -221,7 +230,85 @@ def main() -> int:
                 guard.add("ST-OFFLINE-RECORDED-AT", f"{stem}.{name}",
                           f"{stem}.{name} is written offline by {written_offline[(stem, name)][0]} and "
                           f"{', '.join(present)} has no recorded_at")
+    check_stale_and_secrets(guard, cols, by)
     return guard.finish()
+
+
+MONEY_REF = re.compile(r"(^|/)Money$")
+SECRET_WORDS = re.compile(r"token|secret|credential|password|\bpin\b|apiKey|private", re.I)
+SECRET_FORMS = {"vault-reference", "field-encrypted", "blind-index", "argon2id-phc"}
+
+
+def _field_spec(src: str, by: dict):
+    """The contract property a schema-reference column's `source` names (`contract.Schema.prop` or
+    `contract.Schema.array[].prop`), or None when the contract no longer has it."""
+    bits = src.split(".", 2)
+    if len(bits) != 3 or not (bits[0], bits[1]) in by:
+        return None
+    stem, schema, path = bits
+    node = by[(stem, schema)]
+    for i, part in enumerate(path.split("[].")):
+        p = props_of(node, stem, by).get(part)
+        if not isinstance(p, dict):
+            return None
+        if i < path.count("[]."):
+            items = p.get("items") if isinstance(p.get("items"), dict) else {}
+            node = items
+        else:
+            return p
+    return None
+
+
+def check_stale_and_secrets(guard, cols: dict, by: dict) -> None:
+    """ST-PROPERTY-PERSISTENCE, ST-STALE-COLUMN (CHG-MKT-002, ADAM CR-087) and ST-SECRET-FORM (CHG-MKT-001, CR-086).
+
+    **A table the contract no longer derives keeps the columns of an older run.** `Wishlist.items` carried its own
+    `x-ticvai-persistence`, which derive-schema never reads (it reads the tag on a schema), so
+    `marketing.wishlist_item` was never re-derived: the contract said `list_price` Money (naming-and-style 5.1, the
+    CR-011/014/072 renames) and the table kept `price text`, and no rule looked, because the wrapper schema is `none`
+    and this check walked only persisted schemas. Now: a property-level persistence tag is a finding; and every
+    schema-reference column whose source is a contract field is read back against that field, whatever schema it is
+    on: an `x-ticvai-column` naming another column, or a `Money` field in a column that is not numeric, is stale.
+
+    **A stored secret says how it is stored** (ADR-0063 section 4, ADR-0071). `GuestDevice.tokenRef` was "a vault
+    reference" with no vault abstraction behind it and `tokenFingerprint` "a hash" with no algorithm, so a developer
+    had to invent both. A write-only stored property whose name says it is a token, secret, credential, password or
+    PIN declares `x-ticvai-secret`: `vault-reference` (a Key Vault secret's name, for a few provider credentials),
+    `field-encrypted` (ciphertext under the tenant's data key), `blind-index` (a keyed hash for lookup) or
+    `argon2id-phc` (a password or PIN hash)."""
+    for (stem, name), s in sorted(by.items()):
+        for p, ps in sorted(props_of(s, stem, by).items()):
+            if isinstance(ps, dict) and ps.get("x-ticvai-persistence"):
+                guard.add("ST-PROPERTY-PERSISTENCE", f"{stem}.{name}.{p}",
+                          f"{stem}.{name}.{p} carries x-ticvai-persistence on the property; derive-schema reads it "
+                          f"only on a schema, so the table is never derived from it: give the rows a schema of their own")
+    for t, cs in sorted(cols.items()):
+        for c in cs:
+            src = str(c.get("source") or "")
+            if src.count(".") < 2 or src.startswith(("derive-", "relationship-graph")):
+                continue
+            ps = _field_spec(src, by)
+            if not isinstance(ps, dict):
+                continue
+            col, ctype = str(c.get("column") or ""), str(c.get("type") or "").lower()
+            chosen = ps.get("x-ticvai-column")
+            if chosen and str(chosen) != col:
+                guard.add("ST-STALE-COLUMN", f"{t}.{col}",
+                          f"{t}.{col} holds {src}, which the contract stores as {chosen} (x-ticvai-column): the table "
+                          f"was not re-derived from the contract")
+            ref = str(ps.get("$ref") or "")
+            if not ref:
+                for k in ("allOf", "oneOf"):
+                    parts = ps.get(k) if isinstance(ps.get(k), list) else []
+                    ref = next((str(x.get("$ref")) for x in parts if isinstance(x, dict) and x.get("$ref")), ref)
+            if MONEY_REF.search(ref) and ctype and not ctype.startswith("numeric"):
+                guard.add("ST-STALE-COLUMN", f"{t}.{col}:type",
+                          f"{t}.{col} holds {src}, a Money, as {ctype}; every Money column is numeric(18,4)")
+            if ps.get("writeOnly") and SECRET_WORDS.search(src.rsplit(".", 1)[-1]) \
+                    and str(ps.get("x-ticvai-secret") or "") not in SECRET_FORMS:
+                guard.add("ST-SECRET-FORM", f"{t}.{col}",
+                          f"{t}.{col} stores {src}, a write-only secret, and the contract does not say how "
+                          f"(x-ticvai-secret: {' | '.join(sorted(SECRET_FORMS))}; ADR-0063, ADR-0071)")
 
 
 if __name__ == "__main__":

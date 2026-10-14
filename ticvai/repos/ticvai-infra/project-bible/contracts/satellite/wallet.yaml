@@ -67,6 +67,47 @@ servers:
 - url: https://api.ticvai.com/v1
 security:
 - bearerAuth: []
+# **The rule questions Wallet answers for other modules** (ADR-0055 amendment, 14 October 2026; the r6 shared
+# convention: module, inputs, returns, rule, served). An asking operation names one in `x-ticvai-read-via`.
+x-ticvai-queries:
+  # Finance's period close asks this for `PeriodCloseResult.walletChecks` and `walletRollForward` (ADAM CR-085, ticket
+  # 28411; CHG-FIN-012). Ledger is in `commerce` with Wallet, so it asks in process (ADR-0055 rule 2) and never reads
+  # wallet.* itself; another deployable asks through getWalletPreCloseChecks (serviceAuth).
+  periodCloseChecks:
+    module: wallet
+    inputs:
+      scopePath: { type: string, description: "The legal entity's scope path (ledger.legal_entity.scope_path); wallets at it or beneath it." }
+      periodStart: { type: string, format: date }
+      periodEnd: { type: string, format: date }
+    returns:
+      type: object
+      properties:
+        checks:
+          type: array
+          description: Finance's five wallet checks, in PeriodCloseResult.walletChecks' shape; empty when no wallet balance exists in scope.
+          items:
+            type: object
+            properties:
+              check: { type: string, enum: [walletRollForwardTies, walletLiabilityMatchesLedger, noPendingWalletAuthorisations, expiredBalancesReleased, walletDisputesReviewed] }
+              passed: { type: boolean }
+              detail: { type: string }
+              blockingCount: { type: integer }
+        rollForward:
+          type: object
+          nullable: true
+          description: PeriodCloseResult.walletRollForward, from getWalletMovementSummary over the period; null when no wallet balance exists in scope.
+    rule: >
+      Wallet runs its own pre-close checks (getWalletPreCloseChecks, WalletPreCloseCheck.code) for the period and
+      answers them in finance's names: rollForwardTies is walletRollForwardTies; subLedgerTiesToLedger and
+      reconciliationSourcesMatched together are walletLiabilityMatchesLedger (both say the wallet's figures agree with
+      what finance posted); noExpiredHoldsOpen is noPendingWalletAuthorisations; noPendingExpiryRun is
+      expiredBalancesReleased; noOverdueDisputes is walletDisputesReviewed. A check passes when every wallet check it
+      stands for is pass or warn (a warn is reported in detail and does not block); blockingCount is the number of
+      records the failing wallet checks name. The definitions are Wallet's, in getWalletPreCloseChecks; finance does
+      not restate them. Where no wallet.balance exists at or beneath scopePath (always so for a tenant without the
+      wallet module) checks is empty and rollForward null, which is finance's "empty where the tenant has no wallet
+      module".
+    served: [in-process, service]
 paths:
   /wallet-types:
     get:

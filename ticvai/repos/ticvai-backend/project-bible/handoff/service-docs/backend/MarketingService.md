@@ -22,7 +22,7 @@
 | Service | Tables it reads |
 |---|---|
 | [AccessService](AccessService.md) | `access.blacklist`, `access.entitlement` |
-| [CatalogueService](CatalogueService.md) | `catalogue.event`, `catalogue.product`, `promotions.promotion` |
+| [CatalogueService](CatalogueService.md) | `catalogue.event`, `catalogue.performance`, `catalogue.price`, `catalogue.price_assignment`, `catalogue.price_list`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant`, `promotions.promotion` |
 | [IdentityService](IdentityService.md) | `identity.principal`, `pii.subject` |
 | [OrderService](OrderService.md) | `orders.invitation` |
 | [PlatformService](PlatformService.md) | `control.seo_metadata`, `control.url_redirect` |
@@ -616,7 +616,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 
 **`POST /consent-questions`**: Define a consent question
 
-**A venue's own question, with its own text, version and scope** (decided 29 September, rev 3 REV3-26). `scope` says whether it is asked for each person (`perPerson`) or once for the booking (`perBooking`); `required` whether checkout waits for it; `blockingAnswer` which answer, if any, stops the booking (a `no` to "Are you able to swim?" on a deep-water product). Attaching it to a product is the catalogue's (`catalogue.Product.consentQuestionIds`), and to a booking flow the white-label flow configuration's. Created at version 1.
+**A venue's own question, with its own text, version and scope** (decided 29 September, rev 3 REV3-26). `scope` says whether it is asked for each person (`perPerson`) or once for the booking (`perBooking`); `required` whether checkout waits for it; `blockingAnswer` which answer, if any, stops the booking (a `no` to "Are you able to swim?" on a deep-water product). Attaching it to a product is the catalogue's (`catalogue.Product.consentQuestionIds`), and to a booking flow the white-label flow configuration's. Created at version 1, `active`. The body is `CreateConsentQuestionRequest` (ADAM CR-089): the server sets `id`, `version`, `status` and `scopePath`.
 
 |  |  |
 |---|---|
@@ -637,21 +637,16 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
-**Request body**: `ConsentQuestion`
+**Request body**: `CreateConsentQuestionRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes | (read-only) |
 | kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | text | object | yes | The question as the guest reads it, per locale. |
 | helpText | object |  | (nullable) |
-| version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
-| scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
-| required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
-| blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
-| status | enum (active, retired) | yes | (default active) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-| updatedAt | string (date-time) |  | (read-only) |
+| scope | enum (perPerson, perBooking) |  | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| required | boolean |  | Checkout waits until it is answered. (default True) |
+| blockingAnswer | enum (yes, no, none) |  | The answer that stops the booking, for the person or the booking it covers. (default none) |
 
 **Response**: `ConsentQuestion`
 
@@ -1263,7 +1258,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 
 **The banner's and the preference centre's write, for a visitor nobody has identified yet** (2.6.52, 2.6.55). **Append-only, like `recordConsent`**: a change of mind or a withdrawal is a new row, never an edit, so the trail from first decision to last is the evidence (2.6.56). Where no `consentKey` is sent the server mints one and returns it; the browser or app keeps it as a first-party, strictly necessary cookie or local key, which is the one thing that may be set before consent. **The key is the tenant's, not the domain's** (2.6.62): the storefront on any of the tenant's verified domains (white-label `claimCustomDomain`) presents the same key and gets the same answer; it is never shared across tenants, because two tenants are two controllers.
 **What the action writes.** `acceptAll` grants every category; `rejectNonEssential` and `withdraw` decline every category but `strictlyNecessary`; `savePreferences` records the categories as sent, and a category not sent is declined (off by default, BL-073); `doNotSellOrShare` declines `marketing` (CCPA/CPRA). **A `globalPrivacyControl` signal declines `marketing` whatever else was chosen.** `strictlyNecessary` is always granted and cannot be declined (422). The decision expires after the tenant's device-consent term and the banner asks again; so does a new `noticeVersion`.
-**Personal data stays out of `marketing`** (ADR-0023, BL-073 §3): where the published banner design has `recordIpAddress` on, the request's IP address and user agent are written to `pii.consent_identifier` against this row, never beside it. `country` is the edge's geolocation of the request, kept for the geographic consent statistics (2.6.63) without keeping the address. A key already claimed by a guest (`claimDeviceConsent`) is closed: a decision sent against it mints a new key.
+**Personal data stays out of `marketing`** (ADR-0023, BL-073 §3): where the published banner design has `recordIpAddress` on, the request's IP address and user agent are written to `pii.consent_identifier` against this row, never beside it, by its owner: this calls identity `recordConsentIdentifier` (in `commerce`; ADR-0055 rule 4, CHG-XDW-004). `country` is the edge's geolocation of the request, kept for the geographic consent statistics (2.6.63) without keeping the address. A key already claimed by a guest (`claimDeviceConsent`) is closed: a decision sent against it mints a new key.
 **Publishes `consent.deviceConsentRecorded`** (29 September, build, 2.6.65) in the same transaction as the row, without the IP address or user agent, so a CDP or CRM subscribed through the webhook catalogue receives the consent signal; Google Analytics and Tag Manager read it in the page (`getCookieConsentRuntime`).
 
 |  |  |
@@ -1676,7 +1671,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 **`PATCH /consent-questions/{questionId}`**: Reword, re-scope or retire a consent question
 
-**A change to what the guest is asked is a new version, never an edit** (decided 29 September, rev 3 REV3-26). Changing `text`, `scope`, `required` or `blockingAnswer` raises `version` by one; every answer already given keeps the version it was given against, which is the evidence if the answer is ever questioned. A cart that asked the old version asks the new one on its next read. Setting `status` to `retired` stops it being asked and changes no version.
+**A change to what the guest is asked is a new version, never an edit** (decided 29 September, rev 3 REV3-26). Changing `text`, `scope`, `required` or `blockingAnswer` raises `version` by one; every answer already given keeps the version it was given against, which is the evidence if the answer is ever questioned. A cart that asked the old version asks the new one on its next read. Setting `status` to `retired` stops it being asked and changes no version. **The body carries only what changes** (`UpdateConsentQuestionRequest`, ADAM CR-089): a field left out keeps its value, `kind` is fixed once created, and `version` is the server's to raise. A venue writes the new version row beside its question: `consent_question_version` follows its question's scope (ADAM CR-090).
 
 |  |  |
 |---|---|
@@ -1698,21 +1693,16 @@ Each purpose names the channels it covers, whether it is required for service, a
 | questionId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
-**Request body**: `ConsentQuestion`
+**Request body**: `UpdateConsentQuestionRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes | (read-only) |
-| kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
-| text | object | yes | The question as the guest reads it, per locale. |
+| text | object |  | The question as the guest reads it, per locale. |
 | helpText | object |  | (nullable) |
-| version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
-| scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
-| required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
-| blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
-| status | enum (active, retired) | yes | (default active) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-| updatedAt | string (date-time) |  | (read-only) |
+| scope | enum (perPerson, perBooking) |  | A change raises version by one. |
+| required | boolean |  | A change raises version by one. |
+| blockingAnswer | enum (yes, no, none) |  | A change raises version by one. |
+| status | enum (active, retired) |  | retired stops the question being asked and changes no version. |
 
 **Response**: `ConsentQuestion`
 
@@ -1813,6 +1803,9 @@ Guest-facing. A low rating may open a service case automatically where the venue
 
 Idempotent on the variant and performance — saving twice is one entry, not two. The count matters to the guest and to demand signals, so a double tap must not inflate it.
 **The same product for two different performances is two entries (decided 28 September, audit R149).** The entry key is `variantId` plus `performanceId`; a save with no `performanceId` is a third, date-less entry for the product generally.
+**Whether the variant may be sold is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-081; CHG-TEN-002; ADR-0055 rule 4). Marketing runs in another deployable, so it asks Catalogue's declared query `variantsSellableAt(venueId, [variantId], channel)` through Catalogue's service route with the guest's channel (`web` or `mobile`) and never reads `catalogue.variant`. A variant Catalogue does not know, or one not sellable at the venue on that channel, is the `404`. Catalogue's published service operation for the query is not written yet (a follow-up of CHG-TEN-002).
+**What the saved row holds** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002). The same call to Catalogue's service route asks `variantListingFacts(variantIds, channel, performanceIds)` too, whose `venueId` is the venue `variantsSellableAt` is asked about, and the row stores its `productName`, `imageAssetRef`, `listPrice` (as `list_price`), `performanceStartsAt` and `isAvailable: true` as they are at the save; `getWishlist` replaces them with Catalogue's current answer on every read. A performance that is not the variant's product's is the same `404` (`unknown-variant`).
+**The idempotency is the database's**: a unique index on (`subject_id`, `variant_id`, `performance_id`) with a null performance colliding too (`NULLS NOT DISTINCT`), so two saves racing under different `Idempotency-Key`s make one row. The second save meets the index, reads the existing row and answers `200` with it, its `note` replaced when it sends one.
 
 |  |  |
 |---|---|
@@ -1823,7 +1816,7 @@ Idempotent on the variant and performance — saving twice is one entry, not two
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `marketing.wishlist_item` |
+| Reads | `cache:idempotency`, `catalogue.performance`, `catalogue.price`, `catalogue.price_assignment`, `catalogue.price_list`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant`, `marketing.wishlist_item` |
 | Writes | `cache:idempotency`, `marketing.wishlist_item` |
 | Called by | GST-020, WEB-009 |
 
@@ -1847,19 +1840,20 @@ Idempotent on the variant and performance — saving twice is one entry, not two
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
-| items | array of object | yes |  |
+| items | array of WishlistItem | yes | Newest first: ordered by addedAt descending, id as the tiebreak (CHG-MKT-002). |
 | items[].id | string (uuid) | yes |  |
+| items[].subjectId | string (uuid) | yes | The guest who saved it. (read-only) |
 | items[].variantId | string (uuid) | yes |  |
-| items[].productName | string |  |  |
+| items[].productName | string |  | Catalogue's, not Marketing's. |
 | items[].performanceId | string (uuid) |  | (nullable) |
-| items[].performanceStartsAt | string (date-time) |  | (nullable) |
+| items[].performanceStartsAt | string (date-time) |  | The saved performance's start, from Catalogue's variantListingFacts; null for a date-less entry. (nullable) |
 | items[].price | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].imageAssetRef | string |  | (nullable) |
+| items[].imageAssetRef | string |  | The product's primary media, from Catalogue's variantListingFacts. (nullable) |
 | items[].isAvailable | boolean | yes | False where the product has been withdrawn or the performance has passed. |
-| items[].unavailableReason | string |  | (nullable) |
+| items[].unavailableReason | string |  | Why isAvailable is false, in Catalogue's words (variantListingFacts.reason), or performancePassed; null when available. (nullable) |
 | items[].note | string |  | (nullable) |
 | items[].addedAt | string (date-time) | yes |  |
 
@@ -1868,7 +1862,7 @@ Idempotent on the variant and performance — saving twice is one entry, not two
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Saved, or already present |
-| 404 |  | Variant not found or not sellable in this venue |
+| 404 |  | Variant not found or not sellable in this venue (Catalogue's variantsSellableAt; CHG-TEN-002) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getWishlist
@@ -1877,6 +1871,9 @@ Idempotent on the variant and performance — saving twice is one entry, not two
 
 Deliberately here rather than in the catalogue. A wishlist is a record of a person's intent, not a property of a product — and it is the same shape as every other behavioural signal segmentation already reads.
 Items whose product has been withdrawn are returned with `isAvailable: false` rather than dropped. A guest who saved something and finds it silently gone assumes the feature is broken.
+**Newest first**: ordered by `addedAt` descending, `id` as the tiebreak.
+**What Catalogue knows is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002; ADR-0055 rule 4). Marketing runs in another deployable, so it never reads `catalogue.*`: it asks Catalogue's declared query `variantListingFacts(variantIds, channel, performanceIds)` through Catalogue's service route, once per read for every saved variant, with the guest's channel (`web` or `mobile`), and returns Catalogue's current `productName`, `imageAssetRef`, `price` and `performanceStartsAt`; `isAvailable` is false where Catalogue says the variant is not sellable (`unavailableReason` is its `reason`) or the saved performance has started (`performancePassed`). Nothing is written back: this read runs on a replica. **If Catalogue cannot be reached** the stored values are returned as they were when each item was saved, rather than an error. Catalogue's published service operation for the query is not written yet (a follow-up, as for `variantsSellableAt`, CHG-TEN-002).
+**Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here (CHG-MKT-002, as the developer of ticket 30706 proposed).
 
 |  |  |
 |---|---|
@@ -1888,7 +1885,7 @@ Items whose product has been withdrawn are returned with `isAvailable: false` ra
 | Config scope | subject |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `marketing.wishlist_item` |
+| Reads | `catalogue.performance`, `catalogue.price`, `catalogue.price_assignment`, `catalogue.price_list`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant`, `marketing.wishlist_item` |
 | Writes | - |
 | Called by | GST-020, WEB-009, WEB-017, WEB-024 |
 
@@ -1903,19 +1900,20 @@ Items whose product has been withdrawn are returned with `isAvailable: false` ra
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
-| items | array of object | yes |  |
+| items | array of WishlistItem | yes | Newest first: ordered by addedAt descending, id as the tiebreak (CHG-MKT-002). |
 | items[].id | string (uuid) | yes |  |
+| items[].subjectId | string (uuid) | yes | The guest who saved it. (read-only) |
 | items[].variantId | string (uuid) | yes |  |
-| items[].productName | string |  |  |
+| items[].productName | string |  | Catalogue's, not Marketing's. |
 | items[].performanceId | string (uuid) |  | (nullable) |
-| items[].performanceStartsAt | string (date-time) |  | (nullable) |
+| items[].performanceStartsAt | string (date-time) |  | The saved performance's start, from Catalogue's variantListingFacts; null for a date-less entry. (nullable) |
 | items[].price | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].imageAssetRef | string |  | (nullable) |
+| items[].imageAssetRef | string |  | The product's primary media, from Catalogue's variantListingFacts. (nullable) |
 | items[].isAvailable | boolean | yes | False where the product has been withdrawn or the performance has passed. |
-| items[].unavailableReason | string |  | (nullable) |
+| items[].unavailableReason | string |  | Why isAvailable is false, in Catalogue's words (variantListingFacts.reason), or performancePassed; null when available. (nullable) |
 | items[].note | string |  | (nullable) |
 | items[].addedAt | string (date-time) | yes |  |
 
@@ -1932,6 +1930,9 @@ Items whose product has been withdrawn are returned with `isAvailable: false` ra
 **`GET /guests/{subjectId}/devices`**: A guest's registered devices
 
 Here rather than in tenancy. `platform.device` is staff hardware bound to a workstation — printers, readers, turnstiles. A guest's phone is neither owned by the venue nor bound to anything, and it is registered for one reason: to be sent to. That makes it guest engagement.
+**Ordered by `registeredAt` descending, `id` as the tiebreak** (decided 14 October 2026, Chinmay, ADAM CR-088, CHG-MKT-003): the newest registration, usually the phone in the guest's hand, first. `registeredAt` is never null and is not changed by a re-registration, so a device does not move while a guest pages; the cursor is (`registeredAt`, `id`), as `PageCursor` says.
+**Every status is listed**, `active`, `failed` and `revoked`, each with its `status` and, for a revoked one, `revokedAt`: GST-073 and WEB-024 show a revoked device as revoked rather than dropping it, so a guest can see that the old phone that still held tickets was cut off, and a failed one as needing the app opened again. There is no status filter; a screen that wants active devices only filters what it is given.
+**Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here (CHG-MKT-003, as the developer of ticket 30707 proposed).
 
 |  |  |
 |---|---|
@@ -1963,13 +1964,14 @@ Here rather than in tenancy. `platform.device` is staff hardware bound to a work
 | items[].id | string (uuid) | yes |  |
 | items[].subjectId | string (uuid) | yes |  |
 | items[].platform | enum (ios, android, web) | yes |  |
-| items[].tokenFingerprint | string |  | Hash of the token, not the token. |
-| items[].tokenRef | string |  | A vault reference to the push token, written by the server from registerGuestDevice.token — the same pattern as PaymentProvider.credentialRef. |
+| items[].installationId | string (uuid) |  | The app install the registration came from, as registerGuestDevice.installationId sent it (CHG-MKT-001). (nullable) |
+| items[].tokenFingerprint | string |  | A keyed hash of the token, not the token (decided 14 October 2026, CHG-MKT-001; ADR-0063 section 4 as amended): HMAC-SHA-256 of the token under the tenant's blind-index key, written as 64 lowercase h… (max length 64; nullable) |
+| items[].tokenRef | string |  | The push token, encrypted by the application (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001; ADR-0063 section 4 as amended), written by the server from registerGuestDevice.token: AES-256… (nullable) |
 | items[].appVersion | string |  | (nullable) |
 | items[].osVersion | string |  | (nullable) |
 | items[].deviceModel | string |  | (nullable) |
 | items[].locale | string |  | (nullable) |
-| items[].status | enum (active, revoked, failed) | yes |  |
+| items[].status | enum (active, revoked, failed) | yes | active is sent to. |
 | items[].failureCount | integer |  | Consecutive delivery failures. |
 | items[].registeredAt | string (date-time) | yes |  |
 | items[].lastSeenAt | string (date-time) |  | (nullable) |
@@ -1988,8 +1990,12 @@ Here rather than in tenancy. `platform.device` is staff hardware bound to a work
 
 **`POST /guests/{subjectId}/devices`**: Register a device for push
 
-Called on install and again whenever the provider rotates the token — which happens without warning and without an uninstall. Idempotent on the token, so re-registration updates rather than duplicates.
+Called on install and again whenever the provider rotates the token — which happens without warning and without an uninstall. Re-registration updates rather than duplicates.
 **A registered device is not consent to send.** Push still requires a current consent for the purpose; this only records where a message could go.
+**Which row a registration is** (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001). A rotated token is a different token, so the token alone cannot be the key. The app sends `installationId`, a UUIDv7 it makes once per install (per browser profile for `web`) and keeps until uninstalled. The server looks, among the calling guest's own rows, for the row with that `installationId`, or, when none is sent, the row whose `tokenFingerprint` is this token's; a revoked row has neither, so it is never found. Found: the row is updated in place. Not found: a new `active` row. Unique indexes on (`subject_id`, `installation_id`) and (`subject_id`, `token_fingerprint`) make two racing registrations one row; the loser re-reads and updates it. They are per guest, never tenant-wide: the table is under subject RLS, and a tenant-wide index would fail on a row the caller cannot see.
+**What a re-registration changes**: `tokenRef` and `tokenFingerprint` (the new token's), `platform`, `appVersion`, `osVersion`, `deviceModel` and `locale` (as sent; a field not sent becomes null), `status` `active` (a `failed` row is made active again: a new token is the usual cure), `failureCount` 0 and `lastSeenAt` now; `registeredAt` and `id` are kept. **A revoked device is never made active again**: registering the same phone after a revoke makes a new row, and the revoked one stays as the guest's history (`listGuestDevices`).
+**The token is never stored as sent** (ADR-0063 section 4, amended 14 October 2026): `tokenRef` holds it encrypted with the tenant's data key, and `tokenFingerprint` is its HMAC-SHA-256 under the tenant's blind-index key. Both come from the kernel's field encryption; no Key Vault secret is written per device.
+**One phone, two guests.** When another guest signs in on a shared phone, the same token is registered under their subject as a row of their own. The push sender, a worker that sees every subject, sends a token only to the row registered or seen most recently and marks the others `revoked`, so a guest who has left the phone is not sent the next guest's messages (lead to confirm).
 
 |  |  |
 |---|---|
@@ -2017,7 +2023,8 @@ Called on install and again whenever the provider rotates the token — which ha
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | platform | enum (ios, android, web) | yes |  |
-| token | string | yes | (max length 512) |
+| token | string | yes | The provider's push token. (max length 512) |
+| installationId | string (uuid) |  | A UUIDv7 the app makes once per install (once per browser profile for web) and sends on every registration from that install, so a rotated token updates the same row (CHG-MKT-001). |
 | appVersion | string |  |  |
 | osVersion | string |  |  |
 | deviceModel | string |  |  |
@@ -2030,13 +2037,14 @@ Called on install and again whenever the provider rotates the token — which ha
 | id | string (uuid) | yes |  |
 | subjectId | string (uuid) | yes |  |
 | platform | enum (ios, android, web) | yes |  |
-| tokenFingerprint | string |  | Hash of the token, not the token. |
-| tokenRef | string |  | A vault reference to the push token, written by the server from registerGuestDevice.token — the same pattern as PaymentProvider.credentialRef. |
+| installationId | string (uuid) |  | The app install the registration came from, as registerGuestDevice.installationId sent it (CHG-MKT-001). (nullable) |
+| tokenFingerprint | string |  | A keyed hash of the token, not the token (decided 14 October 2026, CHG-MKT-001; ADR-0063 section 4 as amended): HMAC-SHA-256 of the token under the tenant's blind-index key, written as 64 lowercase h… (max length 64; nullable) |
+| tokenRef | string |  | The push token, encrypted by the application (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001; ADR-0063 section 4 as amended), written by the server from registerGuestDevice.token: AES-256… (nullable) |
 | appVersion | string |  | (nullable) |
 | osVersion | string |  | (nullable) |
 | deviceModel | string |  | (nullable) |
 | locale | string |  | (nullable) |
-| status | enum (active, revoked, failed) | yes |  |
+| status | enum (active, revoked, failed) | yes | active is sent to. |
 | failureCount | integer |  | Consecutive delivery failures. |
 | registeredAt | string (date-time) | yes |  |
 | lastSeenAt | string (date-time) |  | (nullable) |
@@ -2062,8 +2070,8 @@ Called on install and again whenever the provider rotates the token — which ha
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `marketing.guest_profile` |
-| Writes | `cache:idempotency`, `marketing.guest_profile` |
+| Reads | `cache:idempotency`, `marketing.wishlist_item` |
+| Writes | `cache:idempotency`, `marketing.wishlist_item` |
 | Called by | GST-020, WEB-009 |
 
 **Parameters**
@@ -2087,6 +2095,7 @@ Called on install and again whenever the provider rotates the token — which ha
 **`DELETE /guests/{subjectId}/devices/{deviceId}`**: Revoke a device registration
 
 Sign-out, uninstall, or a guest removing a device they no longer have. Revoked rather than deleted — a token that starts failing needs a record explaining why, or the same dead token gets retried indefinitely.
+**A revoke is final and keeps no token** (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001): `status` `revoked`, `revokedAt` now, and `tokenRef`, `tokenFingerprint` and `installationId` cleared, so nothing can be sent to it and no later registration matches it. The row stays, with its platform, model and dates, as the guest's record of the device. Revoking a revoked device is `204` again.
 
 |  |  |
 |---|---|
@@ -2097,8 +2106,8 @@ Sign-out, uninstall, or a guest removing a device they no longer have. Revoked r
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `marketing.guest_profile` |
-| Writes | `cache:idempotency`, `marketing.guest_profile` |
+| Reads | `cache:idempotency`, `marketing.guest_device` |
+| Writes | `cache:idempotency`, `marketing.guest_device` |
 | Called by | GST-073, WEB-024 |
 | State model | Guest device ([states/guest-device.yaml](../../../states/guest-device.yaml)): moves `active` -> `revoked` |
 
@@ -4703,6 +4712,7 @@ Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states a
 **`updateGuestProfile` is staff-only, and the three screens calling it are the staff app, the back office and the CMS** — so to correct a phone number a guest had to ask somebody.
 CF-96 fixed this class for 28 guest screens and the underlying pattern was never swept.
 **A narrower field set than the staff operation.** A guest may correct their name, contact details, language and channel preference. They may not set their own tags, lifetime value or loyalty tier.
+**The name and language are Identity's.** `displayName` and `preferredLanguage` also live on the guest's `pii.subject`, which Identity owns in `commerce`; this calls identity `updateGuestSubjectDetails` with the guest's own subject and those two fields when either is sent (ADR-0055 rule 4, CHG-XDW-005), and writes the rest of the profile itself.
 
 |  |  |
 |---|---|
@@ -5385,7 +5395,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| question_id | uuid | yes |  |
+| question_id | uuid | yes | The question this is a wording of. |
 | version | integer | yes |  |
 | text | jsonb | yes |  |
 | published_at | timestamptz | yes |  |
@@ -5596,13 +5606,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | subject_id | uuid | yes |  |
 | platform | text | yes |  |
-| token_fingerprint | text | no | Hash of the token, not the token. |
-| token_ref | text | no | A vault reference to the push token, written by the server from registerGuestDevice.token — the same pattern as PaymentProvider.credentialRef. |
+| installation_id | uuid | no | The app install the registration came from, as registerGuestDevice.installationId sent it (CHG-MKT-001). |
+| token_fingerprint | text | no | A keyed hash of the token, not the token (decided 14 October 2026, CHG-MKT-001; ADR-0063 section 4 as amended): HMAC-SHA-256 of the token under the tenant's blind-index key, written as 64 lowercase h… |
+| token_ciphertext | text | no | The push token, encrypted by the application (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001; ADR-0063 section 4 as amended), written by the server from registerGuestDevice.token: AES-256… |
 | app_version | text | no |  |
 | os_version | text | no |  |
 | device_model | text | no |  |
 | locale | text | no |  |
-| status | text | yes |  |
+| status | text | yes | active is sent to. |
 | failure_count | integer | no | Consecutive delivery failures. |
 | registered_at | timestamptz | yes |  |
 | last_seen_at | timestamptz | no |  |
@@ -6050,17 +6061,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| subject_id | uuid | yes | Owner. |
 | id | uuid | yes |  |
+| subject_id | uuid | yes | The guest who saved it. |
 | variant_id | uuid | yes |  |
-| product_name | text |  |  |
-| performance_id | uuid |  |  |
-| performance_starts_at | timestamptz |  |  |
-| price | text |  |  |
-| image_asset_ref | text |  |  |
+| product_name | text | no | Catalogue's, not Marketing's. |
+| performance_id | uuid | no |  |
+| performance_starts_at | timestamptz | no | The saved performance's start, from Catalogue's variantListingFacts; null for a date-less entry. |
+| list_price | numeric(18,4) | no | The variant's current list price when the wishlist is read: the price Catalogue's guest listing shows for the variant on the guest's channel (variantListingFacts.listPrice). |
+| image_asset_ref | text | no | The product's primary media, from Catalogue's variantListingFacts. |
 | is_available | boolean | yes | False where the product has been withdrawn or the performance has passed. |
-| unavailable_reason | text |  |  |
-| note | text |  |  |
+| unavailable_reason | text | no | Why isAvailable is false, in Catalogue's words (variantListingFacts.reason), or performancePassed; null when available. |
+| note | text | no |  |
 | added_at | timestamptz | yes |  |
 
 ## Not in the first release

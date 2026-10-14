@@ -94,6 +94,8 @@ contracts:
   - order-completed
   - order-created
   - order-exchanged
+  - order-lapsed
+  - order-linkedToGuest
   - order-paid
   - order-refunded
   - payment-captured
@@ -190,15 +192,15 @@ contracts:
   ref: diagrams/lld/contracts/white-label.yaml
 - contract: identity
   tier: spine
-  operations: 94
+  operations: 97
   holds: null
   service: IdentityService
   verbs:
-    POST: 42
+    POST: 44
     GET: 39
     PUT: 7
     DELETE: 4
-    PATCH: 2
+    PATCH: 3
   guestCallable: 18
   offlineCapable: 6
   events:
@@ -287,12 +289,12 @@ contracts:
   ref: diagrams/lld/contracts/approvals.yaml
 - contract: tenancy
   tier: spine
-  operations: 57
+  operations: 58
   holds: null
   service: TenancyService
   verbs:
     GET: 28
-    POST: 14
+    POST: 15
     PUT: 12
     PATCH: 2
     DELETE: 1
@@ -551,11 +553,11 @@ contracts:
   ref: diagrams/lld/contracts/venue-map.yaml
 - contract: cross-region
   tier: spine
-  operations: 18
+  operations: 20
   holds: null
   service: CrossRegionService
   verbs:
-    POST: 8
+    POST: 10
     GET: 7
     DELETE: 2
     PUT: 1

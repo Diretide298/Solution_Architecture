@@ -5773,13 +5773,13 @@ paths:
   /sync/orders:
     post:
       operationId: syncOrders
-      x-ticvai-write-via:
-      - table: sync.rejection
-        operation: recordSyncRejection
       x-ticvai-consumed-by:
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-132 Offline Transaction Monitor & Sync Queue"
+      x-ticvai-write-via:
+      - table: sync.rejection
+        operation: recordSyncRejection
       x-ticvai-note: >-
         **Ingest, per entry** (system-design review SD-028, 29 September; supersedes "stopping at the first entry").
         Entries are taken in `sequence` order. For each: validate and re-price; write the order, its lines and
@@ -5937,15 +5937,15 @@ paths:
         format: uuid
     post:
       operationId: resolveSyncRejection
+      x-ticvai-consumed-by:
+        - "P08 BO-038 Reconciliation Queue"
+        - "P08 BO-130 Offline Policy & Rules Configuration"
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
       x-ticvai-write-via:
       - table: sync.rejection
         operation: recordSyncRejectionResolution
       x-ticvai-calls:
       - cross-region.recordSyncRejectionResolution
-      x-ticvai-consumed-by:
-        - "P08 BO-038 Reconciliation Queue"
-        - "P08 BO-130 Offline Policy & Rules Configuration"
-        - "P08 BO-133 Offline Alerts, Limits & Audit"
       x-ticvai-audience:
       - staff
       summary: Record what was done about a refused entry

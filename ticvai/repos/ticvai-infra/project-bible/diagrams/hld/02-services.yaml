@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,796 operations and 1,133 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,802 operations and 1,136 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -17,8 +17,8 @@ tiers:
     Identity and 289 tables anchor on `platform.scope`.
   services:
   - service: TenancyService
-    operations: 212
-    tables: 110
+    operations: 213
+    tables: 107
     schemas:
     - platform
     - workforce
@@ -31,13 +31,13 @@ tiers:
     - workforce
     - approvals
     - accreditation
-    flowCoverage: 24%
+    flowCoverage: 23%
     scale: Read-heavy and highly cacheable. Config changes are rare.
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
-    operations: 94
-    tables: 39
+    operations: 97
+    tables: 41
     schemas:
     - identity
     - pii
@@ -249,13 +249,13 @@ tiers:
     ifDown: Down stops dashboards. **Nothing operational depends on it.**
     ref: diagrams/lld/services/ReportingService.yaml
   - service: CrossRegionService
-    operations: 18
-    tables: 3
+    operations: 20
+    tables: 7
     schemas:
     - sync
     contracts:
     - cross-region
-    flowCoverage: 6%
+    flowCoverage: 5%
     scale: Low volume, high scrutiny.
     ifDown: Down blocks cross-region entitlements. Each region continues alone.
     ref: diagrams/lld/services/CrossRegionService.yaml
@@ -304,7 +304,7 @@ crossServiceWrites:
 - from: CatalogueService
   to: TenancyService
   writes: 29
-  reads: 3
+  reads: 1
   kind: strong
 - from: OrderService
   to: LedgerService
@@ -313,28 +313,23 @@ crossServiceWrites:
   kind: strong
 - from: PlatformService
   to: TenancyService
-  writes: 20
+  writes: 19
   reads: 26
+  kind: strong
+- from: IdentityService
+  to: TenancyService
+  writes: 14
+  reads: 9
+  kind: strong
+- from: LedgerService
+  to: TenancyService
+  writes: 14
+  reads: 5
   kind: strong
 - from: OrderService
   to: CatalogueService
   writes: 14
-  reads: 65
-  kind: strong
-- from: IdentityService
-  to: TenancyService
-  writes: 12
-  reads: 6
-  kind: strong
-- from: LedgerService
-  to: TenancyService
-  writes: 12
-  reads: 3
-  kind: strong
-- from: CrossRegionService
-  to: TenancyService
-  writes: 11
-  reads: 16
+  reads: 66
   kind: strong
 - from: WalletService
   to: TenancyService
@@ -414,7 +409,7 @@ crossServiceWrites:
 - from: PlatformService
   to: OrderService
   writes: 3
-  reads: 67
+  reads: 68
   kind: ordinary
 - from: VenueOpsService
   to: InventoryService
@@ -504,7 +499,7 @@ crossServiceWrites:
 - from: IdentityService
   to: OrderService
   writes: 1
-  reads: 2
+  reads: 1
   kind: ordinary
 - from: IdentityService
   to: MarketingService
@@ -514,7 +509,7 @@ crossServiceWrites:
 - from: LedgerService
   to: OrderService
   writes: 1
-  reads: 13
+  reads: 14
   kind: ordinary
 - from: OrderService
   to: WalletService

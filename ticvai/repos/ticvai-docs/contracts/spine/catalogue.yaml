@@ -77,6 +77,112 @@ tags:
 - name: bundle
 - name: lease
 - name: entitlement
+# **The rule questions Catalogue answers for other modules** (decided 14 October 2026, Chinmay: "ask the owner by a
+# declared query", the ADR-0055 amendment; ADAM CR-081, CHG-TEN-002). A module that refuses on whether a variant
+# may be sold asks this and never reads catalogue.variant or catalogue.product itself: in process inside its own
+# transaction from the commerce deployable (ADR-0055 rule 2), through Catalogue's service operation from another
+# deployable (rule 4). **The rule is the lead's proposal, pending the Catalogue owner's confirmation.**
+x-ticvai-queries:
+  variantsSellableAt:
+    module: catalogue
+    decision_owner: Chinmay
+    notes: Catalogue owner to confirm (the rule below, and whether an empty channels list means every channel).
+    inputs:
+      venueId: { type: string, format: uuid }
+      variantIds: { type: array, items: { type: string, format: uuid } }
+      channel: { $ref: '#/components/schemas/Channel' }
+    returns:
+      type: array
+      description: One entry per asked variant, in the order asked.
+      items:
+        type: object
+        required: [variantId, known, sellable]
+        properties:
+          variantId: { type: string, format: uuid }
+          known: { type: boolean, description: False when Catalogue has no such variant (unknown-variant). }
+          sellable: { type: boolean }
+          reason:
+            type: string
+            nullable: true
+            enum: [retired, otherVenue, notApproved, notOnChannel, offSale]
+            description: Why a known variant is not sellable; null when it is.
+    rule: >
+      Proposed by the lead on 14 October 2026 (ADAM CR-081), the Catalogue owner to confirm. A variant is
+      sellable on channel C at venue V when all of these hold: the variant exists and is_active
+      (ProductVariant.isActive, false when retired); its product's venue_id is V (Product.venueId); the
+      product's lifecycle_state is approved or live (ProductLifecycleState); the product's channels contain C
+      (Product.channels, Channel); and the product's on_sale_to is null or later than now (Product.onSaleTo).
+      An empty channels list is read as no channel, so not sellable: the contract says "empty = all" only
+      where it means it (CatalogueAction.channels and the other rule lists) and says nothing of the kind for
+      Product.channels; the owner to confirm. This is not Product.isSellable, which also needs a published
+      bundle: a till board is how a new product reaches its first bundle, so a board save must not need one.
+      publishBundle applies isSellable when the bundle is cut and leaves out a tile whose product fails it.
+    served: [in-process, service]
+  # **What a guest's saved item shows** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002). Marketing's
+  # wishlist (operations deployable) shows a variant's name, picture, price and performance start and whether it can
+  # still be bought; all of it is Catalogue's, and ADR-0055 rule 4 lets Marketing ask only through Catalogue's
+  # published contract. Asked at the save (addToWishlist stores the answer) and at every read (getWishlist returns the
+  # current answer). The price resolution is the lead's proposal, the Catalogue owner to confirm.
+  variantListingFacts:
+    module: catalogue
+    decision_owner: Chinmay
+    notes: Catalogue owner to confirm the listPrice resolution (the guest listing's own, below). Asked by Marketing's
+      addToWishlist and getWishlist (CHG-MKT-002).
+    inputs:
+      variantIds: { type: array, maxItems: 200, items: { type: string, format: uuid } }
+      channel: { $ref: '#/components/schemas/Channel' }
+      performanceIds:
+        type: array
+        description: The saved performances, if any; each answered in `performances`.
+        items: { type: string, format: uuid }
+    returns:
+      type: object
+      properties:
+        variants:
+          type: array
+          description: One entry per asked variant, in the order asked.
+          items:
+            type: object
+            required: [variantId, known]
+            properties:
+              variantId: { type: string, format: uuid }
+              known: { type: boolean, description: False when Catalogue has no such variant; nothing else is set. }
+              venueId: { type: string, format: uuid, description: The product's venue (Product.venueId). }
+              productName: { type: string, description: The product's name in the guest's language, as the guest listing shows it. }
+              imageAssetRef:
+                type: string
+                nullable: true
+                description: The product's primary media (ProductMedia.isPrimary), as the guest listing's primaryMedia; null when it has none.
+              listPrice:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+                description: The price the guest listing shows for this variant on the channel now, in the venue's currency; null when no price list prices it.
+              sellable: { type: boolean, description: variantsSellableAt's answer for the variant at its own venue on the channel. }
+              reason:
+                type: string
+                nullable: true
+                enum: [retired, otherVenue, notApproved, notOnChannel, offSale]
+                description: variantsSellableAt's reason; null when sellable.
+        performances:
+          type: array
+          items:
+            type: object
+            required: [performanceId, known]
+            properties:
+              performanceId: { type: string, format: uuid }
+              known: { type: boolean }
+              productId: { type: string, format: uuid }
+              startsAt: { type: string, format: date-time }
+              isCancelled: { type: boolean }
+    rule: >
+      Proposed by the lead on 14 October 2026 (ADAM CR-087), the Catalogue owner to confirm. For each variant: the
+      product's name and primary media as the guest listing (searchCatalogue) shows them; listPrice is the price the
+      same listing shows for that variant on the asked channel at this moment (the same price-list resolution as its
+      fromPrice, for the one variant), in the venue's currency; sellable and reason are variantsSellableAt's for the
+      variant at its product's own venue. For each performance: its start, whether it is cancelled, and its product,
+      so the asker can tell a performance that is not the variant's product's. Read-only, no side effects, and safe to
+      cache for a short time on the asker's side.
+    served: [service]
 paths:
   /product-categories:
     get:
@@ -3350,7 +3456,17 @@ paths:
         decided 28 September, audit R129 (4)). `tenancy.updateSaleBoard` promises its changes reach
         terminals with the next bundle, and this is where they do: the snapshot reads the venue''s
         sale boards with the catalogue, so a board edit is live at the till once a bundle is published
-        and applied.
+        and applied. Tenancy owns the boards and both modules run in `commerce`, so the snapshot reads them in
+        bulk through the views named for Catalogue (`platform.sale_board_for_catalogue`,
+        `platform.sale_board_page_for_catalogue`, `platform.sale_board_tile_for_catalogue`; ADR-0055 rule 2,
+        CHG-R6G-007), never the tables raw.
+
+        **A tile whose product cannot be sold is left out of the bundle** (decided 14 October 2026, Chinmay,
+        ADAM CR-081; CHG-TEN-002). The board was checked against `variantsSellableAt` when it was saved, but
+        a product can be withdrawn, archived or taken off sale after that. When the bundle is cut, a
+        `product` tile whose product is not `isSellable` in the bundle being published is dropped from the
+        bundle''s copy of the board (the stored board keeps it), so the till never draws a button it
+        cannot sell; the tile comes back with the first bundle in which its product is sellable again.
 
         '
       tags:
@@ -4857,6 +4973,10 @@ paths:
       - event
       x-ticvai-permission: PERFORMANCE_CONFIGURE
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: Cancels a performance and queues refunds to every holder; a supervisor signs it in place (proposed by the coordinator, client to confirm, audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false

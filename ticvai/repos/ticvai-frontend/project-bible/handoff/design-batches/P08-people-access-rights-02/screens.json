@@ -227,6 +227,7 @@
         "Role.grantCount"
        ],
        "operation": "listRoles",
+       "notes": "**Read-only here** (14 October 2026, ADAM CR-076; CHG-IDR-001): every role of the tenant, by name; a role is created and edited on BO-054 by a tenant-scope `ROLE_MANAGE` holder. The counts are computed under row-level security and count only the holders this venue's caller can see (ADAM CR-077; CHG-IDR-002).",
        "provenance": "contract identity.yaml GET /roles"
       },
       {

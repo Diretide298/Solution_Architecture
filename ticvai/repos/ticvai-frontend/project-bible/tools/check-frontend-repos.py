@@ -16,6 +16,22 @@ generators read it through `tools/frontend_repos.py`. This checks that root:
     FR-SETUP-TABLE       viewer/mcp/setup/starters/frontend/CLAUDE.md (the table ADAM setup gives a developer) names
                          another repository for a platform, or one the root does not have
 
+**14 October 2026, CHG-SWP-003** (the sweep after #27741). The developer's agent on the guest app found
+ticvai-guest-app a single React Native CLI app at the repository root, on npm, with `src/`; ADAM's screen said
+`apps/guest-app/src/routes/...` (the Nx/pnpm workspace) and the package names workspace packages (design-tokens,
+ui, api-client, offline-core) the repository does not have. What a repository really holds is recorded on its
+entry as `observed:` (`by`, `date`, `workspace: none|nx`, `packageManager`, `srcRoot`, `packages: [...]`); what
+the package says about it is the screens' `implementation.component`, the platform's `packages` and the suggested
+location frontend_repos.py derives. These read one against the other:
+
+    FR-OLD-PATH          a screen on a platform with a repository names its component under apps/<app>/, the
+                         one-workspace layout, and ADAM serves the screen as written
+    FR-LAYOUT-UNCONFIRMED a platform's repository has no `observed:` layout while frontend-repos.yaml says the layout
+                         is assumed: every location its tickets suggest is a guess
+    FR-LAYOUT-MISMATCH   an `observed:` layout contradicts the package: the suggested locations are not under its
+                         `srcRoot`, the platform names a shared package the repository does not have, or the
+                         repository is no Nx workspace while a screen path still names apps/<app>/
+
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
     python3 tools/check-frontend-repos.py [--all]
@@ -28,6 +44,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+import frontend_repos as fr  # noqa: E402  (CHG-SWP-003)
 
 RULES = {
     "FR-PLATFORM-MISSING": "every screen platform has a repository entry, and every entry a platform (CHG-R6-059)",
@@ -36,6 +53,9 @@ RULES = {
     "FR-REPO-TWICE": "a repository serves one platform unless `shared` says why (CHG-R6-059)",
     "FR-FIELDS": "an entry with a repository says assumed true or false; names and url follow the group (CHG-R6-059)",
     "FR-SETUP-TABLE": "ADAM setup's frontend CLAUDE.md names the same repository per platform (CHG-R6-059)",
+    "FR-OLD-PATH": "a screen with a repository names its component under the old apps/<app>/ workspace (CHG-SWP-003)",
+    "FR-LAYOUT-UNCONFIRMED": "a repository's layout is assumed and nothing observed is recorded (CHG-SWP-003)",
+    "FR-LAYOUT-MISMATCH": "a repository's observed layout contradicts what the package says of it (#27741, CHG-SWP-003)",
 }
 MAPPING = g.ROOT / "docs" / "active" / "frontend-repos.yaml"
 STARTER = g.ROOT.parent / "viewer" / "mcp" / "setup" / "starters" / "frontend" / "CLAUDE.md"
@@ -109,7 +129,56 @@ def main() -> int:
                                                   "CLAUDE.md table does not list it")
     else:
         guard.note("viewer/mcp/setup/starters/frontend/CLAUDE.md not found: the setup table was not compared")
+    layouts(guard, doc, entries)
     return guard.finish()
+
+
+def layouts(guard, doc: dict, entries: dict) -> None:
+    """CHG-SWP-003: what the package says a repository holds against what was seen in it."""
+    plats = {str(p.get("code")): p for p in g.platforms().values() if p.get("code")}
+    by_platform: dict = {}
+    for stem, s in g.screens():
+        by_platform.setdefault(stem[:3], []).append(s)
+    assumed = bool((doc.get("layout") or {}).get("assumed"))
+    old = {}
+    for code, e in sorted(entries.items()):
+        if not isinstance(e, dict) or not e.get("repo"):
+            continue
+        app = e.get("app")
+        paths = []
+        for s in by_platform.get(code, []):
+            comp = str((s.get("implementation") or {}).get("component") or "")
+            if not comp:
+                continue
+            paths.append(fr.relative_path(comp, app))
+            if fr.OLD_APP_PATH.match(comp):
+                guard.add("FR-OLD-PATH", s["id"], f"{code} {s['id']}: component {comp} is in the one-workspace "
+                                                  f"layout; the screen is built in {e['repo']}")
+                old[code] = old.get(code, 0) + 1
+        obs = e.get("observed")
+        if not isinstance(obs, dict):
+            if assumed:
+                guard.add("FR-LAYOUT-UNCONFIRMED", code, f"{code} {e['repo']}: no `observed:` layout; the "
+                                                         f"{len(paths)} locations its tickets suggest are assumed")
+            continue
+        src = str(obs.get("srcRoot") or "").strip("/")
+        if src:
+            off = [p for p in paths if p and not p.startswith(src + "/")]
+            if off:
+                guard.add("FR-LAYOUT-MISMATCH", f"{code}:srcRoot", f"{code} {e['repo']}: {len(off)} suggested "
+                                                                   f"location(s) are not under {src}/, e.g. {off[0]}")
+        have = {str(x) for x in obs.get("packages") or []}
+        for pkg in sorted(str(x) for x in (plats.get(code) or {}).get("packages") or []):
+            if pkg not in have:
+                guard.add("FR-LAYOUT-MISMATCH", f"{code}:package:{pkg}",
+                          f"{code} {e['repo']}: the package names shared package {pkg}; the repository has "
+                          f"{', '.join(sorted(have)) or 'none'} (observed {obs.get('date', '?')})")
+        if str(obs.get("workspace") or "").lower() not in ("", "nx") and old.get(code):
+            guard.add("FR-LAYOUT-MISMATCH", f"{code}:workspace",
+                      f"{code} {e['repo']}: a {obs.get('workspace')} repository ({obs.get('packageManager') or '?'}), "
+                      f"and {old[code]} of its screens name apps/{app}/")
+    if old:
+        guard.note("FR-OLD-PATH by platform: " + ", ".join(f"{c} {n}" for c, n in sorted(old.items())))
 
 
 if __name__ == "__main__":

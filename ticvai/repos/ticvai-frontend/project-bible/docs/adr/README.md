@@ -83,6 +83,7 @@ and usually enough to predict what an ADR says.
 | [0068](0068-guest-admission-policy-lives-in-access-only.md) | Guest admission policy lives in Access only, and the offline package carries it | Accepted 1 October | SD-005, SD-052 |
 | [0069](0069-in-park-3d-navigation-is-built-natively.md) | **In-park 3D navigation is built natively**, from a venue GLB model, a pathway and location file, and GPS | Accepted 30 September (client meeting, MoM 4.8) | — builds on the venue-map contract (19.2.55–19.2.60) |
 | [0070](0070-configuration-moves-as-a-versioned-package.md) | **Configuration moves to production as a versioned package; the schema only moves forward** | Accepted 2 October (DEC-168, ADM-122) | — relates to 0039 |
+| [0071](0071-credentials-are-stored-as-argon2id-phc-strings.md) | **Passwords and PINs are stored as Argon2id PHC strings; a PIN also takes a Key Vault pepper**; the tenant chooses the PIN rule | Accepted 14 October (ADAM CR-078, CHG-CRD-003) | — builds on 0004 and 0063 |
 
 > **0026 to 0037 were added on 30 September** (SD-053): they had been on disk since August and
 > missing from this table. **0049–0051 and 0055–0059 were added the same day**, from the system-design

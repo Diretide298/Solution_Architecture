@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-13",
+ "generated": "2026-10-14",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, eight values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2796,
+  "operations": 2802,
   "screens": 2453,
   "flows": 291
  },
@@ -869,6 +869,7 @@
     "ai.release",
     "ai.suggestion",
     "ai.venue_settings",
+    "approvals.request",
     "assets.media_asset",
     "cache:answer",
     "cache:idempotency",
@@ -885,6 +886,7 @@
     "catalogue.performance",
     "catalogue.plan_benefit",
     "catalogue.price",
+    "catalogue.price_assignment",
     "catalogue.price_list",
     "catalogue.product",
     "catalogue.product_category",
@@ -932,9 +934,11 @@
     "identity.mfa_method",
     "identity.mfa_recovery_code",
     "identity.otp_challenge",
+    "identity.password_policy",
     "identity.principal",
     "identity.refresh_token",
     "identity.session",
+    "identity.subject_holding",
     "inventory.movement",
     "inventory.stock_batch",
     "inventory.stock_earmark",
@@ -1036,7 +1040,6 @@
     "pii.subject_contact",
     "pii.subject_document",
     "platform.audit_record",
-    "platform.dsar_request",
     "platform.idempotency_record",
     "platform.outbox",
     "platform.outlet",
@@ -1158,7 +1161,7 @@
     "screens": 144,
     "flows": 23,
     "contracts": 22,
-    "tables": 329
+    "tables": 332
    }
   },
   "partner": {
@@ -1419,6 +1422,7 @@
     "ai.policy",
     "ai.provider",
     "approvals.decision",
+    "approvals.escalation",
     "approvals.external_dispatch",
     "approvals.external_provider",
     "approvals.request",
@@ -1480,11 +1484,15 @@
     "identity.mfa_challenge",
     "identity.mfa_method",
     "identity.mfa_recovery_code",
+    "identity.module_access",
     "identity.password_policy",
     "identity.principal",
     "identity.principal_credential",
+    "identity.principal_credential_history",
     "identity.refresh_token",
     "identity.role",
+    "identity.role_permission",
+    "identity.segregation_rule",
     "identity.session",
     "identity.sso_provider",
     "ledger.account",
@@ -1552,7 +1560,7 @@
     "screens": 51,
     "flows": 10,
     "contracts": 11,
-    "tables": 131
+    "tables": 136
    }
   },
   "prospect": {
@@ -1661,6 +1669,7 @@
    ],
    "tables": [
     "approvals.decision",
+    "approvals.escalation",
     "approvals.request",
     "approvals.rule",
     "cache:idempotency",
@@ -1700,7 +1709,7 @@
     "screens": 2,
     "flows": 0,
     "contracts": 7,
-    "tables": 34
+    "tables": 35
    }
   },
   "service": {
@@ -1739,13 +1748,17 @@
     "recordChargeback",
     "recordChargebackOutcome",
     "recordCheckoutConsents",
+    "recordConsentIdentifier",
     "recordCookieScan",
     "recordDeposit",
     "recordEInvoiceTransmissionStatus",
+    "recordSyncRejection",
+    "recordSyncRejectionResolution",
     "recordTouchPoint",
     "recordUsage",
     "releaseWalletHold",
     "renewMembership",
+    "requeueDeadLetter",
     "resolveGuestLink",
     "resolveTenantHost",
     "retryMessageDispatch",
@@ -1758,7 +1771,9 @@
     "setTenantDomainMapping",
     "settleDeposit",
     "simulateRecommendationDecision",
-    "transmitEInvoices"
+    "transmitEInvoices",
+    "updateGuestSubjectDetails",
+    "verifySupervisorStepUp"
    ],
    "screens": [],
    "flows": [
@@ -1821,6 +1836,11 @@
     "control.tenant_domain",
     "control.usage_record",
     "identity.benefit_usage",
+    "identity.delegated_access",
+    "identity.password_policy",
+    "identity.principal",
+    "identity.principal_credential",
+    "identity.role_permission",
     "ledger.account",
     "ledger.account_mapping",
     "ledger.credit_memo",
@@ -1873,10 +1893,10 @@
     "payments.provider_connection",
     "payments.provider_event",
     "payments.token",
+    "pii.consent_identifier",
+    "pii.subject",
     "platform.audit_record",
-    "platform.cross_region_entitlement",
-    "platform.dsar_request",
-    "platform.guest_link",
+    "platform.dead_letter",
     "platform.idempotency_record",
     "platform.outbox",
     "platform.region_settings",
@@ -1889,6 +1909,10 @@
     "retail.shop_and_drop_line",
     "seating.seat_reservation",
     "seating.seat_reservation_item",
+    "sync.cross_region_entitlement",
+    "sync.dsar_request",
+    "sync.guest_link",
+    "sync.rejection",
     "transport.fare_matrix_cell",
     "transport.fare_passenger_type",
     "transport.fare_table",
@@ -1903,11 +1927,11 @@
     "whitelabel.guided_choice_question"
    ],
    "counts": {
-    "operations": 53,
+    "operations": 59,
     "screens": 0,
     "flows": 5,
     "contracts": 17,
-    "tables": 113
+    "tables": 122
    }
   },
   "staff": {
@@ -7344,6 +7368,7 @@
     "identity.platform_staff_grant",
     "identity.principal",
     "identity.principal_credential",
+    "identity.principal_credential_history",
     "identity.refresh_token",
     "identity.role",
     "identity.role_permission",
@@ -7351,6 +7376,7 @@
     "identity.session",
     "identity.sso_group_mapping",
     "identity.sso_provider",
+    "identity.subject_holding",
     "inventory.count",
     "inventory.count_line",
     "inventory.daily_count_list",
@@ -7668,25 +7694,26 @@
     "platform.cell_endpoint",
     "platform.configuration_profile",
     "platform.connectivity_policy",
-    "platform.cross_region_entitlement",
     "platform.dead_letter",
     "platform.denomination",
     "platform.device",
     "platform.device_heartbeat",
-    "platform.dsar_request",
     "platform.idempotency_record",
     "platform.offline_policy",
     "platform.outbox",
     "platform.outlet",
+    "platform.outlet_opening_hour",
     "platform.profile_deployment",
     "platform.region_settings",
     "platform.sale_board",
+    "platform.sale_board_for_catalogue",
     "platform.sale_board_page",
+    "platform.sale_board_page_for_catalogue",
     "platform.sale_board_tile",
+    "platform.sale_board_tile_for_catalogue",
     "platform.scope",
     "platform.tenant",
     "platform.venue_settings",
-    "platform.wallet_authorisation",
     "platform.workstation",
     "pricing.dynamic_price_action",
     "pricing.dynamic_price_condition",
@@ -7856,7 +7883,9 @@
     "subscription.vsi_model",
     "sync.cell_connection",
     "sync.cross_cell_request",
+    "sync.cross_region_entitlement",
     "sync.rejection",
+    "sync.wallet_authorisation",
     "tenancy.data_retention_setting",
     "tenancy.device_assignment",
     "tenancy.device_audit",
@@ -7984,7 +8013,7 @@
     "screens": 2158,
     "flows": 138,
     "contracts": 33,
-    "tables": 1110
+    "tables": 1115
    }
   }
  }

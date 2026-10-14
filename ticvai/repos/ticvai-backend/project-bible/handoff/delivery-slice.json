@@ -221,8 +221,8 @@
  "deferredScreens": [],
  "counts": {
   "core": 520,
-  "setup": 240,
-  "allOperations": 2796
+  "setup": 261,
+  "allOperations": 2802
  },
  "services": {
   "AccessService": {
@@ -237,7 +237,7 @@
   },
   "CatalogueService": {
    "core": 39,
-   "setup": 35,
+   "setup": 56,
    "total": 451
   },
   "FnbService": {
@@ -248,7 +248,7 @@
   "IdentityService": {
    "core": 34,
    "setup": 6,
-   "total": 94
+   "total": 97
   },
   "InventoryService": {
    "core": 1,
@@ -288,7 +288,7 @@
   "TenancyService": {
    "core": 15,
    "setup": 17,
-   "total": 212
+   "total": 213
   },
   "VenueOpsService": {
    "core": 45,
@@ -795,6 +795,7 @@
    "platforms": [],
    "screens": [],
    "enables": [
+    "catalogue.price",
     "inventory.inventory_item"
    ]
   },
@@ -1540,6 +1541,21 @@
     "marketing.challenge"
    ]
   },
+  "createChannelProfile": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/channel-profile",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-259"
+   ],
+   "enables": [
+    "catalogue.sales_channel"
+   ]
+  },
   "createCollection": {
    "part": "core",
    "service": "VenueOpsService",
@@ -1899,6 +1915,21 @@
     "ledger.legal_entity"
    ]
   },
+  "createLiveDynamicPrice": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/live-dynamic-price",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-115"
+   ],
+   "enables": [
+    "catalogue.price"
+   ]
+  },
   "createLoyaltyProgramme": {
    "part": "setup",
    "service": "MarketingService",
@@ -2074,7 +2105,8 @@
     "BO-044"
    ],
    "enables": [
-    "platform.outlet"
+    "platform.outlet",
+    "platform.outlet_opening_hour"
    ]
   },
   "createPayment": {
@@ -2843,6 +2875,22 @@
    ],
    "enables": [
     "ai.operational_requirement"
+   ]
+  },
+  "decidePricingRecommendation": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/recommendation-review-decision/{recommendationId}/decision",
+   "perm": "AI_APPROVE",
+   "platforms": [],
+   "screens": [
+    "ADM-106",
+    "ADM-113"
+   ],
+   "enables": [
+    "catalogue.pricing_recommendation"
    ]
   },
   "decideProductionAccess": {
@@ -8364,6 +8412,7 @@
     "BO-040",
     "BO-041",
     "BO-043",
+    "BO-053",
     "BO-100",
     "EMP-008",
     "EMP-009",
@@ -9331,6 +9380,38 @@
    ],
    "enables": [
     "catalogue.published_bundle"
+   ]
+  },
+  "publishChannelAvailability": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/channel-availability",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-124",
+    "BO-291",
+    "BO-601"
+   ],
+   "enables": [
+    "catalogue.product_channel_assignment"
+   ]
+  },
+  "publishChannelReadinessValidation": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/channel-readiness-validation",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-267"
+   ],
+   "enables": [
+    "catalogue.sales_channel"
    ]
   },
   "publishContentBlock": {
@@ -11276,6 +11357,21 @@
    ],
    "enables": []
   },
+  "setBookingVelocityTime": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/booking-velocity-time",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-091"
+   ],
+   "enables": [
+    "pricing.dynamic_price_rule"
+   ]
+  },
   "setBrandIdentity": {
    "part": "core",
    "service": "WhiteLabelService",
@@ -11308,6 +11404,68 @@
    ],
    "enables": [
     "identity.capability_template"
+   ]
+  },
+  "setChannelConnectionConfiguration": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/channel-connections",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-269"
+   ],
+   "enables": [
+    "catalogue.channel_connection"
+   ]
+  },
+  "setChannelFeePayment": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/channel-fee-payment",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-266"
+   ],
+   "enables": [
+    "catalogue.sales_channel"
+   ]
+  },
+  "setChannelPricingCommercial": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/channel-pricing-commercial",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-261"
+   ],
+   "enables": [
+    "catalogue.price_assignment"
+   ]
+  },
+  "setChannelSalesRule": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/channel-sales-rules/{ruleId}",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-263",
+    "ADM-264",
+    "ADM-265"
+   ],
+   "enables": [
+    "catalogue.channel_sales_rule"
    ]
   },
   "setCodeDistributionManager": {
@@ -11403,6 +11561,21 @@
     "fnb.delivery_location_outlet"
    ]
   },
+  "setDemandOccupancyAvailability": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/demand-occupancy-availability",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-090"
+   ],
+   "enables": [
+    "pricing.dynamic_price_rule"
+   ]
+  },
   "setDenominations": {
    "part": "setup",
    "service": "OrderService",
@@ -11491,6 +11664,55 @@
    "screens": [],
    "enables": [
     "marketing.form_definition_field"
+   ]
+  },
+  "setDynamicPriceRule": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/pricing/dynamic-rules/{ruleId}",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-009",
+    "BO-443"
+   ],
+   "enables": [
+    "pricing.dynamic_price_rule"
+   ]
+  },
+  "setDynamicPricingGuardrailPolicy": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/dynamic-pricing-controls",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-095",
+    "ADM-096",
+    "ADM-114"
+   ],
+   "enables": [
+    "catalogue.dynamic_pricing_control",
+    "catalogue.dynamic_pricing_strategy"
+   ]
+  },
+  "setDynamicPricingStrategy": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/dynamic-pricing-strategy",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-089"
+   ],
+   "enables": [
+    "catalogue.dynamic_pricing_strategy"
    ]
   },
   "setEInvoicingProvider": {
@@ -11627,6 +11849,21 @@
     "CMS-001"
    ],
    "enables": []
+  },
+  "setFeeDefinition": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/fees",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-071"
+   ],
+   "enables": [
+    "catalogue.fee"
+   ]
   },
   "setFnbDeliveryPolicy": {
    "part": "setup",
@@ -12109,6 +12346,21 @@
    ],
    "enables": []
   },
+  "setPriceLadderMatrix": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/dynamic-pricing-strategies/{strategyId}/price-ladder",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-094"
+   ],
+   "enables": [
+    "catalogue.price_ladder"
+   ]
+  },
   "setPrices": {
    "part": "setup",
    "service": "CatalogueService",
@@ -12126,6 +12378,21 @@
     "catalogue.price_list"
    ]
   },
+  "setPricing": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/pricing",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-109"
+   ],
+   "enables": [
+    "catalogue.pricing_recommendation"
+   ]
+  },
   "setPrimaryDomain": {
    "part": "core",
    "service": "WhiteLabelService",
@@ -12141,6 +12408,21 @@
     "CMS-017"
    ],
    "enables": []
+  },
+  "setProductCatalogue": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/product-catalogue",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-260"
+   ],
+   "enables": [
+    "catalogue.product_channel_assignment"
+   ]
   },
   "setProductCategories": {
    "part": "core",
@@ -12171,6 +12453,21 @@
    ],
    "enables": [
     "catalogue.product_eligibility_rule"
+   ]
+  },
+  "setProductServicePrice": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/product-service-price",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-052"
+   ],
+   "enables": [
+    "catalogue.price_assignment"
    ]
   },
   "setPromotionVariants": {
@@ -12315,6 +12612,21 @@
    ],
    "enables": [
     "identity.role_permission"
+   ]
+  },
+  "setRulePriorityConflict": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/rule-priority-conflict",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-441"
+   ],
+   "enables": [
+    "pricing.dynamic_price_rule"
    ]
   },
   "setSeatRecommendationRules": {
@@ -13103,6 +13415,22 @@
    ],
    "enables": []
   },
+  "transitionDynamicPricingStrategy": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/dynamic-pricing-strategies/{strategyId}/lifecycle",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-088",
+    "ADM-089"
+   ],
+   "enables": [
+    "catalogue.dynamic_pricing_strategy"
+   ]
+  },
   "transmitEInvoices": {
    "part": "setup",
    "service": "LedgerService",
@@ -13523,7 +13851,8 @@
     "BO-731"
    ],
    "enables": [
-    "platform.outlet"
+    "platform.outlet",
+    "platform.outlet_opening_hour"
    ]
   },
   "updateParkingEntitlement": {
@@ -14241,13 +14570,19 @@
   "ai.eval_suite",
   "ai.forecast_accuracy",
   "ai.training_run",
+  "catalogue.demand_forecast",
+  "catalogue.rate",
   "fnb.sold_out_item",
+  "identity.subject_holding",
   "inventory.serialised_item",
   "inventory.stock_batch",
   "marketing.attribution_touch",
   "marketing.challenge_progress",
   "payments.stored_forward",
   "platform.device_heartbeat",
+  "platform.sale_board_for_catalogue",
+  "platform.sale_board_page_for_catalogue",
+  "platform.sale_board_tile_for_catalogue",
   "promotions.promotion_rule",
   "seating.seat_block_item",
   "workforce.attendance_amendment"

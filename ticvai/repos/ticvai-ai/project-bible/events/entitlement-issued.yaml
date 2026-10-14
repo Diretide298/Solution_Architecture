@@ -14,6 +14,11 @@ payload:
   type: uuid
 - field: orderId
   type: uuid
+- field: orderLineId
+  type: uuid
+  required: false
+  notes: Optional (14 October 2026, CHG-GDL-001). The order line it was issued from (access.entitlement.order_line_id),
+    so the identity projection can apply a partial refund's lineIds; null for an entitlement an invitation issued
 - field: mediaCode
   type: string
   notes: What the guest carries. Several entitlements may share one
@@ -59,6 +64,17 @@ consumers:
     or a campaign opened) (AI system design section 3.2)
   idempotencyKey: entitlementId
   onFailure: retry
+  isCritical: false
+- context: identity
+  purpose: Record the entitlement in identity.subject_holding (subjectId, status issued, validTo, orderId, orderLineId)
+    when it names a subject or its order already has a row there (a guest checkout, recorded without a subject until
+    order.linkedToGuest attaches it), so deleteGuestAccount refuses while a live entitlement remains without reading
+    access.entitlement (Identity is Foundation and reads nothing above it, ADR-0028) (ADAM CR-084, CHG-GDL-001,
+    CHG-GDL-003)
+  writes:
+  - identity.subject_holding
+  idempotencyKey: entitlementId
+  onFailure: retryThenDeadLetter
   isCritical: false
 retention: 30 days after publication
 notes: '**Published by AccessService** (system-design review SD-033, 29 September): access.entitlement is

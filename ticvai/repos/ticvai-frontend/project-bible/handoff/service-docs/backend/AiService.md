@@ -5063,8 +5063,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| source_id | uuid | yes |  |
+| record_key | text | yes | The indexed record's key in its own table (the {entryId} of removeIndexEntry). |
+| subject_id | uuid | no | The guest the record is about, where it is one (a case, a profile note), so erasure and archive remove every entry about a subject without reading the source tables. |
+| content_hash | text | yes | Hash of the embedded text fields; an unchanged hash is not re-embedded. |
+| chunk_count | integer | no |  |
+| embedding_model | text | no |  |
+| point_ids | text[] | no | The vector points this entry wrote (Qdrant in a scale-out tenant, AI design section 6), so removal names what it deletes in the second store too. |
+| indexed_at | timestamptz | yes |  |
+| last_job_id | uuid | no |  |
 | id | uuid | yes | Synthesised key. |
-| source_id | uuid | yes | Points at ai.index_source. |
 
 ### `ai.index_job`
 

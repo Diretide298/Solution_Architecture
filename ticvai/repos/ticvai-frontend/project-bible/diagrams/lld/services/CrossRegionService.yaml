@@ -1,5 +1,5 @@
 id: LLD-CrossRegionService
-title: CrossRegionService — 18 operations, 3 tables
+title: CrossRegionService — 20 operations, 7 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -13,20 +13,20 @@ why: '**The only service that reaches another region** (ADR-0010, ADR-0014). Sep
 scale: Low volume, high scrutiny.
 ifDown: Down blocks cross-region entitlements. Each region continues alone.
 coverage:
-  operations: 18
+  operations: 20
   inAFlow: 1
-  percent: 6%
+  percent: 5%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: sync
-  tables: 3
+  tables: 7
   stores:
   - postgres
-  largestTable: sync.cross_cell_request
+  largestTable: sync.wallet_authorisation
 operationsByContract:
 - contract: cross-region
-  count: 18
+  count: 20
   operations:
   - operation: authoriseWalletSpend
     verb: POST
@@ -132,6 +132,22 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: recordSyncRejection
+    verb: POST
+    path: /sync-rejections
+    scope: workstation
+    permission: null
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: recordSyncRejectionResolution
+    verb: POST
+    path: /sync-rejections/{rejectionId}/resolution
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 1
   - operation: relinquishWalletAuthorisation
     verb: POST
     path: /wallet-authorisations/{authorisationId}/release
@@ -218,12 +234,34 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: sync.cross_region_entitlement
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - cross-region
+  foreignWriters: null
+- table: sync.dsar_request
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - cross-region
+  foreignWriters: null
+- table: sync.guest_link
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy:
+  - cross-region
+  foreignWriters: null
 - table: sync.rejection
   columns: 11
   store: postgres
   parent: null
   writtenBy:
   - access
+  - cross-region
   - games
   - orders
   - subscription
@@ -232,53 +270,17 @@ tables:
   - games
   - orders
   - subscription
+- table: sync.wallet_authorisation
+  columns: 25
+  store: postgres
+  parent: null
+  writtenBy:
+  - cross-region
+  foreignWriters: null
 readsFrom:
-- service: TenancyService
-  operations: 16
 - service: AccessService
   operations: 1
-writesOutside:
-- service: TenancyService
-  operations: 11
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event TenancyService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: authoriseWalletSpend
-    tables:
-    - platform.wallet_authorisation
-  - operation: captureWalletAuthorisation
-    tables:
-    - platform.wallet_authorisation
-  - operation: consumeCrossRegionEntitlement
-    tables:
-    - platform.cross_region_entitlement
-  - operation: createDsarRequest
-    tables:
-    - platform.dsar_request
-  - operation: createGuestLink
-    tables:
-    - platform.guest_link
-  - operation: propagateCrossRegionEntitlement
-    tables:
-    - platform.cross_region_entitlement
-  - operation: reconcileRedemptions
-    tables:
-    - platform.cross_region_entitlement
-  - operation: relinquishWalletAuthorisation
-    tables:
-    - platform.wallet_authorisation
-  - operation: revokeCrossRegionEntitlement
-    tables:
-    - platform.cross_region_entitlement
-  - operation: revokeGuestLink
-    tables:
-    - platform.guest_link
-  - operation: setWalletAllocationPolicy
-    tables:
-    - platform.wallet_authorisation
+writesOutside: []
 screens:
 - P07:SCN-003 Ready to scan
 - P07:SCN-011 Delegated right

@@ -111,6 +111,88 @@ tags:
   - name: shift
   - name: cash
 
+# **The rule questions Orders answers about shifts** (decided 14 October 2026, Chinmay: "ask the owner by a
+# declared query", the ADR-0055 amendment; ADAM CR-083, CHG-TEN-004). Shift belongs to Orders
+# (OrderService owns shift.yaml; handoff/service-decomposition.json). A module that refuses on an open shift
+# asks one of these and never reads orders.pos_shift itself: in process inside its own transaction from the
+# commerce deployable (ADR-0055 rule 2), through Orders' service operation from another deployable (rule 4).
+x-ticvai-queries:
+  openShiftForWorkstation:
+    module: shift
+    inputs:
+      workstationId: { type: string, format: uuid }
+    returns:
+      type: object
+      nullable: true
+      description: The open shift on the workstation, or null when there is none.
+      properties:
+        shiftId: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/ShiftStatus' }
+        principalId: { type: string, format: uuid }
+    rule: >
+      A shift is open on a workstation while its status is any state before closed or autoClosed in
+      states/shift.yaml: pendingApproval, open, suspended, pendingClosure, pendingVariance. closed and
+      autoClosed end it (closed is left only by the reversal reopenShift, which makes it open again). At most
+      one such shift is returned: openShift refuses a second while one is open or suspended, and of several
+      (a new shift beside one still pendingVariance or pendingClosure) the most recently opened is returned.
+      The caller that changes the workstation locks its platform.workstation row (SELECT ... FOR UPDATE)
+      before it asks, in the same transaction, so no shift opens between the answer and its write.
+    served: [in-process]
+  openShiftsInScope:
+    module: shift
+    inputs:
+      scopePath: { type: string, description: 'The venue or tenant scope path; shifts at it or beneath it.' }
+    returns:
+      type: array
+      items:
+        type: object
+        properties:
+          shiftId: { type: string, format: uuid }
+          workstationId: { type: string, format: uuid }
+          principalId: { type: string, format: uuid }
+          status: { $ref: '#/components/schemas/ShiftStatus' }
+    rule: >
+      Every shift at or beneath the scope path that is open by the rule of openShiftForWorkstation
+      (pendingApproval, open, suspended, pendingClosure, pendingVariance), one entry per shift.
+    served: [in-process, service]
+  # Finance's period close asks this for its `noOpenShifts` check (ADAM CR-085, ticket 28411; CHG-FIN-012). Ledger is in
+  # `commerce` with Orders, so it asks in process (ADR-0055 rule 2) and never reads orders.pos_shift itself.
+  unclosedShiftsInPeriod:
+    module: shift
+    inputs:
+      scopePath: { type: string, description: "The legal entity's scope path (ledger.legal_entity.scope_path); shifts of every venue at it or beneath it." }
+      fromDate: { type: string, format: date, description: The period's first day (FiscalPeriod.startDate). }
+      toDate: { type: string, format: date, description: The period's last day (FiscalPeriod.endDate). }
+    returns:
+      type: array
+      description: The shifts that stop the period closing; empty when none does.
+      items:
+        type: object
+        properties:
+          shiftId: { type: string, format: uuid }
+          venueId: { type: string, format: uuid }
+          workstationId: { type: string, format: uuid }
+          businessDate: { type: string, format: date }
+          status: { $ref: '#/components/schemas/ShiftStatus' }
+    rule: >
+      A shift stops a period closing when its business date (Shift.businessDate: the venue-local date of openedAt
+      against the venue's businessDayCutoff, set when it opens and never moved; CHG-R6-032) is on or between fromDate
+      and toDate, its venue is at or beneath scopePath, and its status is open, suspended, pendingClosure or
+      pendingVariance: still taking money, or counted and waiting for the close to be decided (finance's "open,
+      suspended or awaiting close approval"). closed and autoClosed do not stop it. pendingApproval does not either: a
+      shift waiting for its opening approval cannot transact (openShift), so it holds no money dated in the period,
+      and its only exit is approveShiftOpen, so counting it would let an unanswered request hold the books open.
+      One entry per shift, in businessDate then shiftId order.
+    served: [in-process, service]
+    # Machine-read by tools/check-error-sources.py (E-STUCK): every blocking state can be ended.
+    states:
+      model: states/shift.yaml
+      blocking: [open, suspended, pendingClosure, pendingVariance]
+      waitsOnActor:
+        pendingVariance: a count beyond the venue's threshold is cash nobody has explained; only a supervisor accepting
+          it (acceptShiftVariance) or a recount within the threshold (submitShiftCount) may end it, and a timer that
+          closed it would close the books over an unexplained difference
+
 paths:
   /shifts:
     get:
@@ -126,6 +208,7 @@ paths:
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-043 Daily Reconciliation"
+        - "P08 BO-053 Staff Directory"
         - "P08 BO-100 Venue Home"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
@@ -625,6 +708,10 @@ paths:
       tags: [shift]
       x-ticvai-permission: CASH_LIFT
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `witnessStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: The cashier the cash came from countersigns the withdrawal with their own PIN on the same device (DEC-178; CHG-CSP-015).
       x-ticvai-step-up-carrier: body:witnessStepUp
       x-ticvai-scope-level: venue
@@ -950,6 +1037,10 @@ paths:
       tags: [shift]
       x-ticvai-permission: SHIFT_REOPEN
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: Reopening a counted shift is a reversal; a supervisor signs it in place (audit R144).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
@@ -1191,6 +1282,10 @@ paths:
       x-ticvai-permission: SHIFT_CLOSE
       x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: A supervisor closes a cashier's shift and sees the expected cash and the variance (CHG-FIN-003); their own PIN on the device in use proves who did it (pre-apply round, 2 October; CHG-CSP-012).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue   # was workstation; the supervisor closes from any till or the back office (CHG-CSP-012)
@@ -1296,6 +1391,10 @@ paths:
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: A supervisor signs off a cashier's over/short in person, with their own PIN on the device they use (audit R080 (e); any till or the daily reconciliation since 2 October, CHG-CSP-012).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
@@ -1389,6 +1488,10 @@ paths:
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       x-ticvai-step-up-reason: The same supervisor act as accepting a variance, in person with their own PIN (audit R080 (e); DEC-175).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue

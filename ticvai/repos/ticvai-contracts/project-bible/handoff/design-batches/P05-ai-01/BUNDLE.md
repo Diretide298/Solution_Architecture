@@ -347,6 +347,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
+- ADR-0055 *A modular monolith, deployed as five units* (`docs/adr/0055-a-modular-monolith-deployed-as-five-units.md`)
 
 #### Acceptance for the design
 

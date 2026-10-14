@@ -11208,11 +11208,17 @@ screens:
   - id: formConfigureWorkstation
     component: modal
     trigger: Configure workstation
-    body: '**Collects what `configureWorkstation` sends before it is called.** Required: `name`, `saleBoardId`.
-      Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `departmentId`, `accessPointId`,
-      `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing sends nothing; the screen behind
-      is unchanged. Not asked, because the server sets it (readOnly in the contract): `mediaStockRemaining`
-      (3 October 2026, CHG-SPF-001).'
+    body: '**Collects what `configureWorkstation` sends before it is called.** Required: `name`. Optional:
+      `saleBoardId` (absent or null, the till uses its outlet''s board; DEC-183, CHG-CSP-006), `outletId`,
+      `cashDrawerLimit` (null inherits the venue''s; DEC-179, CHG-CSP-016), `cashierInputMode`, `guestDisplayContent`,
+      `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. **The
+      form opens filled with the workstation as `getWorkstation` returns it and sends it back whole**:
+      the call replaces the configuration, so a field left out takes its default (`cashierInputMode` `hybrid`,
+      `guestDisplayContent` line items only, `isActive` on) or is cleared (ADAM CR-082, CHG-TEN-003).
+      Dismissing sends nothing; the screen behind is unchanged. Not asked: `loadedMediaStockId` and `mediaStockRemaining`,
+      deprecated and stored nowhere until BL-095 (the media stock record, on the printer device, waits
+      on the BOCA stock answer; CHG-TEN-003). Refused `409 shift-open` while a shift is open on the till,
+      naming the shift (CHG-TEN-004).'
     bindsTo: ConfigureWorkstationRequest
     confirm:
       label: Configure workstation
@@ -11222,9 +11228,10 @@ screens:
       discards:
       - name
       - saleBoardId
+      - outletId
+      - cashDrawerLimit
       - cashierInputMode
       - guestDisplayContent
-      - loadedMediaStockId
       - departmentId
       - accessPointId
       - devices
@@ -15992,6 +15999,9 @@ screens:
         - Principal.roles
         - Principal.lastLoginAt
         operation: listPrincipals
+        notes: Ordered by display name. A venue manager lists the people homed at the venue or beneath
+          it; the roles column is each person's live role grants, the primary one marked (14 October 2026,
+          ADAM CR-076 and CR-077; CHG-IDR-001, CHG-IDR-002).
         provenance: contract identity.yaml GET /principals
     - name: contextPanel
       slot: selection
@@ -16054,6 +16064,22 @@ screens:
           in the venues in scope, the caller's own unless they choose otherwise; the confirmation asks
           for the authentication code in place, because the request carries a `stepUpToken`.
         provenance: contract identity.yaml POST /auth/sessions/revoke-all
+      - kind: dataTable
+        label: Shifts still open
+        bindsTo: Shift
+        columns:
+        - Shift.principalDisplayName
+        - Shift.workstationId
+        - Shift.status
+        - Shift.openedAt
+        operation: listShifts
+        notes: '**Inside the Sign everyone out confirmation, before the code is asked** (14 October 2026,
+          CHG-R6G-006). Orders'' `listShifts` with `status=open` for the venue in scope: whose cash is
+          unreconciled once they are signed out. Signing out closes no shift and moves no float (ADR-0004).
+          Identity no longer reports open shifts in `revokeAllSessions` (it reads nothing above it, ADR-0028),
+          so the console asks Orders, which owns them. Shown to a holder of REPORT_VIEW_WORKSTATION; absent
+          for anyone else, and the confirmation says the shifts could not be listed.'
+        provenance: contract shift.yaml GET /shifts
       - kind: textField
         label: Authentication code
         operation: verifyMfaChallenge
@@ -16152,6 +16178,12 @@ screens:
     trigger: onAction
     invalidates:
     - listActiveSessions
+    - listShifts
+  - operationId: listShifts
+    contract: shift
+    purpose: The shifts still open in the venue in scope (`status=open`), shown in the Sign everyone out
+      confirmation beside revokeAllSessions, which no longer reports them (CHG-R6G-006)
+    trigger: onAction
   - operationId: createMfaChallenge
     contract: identity
     purpose: The step-up challenge Sign everyone out asks for in place
@@ -16205,8 +16237,12 @@ screens:
     component: modal
     trigger: Create principal
     body: '**Collects what `createPrincipal` sends before it is called.** Required: `username`, `displayName`.
-      Optional: `initialCredential`, `mustChangeCredential`, `validTo`, `roleIds`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+      Optional: `initialCredential`, `mustChangeCredential`, `validTo`, `homeScopePath`, `roleIds`. The
+      home scope defaults to the caller''s own and is picked from the nodes the caller''s `USER_MANAGE`
+      reaches; each chosen role is granted there, the first becoming the primary role (14 October 2026,
+      ADAM CR-077; CHG-IDR-002). A `409 segregation-breach` names the rule and the two roles'' permissions
+      and keeps the form as typed (ADAM CR-079; CHG-IDR-003). Dismissing sends nothing; the screen behind
+      is unchanged.'
     bindsTo: CreatePrincipalRequest
     confirm:
       label: Create principal
@@ -16219,6 +16255,7 @@ screens:
       - initialCredential
       - mustChangeCredential
       - validTo
+      - homeScopePath
       - roleIds
     provenance: contract identity.yaml POST /principals
   - id: formUpdatePrincipal
@@ -16296,6 +16333,11 @@ screens:
         - Role.principalCount
         - Role.grantCount
         operation: listRoles
+        notes: '**Every role of the tenant, read-only to a venue-scoped caller** (14 October 2026, ADAM
+          CR-076; CHG-IDR-001): roles are tenant-wide, so a venue manager sees them all, in order to grant
+          them, and cannot change them here. Ordered by name. The two counts are computed under row-level
+          security and count only the holders the caller can see: the venue''s, not the tenant''s (ADAM
+          CR-077; CHG-IDR-002).'
         provenance: contract identity.yaml GET /roles
       - kind: multiSelect
         label: Start from presets
@@ -16315,7 +16357,10 @@ screens:
         bindsTo: Role.permissions
         operation: setRolePermissions
         notes: 'The per-module checklist: one group per module, every permission in exactly one module
-          (x-ticvai-permission-modules).'
+          (x-ticvai-permission-modules). **Editable only with `ROLE_MANAGE` at the tenant scope** (`setRolePermissions`
+          is a tenant operation; 14 October 2026, ADAM CR-076, CHG-IDR-001); a caller whose `ROLE_MANAGE`
+          is held only at a venue sees the ticks read-only. It shows the role''s own permissions; inherited
+          ones are read from the parent role (`Role.inheritsFromRoleId`).'
         provenance: contract tenancy.yaml PUT /roles/{roleId}/permissions
     - name: contextPanel
       slot: selection
@@ -16341,10 +16386,17 @@ screens:
       - kind: primaryButton
         label: Create role
         operation: createRole
+        notes: '**Needs `ROLE_MANAGE` at the tenant scope** (`createRole` is a tenant operation since
+          r6; 14 October 2026, ADAM CR-076, CHG-IDR-001). Shown disabled to a caller whose `ROLE_MANAGE`
+          is held only at a venue, saying a role is created for the whole tenant by a tenant administrator.'
         provenance: contract identity.yaml POST /roles
       - kind: secondaryButton
         label: Save role permissions
         operation: setRolePermissions
+        notes: '**Needs `ROLE_MANAGE` at the tenant scope**, as Create role; disabled for a venue-scoped
+          caller (ADAM CR-076; CHG-IDR-001). A `409 segregation-breach` names the rule, both permissions
+          and, for a parent role, the inheriting role where they meet; the ticks stay as edited so one
+          can be removed (ADAM CR-079; CHG-IDR-003).'
         provenance: contract tenancy.yaml PUT /roles/{roleId}/permissions; wiring fix, 2 October 2026
       - kind: secondaryButton
         label: Grant role
@@ -16364,7 +16416,10 @@ screens:
       screen, and names that permission (the screen''s other reads need `PERMISSION_VIEW` and say so in
       their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question. A caller who can see the screen but lacks what an action needs
-      sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`.'
+      sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`. **A venue-scoped
+      `ROLE_MANAGE` sees every role read-only**: Create role, Save role permissions and saving a preset
+      (`createRole`, `setRolePermissions`, `setCapabilityTemplate`) need `ROLE_MANAGE` at the tenant scope
+      and are shown disabled, naming the tenant scope (14 October 2026, ADAM CR-076; CHG-IDR-001).'
   apis:
   - operationId: listRoles
     contract: identity
@@ -16492,7 +16547,10 @@ screens:
     trigger: Create role
     body: '**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional:
       `description`, `presetCodes`, `permissions`. `presetCodes` fills the checklist from the chosen presets;
-      `permissions` is the edited result. Dismissing sends nothing; the screen behind is unchanged.'
+      `permissions` is the edited result. Dismissing sends nothing; the screen behind is unchanged. A
+      `409` stays in the dialog with what was typed: `duplicate-code` names the role already holding the
+      code (compared case-insensitively), `segregation-breach` names the rule and both permissions, so
+      one tick can be removed (14 October 2026, ADAM CR-079; CHG-IDR-003).'
     confirm:
       label: Create role
       operation: createRole
@@ -29764,6 +29822,10 @@ screens:
         - Role.principalCount
         - Role.grantCount
         operation: listRoles
+        notes: '**Read-only here** (14 October 2026, ADAM CR-076; CHG-IDR-001): every role of the tenant,
+          by name; a role is created and edited on BO-054 by a tenant-scope `ROLE_MANAGE` holder. The
+          counts are computed under row-level security and count only the holders this venue''s caller
+          can see (ADAM CR-077; CHG-IDR-002).'
         provenance: contract identity.yaml GET /roles
       - kind: metricTile
         label: Takings and admissions today
@@ -219341,6 +219403,39 @@ screens:
           the tenant may add permissions and never drop a floor entry (`setPasswordPolicy` refuses such
           a body with 400).'
         provenance: contract identity.yaml PUT /password-policy
+      - kind: selectField
+        label: PIN length
+        bindsTo: PasswordPolicy.pinLength
+        operation: setPasswordPolicy
+        notes: '**A drop-down: 4, 6 or 8 digits** (decided by Chinmay, 14 October 2026, ADAM CR-078: "Give
+          those as options that they select as a drop down"; CHG-CRD-002). Every PIN keypad of the tenant
+          (POS-000, EMP-001, SCN-001 and the supervisor step-up prompts) takes this many digits. Raising
+          it leaves existing PINs working and asks their holders for a new one at the next sign-in. Shows
+          the current value from getPasswordPolicy; default 4.'
+        provenance: contract identity.yaml PasswordPolicy.pinLength (CHG-CRD-002)
+      - kind: selectField
+        label: PIN reuse
+        bindsTo: PasswordPolicy.pinReusePrevention
+        operation: setPasswordPolicy
+        notes: '**A drop-down: Allow reuse (`none`), Not the last 3 (`last3`), Not the last 5 (`last5`)**
+          (CHG-CRD-002). Applies to PINs only; passwords keep their own rule (`reusePreventionCount`,
+          audit R132). Default: not the last 5.'
+        provenance: contract identity.yaml PasswordPolicy.pinReusePrevention (CHG-CRD-002)
+      - kind: selectField
+        label: Lock a PIN after
+        bindsTo: PasswordPolicy.pinLockoutAfterAttempts
+        operation: setPasswordPolicy
+        notes: '**A drop-down: 3, 5 or 10 wrong PINs** (CHG-CRD-002), then the PIN is locked for the policy''s
+          lockout minutes, never permanently. Wrong passwords count against the password lockout instead.
+          Default 5.'
+        provenance: contract identity.yaml PasswordPolicy.pinLockoutAfterAttempts (CHG-CRD-002)
+      - kind: primaryButton
+        label: Save PIN settings
+        operation: setPasswordPolicy
+        notes: Sends the whole policy read from getPasswordPolicy with the three PIN settings changed;
+          `setPasswordPolicy` replaces the policy, so nothing else may be dropped. The R126 floor rules
+          are password rules and never apply here.
+        provenance: contract identity.yaml PUT /password-policy (CHG-CRD-002)
       - kind: primaryButton
         label: Save MFA requirement
         operation: setPasswordPolicy
@@ -219385,7 +219480,8 @@ screens:
   - operationId: setPasswordPolicy
     contract: identity
     purpose: Which permissions require MFA (`mfaRequiredForPermissions`) — add above the floor, never
-      drop (decided 28 September, audit R135)
+      drop (decided 28 September, audit R135); and the tenant's PIN settings, chosen from drop-downs (`pinLength`,
+      `pinReusePrevention`, `pinLockoutAfterAttempts`; CHG-CRD-002)
     trigger: onAction
   - operationId: listMfaMethods
     contract: identity

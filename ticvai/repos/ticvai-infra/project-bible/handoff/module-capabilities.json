@@ -920,7 +920,7 @@
   "cross-region": {
    "title": "Cross-cutting — multi-region",
    "capabilityCount": 5,
-   "unguardedOperations": 9,
+   "unguardedOperations": 11,
    "capabilities": [
     {
      "key": "ACCESS_VALIDATE",
@@ -1364,7 +1364,7 @@
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "capabilityCount": 12,
-   "unguardedOperations": 31,
+   "unguardedOperations": 34,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",
@@ -3688,7 +3688,7 @@
   "tenancy": {
    "title": "Cross-cutting — organisation hierarchy",
    "capabilityCount": 11,
-   "unguardedOperations": 3,
+   "unguardedOperations": 4,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",

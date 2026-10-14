@@ -8,6 +8,52 @@
 
 ---
 
+## Amended 14 October 2026: a rule question is asked of the owner by a declared query
+
+**Decided by Chinmay, 14 October 2026** (the settlement of ADAM CR-081, CR-083 and CR-084; change entry
+CHG-GEN-009). Three refusals the developers raised that day were the same question: an operation must refuse when
+another module's data says so (a board tile names a variant Catalogue does not sell; a workstation has a shift open in
+Orders; a guest still holds a live entitlement in Access or an open order in Orders), and the only way the package
+gave to know was to read the owner's tables raw, some across deployables, some not in the lineage at all. On 14
+October the lineage held 941 cross-module table reads in 517 of 2,796 operations, and nothing checked rule 2 or rule 4
+(the lineage check promised under "Enforcement" did not exist). **One pattern now answers every such question.**
+
+**Rule 2 is refined, not reversed.**
+
+1. **A rule question goes through a declared query.** The owner declares it in its contract, in a top-level
+   `x-ticvai-queries:` map: `<queryName>: {module, inputs, returns, rule, served}`, where `rule` states the rule in
+   words (what "sellable", "open" or "live" means), and `served` lists the routes it answers on. The asking operation
+   names it: `x-ticvai-read-via: [{query: <contract>#<queryName>, route, for}]`, `for` saying which check or field it
+   feeds. `tools/derive-lineage.py` copies it into the lineage as `readVia`, as `x-ticvai-write-via` became `writeVia`
+   (CHG-R6-020).
+2. **The route follows the deployables.** `in-process`: within one deployable, a C# interface in the application
+   abstractions, implemented by the owner module and called in the caller's transaction (rule 2). `service`: across
+   deployables, the owner's published serviceAuth operation (rule 4). `projection`: the asker keeps a local copy fed by
+   the owner's events (ADR-0057), the only way Identity learns about a module above it (ADR-0028 tiers).
+3. **Generated views are for bulk data reads within one deployable, never for rule questions.** DB-READ-VIEWS keeps
+   its shape, `<table>_for_<reader module>` in the owner's schema, for reads of data an operation shows or exports.
+   **Across deployables there is no view**: a view granted to another deployable's role is shared SQL, which rule 4
+   forbids, so a reader in another deployable asks the owner's service or keeps a projection. Within a deployable all
+   modules share one role (DB-ROLES), so the view is a boundary the architecture tests keep, not a grant.
+4. **Identity reads nothing above it but a projection.** Tenancy shares the foundation tier but runs in `commerce`
+   with Orders and Catalogue, and asks them in-process (CR-083: `configureWorkstation` asks Orders whether a shift is
+   open, after locking the workstation row).
+
+**Enforcement.** `tools/check-cross-module-reads.py` (in `run-checks.py`): every cross-module lineage read is the
+module's own schema, a view named for the reader inside its deployable, or covered by a `readVia` to a query of the
+owning module; every `readVia` names a declared query whose module owns its contract; `in-process` only within one
+deployable; Identity reads above it only through a projection. The 941 reads already in the lineage are baselined and
+leave the baseline as each is routed; the reads the r6 fixes route (sale-board tiles, workstation shifts, the guest
+account deletion and export, the PIN step-ups) cannot be baselined. **ARCH-TESTS** (action item 6) allows a module's SQL
+to name exactly one kind of object in another module's schema: a view named `<table>_for_<its own module>`.
+
+**Shift is Orders'.** The deployable table below said "Tenancy (with Workforce, Approvals, Shift)". `shift` moved to
+OrderService on 24 August (`handoff/service-decomposition.json`), and the lineage agrees: its rows are
+`orders.pos_shift`, `orders.cash_movement`, `orders.deposit_box`. The table is corrected; ADR-0028 is corrected the
+same day.
+
+---
+
 ## Context
 
 **The package describes 17 services. They all use one database per tenant.** ADR-0038 (amended by ADR-0040
@@ -46,7 +92,7 @@ decision below keeps both as separate deployables.
 
 | Deployable | Modules | Share of normal traffic (`sizing.json` mix) | Why it is its own unit |
 |---|---|---:|---|
-| `commerce` | Identity (with PII), Tenancy (with Workforce, Approvals, Shift), Catalogue, Order (with Payments), Ledger, Wallet | 49.2% | The sale path. Order, payment and ledger can commit in one transaction. Autoscales on RPS |
+| `commerce` | Identity (with PII), Tenancy (with Workforce, Approvals), Catalogue, Order (with Payments and Shift; corrected 14 October 2026), Ledger, Wallet | 49.2% | The sale path. Order, payment and ledger can commit in one transaction. Autoscales on RPS |
 | `access` | Access | 15.3% | Gate hot path, flat high rate, offline package. The same module code builds the venue edge node |
 | `operations` | F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform (subscription, platform-ops, public-api), CrossRegion | 34.6% | Back office and engagement. Nothing that takes money waits on it |
 | `ticvai-ai` | AI (Python) | 1.1% | ADR-0020. Unchanged, three process groups |
@@ -166,7 +212,17 @@ load). It should not share a process with Marketing sends.
 **Sprint 1 (5–23 October)**
 
 6. [ ] **ARCH-TESTS**: extend `ModuleBoundaryTests` to 17 modules; add a test that no module's SQL names another module's schema. (3 pts)
+   - **14 October 2026 (amendment above, CHG-GEN-009).** The test allows one kind of object in another module's
+     schema: a view named `<table>_for_<this module>`. Anything else is a declared query through the owner's
+     interface.
 7. [ ] **DB-READ-VIEWS**: generate published read views for the 894 cross-schema reads from lineage (a deriver), applied in the migrations. (5 pts)
+   - **14 October 2026 (amendment above, CHG-GEN-009; the grant question).** A view is generated only for a reader in
+     the owner's deployable, for bulk data reads, never for a rule question (a lineage read covered by a `readVia` gets
+     no view). **No view is granted to another deployable's role**: across deployables the reader asks the owner's
+     service or keeps a projection (rule 4). The task text's "SELECT granted to the reader's deployable role" reads,
+     after this, as the owner's own deployable role only. The ticket text is not rewritten (a started ticket is not,
+     and the plan input waits for a plan change); the developer reads this line and
+     `tools/check-cross-module-reads.py`, which reports a view read across deployables as XR-VIEW-ACROSS.
 8. [ ] **DB-ROLES**: one Postgres role per deployable in MIG-BASELINE; AI read-only. (2 pts)
    - **12 October 2026 (ADAM CR-002, raised on DB-ROLES; Chinmay chose option A; CHG-R6-020).** The lineage still
      recorded writes into tables another deployable owns as the caller's own SQL, which these grants refuse. Rule 4

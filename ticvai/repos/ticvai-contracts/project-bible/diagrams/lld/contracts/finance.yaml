@@ -78,16 +78,21 @@ operations:
   - staff
   offline: false
   reads:
+  - approvals.rule
   - cache:idempotency
   - ledger.fiscal_period
   - ledger.fiscal_period_event
   - ledger.journal_entry
   - ledger.journal_line
+  - ledger.legal_entity
   - ledger.price_variance
   - ledger.recognition_schedule
   - ledger.settlement
   - ledger.settlement_exception
+  - orders.pos_shift
+  - wallet.balance
   writes:
+  - approvals.request
   - cache:idempotency
   - ledger.fiscal_period
   - ledger.fiscal_period_event
@@ -778,10 +783,12 @@ operations:
   - staff
   offline: false
   reads:
+  - approvals.rule
   - cache:idempotency
   - ledger.fiscal_period
   - ledger.fiscal_period_event
   writes:
+  - approvals.request
   - cache:idempotency
   - ledger.fiscal_period
 - operation: resolveObligationDispute

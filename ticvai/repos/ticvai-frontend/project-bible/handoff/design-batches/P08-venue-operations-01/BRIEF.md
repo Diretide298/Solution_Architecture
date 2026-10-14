@@ -178,7 +178,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-036` | Device Registry | B | 32 | 41 | 6 | 66 | 10 | 0 | — | notStarted (generated) |
+| `BO-036` | Device Registry | B | 31 | 41 | 6 | 66 | 10 | 0 | — | notStarted (generated) |
 | `BO-044` | F&B Outlets | A | 73 | 47 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-058` | Reporting Home | D | 91 | 26 | 6 | 100 | 2 | 0 | — | notStarted (generated) |
 | `BO-060` | Attendance & Footfall | D | 111 | 38 | 6 | 153 | 1 | 0 | — | notStarted (generated) |

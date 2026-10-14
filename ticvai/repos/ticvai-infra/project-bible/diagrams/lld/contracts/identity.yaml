@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 94 operations
+title: identity — 97 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -19,9 +19,12 @@ operations:
   - identity.password_policy
   - identity.principal
   - identity.principal_credential
+  - identity.principal_credential_history
   writes:
   - cache:idempotency
+  - identity.principal
   - identity.principal_credential
+  - identity.principal_credential_history
   - identity.session
 - operation: completeSsoAuthorization
   verb: POST
@@ -91,6 +94,10 @@ operations:
   reads:
   - cache:idempotency
   - identity.delegated_access
+  - identity.module_access
+  - identity.role
+  - identity.role_permission
+  - identity.segregation_rule
   writes:
   - cache:idempotency
   - cache:resolution
@@ -119,7 +126,9 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.mfa_challenge
   - identity.mfa_method
+  - identity.session
   writes:
   - cache:idempotency
   - identity.mfa_challenge
@@ -134,15 +143,23 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.delegated_access
+  - identity.password_policy
   - identity.principal
+  - identity.role
+  - identity.role_permission
+  - identity.segregation_rule
+  - platform.scope
   writes:
   - cache:idempotency
+  - cache:resolution
+  - identity.delegated_access
   - identity.principal
   - identity.principal_credential
 - operation: createRole
   verb: POST
   path: /roles
-  scope: venue
+  scope: tenant
   permission: ROLE_MANAGE
   audience:
   - staff
@@ -158,6 +175,7 @@ operations:
   - cache:resolution
   - identity.role
   - identity.role_permission
+  - platform.audit_record
 - operation: decideAccessReviewItem
   verb: POST
   path: /access-review-items/{itemId}/decision
@@ -220,11 +238,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.subject_holding
   - pii.subject
   writes:
+  - approvals.request
   - cache:idempotency
   - pii.subject
-  - platform.dsar_request
 - operation: endOwnSession
   verb: POST
   path: /auth/sessions/mine/{sessionId}/end
@@ -278,17 +297,16 @@ operations:
   - guest
   offline: false
   reads:
-  - access.entitlement
   - cache:idempotency
+  - identity.subject_holding
   - marketing.consent_record
   - marketing.form_submission
   - marketing.guest_document
   - marketing.guest_profile
-  - orders.sales_order
   - pii.subject
   writes:
+  - approvals.request
   - cache:idempotency
-  - platform.dsar_request
 - operation: forceLogout
   verb: POST
   path: /auth/sessions/{sessionId}/force-logout
@@ -301,12 +319,14 @@ operations:
   reads:
   - cache:idempotency
   - identity.delegated_access
+  - identity.password_policy
   - identity.principal
   - identity.principal_credential
   - identity.session
   - platform.workstation
   writes:
   - cache:idempotency
+  - identity.principal_credential
   - identity.session
 - operation: getAuthorisationPolicy
   verb: GET
@@ -417,7 +437,10 @@ operations:
   - partner
   offline: false
   reads:
+  - identity.delegated_access
   - identity.principal
+  - identity.role
+  - platform.scope
   writes: []
 - operation: getPrincipalModuleAccess
   verb: GET
@@ -538,6 +561,7 @@ operations:
   - cache:idempotency
   - orders.sales_order
   - pii.subject
+  - platform.outbox
 - operation: listAccessDecisions
   verb: GET
   path: /access-decisions/audit
@@ -805,7 +829,10 @@ operations:
   - partner
   offline: false
   reads:
+  - identity.delegated_access
   - identity.principal
+  - identity.role
+  - platform.scope
   writes: []
 - operation: listRoles
   verb: GET
@@ -816,6 +843,7 @@ operations:
   - staff
   offline: true
   reads:
+  - identity.delegated_access
   - identity.role
   - identity.role_permission
   writes: []
@@ -869,11 +897,13 @@ operations:
   - cache:idempotency
   - identity.delegated_access
   - identity.mfa_method
+  - identity.password_policy
   - identity.principal
   - identity.principal_credential
   - identity.role
   writes:
   - cache:idempotency
+  - identity.principal_credential
   - identity.refresh_token
   - identity.session
   - platform.outbox
@@ -917,6 +947,17 @@ operations:
   - identity.benefit_usage
   writes:
   - identity.benefit_usage
+- operation: recordConsentIdentifier
+  verb: POST
+  path: /internal/consent-identifiers
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads: []
+  writes:
+  - pii.consent_identifier
 - operation: refreshToken
   verb: POST
   path: /auth/refresh
@@ -980,6 +1021,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.otp_challenge
   - pii.subject_contact
   writes:
   - cache:idempotency
@@ -995,11 +1037,14 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.password_policy
   - identity.principal
   - identity.principal_credential
   writes:
   - cache:idempotency
+  - identity.principal
   - identity.principal_credential
+  - identity.principal_credential_history
   - identity.session
   - platform.outbox
 - operation: resolvePermissions
@@ -1129,7 +1174,10 @@ operations:
   - staff
   offline: false
   reads:
+  - identity.delegated_access
   - identity.module_access
+  - identity.role_permission
+  - identity.segregation_rule
   writes:
   - identity.module_access
 - operation: setSegregationRules
@@ -1243,6 +1291,18 @@ operations:
   - identity.authorisation_policy
   writes:
   - identity.authorisation_policy
+- operation: updateGuestSubjectDetails
+  verb: PATCH
+  path: /internal/guest-subjects/{subjectId}/details
+  scope: subject
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - pii.subject
+  writes:
+  - pii.subject
 - operation: updatePrincipal
   verb: PATCH
   path: /principals/{principalId}
@@ -1261,7 +1321,7 @@ operations:
 - operation: updateRole
   verb: PATCH
   path: /roles/{roleId}
-  scope: venue
+  scope: tenant
   permission: ROLE_MANAGE
   audience:
   - staff
@@ -1304,6 +1364,7 @@ operations:
   writes:
   - cache:idempotency
   - identity.guest_session
+  - identity.otp_challenge
   - pii.subject_contact
   - platform.outbox
 - operation: verifyMfaChallenge
@@ -1320,6 +1381,7 @@ operations:
   - cache:idempotency
   - identity.mfa_challenge
   - identity.mfa_recovery_code
+  - identity.password_policy
   writes:
   - cache:idempotency
   - identity.mfa_challenge
@@ -1353,3 +1415,19 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: verifySupervisorStepUp
+  verb: POST
+  path: /internal/step-up/verify
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - identity.delegated_access
+  - identity.password_policy
+  - identity.principal
+  - identity.principal_credential
+  - identity.role_permission
+  writes:
+  - identity.principal_credential

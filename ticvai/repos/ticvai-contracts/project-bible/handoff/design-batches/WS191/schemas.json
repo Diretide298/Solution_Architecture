@@ -123,6 +123,7 @@
   ],
   "properties": {
    "deviceId": {
+    "x-ticvai-references": "platform.device",
     "type": "string",
     "format": "uuid",
     "description": "The `tenancy.RegisteredDevice`. **Enrolment, credentials, firmware and tamper state live there.**"

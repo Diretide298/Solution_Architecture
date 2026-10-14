@@ -1,6 +1,6 @@
 # P01-account-self-service-01 — P01 · Account & Self-Service
 
-**5 screens · 45 operations · 51 schemas · 8 permissions**
+**5 screens · 45 operations · 52 schemas · 8 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·

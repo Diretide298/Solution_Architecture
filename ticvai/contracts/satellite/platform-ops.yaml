@@ -1508,13 +1508,13 @@ paths:
   /dead-letters/{deadLetterId}/replay:
     post:
       operationId: replayDeadLetter
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
       x-ticvai-write-via:
       - table: platform.dead_letter
         operation: requeueDeadLetter
       x-ticvai-calls:
       - tenancy.requeueDeadLetter
-      x-ticvai-consumed-by:
-        - "P09 ADM-318 Dead Letters"
       summary: Re-enter the delivery path
       description: '**Records the replay as a new attempt rather than resetting the count** (ADR-0033).
         An operator retrying the same poison message forty times should be able to see that they did.

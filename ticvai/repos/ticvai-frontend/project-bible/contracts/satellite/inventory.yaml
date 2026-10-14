@@ -663,7 +663,9 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          description: SKU already in use in this venue
+          description: SKU already in use in this venue (`duplicate-code`; CHG-DDL-003)
+          x-ticvai-problem-types:
+          - duplicate-code
           content:
             application/problem+json:
               schema:
@@ -1509,6 +1511,10 @@ paths:
       - count
       x-ticvai-permission: LEDGER_APPROVE
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: service
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); the operations deployable may not read identity.*: Identity''s serviceAuth operation verifySupervisorStepUp (ADR-0055 rule 4)'
       x-ticvai-step-up-reason: Sends a submitted count back, discarding its variance; a supervisor signs it in place (audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1741,6 +1747,10 @@ paths:
       - transfer
       x-ticvai-permission: LEDGER_APPROVE
       x-ticvai-step-up: pin
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: service
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); the operations deployable may not read identity.*: Identity''s serviceAuth operation verifySupervisorStepUp (ADR-0055 rule 4)'
       x-ticvai-step-up-reason: Writes off stock in transit; a supervisor signs it in place (proposed by the coordinator, client to confirm, audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -3934,9 +3944,14 @@ components:
       - costingMethod
       properties:
         sku:
-          x-ticvai-unique: tenant
+          x-ticvai-unique: venue
           type: string
           maxLength: 64
+          description: 'Unique within the item''s venue, as the 409 says (ADAM CR-068, CHG-DDL-003): an
+            inventory item is something one venue stocks (`venueId` is required), so two venues of a chain
+            keep their own row for the same syrup under the same SKU. The index is (venue_id, sku).
+
+            '
         barcode:
           type: string
           maxLength: 128
@@ -4798,6 +4813,8 @@ components:
           nullable: true
     Supplier:
       x-ticvai-persistence: inventory.supplier
+      # CHG-GEN-005: owned at tenant, read and quoted against at venue (audit R183).
+      x-ticvai-rls: read-beneath
       type: object
       required:
       - id

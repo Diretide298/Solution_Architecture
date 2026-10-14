@@ -958,6 +958,16 @@
  "GuestDevice": {
   "type": "object",
   "x-ticvai-persistence": "marketing.guest_device",
+  "x-ticvai-unique-together": [
+   [
+    "subjectId",
+    "installationId"
+   ],
+   [
+    "subjectId",
+    "tokenFingerprint"
+   ]
+  ],
   "required": [
    "id",
    "subjectId",
@@ -982,14 +992,28 @@
      "web"
     ]
    },
+   "installationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "The app install the registration came from, as `registerGuestDevice.installationId` sent it (CHG-MKT-001). A rotated token arrives under the same install, so it updates this row. Null on a row registered without one, and cleared when the device is revoked. Never returned."
+   },
    "tokenFingerprint": {
     "type": "string",
-    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
+    "nullable": true,
+    "maxLength": 64,
+    "x-ticvai-unique-compare": "exact",
+    "x-ticvai-secret": "blind-index",
+    "description": "**A keyed hash of the token, not the token** (decided 14 October 2026, CHG-MKT-001; ADR-0063 section 4 as amended): HMAC-SHA-256 of the token under the tenant's blind-index key, written as 64 lowercase hex characters. Keyed, so a token somebody holds cannot be checked against the table. It is how a re-registration without an `installationId` finds its row. Cleared when the device is revoked. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
    },
    "tokenRef": {
     "type": "string",
+    "nullable": true,
     "writeOnly": true,
-    "description": "**A vault reference to the push token**, written by the server from `registerGuestDevice.token` — the same pattern as `PaymentProvider.credentialRef`. Never the token and never returned; the sender resolves it at send time. Without it a registered device could not be sent to.\n"
+    "x-ticvai-column": "token_ciphertext",
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**The push token, encrypted by the application** (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001; ADR-0063 section 4 as amended), written by the server from `registerGuestDevice.token`: AES-256-GCM under the tenant's data key, which is wrapped by the tenant's Key Vault key, stored as one string that names the key version (the kernel's field encryption, ADR-0063 action KERNEL-FIELD-ENC). **Not a Key Vault secret per device**: Key Vault holds the one key, never a guest's token, so the vault holds a few secrets per tenant whatever the number of phones (`PaymentProvider.credentialRef` stays the pattern for provider credentials). The push sender decrypts it at send time. Stored as `token_ciphertext`; the wire keeps `tokenRef`. Never returned, and cleared when the device is revoked.\n"
    },
    "appVersion": {
     "type": "string",
@@ -1013,11 +1037,12 @@
      "active",
      "revoked",
      "failed"
-    ]
+    ],
+    "description": "`active` is sent to. `failed` is a token the provider kept refusing: no longer targeted, and made `active` again by the next registration from the same install or token (a rotated token is the usual cure). `revoked` is the guest's or the sign-out's decision and is final: the row keeps no token, fingerprint or install, so no registration matches it, and registering that phone again makes a new row (CHG-MKT-001)."
    },
    "failureCount": {
     "type": "integer",
-    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
+    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate. Set back to 0 by a registration.\n"
    },
    "registeredAt": {
     "type": "string",
@@ -1811,7 +1836,7 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`, or the venue's next business-day cut-off (`VenueSettings.businessDayCutoff`) when the cashier sent none (CHG-GDL-003). Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -2124,6 +2149,7 @@
     "format": "uuid"
    },
    "providerId": {
+    "x-ticvai-references": "payments.provider",
     "type": "string",
     "format": "uuid"
    },
@@ -3020,6 +3046,16 @@
      "thin"
     ],
     "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
+   },
+   "pinLength": {
+    "type": "integer",
+    "enum": [
+     4,
+     6,
+     8
+    ],
+    "readOnly": true,
+    "description": "**The tenant's `PasswordPolicy.pinLength`, carried to the device** (14 October 2026, CHG-CRD-002, ADAM CR-078). A device door draws its PIN keypad, and its supervisor step-up prompt, at this many digits; the device keeps it with the workstation context of the last session on it, so the door needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the server decides. Read from `identity.password_policy`, not stored on the workstation."
    }
   }
  }

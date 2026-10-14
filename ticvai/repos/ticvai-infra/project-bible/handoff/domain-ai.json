@@ -1660,6 +1660,7 @@
    "emits": [
     "order.cancelled",
     "order.completed",
+    "order.lapsed",
     "order.paid",
     "order.refunded"
    ]

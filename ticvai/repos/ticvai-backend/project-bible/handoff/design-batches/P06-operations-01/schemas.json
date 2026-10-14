@@ -192,7 +192,7 @@
  },
  "ChangeCredentialRequest": {
   "type": "object",
-  "description": "Request only. The credential itself is stored hashed in `identity.principal_credential` and is never returned by any operation (`handoff/schema-storage-only.md`).\n",
+  "description": "Request only. The credential itself is stored hashed in `identity.principal_credential` (`PrincipalCredential`, CHG-CRD-001) and is never returned by any operation (`handoff/schema-storage-only.md`).\n",
   "required": [
    "method",
    "currentCredential",
@@ -205,17 +205,21 @@
      "password",
      "pin"
     ],
-    "description": "Which credential is being changed. Card, RFID and SSO are not secrets the principal holds, so they are not changed here."
+    "description": "Which credential is being changed (`PrincipalCredential.method`). Card, RFID and SSO are not secrets the principal holds, so they are not changed here."
    },
    "currentCredential": {
     "type": "string",
     "maxLength": 512,
-    "writeOnly": true
+    "writeOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Compared with the current `credentialHash` and never stored. A wrong one is 422 `current-credential-wrong`, and counts towards the lockout like a wrong sign-in."
    },
    "newCredential": {
     "type": "string",
     "maxLength": 512,
-    "writeOnly": true
+    "writeOnly": true,
+    "x-ticvai-stored-as": "identity.principal_credential.credential_hash",
+    "description": "Stored as the new `credentialHash` (a PHC string, ADR-0071); the replaced hash moves to `identity.principal_credential_history`. A PIN is digits only, exactly `PasswordPolicy.pinLength` long."
    }
   }
  },
@@ -948,9 +952,10 @@
    },
    "credential": {
     "type": "string",
-    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
+    "description": "Password, PIN, card token or RFID token depending on `method`. Compared with the principal's `PrincipalCredential.credentialHash` and never stored (ADR-0071, CHG-CRD-003).\n",
     "maxLength": 512,
-    "writeOnly": true
+    "writeOnly": true,
+    "x-ticvai-persisted": false
    },
    "method": {
     "type": "string",
@@ -985,9 +990,14 @@
     "type": "object",
     "required": [
      "requiresRoleSelection",
-     "requiresMfa"
+     "requiresMfa",
+     "mustChangeCredential"
     ],
     "properties": {
+     "mustChangeCredential": {
+      "type": "boolean",
+      "description": "**The credential just used is temporary** (14 October 2026, CHG-CRD-001, ADAM CR-078): the principal's `Principal.mustChangeCredential`, set at creation and by `resetPrincipalCredential`. While it is true the session may call `changeOwnCredential` and `logout` and nothing else; the door asks for the new password or PIN (ADM-001, SUP-001, PTR-001, EMP-001, SCN-001, POS-000) before the role prompt and the landing. A successful `changeOwnCredential` clears it. Always false for a single sign-on principal."
+     },
      "requiresRoleSelection": {
       "type": "boolean"
      },
@@ -1196,7 +1206,8 @@
     "type": "string"
    },
    "isPrimary": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002)."
    }
   }
  },
@@ -1745,7 +1756,7 @@
     "type": "string",
     "maxLength": 512,
     "writeOnly": true,
-    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in."
    }
   }
  },
@@ -2595,6 +2606,16 @@
      "thin"
     ],
     "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
+   },
+   "pinLength": {
+    "type": "integer",
+    "enum": [
+     4,
+     6,
+     8
+    ],
+    "readOnly": true,
+    "description": "**The tenant's `PasswordPolicy.pinLength`, carried to the device** (14 October 2026, CHG-CRD-002, ADAM CR-078). A device door draws its PIN keypad, and its supervisor step-up prompt, at this many digits; the device keeps it with the workstation context of the last session on it, so the door needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the server decides. Read from `identity.password_policy`, not stored on the workstation."
    }
   }
  }

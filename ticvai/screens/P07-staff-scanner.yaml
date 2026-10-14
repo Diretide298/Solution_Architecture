@@ -155,8 +155,9 @@ screens:
       - kind: textField
         label: New PIN
         operation: changeOwnCredential
-        notes: Shown when `LoginResponse.mustChangeCredential` is true (the PIN is temporary; CHG-CRD-001). The new
-          PIN is the tenant's PIN length, and its reuse follows `PasswordPolicy.pinReusePrevention` (CHG-CRD-002).
+        notes: Shown when `LoginResponse.mustChangeCredential` is true (the PIN is temporary; CHG-CRD-001).
+          The new PIN is the tenant's PIN length, and its reuse follows `PasswordPolicy.pinReusePrevention`
+          (CHG-CRD-002).
         provenance: contract identity.yaml POST /auth/credential
   states:
     loading: Checking the credential. The form stays visible and disabled.

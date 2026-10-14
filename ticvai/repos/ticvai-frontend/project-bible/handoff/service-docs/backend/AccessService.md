@@ -1825,7 +1825,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| mediaCode | string | yes | Unique within the tenant (decided 28 September, audit R108): one entry per code. |
+| mediaCode | string | yes | Unique within the tenant (decided 28 September, audit R108): one entry per code, compared exactly: it is what a gate reads off the media, an opaque external id (common.yaml, the uniqueness rule). |
 | reason | string | yes |  |
 | addedAt | string (date-time) | yes |  |
 | addedByPrincipalId | string (uuid) | yes |  |
@@ -2704,7 +2704,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| media_code | text | yes | Unique within the tenant (decided 28 September, audit R108): one entry per code. |
+| media_code | text | yes | Unique within the tenant (decided 28 September, audit R108): one entry per code, compared exactly: it is what a gate reads off the media, an opaque external id (common.yaml, the uniqueness rule). |
 | reason | text | yes |  |
 | added_at | timestamptz | yes |  |
 | added_by_principal_id | uuid | yes |  |

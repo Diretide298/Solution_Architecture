@@ -1231,6 +1231,7 @@
     "description": "The order whose renewal failed."
    },
    "amount": {
+    "x-ticvai-column": "overdue_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "state": {
@@ -1791,6 +1792,16 @@
  "GuestDevice": {
   "type": "object",
   "x-ticvai-persistence": "marketing.guest_device",
+  "x-ticvai-unique-together": [
+   [
+    "subjectId",
+    "installationId"
+   ],
+   [
+    "subjectId",
+    "tokenFingerprint"
+   ]
+  ],
   "required": [
    "id",
    "subjectId",
@@ -1815,14 +1826,28 @@
      "web"
     ]
    },
+   "installationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "The app install the registration came from, as `registerGuestDevice.installationId` sent it (CHG-MKT-001). A rotated token arrives under the same install, so it updates this row. Null on a row registered without one, and cleared when the device is revoked. Never returned."
+   },
    "tokenFingerprint": {
     "type": "string",
-    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
+    "nullable": true,
+    "maxLength": 64,
+    "x-ticvai-unique-compare": "exact",
+    "x-ticvai-secret": "blind-index",
+    "description": "**A keyed hash of the token, not the token** (decided 14 October 2026, CHG-MKT-001; ADR-0063 section 4 as amended): HMAC-SHA-256 of the token under the tenant's blind-index key, written as 64 lowercase hex characters. Keyed, so a token somebody holds cannot be checked against the table. It is how a re-registration without an `installationId` finds its row. Cleared when the device is revoked. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
    },
    "tokenRef": {
     "type": "string",
+    "nullable": true,
     "writeOnly": true,
-    "description": "**A vault reference to the push token**, written by the server from `registerGuestDevice.token` — the same pattern as `PaymentProvider.credentialRef`. Never the token and never returned; the sender resolves it at send time. Without it a registered device could not be sent to.\n"
+    "x-ticvai-column": "token_ciphertext",
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**The push token, encrypted by the application** (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001; ADR-0063 section 4 as amended), written by the server from `registerGuestDevice.token`: AES-256-GCM under the tenant's data key, which is wrapped by the tenant's Key Vault key, stored as one string that names the key version (the kernel's field encryption, ADR-0063 action KERNEL-FIELD-ENC). **Not a Key Vault secret per device**: Key Vault holds the one key, never a guest's token, so the vault holds a few secrets per tenant whatever the number of phones (`PaymentProvider.credentialRef` stays the pattern for provider credentials). The push sender decrypts it at send time. Stored as `token_ciphertext`; the wire keeps `tokenRef`. Never returned, and cleared when the device is revoked.\n"
    },
    "appVersion": {
     "type": "string",
@@ -1846,11 +1871,12 @@
      "active",
      "revoked",
      "failed"
-    ]
+    ],
+    "description": "`active` is sent to. `failed` is a token the provider kept refusing: no longer targeted, and made `active` again by the next registration from the same install or token (a rotated token is the usual cure). `revoked` is the guest's or the sign-out's decision and is final: the row keeps no token, fingerprint or install, so no registration matches it, and registering that phone again makes a new row (CHG-MKT-001)."
    },
    "failureCount": {
     "type": "integer",
-    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
+    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate. Set back to 0 by a registration.\n"
    },
    "registeredAt": {
     "type": "string",
@@ -2546,6 +2572,7 @@
     "format": "date"
    },
    "amount": {
+    "x-ticvai-column": "due_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "status": {
@@ -2593,6 +2620,7 @@
     "format": "uuid"
    },
    "orderId": {
+    "x-ticvai-references": "orders.sales_order",
     "type": "string",
     "format": "uuid"
    },
@@ -2623,9 +2651,11 @@
     ]
    },
    "total": {
+    "x-ticvai-column": "gross_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "paidToDate": {
+    "x-ticvai-column": "paid_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "nextDueDate": {
@@ -2671,6 +2701,7 @@
     "format": "uuid"
    },
    "providerId": {
+    "x-ticvai-references": "payments.provider",
     "type": "string",
     "format": "uuid"
    },
@@ -3921,64 +3952,87 @@
    },
    "items": {
     "type": "array",
-    "x-ticvai-persistence": "marketing.wishlist_item",
+    "description": "Newest first: ordered by `addedAt` descending, `id` as the tiebreak (CHG-MKT-002).",
     "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "variantId",
-      "addedAt",
-      "isAvailable"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "productName": {
-       "type": "string"
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "performanceStartsAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "price": {
-       "x-ticvai-column": "list_price",
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "The variant's current list price when the wishlist is read. Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column); the wire keeps `price`."
-      },
-      "imageAssetRef": {
-       "type": "string",
-       "nullable": true
-      },
-      "isAvailable": {
-       "type": "boolean",
-       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
-      },
-      "unavailableReason": {
-       "type": "string",
-       "nullable": true
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      },
-      "addedAt": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
+     "$ref": "#/components/schemas/WishlistItem"
     }
+   }
+  }
+ },
+ "WishlistItem": {
+  "x-ticvai-persistence": "marketing.wishlist_item",
+  "x-ticvai-unique-together": [
+   [
+    "subjectId",
+    "variantId",
+    "performanceId"
+   ]
+  ],
+  "x-ticvai-unique-nulls": "not-distinct",
+  "type": "object",
+  "required": [
+   "id",
+   "subjectId",
+   "variantId",
+   "addedAt",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The guest who saved it. The wishlist is keyed by subject; there is no parent wishlist row."
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productName": {
+    "type": "string",
+    "description": "**Catalogue's, not Marketing's.** Taken from Catalogue's `variantListingFacts` when the item is saved, and replaced by Catalogue's current value each time the wishlist is read (CHG-MKT-002)."
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceStartsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The saved performance's start, from Catalogue's `variantListingFacts`; null for a date-less entry."
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The variant's current list price when the wishlist is read: the price Catalogue's guest listing shows for the variant on the guest's channel (`variantListingFacts.listPrice`). Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column), the amount alone as every Money column is (`numeric(18,4)`; the currency resolves from the variant's venue, ADR-0018); the wire keeps `price`. **The stored value is the price when the item was saved**, kept for segmentation (a price drop on a saved item is a signal) and returned only when Catalogue cannot be reached (CHG-MKT-002)."
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The product's primary media, from Catalogue's `variantListingFacts`."
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken. **Computed when the wishlist is read** from Catalogue's `variantListingFacts` (`sellable`) and the performance's start; the stored value is the answer when the item was saved (CHG-MKT-002).\n"
+   },
+   "unavailableReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why `isAvailable` is false, in Catalogue's words (`variantListingFacts.reason`), or `performancePassed`; null when available."
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "addedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  }

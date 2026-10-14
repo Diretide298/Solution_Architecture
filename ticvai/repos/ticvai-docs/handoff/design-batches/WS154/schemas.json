@@ -964,6 +964,7 @@
   ],
   "properties": {
    "chargebackId": {
+    "x-ticvai-references": "orders.chargeback",
     "type": "string",
     "format": "uuid"
    },

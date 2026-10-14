@@ -363,7 +363,10 @@ for t in sorted(set(cols)|set(storage)):
                           'yes' if t in NEW else '','yes' if t in PII else '',
                           ', '.join(fw) or '',
                           (L.get('parent') or '—'), anchtxt or '—',
-                          src,MIG_OF.get(t,'')],1):
+                          # **A renamed table keeps its migration** (CR-067, CHG-DDL-002): the plan this reads
+                          # is the previous refresh's (the ordering caveat above), so on the run that renames a
+                          # table the MIG task still lists it under its old name, and the cell went empty.
+                          src,MIG_OF.get(t,'') or MIG_OF.get(_was,'')],1):
         c=ws.cell(r,i,v); c.font=M if i in (2,3) else B; c.border=BOX
         if i==5: c.alignment=Alignment(wrap_text=True,vertical='top')
         if i in (4,7,8,9,10): c.alignment=Alignment(horizontal='center')
@@ -386,21 +389,31 @@ ws=wb.create_sheet('Columns'); ws.cell(1,1,'Every column').font=T
 ws.cell(2,1,f"{sum(len(v) for v in cols.values())} columns. **References says where a column points; "
         f"Enforced says whether a foreign key checks it.** 28 of 514 are enforced — the rest are "
         f"conventions the relationship graph records and the database does not check.").font=SUB
-hdr(ws,['Table','Column','Type','Required','References','Link','Enforced','Source','Description'],
-    [30,26,15,9,30,14,10,32,54])
+# **`Type` is the type the DDL gives the column, not the contract's shape** (ADAM CR-067, 14 October 2026,
+# CHG-DDL-002). It read `schema-reference.json`'s `type`, which is the wire's: `text` for an id sent as a
+# string, `numeric` for a quantity. derive-ddl turns those into uuid (ADR-0056) and numeric(18,4), and ADAM
+# corrected the sheet only from a CREATE TABLE of the same name in the frozen r1 SQL -- so a table renamed after
+# r1 (`seating.seat_reservation`, `inventory.inventory_item`) had none, and its ids read `text`. The DDL's type
+# now comes from `handoff/ddl-column-types.json` (written by derive-ddl), and the contract's shape stays
+# beside it as `Contract type` where the two differ.
+_DDLT_P = _H / 'ddl-column-types.json'
+_DDLT = (json.loads(_DDLT_P.read_text(encoding='utf-8')).get('tables') or {}) if _DDLT_P.exists() else {}
+hdr(ws,['Table','Column','Type','Required','References','Link','Enforced','Source','Description','Contract type'],
+    [30,26,15,9,30,14,10,32,54,15])
 r=5
 for t in sorted(cols):
     for c_ in cols[t]:
-        row=[c_['table'],c_['column'],c_['type'],c_['required'],
+        _dt=(_DDLT.get(t) or {}).get(c_['column']) or c_['type']
+        row=[c_['table'],c_['column'],_dt,c_['required'],
              c_.get('references',''),c_.get('referenceHow',''),c_.get('enforced',''),
-             c_['source'],c_['description']]
+             c_['source'],c_['description'],c_['type'] if _dt!=c_['type'] else '']
         for i,v in enumerate(row,1):
             x=ws.cell(r,i,v); x.font=M if i in (1,2,3,5) else B; x.border=BOX
             if i in (4,7): x.alignment=Alignment(horizontal='center')
             if i==9: x.alignment=Alignment(wrap_text=True,vertical='top')
             if t in NEW and i<=2: x.fill=BLUE
         r+=1
-ws.auto_filter.ref=f"A4:I{r-1}"
+ws.auto_filter.ref=f"A4:J{r-1}"
 
 ws=wb.create_sheet('No table'); ws.cell(1,1,'Schemas with no table').font=T
 ws.cell(2,1,f'{len(nomap)} of {len(nomap)+len(cols)} mapped schemas.').font=SUB

@@ -108,6 +108,7 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   writes:
   - approvals.request
@@ -121,6 +122,7 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   writes:
   - approvals.request
@@ -165,12 +167,14 @@ operations:
   reads:
   - approvals.decision
   - approvals.delegation
+  - approvals.escalation
   - approvals.matrix
   - approvals.request
   - approvals.rule
   - cache:idempotency
   - identity.principal
   writes:
+  - approvals.escalation
   - approvals.request
   - cache:idempotency
 - operation: createAutomationAutonomouAction
@@ -199,6 +203,7 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   - approvals.rule
   - cache:idempotency
@@ -222,6 +227,7 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   - approvals.rule
   - cache:idempotency
@@ -282,6 +288,7 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   writes: []
 - operation: issueAccreditationBadge
@@ -374,6 +381,7 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   writes: []
 - operation: listApprovedActionExecutions
@@ -597,6 +605,7 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.external_dispatch
   - approvals.external_provider
   - approvals.request
@@ -618,8 +627,10 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   writes:
+  - approvals.escalation
   - approvals.request
 - operation: resolveApprovedActionExecution
   verb: POST
@@ -643,9 +654,11 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   - cache:idempotency
   writes:
+  - approvals.escalation
   - approvals.request
   - cache:idempotency
 - operation: revokeApprovalDelegation
@@ -849,6 +862,7 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   - approvals.rule
   - cache:idempotency
@@ -866,6 +880,7 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.escalation
   - approvals.request
   - cache:idempotency
   writes:

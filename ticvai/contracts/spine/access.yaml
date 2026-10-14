@@ -1750,11 +1750,6 @@ paths:
   /access/scans:
     post:
       operationId: syncScans
-      x-ticvai-write-via:
-      - table: sync.rejection
-        operation: recordSyncRejection
-      x-ticvai-calls:
-      - cross-region.recordSyncRejection
       x-ticvai-consumed-by:
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
@@ -1762,6 +1757,11 @@ paths:
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-write-via:
+      - table: sync.rejection
+        operation: recordSyncRejection
+      x-ticvai-calls:
+      - cross-region.recordSyncRejection
       x-ticvai-audience:
       - staff
       summary: Replay scans recorded offline

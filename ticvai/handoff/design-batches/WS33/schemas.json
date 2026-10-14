@@ -947,7 +947,7 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`, or the venue's next business-day cut-off (`VenueSettings.businessDayCutoff`) when the cashier sent none (CHG-GDL-003). Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -1362,6 +1362,7 @@
     "format": "date"
    },
    "amount": {
+    "x-ticvai-column": "due_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "status": {
@@ -1409,6 +1410,7 @@
     "format": "uuid"
    },
    "orderId": {
+    "x-ticvai-references": "orders.sales_order",
     "type": "string",
     "format": "uuid"
    },
@@ -1439,9 +1441,11 @@
     ]
    },
    "total": {
+    "x-ticvai-column": "gross_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "paidToDate": {
+    "x-ticvai-column": "paid_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "nextDueDate": {

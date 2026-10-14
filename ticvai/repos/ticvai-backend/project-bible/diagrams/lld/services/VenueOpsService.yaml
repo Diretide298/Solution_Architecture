@@ -2784,9 +2784,9 @@ tables:
   - games
   foreignWriters: null
 - table: games.credit_ledger
-  columns: 2
+  columns: 14
   store: postgres
-  parent: null
+  parent: games.card
   writtenBy:
   - games
   foreignWriters: null

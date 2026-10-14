@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 40 of 94 |
+| Operations in the slice | 40 of 97 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -19,10 +19,9 @@
 
 | Service | Tables it reads |
 |---|---|
-| [AccessService](AccessService.md) | `access.entitlement` |
 | [MarketingService](MarketingService.md) | `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile` |
 | [OrderService](OrderService.md) | `orders.sales_order` |
-| [TenancyService](TenancyService.md) | `platform.workstation` |
+| [TenancyService](TenancyService.md) | `platform.scope`, `platform.workstation` |
 | [VenueOpsService](VenueOpsService.md) | `assets.media_asset` |
 
 ## Operations in the first release
@@ -76,18 +75,22 @@
 
 **`POST /roles`**: Create a role
 
-**Start from a preset, then edit the checklist** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003). `presetCodes` names one or more presets (`listCapabilityTemplates`); their permissions are copied into the new role, unioned with any `permissions` sent, and the copy binds to nothing: changing a preset later never widens a role made from it. With neither, the role starts empty and the checklist is ticked by hand. The initial set is checked as `setRolePermissions` checks it: a set that breaches a `SegregationRule` is refused `422 segregation-breach`, naming the rule. An unknown preset code is `422 unknown-preset`.
+**Start from a preset, then edit the checklist** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003). `presetCodes` names one or more presets (`listCapabilityTemplates`); their permissions are copied into the new role, unioned with any `permissions` sent, and the copy binds to nothing: changing a preset later never widens a role made from it. With neither, the role starts empty and the checklist is ticked by hand. An unknown preset code is `422 unknown-preset`.
+
+**The role-time segregation check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). The initial set is checked as `setRolePermissions` checks it: every `SegregationRule` is evaluated against the role's permissions, **whatever its `scopeSensitive`**, because every permission of one role is granted together at one scope, so a pair inside a role always overlaps. Only a rule whose `severity` is `block` refuses, with `409 segregation-breach` (`common.yaml`) naming the rule and both permissions; `requireApproval` and `warn` are accepted, and surface when a grant attaches the role (`createDelegatedAccess`, `createPrincipal`) and in `listSegregationViolations`. The status was `422` until r6 (approved breaking change BC-079). **The create is audited**: one `platform.audit_record` row in the same transaction, as `setRolePermissions` writes for a permission change.
+
+**Tenant scope** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001): roles are tenant-wide (`code` is unique per tenant, compared case-insensitively) and their rows are written only at the tenant root, so the operation is called at the tenant scope, as `setRolePermissions` always was (approved breaking change BC-076). A venue manager reads the roles (`listRoles`) and grants them; it does not create them.
 
 |  |  |
 |---|---|
 | Permission | `ROLE_MANAGE` |
-| Scope level | venue |
+| Scope level | tenant |
 | Part of slice | setup, makes `identity.role`, `identity.role_permission` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.capability_template`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
-| Writes | `cache:idempotency`, `cache:resolution`, `identity.role`, `identity.role_permission` |
+| Writes | `cache:idempotency`, `cache:resolution`, `identity.role`, `identity.role_permission`, `platform.audit_record` |
 | Called by | ADM-021, BO-054 |
 
 **Parameters**
@@ -118,23 +121,23 @@
 | inheritsFromRoleId | string (uuid) |  | Role composition, one level deep and no deeper. (nullable) |
 | isSystem | boolean |  | Seeded roles ship and are editable; deleting one is refused. (default False) |
 | presetCode | string |  | The preset this role was started from, for the record only (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of createRole.presetCodes, or null for a role ticked by hand. (max length 64; read-only; nullable) |
-| principalCount | integer |  |  |
-| grantCount | integer |  |  |
+| principalCount | integer |  | Computed on read, never stored (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the distinct principals holding this role through a live grant (identity.delegated_access with this role_id, a prin… (read-only) |
+| grantCount | integer |  | Computed on read, never stored (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the live grants of this role (the rows principalCount counts, one per grant, so a principal granted the role at two… (read-only) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
-| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
-| 422 |  | A preset code that does not exist (unknown-preset), or an initial permission set that breaches a segregation rule (segregation-breach, naming the rule and both permissions). |
+| 409 |  | The code is already used in the tenant, compared case-insensitively (duplicate-code), or the initial permission set breaches a segregation rule whose severity is block (segregation-breach, naming the… |
+| 422 |  | A preset code that does not exist (unknown-preset). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listOwnPlatformStaffGrants
 
 **`GET /platform-staff-grants/mine`**: The calling platform operator's own grants into this tenant
 
-**How a P09 screen finds a grant already open after a reload** (decided 28 September, audit R098). Callable with `PLATFORM_TENANT_ACCESS`, the permission that opens a grant, so the operator needs no tenant grant to read it; `listPlatformStaffGrants` needs `AUDIT_VIEW`, which the operator only has if a grant carries it. Returns only grants whose `operatorPrincipalId` is the caller, most recent first.
+**How a P09 screen finds a grant already open after a reload** (decided 28 September, audit R098). Callable with `PLATFORM_TENANT_ACCESS`, the permission that opens a grant, so the operator needs no tenant grant to read it; `listPlatformStaffGrants` needs `AUDIT_VIEW`, which the operator only has if a grant carries it. Returns only grants whose `operatorPrincipalId` is the caller, most recent first: **ordered by `openedAt` descending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002).
 
 |  |  |
 |---|---|
@@ -186,6 +189,12 @@
 
 **`GET /principals`**: List principals
 
+**What a venue-scoped caller sees** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001). `USER_MANAGE` is checked at the caller's scope, as before. Any staff grant may read `identity.principal` rows, so the database does not hide a venue's staff from a venue manager; the list is the principals whose home scope (`identity.principal.home_scope_id`, a `platform.scope` row) is at or beneath a node where the caller's `USER_MANAGE` holds, and `scopePath` narrows that further. A `scopePath` outside the caller's reach is `403`. A venue manager therefore lists the venue's people and those homed beneath it, never a sibling venue's.
+
+**Each item's `roles`** are read with it from the principal's live role grants (`identity.delegated_access` joined to `identity.role`; see `Principal.roles`).
+
+**Ordered by `displayName` ascending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): a directory is read by name.
+
 |  |  |
 |---|---|
 | Permission | `USER_MANAGE` |
@@ -195,7 +204,7 @@
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `identity.principal` |
+| Reads | `identity.delegated_access`, `identity.principal`, `identity.role`, `platform.scope` |
 | Writes | - |
 | Called by | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019, PTR-003 |
 
@@ -220,12 +229,14 @@
 | items[].validFrom | string (date-time) |  | (nullable) |
 | items[].validTo | string (date-time) |  | Past this, resolution returns DENY regardless of grants. (nullable) |
 | items[].primaryRoleId | string (uuid) |  | Determines the landing screen when the principal holds several roles and picks one at login. (nullable) |
-| items[].roles | array of RoleSummary |  |  |
+| items[].roles | array of RoleSummary |  | Read with the principal, never stored on it (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): one item per role the principal holds through a live grant, an identity.delegated_access row with this… |
 | items[].roles[].id | string (uuid) | yes |  |
 | items[].roles[].code | string | yes |  |
 | items[].roles[].name | string | yes |  |
-| items[].roles[].isPrimary | boolean |  |  |
+| items[].roles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
 | items[].lastLoginAt | string (date-time) |  | (nullable) |
+| items[].mustChangeCredential | boolean |  | The principal must replace their credential before the session is usable (14 October 2026, CHG-CRD-001, ADAM CR-078; createPrincipal took it and nothing stored it). (default True) |
+| items[].ssoProviderId | string (uuid) |  | Set when single sign-on provisioned this principal (completeSsoAuthorization, from the tenant's identity.sso_provider; 14 October 2026, CHG-CRD-001). (read-only; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -247,6 +258,12 @@ A role is a grouping for permission management — code, name, description and t
 
 `Role.isSystem` stays on the wire for clients built at r1 and is false on every role a tenant creates from 2 October.
 
+**Roles are tenant-wide; a venue-scoped caller reads them all, read-only** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001). A role is defined once for the tenant (`Role.code` is unique per tenant) and granted anywhere in the tree, so a venue manager holding `ROLE_MANAGE` at the venue lists every role of the tenant, with its own permissions, in order to grant it. Creating, renaming or changing the permissions of a role (`createRole`, `updateRole`, `setRolePermissions`) needs `ROLE_MANAGE` at the tenant scope; a screen shows those controls disabled to a caller whose `ROLE_MANAGE` is held only beneath the tenant.
+
+**`principalCount` and `grantCount` are computed on read under row-level security** (ADAM CR-077; CHG-IDR-002): from the role's live grants in `identity.delegated_access`, counting only the grants and principals the caller's grants let it read. A venue manager's count is the venue's, not the tenant's.
+
+**Ordered by `name` ascending, `id` as the tiebreak** (ADAM CR-077; CHG-IDR-002).
+
 |  |  |
 |---|---|
 | Permission | `ROLE_MANAGE` |
@@ -257,7 +274,7 @@ A role is a grouping for permission management — code, name, description and t
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Offline note | 24 August: servable from a local cache. |
-| Reads | `identity.role`, `identity.role_permission` |
+| Reads | `identity.delegated_access`, `identity.role`, `identity.role_permission` |
 | Writes | - |
 | Called by | ADM-021, BO-054, BO-106, CMS-019, CMS-086 |
 
@@ -281,8 +298,8 @@ A role is a grouping for permission management — code, name, description and t
 | items[].inheritsFromRoleId | string (uuid) |  | Role composition, one level deep and no deeper. (nullable) |
 | items[].isSystem | boolean |  | Seeded roles ship and are editable; deleting one is refused. (default False) |
 | items[].presetCode | string |  | The preset this role was started from, for the record only (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of createRole.presetCodes, or null for a role ticked by hand. (max length 64; read-only; nullable) |
-| items[].principalCount | integer |  |  |
-| items[].grantCount | integer |  |  |
+| items[].principalCount | integer |  | Computed on read, never stored (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the distinct principals holding this role through a live grant (identity.delegated_access with this role_id, a prin… (read-only) |
+| items[].grantCount | integer |  | Computed on read, never stored (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the live grants of this role (the rows principalCount counts, one per grant, so a principal granted the role at two… (read-only) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -457,12 +474,14 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 | validFrom | string (date-time) |  | (nullable) |
 | validTo | string (date-time) |  | Past this, resolution returns DENY regardless of grants. (nullable) |
 | primaryRoleId | string (uuid) |  | Determines the landing screen when the principal holds several roles and picks one at login. (nullable) |
-| roles | array of RoleSummary |  |  |
+| roles | array of RoleSummary |  | Read with the principal, never stored on it (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): one item per role the principal holds through a live grant, an identity.delegated_access row with this… |
 | roles[].id | string (uuid) | yes |  |
 | roles[].code | string | yes |  |
 | roles[].name | string | yes |  |
-| roles[].isPrimary | boolean |  |  |
+| roles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
 | lastLoginAt | string (date-time) |  | (nullable) |
+| mustChangeCredential | boolean |  | The principal must replace their credential before the session is usable (14 October 2026, CHG-CRD-001, ADAM CR-078; createPrincipal took it and nothing stored it). (default True) |
+| ssoProviderId | string (uuid) |  | Set when single sign-on provisioned this principal (completeSsoAuthorization, from the tenant's identity.sso_provider; 14 October 2026, CHG-CRD-001). (read-only; nullable) |
 
 **Responses**
 
@@ -477,10 +496,12 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 
 **A role made from a preset is renamed here** (decided 2 October 2026, Chinmay, pre-apply round: *"they can still give that viewer more permissions and rename it"*; DEC-007; CHG-CSP-003). Until this operation a role's name was fixed at `createRole`. `code` does not change: a grant and the audit log name the role by it. The permissions are `setRolePermissions`.
 
+**Called at the tenant scope** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001; approved breaking change BC-077), as `createRole` and `setRolePermissions` are: a role is tenant-wide and its row is written only at the tenant root. **It changes no permission**, so it runs no segregation check (ADAM CR-079): a rename never changes what anybody holds.
+
 |  |  |
 |---|---|
 | Permission | `ROLE_MANAGE` |
-| Scope level | venue |
+| Scope level | tenant |
 | Part of slice | setup, changes rows of `identity.role` that another operation creates |
 | Wave | 1 |
 | Offline | no |
@@ -515,8 +536,8 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 | inheritsFromRoleId | string (uuid) |  | Role composition, one level deep and no deeper. (nullable) |
 | isSystem | boolean |  | Seeded roles ship and are editable; deleting one is refused. (default False) |
 | presetCode | string |  | The preset this role was started from, for the record only (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of createRole.presetCodes, or null for a role ticked by hand. (max length 64; read-only; nullable) |
-| principalCount | integer |  |  |
-| grantCount | integer |  |  |
+| principalCount | integer |  | Computed on read, never stored (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the distinct principals holding this role through a live grant (identity.delegated_access with this role_id, a prin… (read-only) |
+| grantCount | integer |  | Computed on read, never stored (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the live grants of this role (the rows principalCount counts, one per grant, so a principal granted the role at two… (read-only) |
 
 **Responses**
 
@@ -534,7 +555,12 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 **`DELETE /auth/guest/account`**: Self-service account deletion
 
 Raises an erasure request rather than deleting immediately. PII is removed from the erasable store; ledger entries keep their opaque subject reference and stay intact.
-Where the guest is linked across cells, the request fans out (ADR-0010).
+
+**What blocks it, and where Identity reads it from** (ADAM CR-084, decided 14 October 2026, CHG-GDL-001). The request is refused with `409` while the guest still holds something a deletion would strand: an **open order** (`open-orders-remain`: an order whose status is `pending`, `held`, `partiallyPaid` or `paid`, the rule `orders#openOrdersForSubject` states) or a **live entitlement** (`live-entitlement-remains`: an entitlement whose status is `issued` or `partiallyConsumed` and whose `validTo` is still ahead, the rule `access#liveEntitlementsForSubject` states; a frozen or suspended pass is still `issued`). Identity is Foundation and reads nothing above it (ADR-0028), and Access is another deployable (ADR-0055 rule 4), so neither orders.sales_order nor access.entitlement is read: Identity answers from `identity.subject_holding`, its own projection of the order and entitlement events (`SubjectHolding`). **The erasure job checks the same two conditions again when it runs**, against the projection as it stands then; if a blocking holding appeared after the `202`, it erases nothing and closes the request unfulfilled, naming the problem type that held.
+
+**The request is an Approvals request.** `requestId` is the `approvals.request` id, raised in the same transaction through Approvals' in-process `createApprovalRequest` (Approvals is in the Tenancy module, in `commerce` with Identity; ADR-0055 rule 3). A guest's own erasure needs no human approval step (ADR-0047 section 7); the tenant's approval matrix may add one, and then the erasure job waits for the decision.
+
+**Every guest is erased locally; only a linked guest fans out.** The job tombstones the guest's `pii.subject` row (`is_erased`, `erased_at`, and `erasure_request_id` = `requestId`; ADR-0047), for every guest. Only where the guest is linked across cells (the session's `GuestSession.guestLinkId` is set; ADR-0010) does it also call cross-region `createDsarRequest` (`kind: erasure`, `serviceAuth`), which raises the cross-cell sync.dsar_request and fans out. A guest who never transacted across regions has no link (cross-region.yaml) and raises no DSAR record.
 
 |  |  |
 |---|---|
@@ -544,8 +570,8 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `pii.subject` |
-| Writes | `cache:idempotency`, `pii.subject`, `platform.dsar_request` |
+| Reads | `cache:idempotency`, `identity.subject_holding`, `pii.subject` |
+| Writes | `approvals.request`, `cache:idempotency`, `pii.subject` |
 | Called by | GST-066, WEB-024 |
 
 **Parameters**
@@ -558,15 +584,15 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| requestId | string |  |  |
-| estimatedCompletionAt | string (date-time) |  |  |
+| requestId | string | yes | The approvals.request id of the erasure request (raised through Approvals' createApprovalRequest), which the tombstone records as pii.subject.erasure_request_id. |
+| estimatedCompletionAt | string (date-time) |  | Null until a response period reaches Identity. (nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 202 |  | Erasure request raised |
-| 409 |  | Open orders or an unexpired entitlement exist. |
+| 202 |  | Erasure request raised. |
+| 409 |  | The guest still holds something a deletion would strand. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGuestSession
@@ -731,7 +757,7 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | identifier | string | yes | The email address or E.164 mobile number the account was registered with. (max length 256) |
-| password | string | yes | (min length 8; max length 256) |
+| password | string | yes | Compared with GuestCredential.passwordHash and never stored (ADR-0071, CHG-CRD-003). (min length 8; max length 256) |
 | deviceId | string |  | Names the device; a new sign-in here ends the previous session on it. |
 | venueId | string (uuid) |  | The venue the guest app or booking is in. (nullable) |
 
@@ -918,6 +944,8 @@ Government onboarding has lead time and should be started before it becomes the 
 A guest who bought without an account, then registered. **The guest names one booking** (`orderReference`, with `verificationCode` from its confirmation); it is attached only when its contact detail matches the caller's verified identifier, and 403 otherwise. Other guest-checkout orders carrying the same verified contact detail are attached in the same call, and `attachedOrderCount` counts every order attached.
 **Only orders whose contact detail matches the now-verified identifier.** Attaching on an unverified claim would hand someone else's booking history to whoever asked for it.
 
+**Each attached order is announced as `order.linkedToGuest`** (ADAM CR-084, decided 14 October 2026, CHG-GDL-003), one event per order with its `subjectId` and current status, written to `platform.outbox` in the attaching transaction (ADR-0033). Identity's projection identity.subject_holding consumes it, so an attached order and the entitlements issued from it block `deleteGuestAccount` like any other the guest holds; without it a guest could erase an account holding a valid ticket bought before registering.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -927,7 +955,7 @@ A guest who bought without an account, then registered. **The guest names one bo
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order`, `pii.subject_contact` |
-| Writes | `cache:idempotency`, `orders.sales_order`, `pii.subject` |
+| Writes | `cache:idempotency`, `orders.sales_order`, `pii.subject`, `platform.outbox` |
 | Called by | GST-010, GST-042, WEB-013, WEB-016 |
 
 **Parameters**
@@ -1046,7 +1074,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `pii.subject_contact` |
+| Reads | `cache:idempotency`, `identity.otp_challenge`, `pii.subject_contact` |
 | Writes | `cache:idempotency`, `identity.otp_challenge`, `platform.outbox` |
 | Called by | GST-042, WEB-016 |
 
@@ -1159,7 +1187,7 @@ Creates a `pending` verification. `409` while another is pending for this guest;
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method`, `identity.otp_challenge`, `pii.subject_contact` |
-| Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject_contact`, `platform.outbox` |
+| Writes | `cache:idempotency`, `identity.guest_session`, `identity.otp_challenge`, `pii.subject_contact`, `platform.outbox` |
 | Called by | GST-042, WEB-016 |
 
 **Parameters**
@@ -1221,7 +1249,8 @@ Creates a `pending` verification. `409` while another is pending for this guest;
 
 **`createPrincipal` defaults `mustChangeCredential` to true and nothing could change a credential**, so every new member of staff was issued an initial secret they could never replace: the first sign-in could not complete. `identity.principal_credential` was read by `login` and written by nothing after creation.
 **The current credential is required even inside a session.** A till left signed in is a session somebody else can use, and changing its PIN without knowing the old one is how that session becomes theirs permanently.
-Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length rule only, because it is valid only on a registered workstation (see `LoginRequest.method`). **Every other session of the principal is ended** on success, since a credential changed because it leaked is not fixed while the leaked one is still signed in.
+Held to `setPasswordPolicy` (length, breach check); a PIN is held to the tenant's PIN settings only (`PasswordPolicy.pinLength` digits, `pinReusePrevention`; CHG-CRD-002), because it is valid only on a registered workstation (see `LoginRequest.method`). **Every other session of the principal is ended** on success, since a credential changed because it leaked is not fixed while the leaked one is still signed in.
+**What it writes** (14 October 2026, CHG-CRD-001, ADAM CR-078): the principal's `identity.principal_credential` row for `method` takes the new PHC hash (ADR-0071), `setAt` now, `failedAttempts` 0 and `lockedUntil` null; the replaced hash goes to `identity.principal_credential_history`, which the reuse check reads; and a successful change **clears `Principal.mustChangeCredential`**, so the session that signed in with a temporary credential becomes usable. **A wrong `currentCredential` is 422 `current-credential-wrong`, not 401**: the session is valid and stays signed in; the wrong attempt counts towards the lockout like a wrong sign-in, and at the threshold the method locks (429 `credential-locked`). A principal provisioned by single sign-on (`Principal.ssoProviderId`) has no local password to change: `method: password` is 409 `credential-managed-by-sso` (a PIN issued to them by `resetPrincipalCredential` is changed here like anyone's).
 
 |  |  |
 |---|---|
@@ -1231,8 +1260,8 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.password_policy`, `identity.principal`, `identity.principal_credential` |
-| Writes | `cache:idempotency`, `identity.principal_credential`, `identity.session` |
+| Reads | `cache:idempotency`, `identity.password_policy`, `identity.principal`, `identity.principal_credential`, `identity.principal_credential_history` |
+| Writes | `cache:idempotency`, `identity.principal`, `identity.principal_credential`, `identity.principal_credential_history`, `identity.session` |
 | Called by | ADM-001, ADM-699, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
@@ -1245,9 +1274,9 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| method | enum (password, pin) | yes | Which credential is being changed. |
-| currentCredential | string | yes | (max length 512) |
-| newCredential | string | yes | (max length 512) |
+| method | enum (password, pin) | yes | Which credential is being changed (PrincipalCredential.method). |
+| currentCredential | string | yes | Compared with the current credentialHash and never stored. (max length 512) |
+| newCredential | string | yes | Stored as the new credentialHash (a PHC string, ADR-0071); the replaced hash moves to identity.principal_credential_history. (max length 512) |
 
 **Responses**
 
@@ -1256,8 +1285,9 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length 
 | 204 |  | Changed. |
 | 400 | BadRequest | Validation failed |
 | 401 | Unauthorized | Missing, expired or superseded session |
-| 422 |  | The new credential fails the password policy, or matches the current one or any of the previous PasswordPolicy.reusePreventionCount credentials (5 unless the tenant sets another; decided 28 September… |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+| 409 |  | A password change for a principal provisioned by single sign-on, who has no local password (Principal.ssoProviderId set; 14 October 2026, CHG-CRD-001). |
+| 422 |  | One problem type per cause (14 October 2026, CHG-CRD-001, ADAM CR-078; common.yaml Problem): current-credential-wrong, currentCredential does not match the stored hash (a 422, not a 401, because the… |
+| 429 |  | The request budget is exceeded (rate-limited), or wrong current credentials reached the lockout threshold and the method is locked until PrincipalCredential.lockedUntil (credential-locked, CHG-CRD-00… |
 
 ### exportSubjectData
 
@@ -1266,6 +1296,10 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length 
 BL-149. **A subject access request has a statutory clock**, and answering it by hand across twenty-seven contracts is how a venue misses it.
 **Assembled from the lineage, not from a hand-written list.** `api-data-lineage.json` already knows which tables hold subject data, so the export is derived rather than maintained — **a hand-maintained list of personal data is a list that drifts the first time somebody adds a column.**
 Includes what is held and where it came from. **Excludes another guest's data even where the two share a booking**, which is the case that makes this harder than a table dump.
+
+**The orders and entitlements it lists come from Identity's own projection** (ADAM CR-084, decided 14 October 2026, CHG-GDL-002): `identity.subject_holding` (`SubjectHolding`), kept from the order and entitlement events, gives each order and entitlement the guest holds with its status and validity. Identity is Foundation and reads nothing above it (ADR-0028), and Access is another deployable (ADR-0055 rule 4), so the export reads neither orders.sales_order nor access.entitlement.
+
+**The request is an Approvals request, as for `deleteGuestAccount`.** `requestId` is the `approvals.request` id, raised through Approvals' in-process `createApprovalRequest` (ADR-0055 rule 3); the guest's own export needs no human approval step and the tenant's matrix may add one. Only where the guest is linked across cells (`GuestSession.guestLinkId`; ADR-0010) does the export job also call cross-region `createDsarRequest` (`kind: access`, `serviceAuth`), which raises the cross-cell sync.dsar_request; an unlinked guest raises no DSAR record.
 
 |  |  |
 |---|---|
@@ -1276,8 +1310,8 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `access.entitlement`, `cache:idempotency`, `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile`, `orders.sales_order`, `pii.subject` |
-| Writes | `cache:idempotency`, `platform.dsar_request` |
+| Reads | `cache:idempotency`, `identity.subject_holding`, `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile`, `pii.subject` |
+| Writes | `approvals.request`, `cache:idempotency` |
 | Called by | GST-066, WEB-024 |
 
 **Parameters**
@@ -1297,15 +1331,15 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| requestId | string | yes | The data-subject request raised for this export. |
+| requestId | string | yes | The approvals.request id of the export request (raised through Approvals' createApprovalRequest), CHG-GDL-002. |
 | format | enum (json, csv, pdf) | yes | The format asked for, or json when the request named none. |
-| estimatedCompletionAt | string (date-time) |  | (nullable) |
+| estimatedCompletionAt | string (date-time) |  | Null until a response period reaches Identity, as for deleteGuestAccount (the periods are marketing-crm setPrivacyRequestTypes deadlines[].responseDays, which Identity does not read). (nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 202 |  | Export started, as a data-subject request (platform.dsar_request). |
+| 202 |  | Export started, as an Approvals request (and, for a guest linked across cells, a cross-cell sync.dsar_request raised by createDsarRequest). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### forceLogout
@@ -1324,8 +1358,8 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Offline | no |
 | Conflict policy | append |
 | Step-up auth | pin |
-| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `identity.principal_credential`, `identity.session`, `platform.workstation` |
-| Writes | `cache:idempotency`, `identity.session` |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.password_policy`, `identity.principal`, `identity.principal_credential`, `identity.session`, `platform.workstation` |
+| Writes | `cache:idempotency`, `identity.principal_credential`, `identity.session` |
 | Called by | BO-053, POS-000 |
 | State model | Operator session ([states/operator-session.yaml](../../../states/operator-session.yaml)): moves `active` -> `terminated` |
 
@@ -1405,6 +1439,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | workstation.timezone | string |  |  |
 | workstation.cellName | string |  | The cell serving this workstation's region. |
 | workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
+| workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | openedAt | string (date-time) |  |  |
 | expiresAt | string (date-time) |  |  |
 
@@ -1495,6 +1530,7 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 **`GET /guests/{subjectId}/delegations`**: Who may act for this guest, and for whom they may act
 
 CF-132. **Both directions, because a guest is usually in both.** A parent holds authority over two children and is a member of a corporate account — one screen, one question.
+**Ordered by `createdAt` descending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the cursor pages the grants, and each of the two arrays keeps that order, so the newest delegation is first in either direction.
 
 |  |  |
 |---|---|
@@ -1576,6 +1612,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 **`POST /auth/login`**: Authenticate and open a session
 
 One sign-in for every staff and partner door. **A browser door sends no `workstationId`** (the TICVAI Console ADM-001, Venue Management SUP-001, the partner portal PTR-001): a desk browser is not a registered device, and requiring one locked every web door out (CHG-DOOR-001, Chinmay, 2 October 2026: fix the Block A blockers now). **A device door sends it** (the till POS-000, the staff handheld EMP-001, the scanner SCN-001), and a device-bound `method` (`pin`, `card`, `rfid`) without it is refused 400 (problem type `workstation-required`), because the device is what bounds a PIN. Nothing else about the sign-in changes: the second factor is asked by permission (audit R135), five wrong codes lock step-up (R126), a second sign-in is refused 409 (R184), and several roles mean a role prompt (ADR-0003). Where the tenant has SSO, the same doors offer `startSsoAuthorization` / `completeSsoAuthorization`, which return the same `LoginResponse`.
+**The credential is checked against `identity.principal_credential`** (`PrincipalCredential`, 14 October 2026, CHG-CRD-001, ADAM CR-078): the row for the principal and `method`, its PHC hash (ADR-0071), and its lockout. A wrong password or PIN adds to `failedAttempts`; at `PasswordPolicy.lockoutAfterAttempts` (password) or `pinLockoutAfterAttempts` (PIN) the method is locked until `lockedUntil`, and a locked method is refused 429 `credential-locked` without the credential being checked. A PIN must be `PasswordPolicy.pinLength` digits. **A principal provisioned by single sign-on** (`Principal.ssoProviderId`) has no local password: a `password` sign-in, or a `pin` sign-in before `resetPrincipalCredential` has issued a PIN, is refused 401 `sso-sign-in-required`, and the door offers `startSsoAuthorization`. A temporary credential (`Principal.mustChangeCredential`) signs in with `LoginResponse.mustChangeCredential` true.
 
 |  |  |
 |---|---|
@@ -1585,8 +1622,8 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.mfa_method`, `identity.principal`, `identity.principal_credential`, `identity.role` |
-| Writes | `cache:idempotency`, `identity.refresh_token`, `identity.session`, `platform.outbox` |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.mfa_method`, `identity.password_policy`, `identity.principal`, `identity.principal_credential`, `identity.role` |
+| Writes | `cache:idempotency`, `identity.principal_credential`, `identity.refresh_token`, `identity.session`, `platform.outbox` |
 | Called by | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
@@ -1612,6 +1649,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
 | refreshToken | string | yes |  |
 | expiresIn | integer | yes | Seconds |
+| mustChangeCredential | boolean | yes | The credential just used is temporary (14 October 2026, CHG-CRD-001, ADAM CR-078): the principal's Principal.mustChangeCredential, set at creation and by resetPrincipalCredential. |
 | requiresRoleSelection | boolean | yes |  |
 | requiresMfa | boolean | yes | True when the principal holds any permission listed in PasswordPolicy.mfaRequiredForPermissions (decided 28 September, audit R135). |
 | hasMfaMethod | boolean |  | Whether the principal has an active MFA method. |
@@ -1628,7 +1666,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | availableRoles[].id | string (uuid) | yes |  |
 | availableRoles[].code | string | yes |  |
 | availableRoles[].name | string | yes |  |
-| availableRoles[].isPrimary | boolean |  |  |
+| availableRoles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
 | session | Session |  |  |
 | session.sessionId | string (uuid) | yes |  |
 | session.principalId | string (uuid) | yes |  |
@@ -1657,6 +1695,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | session.workstation.timezone | string |  |  |
 | session.workstation.cellName | string |  | The cell serving this workstation's region. |
 | session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
+| session.workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | session.openedAt | string (date-time) |  |  |
 | session.expiresAt | string (date-time) |  |  |
 
@@ -1666,9 +1705,9 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 |---|---|---|
 | 200 |  | Authenticated. |
 | 400 | BadRequest | Validation failed |
-| 401 | Unauthorized | Missing, expired or superseded session |
+| 401 |  | The username and credential do not match (unauthenticated; one answer for an unknown username and a wrong credential), or the principal signs in only through the tenant's single sign-on (sso-sign-in-… |
 | 409 |  | An active session already exists for this principal on another device. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+| 429 |  | The request budget is exceeded (rate-limited), or this principal's password or PIN is locked after too many wrong attempts (credential-locked, 14 October 2026, CHG-CRD-001): PrincipalCredential.locke… |
 
 ### refreshToken
 
@@ -1782,6 +1821,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | workstation.timezone | string |  |  |
 | workstation.cellName | string |  | The cell serving this workstation's region. |
 | workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
+| workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | openedAt | string (date-time) |  |  |
 | expiresAt | string (date-time) |  |  |
 
@@ -1878,6 +1918,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 
 BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats composition, and `requireBreachCheck` stops more account takeovers than every composition rule combined.
 **`maxAgeDays` defaults to null on purpose** — forced rotation produces `Summer2026!` becoming `Summer2027!`. It exists because some tenants are contractually obliged to have it.
+**The PIN rule is the tenant's choice, from three drop-downs** (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): `pinLength` (4, 6 or 8 digits), `pinReusePrevention` (none, last 3, last 5) and `pinLockoutAfterAttempts` (3, 5 or 10). This operation and `getPasswordPolicy` carry them with the rest of the policy. **The floor rules apply to passwords only** (audit R126: `minLength` never below 8, the `mfaRequiredForPermissions` floor); a value outside a PIN setting's options is a 400 like any other enum.
 
 |  |  |
 |---|---|
@@ -1914,10 +1955,13 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | deviceRestriction.allowedCountries | array of string |  |  |
 | deviceRestriction.requireRegisteredDevice | boolean |  | (default False) |
 | deviceRestriction.onViolation | enum (warn, requireStepUp, block) |  | (default requireStepUp) |
-| lockoutAfterAttempts | integer |  | (default 10) |
+| lockoutAfterAttempts | integer |  | Wrong passwords before a staff password is locked for lockoutMinutes, counted in PrincipalCredential.failedAttempts (14 October 2026, CHG-CRD-001). (default 10) |
 | lockoutMinutes | integer |  | A temporary lockout, not a permanent one. (default 15) |
 | forceChangeOnFirstLogon | boolean |  | (default True) |
-| reusePreventionCount | integer |  | How many previous credentials a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). (min 0; max 24; default 5) |
+| reusePreventionCount | integer |  | How many previous passwords a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). (min 0; max 24; default 5) |
+| pinLength | enum (4, 6, 8) |  | How many digits a staff PIN has, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078: "Give those as options that they select as a drop down"; CHG-CRD-002). (default 4) |
+| pinReusePrevention | enum (none, last3, last5) |  | Whether a new PIN may repeat an old one, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): none lets a PIN be reused, last3 and last5 refuse the c… (default last5) |
+| pinLockoutAfterAttempts | enum (3, 5, 10) |  | Wrong PINs before the PIN is locked, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002). (default 5) |
 | mfaRequiredForPermissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | Step-up rather than blanket MFA. (default ['ROLE_MANAGE', 'LEDGER_APPROVE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_TENANT_ACCESS', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY']) |
 
 **Response**: `PasswordPolicy`
@@ -1936,10 +1980,13 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | deviceRestriction.allowedCountries | array of string |  |  |
 | deviceRestriction.requireRegisteredDevice | boolean |  | (default False) |
 | deviceRestriction.onViolation | enum (warn, requireStepUp, block) |  | (default requireStepUp) |
-| lockoutAfterAttempts | integer |  | (default 10) |
+| lockoutAfterAttempts | integer |  | Wrong passwords before a staff password is locked for lockoutMinutes, counted in PrincipalCredential.failedAttempts (14 October 2026, CHG-CRD-001). (default 10) |
 | lockoutMinutes | integer |  | A temporary lockout, not a permanent one. (default 15) |
 | forceChangeOnFirstLogon | boolean |  | (default True) |
-| reusePreventionCount | integer |  | How many previous credentials a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). (min 0; max 24; default 5) |
+| reusePreventionCount | integer |  | How many previous passwords a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). (min 0; max 24; default 5) |
+| pinLength | enum (4, 6, 8) |  | How many digits a staff PIN has, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078: "Give those as options that they select as a drop down"; CHG-CRD-002). (default 4) |
+| pinReusePrevention | enum (none, last3, last5) |  | Whether a new PIN may repeat an old one, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): none lets a PIN be reused, last3 and last5 refuse the c… (default last5) |
+| pinLockoutAfterAttempts | enum (3, 5, 10) |  | Wrong PINs before the PIN is locked, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002). (default 5) |
 | mfaRequiredForPermissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | Step-up rather than blanket MFA. (default ['ROLE_MANAGE', 'LEDGER_APPROVE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_TENANT_ACCESS', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY']) |
 
 **Responses**
@@ -1984,7 +2031,7 @@ BL-147, 3.3.31. **Checked at grant time, not at use time** — discovering the c
 | rules[].name | string |  |  |
 | rules[].permissionA | string | yes |  |
 | rules[].permissionB | string | yes |  |
-| rules[].severity | enum (block, requireApproval, warn) | yes |  |
+| rules[].severity | enum (block, requireApproval, warn) | yes | What each severity does (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). |
 | rules[].rationale | string |  | Why these two conflict, in words an auditor reads. |
 | rules[].scopeSensitive | boolean |  | Whether the two permissions must overlap in scope to conflict, and this is not scopePath below — that one is the partition key and says where the rule *row* lives (ADR-0005), not where the *conflict*… (default True) |
 | rules[].allowWithCompensatingControl | boolean |  | A small venue cannot always separate duties, and pretending otherwise means the rule gets disabled entirely. (default False) |
@@ -2073,7 +2120,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_method` |
+| Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_method`, `identity.session` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge` |
 | Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, GST-073, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
 
@@ -2232,7 +2279,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code` |
+| Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code`, `identity.password_policy` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code`, `identity.session`, `platform.outbox` |
 | Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, GST-073, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
 
@@ -2283,6 +2330,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | session.workstation.timezone | string |  |  |
 | session.workstation.cellName | string |  | The cell serving this workstation's region. |
 | session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
+| session.workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | session.openedAt | string (date-time) |  |  |
 | session.expiresAt | string (date-time) |  |  |
 
@@ -2355,6 +2403,8 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 
 Who is logged in, on which workstation, since when. There was previously no way to see this — only to terminate a session someone already knew about.
 **Callable on the POS-000 door with no session, under a supervisor's PIN step-up** (Chinmay, 3 October 2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`), and carries the supervisor's own principal and PIN (the `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The PIN is verified against the principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT` at the till's venue, and the call reaches only the sessions at that one till (`workstationId` is required then). Anything else is `403 supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up: it authorises this one call. With a session (BO-053 Staff Directory) the caller's own `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
+
+**Ordered by `startedAt` descending, `sessionId` as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the session that began last is first, which on a till is the one somebody is asking about.
 
 |  |  |
 |---|---|
@@ -2462,7 +2512,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | subject_id | uuid | yes |  |
-| password_hash | text | yes | Argon2id, with its parameters, never the password. |
+| password_hash | text | yes | Argon2id, with its parameters, never the password: the self-describing PHC string (ADR-0071). |
 | failed_attempts | integer | yes |  |
 | locked_until | timestamptz | no |  |
 | password_set_at | timestamptz | no |  |
@@ -2516,8 +2566,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
-| principal_id | uuid | yes | Points at identity.principal. |
+| id | uuid | yes | The challengeId the client verifies. |
+| principal_id | uuid | yes |  |
+| method_id | uuid | no | The identity.mfa_method asked; null means the principal's primary method. |
+| action | text | yes | What the step-up is for (signIn at sign-in). |
+| session_id | uuid | no | The session the challenge, and the step-up it proves, are bound to (CHG-RUL-020). |
+| code_hash | text | no | The PHC hash (ADR-0071) of a code the server sent (emailOtp); null for an authenticator (totp), whose code is computed, never sent. |
+| status | text | yes |  |
+| failed_attempts | integer | yes |  |
+| expires_at | timestamptz | yes |  |
+| verified_at | timestamptz | no |  |
+| consumed_at | timestamptz | no | When the operation that demanded the step-up used it. |
+| voided_at | timestamptz | no | Voided by the fifth wrong code or by a newer challenge for the same action. |
 
 ### `identity.mfa_method`
 
@@ -2537,15 +2597,28 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| principal_id | uuid | yes |  |
+| code_hash | text | yes | The PHC hash of the code (ADR-0071), never the code. |
+| issued_at | timestamptz | yes |  |
+| used_at | timestamptz | no | Set when the code is used; a used code never works again. |
 | id | uuid | yes | Synthesised key. |
-| principal_id | uuid | no | Points at identity.principal. |
 
 ### `identity.otp_challenge`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| subject_id | uuid | no |  |
+| identifier_hash | text | yes | The email or mobile number, normalised and hashed with the tenant key (the same keyed hash identity.credentialResetRequested carries), so a lookup needs no plaintext contact here. |
+| channel | text | yes | emailLink is verifyGuestEmail's single-use link. |
+| purpose | text | yes |  |
+| code_hash | text | yes | The PHC hash of the code or link token (ADR-0071), never the code. |
+| failed_attempts | integer | yes |  |
+| attempt_limit | integer | yes | VenueSettings.identity.guestOtpMaxAttempts when the code was sent (audit R094); reaching it invalidates the code. |
+| expires_at | timestamptz | yes |  |
+| resend_after | timestamptz | no |  |
+| consumed_at | timestamptz | no |  |
+| invalidated_at | timestamptz | no | Set by the attempt limit or by a newer code for the same identifier and purpose. |
 | id | uuid | yes | Synthesised key. |
-| subject_id | uuid | yes | Points at pii.subject. |
 
 ### `identity.password_policy`
 
@@ -2559,10 +2632,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recovery_methods | text[] | no | BL-132. |
 | max_concurrent_sessions | integer | no | BL-145. |
 | device_restriction | jsonb | no | BL-146. |
-| lockout_after_attempts | integer | no |  |
+| lockout_after_attempts | integer | no | Wrong passwords before a staff password is locked for lockoutMinutes, counted in PrincipalCredential.failedAttempts (14 October 2026, CHG-CRD-001). |
 | lockout_minutes | integer | no | A temporary lockout, not a permanent one. |
 | force_change_on_first_logon | boolean | no |  |
-| reuse_prevention_count | integer | no | How many previous credentials a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). |
+| reuse_prevention_count | integer | no | How many previous passwords a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). |
+| pin_length | integer | no | How many digits a staff PIN has, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078: "Give those as options that they select as a drop down"; CHG-CRD-002). |
+| pin_reuse_prevention | text | no | Whether a new PIN may repeat an old one, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): none lets a PIN be reused, last3 and last5 refuse the c… |
+| pin_lockout_after_attempts | integer | no | Wrong PINs before the PIN is locked, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002). |
 | mfa_required_for_permissions | text[] | no | Step-up rather than blanket MFA. |
 
 ### `identity.platform_staff_grant`
@@ -2591,14 +2667,30 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_to | timestamptz | no | Past this, resolution returns DENY regardless of grants. |
 | primary_role_id | uuid | no | Determines the landing screen when the principal holds several roles and picks one at login. |
 | last_login_at | timestamptz | no |  |
+| must_change_credential | boolean | no | The principal must replace their credential before the session is usable (14 October 2026, CHG-CRD-001, ADAM CR-078; createPrincipal took it and nothing stored it). |
+| sso_provider_id | uuid | no | Set when single sign-on provisioned this principal (completeSsoAuthorization, from the tenant's identity.sso_provider; 14 October 2026, CHG-CRD-001). |
 | home_scope_id | uuid | no | Points at platform.org_unit. |
 
 ### `identity.principal_credential`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| principal_id | uuid | yes | The principal this credential signs in. |
+| method | text | yes | Which secret this row holds. |
+| credential_hash | text | yes | A self-describing PHC string, $argon2id$v=19$m=<KiB>,t=<passes>,p=<lanes>$<salt>$<hash> (ADR-0071): the algorithm and its parameters travel with the hash, so raising the parameters re-hashes at the n… |
+| set_at | timestamptz | yes | When this credential was set; PasswordPolicy.maxAgeDays, where a tenant sets it, counts from here. |
+| failed_attempts | integer | yes | Consecutive wrong attempts since the last correct one. |
+| locked_until | timestamptz | no | A temporary lock, never a permanent one (PasswordPolicy.lockoutMinutes). |
 | id | uuid | yes | Synthesised key. |
-| principal_id | uuid | no | Points at identity.principal. |
+
+### `identity.principal_credential_history`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| principal_credential_id | uuid | yes | The parent row. |
+| credential_hash | text | yes | The replaced credential's PHC string (ADR-0071), never the credential. |
+| replaced_at | timestamptz | yes | When it stopped being the current credential. |
 
 ### `identity.refresh_token`
 
@@ -2626,8 +2718,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | inherits_from_role_id | uuid | no | Role composition, one level deep and no deeper. |
 | is_system | boolean | no | Seeded roles ship and are editable; deleting one is refused. |
 | preset_code | text | no | The preset this role was started from, for the record only (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of createRole.presetCodes, or null for a role ticked by hand. |
-| principal_count | integer | no |  |
-| grant_count | integer | no |  |
 
 ### `identity.role_permission`
 
@@ -2648,7 +2738,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | name | text | no |  |
 | permission_a | text | yes |  |
 | permission_b | text | yes |  |
-| severity | text | yes |  |
+| severity | text | yes | What each severity does (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). |
 | rationale | text | no | Why these two conflict, in words an auditor reads. |
 | scope_sensitive | boolean | no | Whether the two permissions must overlap in scope to conflict, and this is not scopePath below — that one is the partition key and says where the rule *row* lives (ADR-0005), not where the *conflict*… |
 | allow_with_compensating_control | boolean | no | A small venue cannot always separate duties, and pretending otherwise means the rule gets disabled entirely. |
@@ -2670,6 +2760,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 | started_at | timestamptz | yes |  |
 | last_seen_at | timestamptz | yes |  |
 | id | uuid | yes | Synthesised key. |
+
+### `identity.subject_holding`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| subject_id | uuid | no | The guest who holds it (pii.subject). |
+| holding_kind | text | yes |  |
+| holding_id | uuid | yes | The order id (orders.sales_order.id) or the entitlement id (access.entitlement.id). |
+| order_id | uuid | no | For an entitlement, the order it was issued from (null for one an invitation issued), so a refund of that order reaches its entitlements. |
+| order_line_id | uuid | no | For an entitlement, the order line it was issued from, so a partial refund reaches only its lines. |
+| status | text | yes | The owner's status value as the last event applied gave it, an OrderStatus value for an order and an EntitlementStatus value for an entitlement. |
+| valid_to | timestamptz | no | For an entitlement, the end of its validity; null for an order. |
+| last_event_at | timestamptz | no | The occurredAt of the event last applied to the row; an older redelivery changes nothing. |
+| updated_at | timestamptz | yes |  |
 
 ### `pii.subject`
 
@@ -2721,12 +2826,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-54 operations, added to this service in later releases without changing any of the above.
+57 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
-| identity | `decideGuestIdentityVerification`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage` |
+| identity | `decideGuestIdentityVerification`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |
 | sso | `completeSsoAuthorization`, `getSsoConfig`, `listSsoProviders`, `setSsoConfig`, `startSsoAuthorization` |

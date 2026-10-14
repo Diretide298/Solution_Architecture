@@ -262,7 +262,7 @@
  },
  "Outlet": {
   "type": "object",
-  "x-ticvai-persistence": "platform.outlet",
+  "x-ticvai-persistence": "platform.outlet + platform.outlet_opening_hour",
   "required": [
    "id",
    "code",
@@ -278,7 +278,9 @@
    },
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "Unique within the venue (`409 duplicate-code`; ADAM CR-074, CHG-DDL-008): the database holds it with a unique index on (venue_id, code), so two concurrent creates cannot both keep one code.\n"
    },
    "name": {
     "type": "string",
@@ -361,7 +363,7 @@
    },
    "openingHours": {
     "type": "array",
-    "description": "The weekly pattern, one entry per window. Several windows on a day are allowed.",
+    "description": "The weekly pattern, one entry per window. Several windows on a day are allowed. **Stored as rows of `platform.outlet_opening_hour`, one per window, keyed to the outlet** (ADAM CR-073, CHG-DDL-007): `createOutlet` writes them, `updateOutlet` replaces them all, `getOutlet` and `listOutlets` read them back.\n",
     "items": {
      "$ref": "#/components/schemas/OpeningHoursWindow"
     }

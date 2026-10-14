@@ -96,7 +96,7 @@ spread the problem.
 | `principal_deactivation_reason` | Deactivation always carries a reason. "Who disabled this and why" is the first question after an incident |
 | `mfa_active_requires_verification` | A method cannot be active before it is verified — enrolling then enforcing locks the principal out of their own account |
 | `subject_erasure_is_complete` | An erased subject cannot retain identifying fields. **A partial erasure that reports success is worse than a failure** |
-| `sale_board_tile_product` | A product tile with no variant is a button that does nothing. Caught here rather than by a cashier during service |
+| `sale_board_tile_variant_id_when_chk` | A product tile with no variant is a button that does nothing. Caught here rather than by a cashier during service. Derived since 14 October 2026 from `SaleBoardTile`'s `x-ticvai-required-when` (ADAM CR-080, CHG-TEN-001), with its siblings for category and action tiles; the r0 name was `sale_board_tile_product` |
 | `drop_line_collected` | Collecting more than was dropped is not partial collection |
 | `grant_unique_live` (partial unique) | One live grant per role per scope. A duplicate is a data defect, not a stronger grant |
 

@@ -34,7 +34,7 @@
     "required": null
    }
   ],
-  "requestBody": "ConsentQuestion",
+  "requestBody": "CreateConsentQuestionRequest",
   "responds": "ConsentQuestion"
  },
  "createGuidedChoice": {
@@ -1059,7 +1059,7 @@
     "required": null
    }
   ],
-  "requestBody": "ConsentQuestion",
+  "requestBody": "UpdateConsentQuestionRequest",
   "responds": "ConsentQuestion"
  },
  "updateGuidedChoice": {

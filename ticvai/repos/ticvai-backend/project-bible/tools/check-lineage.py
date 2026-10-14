@@ -41,6 +41,7 @@ import glob
 import io
 import json
 import os
+import re
 import sys
 
 import yaml
@@ -131,13 +132,28 @@ def main():
                           % (o, e["service"], ops[o], svc_of_contract[ops[o]]))
 
     # 6 — a table an operation claims to touch has to exist.
+    # **A read view is not a table** (14 October 2026, CHG-R6G-007). DB-READ-VIEWS publishes `<table>_for_<reader>` over
+    # an owner's table for bulk reads within one deployable (ADR-0055 rule 2), and the lineage names such a read by the
+    # view (check-cross-module-reads accepts it). It exists when its table does and the reader is the operation's own
+    # module; it is read, never written.
+    names_of = {}
+    for name, s in (dec.get("services") or {}).items():
+        names_of[name] = {name[:-len("Service")].lower() if name.endswith("Service") else name.lower()} | {
+            x.replace("-", "_") for x in (s.get("contracts") or []) + (s.get("schemas") or [])}
+    view = re.compile(r"^(\w+)\.(\w+)_for_([a-z0-9_]+)$")
+
+    def read_view(t, service):
+        m = view.match(t)
+        return bool(m) and f"{m.group(1)}.{m.group(2)}" in cols and m.group(3) in names_of.get(service, set())
+
     unknown = collections.Counter()
     for o, e in lin.items():
-        for t in list(e.get("reads") or []) + list(e.get("writes") or []):
-            if ":" in t:          # cache:idempotency, qdrant:knowledge — not postgres
-                continue
-            if t not in cols:
-                unknown[t] += 1
+        for kind in ("reads", "writes"):
+            for t in e.get(kind) or []:
+                if ":" in t:          # cache:idempotency, qdrant:knowledge — not postgres
+                    continue
+                if t not in cols and not (kind == "reads" and read_view(t, e.get("service"))):
+                    unknown[t] += 1
     for t, n in unknown.most_common():
         ERRORS.append("%d operation(s) read or write '%s', which is in no schema — a table "
                       "that does not exist is rebuilt by derive-schema from these entries"

@@ -1080,7 +1080,7 @@
  "DataSubjectCustomerPrivacyRequestManagementView": {
   "type": "object",
   "x-ticvai-persistence": "marketing.privacy_request",
-  "description": "One customer privacy request (pack 17.2.4 Case Information). The case layer over the cross-region `platform.dsar_request` fan-out, which it references when it raises one.",
+  "description": "One customer privacy request (pack 17.2.4 Case Information). The case layer over the cross-region `sync.dsar_request` fan-out, which it references when it raises one.",
   "required": [
    "subjectId",
    "requestType",

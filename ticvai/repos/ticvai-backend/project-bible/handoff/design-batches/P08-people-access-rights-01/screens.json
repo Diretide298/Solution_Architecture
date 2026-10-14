@@ -72,6 +72,7 @@
         "Principal.lastLoginAt"
        ],
        "operation": "listPrincipals",
+       "notes": "Ordered by display name. A venue manager lists the people homed at the venue or beneath it; the roles column is each person's live role grants, the primary one marked (14 October 2026, ADAM CR-076 and CR-077; CHG-IDR-001, CHG-IDR-002).",
        "provenance": "contract identity.yaml GET /principals"
       }
      ]
@@ -150,6 +151,20 @@
        "operation": "revokeAllSessions",
        "notes": "SESSION_FORCE_LOGOUT, for an incident (a lost device, a leaked password). Ends every session in the venues in scope, the caller's own unless they choose otherwise; the confirmation asks for the authentication code in place, because the request carries a `stepUpToken`.",
        "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Shifts still open",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.principalDisplayName",
+        "Shift.workstationId",
+        "Shift.status",
+        "Shift.openedAt"
+       ],
+       "operation": "listShifts",
+       "notes": "**Inside the Sign everyone out confirmation, before the code is asked** (14 October 2026, CHG-R6G-006). Orders' `listShifts` with `status=open` for the venue in scope: whose cash is unreconciled once they are signed out. Signing out closes no shift and moves no float (ADR-0004). Identity no longer reports open shifts in `revokeAllSessions` (it reads nothing above it, ADR-0028), so the console asks Orders, which owns them. Shown to a holder of REPORT_VIEW_WORKSTATION; absent for anyone else, and the confirmation says the shifts could not be listed.",
+       "provenance": "contract shift.yaml GET /shifts"
       },
       {
        "kind": "textField",
@@ -276,8 +291,15 @@
     "purpose": "Sign everyone in scope out after an incident, under step-up (moved here from the doors, CHG-DOOR-003)",
     "trigger": "onAction",
     "invalidates": [
-     "listActiveSessions"
+     "listActiveSessions",
+     "listShifts"
     ]
+   },
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "The shifts still open in the venue in scope (`status=open`), shown in the Sign everyone out confirmation beside revokeAllSessions, which no longer reports them (CHG-R6G-006)",
+    "trigger": "onAction"
    },
    {
     "operationId": "createMfaChallenge",
@@ -340,7 +362,7 @@
     "id": "formCreatePrincipal",
     "component": "modal",
     "trigger": "Create principal",
-    "body": "**Collects what `createPrincipal` sends before it is called.** Required: `username`, `displayName`. Optional: `initialCredential`, `mustChangeCredential`, `validTo`, `roleIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPrincipal` sends before it is called.** Required: `username`, `displayName`. Optional: `initialCredential`, `mustChangeCredential`, `validTo`, `homeScopePath`, `roleIds`. The home scope defaults to the caller's own and is picked from the nodes the caller's `USER_MANAGE` reaches; each chosen role is granted there, the first becoming the primary role (14 October 2026, ADAM CR-077; CHG-IDR-002). A `409 segregation-breach` names the rule and the two roles' permissions and keeps the form as typed (ADAM CR-079; CHG-IDR-003). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreatePrincipalRequest",
     "confirm": {
      "label": "Create principal",
@@ -354,6 +376,7 @@
       "initialCredential",
       "mustChangeCredential",
       "validTo",
+      "homeScopePath",
       "roleIds"
      ]
     },
@@ -467,6 +490,7 @@
         "Role.grantCount"
        ],
        "operation": "listRoles",
+       "notes": "**Every role of the tenant, read-only to a venue-scoped caller** (14 October 2026, ADAM CR-076; CHG-IDR-001): roles are tenant-wide, so a venue manager sees them all, in order to grant them, and cannot change them here. Ordered by name. The two counts are computed under row-level security and count only the holders the caller can see: the venue's, not the tenant's (ADAM CR-077; CHG-IDR-002).",
        "provenance": "contract identity.yaml GET /roles"
       },
       {
@@ -487,7 +511,7 @@
        "label": "Permissions by module",
        "bindsTo": "Role.permissions",
        "operation": "setRolePermissions",
-       "notes": "The per-module checklist: one group per module, every permission in exactly one module (x-ticvai-permission-modules).",
+       "notes": "The per-module checklist: one group per module, every permission in exactly one module (x-ticvai-permission-modules). **Editable only with `ROLE_MANAGE` at the tenant scope** (`setRolePermissions` is a tenant operation; 14 October 2026, ADAM CR-076, CHG-IDR-001); a caller whose `ROLE_MANAGE` is held only at a venue sees the ticks read-only. It shows the role's own permissions; inherited ones are read from the parent role (`Role.inheritsFromRoleId`).",
        "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
       }
      ]
@@ -524,12 +548,14 @@
        "kind": "primaryButton",
        "label": "Create role",
        "operation": "createRole",
+       "notes": "**Needs `ROLE_MANAGE` at the tenant scope** (`createRole` is a tenant operation since r6; 14 October 2026, ADAM CR-076, CHG-IDR-001). Shown disabled to a caller whose `ROLE_MANAGE` is held only at a venue, saying a role is created for the whole tenant by a tenant administrator.",
        "provenance": "contract identity.yaml POST /roles"
       },
       {
        "kind": "secondaryButton",
        "label": "Save role permissions",
        "operation": "setRolePermissions",
+       "notes": "**Needs `ROLE_MANAGE` at the tenant scope**, as Create role; disabled for a venue-scoped caller (ADAM CR-076; CHG-IDR-001). A `409 segregation-breach` names the rule, both permissions and, for a parent role, the inheriting role where they meet; the ticks stay as edited so one can be removed (ADAM CR-079; CHG-IDR-003).",
        "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions; wiring fix, 2 October 2026"
       },
       {
@@ -553,7 +579,7 @@
    "error": "Could not load. Names which read failed and leaves the role assignment untouched.",
    "emptyFirstRun": "No role assignment yet. Offers Create role (`createRole`).",
    "emptyNoResults": "Never shown: `listRoles` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PERMISSION_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`."
+   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PERMISSION_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`. **A venue-scoped `ROLE_MANAGE` sees every role read-only**: Create role, Save role permissions and saving a preset (`createRole`, `setRolePermissions`, `setCapabilityTemplate`) need `ROLE_MANAGE` at the tenant scope and are shown disabled, naming the tenant scope (14 October 2026, ADAM CR-076; CHG-IDR-001)."
   },
   "apis": [
    {
@@ -720,7 +746,7 @@
     "id": "formCreateRole",
     "component": "modal",
     "trigger": "Create role",
-    "body": "**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional: `description`, `presetCodes`, `permissions`. `presetCodes` fills the checklist from the chosen presets; `permissions` is the edited result. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional: `description`, `presetCodes`, `permissions`. `presetCodes` fills the checklist from the chosen presets; `permissions` is the edited result. Dismissing sends nothing; the screen behind is unchanged. A `409` stays in the dialog with what was typed: `duplicate-code` names the role already holding the code (compared case-insensitively), `segregation-breach` names the rule and both permissions, so one tick can be removed (14 October 2026, ADAM CR-079; CHG-IDR-003).",
     "confirm": {
      "label": "Create role",
      "operation": "createRole"

@@ -537,6 +537,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (mobile v4 (30 September build), verified 2026-10-01, match partial): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view *… Plan your trip → departure 07:00 → one adult (the passengers under the chosen departure)*. Differences: The chosen departure's stops are the route map above the departures, not a stop list; the passengers sit under the departures on the same screen (Plan your trip).
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
+- ADR-0055 *A modular monolith, deployed as five units* (`docs/adr/0055-a-modular-monolith-deployed-as-five-units.md`)
 
 #### Acceptance for the design
 
@@ -720,6 +721,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (mobile v4 (30 September build), verified 2026-10-01, match exact): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view *… Plan your trip → Multi-trip (multi-trip cards for this route)*
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
+- ADR-0055 *A modular monolith, deployed as five units* (`docs/adr/0055-a-modular-monolith-deployed-as-five-units.md`)
 
 #### Acceptance for the design
 

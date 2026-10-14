@@ -2825,6 +2825,36 @@
     "nullable": true,
     "description": "**This till's drawer limit, overriding the venue's** (`VenueSettings.cashDrawerLimit`; DEC-179; CHG-CSP-016). Null inherits the venue's. Above it the till warns and offers a cash lift.\n"
    },
+   "cashierInputMode": {
+    "type": "string",
+    "enum": [
+     "keyboard",
+     "touch",
+     "scanner",
+     "hybrid"
+    ],
+    "default": "hybrid",
+    "description": "BL-061. **How the cashier at this till enters a sale**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003): until then the request took it and nothing kept it.\n"
+   },
+   "guestDisplayContent": {
+    "type": "array",
+    "default": [
+     "lineItems"
+    ],
+    "description": "BL-061. **What the guest-facing screen shows while a sale is in progress**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003).\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "lineItems",
+      "total",
+      "loyaltyBalance",
+      "promotions",
+      "branding",
+      "upsell",
+      "queuePosition"
+     ]
+    }
+   },
    "accessPointId": {
     "type": "string",
     "format": "uuid",

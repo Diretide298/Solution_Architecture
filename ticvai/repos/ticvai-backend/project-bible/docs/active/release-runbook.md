@@ -52,11 +52,18 @@ Once everything is green:
 - **OpenProject, a release that creates nothing** (a change-request release): from any workstation,
   `python3 tools/op-release-api.py --from r<N-1> --to r<N>` (dry run), then `--apply`, with `TICVAI_OP_TOKEN`
   set. It applies only the tickets that differ between the two bundles, over the REST API, with the same rules
-  (New tickets set, started ones commented, no mail). It refuses, naming the server path, when the release creates
+  (New tickets set, started ones commented, no mail; a started ticket's text is never rewritten). It refuses, naming the server path, when the release creates
   tickets, changes links or retires tickets.
 - **Change requests:** settle them and tell their tickets with ADAM's `viewer/api/settle_changes.py
-  decisions.json` (dry run, then `--apply`).
-- **ADAM:** on the box, run `git pull` and deploy. ADAM serves `r<N>`, and `/ticket` shows each developer what changed since their pin.
+  decisions.json` (dry run, then `--apply`), or on ADAM's Changes page, which tells the ticket the same way
+  (CHG-ADM-002): a ticket that is not closed gets one comment for the AI agent that pulls it; a closed one
+  gets a child task for the change, created before the CR is marked Done. Never two tickets or two identical
+  comments per CR. Migration work a CR causes is a child task of the affected MIG-* ticket for the migration
+  owner, filed by the lead. If ADAM cannot create a child task (its apply answers 502 behind the proxy), make it
+  on the OpenProject server with `tools/op-create.rb`, subject `[CR-nnn] ...`, under the CR's ticket, then record
+  it in ADAM with `settle_changes.py --link-existing` (or `POST /api/changes/<n>/ticket/link`, admin) (CHG-ADM-003).
+- **ADAM:** on the box, run `git pull` and deploy. ADAM serves `r<N>`, and every developer and agent is always
+  on the latest release: their next `/ticket` is at `r<N>` and shows what changed since their previous pull.
 - **Client:** send the release note, `python tools/release-notes.py r<N-1> r<N>`: what their answers changed, and what is waiting on them.
 
 ## 7. Re-audit, every release
@@ -89,17 +96,25 @@ generator rule or a template field, and it must fail on the commit before the fi
 and says so). `prevention: none` needs a reason and the lead's approval. A new root class gets its check
 before its fix merges (`change-rules.md` CR-7).
 
-**R3. Triage.** Every CR is triaged `blocker` (fixed in the next release, even on started tickets, as a
-delta), `fix-forward` (into unstarted tickets at the next tag) or `defer` (logged, open). The lead triages
+**R3. Triage.** Every CR is triaged `blocker` (fixed in the next release, even on started tickets: a comment
+for the agent, or a child task when the ticket is closed, R5), `fix-forward` (into unstarted tickets at the next tag) or `defer` (logged, open). The lead triages
 in a **daily 30-minute slot**.
 
 **R4. Client sign-off.** A minutes-sourced change carries `client_signoff`. Sign-offs go to the client as
 one batch a week (contract decisions and open questions included). Silence for 5 working days after the
 batch is sent is acceptance, recorded as `by: "silence (5 working days)"` with the date.
 
-**R5. Started tickets.** A ticket past "New" is frozen. A fix to it is a comment plus a linked delta
-ticket, and ADAM keeps serving the developer's start tag until they re-pin. Unstarted tickets get the fix at
-the next tag through their pointer bodies.
+**R5. Started tickets, and always the latest release** (replaced 14 October 2026, CHG-ADM-001 and
+CHG-ADM-002). A ticket past "New" is frozen: its OpenProject text is never rewritten. Developers and agents
+always build against the latest release: every ADAM pull serves the release ADAM serves now and moves the
+ticket to it (the pin moves by itself, logged `auto`), and `/ticket` says what changed since the ticket's
+previous pull. Nobody chooses or asks between releases. A fix to a started ticket reaches it when its CR is
+settled: a ticket that is not closed gets a comment written for the AI agent that pulls it (and the pull's
+README.md lists the CR, its decision and its release under "Change requests on this ticket"); a closed
+ticket gets a **child task** for the change, created before the CR is marked Done. A CR's work is one child
+task of the ticket it was raised from; migration work it causes is a child task of the affected MIG-*
+ticket, assigned to the migration owner (`docs/active/team.json` `migrations.owner`). Unstarted tickets get
+the fix at the next tag through their pointer bodies.
 
 **R6. The release window.** Releases go out on Tuesday and Friday. No spec edits on Monday or Thursday after
 the noon CR cut-off. Edits wait for the next window.
@@ -130,6 +145,10 @@ screen against three operation properties: its audience, whether it needs a sess
 the caller or a named customer. `check-audience-match` also reports an operation whose declared audience
 includes guests while its security admits no guest. They are report-only until the guest fixes and the POS loyalty swap land.
 The lead then records each baseline (`--update-baseline`) and takes the check out of `REPORT_ONLY`.
+**`check-audience-match` gates since 14 October 2026** (CHG-SWP-002): the guest fixes had landed (no guest-screen
+finding on r6), its baseline is recorded, and it also holds every app's feature ticket to the app's audience
+(AM-TICKET-OP, after #27741 listed the staff-only `searchGuests` on the guest app). `check-preauth-session` and
+`check-subject` stay report-only until the POS loyalty swap.
 
 **R12. Canary.** After each release, one AI session pulls **5 tickets** through ADAM at the new tag, as a
 developer would. A problem it finds is a CR. This comes before the wider §7 sample.

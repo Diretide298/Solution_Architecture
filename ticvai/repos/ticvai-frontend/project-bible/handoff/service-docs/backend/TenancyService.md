@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy`, `kernel` |
-| Operations in the slice | 32 of 212 |
+| Operations in the slice | 32 of 213 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -24,7 +24,9 @@
 | Service | Tables it reads |
 |---|---|
 | [AccessService](AccessService.md) | `access.access_point` |
+| [CatalogueService](CatalogueService.md) | `catalogue.product`, `catalogue.variant` |
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
+| [OrderService](OrderService.md) | `orders.pos_shift` |
 | [PlatformService](PlatformService.md) | `control.api_client` |
 
 ## Operations in the first release
@@ -582,6 +584,7 @@ POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found
 A role that grants no permissions is not a role, and until now a venue could create one and never give it anything.
 **The whole set in one call.** A permission added one at a time leaves a role briefly holding a combination nobody intended, and **a segregation-of-duties rule evaluated against that intermediate state either fires wrongly or misses.**
 **Refused where it breaches a `SegregationRule`.** The refusal names the rule and the two permissions in conflict — a venue told only *not allowed* will grant it another way.
+**The role-time check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). Every rule is evaluated against the role's own permissions (this body) united with those of `inheritsFromRoleId`, **whatever the rule's `scopeSensitive`**: a role's permissions are granted together at one scope, so a pair inside a role always overlaps. Only `severity: block` refuses, with `409 segregation-breach` (`common.yaml`), the one type and status every segregation check answers with; `requireApproval` and `warn` are accepted and surface when a grant attaches the role and in `listSegregationViolations`. **A parent role's edit re-checks every role that inherits from it** (its own set united with the new one); a breach there refuses this call too, naming the child role. Each change writes one `platform.audit_record` row in the same transaction.
 **No escalated permission** (decided 28 September, audit R197): a role's permission set has no value to set a threshold on, and an escalation that repeated `ROLE_MANAGE` gated nothing. The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a permission ends the live sessions of every principal holding the role at once** (audit R126); an addition takes effect at their next sign-in.
 **The checklist a preset filled stays editable here** (decided 2 October 2026, Chinmay, pre-apply round: roles are preset permission configurations; DEC-007; CHG-CSP-003). A role started from the Viewer preset is given more ticks with this call like any other role; the preset is not consulted and not changed.
 
@@ -625,7 +628,7 @@ A role that grants no permissions is not a role, and until now a venue could cre
 |---|---|---|
 | 200 |  | Set. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | Breaches a segregation rule. |
+| 409 |  | Breaches a segregation rule whose severity is block, in this role or in a role inheriting it (segregation-breach). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -889,6 +892,7 @@ Currency, decimal scale, time zone, date format and fiscal year. These inherit t
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | The partition key (ADR-0005): the path of the region in regionId, set by the server when updateRegionSettings first saves the row, and ignored on input. (read-only) |
 | countryCode | string | yes | ISO 3166-1 alpha-2. (pattern ^[A-Z]{2}$) |
 | currencyCode | string | yes | (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Decimal places for this region's currency. (min 0; max 4) |
@@ -957,6 +961,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | The partition key (ADR-0005): the path of the region in regionId, set by the server when updateRegionSettings first saves the row, and ignored on input. (read-only) |
 | countryCode | string | yes | ISO 3166-1 alpha-2. (pattern ^[A-Z]{2}$) |
 | currencyCode | string | yes | (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Decimal places for this region's currency. (min 0; max 4) |
@@ -989,6 +994,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | The partition key (ADR-0005): the path of the region in regionId, set by the server when updateRegionSettings first saves the row, and ignored on input. (read-only) |
 | countryCode | string | yes | ISO 3166-1 alpha-2. (pattern ^[A-Z]{2}$) |
 | currencyCode | string | yes | (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Decimal places for this region's currency. (min 0; max 4) |
@@ -1051,8 +1057,8 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `approvals.decision`, `approvals.delegation`, `approvals.matrix`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
-| Writes | `approvals.request`, `cache:idempotency` |
+| Reads | `approvals.decision`, `approvals.delegation`, `approvals.escalation`, `approvals.matrix`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
+| Writes | `approvals.escalation`, `approvals.request`, `cache:idempotency` |
 | Called by | ADM-567, BO-045, BO-1010, BO-1031, BO-1080, BO-1181, BO-163, BO-243, BO-301, BO-718, BO-771, BO-922, POS-002, POS-020 |
 | State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): created as `draft` or `pending` |
 
@@ -1125,11 +1131,13 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | decisions[].signatureRef | string |  | (nullable) |
 | decisions[].decidedAt | string (date-time) | yes |  |
 | escalations | array of object |  | 11.1.48. |
-| escalations[].at | string (date-time) |  |  |
-| escalations[].reason | string |  |  |
+| escalations[].at | string (date-time) | yes |  |
+| escalations[].reason | string |  | The requester's or approver's reason; for an automatic escalation, the SLA rule that fired. (max length 300) |
 | escalations[].fromLevel | integer |  |  |
-| escalations[].toLevel | integer |  |  |
-| escalations[].wasAutomatic | boolean |  |  |
+| escalations[].toLevel | integer | yes |  |
+| escalations[].wasAutomatic | boolean | yes |  |
+| escalations[].escalatedByPrincipalId | string (uuid) |  | Who escalated it by hand (escalateApprovalRequest's caller); null for an automatic one. (nullable) |
+| escalations[].addedApproverPrincipalId | string (uuid) |  | The approver the escalation added at toLevel; the original approver stays in the chain. (nullable) |
 | resubmittedFromId | string |  | (nullable) |
 | reopenedFromId | string |  | (nullable) |
 | slaDueAt | string (date-time) |  | (nullable) |
@@ -1180,7 +1188,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `approvals.decision`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
+| Reads | `approvals.decision`, `approvals.escalation`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.decision`, `approvals.request`, `cache:idempotency`, `control.partner_agreement`, `control.partner_application`, `control.partner_change_request`, `marketing.privacy_notice_governance`, `platform.outbox` |
 | Called by | ADM-145, BO-084, BO-085, BO-243, BO-367, BO-374, BO-377, BO-378, BO-940, POS-020 |
 | State model | AccessConfigurationVersion ([states/access-configuration-version.yaml](../../../states/access-configuration-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>AccessDynamicPolicyVersion ([states/access-dynamic-policy-version.yaml](../../../states/access-dynamic-policy-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `rejected`<br/>AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `draft`<br/>AccessMediaTemplateVersion ([states/access-media-template-version.yaml](../../../states/access-media-template-version.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `rejected`<br/>AccessMediaTemplate ([states/access-media-template.yaml](../../../states/access-media-template.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`, `pending` -> `returned`, `escalated` -> `returned`, `pending` -> `informationRequested`, `escalated` -> `informationRequested`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Partner application ([states/partner-application.yaml](../../../states/partner-application.yaml)): moves `inReview` -> `approved`, `inReview` -> `rejected`<br/>Partner change request ([states/partner-change-request.yaml](../../../states/partner-change-request.yaml)): moves `pendingApproval` -> `approved`, `pendingApproval` -> `rejected`<br/>Privacy notice governance ([states/privacy-notice-governance.yaml](../../../states/privacy-notice-governance.yaml)): moves `review` -> `approved`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
@@ -1246,11 +1254,13 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | decisions[].signatureRef | string |  | (nullable) |
 | decisions[].decidedAt | string (date-time) | yes |  |
 | escalations | array of object |  | 11.1.48. |
-| escalations[].at | string (date-time) |  |  |
-| escalations[].reason | string |  |  |
+| escalations[].at | string (date-time) | yes |  |
+| escalations[].reason | string |  | The requester's or approver's reason; for an automatic escalation, the SLA rule that fired. (max length 300) |
 | escalations[].fromLevel | integer |  |  |
-| escalations[].toLevel | integer |  |  |
-| escalations[].wasAutomatic | boolean |  |  |
+| escalations[].toLevel | integer | yes |  |
+| escalations[].wasAutomatic | boolean | yes |  |
+| escalations[].escalatedByPrincipalId | string (uuid) |  | Who escalated it by hand (escalateApprovalRequest's caller); null for an automatic one. (nullable) |
+| escalations[].addedApproverPrincipalId | string (uuid) |  | The approver the escalation added at toLevel; the original approver stays in the chain. (nullable) |
 | resubmittedFromId | string |  | (nullable) |
 | reopenedFromId | string |  | (nullable) |
 | slaDueAt | string (date-time) |  | (nullable) |
@@ -1398,7 +1408,7 @@ Sorted by SLA proximity rather than age. **A request breaching in ten minutes ma
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `approvals.decision`, `approvals.request` |
+| Reads | `approvals.decision`, `approvals.escalation`, `approvals.request` |
 | Writes | - |
 | Called by | ADM-130, ADM-145, ADM-224, BO-084, BO-085, BO-1181, BO-364, BO-366, BO-367, BO-368, BO-369, BO-371, BO-374, BO-375, BO-393, BO-940, EMP-037, POS-020 |
 
@@ -1460,11 +1470,13 @@ Sorted by SLA proximity rather than age. **A request breaching in ten minutes ma
 | items[].decisions[].signatureRef | string |  | (nullable) |
 | items[].decisions[].decidedAt | string (date-time) | yes |  |
 | items[].escalations | array of object |  | 11.1.48. |
-| items[].escalations[].at | string (date-time) |  |  |
-| items[].escalations[].reason | string |  |  |
+| items[].escalations[].at | string (date-time) | yes |  |
+| items[].escalations[].reason | string |  | The requester's or approver's reason; for an automatic escalation, the SLA rule that fired. (max length 300) |
 | items[].escalations[].fromLevel | integer |  |  |
-| items[].escalations[].toLevel | integer |  |  |
-| items[].escalations[].wasAutomatic | boolean |  |  |
+| items[].escalations[].toLevel | integer | yes |  |
+| items[].escalations[].wasAutomatic | boolean | yes |  |
+| items[].escalations[].escalatedByPrincipalId | string (uuid) |  | Who escalated it by hand (escalateApprovalRequest's caller); null for an automatic one. (nullable) |
+| items[].escalations[].addedApproverPrincipalId | string (uuid) |  | The approver the escalation added at toLevel; the original approver stays in the chain. (nullable) |
 | items[].resubmittedFromId | string |  | (nullable) |
 | items[].reopenedFromId | string |  | (nullable) |
 | items[].slaDueAt | string (date-time) |  | (nullable) |
@@ -2454,8 +2466,10 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 **`PUT /workstations/{workstationId}`**: Configure a workstation
 
-**Configures an existing workstation; it never creates one** (pull audit R103). The target is the workstation in the path, and the body has no code, venue or region, which a new workstation would need — an unknown `workstationId` is `404`. `mediaStockRemaining` is `readOnly` and ignored on input.
+**Configures an existing workstation; it never creates one** (pull audit R103). The target is the workstation in the path, and the body has no code, venue or region, which a new workstation would need — an unknown `workstationId` is `404`. `loadedMediaStockId` and `mediaStockRemaining` are deprecated and ignored: nothing stores them until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer; ADAM CR-082, CHG-TEN-003).
+**PUT replaces the configuration** (pull audit R103, as `updateSaleBoard`; decided 14 October 2026, ADAM CR-082, CHG-TEN-003). The body is the workstation's whole configuration, not a patch: a field left out takes its declared default (`cashierInputMode` `hybrid`, `guestDisplayContent` `[lineItems]`, `isActive` true) or, where it has none, null (`saleBoardId`, `outletId`, `cashDrawerLimit`, `departmentId`, `accessPointId`, `edgeNodeId`) or empty (`devices`). A client that changes one setting sends back the configuration it read (`getWorkstation`) with that setting changed. `cashierInputMode` and `guestDisplayContent` are stored on the workstation and returned on `Workstation`.
 **Refused while a shift is open on this workstation** (F73, pull audit R078). Changing the rules under an open shift means it closes against rules it did not open under, so the change waits for the shift to close.
+**How it knows: it asks Orders, which owns the shift** (decided 14 October 2026, Chinmay, ADAM CR-083; CHG-TEN-004; ADR-0055 rule 2). In one transaction Tenancy first locks the workstation row (`SELECT ... FOR UPDATE` on `platform.workstation`), then calls Orders' declared query `openShiftForWorkstation(workstationId)` in process (`x-ticvai-read-via`), then writes. The lock serialises the check against `openShift`, whose insert of a shift takes a key-share lock on the same row through its foreign key, so a shift cannot open between the question and the write. **Open means every state before `closed` or `autoClosed`** (`pendingApproval`, `open`, `suspended`, `pendingClosure`, `pendingVariance`; the query's rule in shift.yaml). A shift open is `409 shift-open`, naming the shift (`WorkstationShiftOpenProblem`).
 **The till layout is the outlet's unless this till overrides it** (decided 2 October 2026, Chinmay, BO-109; DEC-183; CHG-CSP-006). `saleBoardId` is optional since 2 October: absent or null, the workstation uses its outlet's `Outlet.saleBoardId`; set, it overrides it for this till alone. A workstation with neither an outlet board nor its own is refused `422 sale-board-required`, because a till must open on something. `cashDrawerLimit` overrides the venue's drawer limit for this till (DEC-179; CHG-CSP-016).
 
 |  |  |
@@ -2467,7 +2481,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `platform.device`, `platform.workstation` |
+| Reads | `cache:idempotency`, `orders.pos_shift`, `platform.device`, `platform.workstation` |
 | Writes | `cache:idempotency`, `platform.device`, `platform.workstation` |
 | Called by | BO-036, BO-602, POS-016 |
 
@@ -2483,9 +2497,9 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | cashierInputMode | enum (keyboard, touch, scanner, hybrid) |  | BL-061. (default hybrid) |
-| guestDisplayContent | array of enum (lineItems, total, loyaltyBalance, promotions, branding, upsell, queuePosition) |  | What the guest-facing screen shows while a sale is in progress. |
-| loadedMediaStockId | string (uuid) |  | BL-095. (nullable) |
-| mediaStockRemaining | integer |  | Decremented on issue. (read-only; nullable) |
+| guestDisplayContent | array of enum (lineItems, total, loyaltyBalance, promotions, branding, upsell, queuePosition) |  | What the guest-facing screen shows while a sale is in progress. (default ['lineItems']) |
+| loadedMediaStockId | string (uuid) |  | Deprecated: not stored until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer; ADAM CR-082, CHG-TEN-003). (nullable) |
+| mediaStockRemaining | integer |  | Deprecated: not stored until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer; ADAM CR-082, CHG-TEN-003). (read-only; nullable) |
 | name | string | yes | (max length 200) |
 | saleBoardId | string (uuid) |  | This till's own layout, overriding its outlet's (DEC-183; CHG-CSP-006). (nullable) |
 | outletId | string (uuid) |  | The outlet this till stands in (CHG-CSP-006). (nullable) |
@@ -2519,6 +2533,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 | saleBoard.name | string |  |  |
 | saleBoardSource | enum (outlet, workstation) |  | Where saleBoard came from (decided 2 October 2026, Chinmay, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006): outlet when the till uses its outlet's layout, workstation when this til… (read-only) |
 | cashDrawerLimit | Money |  | This till's drawer limit, overriding the venue's (VenueSettings.cashDrawerLimit; DEC-179; CHG-CSP-016). (nullable) |
+| cashierInputMode | enum (keyboard, touch, scanner, hybrid) |  | BL-061. (default hybrid) |
+| guestDisplayContent | array of enum (lineItems, total, loyaltyBalance, promotions, branding, upsell, queuePosition) |  | BL-061. (default ['lineItems']) |
 | accessPointId | string (uuid) |  | Inherited from the workstation, never selected by the operator. (nullable) |
 | devices | array of DeviceBinding |  |  |
 | devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
@@ -2549,7 +2565,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | A shift is open on this workstation. |
+| 409 |  | A shift is open on this workstation (shift-open: Orders' openShiftForWorkstation found one in pendingApproval, open, suspended, pendingClosure or pendingVariance; ADAM CR-083, CHG-TEN-004). |
 | 422 |  | No board would apply: the request sends no saleBoardId and the workstation's outlet has none (sale-board-required; CHG-CSP-006). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2561,12 +2577,12 @@ Support hours were an open conflict for eleven days and were never a design ques
 |---|---|
 | Permission | `REGION_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `platform.outlet` non-empty |
+| Part of slice | setup, makes `platform.outlet`, `platform.outlet_opening_hour` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `platform.outlet` |
-| Writes | `cache:idempotency`, `platform.outlet` |
+| Reads | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour` |
+| Writes | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour` |
 | Called by | BO-044 |
 
 **Parameters**
@@ -2580,7 +2596,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes | (max length 64) |
+| code | string | yes | Unique within the venue (409 duplicate-code; ADAM CR-074, CHG-DDL-008): the database holds it with a unique index on (venue_id, code), so two concurrent creates cannot both keep one code. (max length 64) |
 | name | string | yes | The outlet's name in English. (max length 200) |
 | nameTranslations | OutletNameTranslations |  | The outlet's name in other languages, keyed by ISO 639-1 code (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English"; DEC-031; CHG-CSP… |
 | venueId | string (uuid) | yes |  |
@@ -2606,7 +2622,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes | (max length 64) |
+| code | string | yes | Unique within the venue (409 duplicate-code; ADAM CR-074, CHG-DDL-008): the database holds it with a unique index on (venue_id, code), so two concurrent creates cannot both keep one code. (max length 64) |
 | name | string | yes | The outlet's name in English. (max length 200) |
 | nameTranslations | OutletNameTranslations |  | The outlet's name in other languages, keyed by ISO 639-1 code (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English"; DEC-031; CHG-CSP… |
 | venueId | string (uuid) | yes |  |
@@ -2634,7 +2650,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 409 |  | Code already in use in this venue |
+| 409 |  | Code already in use in this venue (duplicate-code; Outlet.code is x-ticvai-unique per venue, CHG-DDL-008) |
 | 422 |  | The region requires a local-language name and nameTranslations lacks it (local-name-required), an opening window ends before it starts (window-ends-before-start), or producesForOutletIds names the ou… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2643,6 +2659,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 **`POST /sale-boards`**: Create a sale board
 
 Tiles reference catalogue variants and are grouped into pages. A cashier finds an item faster on a well-arranged board than through search, which is the entire reason boards exist rather than a product list.
+**Every product tile's variant is asked of Catalogue, never read from its tables** (decided 14 October 2026, Chinmay, ADAM CR-081; CHG-TEN-002; ADR-0055 rule 2). In the same transaction Tenancy calls Catalogue's declared query `variantsSellableAt(venueId, variantIds, pos)` in process (`x-ticvai-read-via`) with the variants of every `product` tile. A variant Catalogue does not know is `422 unknown-variant`; one it knows and that is not sellable at this venue on the till is `422 variant-not-sellable`. Both name each refused tile by page `sortOrder` and `position` (`SaleBoardTileProblem`). **Sellable is not `Product.isSellable`**: that needs a published bundle, and a board is how a new product reaches its first bundle, so asking it here would refuse every new product (the query's rule, catalogue.yaml `x-ticvai-queries`).
+A board `code` already used in the venue is `409 duplicate-code` (audit R108; CHG-TEN-001).
 
 |  |  |
 |---|---|
@@ -2653,7 +2671,7 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `platform.sale_board` |
+| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.variant`, `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Writes | `cache:idempotency`, `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Called by | BO-109, BO-124 |
 
@@ -2668,19 +2686,21 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes | (max length 64) |
+| code | string | yes | Unique within the venue (as the hand-written r0 table had it). (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
 | kind | SaleBoardKind: enum (ticketing, fnb, retail, mixed) | yes |  |
 | pages | array of object | yes | (min items 1) |
 | pages[].name | string | yes |  |
 | pages[].sortOrder | integer | yes |  |
-| pages[].tiles | array of object | yes |  |
+| pages[].tiles | array of SaleBoardTile | yes |  |
 | pages[].tiles[].position | integer | yes |  |
 | pages[].tiles[].kind | enum (product, category, action, spacer) | yes |  |
-| pages[].tiles[].variantId | string (uuid) |  | (nullable) |
+| pages[].tiles[].variantId | string (uuid) |  | The catalogue variant a product tile sells (catalogue.variant). (nullable) |
+| pages[].tiles[].categoryId | string (uuid) |  | The catalogue category a category tile opens (catalogue.product_category; ADAM CR-080, CHG-TEN-001). (nullable) |
+| pages[].tiles[].actionCode | enum (holdSale, recallHeld, applyDiscount, guestLookup, scanMedia, reprintReceipt) |  | The till action an action tile runs (ADAM CR-080, CHG-TEN-001). (nullable) |
 | pages[].tiles[].label | string |  |  |
-| pages[].tiles[].colour | string |  | (nullable) |
+| pages[].tiles[].colour | string |  | #rrggbb, as the hand-written r0 table held it (char(7); audit R246; CHG-TEN-001). (pattern ^#[0-9A-Fa-f]{6}$; nullable) |
 | pages[].tiles[].imageAssetRef | string |  | (nullable) |
 | isActive | boolean |  |  |
 
@@ -2689,19 +2709,21 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes | (max length 64) |
+| code | string | yes | Unique within the venue (as the hand-written r0 table had it). (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
 | kind | SaleBoardKind: enum (ticketing, fnb, retail, mixed) | yes |  |
 | pages | array of object | yes | (min items 1) |
 | pages[].name | string | yes |  |
 | pages[].sortOrder | integer | yes |  |
-| pages[].tiles | array of object | yes |  |
+| pages[].tiles | array of SaleBoardTile | yes |  |
 | pages[].tiles[].position | integer | yes |  |
 | pages[].tiles[].kind | enum (product, category, action, spacer) | yes |  |
-| pages[].tiles[].variantId | string (uuid) |  | (nullable) |
+| pages[].tiles[].variantId | string (uuid) |  | The catalogue variant a product tile sells (catalogue.variant). (nullable) |
+| pages[].tiles[].categoryId | string (uuid) |  | The catalogue category a category tile opens (catalogue.product_category; ADAM CR-080, CHG-TEN-001). (nullable) |
+| pages[].tiles[].actionCode | enum (holdSale, recallHeld, applyDiscount, guestLookup, scanMedia, reprintReceipt) |  | The till action an action tile runs (ADAM CR-080, CHG-TEN-001). (nullable) |
 | pages[].tiles[].label | string |  |  |
-| pages[].tiles[].colour | string |  | (nullable) |
+| pages[].tiles[].colour | string |  | #rrggbb, as the hand-written r0 table held it (char(7); audit R246; CHG-TEN-001). (pattern ^#[0-9A-Fa-f]{6}$; nullable) |
 | pages[].tiles[].imageAssetRef | string |  | (nullable) |
 | isActive | boolean |  |  |
 
@@ -2710,8 +2732,10 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 400 |  | A tile references an unknown or unsellable variant |
+| 409 |  | The board code is already used by another board of this venue (duplicate-code, audit R108; CHG-TEN-001). |
+| 422 |  | A product tile names a variant Catalogue does not know (unknown-variant) or one that is not sellable at this venue on the till (variant-not-sellable, the rule of catalogue#variantsSellableAt). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getOutlet
@@ -2729,7 +2753,7 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `platform.outlet` |
+| Reads | `platform.outlet`, `platform.outlet_opening_hour` |
 | Writes | - |
 | Called by | POS-021 |
 
@@ -2744,7 +2768,7 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes | (max length 64) |
+| code | string | yes | Unique within the venue (409 duplicate-code; ADAM CR-074, CHG-DDL-008): the database holds it with a unique index on (venue_id, code), so two concurrent creates cannot both keep one code. (max length 64) |
 | name | string | yes | The outlet's name in English. (max length 200) |
 | nameTranslations | OutletNameTranslations |  | The outlet's name in other languages, keyed by ISO 639-1 code (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English"; DEC-031; CHG-CSP… |
 | venueId | string (uuid) | yes |  |
@@ -2898,12 +2922,12 @@ The configured front ends a workstation may load. A board determines presentatio
 |---|---|
 | Permission | `REGION_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, changes rows of `platform.outlet` that another operation creates |
+| Part of slice | setup, changes rows of `platform.outlet`, `platform.outlet_opening_hour` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `platform.outlet` |
-| Writes | `cache:idempotency`, `platform.outlet` |
+| Reads | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour` |
+| Writes | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour` |
 | Called by | BO-044, BO-063, BO-731 |
 
 **Parameters**
@@ -2939,7 +2963,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes | (max length 64) |
+| code | string | yes | Unique within the venue (409 duplicate-code; ADAM CR-074, CHG-DDL-008): the database holds it with a unique index on (venue_id, code), so two concurrent creates cannot both keep one code. (max length 64) |
 | name | string | yes | The outlet's name in English. (max length 200) |
 | nameTranslations | OutletNameTranslations |  | The outlet's name in other languages, keyed by ISO 639-1 code (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English"; DEC-031; CHG-CSP… |
 | venueId | string (uuid) | yes |  |
@@ -2976,7 +3000,7 @@ The configured front ends a workstation may load. A board determines presentatio
 **`PUT /sale-boards/{saleBoardId}`**: Update a sale board
 
 Changes reach terminals with the next catalogue bundle, not immediately — a board that rearranged itself mid-transaction would be worse than one that lags.
-**PUT semantics** (pull audit R103). The target is the board in the path; this never creates one. The body replaces the board whole — every page and every tile — so a page or tile left out is removed. `id` is `readOnly` and ignored on input. Tiles are checked as `createSaleBoard` checks them.
+**PUT semantics** (pull audit R103). The target is the board in the path; this never creates one. The body replaces the board whole — every page and every tile — so a page or tile left out is removed. `id` is `readOnly` and ignored on input. Tiles are checked as `createSaleBoard` checks them: every product tile's variant is asked of Catalogue's `variantsSellableAt` in process, in the same transaction (ADAM CR-081; CHG-TEN-002), and a refused tile is `422 unknown-variant` or `422 variant-not-sellable`, naming the tile. A `code` already used by another board of the venue is `409 duplicate-code` (CHG-TEN-001).
 
 |  |  |
 |---|---|
@@ -2987,7 +3011,7 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `platform.sale_board` |
+| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.variant`, `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Writes | `cache:idempotency`, `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Called by | BO-109, BO-116, BO-124, BO-125, BO-126 |
 
@@ -3003,19 +3027,21 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes | (max length 64) |
+| code | string | yes | Unique within the venue (as the hand-written r0 table had it). (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
 | kind | SaleBoardKind: enum (ticketing, fnb, retail, mixed) | yes |  |
 | pages | array of object | yes | (min items 1) |
 | pages[].name | string | yes |  |
 | pages[].sortOrder | integer | yes |  |
-| pages[].tiles | array of object | yes |  |
+| pages[].tiles | array of SaleBoardTile | yes |  |
 | pages[].tiles[].position | integer | yes |  |
 | pages[].tiles[].kind | enum (product, category, action, spacer) | yes |  |
-| pages[].tiles[].variantId | string (uuid) |  | (nullable) |
+| pages[].tiles[].variantId | string (uuid) |  | The catalogue variant a product tile sells (catalogue.variant). (nullable) |
+| pages[].tiles[].categoryId | string (uuid) |  | The catalogue category a category tile opens (catalogue.product_category; ADAM CR-080, CHG-TEN-001). (nullable) |
+| pages[].tiles[].actionCode | enum (holdSale, recallHeld, applyDiscount, guestLookup, scanMedia, reprintReceipt) |  | The till action an action tile runs (ADAM CR-080, CHG-TEN-001). (nullable) |
 | pages[].tiles[].label | string |  |  |
-| pages[].tiles[].colour | string |  | (nullable) |
+| pages[].tiles[].colour | string |  | #rrggbb, as the hand-written r0 table held it (char(7); audit R246; CHG-TEN-001). (pattern ^#[0-9A-Fa-f]{6}$; nullable) |
 | pages[].tiles[].imageAssetRef | string |  | (nullable) |
 | isActive | boolean |  |  |
 
@@ -3024,19 +3050,21 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes | (max length 64) |
+| code | string | yes | Unique within the venue (as the hand-written r0 table had it). (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
 | kind | SaleBoardKind: enum (ticketing, fnb, retail, mixed) | yes |  |
 | pages | array of object | yes | (min items 1) |
 | pages[].name | string | yes |  |
 | pages[].sortOrder | integer | yes |  |
-| pages[].tiles | array of object | yes |  |
+| pages[].tiles | array of SaleBoardTile | yes |  |
 | pages[].tiles[].position | integer | yes |  |
 | pages[].tiles[].kind | enum (product, category, action, spacer) | yes |  |
-| pages[].tiles[].variantId | string (uuid) |  | (nullable) |
+| pages[].tiles[].variantId | string (uuid) |  | The catalogue variant a product tile sells (catalogue.variant). (nullable) |
+| pages[].tiles[].categoryId | string (uuid) |  | The catalogue category a category tile opens (catalogue.product_category; ADAM CR-080, CHG-TEN-001). (nullable) |
+| pages[].tiles[].actionCode | enum (holdSale, recallHeld, applyDiscount, guestLookup, scanMedia, reprintReceipt) |  | The till action an action tile runs (ADAM CR-080, CHG-TEN-001). (nullable) |
 | pages[].tiles[].label | string |  |  |
-| pages[].tiles[].colour | string |  | (nullable) |
+| pages[].tiles[].colour | string |  | #rrggbb, as the hand-written r0 table held it (char(7); audit R246; CHG-TEN-001). (pattern ^#[0-9A-Fa-f]{6}$; nullable) |
 | pages[].tiles[].imageAssetRef | string |  | (nullable) |
 | isActive | boolean |  |  |
 
@@ -3045,9 +3073,11 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 400 |  | A tile references an unknown or unsellable variant |
+| 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The board code is already used by another board of this venue (duplicate-code, audit R108; CHG-TEN-001). |
+| 422 |  | A product tile names a variant Catalogue does not know (unknown-variant) or one that is not sellable at this venue on the till (variant-not-sellable, the rule of catalogue#variantsSellableAt). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
@@ -3089,6 +3119,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 | delegation_type | text | no | The composite screen's delegationType (planned absence, temporary cover ...), for display and reporting; the engine treats every delegation alike (4 October 2026, CHG-FXC-005). |
 | max_percentage | numeric | no | A percentage cap beside maxAmount (the composite's authorityPercentage, CHG-FXC-005). |
 | required_role_id | uuid | no | A role the delegate must hold for the delegation to act (the composite's requiredRole); checked when the delegate decides, refused with 409 at creation where the delegate does not hold it (CHG-FXC-00… |
+
+### `approvals.escalation`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| request_id | text | yes | The parent row. |
+| escalated_at | timestamptz | yes |  |
+| reason | text | no | The requester's or approver's reason; for an automatic escalation, the SLA rule that fired. |
+| from_level | integer | no |  |
+| to_level | integer | yes |  |
+| was_automatic | boolean | yes |  |
+| escalated_by_principal_id | uuid | no | Who escalated it by hand (escalateApprovalRequest's caller); null for an automatic one. |
+| added_approver_principal_id | uuid | no | The approver the escalation added at toLevel; the original approver stays in the chain. |
+| id | uuid | yes | Synthesised key. |
 
 ### `approvals.external_provider`
 
@@ -3283,7 +3327,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| code | text | yes |  |
+| code | text | yes | Unique within the venue (409 duplicate-code; ADAM CR-074, CHG-DDL-008): the database holds it with a unique index on (venue_id, code), so two concurrent creates cannot both keep one code. |
 | name | text | yes | The outlet's name in English. |
 | name_translations | jsonb | no |  |
 | venue_id | uuid | yes |  |
@@ -3299,10 +3343,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sale_board_id | uuid | no | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). |
 | is_active | boolean | no |  |
 
+### `platform.outlet_opening_hour`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| outlet_id | uuid | yes | The parent row. |
+| day | text | yes |  |
+| from | text | yes | Local time, 24-hour HH:MM, when the outlet opens. |
+| to | text | yes | Local time, 24-hour HH:MM, when the outlet closes. |
+| ends_next_day | boolean | no | A late-night window is one window past midnight (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). |
+
 ### `platform.region_settings`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | The partition key (ADR-0005): the path of the region in regionId, set by the server when updateRegionSettings first saves the row, and ignored on input. |
 | country_code | text | yes | ISO 3166-1 alpha-2. |
 | currency_code | text | yes |  |
 | currency_scale | integer | yes | Decimal places for this region's currency. |
@@ -3328,7 +3384,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| code | text | yes |  |
+| code | text | yes | Unique within the venue (as the hand-written r0 table had it). |
 | name | text | yes |  |
 | venue_id | uuid | yes |  |
 | kind | text | yes |  |
@@ -3347,8 +3403,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| sale_board_page_id | uuid | yes | The parent row. |
+| position | integer | yes |  |
+| kind | text | yes |  |
+| variant_id | uuid | no | The catalogue variant a product tile sells (catalogue.variant). |
+| category_id | uuid | no | The catalogue category a category tile opens (catalogue.product_category; ADAM CR-080, CHG-TEN-001). |
+| action_code | text | no | The till action an action tile runs (ADAM CR-080, CHG-TEN-001). |
+| label | text | no |  |
+| colour | text | no | #rrggbb, as the hand-written r0 table held it (char(7); audit R246; CHG-TEN-001). |
+| image_asset_ref | text | no |  |
 | id | uuid | yes | Synthesised key. |
-| page_id | uuid | no | Points at platform.sale_board_page. |
 
 ### `platform.scope`
 
@@ -3415,6 +3479,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sale_board | jsonb | yes | Determines which front end loads. |
 | sale_board_source | text | no | Where saleBoard came from (decided 2 October 2026, Chinmay, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006): outlet when the till uses its outlet's layout, workstation when this til… |
 | deposit_box_limit_amount | numeric(18,4) | no | This till's drawer limit, overriding the venue's (VenueSettings.cashDrawerLimit; DEC-179; CHG-CSP-016). |
+| cashier_input_mode | text | no | BL-061. |
+| guest_display_content | text[] | no | BL-061. |
 | access_point_id | uuid | no | Inherited from the workstation, never selected by the operator. |
 | time_zone | text | yes |  |
 | deployment_profile | text | no |  |
@@ -3498,7 +3564,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-180 operations, added to this service in later releases without changing any of the above.
+181 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -3513,6 +3579,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | request | `assignApprovalRequest`, `cancelApprovalRequest`, `escalateApprovalRequest`, `getApprovalRequest`, `listApprovalExternalDispatches`, `listApprovedActionExecutions`, `recordExternalApprovalDecision`, `reopenApprovalRequest`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
 | rota | `requestShiftSwap` |
 | scope | `getOrgUnit` |
-| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `resolveTenantHost`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
+| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `requeueDeadLetter`, `resolveTenantHost`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `getWorkstation`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |

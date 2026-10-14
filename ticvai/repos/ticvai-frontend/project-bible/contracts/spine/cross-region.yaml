@@ -572,7 +572,7 @@ paths:
         **A reference to a wallet hold, never a second balance** (system-design review SD-027, 29
         September; applied 30 September). The home cell''s wallet service owns the one balance writer:
         this call is served in the home cell by wallet `holdWalletFunds` (guarded update on
-        `wallet.balance` under its row lock), and `platform.wallet_authorisation` records only the
+        `wallet.balance` under its row lock), and `sync.wallet_authorisation` records only the
         cross-cell handshake: which consuming cell asked, for which guest link, and the `walletHoldId`
         it was given. Capture is `captureWalletHold`, release is `releaseWalletHold`, and expiry is the
         hold''s own. Nothing here debits, credits or caches a balance.
@@ -983,8 +983,161 @@ paths:
                         $ref: '#/components/schemas/SyncCrossCellRequest'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /sync-rejections:
+    post:
+      operationId: recordSyncRejection
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Quarantine an entry an offline device replayed and the server refused
+      description: '**The owner''s write of `sync.rejection`** (14 October 2026, CHG-XDW-002; ADR-0055 rule 4).
+        `sync.rejection` is in `sync`, CrossRegionService''s schema in the `operations` deployable, and the replays
+        that refuse an entry on its merits run elsewhere: `orders.syncOrders` in `commerce`, `access.syncScans` in
+        `access`. They call this, cell-internal over mTLS, for each refused entry, with the `Idempotency-Key` set to
+        the rejection''s `id`, which the caller chooses (a UUIDv7) and returns to the device as `rejectionId`. A
+        retry with the same id is the same answer. The replays inside `operations` (`syncGamePlays`,
+        `reconcileBurstEnvironment`) call the same write in-process.
+
+
+        **Records, never judges.** The caller has already refused the entry and says why (`problem`); this keeps
+        it, verbatim (`payload`), for the supervisor who resolves it (`orders.listSyncRejections`,
+        `resolveSyncRejection`). It is not transactional with the caller''s batch: a failure here is the
+        caller''s transient failure, and the batch stops at that entry and is retried from there (SD-028).
+
+        '
+      tags:
+      - cross-region
+      x-ticvai-permission: null
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../spine/orders.yaml#/components/schemas/SyncRejection
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Quarantined. The rejection as kept, `resolvedAt` null.
+          content:
+            application/json:
+              schema:
+                $ref: ../spine/orders.yaml#/components/schemas/SyncRejection
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /sync-rejections/{rejectionId}/resolution:
+    parameters:
+    - name: rejectionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: recordSyncRejectionResolution
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Record what a supervisor did about a quarantined entry
+      description: '**The owner''s write of a rejection''s resolution** (14 October 2026, CHG-XDW-002; ADR-0055 rule
+        4). `orders.resolveSyncRejection` (in `commerce`) checks the supervisor''s permission and calls this with
+        what they did, the record it produced and who they are. **Resolved once**: the same resolution and record
+        again is the same answer; a different one on an already-resolved rejection is refused `409`
+        (`sync-rejection-already-resolved`), which the caller answers as its own `alreadyResolved`.
+
+        '
+      tags:
+      - cross-region
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncRejectionResolution'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Resolved. The rejection, with `resolvedAt`, `resolvedByPrincipalId`, `resolution` and
+            `resolvedRecordId` set.
+          content:
+            application/json:
+              schema:
+                $ref: ../spine/orders.yaml#/components/schemas/SyncRejection
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: Already resolved, differently (`sync-rejection-already-resolved`).
+          x-ticvai-problem-types:
+          - sync-rejection-already-resolved
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
+    SyncRejectionResolution:
+      type: object
+      x-ticvai-persistence: none — request only; lands on sync.rejection
+      description: What `orders.resolveSyncRejection` sends the owner (CHG-XDW-002).
+      required:
+      - resolution
+      - resolvedRecordId
+      - resolvedByPrincipalId
+      properties:
+        resolution:
+          type: string
+          enum:
+          - posted
+          - voided
+          - refunded
+        resolvedRecordId:
+          type: string
+          format: uuid
+          description: The order, void or refund the resolution produced.
+        resolvedByPrincipalId:
+          type: string
+          format: uuid
+          description: The supervisor who called `resolveSyncRejection`; the caller's session principal.
     SyncCellConnection:
       type: object
       x-ticvai-persistence: sync.cell_connection
@@ -1082,7 +1235,7 @@ components:
           format: date-time
           nullable: true
     GuestLink:
-      x-ticvai-persistence: platform.guest_link
+      x-ticvai-persistence: sync.guest_link
       type: object
       required:
       - guestLinkId
@@ -1155,7 +1308,7 @@ components:
           type: string
           format: date-time
     CrossRegionEntitlement:
-      x-ticvai-persistence: platform.cross_region_entitlement
+      x-ticvai-persistence: sync.cross_region_entitlement
       type: object
       required:
       - rightId
@@ -1294,7 +1447,7 @@ components:
 
             '
     WalletAuthorisation:
-      x-ticvai-persistence: platform.wallet_authorisation
+      x-ticvai-persistence: sync.wallet_authorisation
       type: object
       required:
       - authorisationId
@@ -1400,7 +1553,7 @@ components:
             `interEntity` are different rates on the same day, and a spend priced at a reporting rate
             would be wrong by whatever the spread is.'
     WalletAllocation:
-      x-ticvai-persistence: platform.wallet_authorisation
+      x-ticvai-persistence: sync.wallet_authorisation
       type: object
       required:
       - guestLinkId
@@ -1442,7 +1595,7 @@ components:
             not become a different ceiling because the guest walked into a Saudi venue — converting the
             limit as well as the spend is how a policy silently loosens when a rate moves.'
     DsarRequest:
-      x-ticvai-persistence: platform.dsar_request
+      x-ticvai-persistence: sync.dsar_request
       type: object
       required:
       - requestId

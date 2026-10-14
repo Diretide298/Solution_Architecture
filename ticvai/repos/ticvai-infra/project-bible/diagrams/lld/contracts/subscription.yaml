@@ -1569,6 +1569,7 @@ operations:
   reads:
   - cache:idempotency
   - control.tenant_migration_plan
+  - orders.pos_shift
   writes:
   - cache:idempotency
   - control.tenant_migration_plan

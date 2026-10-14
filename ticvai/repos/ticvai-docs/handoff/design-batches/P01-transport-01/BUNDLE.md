@@ -447,6 +447,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (rev 3 (30 September build), verified 2026-10-01, match exact): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Engine controls → Transport → Route & schedule · one-way, multi-trip, favourites → Book → Fri (stations filled in, departures without a search)*. Differences: 30 September: the route opens with its stations filled in and the departures listed without a search; the time-period buttons filter them. The engine's other transport flow, Popular routes (card view), is route cards with a from-fare and Book, then the date, the departures and the passengers. The route map needs a street-map tile provider (audit R038).
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
+- ADR-0055 *A modular monolith, deployed as five units* (`docs/adr/0055-a-modular-monolith-deployed-as-five-units.md`)
 
 #### Acceptance for the design
 

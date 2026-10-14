@@ -1,6 +1,6 @@
 # P01-booking-selection-01 — P01 · Booking & Selection
 
-**7 screens · 33 operations · 66 schemas · 7 permissions**
+**7 screens · 33 operations · 67 schemas · 7 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -178,7 +178,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-006` | Date & Performance Selection | A | 45 | 19 | 6 | 19 | 32 | 6 | guest | review (client-verified) |
 | `WEB-007` | Interactive Seat Selection | A | 8 | 40 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
 | `WEB-008` | Add-ons & Upsell | A | 19 | 14 | 5 | 47 | 16 | 0 | guest | review (client-verified) |
-| `WEB-009` | Wishlist | A | 0 | 15 | 5 | 1 | 2 | 0 | guest | review (client-verified) |
+| `WEB-009` | Wishlist | A | 0 | 16 | 5 | 1 | 2 | 0 | guest | review (client-verified) |
 | `WEB-047` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (client-verified) |
 | `WEB-048` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (client-verified) |
 

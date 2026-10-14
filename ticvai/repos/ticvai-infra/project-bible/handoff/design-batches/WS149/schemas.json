@@ -1381,6 +1381,7 @@
   ],
   "properties": {
    "deviceId": {
+    "x-ticvai-references": "platform.device",
     "type": "string",
     "format": "uuid",
     "description": "The `tenancy.RegisteredDevice`. **Enrolment, credentials, firmware and tamper state live there.**"
@@ -1813,6 +1814,7 @@
     "format": "uuid"
    },
    "amount": {
+    "x-ticvai-column": "transaction_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "takenAt": {

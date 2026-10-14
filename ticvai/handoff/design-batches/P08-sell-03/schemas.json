@@ -2618,7 +2618,8 @@
   }
  },
  "SaleBoard": {
-  "x-ticvai-persistence": "platform.sale_board",
+  "x-ticvai-persistence": "platform.sale_board + platform.sale_board_page + platform.sale_board_tile",
+  "description": "**A board is stored as three tables** (decided 14 October 2026, Chinmay, ADAM CR-080; CHG-TEN-001): the board (`platform.sale_board`), one row per page (`pages[]`, `platform.sale_board_page`, keyed to the board) and one row per tile (`pages[].tiles[]`, `platform.sale_board_tile`, keyed to its page by a NOT NULL `sale_board_page_id`, so a tile follows its page's row-level security). Until then the persistence named the board alone, and the tile table held an id and a nullable page key and nothing a till could draw.\n",
   "type": "object",
   "required": [
    "id",
@@ -2636,7 +2637,9 @@
    },
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "Unique within the venue (as the hand-written r0 table had it). A second board with the same code is `409 duplicate-code` (audit R108; ADAM CR-080; CHG-TEN-001).\n"
    },
    "name": {
     "type": "string",
@@ -2669,41 +2672,7 @@
       "tiles": {
        "type": "array",
        "items": {
-        "type": "object",
-        "required": [
-         "position",
-         "kind"
-        ],
-        "properties": {
-         "position": {
-          "type": "integer"
-         },
-         "kind": {
-          "type": "string",
-          "enum": [
-           "product",
-           "category",
-           "action",
-           "spacer"
-          ]
-         },
-         "variantId": {
-          "type": "string",
-          "format": "uuid",
-          "nullable": true
-         },
-         "label": {
-          "type": "string"
-         },
-         "colour": {
-          "type": "string",
-          "nullable": true
-         },
-         "imageAssetRef": {
-          "type": "string",
-          "nullable": true
-         }
-        }
+        "$ref": "#/components/schemas/SaleBoardTile"
        }
       }
      }
@@ -2722,6 +2691,84 @@
    "retail",
    "mixed"
   ]
+ },
+ "SaleBoardTile": {
+  "x-ticvai-persistence": "platform.sale_board_tile",
+  "description": "**One button on one page of a till board** (ADAM CR-080, 14 October 2026; CHG-TEN-001): the rows of `SaleBoard.pages[].tiles[]`, each keyed to its page. A position holds one tile on a page (`x-ticvai-unique-together`).\n**A tile that acts names what it acts on** (`x-ticvai-required-when`, carried as a CHECK): a `product` tile names its variant, a `category` tile the catalogue category it opens, an `action` tile the till action it runs (`actionCode`); a `spacer` names nothing. The hand-written r0 table had the product rule as `sale_board_tile_product` (\"a product tile with no variant is a button that does nothing\", handoff/storage-design.md).\n**A tile's variant is checked when the board is saved and again when it is published.** `createSaleBoard` and `updateSaleBoard` ask Catalogue whether every product tile's variant is sellable at the board's venue (`catalogue#variantsSellableAt`, ADAM CR-081); `publishBundle` leaves out a tile whose product is not `isSellable` when the bundle is cut, and the till never draws it.\n",
+  "x-ticvai-unique-together": [
+   [
+    "sale_board_page_id",
+    "position"
+   ]
+  ],
+  "x-ticvai-required-when": {
+   "variantId": {
+    "kind": "product"
+   },
+   "categoryId": {
+    "kind": "category"
+   },
+   "actionCode": {
+    "kind": "action"
+   }
+  },
+  "type": "object",
+  "required": [
+   "position",
+   "kind"
+  ],
+  "properties": {
+   "position": {
+    "type": "integer"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "product",
+     "category",
+     "action",
+     "spacer"
+    ]
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The catalogue variant a `product` tile sells (`catalogue.variant`). Required when `kind` is `product`."
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The catalogue category a `category` tile opens** (`catalogue.product_category`; ADAM CR-080, CHG-TEN-001). Required when `kind` is `category`; until 14 October a category tile referenced nothing.\n"
+   },
+   "actionCode": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "holdSale",
+     "recallHeld",
+     "applyDiscount",
+     "guestLookup",
+     "scanMedia",
+     "reprintReceipt"
+    ],
+    "description": "**The till action an `action` tile runs** (ADAM CR-080, CHG-TEN-001). Required when `kind` is `action`. The values are the sell screen's own actions (POS-002 hold and recall, discount, guest lookup, media scan, receipt reprint); proposed, client to correct. Until 14 October an action tile referenced nothing.\n"
+   },
+   "label": {
+    "type": "string"
+   },
+   "colour": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^#[0-9A-Fa-f]{6}$",
+    "description": "`#rrggbb`, as the hand-written r0 table held it (`char(7)`; audit R246; CHG-TEN-001)."
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   }
+  }
  },
  "Segment": {
   "x-ticvai-persistence": "marketing.segment + marketing.segment_criterion",
@@ -2951,9 +2998,11 @@
  },
  "UpsellRule": {
   "x-ticvai-persistence": "promotions.upsell_rule",
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "required": [
    "id",
+   "scopePath",
    "name",
    "placement",
    "triggerVariantIds",
@@ -2969,6 +3018,11 @@
     "format": "uuid",
     "readOnly": true,
     "description": "The region that owns the rule. Upsell rules are owned at region and read at venue (decided 28 September, audit R183); set from the caller's region scope on create.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005): the owning region's path, set with `regionId` on create. Row-level security reads the rule at and beneath it (`x-ticvai-rls: read-beneath`, CHG-GEN-005), so a venue reads its region's rules, and only the region or above writes them. **Always present, never null** (CHG-R6G-002): the column is NOT NULL once the rules that predate it are backfilled from `region_id` through `platform.scope.path` (handoff/migration-review.md)."
    },
    "name": {
     "type": "string",
@@ -3112,6 +3166,36 @@
     ],
     "nullable": true,
     "description": "**This till's drawer limit, overriding the venue's** (`VenueSettings.cashDrawerLimit`; DEC-179; CHG-CSP-016). Null inherits the venue's. Above it the till warns and offers a cash lift.\n"
+   },
+   "cashierInputMode": {
+    "type": "string",
+    "enum": [
+     "keyboard",
+     "touch",
+     "scanner",
+     "hybrid"
+    ],
+    "default": "hybrid",
+    "description": "BL-061. **How the cashier at this till enters a sale**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003): until then the request took it and nothing kept it.\n"
+   },
+   "guestDisplayContent": {
+    "type": "array",
+    "default": [
+     "lineItems"
+    ],
+    "description": "BL-061. **What the guest-facing screen shows while a sale is in progress**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003).\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "lineItems",
+      "total",
+      "loyaltyBalance",
+      "promotions",
+      "branding",
+      "upsell",
+      "queuePosition"
+     ]
+    }
    },
    "accessPointId": {
     "type": "string",

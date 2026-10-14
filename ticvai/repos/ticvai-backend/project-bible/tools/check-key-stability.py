@@ -328,6 +328,14 @@ def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
 
     planned = {r["key"] for r in rows}
     pit = gen.pushed_items(mp)
+    # **A case judges only what its own edit causes** (14 October 2026, CHG-R6G-001). The "passes" cases ran check()
+    # on today's plan with one edit and wanted no error at all, so a real finding in today's plan (VM-MIG-APPROVALS
+    # leaving it, r6 gate) failed three self-tests with the real finding's text, and the tests said nothing about
+    # the rule they test. Today's own findings are reported by the main check; a case subtracts them.
+    live = set(check(rows, mp, closed, retired)[0])
+
+    def new_errs(errs):
+        return [e for e in errs if e not in live]
     renamed = [k for k in sorted(work) if k in pit and gen.key_identity(k)[0] in ("ops", "screen")
                and (gen.key_identity(k)[0] == "screen" or pit[k] & work[k])
                and other_prefix(k) and other_prefix(k) not in mp and other_prefix(k) not in planned
@@ -343,7 +351,7 @@ def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
         # 9. The same move, pushed under the other prefix and written under the pushed key: metadata, passes.
         m = rekey(mp, k, nk)
         errs, _ = check(rows_with(rows, k, nk), m, closed, retired)
-        case(f"{kind} moved {k} -> {nk} under its pushed key passes", errs, [])
+        case(f"{kind} moved {k} -> {nk} under its pushed key passes", new_errs(errs), [])
         # 10. ...because the generator gives the natural key (the new prefix) the pushed one.
         case(f"{kind} moved: reconciliation writes {k} as pushed {nk}", run(work, m).get(k), nk)
     # 11. A ticket's operations folded into another planned ticket, the first dropped from the plan without
@@ -368,7 +376,7 @@ def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
              any(e.startswith("renamed") and a in e for e in errs), True)
         # retired as merged into b, which closes the ticket (op-retire's merge = Rejected), so it is closed here too
         errs, _ = check(rs, mp, closed | {a}, retired | {a})
-        case(f"work of {a} moved into {b}, retired in op-retire, passes", errs, [])
+        case(f"work of {a} moved into {b}, retired in op-retire, passes", new_errs(errs), [])
 
     # 13-14. **A pushed task keeps its operations** (12 October 2026, CHG-R6-052). The shift tasks were regrouped and
     # openShift, resumeShift and suspendShift each moved one task up: their pushed sub-tasks had to be closed as

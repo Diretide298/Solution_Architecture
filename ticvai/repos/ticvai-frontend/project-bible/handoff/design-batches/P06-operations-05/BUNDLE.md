@@ -1162,6 +1162,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-049` · status **notStarted** · provenance generated
 - Flow F71 *A device is prepared, used and handed over*, step 3: At the end of the session the journal is handed over. → **Handed over, not just synced.** A device passed to the next shift with an unsynced journal carries somebody else’s scans.
 - Flow F71 branch at step 3 (medium): when The journal will not sync., **A technician job, not a supervisor one.** Connectivity is IT; deciding whether a scan stands is not — CF-159 settled that split.
+- ADR-0055 *A modular monolith, deployed as five units* (`docs/adr/0055-a-modular-monolith-deployed-as-five-units.md`)
 
 #### Acceptance for the design
 

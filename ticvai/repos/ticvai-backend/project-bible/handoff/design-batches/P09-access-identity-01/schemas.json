@@ -87,6 +87,7 @@
  },
  "CapabilityTemplate": {
   "x-ticvai-persistence": "identity.capability_template",
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "description": "3.3.23, BL-110. **A named tick-set — a role, with nothing depending on the name.**\n",
   "required": [
@@ -148,7 +149,7 @@
  },
  "ChangeCredentialRequest": {
   "type": "object",
-  "description": "Request only. The credential itself is stored hashed in `identity.principal_credential` and is never returned by any operation (`handoff/schema-storage-only.md`).\n",
+  "description": "Request only. The credential itself is stored hashed in `identity.principal_credential` (`PrincipalCredential`, CHG-CRD-001) and is never returned by any operation (`handoff/schema-storage-only.md`).\n",
   "required": [
    "method",
    "currentCredential",
@@ -161,17 +162,21 @@
      "password",
      "pin"
     ],
-    "description": "Which credential is being changed. Card, RFID and SSO are not secrets the principal holds, so they are not changed here."
+    "description": "Which credential is being changed (`PrincipalCredential.method`). Card, RFID and SSO are not secrets the principal holds, so they are not changed here."
    },
    "currentCredential": {
     "type": "string",
     "maxLength": 512,
-    "writeOnly": true
+    "writeOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Compared with the current `credentialHash` and never stored. A wrong one is 422 `current-credential-wrong`, and counts towards the lockout like a wrong sign-in."
    },
    "newCredential": {
     "type": "string",
     "maxLength": 512,
-    "writeOnly": true
+    "writeOnly": true,
+    "x-ticvai-stored-as": "identity.principal_credential.credential_hash",
+    "description": "Stored as the new `credentialHash` (a PHC string, ADR-0071); the replaced hash moves to `identity.principal_credential_history`. A PIN is digits only, exactly `PasswordPolicy.pinLength` long."
    }
   }
  },
@@ -193,18 +198,27 @@
    "initialCredential": {
     "type": "string",
     "maxLength": 512,
-    "writeOnly": true
+    "writeOnly": true,
+    "x-ticvai-stored-as": "identity.principal_credential.credential_hash",
+    "description": "**Stored hashed, never as sent** (14 October 2026, CHG-CRD-001): `createPrincipal` writes one `identity.principal_credential` row with `method: password` and `credentialHash` the PHC string of this value (ADR-0071). Held to `setPasswordPolicy`. Omitted for a principal who will sign in only through the tenant's single sign-on, who then has no local credential until `resetPrincipalCredential` issues one."
    },
    "mustChangeCredential": {
     "type": "boolean",
-    "default": true
+    "default": true,
+    "description": "Stored on the principal (`Principal.mustChangeCredential`, CHG-CRD-001) and returned at `login`; cleared by the principal's first successful `changeOwnCredential`."
    },
    "validTo": {
     "type": "string",
     "format": "date-time"
    },
+   "homeScopePath": {
+    "type": "string",
+    "x-ticvai-persisted": false,
+    "description": "The `platform.scope` path the person works from. **Resolved, not kept:** the path is resolved to the `platform.scope` row at it, whose id is `identity.principal.home_scope_id`; the path itself has no column (CHG-R6G-009). Omitted: the caller's own home scope. At or beneath a node where the caller holds `USER_MANAGE`, or `403` (14 October 2026, ADAM CR-077; CHG-IDR-002)."
+   },
    "roleIds": {
     "type": "array",
+    "description": "Roles granted at once. **Each becomes one `identity.delegated_access` row** (ALLOW, at the home scope's path, granted by the caller), as `createDelegatedAccess` writes it and under the same segregation check; the first is the principal's `primaryRoleId` (14 October 2026, ADAM CR-077; CHG-IDR-002).",
     "items": {
      "type": "string",
      "format": "uuid"
@@ -282,9 +296,10 @@
    },
    "credential": {
     "type": "string",
-    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
+    "description": "Password, PIN, card token or RFID token depending on `method`. Compared with the principal's `PrincipalCredential.credentialHash` and never stored (ADR-0071, CHG-CRD-003).\n",
     "maxLength": 512,
-    "writeOnly": true
+    "writeOnly": true,
+    "x-ticvai-persisted": false
    },
    "method": {
     "type": "string",
@@ -319,9 +334,14 @@
     "type": "object",
     "required": [
      "requiresRoleSelection",
-     "requiresMfa"
+     "requiresMfa",
+     "mustChangeCredential"
     ],
     "properties": {
+     "mustChangeCredential": {
+      "type": "boolean",
+      "description": "**The credential just used is temporary** (14 October 2026, CHG-CRD-001, ADAM CR-078): the principal's `Principal.mustChangeCredential`, set at creation and by `resetPrincipalCredential`. While it is true the session may call `changeOwnCredential` and `logout` and nothing else; the door asks for the new password or PIN (ADM-001, SUP-001, PTR-001, EMP-001, SCN-001, POS-000) before the role prompt and the landing. A successful `changeOwnCredential` clears it. Always false for a single sign-on principal."
+     },
      "requiresRoleSelection": {
       "type": "boolean"
      },
@@ -735,6 +755,7 @@
  },
  "Principal": {
   "x-ticvai-persistence": "identity.principal",
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "required": [
    "id",
@@ -775,6 +796,8 @@
    },
    "roles": {
     "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**Read with the principal, never stored on it** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): one item per role the principal holds through a live grant, an `identity.delegated_access` row with this `principal_id`, a `role_id`, `effect` ALLOW, `revoked_at` null and now inside `valid_from`..`valid_to` (an open end is open), joined to `identity.role` for `code` and `name`. A role granted at several scopes appears once. `isPrimary` is `role.id = principal.primary_role_id`. Ordered by `name` ascending.",
     "items": {
      "$ref": "#/components/schemas/RoleSummary"
     }
@@ -783,11 +806,25 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "mustChangeCredential": {
+    "type": "boolean",
+    "default": true,
+    "description": "**The principal must replace their credential before the session is usable** (14 October 2026, CHG-CRD-001, ADAM CR-078; `createPrincipal` took it and nothing stored it). Set by `createPrincipal` (from `CreatePrincipalRequest.mustChangeCredential`, true unless the creator says otherwise) and by `resetPrincipalCredential` (always true: a reset credential is temporary). **Cleared only by a successful `changeOwnCredential`.** `login` returns it in `LoginResponse.mustChangeCredential`, and while it is true the session may call `changeOwnCredential`, `logout` and nothing else."
+   },
+   "ssoProviderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.sso_provider",
+    "description": "**Set when single sign-on provisioned this principal** (`completeSsoAuthorization`, from the tenant's `identity.sso_provider`; 14 October 2026, CHG-CRD-001). Such a principal has **no local password**: no `password` row in `identity.principal_credential`, a `password` `login` is refused 401 `sso-sign-in-required` (the door offers `startSsoAuthorization` instead), and `changeOwnCredential` with `method: password` is refused 409 `credential-managed-by-sso`. A till PIN may still be issued to them by `resetPrincipalCredential` (`method: pin`); until it is, a `pin` sign-in is refused the same way. Null for a principal created with `createPrincipal`."
    }
   }
  },
  "Role": {
   "x-ticvai-persistence": "identity.role",
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "required": [
    "id",
@@ -802,7 +839,7 @@
    "code": {
     "type": "string",
     "x-ticvai-unique": "tenant",
-    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"
+    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n**Compared case-insensitively** (`common.yaml`, `x-ticvai-unique`; ADAM CR-079, CHG-IDR-003): `ADMIN` and `admin` are one code, and the second is the duplicate. The code is kept as it was typed.\n"
    },
    "name": {
     "type": "string"
@@ -812,7 +849,7 @@
    },
    "permissions": {
     "type": "array",
-    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n",
+    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n**The role's own set, not revoked** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the `identity.role_permission` rows of this role with `is_active` true. A revoked row is history, not a permission. **Inherited permissions are not merged in**: a client reads `inheritsFromRoleId` and that role, the same shape `setRolePermissions` returns (`permissions` beside `inheritsFromRoleId`). The segregation check is the one place the two are taken together (ADAM CR-079).\n",
     "items": {
      "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
     }
@@ -836,10 +873,16 @@
     "description": "**The preset this role was started from, for the record only** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of `createRole.presetCodes`, or null for a role ticked by hand. It binds nothing; a later edit of the preset never changes this role.\n"
    },
    "principalCount": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the distinct principals holding this role through a live grant (`identity.delegated_access` with this `role_id`, a `principal_id`, `effect` ALLOW, `revoked_at` null, now inside its validity window). **Counted under row-level security**, so only the grants the caller's own grants let it read are counted: a venue manager sees the venue's holders, not the tenant's."
    },
    "grantCount": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the live grants of this role (the rows `principalCount` counts, one per grant, so a principal granted the role at two scopes counts twice). Counted under row-level security, as `principalCount`."
    }
   }
  },
@@ -863,7 +906,8 @@
     "type": "string"
    },
    "isPrimary": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002)."
    }
   }
  },
@@ -1217,6 +1261,16 @@
      "thin"
     ],
     "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
+   },
+   "pinLength": {
+    "type": "integer",
+    "enum": [
+     4,
+     6,
+     8
+    ],
+    "readOnly": true,
+    "description": "**The tenant's `PasswordPolicy.pinLength`, carried to the device** (14 October 2026, CHG-CRD-002, ADAM CR-078). A device door draws its PIN keypad, and its supervisor step-up prompt, at this many digits; the device keeps it with the workstation context of the last session on it, so the door needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the server decides. Read from `identity.password_policy`, not stored on the workstation."
    }
   }
  }

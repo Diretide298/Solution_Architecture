@@ -1504,6 +1504,7 @@
     "readOnly": true
    },
    "mapId": {
+    "x-ticvai-references": "venuemap.map",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -3852,11 +3853,13 @@
    },
    "fromPointId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "venuemap.point"
    },
    "toPointId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "venuemap.point"
    },
    "geometry": {
     "type": "string",
@@ -3879,6 +3882,7 @@
     "default": false
    },
    "restrictedByPointId": {
+    "x-ticvai-references": "venuemap.point",
     "type": "string",
     "format": "uuid",
     "nullable": true,

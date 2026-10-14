@@ -54,5 +54,15 @@ consumers:
   idempotencyKey: orderId + channel + purpose
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: identity
+  purpose: Record a pending order in identity.subject_holding when the order names a subjectId, or without a subject
+    when it is a guest checkout (verifiedContactRef set), which order.linkedToGuest may later attach to an account, so
+    deleteGuestAccount refuses while an open order remains without reading orders.sales_order (ADR-0028) (ADAM CR-084,
+    CHG-GDL-001, CHG-GDL-003)
+  writes:
+  - identity.subject_holding
+  idempotencyKey: orderId
+  onFailure: retryThenDeadLetter
+  isCritical: false
 retention: 30 days after publication
 notes: No state model emits this. The order is created already pending, so there is no from-state.

@@ -1587,16 +1587,35 @@ def main() -> int:
                 rel.add(x)
                 why[x] = f"referenced by {t}"
                 frontier.append(x)
+    # **A pushed forward migration the first release now needs whole keeps its key** (14 October 2026, CHG-R6G-001).
+    # CR-078 made ApprovalRequest.escalations[] persist, so createApprovalRequest (first release) writes
+    # approvals.escalation, the one table of VM-MIG-APPROVALS (#27826, V1005). The table joined MIG-APPROVALS, the
+    # first-release migration of its schema, and the pushed ticket left the plan: a renamed key, which
+    # check-key-stability blocks (a pushed key is never renamed; moves are metadata). So a pushed forward migration
+    # (VM-MIG-<S>, MIG-<S>-<n>) every table of which the first release now reads or writes stays one task under its
+    # pushed key and its planned file, moved into the first release; a pushed migration only part of whose tables
+    # are needed is left as before (the needed table joins its schema's first-release migration, the rest stay).
+    fwd_kept = {}
+    for k_, items_ in sorted(pushed_work.items()):
+        ident_ = key_identity(k_)
+        if not ident_ or ident_[0] != "tables" or k_ in closed_now or k_ == f"MIG-{ident_[1].upper()}":
+            continue
+        ts_ = {x for x in items_ if x in ddl}
+        base_ = pushed_work.get(f"MIG-{ident_[1].upper()}", set())
+        if ts_ and ts_ == {x for x in items_ if "." in x} and ts_ <= rel and not (ts_ & base_):
+            for x in ts_:
+                fwd_kept[x] = k_
     # The control plane is its own database, so its migrations are their own series and never
     # reference a tenant table by key (backend/990-cross-database-references.sql).
     groups = defaultdict(list)
     for t in sorted(rel):
-        groups[(ddl[t]["db"], t.split(".")[0])].append(t)
+        if t not in fwd_kept:
+            groups[(ddl[t]["db"], t.split(".")[0])].append(t)
     edges = {g: defaultdict(int) for g in groups}
     for g, ts in groups.items():
         for t in ts:
             for x in ddl[t]["fks"]:
-                if x in rel and ddl[x]["db"] == g[0]:
+                if x in rel and x not in fwd_kept and ddl[x]["db"] == g[0]:
                     edges[g][(g[0], x.split(".")[0])] += 1
     mig_order, deferred = [], {}
     for db in ("control", "tenant"):
@@ -1643,6 +1662,30 @@ def main() -> int:
         migrations.append([i - 1, mig_key[g], fname, g[0], g[1], len(ts), n_cols,
                            ", ".join(r.replace("MIG-", "").lower() for r in refs),
                            MIG_OWNER if MIG_OWNER and sp.is_migration_of(MIG_RX, mig_key[g]) else who, pts, svc])
+    # The pushed forward migrations kept whole (CHG-R6G-001, above): one task each, in the first release, after the
+    # first-release migration of its schema and the migrations its keys point into; its file is the one it was
+    # planned with (the forward-migration numbering below keeps it).
+    for k_ in sorted(set(fwd_kept.values())):
+        ts = sorted(t for t, kk in fwd_kept.items() if kk == k_)
+        sch = ts[0].split(".")[0]
+        n_cols = sum(len(ddl[t]["columns"]) for t in ts)
+        pts = points_of(1 + 0.5 * len(ts) + n_cols / 40 + 0.3 * sum(1 for t in ts if ddl[t]["rls"])
+                        + 0.5 * sum(ddl[t]["partitioned"] for t in ts))
+        own = mig_key.get((ddl[ts[0]]["db"], sch))
+        fk_into = sorted({table_mig[x] for t in ts for x in ddl[t]["fks"] if x in table_mig} - {own})
+        svc = schema_owner.get(sch, "")
+        who = svc_owner.get(svc) or (min(backend, key=lambda x: load[x]) if backend else "")
+        load[who] += pts
+        task(k_, "MIG", "Task", f"Forward migration: {sch} for the first release ({len(ts)} tables)",
+             "Tables: " + ", ".join(ts) + f". Source DDL: {src_files(ddl, ts)} and the matching rows of "
+             "900-foreign-keys, 910-indexes and 920-row-level-security. A forward migration after the r1 baseline "
+             "(frozen, check-migration-freeze), pushed before the first release needed it and kept under its pushed "
+             "key (CHG-R6G-001); applied forward by SqlMigrationRunner, and a second run applies nothing.", 1,
+             service=svc, pts=pts, area="backend", assignee=who,
+             depends=["MIG-BASELINE"] + ([own] if own else []) + fk_into)
+        by_key[k_]["phase"] = 1          # first-release work, whatever its pushed key's prefix says
+        for t in ts:
+            table_mig[t] = k_
     if deferred:
         n_def = sum(deferred.values())
         # **The ticket names its keys and links their tables** (4 October, the Sprint 1-2 judging; CHG-FXP-005): it said
@@ -1678,14 +1721,15 @@ def main() -> int:
     MIG_COLS = ["Order", "File", "Task", "Database", "Schema", "Tables", "Columns", "References", "Assignee",
                 "Points"]
     tables_rows = []
-    for t in sorted(rel, key=lambda x: (mig_order.index((ddl[x]["db"], x.split(".")[0])), x)):
+    for t in sorted(rel, key=lambda x: (mig_order.index((ddl[x]["db"], x.split(".")[0]))
+                                        if (ddl[x]["db"], x.split(".")[0]) in mig_order else len(mig_order), x)):
         tables_rows.append([table_mig[t], t, ddl[t]["db"], len(ddl[t]["columns"]), ddl[t]["policy_label"],
                             "yes" if ddl[t]["partitioned"] else "", len(used[t]["reads"]), len(used[t]["writes"]),
                             ", ".join(sorted(x for x in ddl[t]["fks"] if x in rel)), why[t],
                             schema_owner.get(t.split(".")[0], ""), ddl[t]["file"]])
 
     # Seed data and sign-in need tables, so they wait for the migrations rather than the empty database.
-    all_migs = [m[1] for m in migrations]
+    all_migs = [m[1] for m in migrations] + sorted(set(fwd_kept.values()))
     for t_ in tasks:
         if t_["key"] == "SETUP-SEED":
             t_["dependsOn"] = " ".join(sorted(set(all_migs)))

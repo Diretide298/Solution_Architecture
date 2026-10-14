@@ -517,9 +517,10 @@
   ],
   "properties": {
    "sku": {
-    "x-ticvai-unique": "tenant",
+    "x-ticvai-unique": "venue",
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "description": "Unique within the item's venue, as the 409 says (ADAM CR-068, CHG-DDL-003): an inventory item is something one venue stocks (`venueId` is required), so two venues of a chain keep their own row for the same syrup under the same SKU. The index is (venue_id, sku).\n"
    },
    "barcode": {
     "type": "string",
@@ -2227,7 +2228,7 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`, or the venue's next business-day cut-off (`VenueSettings.businessDayCutoff`) when the cashier sent none (CHG-GDL-003). Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -2665,7 +2666,7 @@
  },
  "Outlet": {
   "type": "object",
-  "x-ticvai-persistence": "platform.outlet",
+  "x-ticvai-persistence": "platform.outlet + platform.outlet_opening_hour",
   "required": [
    "id",
    "code",
@@ -2681,7 +2682,9 @@
    },
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "Unique within the venue (`409 duplicate-code`; ADAM CR-074, CHG-DDL-008): the database holds it with a unique index on (venue_id, code), so two concurrent creates cannot both keep one code.\n"
    },
    "name": {
     "type": "string",
@@ -2764,7 +2767,7 @@
    },
    "openingHours": {
     "type": "array",
-    "description": "The weekly pattern, one entry per window. Several windows on a day are allowed.",
+    "description": "The weekly pattern, one entry per window. Several windows on a day are allowed. **Stored as rows of `platform.outlet_opening_hour`, one per window, keyed to the outlet** (ADAM CR-073, CHG-DDL-007): `createOutlet` writes them, `updateOutlet` replaces them all, `getOutlet` and `listOutlets` read them back.\n",
     "items": {
      "$ref": "#/components/schemas/OpeningHoursWindow"
     }
@@ -3676,6 +3679,7 @@
     "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
    },
    "taxReversalEntryId": {
+    "x-ticvai-references": "ledger.journal_entry",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -5007,7 +5011,7 @@
     "type": "string",
     "maxLength": 512,
     "writeOnly": true,
-    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in."
    }
   }
  },

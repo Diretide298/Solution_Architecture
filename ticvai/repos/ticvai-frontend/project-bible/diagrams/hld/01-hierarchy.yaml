@@ -34,7 +34,7 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 603
+  operations: 606
   configurations: 113
   configuredBy:
   - claimCustomDomain
@@ -91,7 +91,7 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 2046
+  operations: 2047
   configurations: 190
   configuredBy:
   - cloneAccreditationProgramme
@@ -134,7 +134,7 @@ levels:
 - level: workstation
   branch: organisational
   parent: subDepartment
-  operations: 47
+  operations: 48
   configurations: 0
   configuredBy: null
   owns:

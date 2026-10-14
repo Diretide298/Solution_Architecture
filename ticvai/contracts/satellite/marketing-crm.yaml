@@ -2620,15 +2620,15 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateMyProfile
+      x-ticvai-consumed-by:
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-020 Profile & Preferences"
+        - "P02 GST-039 Profile"
       x-ticvai-write-via:
       - table: pii.subject
         operation: updateGuestSubjectDetails
       x-ticvai-calls:
       - identity.updateGuestSubjectDetails
-      x-ticvai-consumed-by:
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P01 WEB-020 Profile & Preferences"
-        - "P02 GST-039 Profile"
       security:
       - guestAuth: []
       summary: A guest correcting their own details
@@ -16795,16 +16795,16 @@ paths:
   /consent/device:
     post:
       operationId: recordDeviceConsent
-      x-ticvai-write-via:
-      - table: pii.consent_identifier
-        operation: recordConsentIdentifier
-      x-ticvai-calls:
-      - identity.recordConsentIdentifier
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-001 Home"
         - "P02 GST-066 Privacy & My Data"
+      x-ticvai-write-via:
+      - table: pii.consent_identifier
+        operation: recordConsentIdentifier
+      x-ticvai-calls:
+      - identity.recordConsentIdentifier
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - anonymous

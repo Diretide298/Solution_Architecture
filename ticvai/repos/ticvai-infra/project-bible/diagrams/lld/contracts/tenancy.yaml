@@ -1,5 +1,5 @@
 id: LLD-tenancy
-title: tenancy — 57 operations
+title: tenancy — 58 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -27,6 +27,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.pos_shift
   - platform.device
   - platform.workstation
   writes:
@@ -74,9 +75,11 @@ operations:
   reads:
   - cache:idempotency
   - platform.outlet
+  - platform.outlet_opening_hour
   writes:
   - cache:idempotency
   - platform.outlet
+  - platform.outlet_opening_hour
 - operation: createSaleBoard
   verb: POST
   path: /sale-boards
@@ -87,7 +90,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.product
+  - catalogue.variant
   - platform.sale_board
+  - platform.sale_board_page
+  - platform.sale_board_tile
   writes:
   - cache:idempotency
   - platform.sale_board
@@ -226,6 +233,7 @@ operations:
   offline: true
   reads:
   - platform.outlet
+  - platform.outlet_opening_hour
   writes: []
 - operation: getRegionSettings
   verb: GET
@@ -416,6 +424,7 @@ operations:
   offline: true
   reads:
   - platform.outlet
+  - platform.outlet_opening_hour
   writes: []
 - operation: listProfileDeployments
   verb: GET
@@ -494,6 +503,19 @@ operations:
   writes:
   - cache:idempotency
   - platform.device
+- operation: requeueDeadLetter
+  verb: POST
+  path: /internal/dead-letters/{deadLetterId}/replays
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - platform.dead_letter
+  writes:
+  - platform.dead_letter
+  - platform.outbox
 - operation: resolveTenantHost
   verb: GET
   path: /tenant-domains/{hostname}
@@ -726,9 +748,11 @@ operations:
   reads:
   - cache:idempotency
   - platform.outlet
+  - platform.outlet_opening_hour
   writes:
   - cache:idempotency
   - platform.outlet
+  - platform.outlet_opening_hour
 - operation: updateRegionSettings
   verb: PUT
   path: /regions/{regionId}/settings
@@ -754,7 +778,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.product
+  - catalogue.variant
   - platform.sale_board
+  - platform.sale_board_page
+  - platform.sale_board_tile
   writes:
   - cache:idempotency
   - platform.sale_board

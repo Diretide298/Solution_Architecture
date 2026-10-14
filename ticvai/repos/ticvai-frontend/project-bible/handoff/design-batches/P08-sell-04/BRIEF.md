@@ -1,6 +1,6 @@
 # P08-sell-04 — P08 · Sell (4 of 4)
 
-**8 screens · 17 operations · 37 schemas · 11 permissions**
+**8 screens · 17 operations · 38 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -157,9 +157,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-121` | Personalized Offers & Guest Engagement | D | 42 | 14 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
 | `BO-122` | POS Experience Dashboard | B | 3 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-123` | POS Profile Management | B | 9 | 12 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-124` | Layout & Journey Builder | B | 38 | 22 | 6 | 9 | 2 | 6 | — | notStarted (generated) |
-| `BO-125` | Product & Category Button Configuration | B | 19 | 6 | 6 | 14 | 3 | 0 | — | notStarted (generated) |
-| `BO-126` | Deployment, Preview & Audit | B | 23 | 47 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-124` | Layout & Journey Builder | B | 42 | 24 | 6 | 9 | 2 | 6 | — | notStarted (generated) |
+| `BO-125` | Product & Category Button Configuration | B | 21 | 6 | 6 | 14 | 3 | 0 | — | notStarted (generated) |
+| `BO-126` | Deployment, Preview & Audit | B | 25 | 49 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-142` | Store Rules, Controls & Permissions | B–D | 11 | 5 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `BO-143` | Retail Global Settings & Controls | C | 10 | 10 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 

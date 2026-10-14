@@ -2906,6 +2906,7 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         mapId:
+          x-ticvai-references: venuemap.map
           type: string
           format: uuid
           readOnly: true
@@ -3003,8 +3004,8 @@ components:
           format: uuid
           readOnly: true
           description: From the path of the operation that writes the path.
-        fromPointId: { type: string, format: uuid }
-        toPointId: { type: string, format: uuid }
+        fromPointId: { type: string, format: uuid, x-ticvai-references: venuemap.point }
+        toPointId: { type: string, format: uuid, x-ticvai-references: venuemap.point }
         geometry:
           type: string
           nullable: true
@@ -3035,6 +3036,7 @@ components:
             staircase has been failed by the map, not by the venue.
         isIndoor: { type: boolean, default: false }
         restrictedByPointId:
+          x-ticvai-references: venuemap.point
           type: string
           format: uuid
           nullable: true
@@ -3375,12 +3377,12 @@ components:
       required: [id, mapId, version, publishedAt, publishedByPrincipalId, snapshot]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        mapId: { type: string, format: uuid }
+        mapId: { type: string, format: uuid, x-ticvai-references: venuemap.map }
         version:
           type: integer
           description: One more than the version before it. `VenueMap.publishedVersion` names the current one.
         publishedAt: { type: string, format: date-time }
-        publishedByPrincipalId: { type: string, format: uuid }
+        publishedByPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
         note:
           type: string
           nullable: true

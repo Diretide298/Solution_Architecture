@@ -29,6 +29,12 @@ The kiosk (P05) runs on a registered device, so `device` operations are its own.
                     session) nor `x-ticvai-self-scoped` (it answers only for the caller). A guest holds no
                     permission, so nothing says what the guest is allowed or what they get back.
 
+    AM-TICKET-OP    a feature ticket of an app lists (builds) an operation whose audience that app may not call:
+                    a staff operation on a guest app's ticket, a guest-only one on a staff app's (14 October 2026,
+                    CHG-SWP-002: #27741, AM-IDENTITY-SECURITY-P02 on the guest app, listed the staff-only
+                    searchGuests; no screen bound it, so the screen rules above never saw it). Read from
+                    handoff/service-docs/plan-tasks.csv; the feature #27741 itself is not baselined (batch GAP)
+
 and notes, without counting, operations bound on a screen that declare no audience at all.
 
 **AM-GUEST-PERMISSION, 3 October 2026** (Chinmay's answers to the Block A audit, "Pattern 4"; CHG-GCF-001 to
@@ -41,8 +47,10 @@ self-scoped and the guest's side of a handed-over chat its own operation (`sendG
 `sendConversationMessage` stay staff operations and leave the guest screens. A binding that is right as it
 is goes in `GUEST_PERMISSION_EXEMPT` below with its reason; there is no silent skip.
 
-**Report-only until the guest fixes land** (`run-checks.py` REPORT_ONLY); the lead then records the
-baseline (`--update-baseline`) and takes it out of REPORT_ONLY, and a new mismatch blocks.
+**Gates since 14 October 2026** (CHG-SWP-002). It was report-only until the guest fixes landed (council of
+2 October; docs/active/release-runbook.md R11). They have: AM-GUEST-OP, AM-GUEST-FIELD and AM-GUEST-PERMISSION
+find nothing on r6, so the baseline was recorded (6 AM-STAFF-OP, 4 AM-GUEST-SECURITY and the AM-TICKET-OP debt)
+and the check left REPORT_ONLY; a new mismatch blocks.
 
     python3 tools/check-audience-match.py [--all] [--update-baseline]
 """
@@ -50,6 +58,8 @@ import collections
 import sys
 
 import audit_guard as g
+import ticket_done as td
+import ticket_features as tf
 import typed_props as tp
 
 RULES = {
@@ -59,6 +69,8 @@ RULES = {
     "AM-GUEST-SECURITY": "operation declares a guest audience its security lets no guest call",
     "AM-GUEST-PERMISSION": "guest screen binds a staff-permission operation that is neither guest-callable "
                            "nor self-scoped",
+    "AM-TICKET-OP": "an app's feature ticket lists an operation that app's audience may not call (#27741, "
+                    "CHG-SWP-002)",
 }
 
 # (screen id, or "*" for every guest screen, operationId) -> why the binding is right as it is. A reason is
@@ -141,6 +153,7 @@ def main() -> int:
         if need and "guestAuth" not in schemes:
             guard.add("AM-GUEST-SECURITY", op, f"{op} ({ops[op]['contract']}): audience {', '.join(sorted(a))}, "
                       f"security {schemes}")
+    ticket_ops(guard)
     if undeclared:
         guard.note(f"{len(undeclared)} bound operation(s) declare no x-ticvai-audience: "
                    + ", ".join(sorted(undeclared)[:8]) + (" ..." if len(undeclared) > 8 else ""))
@@ -150,6 +163,40 @@ def main() -> int:
     if per_screen:
         guard.note("most findings: " + ", ".join(f"{c} {sid} ({n})" for (c, sid), n in per_screen.most_common(10)))
     return guard.finish()
+
+
+def ticket_ops(guard) -> None:
+    """CHG-SWP-002: every operation a feature ticket lists against the audience of the app its screens are on."""
+    rows = tf.plan_rows(g.ROOT)
+    if not rows:
+        guard.note("handoff/service-docs/plan-tasks.csv missing: AM-TICKET-OP not run")
+        return
+    plats = g.platforms()
+    aud_of, platform_of, screens = {}, {}, {}
+    for stem, s in g.screens():
+        p = plats.get(stem) or {}
+        code = str(p.get("code") or stem.split("-")[0])
+        aud_of[code] = tp.OPERATOR_AUDIENCE.get(p.get("operator"))
+        platform_of[s["id"]] = code
+        screens[s["id"]] = s
+    td.merge_bindings(screens)
+    per = collections.Counter()
+    for fk, f in sorted(tf.features(rows, screens, platform_of).items()):
+        for code in sorted(f.platforms):
+            aud = aud_of.get(code)
+            if aud not in ("guest", "staff") or (aud == "guest" and code not in tp.GUEST_PLATFORMS):
+                continue
+            ok = tp.callable_by(aud, code)
+            for op, task in sorted(f.ops.items()):
+                a = tp.audience(op)
+                if not a or a & ok:
+                    continue
+                guard.add("AM-TICKET-OP", f"{fk}:{code}:{op}",
+                          f"{fk} ({code} {aud}, block {f.block}): lists {op} ({task}), which is for "
+                          f"{', '.join(sorted(a))}", strict=fk in tf.UNBASELINED)
+                per[(code, f.block)] += 1
+    if per:
+        guard.note("AM-TICKET-OP by app and block: " + ", ".join(f"{c} {b} {n}" for (c, b), n in sorted(per.items())))
 
 
 if __name__ == "__main__":

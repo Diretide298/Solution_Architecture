@@ -33,6 +33,7 @@ operations:
   reads:
   - catalogue.channel_capacity
   - catalogue.performance
+  - catalogue.product
   - catalogue.variant
   - marketing.consent_question
   - marketing.consent_question_version

@@ -122,7 +122,7 @@
 | shift | [`giveShiftVarianceReason`](#giveshiftvariancereason) | POST | `/shifts/{shiftId}/variance-reason` | core | 1 | BO-040, EMP-009, POS-007 |
 | shift | [`listDenominations`](#listdenominations) | GET | `/denominations` | core | 1 | BO-1065, POS-001, POS-007 |
 | shift | [`listDepositBoxes`](#listdepositboxes) | GET | `/deposit-boxes` | core | 1 | BO-042, POS-015, POS-018 |
-| shift | [`listShifts`](#listshifts) | GET | `/shifts` | core | 1 | BO-039, BO-040, BO-041, BO-043, BO-100, EMP-008 … |
+| shift | [`listShifts`](#listshifts) | GET | `/shifts` | core | 1 | BO-039, BO-040, BO-041, BO-043, BO-053, BO-100 … |
 | shift | [`openShift`](#openshift) | POST | `/shifts` | core | 1 | POS-001 |
 | shift | [`recordNoSale`](#recordnosale) | POST | `/shifts/{shiftId}/no-sale` | core | 1 | POS-014, POS-020 |
 | shift | [`rejectShiftVariance`](#rejectshiftvariance) | POST | `/shifts/{shiftId}/reject-variance` | core | 1 | BO-040, BO-043, POS-007 |
@@ -192,6 +192,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 **A transport trip or pass is a line with `attributes.transport`** (decided 29 September, rev 3 REV3-21; see `TransportLineAttributes`). The unit price is not read from the variant's price list: the order service calls `transport.quoteTransportFare` (service to service) for the route, the two stations and the passenger type, and a refused quote refuses the line 422 `transportFareUnavailable`. A one-way trip carries `variantId` = the passenger type's `catalogueVariantId` and `performanceId` = the departure's performance, and holds a seat with the inventory lease like any timed ticket (`seatIds` where the departure has a seat map). A pass carries the pass type's `openDated` product variant and no `performanceId`. A seat reserved with a pass the guest already owns (`passEntitlementId`) is a zero-priced line, refused 422 `passNotValidForTrip` unless the pass covers the two stations, has an entry left and is within its validity.
 **Behind the on-sale waiting room when it is on** (ADR-0066, accepted 1 October). For a performance whose waiting room is active (catalogue `WaitingRoomSetting`), the line needs the admission token the guest was given when admitted (`getWaitingRoomPosition`), sent as `X-Admission-Token`; missing, expired, forged or for another performance, it is refused `403 admission-required` and nothing is held. The check is a signature check in middleware with no database read, and the order service forwards the token to `catalogue.acquireInventoryHold`. A guest who skips the waiting page no longer goes straight to the sale.
 Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:00 already in the cart and karting at 13:00 being added is a prompt, not a refusal, because a party of four may legitimately split.
+**Whether the variant may be sold on this channel is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-081; CHG-TEN-002; ADR-0055 rule 2). Orders calls Catalogue's declared query `variantsSellableAt(venueId, [variantId], channel)` in process, in the cart's transaction, with the caller's channel (`pos` at a till), rather than reading `catalogue.variant` and `catalogue.product` itself; a variant that fails it is `409 notSellableOnChannel`.
 
 |  |  |
 |---|---|
@@ -201,7 +202,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.variant`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
+| Reads | `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `orders.cart`, `orders.cart_line`, `platform.idempotency_record` |
 | Called by | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-015, KSK-017, POS-002, POS-021, POS-023, POS-030, PTR-010, WEB-005, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active`, `expired` -> `active` |
@@ -656,7 +657,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -1888,7 +1889,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.shiftId | string (uuid) |  | (nullable) |
 | order.subjectId | string (uuid) |  | (nullable) |
 | order.holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| order.heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| order.heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | order.createdAt | string (date-time) | yes |  |
 | order.recordedAt | string (date-time) | yes |  |
 | order.syncedAt | string (date-time) |  | (nullable) |
@@ -2103,7 +2104,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -2381,7 +2382,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -2716,7 +2717,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -3054,7 +3055,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -3349,7 +3350,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.shiftId | string (uuid) |  | (nullable) |
 | order.subjectId | string (uuid) |  | (nullable) |
 | order.holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| order.heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| order.heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | order.createdAt | string (date-time) | yes |  |
 | order.recordedAt | string (date-time) | yes |  |
 | order.syncedAt | string (date-time) |  | (nullable) |
@@ -3629,7 +3630,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.shiftId | string (uuid) |  | (nullable) |
 | order.subjectId | string (uuid) |  | (nullable) |
 | order.holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| order.heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| order.heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | order.createdAt | string (date-time) | yes |  |
 | order.recordedAt | string (date-time) | yes |  |
 | order.syncedAt | string (date-time) |  | (nullable) |
@@ -3955,7 +3956,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -4733,7 +4734,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].shiftId | string (uuid) |  | (nullable) |
 | items[].subjectId | string (uuid) |  | (nullable) |
 | items[].holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| items[].heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| items[].heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | items[].createdAt | string (date-time) | yes |  |
 | items[].recordedAt | string (date-time) | yes |  |
 | items[].syncedAt | string (date-time) |  | (nullable) |
@@ -6602,7 +6603,7 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
-| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -7980,7 +7981,7 @@ That separation is what makes a variance attributable to a person rather than to
 | Read routing | primary |
 | Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | - |
-| Called by | BO-039, BO-040, BO-041, BO-043, BO-100, EMP-008, EMP-009, POS-007, POS-009, POS-019, POS-025 |
+| Called by | BO-039, BO-040, BO-041, BO-043, BO-053, BO-100, EMP-008, EMP-009, POS-007, POS-009, POS-019, POS-025 |
 
 **Parameters**
 
@@ -9568,6 +9569,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | expected_cash_amount | numeric(18,4) | no | 26 September, pull audit R207. |
 | counted_cash_amount | numeric(18,4) | no | What the close count found. |
 | variance_amount | numeric(18,4) | no | Counted minus expected, as ShiftCloseResult.variance. |
+| cashier_reason | text | no | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). |
+| cashier_note | text | no | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). |
 | held_lease_count | integer | no | Inventory leases currently held by this workstation. |
 | opened_at | timestamptz | yes |  |
 | business_date | date | no | The business day the shift belongs to (12 October 2026, CHG-R6-032): the venue-local date of openedAt taken against the venue's businessDayCutoff (tenancy VenueSettings, inheriting the tenant default… |
@@ -9581,8 +9584,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recount_reason | text | no | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). |
 | count_number | integer | no | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). |
 | synced_at | timestamptz | no | Null while the shift has unsynced operations. |
-| cashier_reason | text | yes | The same reasons as CloseShiftRequest.cashierReason (DI-803), recorded as the shift's cashierReason. |
-| cashier_note | text | no | What happened, in the cashier's words; recorded as the shift's cashierNote (appended to a note given with the count). |
 
 ### `orders.pos_shift_approval`
 
@@ -9731,7 +9732,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | shift_id | uuid | no |  |
 | subject_id | uuid | no |  |
 | hold_label | text | no | The label a cashier gave when parking it with holdOrder — how they find it again. |
-| held_until | timestamptz | no | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. |
+| held_until | timestamptz | no | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil, or the venue's next business-day cut-off (VenueSettings.businessDayCutoff) when the cashier sent none (CHG-GDL… |
 | created_at | timestamptz | yes |  |
 | recorded_at | timestamptz | yes |  |
 | synced_at | timestamptz | no |  |
@@ -9825,7 +9826,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | subject_id | uuid | no |  |
 | order_id | uuid | no | The order whose renewal failed. |
-| amount | numeric(18,4) | no |  |
+| overdue_amount | numeric(18,4) | no |  |
 | state | text | yes |  |
 | decline_class | text | no | From the most recent attempt. |
 | attempts_made | integer | yes |  |
@@ -9857,7 +9858,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | instalment_plan_id | uuid | yes | The parent row. |
 | sequence | integer | yes |  |
 | due_date | date | yes |  |
-| amount | numeric(18,4) | yes |  |
+| due_amount | numeric(18,4) | yes |  |
 | status | text | yes |  |
 | payment_id | uuid | no |  |
 | dunning_case_id | uuid | no |  |
@@ -9874,8 +9875,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | frequency | text | yes |  |
 | payment_token_id | uuid | no |  |
 | status | text | yes |  |
-| total | numeric(18,4) | yes |  |
-| paid_to_date | numeric(18,4) | no |  |
+| gross_amount | numeric(18,4) | yes |  |
+| paid_amount | numeric(18,4) | no |  |
 | next_due_date | date | no |  |
 | created_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
@@ -9886,11 +9887,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | is_enabled | boolean | no |  |
 | eligible_product_kinds | text[] | no |  |
-| minimum_order_value | numeric(18,4) | no |  |
+| minimum_order_amount | numeric(18,4) | no |  |
 | allowed_frequencies | text[] | no |  |
 | maximum_instalments | integer | no |  |
 | due_at_purchase_percent | numeric | no |  |
-| instalment_fee | numeric(18,4) | no |  |
+| instalment_fee_amount | numeric(18,4) | no |  |
 | require_stored_card | boolean | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 | id | uuid | yes | Synthesised key. |
@@ -9915,7 +9916,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | attempt_kind | text | no | Which adapter call this was (authorise, capture, refund, void, inquire; terminal for an ECR instruction to a card terminal). |
 | latency_ms | integer | no | Request to provider response. |
 | authentication_outcome | text | no | The 3-D Secure result, the authenticationOutcome dimension of getPaymentPerformance. |
-| amount | numeric(18,4) | no |  |
+| attempted_amount | numeric(18,4) | no |  |
 | attempted_at | timestamptz | yes |  |
 | scope_path | text | yes |  |
 

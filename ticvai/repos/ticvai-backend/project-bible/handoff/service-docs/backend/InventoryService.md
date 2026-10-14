@@ -49,7 +49,7 @@ Board 2C. **Retire a season, reprice a category, change a tax class across two h
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `inventory.inventory_item` non-empty |
+| Part of slice | setup, makes `catalogue.price`, `inventory.inventory_item` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -175,7 +175,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| sku | string | yes | (max length 64) |
+| sku | string | yes | Unique within the item's venue, as the 409 says (ADAM CR-068, CHG-DDL-003): an inventory item is something one venue stocks (venueId is required), so two venues of a chain keep their own row for the… (max length 64) |
 | barcode | string |  | (max length 128) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -196,7 +196,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| sku | string | yes | (max length 64) |
+| sku | string | yes | Unique within the item's venue, as the 409 says (ADAM CR-068, CHG-DDL-003): an inventory item is something one venue stocks (venueId is required), so two venues of a chain keep their own row for the… (max length 64) |
 | barcode | string |  | (max length 128) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -235,7 +235,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 |---|---|---|
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
-| 409 |  | SKU already in use in this venue |
+| 409 |  | SKU already in use in this venue (duplicate-code; CHG-DDL-003) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setInventoryKitDefinition
@@ -338,7 +338,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| sku | string | yes | (max length 64) |
+| sku | string | yes | Unique within the item's venue, as the 409 says (ADAM CR-068, CHG-DDL-003): an inventory item is something one venue stocks (venueId is required), so two venues of a chain keep their own row for the… (max length 64) |
 | barcode | string |  | (max length 128) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -584,7 +584,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| sku | text | yes |  |
+| sku | text | yes | Unique within the item's venue, as the 409 says (ADAM CR-068, CHG-DDL-003): an inventory item is something one venue stocks (venueId is required), so two venues of a chain keep their own row for the… |
 | barcode | text | no |  |
 | name | text | yes |  |
 | venue_id | uuid | yes |  |

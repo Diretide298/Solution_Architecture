@@ -8,19 +8,23 @@
 
 ## Your day
 1. `/board` shows your open tickets in build order: started work first, then the order to work in.
-2. `/ticket <id>` pulls one ticket at the current release. ADAM **records the release you pulled at** (your pin).
-3. Build against what `/ticket` gives you. If you can't finish the ticket in one go, pull it again the next day; you stay on your pin.
+2. `/ticket <id>` pulls one ticket at the **latest release**. You and your agent are always on the latest release: there is no release to choose and nothing to re-pin (CHG-ADM-001, 14 October 2026).
+3. Build against what `/ticket` gives you. If you can't finish the ticket in one go, pull it again the next day; that pull is at the latest release too.
 
 ## When the spec changes under you
-Releases go out on **Tuesday and Friday**. If something your ticket touches changed, the next `/ticket` says **"Spec changed since you pulled at r1 (now r2)"**, and shows what changed.
-- **Accept:** re-pin to the new release and build to it.
-- **Or raise a CR** if it doesn't fit, with the reason.
-- **A breaking contract change is not optional.** When an operation you produce or consume changed in a breaking way, both sides re-pin to the same release. `/ticket` marks it as required.
+Releases go out on **Tuesday and Friday**. If something your ticket touches changed, the next `/ticket` is already at the new release and says **"What changed since your previous pull (r1 -> r2)"**, with the diffs in `spec-diff.md`. Build against the files as they are now.
+- **A breaking contract change** on an operation you produce or consume is called out in that section: both sides build against the latest release, so check the code you wrote before the pull.
+- **Raise a CR** if a change doesn't fit your ticket, with the reason, and build the rest.
 
-Nobody rewrites a ticket you've started. You see the change as a diff, and you decide.
+Nobody rewrites a ticket you've started.
+
+## When a change request is settled
+When the lead settles a CR raised from your ticket (accepted, done or rejected), ADAM tells the ticket (CHG-ADM-002):
+- **Your ticket is not closed:** it gets a comment written for your agent ("ADAM CR-076 · accepted — read before building": what was decided, which release carries it, what to do now), and `/ticket` lists the CR near the top of README.md under "Change requests on this ticket". Follow a settled decision where it differs from the description; wait on the part an open CR covers.
+- **Your ticket is closed:** the change becomes a **child task** of it, carrying the CR, the decision and the release. A CR's work is one child task; migration work it causes is a child task of the affected MIG-* ticket, for the migration owner.
 
 ## When you find a gap
-If an operation, field, table or screen state is missing, or wrong, **raise it from `/ticket` as a CR** (source: developer). Don't work around it silently, and don't edit the package. The lead triages it: clarification, scope or defect; now or later. It lands in a release.
+If an operation, field, table or screen state is missing, or wrong, **raise it from `/ticket` as a CR** (source: developer). Don't work around it, and don't edit the package. If it blocks the ticket, the CR is `blocking`, the ticket goes On hold and you move to the next workable ticket (below). The lead triages it: clarification, scope or defect; now or later. It lands in a release.
 
 ## When a ticket conflicts with the spec
 Sometimes what you pulled contradicts itself or the contract. For example: a guest screen calls a staff-only
@@ -32,15 +36,20 @@ happens:
 2. **Name the invariant it breaks**, in one line. Examples: "a guest screen never binds a staff-audience
    operation", "every form control maps to a contract field", "a pre-sign-in load needs no session". This
    is what lets the lead turn your report into a check, so it cannot happen again anywhere.
-3. **Carry on with the rest of the ticket.** Don't invent the missing piece. The lead triages the CR in the
-   daily slot, as a blocker, a fix-forward or a defer, and the fix reaches you as a comment plus a linked
-   delta ticket. Your ticket is never rewritten.
+3. **If it blocks the ticket, put the ticket On hold and move on.** A blocker is always a CR, raised with
+   `blocking: true` (CHG-ADM-004). Never work around it and never build a guess. Your agent proposes the
+   ticket **On hold** naming the CR, then the next ticket you can finish: `/board` marks each ticket an open
+   blocking CR affects (`blocked`) and names the first workable one, and `/ticket` shows a **Blocked by**
+   section. If the CR does not block the ticket, build the rest. The lead triages the CR in the daily slot,
+   as a blocker, a fix-forward or a defer, and the fix reaches you as a comment for your agent (or a child
+   task, if your ticket is closed by then; see "When a change request is settled"). Your ticket's text is
+   never rewritten.
 
 **Known issues** are listed in three places:
 - the change log, one file per change in `changes/entries/` (indexed in `CHANGELOG.md` beside it at each release); open entries are the known, unfixed changes;
 - the check reports in the last release run (`python3 tools/run-checks.py`): `check-audience-match`,
   `check-preauth-session`, `check-subject` and `check-binding-ratchet` list issues by screen;
-- `/ticket`, where each one shows what changed since your pin.
+- `/ticket`, which shows what changed since your previous pull and the change requests on your ticket.
 
 If your ticket's screen appears in one of these, it is known. Raise a CR only if you have something to add.
 

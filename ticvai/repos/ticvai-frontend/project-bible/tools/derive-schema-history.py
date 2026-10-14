@@ -150,6 +150,18 @@ RENAMES = [
      "why": "CR-014: one spelling throughout; the package writes organisation (organisation_type, organisation_id beside it)"},
     {"from": "orders.group_customer_organization_contact", "to": "orders.group_customer_organisation_contact", "on": "2026-10-12",
      "why": "CR-014: moved with orders.group_customer_organisation"},
+    # CHG-XDW-001 (14 October 2026, the lead: "Remove them now ?"): CrossRegionService's four records leave the
+    # platform schema, which TenancyService owns in commerce, for sync, CrossRegionService's own schema in
+    # operations. Every operation that reads or writes them is CrossRegionService's, so no write crosses a
+    # deployable (ADR-0055 rule 4; XDW-001 to XDW-011 removed). The table names do not change, only the schema.
+    {"from": "platform.guest_link", "to": "sync.guest_link", "on": "2026-10-14",
+     "why": "CHG-XDW-001: a pseudonymous link between cells is CrossRegionService's record (createGuestLink, revokeGuestLink, resolveGuestLink); in platform, TenancyService's schema in commerce, its own writers in operations could not write it (DB-ROLES)"},
+    {"from": "platform.dsar_request", "to": "sync.dsar_request", "on": "2026-10-14",
+     "why": "CHG-XDW-001: moved with sync.guest_link, which its fan-out walks (schema-merge decision 10, 20 September: both go or neither does); createDsarRequest and getDsarRequest are CrossRegionService's"},
+    {"from": "platform.cross_region_entitlement", "to": "sync.cross_region_entitlement", "on": "2026-10-14",
+     "why": "CHG-XDW-001: CrossRegionService's record; every operation on it (consume, propagate, reconcile, revoke, get) is CrossRegionService's"},
+    {"from": "platform.wallet_authorisation", "to": "sync.wallet_authorisation", "on": "2026-10-14",
+     "why": "CHG-XDW-001: CrossRegionService's record of the cross-cell wallet handshake; every operation on it is CrossRegionService's"},
 ]
 
 # **A column rename is declared here too** (CHG-R6-010, 12 October 2026), by the table's name *now*. The contract
@@ -169,7 +181,7 @@ COLUMN_RENAMES = [
      "why": "CR-011: Hold is banned in DDL"},
     {"table": "wallet.wallet_transaction", "from": "wallet_hold_id", "to": "fund_reservation_id", "on": "2026-10-12",
      "why": "CR-011: a key names the table it references"},
-    {"table": "platform.wallet_authorisation", "from": "wallet_hold_id", "to": "fund_reservation_id", "on": "2026-10-12",
+    {"table": "sync.wallet_authorisation", "from": "wallet_hold_id", "to": "fund_reservation_id", "on": "2026-10-12",
      "why": "CR-011: a key names the table it references"},
     {"table": "orders.order_line", "from": "inventory_hold_id", "to": "inventory_reservation_id", "on": "2026-10-12",
      "why": "CR-011: a key names the table it references"},
@@ -250,6 +262,55 @@ COLUMN_RENAMES = [
      "why": "CR-014: one spelling throughout"},
     {"table": "rental.agreement_item", "from": "stock_reservation_id", "to": "stock_earmark_id", "on": "2026-10-12",
      "why": "CR-014: a key names the table it references (inventory.stock_earmark)"},
+    # CHG-TEN-001 (ADAM CR-080, 14 October 2026)
+    {"table": "platform.sale_board_tile", "from": "page_id", "to": "sale_board_page_id", "on": "2026-10-14",
+     "why": "CR-080: the tile is SaleBoard.pages[].tiles[] and its parent key is derived as sale_board_page_id; the "
+            "relationship graph's old page_id would be a second key to the same page (D-DOUBLE-KEY)"},
+    # CHG-DDL-006 (ADAM CR-072, 14 October 2026): the bare money names of the Sprint 1 modules built after CR-011
+    # (payments, retail), settled as CR-011 and CR-014 were (naming-and-style 5.1). The wire keeps its names.
+    {"table": "payments.dunning_case", "from": "amount", "to": "overdue_amount", "on": "2026-10-14",
+     "why": "CR-072: bare money name (5.1); the sum the dunning case is chasing"},
+    {"table": "payments.instalment", "from": "amount", "to": "due_amount", "on": "2026-10-14",
+     "why": "CR-072: bare money name (5.1); what this instalment collects"},
+    {"table": "payments.payment_attempt", "from": "amount", "to": "attempted_amount", "on": "2026-10-14",
+     "why": "CR-072: bare money name (5.1)"},
+    {"table": "payments.stored_forward", "from": "amount", "to": "transaction_amount", "on": "2026-10-14",
+     "why": "CR-072: bare money name (5.1); as wallet.wallet_transaction.transaction_amount"},
+    {"table": "payments.provider_cost", "from": "amount", "to": "cost_amount", "on": "2026-10-14",
+     "why": "CR-072 (same rule, not on its list): bare money name (5.1)"},
+    {"table": "payments.instalment_plan", "from": "total", "to": "gross_amount", "on": "2026-10-14",
+     "why": "CR-072: a total is gross_amount (5.1)"},
+    {"table": "payments.instalment_plan", "from": "paid_to_date", "to": "paid_amount", "on": "2026-10-14",
+     "why": "CR-072: a money column says it is an amount (5.1)"},
+    {"table": "payments.instalment_policy", "from": "minimum_order_value", "to": "minimum_order_amount", "on": "2026-10-14",
+     "why": "CR-072: value alone is banned (5.1); as inventory.supplier.minimum_order_amount (CR-014)"},
+    {"table": "payments.instalment_policy", "from": "instalment_fee", "to": "instalment_fee_amount", "on": "2026-10-14",
+     "why": "CR-072: a money column says it is an amount (5.1)"},
+    {"table": "retail.sale_line", "from": "unit_price", "to": "unit_amount", "on": "2026-10-14",
+     "why": "CR-072: a unit figure copied onto the line at sale, not an entered price; as ledger.tax_invoice_line.unit_amount"},
+    {"table": "retail.sale_line", "from": "discount", "to": "discount_amount", "on": "2026-10-14",
+     "why": "CR-072: bare money name (5.1); as retail.sale.discount_amount"},
+    {"table": "retail.sale_line", "from": "line_total", "to": "gross_amount", "on": "2026-10-14",
+     "why": "CR-072: a total is gross_amount (5.1); as retail.sale.gross_amount"},
+    {"table": "retail.return_policy", "from": "self_authorise_limit", "to": "self_authorise_limit_amount", "on": "2026-10-14",
+     "why": "CR-072: a money column says it is an amount (5.1); as deposit_box_limit_amount"},
+    {"table": "retail.return_policy", "from": "requires_second_user_above", "to": "second_user_above_amount",
+     "on": "2026-10-14", "why": "CR-072: a money threshold named as an amount (5.1), not as a verb"},
+    {"table": "retail.return_policy", "from": "requires_approval_above", "to": "approval_above_amount",
+     "on": "2026-10-14", "why": "CR-072: as second_user_above_amount"},
+    {"table": "retail.exchange", "from": "returned_value", "to": "returned_amount", "on": "2026-10-14",
+     "why": "CR-072 (same rule, not on its list): value is banned (5.1)"},
+    {"table": "retail.exchange", "from": "replacement_value", "to": "replacement_amount", "on": "2026-10-14",
+     "why": "CR-072 (same rule): value is banned (5.1)"},
+    {"table": "retail.exchange", "from": "difference", "to": "difference_amount", "on": "2026-10-14",
+     "why": "CR-072 (same rule): a money column says it is an amount (5.1)"},
+    # CHG-MKT-001 / CHG-MKT-002 (ADAM CR-086, CR-087, 14 October 2026)
+    {"table": "marketing.guest_device", "from": "token_ref", "to": "token_ciphertext", "on": "2026-10-14",
+     "why": "CR-086: the push token is stored encrypted by the application (ADR-0063 section 4), not as a vault "
+            "reference; the wire keeps tokenRef"},
+    {"table": "marketing.wishlist_item", "from": "price", "to": "list_price", "on": "2026-10-14",
+     "why": "CR-087: the contract said list_price Money (5.1) and the table kept price text from an older run; "
+            "typed numeric(18,4) as Money now (was text)"},
 ]
 
 

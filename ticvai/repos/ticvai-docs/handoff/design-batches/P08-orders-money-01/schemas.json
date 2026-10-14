@@ -3231,7 +3231,7 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`, or the venue's next business-day cut-off (`VenueSettings.businessDayCutoff`) when the cashier sent none (CHG-GDL-003). Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -4018,6 +4018,7 @@
     "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
    },
    "taxReversalEntryId": {
+    "x-ticvai-references": "ledger.journal_entry",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -5298,7 +5299,7 @@
     "type": "string",
     "maxLength": 512,
     "writeOnly": true,
-    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in."
    }
   }
  },
@@ -5580,6 +5581,36 @@
     ],
     "nullable": true,
     "description": "**This till's drawer limit, overriding the venue's** (`VenueSettings.cashDrawerLimit`; DEC-179; CHG-CSP-016). Null inherits the venue's. Above it the till warns and offers a cash lift.\n"
+   },
+   "cashierInputMode": {
+    "type": "string",
+    "enum": [
+     "keyboard",
+     "touch",
+     "scanner",
+     "hybrid"
+    ],
+    "default": "hybrid",
+    "description": "BL-061. **How the cashier at this till enters a sale**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003): until then the request took it and nothing kept it.\n"
+   },
+   "guestDisplayContent": {
+    "type": "array",
+    "default": [
+     "lineItems"
+    ],
+    "description": "BL-061. **What the guest-facing screen shows while a sale is in progress**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003).\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "lineItems",
+      "total",
+      "loyaltyBalance",
+      "promotions",
+      "branding",
+      "upsell",
+      "queuePosition"
+     ]
+    }
    },
    "accessPointId": {
     "type": "string",

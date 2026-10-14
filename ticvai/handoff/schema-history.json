@@ -1196,7 +1196,14 @@
   "wallet.fund_reservation": "2026-10-12",
   "wallet.funding_rule": "2026-10-12",
   "wallet.risk_rule_set": "2026-10-12",
-  "wallet.transfer_rule": "2026-10-12"
+  "wallet.transfer_rule": "2026-10-12",
+  "identity.principal_credential_history": "2026-10-14",
+  "identity.subject_holding": "2026-10-14",
+  "platform.outlet_opening_hour": "2026-10-14",
+  "sync.cross_region_entitlement": "2026-10-14",
+  "sync.dsar_request": "2026-10-14",
+  "sync.guest_link": "2026-10-14",
+  "sync.wallet_authorisation": "2026-10-14"
  },
  "renames": [
   {
@@ -1450,6 +1457,30 @@
    "to": "orders.group_customer_organisation_contact",
    "on": "2026-10-12",
    "why": "CR-014: moved with orders.group_customer_organisation"
+  },
+  {
+   "from": "platform.guest_link",
+   "to": "sync.guest_link",
+   "on": "2026-10-14",
+   "why": "CHG-XDW-001: a pseudonymous link between cells is CrossRegionService's record (createGuestLink, revokeGuestLink, resolveGuestLink); in platform, TenancyService's schema in commerce, its own writers in operations could not write it (DB-ROLES)"
+  },
+  {
+   "from": "platform.dsar_request",
+   "to": "sync.dsar_request",
+   "on": "2026-10-14",
+   "why": "CHG-XDW-001: moved with sync.guest_link, which its fan-out walks (schema-merge decision 10, 20 September: both go or neither does); createDsarRequest and getDsarRequest are CrossRegionService's"
+  },
+  {
+   "from": "platform.cross_region_entitlement",
+   "to": "sync.cross_region_entitlement",
+   "on": "2026-10-14",
+   "why": "CHG-XDW-001: CrossRegionService's record; every operation on it (consume, propagate, reconcile, revoke, get) is CrossRegionService's"
+  },
+  {
+   "from": "platform.wallet_authorisation",
+   "to": "sync.wallet_authorisation",
+   "on": "2026-10-14",
+   "why": "CHG-XDW-001: CrossRegionService's record of the cross-cell wallet handshake; every operation on it is CrossRegionService's"
   }
  ],
  "withdrawn": {
@@ -1483,5 +1514,5 @@
   "ai.chunk_ref": "2026-09-30"
  },
  "baseline": "2026-09-19",
- "generated": "2026-10-13"
+ "generated": "2026-10-14"
 }

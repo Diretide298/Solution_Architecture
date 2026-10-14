@@ -18027,6 +18027,58 @@ components:
           type: integer
           readOnly: true
           description: Records changed since their last embedding. Non-zero for long is drift.
+    IndexEntry:
+      type: object
+      x-ticvai-persistence: ai.index_entry
+      # One entry per source record (14 October 2026, CHG-CRD-007).
+      x-ticvai-unique-together:
+      - [sourceId, recordKey]
+      description: '**One indexed record of a source, as stored** (14 October 2026, CHG-CRD-007, ADAM CR-078; the table
+        held only `id` and `source_id`, so `removeIndexEntry` had nothing to find by the `{entryId}` it is called with
+        and erasure could not find a person''s entries). Never returned by an operation. `reindexSource` writes one per
+        record it embeds (replacing the source''s entries when the shadow collection is swapped in) and the incremental
+        indexer keeps it current; `removeIndexEntry` finds it by `sourceId` and `recordKey` and deletes it with its
+        chunks and points; erasure and archive find a subject''s entries by `subjectId` (ADR-0047).'
+      required: [sourceId, recordKey, contentHash, indexedAt]
+      properties:
+        sourceId:
+          type: string
+          format: uuid
+        recordKey:
+          type: string
+          maxLength: 200
+          description: The indexed record's key in its own table (the `{entryId}` of `removeIndexEntry`).
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: none
+          description: The guest the record is about, where it is one (a case, a profile note), so erasure and archive
+            remove every entry about a subject without reading the source tables. A plain value, not a key into `pii`.
+        contentHash:
+          type: string
+          description: Hash of the embedded text fields; an unchanged hash is not re-embedded.
+        chunkCount:
+          type: integer
+          minimum: 0
+        embeddingModel:
+          type: string
+          maxLength: 200
+        pointIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: The vector points this entry wrote (Qdrant in a scale-out tenant, AI design section 6), so removal
+            names what it deletes in the second store too.
+        indexedAt:
+          type: string
+          format: date-time
+        lastJobId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: ai.index_job
     IndexJob:
       type: object
       x-ticvai-persistence: ai.index_job

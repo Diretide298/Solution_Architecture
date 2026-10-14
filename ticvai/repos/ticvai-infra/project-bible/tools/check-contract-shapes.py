@@ -21,8 +21,21 @@ same kind that nothing held:
   C-EVENT-NAME             an event not named <aggregate>.<pastTenseVerb> (R186, rule changed 1 October)
   C-MONEY-NUMBER           a money-named field typed number/integer instead of Money (R122, R177)
   C-UNTYPED-BODY           a request or 2xx body that is a bare object with no properties (R088)
-  C-PAGED-ORDER            a cursor-paged list that says nothing about its order (R154)
+  C-PAGED-ORDER            a cursor-paged list that says nothing about its order, or an order that names
+                           no field ("most recent first" alone) (R154, CHG-GEN-002, CR-077)
   C-PROSE-SPLIT            a word split by line-wrap or find-and-replace (`s ervice`) (R138)
+  C-SEGREGATION-409        a write whose description cites `SegregationRule` declares no 409 carrying the
+                           `segregation-breach` problem type, or a response carries that type with a status
+                           other than 409 (ADAM CR-079, CHG-IDR-003: one rule, one type, one status)
+  C-PATCH-FULL-BODY        a PATCH whose body is a persisted resource schema with a `required` list naming a
+                           field the caller may send, so a partial update has to resend the whole resource
+                           (ADAM CR-089, CHG-CNS-001). The package's partial update is an `Update<X>Request`:
+                           `minProperties: 1`, no `required`, no defaults, `x-ticvai-persistence: none — request
+                           only` (UpdateProductRequest, UpdateParkingEntitlementRequest). C-REQUEST-SERVER-FIELDS
+                           saw `updateConsentQuestion` only for `status` and it was baselined; the client-owned
+                           required fields (`kind`, `text`, ...) are what a PATCH must not require.
+  C-PAGED-STATUS           a cursor-paged list whose items' status can end (revoked, cancelled, expired ...) that
+                           says neither which statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -47,7 +60,7 @@ RULES = {
     "C-EVENT-NAME": "an event name breaks <aggregate>.<pastTenseVerb> (R186)",
     "C-MONEY-NUMBER": "a money-named field typed number/integer, not Money (R122 R177)",
     "C-UNTYPED-BODY": "a request or 2xx body that is a bare object (R088)",
-    "C-PAGED-ORDER": "a cursor-paged list that states no order (R154)",
+    "C-PAGED-ORDER": "a cursor-paged list that states no order naming the field it sorts on (R154, CHG-GEN-002)",
     "C-PROSE-SPLIT": "a word split in contract prose (R138)",
     "C-TWO-IDEMPOTENCY": "a body idempotency key beside the Idempotency-Key header (R153)",
     "C-SEARCH-PARAM": "a search/q parameter that says nothing about what it matches (R182)",
@@ -61,7 +74,13 @@ RULES = {
     "C-CLONE-CODE": "a clone of an entity with a unique code takes no new code (R108, CHG-R4-016)",
     "C-NAME-LOCALISED": "an entity localises other text but not its name (CHG-R4-011)",
     "C-SERIES-WINDOW": "a series repeating every N minutes has no last start time of the day (DI-995, CHG-R4-014)",
+    "C-SEGREGATION-409": "a segregation check answered other than 409 segregation-breach (ADAM CR-079, CHG-IDR-003)",
+    "C-PATCH-FULL-BODY": "a PATCH body is the full resource schema with its required list (ADAM CR-089, CHG-CNS-001)",
+    "C-PAGED-STATUS": "a paged list of items whose status can end (revoked, cancelled ...) that says neither which "
+                      "statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)",
 }
+# CHG-IDR-003: a write that says it runs the segregation check names the rule schema in its description.
+SEGREGATION = re.compile(r"\bSegregationRule\b")
 CREATES = re.compile(r"^(create|add|register|import)[A-Z]")
 LOCALISED = re.compile(r"schemas/(LocalisedText|LocalisedRichText)['\"]")
 INTERNAL = re.compile(r"^(createdByPrincipalId|updatedByPrincipalId|principalId|approvedByPrincipalId|"
@@ -98,6 +117,132 @@ def body_schema(container):
         if isinstance(media, dict) and media.get("schema") is not None:
             return media["schema"]
     return None
+
+
+def response_props(op, doc) -> set:
+    """Every property name reachable from an operation's 200 body (local refs, allOf, array items): the fields a
+    list can be ordered on."""
+    out, seen = set(), set()
+
+    def walk(node, depth=0):
+        if depth > 8 or not isinstance(node, dict):
+            return
+        if "$ref" in node:
+            if node["$ref"] in seen:
+                return
+            seen.add(node["$ref"])
+            node, _ = deref(node, doc)
+            if not isinstance(node, dict):
+                return
+        for k in ("allOf", "oneOf", "anyOf"):
+            for part in node.get(k) or []:
+                walk(part, depth + 1)
+        if isinstance(node.get("items"), dict):
+            walk(node["items"], depth + 1)
+        for p, v in (node.get("properties") or {}).items():
+            out.add(str(p))
+            walk(v, depth + 1)
+
+    walk(body_schema(((op.get("responses") or {}).get("200")) or {}) or {})
+    return out
+
+
+# CHG-MKT-003 (ADAM CR-088): a status value that ends an item's life, and the parameters that choose among them.
+ENDED_STATUSES = {"revoked", "cancelled", "canceled", "deleted", "archived", "expired", "failed", "closed",
+                  "withdrawn", "voided", "retired", "inactive", "rejected", "lapsed", "superseded", "removed"}
+STATUS_PARAMS = {"status", "statuses", "state", "states", "includeinactive", "includerevoked", "includearchived",
+                 "includeexpired", "includeclosed", "isactive", "active"}
+
+
+def item_status_values(op, doc) -> set:
+    """The `status` enum of the items a paged 200 body lists (`items[]`, through local refs and allOf)."""
+    vals, seen = set(), set()
+
+    def resolve(node):
+        while isinstance(node, dict) and "$ref" in node and node["$ref"] not in seen:
+            seen.add(node["$ref"])
+            node, _ = deref(node, doc)
+        return node if isinstance(node, dict) else {}
+
+    def item_schema(node, depth=0):
+        node = resolve(node)
+        if depth > 6:
+            return []
+        out = []
+        for part in node.get("allOf") or []:
+            out += item_schema(part, depth + 1)
+        items = (node.get("properties") or {}).get("items")
+        if isinstance(items, dict):
+            out.append(resolve(items.get("items") or {}))
+        return out
+
+    def status_of(node, depth=0):
+        node = resolve(node)
+        if depth > 6:
+            return
+        for part in node.get("allOf") or []:
+            status_of(part, depth + 1)
+        st = resolve((node.get("properties") or {}).get("status") or {})
+        for v in st.get("enum") or []:
+            vals.add(str(v).lower())
+
+    for it in item_schema(body_schema(((op.get("responses") or {}).get("200")) or {}) or {}):
+        status_of(it)
+    return vals
+
+
+# An order statement and the field it names: "sorted by `openedAt` descending", "ordered by name", "openedAt
+# descending", "most recent first, by `startedAt`", "newest `resolvedAt` first", "ordered by creation (`id`, a
+# UUIDv7)", "keyset on (startsAt, id)", "... then `name`".
+_TOK = r"[`(]*[A-Za-z_][A-Za-z0-9_.']*[`),]*"
+ORDER_WORD = re.compile(r"\b(?:sorted|ordered|order|sort|sorts|keyset|newest|oldest|most recent|latest|earliest|"
+                        r"soonest|ascending|descending|in the order)\b", re.I)
+ORDER_BY = re.compile(r"\b(?:sorted|ordered|order|sort|sorts|keyset|newest|oldest|most recent|latest|earliest|"
+                      r"soonest|first|last|in the order)\b(?:[\s,]+\w+){0,3}?[\s,]+(?:by|on|of)\s+"
+                      r"(?:the\s+|its\s+|their\s+)?((?:" + _TOK + r"\s*){1,3})", re.I)
+FIRST_FIELD = re.compile(r"\b(?:newest|oldest|most recent|latest|earliest|soonest|highest|lowest)\s+`?"
+                         r"([A-Za-z_][A-Za-z0-9_]*)`?\s+first\b", re.I)
+FIELD_DIRECTION = re.compile(r"(" + _TOK + r")\s*,?\s*\(?(?:ascending|descending|asc|desc|alphabetical(?:ly)?)\b",
+                             re.I)
+THEN_FIELD = re.compile(r"\bthen\s+(?:by\s+)?((?:" + _TOK + r"\s*){1,3})", re.I)
+NOT_A_FIELD = {"the", "a", "an", "its", "their", "which", "what", "when", "default", "order", "them", "it",
+               "this", "that", "date", "time", "most", "recent", "first", "last", "and", "or", "then", "by",
+               "creation", "age", "value", "uuidv7", "row", "rows"}
+
+
+def order_names_field(text: str, props: set) -> bool:
+    """True when an order statement in `text` names a field: a property of the listed items (one word, or two or
+    three run together: "visit date" is `visitDate`), a backticked name, or a camelCase / snake_case identifier."""
+    text = text.replace("**", "")
+    lowered = {p.lower() for p in props}
+
+    def names_field(chunk: str, backtick_ok: bool = True) -> bool:
+        toks = re.findall(r"`?[A-Za-z_][A-Za-z0-9_.']*`?", chunk)
+        words = [t.strip("`").split(".")[-1].removesuffix("'s").strip("'") for t in toks]
+        for i, (raw, w) in enumerate(zip(toks, words)):
+            if not w or w.lower() in NOT_A_FIELD:
+                continue
+            if w.lower() in lowered or re.search(r"[a-z][A-Z]|_", w) or (backtick_ok and raw.startswith("`")):
+                return True
+            for n in (2, 3):
+                if "".join(words[i:i + n]).lower() in lowered and len(words[i:i + n]) == n:
+                    return True
+        return False
+
+    for m in ORDER_BY.finditer(text):
+        if names_field(m.group(1)):
+            return True
+    for m in FIRST_FIELD.finditer(text):
+        if names_field(m.group(1), backtick_ok=False):
+            return True
+    for m in FIELD_DIRECTION.finditer(text):
+        if names_field(m.group(1)):
+            return True
+    if ORDER_WORD.search(text):
+        for m in THEN_FIELD.finditer(text):
+            if names_field(m.group(1)):
+                return True
+    return False
 
 
 def walk_enums(node, where, out, depth=0):
@@ -145,6 +290,13 @@ def main() -> int:
                 if bad and persisted:
                     guard.add("C-REQUEST-SERVER-FIELDS", oid,
                               f"{oid}: request body requires server-owned {', '.join(bad)}")
+                # CR-089: a partial update names only what changes; the resource's required list is the response's.
+                sent = sorted(p for p in req if not (isinstance(props.get(p), dict) and props[p].get("readOnly")))
+                if m == "patch" and persisted and sent:
+                    guard.add("C-PATCH-FULL-BODY", oid,
+                              f"{oid}: PATCH body is the persisted schema "
+                              f"{g.ref_name(str((sch or {}).get('$ref') or '')) or '(inline)'} and requires "
+                              f"{', '.join(sent)}; use an Update<X>Request with minProperties: 1 and no required")
                 if node.get("type") == "object" and not props and not node.get("allOf") \
                         and not node.get("oneOf") and not node.get("anyOf") \
                         and not isinstance(node.get("additionalProperties"), dict):
@@ -194,10 +346,22 @@ def main() -> int:
         refs = {g.ref_name(p.get("$ref", "")) for p in (op.get("parameters") or []) if isinstance(p, dict)}
         if m == "get" and ("PageCursor" in refs or "cursor" in pnames):
             text = " ".join(str(op.get(k) or "") for k in ("description", "summary", "x-ticvai-note"))
+            # **The order names the field it sorts on** (CHG-GEN-002, ADAM CR-077, 14 October 2026). "Most recent
+            # first" passed this rule while naming no column, so listOwnPlatformStaffGrants and
+            # listPlatformStaffGrants could be built in any order a developer guessed (identity.yaml:4273,4641).
             if not ({"sort", "orderBy", "order", "sortBy"} & pnames) and \
-                    not re.search(r"\b(sorted|ordered|order(ed)? by|newest|oldest|most recent|"
-                                  r"ascending|descending|keyset|in the order)\b", text, re.I):
-                guard.add("C-PAGED-ORDER", oid, f"{oid}: paged by cursor and states no order")
+                    not order_names_field(text, response_props(op, doc)):
+                guard.add("C-PAGED-ORDER", oid, f"{oid}: paged by cursor and states no order that names a field")
+            # **Which rows are in the list** (CHG-MKT-003, ADAM CR-088, 14 October 2026). listGuestDevices pages
+            # devices whose status may be revoked or failed and said neither whether they are listed nor how to ask
+            # for them, so the guest's device screen could show a revoked phone as live or drop it silently. A list
+            # whose items carry a status with an ended value, and that takes no status filter, says in words which
+            # statuses it returns.
+            ended = sorted(item_status_values(op, doc) & ENDED_STATUSES)
+            if ended and not (STATUS_PARAMS & {p.lower() for p in pnames}) \
+                    and not re.search(r"\bstatus(es)?\b|`status`", text, re.I):
+                guard.add("C-PAGED-STATUS", oid, f"{oid}: lists items whose status can be {', '.join(ended)} and "
+                          "says neither which statuses it returns nor takes a status filter")
         prose.append((f"{oid}", " ".join(str(op.get(k) or "") for k in ("description", "summary"))))
 
     for (stem, name), s in sorted(g.schemas()[0].items()):
@@ -262,7 +426,33 @@ def main() -> int:
             if (a + b) in vocab and b not in vocab:
                 guard.add("C-PROSE-SPLIT", f"{where}:{a} {b}", f"{where}: '{a} {b}' reads as a split '{a + b}'")
     extra_rules(guard, ops, docs)
+    segregation_rules(guard, ops, docs)
     return guard.finish()
+
+
+def segregation_rules(guard, ops, docs):
+    """**One segregation rule, one answer** (14 October 2026, ADAM CR-079; CHG-IDR-003). The same check was `422
+    segregation-breach` on createRole, a bare 409 on setRolePermissions and setPrincipalModuleAccess, and nothing on
+    createDelegatedAccess, so a client could not switch on it and a grant could bypass it. Every write whose
+    description says it runs the check (it names `SegregationRule`) declares a 409 listing `segregation-breach`, and no
+    response anywhere carries that type with another status. Reads that name the rule (listPermissionFindings) report
+    conflicts and refuse nothing, so they are not asked for a 409."""
+    for oid, f in sorted(ops.items()):
+        op, doc, m = f["op"], docs[f["contract"]], f["method"]
+        carried = {}
+        for code, r in (op.get("responses") or {}).items():
+            rr, _ = deref(r, doc)
+            types = (rr or {}).get("x-ticvai-problem-types") if isinstance(rr, dict) else None
+            if isinstance(types, list) and "segregation-breach" in types:
+                carried[str(code)] = True
+        for c in sorted(carried):
+            if c != "409":
+                guard.add("C-SEGREGATION-409", f"{oid}:{c}",
+                          f"{oid}: {c} carries segregation-breach; the one status for it is 409")
+        if m in ("post", "put", "patch") and SEGREGATION.search(str(op.get("description") or "")) \
+                and "409" not in carried:
+            guard.add("C-SEGREGATION-409", oid,
+                      f"{oid}: its description runs the SegregationRule check and no 409 lists segregation-breach")
 
 
 def family(name: str) -> str:

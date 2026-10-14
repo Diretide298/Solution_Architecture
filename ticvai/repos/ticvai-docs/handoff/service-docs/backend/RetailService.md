@@ -1282,9 +1282,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | default_window_days | integer | yes |  |
 | requires_receipt | boolean | yes |  |
 | allow_cash_refund_on_card_sale | boolean | no |  |
-| self_authorise_limit | numeric(18,4) | no | Up to this, one cashier may accept a return alone. |
-| requires_second_user_above | numeric(18,4) | no |  |
-| requires_approval_above | numeric(18,4) | no |  |
+| self_authorise_limit_amount | numeric(18,4) | no | Up to this, one cashier may accept a return alone. |
+| second_user_above_amount | numeric(18,4) | no |  |
+| approval_above_amount | numeric(18,4) | no |  |
 | restockable_conditions | text[] | no | Conditions that return stock to sale. |
 | non_returnable_category_ids | text[] | no |  |
 
@@ -1315,9 +1315,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | merchandise_id | uuid | no |  |
 | name | text | no |  |
 | quantity | integer | no |  |
-| unit_price | numeric(18,4) | no |  |
-| discount | numeric(18,4) | no |  |
-| line_total | numeric(18,4) | no |  |
+| unit_amount | numeric(18,4) | no |  |
+| discount_amount | numeric(18,4) | no |  |
+| gross_amount | numeric(18,4) | no |  |
 | serial_numbers | text[] | no |  |
 | returned_quantity | integer | no |  |
 | is_returnable | boolean | no | False once the window has passed or the line is fully returned. |

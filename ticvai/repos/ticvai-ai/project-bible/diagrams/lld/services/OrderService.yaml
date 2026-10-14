@@ -62,7 +62,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 7
+    reads: 8
     writes: 3
   - operation: addTip
     verb: POST
@@ -4135,6 +4135,7 @@ screens:
 - P08:BO-042 Banking & Safe
 - P08:BO-043 Daily Reconciliation
 - P08:BO-047 Order Corrections & Exceptions
+- P08:BO-053 Staff Directory
 - P08:BO-062 Venue Profile
 - P08:BO-065 Venue Configuration
 - P08:BO-097 Check Out & Check In

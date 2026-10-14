@@ -247,7 +247,7 @@
 | `conversation.yaml` | marketing-crm | `ConversationState` | `conversation.handedOver` |
 | `entitlement-status.yaml` | orders | `EntitlementStatus` | `access.validated`, `entitlement.voided` |
 | `media.yaml` | assets | `MediaStatus` | `assets.documentIndexed` |
-| `order.yaml` | orders | `OrderStatus` | `order.cancelled`, `order.completed`, `order.paid`, `order.refunded` |
+| `order.yaml` | orders | `OrderStatus` | `order.cancelled`, `order.completed`, `order.lapsed`, `order.paid`, `order.refunded` |
 | `payment.yaml` | orders | `Payment.status` | `order.paid` |
 | `performance.yaml` | catalogue | `Performance.status` | `performance.cancelled` |
 | `period.yaml` | finance | `PeriodStatus` | `ledger.periodClosed` |

@@ -396,7 +396,6 @@ operations:
   writes:
   - cache:idempotency
   - platform.dead_letter
-  - platform.outbox
 - operation: republishOutbox
   verb: POST
   path: /outbox-republishes

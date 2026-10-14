@@ -50,6 +50,10 @@ python3 tools/derive-lineage.py --apply
 # lineage, so it runs after it; services are frozen at 1.0.0 against this list, not typed from memory.
 python3 tools/derive-delivery-slice.py
 python3 tools/derive-schema.py
+# **Each read in the lineage names the columns it reads** (14 October 2026, ADAM CR-004, CHG-LIN-001). DB-READ-VIEWS
+# generates each published view from `readColumns`, so a view exposes only what its readers read and a pii view is
+# always narrow. After derive-schema, because it compares the response fields with the columns that run produced.
+python3 tools/derive-read-columns.py --apply
 # **`service-decomposition.json` is an authored input and half of it is arithmetic.**
 # Which schemas a service owns is a boundary decision and nothing rewrites it; the
 # operation and table counts, and the cross-service read and write edges, are counted
@@ -402,6 +406,8 @@ screen_patterns                                                    # imported by
 ticket_done                                                        # imported by build-service-docs and op-release (one done-when for the plan row and the pointer), no main (3 October, CHG-GTR-002)
 resolution_cache                                                   # imported by derive-lineage, derive-diagrams and check-write-lineage (the cache key a writer bumps), no main (4 October, CHG-FXC-001)
 frontend_repos                                                     # imported by build-service-docs, derive-frontend, op-descriptions, op-release, check-ticket-text and check-frontend-repos (the app -> repository map), no main (13 October, CHG-R6-059)
+ticket_features                                                    # imported by check-ticket-scope and check-audience-match (a feature's screens and operations), no main (14 October, CHG-SWP-001)
+audit-screen-promises                                              # ranks screen promises for an AI sample, by hand (--out); decides nothing (14 October, CHG-SWP-005)
 build-tracker-index                                                # intake: reads the two task-tracker workbooks at the repository root, outside git, once per tracker drop (1 October)
 push-openproject op-release op-release-api op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
 release-notes                                                      # per release, between two tags

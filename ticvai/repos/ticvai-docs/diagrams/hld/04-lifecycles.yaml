@@ -7,7 +7,7 @@ sourceFiles:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 207 state models and 87 events
+title: 207 state models and 89 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -1852,7 +1852,7 @@ stateModels:
   owner: orders
   service: OrderService
   states: null
-  transitions: 14
+  transitions: 15
   initial:
   - pending
   terminal:
@@ -1865,7 +1865,7 @@ stateModels:
   - holdOrder
   - resumeOrder
   - voidOrder
-  guarded: 14
+  guarded: 15
   ref: diagrams/lld/lifecycles/order.yaml
 - entity: Outbox republish
   contract: platform-ops
@@ -3526,6 +3526,11 @@ events:
 - event: order-exchanged
   description: Lines on a paid order were exchanged for different products, dates or performances, settling
     only the difference.
+- event: order-lapsed
+  description: An order ended without being paid and without anybody voiding it — its payment was declined
+    and not retried, its payment window passed, or a parked sale's hold expired.
+- event: order-linkedToGuest
+  description: A guest-checkout order was attached to a guest's account, so it now belongs to that subject.
 - event: order-paid
   description: An order has been paid in full. The moment revenue is recognisable and entitlements may
     be issued.

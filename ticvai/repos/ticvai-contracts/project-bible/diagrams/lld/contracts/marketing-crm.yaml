@@ -133,6 +133,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.performance
+  - catalogue.price
+  - catalogue.price_assignment
+  - catalogue.price_list
+  - catalogue.product
+  - catalogue.product_media
+  - catalogue.variant
   - marketing.wishlist_item
   writes:
   - cache:idempotency
@@ -1020,6 +1027,13 @@ operations:
   - guest
   offline: false
   reads:
+  - catalogue.performance
+  - catalogue.price
+  - catalogue.price_assignment
+  - catalogue.price_list
+  - catalogue.product
+  - catalogue.product_media
+  - catalogue.variant
   - marketing.wishlist_item
   writes: []
 - operation: handoverToAgent
@@ -2634,10 +2648,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - marketing.guest_profile
+  - marketing.wishlist_item
   writes:
   - cache:idempotency
-  - marketing.guest_profile
+  - marketing.wishlist_item
 - operation: reopenCase
   verb: POST
   path: /cases/{caseId}/reopen
@@ -2728,10 +2742,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - marketing.guest_profile
+  - marketing.guest_device
   writes:
   - cache:idempotency
-  - marketing.guest_profile
+  - marketing.guest_device
 - operation: runDataRetention
   verb: POST
   path: /retention-runs

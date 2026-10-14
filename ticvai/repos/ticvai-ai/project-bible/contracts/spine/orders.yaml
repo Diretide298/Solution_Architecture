@@ -90,6 +90,35 @@ tags:
 - name: reservation
 - name: policy
 - name: sync
+x-ticvai-queries:
+  # Rule questions other modules ask Orders, answered by the owner (ADR-0055 amendment, 14 October 2026; the shape is
+  # the r6 shared convention: module, inputs, returns, rule, served). An asking operation names one in
+  # `x-ticvai-read-via`.
+  openOrdersForSubject:
+    module: orders
+    inputs:
+      subjectId: {type: string, format: uuid, description: The guest (pii.subject).}
+    returns:
+      orderIds: {type: array, items: {type: string, format: uuid}, description: The guest's open orders; empty when none.}
+    rule: >-
+      An order is open while its status (`OrderStatus`, states/order.yaml) is `pending`, `held`, `partiallyPaid` or
+      `paid`: not yet paid, or paid and not yet fulfilled. `completed`, `voided`, `refunded`, `partiallyRefunded` and
+      `failed` are not open (ADAM CR-084, CHG-GDL-001).
+    served: [projection]
+    # Machine-read by tools/check-error-sources.py (CHG-GDL-003): E-STUCK (a blocking state has an exit nobody has to
+    # take) and E-UNFED (every way into or out of the blocking set reaches the projection by an event it consumes).
+    states:
+      model: states/order.yaml
+      blocking: [pending, held, partiallyPaid, paid]
+      waitsOnActor:
+        partiallyPaid: money was captured, so only a person may end it (createPayment for the balance, or createRefund);
+          a timer that dropped it would strand the guest's money, and blocking the erasure until then is right
+    projection:
+      context: identity
+      table: identity.subject_holding
+      source: orders.sales_order
+      feeds: [order.created, order.paid, order.completed, order.cancelled, order.lapsed, order.refunded,
+              order.linkedToGuest, guest.merged]
 paths:
   /carts:
     post:
@@ -3038,6 +3067,12 @@ paths:
         cart and karting at 13:00 being added is a prompt, not a refusal, because a party of four may
         legitimately split.
 
+        **Whether the variant may be sold on this channel is asked of Catalogue** (decided 14 October 2026,
+        Chinmay, ADAM CR-081; CHG-TEN-002; ADR-0055 rule 2). Orders calls Catalogue''s declared query
+        `variantsSellableAt(venueId, [variantId], channel)` in process, in the cart''s transaction, with the
+        caller''s channel (`pos` at a till), rather than reading `catalogue.variant` and `catalogue.product`
+        itself; a variant that fails it is `409 notSellableOnChannel`.
+
         '
       tags:
       - cart
@@ -3045,6 +3080,10 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-via:
+        - query: catalogue#variantsSellableAt
+          route: in-process
+          for: "the line's variantId on the caller's channel (409 notSellableOnChannel)"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - $ref: ../shared/common.yaml#/components/parameters/AdmissionToken
@@ -5738,14 +5777,19 @@ paths:
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-132 Offline Transaction Monitor & Sync Queue"
+      x-ticvai-write-via:
+      - table: sync.rejection
+        operation: recordSyncRejection
       x-ticvai-note: >-
         **Ingest, per entry** (system-design review SD-028, 29 September; supersedes "stopping at the first entry").
         Entries are taken in `sequence` order. For each: validate and re-price; write the order, its lines and
         payments; post any price variance to the variance account; report consumed units against the till's
         hold (`catalogue.renewInventoryHold` / `relinquishInventoryHold`); and write `order.paid` to the outbox
         for a paid order, so tickets and revenue follow the same saga as an online sale. **An entry refused on its
-        merits is quarantined, not blocking**: it is written to `sync.rejection` (with `sync.rejectionRaised` to
-        the outbox), its result is `rejected` with the `rejectionId`, and the batch continues. **An entry that
+        merits is quarantined, not blocking**: it is recorded in `sync.rejection` by the owner, cross-region
+        `recordSyncRejection` (in `operations`; ADR-0055 rule 4, CHG-XDW-002), called with the `rejectionId` this
+        operation chose as its `Idempotency-Key` (with `sync.rejectionRaised` to the outbox), its result is
+        `rejected` with the `rejectionId`, and the batch continues. A failed call is a transient failure. **An entry that
         depends on a rejected one** (a void, refund or payment for the same order) is `blockedByRejection` and
         quarantined with it, so a void is never evaluated before its sale. **Only a transient failure stops the
         batch** (a database or provider error): `stoppedAtSequence` names it and the till retries from there.
@@ -5756,6 +5800,7 @@ paths:
       x-ticvai-calls:
       - catalogue.renewInventoryHold
       - catalogue.relinquishInventoryHold
+      - cross-region.recordSyncRejection
       x-ticvai-audience:
       - staff
       summary: Replay orders recorded offline
@@ -5896,6 +5941,11 @@ paths:
         - "P08 BO-038 Reconciliation Queue"
         - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
+      x-ticvai-write-via:
+      - table: sync.rejection
+        operation: recordSyncRejectionResolution
+      x-ticvai-calls:
+      - cross-region.recordSyncRejectionResolution
       x-ticvai-audience:
       - staff
       summary: Record what was done about a refused entry
@@ -5908,6 +5958,11 @@ paths:
         `createOrder`, voids it with `voidOrder` or refunds it with `createRefund` (F33 step 8), then
         calls this with what they did and the id it produced. The rejection then leaves the unresolved
         view of `listSyncRejections`.
+
+        **The owner writes it.** `sync.rejection` is CrossRegionService''s, in `operations`; this checks the
+        caller''s permission and calls cross-region `recordSyncRejectionResolution` with the resolution and the
+        caller''s principal (ADR-0055 rule 4, CHG-XDW-002). Its `409` `sync-rejection-already-resolved` is
+        answered here as `alreadyResolved`.
 
         **Resolved once.** A second call with the same resolution and record is the same answer; a
         different one on an already-resolved rejection is refused, because two resolutions of one
@@ -20126,6 +20181,7 @@ components:
         priority:
           type: integer
         providerId:
+          x-ticvai-references: payments.provider
           type: string
           format: uuid
         conditions:
@@ -20160,6 +20216,7 @@ components:
             maxAmount:
               $ref: ../shared/common.yaml#/components/schemas/Money
         fallbackProviderId:
+          x-ticvai-references: payments.provider
           type: string
           format: uuid
           nullable: true
@@ -20205,6 +20262,7 @@ components:
           type: string
           format: uuid
         providerId:
+          x-ticvai-references: payments.provider
           type: string
           format: uuid
         token:
@@ -22150,7 +22208,8 @@ components:
           nullable: true
           readOnly: true
           description: When a held order expires and is voided (states/order.yaml), from `holdOrder`'s
-            `holdUntil`. Null on an order not currently held.
+            `holdUntil`, or the venue's next business-day cut-off (`VenueSettings.businessDayCutoff`) when the
+            cashier sent none (CHG-GDL-003). Null on an order not currently held.
         createdAt:
           type: string
           format: date-time
@@ -22410,6 +22469,7 @@ components:
 
             '
         taxReversalEntryId:
+          x-ticvai-references: ledger.journal_entry
           type: string
           format: uuid
           nullable: true

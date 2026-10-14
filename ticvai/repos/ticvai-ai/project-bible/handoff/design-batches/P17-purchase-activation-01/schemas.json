@@ -794,6 +794,7 @@
     "type": "integer"
    },
    "providerId": {
+    "x-ticvai-references": "payments.provider",
     "type": "string",
     "format": "uuid"
    },
@@ -827,6 +828,7 @@
     }
    },
    "fallbackProviderId": {
+    "x-ticvai-references": "payments.provider",
     "type": "string",
     "format": "uuid",
     "nullable": true,

@@ -116,6 +116,7 @@
  },
  "Principal": {
   "x-ticvai-persistence": "identity.principal",
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "required": [
    "id",
@@ -156,6 +157,8 @@
    },
    "roles": {
     "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**Read with the principal, never stored on it** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): one item per role the principal holds through a live grant, an `identity.delegated_access` row with this `principal_id`, a `role_id`, `effect` ALLOW, `revoked_at` null and now inside `valid_from`..`valid_to` (an open end is open), joined to `identity.role` for `code` and `name`. A role granted at several scopes appears once. `isPrimary` is `role.id = principal.primary_role_id`. Ordered by `name` ascending.",
     "items": {
      "$ref": "#/components/schemas/RoleSummary"
     }
@@ -164,6 +167,19 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "mustChangeCredential": {
+    "type": "boolean",
+    "default": true,
+    "description": "**The principal must replace their credential before the session is usable** (14 October 2026, CHG-CRD-001, ADAM CR-078; `createPrincipal` took it and nothing stored it). Set by `createPrincipal` (from `CreatePrincipalRequest.mustChangeCredential`, true unless the creator says otherwise) and by `resetPrincipalCredential` (always true: a reset credential is temporary). **Cleared only by a successful `changeOwnCredential`.** `login` returns it in `LoginResponse.mustChangeCredential`, and while it is true the session may call `changeOwnCredential`, `logout` and nothing else."
+   },
+   "ssoProviderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.sso_provider",
+    "description": "**Set when single sign-on provisioned this principal** (`completeSsoAuthorization`, from the tenant's `identity.sso_provider`; 14 October 2026, CHG-CRD-001). Such a principal has **no local password**: no `password` row in `identity.principal_credential`, a `password` `login` is refused 401 `sso-sign-in-required` (the door offers `startSsoAuthorization` instead), and `changeOwnCredential` with `method: password` is refused 409 `credential-managed-by-sso`. A till PIN may still be issued to them by `resetPrincipalCredential` (`method: pin`); until it is, a `pin` sign-in is refused the same way. Null for a principal created with `createPrincipal`."
    }
   }
  },
@@ -1068,7 +1084,8 @@
     "type": "string"
    },
    "isPrimary": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002)."
    }
   }
  },

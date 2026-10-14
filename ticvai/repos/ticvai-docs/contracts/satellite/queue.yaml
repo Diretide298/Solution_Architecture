@@ -1272,6 +1272,7 @@ components:
                   **When the queue stops accepting, which is before it stops running.** A guest
                   joining two minutes before close waits twenty and is turned away at the front.
         parentQueueId:
+          x-ticvai-references: queue.queue
           type: string
           format: uuid
           nullable: true
@@ -1561,11 +1562,13 @@ components:
             loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not
             `none`. Kept on the entry so a disputed priority can be explained afterwards.
         priorityTierId:
+          x-ticvai-references: marketing.programme_tier
           type: string
           format: uuid
           nullable: true
           description: The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`.
         priorityPromotionId:
+          x-ticvai-references: promotions.promotion
           type: string
           format: uuid
           nullable: true
@@ -1582,6 +1585,7 @@ components:
         joinedAt: { type: string, format: date-time }
         syncedAt: { type: string, format: date-time, nullable: true }
         overriddenByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           nullable: true
@@ -1712,6 +1716,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         feedId:
+          x-ticvai-references: queue.feed
           type: string
           format: uuid
           readOnly: true

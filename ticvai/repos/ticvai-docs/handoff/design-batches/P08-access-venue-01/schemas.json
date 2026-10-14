@@ -438,7 +438,8 @@
    "mediaCode": {
     "type": "string",
     "x-ticvai-unique": "tenant",
-    "description": "**Unique within the tenant** (decided 28 September, audit R108): one entry per code. `addBlacklistEntry` refuses a second entry with `409 duplicate-code`. **One code space for both lists** (decided 29 September, writers pass): a code on the blacklist cannot also be whitelisted; adding it to the other list is the same `409 duplicate-code`. Move a code between lists by removing and re-adding it."
+    "x-ticvai-unique-compare": "exact",
+    "description": "**Unique within the tenant** (decided 28 September, audit R108): one entry per code, compared exactly: it is what a gate reads off the media, an opaque external id (common.yaml, the uniqueness rule). `addBlacklistEntry` refuses a second entry with `409 duplicate-code`. **One code space for both lists** (decided 29 September, writers pass): a code on the blacklist cannot also be whitelisted; adding it to the other list is the same `409 duplicate-code`. Move a code between lists by removing and re-adding it."
    },
    "reason": {
     "type": "string"
@@ -590,6 +591,7 @@
     }
    },
    "parentQueueId": {
+    "x-ticvai-references": "queue.queue",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1253,6 +1255,7 @@
     "format": "uuid"
    },
    "feedId": {
+    "x-ticvai-references": "queue.feed",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1583,12 +1586,14 @@
     "description": "Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement, loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not `none`. Kept on the entry so a disputed priority can be explained afterwards.\n"
    },
    "priorityTierId": {
+    "x-ticvai-references": "marketing.programme_tier",
     "type": "string",
     "format": "uuid",
     "nullable": true,
     "description": "The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`."
    },
    "priorityPromotionId": {
+    "x-ticvai-references": "promotions.promotion",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1632,6 +1637,7 @@
     "nullable": true
    },
    "overriddenByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "nullable": true,

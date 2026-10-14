@@ -119,7 +119,10 @@ def kind(node, base: Path) -> tuple[str, list]:
     return f"{t or 'object'}{':' + n['format'] if n.get('format') else ''}", []
 
 
-def fields(node, base: Path, prefix="", depth=0, seen=frozenset()) -> dict:
+def fields(node, base: Path, prefix="", depth=0, seen=frozenset(), inbound=False) -> dict:
+    """Every field of a body. **A readOnly field is never required of a request** (14 October 2026, CHG-R6G-002):
+    OpenAPI ignores readOnly properties on input, so `required` on one binds the response only. A server-set
+    `scopePath` made required for its NOT NULL column read as a new required request field."""
     out = {}
     _, _, name = sd.resolve(node, base)
     if name and name in seen:
@@ -131,15 +134,16 @@ def fields(node, base: Path, prefix="", depth=0, seen=frozenset()) -> dict:
         if not isinstance(vr, dict):
             continue
         t, e = kind(v, b)
-        out[prefix + k] = {"type": t, "required": k in req, "enum": e}
+        ro = inbound and bool((isinstance(v, dict) and v.get("readOnly")) or vr.get("readOnly"))
+        out[prefix + k] = {"type": t, "required": k in req and not ro, "enum": e}
         if depth + 1 >= 4:
             continue
         if vr.get("type") == "array":
             it, _, iname = sd.resolve(vr.get("items", {}), vb)
             if isinstance(it, dict) and (it.get("properties") or it.get("allOf")) and iname not in seen:
-                out.update(fields(vr["items"], vb, prefix + k + "[].", depth + 1, seen))
+                out.update(fields(vr["items"], vb, prefix + k + "[].", depth + 1, seen, inbound))
         elif (vr.get("properties") or vr.get("allOf")) and vname not in seen:
-            out.update(fields(v, b, prefix + k + ".", depth + 1, seen))
+            out.update(fields(v, b, prefix + k + ".", depth + 1, seen, inbound))
     return out
 
 
@@ -220,7 +224,7 @@ def shape(contract_name: str, root: Path = ROOT) -> dict:
                 rbr, rbb, _ = sd.resolve(rb, f)
                 sch = ((rbr.get("content") or {}).get("application/json") or {}).get("schema")
                 if sch:
-                    req = fields(sch, rbb)
+                    req = fields(sch, rbb, inbound=True)
             resp = {}
             for code, r in (op.get("responses") or {}).items():
                 if str(code).startswith("2"):

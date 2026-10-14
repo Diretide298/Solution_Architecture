@@ -2624,6 +2624,11 @@ paths:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-039 Profile"
+      x-ticvai-write-via:
+      - table: pii.subject
+        operation: updateGuestSubjectDetails
+      x-ticvai-calls:
+      - identity.updateGuestSubjectDetails
       security:
       - guestAuth: []
       summary: A guest correcting their own details
@@ -2634,6 +2639,11 @@ paths:
 
         **A narrower field set than the staff operation.** A guest may correct their name, contact details,
         language and channel preference. They may not set their own tags, lifetime value or loyalty tier.
+
+        **The name and language are Identity''s.** `displayName` and `preferredLanguage` also live on the
+        guest''s `pii.subject`, which Identity owns in `commerce`; this calls identity
+        `updateGuestSubjectDetails` with the guest''s own subject and those two fields when either is sent
+        (ADR-0055 rule 4, CHG-XDW-005), and writes the rest of the profile itself.
 
         '
       tags:
@@ -4512,9 +4522,30 @@ paths:
         Items whose product has been withdrawn are returned with `isAvailable: false` rather than dropped.
         A guest who saved something and finds it silently gone assumes the feature is broken.
 
+        **Newest first**: ordered by `addedAt` descending, `id` as the tiebreak.
+
+        **What Catalogue knows is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002;
+        ADR-0055 rule 4). Marketing runs in another deployable, so it never reads `catalogue.*`: it asks
+        Catalogue''s declared query `variantListingFacts(variantIds, channel, performanceIds)` through
+        Catalogue''s service route, once per read for every saved variant, with the guest''s channel (`web` or
+        `mobile`), and returns Catalogue''s current `productName`, `imageAssetRef`, `price` and
+        `performanceStartsAt`; `isAvailable` is false where Catalogue says the variant is not sellable
+        (`unavailableReason` is its `reason`) or the saved performance has started (`performancePassed`).
+        Nothing is written back: this read runs on a replica. **If Catalogue cannot be reached** the stored
+        values are returned as they were when each item was saved, rather than an error. Catalogue''s
+        published service operation for the query is not written yet (a follow-up, as for
+        `variantsSellableAt`, CHG-TEN-002).
+
+        **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here
+        (CHG-MKT-002, as the developer of ticket 30706 proposed).
+
         '
       tags:
       - guest
+      x-ticvai-read-via:
+      - query: catalogue#variantListingFacts
+        route: service
+        for: "items[] productName, imageAssetRef, price, performanceStartsAt, isAvailable, unavailableReason"
       x-ticvai-permission: null
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject
@@ -4529,7 +4560,6 @@ paths:
       x-ticvai-self-scoped: subject
       security:
       - guestAuth: []
-      - bearerAuth: []
       responses:
         '200':
           description: Wishlist
@@ -4556,9 +4586,35 @@ paths:
         audit R149).** The entry key is `variantId` plus `performanceId`; a save with no
         `performanceId` is a third, date-less entry for the product generally.
 
+        **Whether the variant may be sold is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM
+        CR-081; CHG-TEN-002; ADR-0055 rule 4). Marketing runs in another deployable, so it asks Catalogue''s
+        declared query `variantsSellableAt(venueId, [variantId], channel)` through Catalogue''s service route
+        with the guest''s channel (`web` or `mobile`) and never reads `catalogue.variant`. A variant Catalogue
+        does not know, or one not sellable at the venue on that channel, is the `404`. Catalogue''s published
+        service operation for the query is not written yet (a follow-up of CHG-TEN-002).
+
+        **What the saved row holds** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002). The same call
+        to Catalogue''s service route asks `variantListingFacts(variantIds, channel, performanceIds)` too, whose
+        `venueId` is the venue `variantsSellableAt` is asked about, and the row stores its `productName`,
+        `imageAssetRef`, `listPrice` (as `list_price`), `performanceStartsAt` and `isAvailable: true` as they are
+        at the save; `getWishlist` replaces them with Catalogue''s current answer on every read. A performance that
+        is not the variant''s product''s is the same `404` (`unknown-variant`).
+
+        **The idempotency is the database''s**: a unique index on (`subject_id`, `variant_id`, `performance_id`)
+        with a null performance colliding too (`NULLS NOT DISTINCT`), so two saves racing under different
+        `Idempotency-Key`s make one row. The second save meets the index, reads the existing row and answers
+        `200` with it, its `note` replaced when it sends one.
+
         '
       tags:
       - guest
+      x-ticvai-read-via:
+      - query: catalogue#variantsSellableAt
+        route: service
+        for: "the saved variantId (404 unknown-variant, variant-not-sellable)"
+      - query: catalogue#variantListingFacts
+        route: service
+        for: "the stored productName, imageAssetRef, list_price, performanceStartsAt (404 unknown-variant)"
       x-ticvai-permission: null
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject
@@ -4606,7 +4662,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Wishlist'
         '404':
-          description: Variant not found or not sellable in this venue
+          description: Variant not found or not sellable in this venue (Catalogue's `variantsSellableAt`;
+            CHG-TEN-002)
+          x-ticvai-problem-types:
+          - unknown-variant
+          - variant-not-sellable
           content:
             application/problem+json:
               schema:
@@ -4683,6 +4743,20 @@ paths:
         — printers, readers, turnstiles. A guest''s phone is neither owned by the venue nor bound to anything,
         and it is registered for one reason: to be sent to. That makes it guest engagement.
 
+        **Ordered by `registeredAt` descending, `id` as the tiebreak** (decided 14 October 2026, Chinmay, ADAM
+        CR-088, CHG-MKT-003): the newest registration, usually the phone in the guest''s hand, first.
+        `registeredAt` is never null and is not changed by a re-registration, so a device does not move while a
+        guest pages; the cursor is (`registeredAt`, `id`), as `PageCursor` says.
+
+        **Every status is listed**, `active`, `failed` and `revoked`, each with its `status` and, for a revoked
+        one, `revokedAt`: GST-073 and WEB-024 show a revoked device as revoked rather than dropping it, so a
+        guest can see that the old phone that still held tickets was cut off, and a failed one as needing the
+        app opened again. There is no status filter; a screen that wants active devices only filters what it
+        is given.
+
+        **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here
+        (CHG-MKT-003, as the developer of ticket 30707 proposed).
+
         '
       tags:
       - guest
@@ -4704,7 +4778,6 @@ paths:
       x-ticvai-self-scoped: subject
       security:
       - guestAuth: []
-      - bearerAuth: []
       responses:
         '200':
           description: Devices
@@ -4729,11 +4802,36 @@ paths:
       - guest
       summary: Register a device for push
       description: 'Called on install and again whenever the provider rotates the token — which happens
-        without warning and without an uninstall. Idempotent on the token, so re-registration updates
-        rather than duplicates.
+        without warning and without an uninstall. Re-registration updates rather than duplicates.
 
         **A registered device is not consent to send.** Push still requires a current consent for the
         purpose; this only records where a message could go.
+
+        **Which row a registration is** (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001). A rotated
+        token is a different token, so the token alone cannot be the key. The app sends `installationId`, a
+        UUIDv7 it makes once per install (per browser profile for `web`) and keeps until uninstalled. The
+        server looks, among the calling guest''s own rows, for the row with that `installationId`, or, when none
+        is sent, the row whose `tokenFingerprint` is this token''s; a revoked row has neither, so it is never
+        found. Found: the row is updated in place. Not found: a new `active` row. Unique indexes on
+        (`subject_id`, `installation_id`) and (`subject_id`, `token_fingerprint`) make two racing registrations
+        one row; the loser re-reads and updates it. They are per guest, never tenant-wide: the table is under
+        subject RLS, and a tenant-wide index would fail on a row the caller cannot see.
+
+        **What a re-registration changes**: `tokenRef` and `tokenFingerprint` (the new token''s), `platform`,
+        `appVersion`, `osVersion`, `deviceModel` and `locale` (as sent; a field not sent becomes null),
+        `status` `active` (a `failed` row is made active again: a new token is the usual cure), `failureCount`
+        0 and `lastSeenAt` now; `registeredAt` and `id` are kept. **A revoked device is never made active
+        again**: registering the same phone after a revoke makes a new row, and the revoked one stays as the
+        guest''s history (`listGuestDevices`).
+
+        **The token is never stored as sent** (ADR-0063 section 4, amended 14 October 2026): `tokenRef` holds it
+        encrypted with the tenant''s data key, and `tokenFingerprint` is its HMAC-SHA-256 under the tenant''s
+        blind-index key. Both come from the kernel''s field encryption; no Key Vault secret is written per device.
+
+        **One phone, two guests.** When another guest signs in on a shared phone, the same token is registered
+        under their subject as a row of their own. The push sender, a worker that sees every subject, sends a
+        token only to the row registered or seen most recently and marks the others `revoked`, so a guest who
+        has left the phone is not sent the next guest''s messages (lead to confirm).
 
         '
       tags:
@@ -4773,6 +4871,16 @@ paths:
                 token:
                   type: string
                   maxLength: 512
+                  description: The provider's push token. Stored only encrypted (`GuestDevice.tokenRef`) and as a
+                    keyed hash (`GuestDevice.tokenFingerprint`); never stored or logged as sent (CHG-MKT-001).
+                installationId:
+                  type: string
+                  format: uuid
+                  description: 'A UUIDv7 the app makes once per install (once per browser profile for `web`)
+                    and sends on every registration from that install, so a rotated token updates the same row
+                    (CHG-MKT-001). Optional so an app that predates it still registers: without it the row is
+                    matched on the token, and a rotated token makes a new row while the old one fails and ages
+                    out.'
                 appVersion:
                   type: string
                 osVersion:
@@ -4818,6 +4926,11 @@ paths:
       description: 'Sign-out, uninstall, or a guest removing a device they no longer have. Revoked rather
         than deleted — a token that starts failing needs a record explaining why, or the same dead token
         gets retried indefinitely.
+
+        **A revoke is final and keeps no token** (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001):
+        `status` `revoked`, `revokedAt` now, and `tokenRef`, `tokenFingerprint` and `installationId` cleared, so
+        nothing can be sent to it and no later registration matches it. The row stays, with its platform, model
+        and dates, as the guest''s record of the device. Revoking a revoked device is `204` again.
 
         '
       tags:
@@ -16088,7 +16201,8 @@ paths:
         (`perBooking`); `required` whether checkout waits for it; `blockingAnswer` which answer, if any,
         stops the booking (a `no` to "Are you able to swim?" on a deep-water product). Attaching it to a
         product is the catalogue's (`catalogue.Product.consentQuestionIds`), and to a booking flow the
-        white-label flow configuration's. Created at version 1.
+        white-label flow configuration's. Created at version 1, `active`. The body is
+        `CreateConsentQuestionRequest` (ADAM CR-089): the server sets `id`, `version`, `status` and `scopePath`.
       tags:
       - consent
       x-ticvai-permission: GUEST_MANAGE
@@ -16103,7 +16217,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConsentQuestion'
+              $ref: '#/components/schemas/CreateConsentQuestionRequest'
       responses:
         '201':
           headers:
@@ -16141,7 +16255,10 @@ paths:
         3 REV3-26). Changing `text`, `scope`, `required` or `blockingAnswer` raises `version` by one; every
         answer already given keeps the version it was given against, which is the evidence if the answer
         is ever questioned. A cart that asked the old version asks the new one on its next read. Setting
-        `status` to `retired` stops it being asked and changes no version.
+        `status` to `retired` stops it being asked and changes no version. **The body carries only what
+        changes** (`UpdateConsentQuestionRequest`, ADAM CR-089): a field left out keeps its value, `kind` is
+        fixed once created, and `version` is the server's to raise. A venue writes the new version row
+        beside its question: `consent_question_version` follows its question's scope (ADAM CR-090).
       tags:
       - consent
       x-ticvai-permission: GUEST_MANAGE
@@ -16156,7 +16273,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConsentQuestion'
+              $ref: '#/components/schemas/UpdateConsentQuestionRequest'
       responses:
         '200':
           headers:
@@ -16683,6 +16800,11 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-001 Home"
         - "P02 GST-066 Privacy & My Data"
+      x-ticvai-write-via:
+      - table: pii.consent_identifier
+        operation: recordConsentIdentifier
+      x-ticvai-calls:
+      - identity.recordConsentIdentifier
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - anonymous
@@ -16710,7 +16832,8 @@ paths:
 
         **Personal data stays out of `marketing`** (ADR-0023, BL-073 §3): where the published banner
         design has `recordIpAddress` on, the request's IP address and user agent are written to
-        `pii.consent_identifier` against this row, never beside it. `country` is the edge's
+        `pii.consent_identifier` against this row, never beside it, by its owner: this calls identity
+        `recordConsentIdentifier` (in `commerce`; ADR-0055 rule 4, CHG-XDW-004). `country` is the edge's
         geolocation of the request, kept for the geographic consent statistics (2.6.63) without
         keeping the address. A key already claimed by a guest (`claimDeviceConsent`) is closed: a
         decision sent against it mints a new key.
@@ -18588,6 +18711,84 @@ components:
           type: string
           format: date-time
           readOnly: true
+    CreateConsentQuestionRequest:
+      type: object
+      x-ticvai-persistence: none — request only; applied to marketing.consent_question and marketing.consent_question_version
+      description: '**The body of `createConsentQuestion`** (ADAM CR-089, CHG-CNS-001). Each field means what it
+        means on `ConsentQuestion`. `id`, `version` (1), `status` (`active`), `scopePath` and `updatedAt` are the
+        server''s and are not sent.'
+      required:
+      - kind
+      - text
+      properties:
+        kind:
+          $ref: '#/components/schemas/ConsentQuestionKind'
+        text:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          description: The question as the guest reads it, per locale.
+        helpText:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        scope:
+          type: string
+          enum:
+          - perPerson
+          - perBooking
+          default: perPerson
+          description: Asked for each declared person, or once for the whole booking.
+        required:
+          type: boolean
+          default: true
+          description: Checkout waits until it is answered.
+        blockingAnswer:
+          type: string
+          enum:
+          - 'yes'
+          - 'no'
+          - none
+          default: none
+          description: The answer that stops the booking, for the person or the booking it covers.
+    UpdateConsentQuestionRequest:
+      type: object
+      x-ticvai-persistence: none — request only; applied to marketing.consent_question and marketing.consent_question_version
+      description: '**The body of `updateConsentQuestion`: only what changes** (ADAM CR-089, CHG-CNS-001). A partial
+        update, so a field left out keeps its stored value; no field has a default here, so leaving one out never
+        resets it. Each field means what it means on `ConsentQuestion`. `kind` is fixed once created; `id`,
+        `version`, `scopePath` and `updatedAt` are the server''s. `helpText: null` clears the help text.'
+      minProperties: 1
+      properties:
+        text:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          description: The question as the guest reads it, per locale. A change raises `version` by one.
+        helpText:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        scope:
+          type: string
+          enum:
+          - perPerson
+          - perBooking
+          description: A change raises `version` by one.
+        required:
+          type: boolean
+          description: A change raises `version` by one.
+        blockingAnswer:
+          type: string
+          enum:
+          - 'yes'
+          - 'no'
+          - none
+          description: A change raises `version` by one.
+        status:
+          type: string
+          enum:
+          - active
+          - retired
+          description: '`retired` stops the question being asked and changes no version.'
     ConsentQuestionVersion:
       type: object
       x-ticvai-persistence: marketing.consent_question_version
@@ -18603,6 +18804,10 @@ components:
         questionId:
           type: string
           format: uuid
+          x-ticvai-references: marketing.consent_question
+          description: The question this is a wording of. **A declared key** (ADAM CR-090, CHG-CNS-002), so a
+            version is read and written exactly where its question is (the parent rule), never only at the
+            tenant root.
         version:
           type: integer
           minimum: 1
@@ -22942,58 +23147,96 @@ components:
           format: uuid
         items:
           type: array
-          x-ticvai-persistence: marketing.wishlist_item
+          description: 'Newest first: ordered by `addedAt` descending, `id` as the tiebreak (CHG-MKT-002).'
           items:
-            type: object
-            required:
-            - id
-            - variantId
-            - addedAt
-            - isAvailable
-            properties:
-              id:
-                type: string
-                format: uuid
-              variantId:
-                type: string
-                format: uuid
-              productName:
-                type: string
-              performanceId:
-                type: string
-                format: uuid
-                nullable: true
-              performanceStartsAt:
-                type: string
-                format: date-time
-                nullable: true
-              price:
-                x-ticvai-column: list_price
-                $ref: ../shared/common.yaml#/components/schemas/Money
-                description: The variant's current list price when the wishlist is read. Stored as `list_price`
-                  (naming-and-style 5.1 bans a bare `price` column); the wire keeps `price`.
-              imageAssetRef:
-                type: string
-                nullable: true
-              isAvailable:
-                type: boolean
-                description: 'False where the product has been withdrawn or the performance has passed.
-                  Returned rather than dropped — a guest who saved something and finds it silently gone
-                  assumes the feature is broken.
+            $ref: '#/components/schemas/WishlistItem'
+    WishlistItem:
+      # **The row a saved item is** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002). The rows used to be
+      # tagged on `Wishlist.items` itself, a place derive-schema never reads, so `marketing.wishlist_item` kept the
+      # columns of an older run (`price text`) while the contract said `list_price` Money. As a schema of its own the
+      # table is derived from it like every other.
+      x-ticvai-persistence: marketing.wishlist_item
+      # One entry per variant and performance for a guest; a save with no performance is one date-less entry, so a
+      # null performance still collides (R149; `NULLS NOT DISTINCT`).
+      x-ticvai-unique-together:
+      - [subjectId, variantId, performanceId]
+      x-ticvai-unique-nulls: not-distinct
+      type: object
+      required:
+      - id
+      - subjectId
+      - variantId
+      - addedAt
+      - isAvailable
+      properties:
+        id:
+          type: string
+          format: uuid
+        subjectId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The guest who saved it. The wishlist is keyed by subject; there is no parent wishlist row.
+        variantId:
+          type: string
+          format: uuid
+        productName:
+          type: string
+          description: '**Catalogue''s, not Marketing''s.** Taken from Catalogue''s `variantListingFacts` when the
+            item is saved, and replaced by Catalogue''s current value each time the wishlist is read (CHG-MKT-002).'
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+        performanceStartsAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The saved performance's start, from Catalogue's `variantListingFacts`; null for a date-less
+            entry.
+        price:
+          x-ticvai-column: list_price
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: 'The variant''s current list price when the wishlist is read: the price Catalogue''s guest
+            listing shows for the variant on the guest''s channel (`variantListingFacts.listPrice`). Stored as
+            `list_price` (naming-and-style 5.1 bans a bare `price` column), the amount alone as every Money column
+            is (`numeric(18,4)`; the currency resolves from the variant''s venue, ADR-0018); the wire keeps
+            `price`. **The stored value is the price when the item was saved**, kept for segmentation (a price
+            drop on a saved item is a signal) and returned only when Catalogue cannot be reached (CHG-MKT-002).'
+        imageAssetRef:
+          type: string
+          nullable: true
+          description: The product's primary media, from Catalogue's `variantListingFacts`.
+        isAvailable:
+          type: boolean
+          description: 'False where the product has been withdrawn or the performance has passed.
+            Returned rather than dropped — a guest who saved something and finds it silently gone
+            assumes the feature is broken. **Computed when the wishlist is read** from Catalogue''s
+            `variantListingFacts` (`sellable`) and the performance''s start; the stored value is the answer when
+            the item was saved (CHG-MKT-002).
 
-                  '
-              unavailableReason:
-                type: string
-                nullable: true
-              note:
-                type: string
-                nullable: true
-              addedAt:
-                type: string
-                format: date-time
+            '
+        unavailableReason:
+          type: string
+          nullable: true
+          description: Why `isAvailable` is false, in Catalogue's words (`variantListingFacts.reason`), or
+            `performancePassed`; null when available.
+        note:
+          type: string
+          nullable: true
+        addedAt:
+          type: string
+          format: date-time
     GuestDevice:
       type: object
       x-ticvai-persistence: marketing.guest_device
+      # **One row per app install, and per token where the install sends none** (decided 14 October 2026, Chinmay,
+      # ADAM CR-086, CHG-MKT-001). Unique for the guest only: the table is under subject RLS, so a tenant-wide index
+      # would fail on a row the caller cannot see. A revoked row keeps neither key, so it never collides and is never
+      # matched again.
+      x-ticvai-unique-together:
+      - [subjectId, installationId]
+      - [subjectId, tokenFingerprint]
       required:
       - id
       - subjectId
@@ -23013,18 +23256,43 @@ components:
           - ios
           - android
           - web
+        installationId:
+          type: string
+          format: uuid
+          nullable: true
+          writeOnly: true
+          description: 'The app install the registration came from, as `registerGuestDevice.installationId` sent
+            it (CHG-MKT-001). A rotated token arrives under the same install, so it updates this row. Null on a row
+            registered without one, and cleared when the device is revoked. Never returned.'
         tokenFingerprint:
           type: string
-          description: 'Hash of the token, not the token. The token itself is write-only — returning it
-            would put a push credential in every response a support agent can read.
+          nullable: true
+          maxLength: 64
+          x-ticvai-unique-compare: exact
+          x-ticvai-secret: blind-index
+          description: '**A keyed hash of the token, not the token** (decided 14 October 2026, CHG-MKT-001; ADR-0063
+            section 4 as amended): HMAC-SHA-256 of the token under the tenant''s blind-index key, written as 64
+            lowercase hex characters. Keyed, so a token somebody holds cannot be checked against the table. It is
+            how a re-registration without an `installationId` finds its row. Cleared when the device is revoked.
+            The token itself is write-only — returning it would put a push credential in every response a support
+            agent can read.
 
             '
         tokenRef:
           type: string
+          nullable: true
           writeOnly: true
-          description: '**A vault reference to the push token**, written by the server from `registerGuestDevice.token`
-            — the same pattern as `PaymentProvider.credentialRef`. Never the token and never returned;
-            the sender resolves it at send time. Without it a registered device could not be sent to.
+          x-ticvai-column: token_ciphertext
+          x-ticvai-secret: field-encrypted
+          description: '**The push token, encrypted by the application** (decided 14 October 2026, Chinmay, ADAM
+            CR-086, CHG-MKT-001; ADR-0063 section 4 as amended), written by the server from
+            `registerGuestDevice.token`: AES-256-GCM under the tenant''s data key, which is wrapped by the
+            tenant''s Key Vault key, stored as one string that names the key version (the kernel''s field
+            encryption, ADR-0063 action KERNEL-FIELD-ENC). **Not a Key Vault secret per device**: Key Vault holds
+            the one key, never a guest''s token, so the vault holds a few secrets per tenant whatever the number of
+            phones (`PaymentProvider.credentialRef` stays the pattern for provider credentials). The push sender
+            decrypts it at send time. Stored as `token_ciphertext`; the wire keeps `tokenRef`. Never returned, and
+            cleared when the device is revoked.
 
             '
         appVersion:
@@ -23045,11 +23313,16 @@ components:
           - active
           - revoked
           - failed
+          description: '`active` is sent to. `failed` is a token the provider kept refusing: no longer targeted,
+            and made `active` again by the next registration from the same install or token (a rotated token is the
+            usual cure). `revoked` is the guest''s or the sign-out''s decision and is final: the row keeps no token,
+            fingerprint or install, so no registration matches it, and registering that phone again makes a new row
+            (CHG-MKT-001).'
         failureCount:
           type: integer
           description: 'Consecutive delivery failures. Past the threshold the device is marked failed
             and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery
-            rate.
+            rate. Set back to 0 by a registration.
 
             '
         registeredAt:
@@ -28168,7 +28441,7 @@ components:
       type: object
       x-ticvai-persistence: marketing.privacy_request
       description: One customer privacy request (pack 17.2.4 Case Information). The case layer over the
-        cross-region `platform.dsar_request` fan-out, which it references when it raises one.
+        cross-region `sync.dsar_request` fan-out, which it references when it raises one.
       required:
       - subjectId
       - requestType

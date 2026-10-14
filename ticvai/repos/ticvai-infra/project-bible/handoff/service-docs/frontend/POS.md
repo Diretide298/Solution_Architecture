@@ -665,7 +665,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-002 | Open shift, after the four-digit PIN and the float count | shiftId, openingFloat, workstationId | sale.create |
+| POS-002 | Open shift, after the PIN (the tenant's PIN length) and the float count | shiftId, openingFloat, workstationId | sale.create |
 | POS-007 | Close shift | shiftId | shift.reopen |
 | POS-009 | Staff Roster |  |  |
 | POS-021 | Sell — Food & Drink |  |  |

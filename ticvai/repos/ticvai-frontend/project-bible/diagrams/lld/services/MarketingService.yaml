@@ -98,7 +98,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 2
+    reads: 9
     writes: 2
   - operation: adjustLoyaltyPoints
     verb: POST
@@ -610,7 +610,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 1
+    reads: 8
     writes: 0
   - operation: handoverToAgent
     verb: POST
@@ -2862,7 +2862,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.guest_device
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -3425,7 +3425,7 @@ tables:
 - table: marketing.wishlist_item
   columns: 12
   store: postgres
-  parent: pii.subject
+  parent: null
   writtenBy:
   - marketing-crm
   foreignWriters: null
@@ -3435,7 +3435,7 @@ readsFrom:
 - service: OrderService
   operations: 15
 - service: CatalogueService
-  operations: 9
+  operations: 11
 - service: AccessService
   operations: 4
 - service: PlatformService

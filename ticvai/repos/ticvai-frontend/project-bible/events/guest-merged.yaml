@@ -25,10 +25,12 @@ payload:
   type: timestamp
 consumers:
 - context: identity
-  purpose: Fold the merged subject into the survivor on pii.subject, which Identity owns. **Ids only travel**; the
+  purpose: Fold the merged subject into the survivor on pii.subject, which Identity owns, and move the merged
+    subject's identity.subject_holding rows to the survivor (ADAM CR-084, CHG-GDL-001). **Ids only travel**; the
     personal data never leaves the pii schema
   writes:
   - pii.subject
+  - identity.subject_holding
   idempotencyKey: mergedSubjectId
   onFailure: retryThenDeadLetter
   isCritical: true

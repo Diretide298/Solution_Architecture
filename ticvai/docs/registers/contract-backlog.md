@@ -1,6 +1,6 @@
 # Contract backlog — index
 
-**182 edits raised by the requirement walk — 4 open, 176 done, 2 withdrawn.**
+**182 edits raised by the requirement walk — 5 open, 175 done, 2 withdrawn.**
 
 Generated from `handoff/contract-backlog.json` by `tools/build-backlog-index.py`.
 Every gap the walk finds lands here. **The ones carrying a decision or a cost also carry a CF** and are in `conflicts.md`; the rest are work rather than conflict, and putting them in the conflict register would bury the open decisions among them.
@@ -8,9 +8,9 @@ Every gap the walk finds lands here. **The ones carrying a decision or a cost al
 | Lane | Open |
 |---|---|
 | Needs a decision | **1** |
-| Deferred | **0** |
+| Deferred | **1** |
 | Settled | **3** |
-| **Total open** | **4** |
+| **Total open** | **5** |
 
 
 ## Needs a decision — tracked as a conflict — 1
@@ -20,6 +20,14 @@ Each of these has a CF. The register holds the reasoning; this is the index.
 | ID | Section | Refs | What | Contracts | Blocked on | CF |
 |---|---|---|---|---|---|---|
 | **BL-140** | 5.7 | 5.7.93, 5.7.94, 5.10.3, 6.1.1, 6.1.23, 20.7.7 | No invoice, no credit memo, and no statement of what a compliant receipt must show. | `finance` | — | CF-133 |
+
+## Deferred — waiting on a section — 1
+
+Crosses contracts, or has no precedent to copy. Deciding now would design it in the wrong contract. Each names what unblocks it.
+
+| ID | Section | Refs | What | Contracts | Blocked on | CF |
+|---|---|---|---|---|---|---|
+| **BL-095** | 2.13 | 2.13.26, 2.16.4, 2.16.16 | Media stock is not modelled — neither which stock a printer is loaded with, nor how much of it is left. | `tenancy, inventory` | — | — |
 
 ## Settled — made at section close — 3
 
@@ -95,7 +103,7 @@ One contract, and that contract already shows how it should look.
 | **BL-058** | 1.4 | No product version history, no restore, and no duplication. | **Done.** ProductVersion, following white-label.ConfigVersion. **A restore creates a new version rather than rewinding** — a price that was wrong for three days stays reproducible. |
 | **BL-059** | 1.5 | Transaction rules are not per-product. A ticket type cannot state its own refund, exchange or transfer eligibility. | **Done.** AdmissionRules.perProductRules. **Rules were per profile and a ticket type could not state its own**, so an annual pass allowing one entry per day and a single ticket allowing one entry ever needed two profiles. minimumGapMinutes rather than a boolean: **a guest returning from lunch in forty minutes is normal, and the same scan twice in ten seconds is a card passed back over a fence.** |
 | **BL-060** | 1.6 | No resale listing entity, and a cart line cannot point at one. | **Done.** ResaleListing. **Smaller than it first looked** — transfer, order and payment machinery all existed. **A resale is a transfer with money attached and the venue stays in the middle**: the seller entitlement is voided and a new one issued, so the ticket that admits is always one the venue issued, which is what stops a screenshot at the gate. **The seller is paid after the buyer is admitted**, because a resale refunded at the gate cannot be clawed back from a seller already paid. |
-| **BL-061** | 2.1 | Cashier input mode, guest-facing display content and a web-like POS journey are stated nowhere. | **Done.** ConfigureWorkstationRequest cashierInputMode and guestDisplayContent. **A till operator who touch-types is slower on a touchscreen and a new starter is faster**, so the mode is per workstation because the operator is. **A second screen showing nothing is one the guest ignores when it does show something.** |
+| **BL-061** | 2.1 | Cashier input mode, guest-facing display content and a web-like POS journey are stated nowhere. | **Done.** ConfigureWorkstationRequest cashierInputMode and guestDisplayContent. **A till operator who touch-types is slower on a touchscreen and a new starter is faster**, so the mode is per workstation because the operator is. **A second screen showing nothing is one the guest ignores when it does show something.** **Reopened and closed again 14 October 2026** (ADAM CR-082, CHG-TEN-003): until then the two fields were on the request alone and nothing stored them; they are now `Workstation.cashierInputMode` and `Workstation.guestDisplayContent`, columns of `platform.workstation`, returned by `getWorkstation` and `configureWorkstation`. |
 | **BL-062** | 2.1 | No configurable demographic or survey capture at the point of sale. | **Done.** FormDefinition of kind dataCapture at the point of sale, with isPersonalData marked per field. **Retention is decided at the field** — a survey answer and a medical condition on one form have different lifetimes. |
 | **BL-063** | 2.1 | Nothing awards loyalty points when a ticketing order completes. | **Done.** accrueLoyaltyPoints, fired by order completion and idempotent on the order. **games awarded points on play and ticketing did not**, so a guest earned for an arcade game and not for the ticket that got them in. |
 | **BL-064** | 2.1 | No single guest-identification operation across QR, RFID, NFC, membership card, wallet, app, phone and email. | **Done.** identifyGuest — one resolver over QR, RFID, NFC, membership card, wallet pass, phone, email, app device and plate. **Ambiguity is returned, not resolved**: two guests sharing a phone number is real, and picking one silently lands a sale on the wrong account. |
@@ -129,7 +137,6 @@ One contract, and that contract already shows how it should look.
 | **BL-092** | 2.11 | Pro-rata upgrade pricing is not computed. | **Done.** quoteUpgrade. proRataListPrice splits a bundle discount and prorate is time-based against a plan — **neither computes moving a ticket from one product to another.** The unused portion is the credit and what counts as unused depends on the entitlement. **The basis is returned with the quote**, because a guest disputing an upgrade price is disputing the basis. |
 | **BL-093** | 2.11 | Person type is not modelled, so it cannot be changed on an upgrade. | **Done.** EntitlementTemplate.personType. Adult and child existed only as variant axis values, so an upgrade was a cancel-and-rebuy. **Recorded on the entitlement because the guest ages and the product does not.** |
 | **BL-094** | 2.13 | An assisted transaction is not bound to a case. | **Done.** Conversation.assistSessionId. startKioskAssist and createCase neither referenced the other, **so the traceability 2.13.20 asks for had no link to follow.** On the conversation because a case may span several assists and an assist belongs to at most one case. |
-| **BL-095** | 2.13 | Media stock is not modelled — neither which stock a printer is loaded with, nor how much of it is left. | **Done.** ConfigureWorkstationRequest loadedMediaStockId and mediaStockRemaining. **A till that runs out of wristbands mid-queue is an outage nobody predicted.** Read-only, because the count comes from what was printed rather than from somebody estimate. |
 | **BL-096** | 2.13 | No identity verification. A presented document is never checked against the entitlement holder. | **Done.** **Closed 21 September.** `verifyIdentity` models matching apart from enrolling, which is what the entry asked for and what the package could not do — `enrolFacePass` binds a face to an entitlement, and nothing anywhere read a presented document and checked it against the holder.
 
 **Two methods, because 2.13.41 asks two different questions.** `documentToHolder` compares a presented document with the entitlement holder's recorded details; `liveCaptureToEnrolment` compares a capture with an existing `facePass` or `faceTag` and **requires one to exist** — it is the check, never a back door to enrolment.

@@ -6002,8 +6002,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| card_id | uuid | yes |  |
+| play_id | uuid | yes | RecordPlayRequest.id, the play's UUIDv7; also the games.play key (play_id). |
+| reader_id | uuid | yes | The reader that recorded the play offline (syncGamePlays.readerId). |
+| sequence | integer | no | The reader's monotonic sequence, which orders an offline batch. |
+| credits_used | integer | yes |  |
+| bonus_credits_used | integer | no |  |
+| points_awarded | integer | yes |  |
+| credits_after | integer | yes | The card's paid credits after this play; negative only on a divergence. |
+| points_after | integer | yes |  |
+| is_divergence | boolean | yes | True when the play spent more than the card held; reported in syncGamePlays.divergences. |
+| reconciled_at | timestamptz | no | When a person settled the divergence; null while it is open. |
+| recorded_at | timestamptz | yes | When the reader recorded the play (RecordPlayRequest.recordedAt). |
+| synced_at | timestamptz | yes |  |
 | id | uuid | yes | Synthesised key. |
-| card_id | uuid | yes | Points at games.card. |
 
 ### `maintenance.inspection_template`
 

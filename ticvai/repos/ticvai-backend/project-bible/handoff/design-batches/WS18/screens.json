@@ -601,6 +601,37 @@
        "provenance": "contract identity.yaml PUT /password-policy"
       },
       {
+       "kind": "selectField",
+       "label": "PIN length",
+       "bindsTo": "PasswordPolicy.pinLength",
+       "operation": "setPasswordPolicy",
+       "notes": "**A drop-down: 4, 6 or 8 digits** (decided by Chinmay, 14 October 2026, ADAM CR-078: \"Give those as options that they select as a drop down\"; CHG-CRD-002). Every PIN keypad of the tenant (POS-000, EMP-001, SCN-001 and the supervisor step-up prompts) takes this many digits. Raising it leaves existing PINs working and asks their holders for a new one at the next sign-in. Shows the current value from getPasswordPolicy; default 4.",
+       "provenance": "contract identity.yaml PasswordPolicy.pinLength (CHG-CRD-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "PIN reuse",
+       "bindsTo": "PasswordPolicy.pinReusePrevention",
+       "operation": "setPasswordPolicy",
+       "notes": "**A drop-down: Allow reuse (`none`), Not the last 3 (`last3`), Not the last 5 (`last5`)** (CHG-CRD-002). Applies to PINs only; passwords keep their own rule (`reusePreventionCount`, audit R132). Default: not the last 5.",
+       "provenance": "contract identity.yaml PasswordPolicy.pinReusePrevention (CHG-CRD-002)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Lock a PIN after",
+       "bindsTo": "PasswordPolicy.pinLockoutAfterAttempts",
+       "operation": "setPasswordPolicy",
+       "notes": "**A drop-down: 3, 5 or 10 wrong PINs** (CHG-CRD-002), then the PIN is locked for the policy's lockout minutes, never permanently. Wrong passwords count against the password lockout instead. Default 5.",
+       "provenance": "contract identity.yaml PasswordPolicy.pinLockoutAfterAttempts (CHG-CRD-002)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save PIN settings",
+       "operation": "setPasswordPolicy",
+       "notes": "Sends the whole policy read from getPasswordPolicy with the three PIN settings changed; `setPasswordPolicy` replaces the policy, so nothing else may be dropped. The R126 floor rules are password rules and never apply here.",
+       "provenance": "contract identity.yaml PUT /password-policy (CHG-CRD-002)"
+      },
+      {
        "kind": "primaryButton",
        "label": "Save MFA requirement",
        "operation": "setPasswordPolicy",
@@ -653,7 +684,7 @@
    {
     "operationId": "setPasswordPolicy",
     "contract": "identity",
-    "purpose": "Which permissions require MFA (`mfaRequiredForPermissions`) — add above the floor, never drop (decided 28 September, audit R135)",
+    "purpose": "Which permissions require MFA (`mfaRequiredForPermissions`) — add above the floor, never drop (decided 28 September, audit R135); and the tenant's PIN settings, chosen from drop-downs (`pinLength`, `pinReusePrevention`, `pinLockoutAfterAttempts`; CHG-CRD-002)",
     "trigger": "onAction"
    },
    {
