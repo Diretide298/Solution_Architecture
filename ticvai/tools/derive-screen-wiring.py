@@ -64,6 +64,11 @@ CREATE_LIKE = re.compile(r"^(create|add|register|issue|open|start|submit|raise|r
                          r"generate|publish|assign|allocate|log)", re.I)
 WRITES = ("post", "put", "patch", "delete")
 GUEST_CODES = ("P01", "P02", "P05")
+# Screens no rule touches, by the lead's decision.
+FROZEN = {
+    "GST-073": "#27741 problem 2, decision 1 (Chinmay, 14 October 2026): the guest's devices screen is unchanged; "
+               "revoking a device also signs it out, which the API keeps (revokeGuestDevice, batch MOD)",
+}
 
 
 # ── the package ─────────────────────────────────────────────────────────────────────────────────
@@ -615,6 +620,36 @@ def fix_division(s: dict, ops: dict, log: list, keeps: list, docs: dict | None =
     log.append(f"{s['id']}: division stated against {', '.join(sorted(others)[:3])}")
 
 
+# ── S-BUTTON-FORM ───────────────────────────────────────────────────────────────────────────────
+# A button calls a write whose body nothing on the screen collects. Where the approved screen opens a dialog from
+# that button (the overlay's trigger is the button's label) and the dialog does not yet say what accepting it calls,
+# the dialog's confirm calls the write: the dialog is what collects and confirms it. Otherwise the approved screen
+# collects nothing and the member is a keep (client-approved UI).
+
+def fix_button_form(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    if any(c.get("kind") in CHECK_INPUTS for _, c in comps(s)):
+        return
+    overlays = [o for o in (s.get("overlays") or []) if isinstance(o, dict)]
+    collected = {(o.get("confirm") or {}).get("operation") for o in overlays if isinstance(o.get("confirm"), dict)}
+    for _, c in comps(s):
+        op = c.get("operation")
+        f = ops.get(op) if op else None
+        if not f or "Button" not in str(c.get("kind")) or f["method"] not in WRITES or op in collected:
+            continue
+        rb = f["op"].get("requestBody")
+        if not (isinstance(rb, dict) and (rb.get("required") or "$ref" in rb)):
+            continue
+        dialog = next((o for o in overlays if str(o.get("trigger") or "").strip() == str(c.get("label") or "").strip()
+                       and not (o.get("confirm") or {}).get("operation")), None)
+        if dialog:
+            dialog.setdefault("confirm", {})["operation"] = op
+            collected.add(op)
+            log.append(f"{s['id']}: dialog {dialog.get('id')} confirms {op}")
+        else:
+            keeps.append((s["id"], "S-BUTTON-FORM", f"{c.get('label')!r} calls {op}, whose body the approved screen "
+                          f"collects nowhere (client-approved UI)"))
+
+
 STEPS = {
     "S-PURPOSE-BOILERPLATE": fix_screen_purpose,
     "S-PURPOSE-TEMPLATE": fix_api_purpose,
@@ -624,6 +659,7 @@ STEPS = {
     "S-NO-READ": fix_no_read,
     "S-DUP-REGION": fix_dup_regions,
     "S-OP-UNREACHED": fix_unreached,
+    "S-BUTTON-FORM": fix_button_form,
     "S-DUP-SCREEN": fix_division,
 }
 
@@ -666,6 +702,8 @@ def main() -> int:
         fn = STEPS[step]
         for f, d in docs.items():
             for s in d.get("screens") or []:
+                if s.get("id") in FROZEN:
+                    continue
                 before = json.dumps(s, sort_keys=False, default=str)
                 fn(s, ops, log, keeps, platform=d.get("platform") or {}, docs=docs)
                 if json.dumps(s, sort_keys=False, default=str) != before:

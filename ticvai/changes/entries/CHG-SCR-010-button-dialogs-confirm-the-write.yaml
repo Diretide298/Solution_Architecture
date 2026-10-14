@@ -1,0 +1,41 @@
+id: CHG-SCR-010
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A button whose write needs a body is bound to the dialog the approved screen already opens from it (the
+  dialog''s confirm calls the write), by a deriver on the refresh; where the approved screen collects nothing, the member
+  is a keep.'
+decision:
+  what: 'tools/derive-screen-wiring.py gains rule S-BUTTON-FORM (fix_button_form): an overlay whose trigger is the
+    button''s label and whose confirm names no operation gets `confirm.operation` (invisible). No form, field or dialog
+    is added (client-approved UI, Chinmay, 14 October 2026). The deriver also never touches GST-073 (FROZEN: #27741
+    decision 1).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R264): check-screen-wiring/S-BUTTON-FORM had 67 members
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 182 Block A tickets). Default ruling (triage.py): "A button
+  whose operation needs a body opens the form or panel that collects it"; the coordinator''s instruction: bind to what
+  the approved UI collects, else keep. After: 55 package-wide, every one a keep listed by the deriver (the approved
+  screen collects the body nowhere).'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - screens/P08-venue-back-office.yaml
+  screens:
+  - P08 on this branch; the other platforms at the refresh
+  other:
+  - S-BUTTON-FORM
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-screen-wiring.py::fix_button_form
+status: open
+notes: Batch SCR, 14 October 2026.

@@ -8027,6 +8027,8 @@ screens:
       qualityIssue, duplicate, other); **choosing Other makes `note` required** (decided 28 September,
       audit R125 (4), R222).'
     provenance: contract orders.yaml POST /orders/{orderId}/voids
+    confirm:
+      operation: voidOrder
   - id: formCreateRefund
     component: modal
     trigger: Create refund
@@ -48081,6 +48083,8 @@ screens:
       not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in
       the body is required. Optional: `reason`.'
     provenance: contract access.yaml POST /gate-mode-changes/{changeId}/cancel
+    confirm:
+      operation: cancelGateModeChange
   - id: formSetAccessPointDirection
     component: modal
     trigger: Switch direction
@@ -49496,6 +49500,8 @@ screens:
       it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so
       the dialog states that it is recorded.'
     provenance: pack Access Control Module_Reference.pdf, page 146 §Allow
+    confirm:
+      operation: rollbackAccessPolicy
   states:
     loading: The policy approval audit list.
     error: Could not load. Names which read failed and leaves the policy approval audit untouched.
@@ -61332,6 +61338,8 @@ screens:
       the verb. A order this affects should be identified in the dialog, not just counted. **Collects
       what `mergeOrders` sends before it is called.** Required: `sourceOrderIds`. Optional: `reason`.'
     provenance: contract orders.yaml POST /orders/{orderId}/merge
+    confirm:
+      operation: mergeOrders
 - id: BO-329
   name: Related Order & Transaction Relationship Explorer
   module: Orders & Money
@@ -63583,6 +63591,8 @@ screens:
       just counted. **Collects what `archiveMediaTemplate` sends before it is called.** Nothing in the
       body is required. Optional: `reason`.'
     provenance: contract access.yaml POST /media-templates/{templateId}/archive
+    confirm:
+      operation: archiveMediaTemplate
   - id: formCreateTicketTemplate
     component: modal
     trigger: New ticket template
@@ -159948,6 +159958,8 @@ screens:
       it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so
       the dialog states that it is recorded.'
     provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Support
+    confirm:
+      operation: restoreWalletConfigurationVersion
   states:
     loading: The security governance audit list.
     error: Could not load. Names which read failed and leaves the security governance audit untouched.
@@ -162614,6 +162626,8 @@ screens:
       Names what it affects and what it leaves alone. The pack requires the decision to reach the audit
       trail, so the dialog states that it is recorded.'
     provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions
+    confirm:
+      operation: setApiClientStatus
   states:
     loading: The integration monitoring exception list.
     error: Could not load. Names which read failed and leaves the integration monitoring exception untouched.
@@ -170624,6 +170638,8 @@ screens:
       not just counted. **Collects what `cancelPricingRollback` sends before it is called.** Required:
       `reason`.'
     provenance: contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel
+    confirm:
+      operation: cancelPricingRollback
 - id: ADM-087
   name: Pricing History, Audit & Compliance Explorer
   module: Commercial
