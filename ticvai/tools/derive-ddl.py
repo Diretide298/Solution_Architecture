@@ -287,6 +287,12 @@ ROW_OWNER = {
     "inventory.movement": "item_id",              # CHG-R6-015
     "inventory.stock_earmark": "item_id",         # CHG-R6-015
     "inventory.goods_receipt": "purchase_order_id",   # CHG-R6-015
+    # CHG-GEN-007 (ADAM CR-071, 14 October 2026): a till sale belongs to the outlet that rang it up. With two protected
+    # owners (`order_id -> orders.sales_order`, `outlet_id -> platform.outlet`) it fell to the subject rule, and its
+    # lines, returns and return lines to the tenant root ("its owner has no policy"), so a cashier could write a sale
+    # and none of its lines, and no venue role could record a return. Following the outlet, the sale is the venue's,
+    # and sale_line, return and return_line follow it by their NOT NULL keys.
+    "retail.sale": "outlet_id",                  # CHG-GEN-007 (CR-071)
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------

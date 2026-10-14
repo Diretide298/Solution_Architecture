@@ -1,0 +1,52 @@
+id: CHG-GEN-007
+date: '2026-10-14'
+source: developer
+kind: spec
+summary: 'A retail sale belongs to the outlet that rang it up: retail.sale follows platform.outlet through the parent
+  rule, and sale_line, return, return_line and exchange follow the sale, so a venue''s cashier writes a sale and its
+  lines and a venue role records a return.'
+decision:
+  what: 'CR-071 option 2 (the CR''s recommendation): ROW_OWNER["retail.sale"] = "outlet_id" in tools/derive-ddl.py, so
+    the sale takes apply_parent_rls through outlet_id -> platform.outlet (venue policy) instead of the subject rule;
+    retail.sale_line (sale_id), retail.return (sale_id), retail.return_line (return_id) and retail.exchange
+    (new_sale_id) then follow by their NOT NULL declared keys instead of the tenant root. The swaps reach the forward
+    migration through CHG-GEN-004 (drop the table''s policies, apply the parent policy; parents first). No contract
+    change: every operation on these tables is staff-only (createRetailSale at workstation, the rest at venue).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'ADAM CR-071 (ticket 27682, MIG-RETAIL): 920-row-level-security.sql:1099 gave retail.sale apply_subject_rls and
+  :1239-1240 gave return_line and sale_line apply_tenant_rls ("its owner retail.sale has no policy either"), so a
+  cashier could read and write a sale but none of its lines and no venue role could record a return. The sale had two
+  NOT NULL protected owners (order_id -> orders.sales_order, outlet_id -> platform.outlet), which the parent rule leaves
+  undecided (CHG-R6-005 ROW_OWNER). The lead decided on 14 October that CR-071 ships in r6 through the GEN rules.'
+keys_touched:
+  tables:
+  - retail.sale
+  - retail.sale_line
+  - retail.return
+  - retail.return_line
+  - retail.exchange
+  files:
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  tickets:
+  - '27682'
+root_class: A23 AUTH-SCOPE
+tickets:
+  started:
+  - '27682'
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: CR-071 (ADAM)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::ROW_OWNER
+status: open
+notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
+  Verified on this branch: derive-ddl --apply wrote the five swaps into V0104 (retail.sale to apply_parent_rls via
+  outlet_id, then exchange, return, sale_line, return_line), with the old subject and tenant-root calls as rollback;
+  derived files restored before the commit. The same run showed the reserved word: ddl_forward now keeps a table name
+  as the call quotes it (retail."return"), so its drop call parses. A guest no longer reads a sale by subject; no
+  operation lets a guest read one. The sale''s order_id stays a plain reference.'

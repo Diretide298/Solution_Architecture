@@ -330,7 +330,7 @@ def rls_call(stmt: str):
     """`(helper, table)` for a generated row-level-security call (`SELECT platform.apply_*_rls('t'::regclass ...)`),
     else None."""
     m = RLS_CALL.match(norm(stmt))
-    return (m.group(1).lower(), unq(m.group(2))) if m else None
+    return (m.group(1).lower(), unq(m.group(2)), m.group(2)) if m else None
 
 
 def tables_named(stmt: str, known: set) -> set:
@@ -567,11 +567,11 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
             # policy again, so it is idempotent and touches no row. Listing it for a person is how CR-005's
             # policies stayed off the databases: the review row was read as done, and 920 still said tenant root.
             t = rc_[1]
-            was = [old.stmts[k] for k in old.stmts if k[0] == "stmt" and (rls_call(old.stmts[k]) or ("", ""))[1] == t
+            was = [old.stmts[k] for k in old.stmts if k[0] == "stmt" and (rls_call(old.stmts[k]) or ("", "", ""))[1] == t
                    and rls_call(old.stmts[k])[0] != "drop_rls_policies"]
-            p.statements.append(f"SELECT platform.drop_rls_policies('{t}'::regclass)")
+            p.statements.append(f"SELECT platform.drop_rls_policies('{rc_[2]}'::regclass)")
             p.statements.append(stmt)
-            p.rollback.append(f"SELECT platform.drop_rls_policies('{t}'::regclass); "
+            p.rollback.append(f"SELECT platform.drop_rls_policies('{rc_[2]}'::regclass); "
                               + " ".join(w.rstrip(";") + ";" for w in was))
             p.counts["policies"] = p.counts.get("policies", 0) + 1
             continue
