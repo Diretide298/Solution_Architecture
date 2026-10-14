@@ -1,0 +1,41 @@
+id: CHG-MOD-005
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'A refusal defined in its response schema by another module''s record declares its problem types and asks that
+  module through a declared query: allocateResources, claimTicketTransfer, createGuestFnbOrder (409, 422),
+  deleteMediaAsset, transferOrderTickets and updateMediaAsset; the rest were words the check misread.'
+decision:
+  what: 'allocateResources 409 (nothing-available, dependency-missing) asks catalogue#productRecords for the experience
+    product its requirements belong to; deleteMediaAsset and updateMediaAsset 409 ask catalogue#productRecords for the
+    products that list the asset (MediaUsage surface product); createGuestFnbOrder 409 and 422 declare the
+    GuestOrderProblem reasons they return and ask orders#paymentRecords; claimTicketTransfer 410 and
+    transferOrderTickets 409 declare their TicketTransferProblem reasons (Access is already asked). changeOwnCredential
+    ("valid only on a registered workstation"), createDashboard ("layout variants"), setApprovalMatrix (the field
+    `order`), setStepUpPolicy ("several times a shift") and storePaymentToken ("wallet auto-reload") are words, not
+    records, and leave the class through the vocabulary of CHG-MOD-003.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-error-sources/E-SCHEMA-READ-VIA,
+  12 findings touching 43 Block A tickets (27 due by 28 October); ADAM CR-085 (CHG-FIN-012): a refusal written in
+  its schema rests on the records the schema names. Default ruling (lead, 14 October): "As E-READ-VIA, for 4xx
+  defined in the response schema (CR-085)." Count before 12, after 0.'
+keys_touched:
+  operations: [allocateResources, changeOwnCredential, claimTicketTransfer, createDashboard, createGuestFnbOrder,
+    deleteMediaAsset, setApprovalMatrix, setStepUpPolicy, storePaymentToken, transferOrderTickets, updateMediaAsset]
+  files:
+  - tools/check-error-sources.py
+root_class: A19 ERRORS-AND-STATES
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'Batch MOD, 14 October 2026. Verified: E-SCHEMA-READ-VIA 12 -> 0, 0 new; MUST_FIX (closeFiscalPeriod 409) still
+  passes.'

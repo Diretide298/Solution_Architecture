@@ -1,0 +1,86 @@
+id: CHG-MOD-007
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'A table read below the tenant is opened to staff grants (x-ticvai-rls grant-holder-read on 64 schemas, and
+  on five storage-only or derived tables by a generator rule; a guest still reads its own subject rows), and a table
+  written below the tenant gets a scope: 42 persisted schemas gain a server-set scopePath, so their rows belong to
+  the venue, region or tenant that wrote them.'
+decision:
+  what: 'Reads (RF-TENANT-ROOT "open its SELECT"): `x-ticvai-rls: grant-holder-read` on the schema that persists each
+    tenant-root or subject table a staff operation below the tenant reads; tools/derive-ddl.py TABLE_RLS carries the
+    same mark for pii.subject, pii.subject_contact, fnb.delivery_location_outlet, whitelabel.homepage_section and
+    wallet.balance, which no contract schema describes. A subject-owned table marked so gets the new
+    platform.apply_grant_holder_subject_read_rls (any staff grant reads, the guest still reads its own rows, writes
+    stay the subject''s or the tenant root''s), because the grant-holder check alone would have shut the guest out.
+    Writes (RF-TENANT-ROOT "give the table a scope"): the persisted schema of each of 42 tables written by a venue,
+    workstation or region operation gains `scopePath` (readOnly, required, set by the server from the caller''s
+    scope), the shape CHG-GEN-005 and CHG-R6G-002 gave UpsellRule and RegionSettings; derive-ddl then puts the table
+    under the scope rule. tools/ddl_forward.py names the backfill for such a column (a table that was the tenant
+    root''s alone holds only rows the tenant root wrote, so they take the tenant root''s path, then NOT NULL), and
+    keeps naming a scope_path backfill once the column is in an earlier forward migration. derive-ddl ROW_OWNER keeps
+    fnb.table_visit and fnb.table_session with their outlet (the scoped dining table gave them a second owner).
+    tools/check-rls-scope-fit.py knows the new helper.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-rls-scope-fit/RF-TENANT-ROOT,
+  782 findings touching 511 Block A tickets (198 due by 28 October); ADAM CR-076 (CHG-GEN-010): a venue''s guest
+  lookup, a till''s wallet read and a kitchen''s table map read nothing under the tenant-root policy. Default ruling
+  (lead, 14 October): "A table written below tenant gets a scope (follows its parent); else the operation runs at
+  tenant", and for reads "open its SELECT (x-ticvai-rls)". Members on tables batch STO''s key declarations move
+  (SP-KEY-TENANT-FALLBACK, SP-KEY-UNDECLARED) were skipped as the batch brief says. Count before 782, after 341: 268
+  on STO''s tables, 25 on children of STO''s tables or of the inventory_item rename a person re-applies
+  (inventory.count_line, serialised_item, orders.group_payment_milestone, transport.timetable_run,
+  fare_passenger_type), and 48 kept for the lead (listed in notes).'
+keys_touched:
+  tables:
+  - pii.subject
+  - pii.subject_contact
+  - wallet.balance
+  - fnb.delivery_location_outlet
+  - whitelabel.homepage_section
+  - fnb.table_visit
+  - fnb.table_session
+  files:
+  - contracts/
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/check-rls-scope-fit.py
+  other:
+  - 'x-ticvai-rls grant-holder-read on 64 contract schemas'
+  - 'scopePath (readOnly, required) on 42 persisted schemas: ai.AiConfigurationSource, approvals.AccreditationBadge,
+    catalogue.AlternativeCode, CatalogueMembershipBenefit, CatalogueMembershipProgramme, fnb.ColdChainEvent, Combo,
+    ComboSlot, TableDefinition, KitchenException, KitchenStation, ProductionPlan, TemperatureLog, games.PlayResult,
+    ReaderDeployment, finance.RecognitionSchedule, TaxCode, TaxExemption, marketing-crm.MarketingBadge, CaseMessage,
+    MarketingGuestExtraOption, MarketingGuestExtraValue, MarketingLoyaltyCampaign, MarketingLoyaltyPoints,
+    MarketingPointsRedemptionRule, MarketingReward, orders.GroupEnquiryOpportunityView, InvitationAllowance,
+    MemberExceptionView, MembershipMigrationView, RefundCalculationPolicyView, TicketTemplate,
+    payments.PaymentsDepositActivity, PaymentsFeeRule, shift.Denomination, tenancy.RegisteredDevice,
+    promotions.PromotionVariant, rental.RentalParticipant, seating.Seat, SeatPriceBand, venue-map.VenueMapImportJob,
+    white-label.BookingFlowStep'
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: ['27649', '27650', '27653', '27658', '27660', '27663', '27664', '27665', '27668', '27669', '27671', '27672', '27673', '27674', '27675']
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open
+notes: 'Batch MOD, 14 October 2026. Derive before check: derive-schema, derive-read-columns --apply and derive-ddl
+  --apply write the 42 scope_path columns, their indexes, the new helper and 129 policy swaps into the next forward
+  migration (V0105 on this branch; derived, not committed), with each backfill named in handoff/migration-review.md
+  (check-ddl-conventions D-SCOPE-NOTNULL passes). Kept for the lead, not baselined: 35 writes by venue staff to rows a
+  guest owns (marketing.message_dispatch, wallet.wallet, wallet.gift_card, marketing.consent_record, ledger.deposit,
+  orders.membership_activation_action, payments.token, marketing.form_submission, marketing.guest_document,
+  platform.audit_read): the subject policy lets only the guest or the tenant root write, and the ruling''s options do
+  not fit a guest-owned row (a scope would hide it from the guest; running a till top-up at tenant needs a tenant
+  grant), so the lead chooses between a staff-grant write rule for subject tables and writing under the tenant root
+  after the venue check; 9 writes and reads of identity.principal, principal_credential and
+  principal_credential_history (tracker F13, deferred to r7 by CHG-R6G-008); 2 reads of the append-only audit trails
+  (platform.audit_record, identity.authz_audit) by listAuditRecords and its peer at venue, which CHG-R6-002 decided
+  only the tenant root reads; fnb.delivery_location_outlet''s 2 writes (a join table with no schema of its own and a
+  nullable outlet key: STO''s key class).'

@@ -53,6 +53,64 @@ servers:
 - url: https://api.ticvai.com/v1
 security:
 - bearerAuth: []
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  providerConnectionRecords:
+    module: payments
+    table: payments.provider_connection
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The payments.provider_connection rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PaymentProviderConnection'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its payments.provider_connection rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
+  storedForwardRecords:
+    module: payments
+    table: payments.stored_forward
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The payments.stored_forward rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/StoredForwardTransaction'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its payments.stored_forward rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
+  instalmentPolicyRecords:
+    module: payments
+    table: payments.instalment_policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The payments.instalment_policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PayInstalmentPolicy'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-003; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its payments.instalment_policy rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation. It
+      is asked from another deployable through Orders' service route (serviceAuth).
+    served: [service]
 paths:
   /dunning-policy:
     get:
@@ -908,6 +966,10 @@ paths:
   /payment-providers/economics:
     get:
       operationId: getPaymentProviderEconomics
+      x-ticvai-read-via:
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-577 Provider Cost, Commercial & Routing Economics"
         - "P08 ADM-624 Fees, Commission, FX & Settlement Economics"
@@ -2059,6 +2121,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setInstalmentPolicy
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'the product''s term (422 too-many-instalments) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
       x-ticvai-audience:
@@ -2101,6 +2167,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PayInstalmentPolicy'
         '422':
+          x-ticvai-problem-types: [share-out-of-range, too-many-instalments]
           description: A share due at purchase outside 0-100, or more instalments than the frequency allows
             within the product's term.
           content:
@@ -2171,6 +2238,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createInstalmentPlan
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'whether the product qualifies under the instalment policy (422 not-eligible-for-instalments) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-023 Membership Management"
         - "P02 GST-015 Memberships"
@@ -2289,6 +2360,7 @@ components:
       description: Partner, developer and device key (common.yaml apiKeyAuth).
   schemas:
     PayTerminalCertification:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by setPaymentTerminalConfiguration
       type: object
       x-ticvai-persistence: payments.terminal_certification + payments.terminal_certification_level3
       description: '4.3.1. Also the `recordPaymentTerminalCertification` body. **One per terminal model**; a
@@ -2361,6 +2433,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Operations write it at `tenant` scope.'
     PayInstalmentPolicy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by createInstalmentPlan
       type: object
       x-ticvai-persistence: payments.instalment_policy
       description: 4.2.17, 2.14.19. Also the `setInstalmentPolicy` body.
@@ -2781,6 +2854,7 @@ components:
           format: date-time
           nullable: true
     PaymentsDepositActivity:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listDepositActivity, recordDepositActivity
       type: object
       x-ticvai-persistence: payments.deposit_activity
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Provides an auditable history of every deposit authorization, hold, capture, release, forfeiture, refund, or adjustment.'
@@ -2790,7 +2864,12 @@ components:
       - amount
       - occurredAt
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -2878,6 +2957,7 @@ components:
           format: date-time
           nullable: true
     PaymentsFeeRule:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getPaymentRules, setPaymentRules
       type: object
       x-ticvai-persistence: payments.fee_rule
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-related fees or surcharges that may be applied to an order.'
@@ -2889,7 +2969,12 @@ components:
       - value
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -3070,6 +3155,7 @@ components:
           type: boolean
           default: true
     PaymentProviderConnection:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by capturePayment, createPayment, ingestSettlementFile
       type: object
       x-ticvai-persistence: payments.provider_connection
       description: 'Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**'

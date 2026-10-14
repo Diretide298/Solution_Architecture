@@ -1,0 +1,52 @@
+id: CHG-MOD-002
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'listDelegations no longer reads marketing.guest_profile (the names it shows are the guests'' own, in
+  pii.subject); the other six Identity reads above the foundation tier are kept for the lead, each with the decision
+  it needs.'
+decision:
+  what: 'tools/applied/mod-lineage-14-october.py drops marketing.guest_profile from listDelegations'' lineage reads:
+    DelegatedAccess carries no profile field, and the guest names a delegation list shows are pii.subject''s, which
+    Identity owns and already reads. Kept, not baselined, each for a decision: exportSubjectData''s four reads of
+    marketing.consent_record, form_submission, guest_document and guest_profile (who assembles the Marketing part of
+    a subject export: a projection of a guest''s whole marketing record into Identity, or a fan-out in which
+    Marketing''s own data discovery, setDataDiscoveryAccess, contributes its part when the export request is raised);
+    submitGuestIdentityDocument''s read of assets.media_asset (whether the identity scan is kept by Identity itself,
+    in pii.subject_document, rather than uploaded to the shared media library in another deployable); and
+    linkGuestCheckout''s read of orders.sales_order (it attaches orders through Orders'' in-process API, CHG-GDL-003,
+    which an Identity that reads nothing above it cannot call; the attach could instead be Orders'' own operation).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-cross-module-reads/XR-FOUNDATION,
+  7 findings touching 103 Block A tickets (60 due by 28 October). ADR-0055 amendment rule 4 and ADR-0028 tiers:
+  Identity reads nothing above it but a projection. Default ruling (lead, 14 October): "Identity reads modules above
+  it only through a projection". Count before 7, after 6 (all kept, listed in the batch hand-back with the decision
+  each needs).'
+keys_touched:
+  operations:
+  - listDelegations
+  - exportSubjectData
+  - submitGuestIdentityDocument
+  - linkGuestCheckout
+  tables:
+  - marketing.guest_profile
+  files:
+  - tools/applied/mod-lineage-14-october.py
+root_class: A22 LINEAGE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Batch MOD, 14 October 2026. The lineage is derived: run `python tools/applied/mod-lineage-14-october.py
+  --apply` after derive-lineage --apply at the merge (it also carries CHG-MOD-006 and CHG-MOD-009). Verified on the branch:
+  check-cross-module-reads XR-FOUNDATION 7 -> 6 and XR-UNCOVERED 7 -> 6, 0 new. The six kept are not fixed by a
+  projection here because each projection would copy a guest''s Marketing record, media or unattached orders into
+  Identity, which is a privacy and design decision (ADR-0047), not a mechanical one.'

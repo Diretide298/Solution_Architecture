@@ -108,6 +108,63 @@ x-ticvai-queries:
       wallet module) checks is empty and rollForward null, which is finance's "empty where the tenant has no wallet
       module".
     served: [in-process, service]
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  giftCardRecords:
+    module: wallet
+    table: wallet.gift_card
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The wallet.gift_card rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Wallet stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GiftCard'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Wallet answers with its wallet.gift_card rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Wallet implements.
+    served: [in-process]
+  walletRecords:
+    module: wallet
+    table: wallet.wallet
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The wallet.wallet rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Wallet stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Wallet'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Wallet answers with its wallet.wallet rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Wallet implements.
+    served: [in-process, service]
+  walletTransactionRecords:
+    module: wallet
+    table: wallet.wallet_transaction
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The wallet.wallet_transaction rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Wallet stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/WalletTransaction'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Wallet answers with its wallet.wallet_transaction rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Wallet implements.
+    served: [in-process]
 paths:
   /wallet-types:
     get:
@@ -1848,6 +1905,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: transferWalletBalance
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
@@ -2122,6 +2183,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: topUpWallet
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: in-process
+        for: 'the top-up''s payment (402 payment-declined) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
         - "P08 BO-488 Self-Service Wallet Top-Up"
@@ -2176,6 +2241,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Wallet' }
         '402':
+          x-ticvai-problem-types: [payment-declined]
           description: Payment declined
           content:
             application/problem+json:
@@ -2547,6 +2613,10 @@ paths:
         type: string
     post:
       operationId: loadGameCredits
+      x-ticvai-read-via:
+      - query: games#cardRecords
+        route: service
+        for: 'its read of games.card, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
       x-ticvai-write-via:
@@ -2652,6 +2722,10 @@ paths:
         type: string
     post:
       operationId: adjustGameCard
+      x-ticvai-read-via:
+      - query: games#cardRecords
+        route: service
+        for: 'its read of games.card, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: games.card
         event: wallet.credited
@@ -3597,6 +3671,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletAutoReloadSetting
+      x-ticvai-read-via:
+      - query: orders#tokenRecords
+        route: in-process
+        for: 'its read of payments.token, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
@@ -3650,6 +3728,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [amount-outside-funding-rules, token-not-holders]
           description: An amount outside the venue's funding rules, or a payment token that is not the holder's.
           content:
             application/problem+json:
@@ -3664,6 +3743,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getWalletExitBalance
+      x-ticvai-read-via:
+      - query: payments#storedForwardRecords
+        route: in-process
+        for: 'its read of payments.stored_forward, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
@@ -3703,6 +3786,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: settleWalletAtExit
+      x-ticvai-read-via:
+      - query: payments#storedForwardRecords
+        route: in-process
+        for: 'its read of payments.stored_forward, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
@@ -4377,6 +4464,7 @@ components:
           type: boolean
           default: true
     CreditType:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by expireCreditLots, simulateCreditConsumption
       type: object
       x-ticvai-persistence: wallet.credit_type
       description: 'Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one
@@ -5399,6 +5487,7 @@ components:
         scopePath:
           type: string
     WalletAccountingMapping:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by expireCreditLots
       type: object
       x-ticvai-persistence: wallet.accounting_mapping
       description: 'Boards 9.2 and 9.3. **Different credit types are different liabilities.**'
@@ -5643,6 +5732,7 @@ components:
         scopePath:
           type: string
     Wallet:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by adjustGameCard, adjustWallet, authoriseStoredValue, closeWallet and others
       # `credits[]` is not a column of `wallet.wallet`: each entry is a live lot in
       # `wallet.credit_lot`, so the lot table is named here as the child and a read of the wallet
       # reads both.
@@ -5749,6 +5839,7 @@ components:
       type: string
       enum: [topUp, spend, refund, adjustment, bonus, expiry, transfer]
     GiftCard:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by activateGiftCard, authoriseStoredValue, blockGiftCard, getGiftCard and others
       x-ticvai-persistence: "wallet.gift_card"
       type: object
       required: [cardCode, faceValue, balance, status, issuedAt]

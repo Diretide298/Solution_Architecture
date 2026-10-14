@@ -1,0 +1,50 @@
+id: CHG-MOD-008
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: 'A scope_path table written only at the tenant and read below it is read beneath: 45 schemas gain
+  x-ticvai-rls read-beneath, so a venue or region reads the tenant''s rows above it and still writes only its own.'
+decision:
+  what: '`x-ticvai-rls: read-beneath` on the schema persisting each table check-rls-scope-fit found (ai policies,
+    tools, releases and knowledge, approval policies, catalogue pricing vocabularies, the legal entity, payment
+    provider connections and certifications, reporting KPI definitions and models, resource vocabularies, wallet
+    credit types and mappings, white-label pages and config versions, marketing privacy and suppression lists, and
+    the rest the audit listed). derive-ddl swaps each to apply_read_beneath_rls in the next forward migration
+    (CHG-GEN-004); a child that follows such a table by its key follows it for reading only (CHG-GEN-005).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit of 14 October 2026 (audit/ticvai/runs/audit-1014/classes.json): class check-rls-scope-fit/RF-OWNED-ABOVE,
+  127 findings touching 209 Block A tickets (66 due by 28 October); R183 ("owned above, read below") and ADAM
+  CR-076. Default ruling (lead, 14 October): "A below-tenant read of a tenant-written table declares x-ticvai-rls:
+  read-beneath." Count before 127, after 4: the four left read resources.venue_assignment and ai.byok_enablement,
+  tables batch STO''s key declarations move, skipped as the brief says.'
+keys_touched:
+  tables:
+  - ledger.legal_entity
+  - ai.policy
+  - catalogue.rounding_profile
+  - access.hardware_model
+  files:
+  - contracts/
+  other:
+  - 'x-ticvai-rls read-beneath on 45 contract schemas'
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: ['27649', '27650', '27653', '27658', '27660', '27663', '27664', '27665', '27668', '27669', '27671', '27672', '27673', '27674', '27675']
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open
+notes: 'Batch MOD, 14 October 2026. For the lead: read-beneath on ledger.legal_entity (read at region by
+  closeFiscalPeriod, runFxRevaluation and getVatReturn and at venue by issueTaxInvoice) also opens, for reading, the
+  tables that follow it by key (ledger.account, fiscal_period, fiscal_period_event, journal_entry), as CHG-GEN-005
+  defines a split parent''s children; a grant beneath a legal entity can then read its ledger. The API still gates
+  every read by permission (FINANCE_*); if RLS should keep a venue out of the ledger, those four operations run at
+  tenant instead and the mark comes off. The same cascade applies to ai.knowledge_collection / knowledge_document
+  (index sources, entries and jobs, chunk embeddings) and payments.terminal_certification (its level-3 rows).
+  Verified: RF-OWNED-ABOVE 127 -> 4, 0 new.'

@@ -183,6 +183,269 @@ x-ticvai-queries:
       so the asker can tell a performance that is not the variant's product's. Read-only, no side effects, and safe to
       cache for a short time on the asker's side.
     served: [service]
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  channelCapacityRecords:
+    module: catalogue
+    table: catalogue.channel_capacity
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.channel_capacity rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ChannelCapacity'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.channel_capacity rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked in process within commerce, through the C# query interface Catalogue implements, and
+      asked from another deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  entitlementTemplateRecords:
+    module: catalogue
+    table: catalogue.entitlement_template
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.entitlement_template rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/EntitlementTemplate'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.entitlement_template rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked in process within commerce, through the C# query interface Catalogue implements, and
+      asked from another deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  eventRecords:
+    module: catalogue
+    table: catalogue.event
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.event rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Event'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.event rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
+  groupPackageRecords:
+    module: catalogue
+    table: catalogue.group_package
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.group_package rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GroupPackageDefinition'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.group_package rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements.
+    served: [in-process]
+  inventoryReservationRecords:
+    module: catalogue
+    table: catalogue.inventory_reservation
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.inventory_reservation rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/InventoryHold'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.inventory_reservation rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked in process within commerce, through the C# query interface Catalogue implements.
+    served: [in-process]
+  performanceRecords:
+    module: catalogue
+    table: catalogue.performance
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.performance rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Performance'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.performance rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements, and asked from another
+      deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  priceRecords:
+    module: catalogue
+    table: catalogue.price
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.price rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Price'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.price rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements, and asked from another
+      deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  priceListRecords:
+    module: catalogue
+    table: catalogue.price_list
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.price_list rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PriceList'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.price_list rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements, and asked from another
+      deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  productRecords:
+    module: catalogue
+    table: catalogue.product
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.product rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Product'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.product rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements, and asked from another
+      deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  productCategoryRecords:
+    module: catalogue
+    table: catalogue.product_category
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.product_category rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ProductCategory'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.product_category rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked in process within commerce, through the C# query interface Catalogue implements, and
+      asked from another deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  productEligibilityRuleRecords:
+    module: catalogue
+    table: catalogue.product_eligibility_rule
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.product_eligibility_rule rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ProductEligibilityRule'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.product_eligibility_rule rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
+  taxProfileRecords:
+    module: catalogue
+    table: catalogue.tax_profile
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.tax_profile rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/TaxProfile'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.tax_profile rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements.
+    served: [in-process]
+  variantRecords:
+    module: catalogue
+    table: catalogue.variant
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.variant rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ProductVariant'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.variant rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements, and asked from another
+      deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  variantDimensionRecords:
+    module: catalogue
+    table: catalogue.variant_dimension
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.variant_dimension rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/VariantDimension'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its catalogue.variant_dimension rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
 paths:
   /product-categories:
     get:
@@ -237,6 +500,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductCategories
+      x-ticvai-read-via:
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'its read of whitelabel.booking_flow, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-103 Booking Flows"
@@ -373,6 +640,13 @@ paths:
   /guests/me/memberships:
     get:
       operationId: getMyMemberships
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: marketing-crm#loyaltyPositionRecords
+        route: service
+        for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-022 Membership Plans"
         - "P01 WEB-023 Membership Management"
@@ -423,6 +697,10 @@ paths:
   /products/import:
     post:
       operationId: importProductCatalogue
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'live orders against a category the file would replace (409 category-has-live-orders) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
       summary: Parse a catalogue file into a preview
@@ -496,6 +774,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CatalogueImportJob'
         '409':
+          x-ticvai-problem-types: [category-has-live-orders, source-not-ready]
           description: '`mode` is `replaceCategory` and a category the file would replace has live orders
             against it — that is a migration, not an import. Also answered when `sourceRef` names an asset
             that is not `ready`: still `processing`, or `quarantined` by the scan.
@@ -551,6 +830,10 @@ paths:
   /guest/memberships:
     get:
       operationId: listGuestMemberships
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -721,6 +1004,16 @@ paths:
         format: uuid
     post:
       operationId: assessProductChange
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
       summary: What a change would touch, before making it
@@ -1029,6 +1322,10 @@ paths:
         format: uuid
     post:
       operationId: reinstateEntitlement
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
@@ -1096,6 +1393,10 @@ paths:
         format: uuid
     post:
       operationId: freezeEntitlement
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
@@ -1253,6 +1554,10 @@ paths:
   /search:
     get:
       operationId: searchCatalogue
+      x-ticvai-read-via:
+      - query: white-label#guidedChoiceAnswerRecords
+        route: service
+        for: 'its read of whitelabel.guided_choice_answer, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-002 Event & Attraction Listing"
         - "P01 WEB-003 Search Results"
@@ -1427,6 +1732,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createDonationCampaign
+      x-ticvai-read-via:
+      - query: finance#accountRecords
+        route: in-process
+        for: 'its read of ledger.account, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-1190 Donation Campaigns"
       x-ticvai-audience:
@@ -1691,6 +2000,10 @@ paths:
   /products:
     get:
       operationId: listProducts
+      x-ticvai-read-via:
+      - query: white-label#guidedChoiceAnswerRecords
+        route: service
+        for: 'its read of whitelabel.guided_choice_answer, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-002 Event & Attraction Listing"
@@ -1882,6 +2195,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createProduct
+      x-ticvai-read-via:
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'its read of whitelabel.booking_flow, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-119 Product Creation Workspace"
         - "P08 BO-007 Product Directory"
@@ -2307,6 +2624,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateProduct
+      x-ticvai-read-via:
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'its read of whitelabel.booking_flow, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
@@ -3683,6 +4004,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: acquireInventoryHold
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
       x-ticvai-audience:
@@ -4220,6 +4545,10 @@ paths:
         format: uuid
     post:
       operationId: transitionProductLifecycle
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
@@ -4307,6 +4636,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [invalid-transition, unexpired-entitlements]
           description: 'Transition not valid from the current state, or archiving attempted while unexpired
             entitlements exist.
 
@@ -5195,6 +5525,10 @@ paths:
         format: uuid
     post:
       operationId: suspendEntitlement
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-write-via:
@@ -5568,6 +5902,10 @@ paths:
   /channel-availability:
     put:
       operationId: publishChannelAvailability
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-124 Channel Publication & Availability"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
@@ -6130,6 +6468,16 @@ paths:
   /review-decision:
     put:
       operationId: approveReviewDecision
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-130 Approval Review & Decision Workspace"
       x-ticvai-audience:
@@ -6262,6 +6610,16 @@ paths:
   /change-impact-analysi:
     get:
       operationId: listChangeImpactAnalysis
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-082 Pricing Change Impact Analysis"
         - "P08 ADM-133 Change Impact Analysis"
@@ -6447,6 +6805,10 @@ paths:
   /product-retirement-suspension:
     get:
       operationId: listProductRetirementSuspension
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-135 Product Retirement, Suspension & Archive"
       x-ticvai-audience:
@@ -7454,6 +7816,10 @@ paths:
   /channel:
     get:
       operationId: listChannel
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-268 Channel Operations Command Center"
         - "P08 ADM-277 AI Channel Optimization & Intelligence Center"
@@ -7973,6 +8339,10 @@ paths:
   /channel-performance-commercial:
     get:
       operationId: listChannelPerformanceCommercial
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-274 Channel Performance & Commercial Analytics"
       x-ticvai-audience:
@@ -8092,6 +8462,10 @@ paths:
   /channel-log-transaction:
     get:
       operationId: listChannelLogTransaction
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-275 Channel Audit, Logs & Transaction Traceability"
       x-ticvai-audience:
@@ -11012,6 +11386,13 @@ paths:
   /pricing-change-impact:
     get:
       operationId: listPricingChangeImpact
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-082 Pricing Change Impact Analysis"
       x-ticvai-audience:
@@ -11274,6 +11655,10 @@ paths:
   /pricing-rollback-emergency:
     get:
       operationId: listPricingRollbackEmergency
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-086 Pricing Rollback & Emergency Control Center"
       x-ticvai-audience:
@@ -11434,6 +11819,10 @@ paths:
   /pricing-compliance:
     get:
       operationId: listPricingCompliance
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-087 Pricing History, Audit & Compliance Explorer"
       x-ticvai-audience:
@@ -12621,6 +13010,13 @@ paths:
   /internal-demand-booking:
     get:
       operationId: listInternalDemandBooking
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-099 Internal Demand & Booking Signal Hub"
       x-ticvai-audience:
@@ -13119,6 +13515,10 @@ paths:
   /demand-booking-curve:
     get:
       operationId: listDemandBookingCurve
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-104 AI Demand Forecasting & Booking Curve Studio"
         - "P08 BO-1046 Inventory Forecasting"
@@ -13254,6 +13654,10 @@ paths:
   /price-elasticity-revenue:
     get:
       operationId: listPriceElasticityRevenue
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-105 Price Elasticity & Revenue Response Intelligence"
       x-ticvai-audience:
@@ -13674,6 +14078,10 @@ paths:
   /pricing-2:
     put:
       operationId: setPricing
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-109 Pricing Simulation Studio"
       x-ticvai-audience:
@@ -13871,6 +14279,10 @@ paths:
   /revenue-demand-impact:
     get:
       operationId: listRevenueDemandImpact
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-112 Revenue & Demand Impact Forecasting"
       x-ticvai-audience:
@@ -14181,6 +14593,10 @@ paths:
   /dynamic-pricing-performance:
     get:
       operationId: listDynamicPricingPerformance
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-116 Dynamic Pricing Performance & Optimization Analytics"
       x-ticvai-audience:
@@ -18404,6 +18820,7 @@ components:
           items:
             $ref: '#/components/schemas/PricingDynamicPriceAction'
     CatalogueMembershipBenefit:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listMembershipBenefits, listProductRetirementSuspension, setMembershipBenefit
       type: object
       x-ticvai-persistence: catalogue.membership_benefit
       description: '**Taken from the backend workbook, 20 September.** Defines a benefit that can be included in one or more membership plans.'
@@ -18413,7 +18830,12 @@ components:
       - type
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -18447,6 +18869,7 @@ components:
           type: string
           format: date-time
     CatalogueMembershipProgramme:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listMembershipLoyaltyPricing, listMembershipProgrammes, listPricingChangeImpact, setMembershipProgramme and others
       type: object
       x-ticvai-persistence: catalogue.membership_programme
       description: '**Taken from the backend workbook, 20 September.** Defines the overall membership programme available to customers.'
@@ -18456,7 +18879,12 @@ components:
       - programName
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         programId:
           type: string
           format: uuid
@@ -18655,6 +19083,7 @@ components:
           default: false
           description: 'A protected segment or channel: dynamic adjustments never apply.'
     EventType:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listEventTypes
       type: object
       x-ticvai-persistence: catalogue.event_type
       description: 'Event board 1.2. **The type decides behaviour, not just a label.**'
@@ -19878,12 +20307,18 @@ components:
               reason:
                 type: string
     AlternativeCode:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listAlternativeCodes, setAlternativeCodes
       x-ticvai-persistence: catalogue.alternative_code
       type: object
       required:
       - code
       - partnerId
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         code:
           type: string
           maxLength: 128
@@ -39098,6 +39533,7 @@ components:
           format: date-time
           readOnly: true
     PriceCategory:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listCommercialPricing, listCommercialPricingStructure, listPriceCategoryRate
       type: object
       x-ticvai-persistence: catalogue.price_category
       description: >-
@@ -39507,6 +39943,7 @@ components:
           format: date-time
           readOnly: true
     PricingMarket:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listCommercialPricing, listCommercialPricingStructure, listMarketVenueCurrency
       type: object
       x-ticvai-persistence: catalogue.pricing_market
       description: >-
@@ -40310,6 +40747,7 @@ components:
           format: uuid
           nullable: true
     RoundingProfile:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listCalculationValidationReconciliation, listCurrencyPrecisionRounding, listMarketVenueCurrency, listTaxFeeCalculation and others
       type: object
       x-ticvai-persistence: catalogue.rounding_profile
       description: >-
@@ -41324,6 +41762,7 @@ components:
           format: date-time
           readOnly: true
     SignalRegistryEntry:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listLearningModelPerformance, listPricing, listSignalDataQuality
       type: object
       x-ticvai-persistence: catalogue.signal_registry
       description: >-

@@ -115,11 +115,25 @@ ENTITIES = {
 HOMONYMS = {
     "order": ("inventory.purchase_order", "maintenance.work_order", "fnb.service_order"),
     "shift": ("access.podium_shift",),
+    # MOD audit, 14 October 2026 (CHG-MOD-003): a resale settlement is Orders', an exit settlement Wallet's, a partner
+    # settlement batch Platform's; a membership product is Platform's (subscription) and a membership programme
+    # Catalogue's; a workforce posting is an employee's work assignment (Tenancy), not a ledger posting.
+    "settlement": ("orders.resale_settlement", "wallet.exit_settlement", "control.partner_settlement_batch",
+                   "rental.settlement"),
+    "membership": ("subscription.membership_product", "catalogue.membership_programme"),
+    "posting": ("workforce.work_assignment",),
 }
-# Phrases where an entity word is ordinary English, removed before matching.
+# Phrases where an entity word is ordinary English, removed before matching. The second line onwards (MOD audit,
+# 14 October 2026, CHG-MOD-003) are the words the audit found used for something other than the record: a position
+# in a list (a tile's order), a kind or a tender (a product kind, "card or wallet", a wallet pass), a time span ("several
+# times a shift"), a hold's own status ("converted to an order", "before taking payment"), and problem-type slugs.
 NOT_ENTITY = re.compile(r"\b(?:in order (?:to|for)|sort order|display order|order of|"
                         r"the order in which|in the order|in any order|out of order|sequence order|"
-                        r"(?:ascending|descending) order|order (?:by|matters))\b", re.I)
+                        r"(?:ascending|descending) order|order (?:by|matters)|"
+                        r"tile order|in one order|out-of-order|converted (?:to|for) (?:an|another) order|"
+                        r"layout variants?|product kinds?|card or wallet|card payments?|wallet pass(?:es)?|"
+                        r"(?:apple|google) wallet|wallet auto-reload|times a shift|needs-promotion|"
+                        r"on a registered workstation|taking payment)\b|`order`|`cart` hold", re.I)
 
 
 # **Refusals the r6 batches fix, which may never be baselined** (E-SCHEMA-READ-VIA): the operation and its status.

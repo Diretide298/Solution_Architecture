@@ -111,6 +111,45 @@ x-ticvai-queries:
       approvers is the chain resolved with delegations applied. Read-only: nothing is raised. Asked first by finance's
       closeFiscalPeriod (kind periodClose) and reopenPeriod (kind periodReopen); ADAM CR-085, CHG-FIN-012.
     served: [in-process, service]
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  requestRecords:
+    module: approvals
+    table: approvals.request
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The approvals.request rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ApprovalRequest'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its approvals.request rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  slaPolicyRecords:
+    module: approvals
+    table: approvals.sla_policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The approvals.sla_policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ApprovalSlaPolicy'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its approvals.sla_policy rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
 paths:
   /approval-requests:
     get:
@@ -205,6 +244,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createApprovalRequest
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-020 Shift Exceptions & Alerts"
@@ -266,8 +309,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
         '409':
-          description: 'An open request already exists for this subject. Two approvals for one refund
-            is how a refund gets paid twice. `refusedReason` is `openRequestExists` and `requestId`
+          description: 'An open request already exists for this subject. Two approvals for one subject
+            is how the same money goes out twice. `refusedReason` is `openRequestExists` and `requestId`
             names the open request, so the caller can point at it rather than raise another. A draft
             is not an open request.
 
@@ -370,6 +413,10 @@ paths:
   /approval-requests/evaluate:
     post:
       operationId: evaluateApprovalRequirement
+      x-ticvai-read-via:
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 ADM-337 Routing Simulator & Conflict Detection"
@@ -436,6 +483,10 @@ paths:
         format: uuid
     post:
       operationId: decideApprovalRequest
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-020 Shift Exceptions & Alerts"
         - "P08 ADM-145 Promotion Approval Inbox"
@@ -1109,6 +1160,10 @@ paths:
   /delegations:
     get:
       operationId: listApprovalDelegations
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-243 Roles, Authority, Delegation & Approval Limits"
         - "P08 BO-087 Approval Delegations"
@@ -1140,6 +1195,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createApprovalDelegation
+      x-ticvai-read-via:
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-243 Roles, Authority, Delegation & Approval Limits"
         - "P08 BO-087 Approval Delegations"
@@ -1684,6 +1746,13 @@ paths:
   /role-authority-delegation:
     put:
       operationId: approveRoleAuthorityDelegation
+      x-ticvai-read-via:
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.6 p.13; MoM 8 Sep (delegation/substitute approver, segregation
@@ -1972,6 +2041,10 @@ paths:
   /workflow:
     get:
       operationId: listWorkflow
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-248 Workflow Operations Command Center"
         - "P08 BO-643 Approval Policy Validation & Publication"
@@ -2045,6 +2118,10 @@ paths:
   /unified-decision:
     put:
       operationId: approveUnifiedDecision
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.2 p.25-26; MoM 10 Aug §5.5 and 8 Sep (Approve, Reject, Return,
@@ -2131,6 +2208,10 @@ paths:
   /workflow-instance-process:
     get:
       operationId: listWorkflowInstanceProcess
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-250 Workflow Instance Monitor & Process Timeline"
         - "P08 BO-373 Approval Activity & Notification Center"
@@ -2286,6 +2367,10 @@ paths:
   /sla-escalation-bottleneck:
     get:
       operationId: listSlaEscalationBottleneck
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-362 Bottleneck Analysis & Heatmap"
         - "P08 BO-370 Escalated Approval Center"
@@ -3644,6 +3729,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setApprovalExternalProvider
+      x-ticvai-read-via:
+      - query: public-api#apiClientRecords
+        route: service
+        for: 'its read of control.api_client, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-354 External Workflow System Integration"
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (external workflow connector: endpoint, mapping,
@@ -4153,6 +4242,7 @@ components:
           type: string
           description: The partition key (ADR-0005). Written at venue scope
     ApprovalControlPolicy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listRuleWorkflow
       type: object
       x-ticvai-persistence: approvals.control_policy
       description: 'Approvals boards 6.2 and 6.3. **Which decisions one person may not take alone** —
@@ -4311,6 +4401,7 @@ components:
         scopePath:
           type: string
     ApprovalSlaPolicy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listRuleWorkflow, listSlaEscalationBottleneck, listSlaEscalationReminder, listWorkflowProcessPerformance and others
       type: object
       x-ticvai-persistence: approvals.sla_policy
       description: 'Approvals boards 5.5 and 5.6. **A target with no consequence is a number in a
@@ -4438,6 +4529,7 @@ components:
         scopePath:
           type: string
     ApprovalExternalProvider:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by recordExternalApprovalDecision, setApprovalMatrix
       type: object
       x-ticvai-persistence: approvals.external_provider
       description: '11.1.65 (29 September, build pass). **A third-party workflow system registered to decide
@@ -4794,6 +4886,7 @@ components:
           type: string
           format: date-time
     AccreditationBadge:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by issueAccreditationBadge, listAccreditationBadges
       type: object
       x-ticvai-persistence: approvals.accreditation_badge
       description: '**Drafted 4 September.** The credential an approved application produces. **Its lifetime
@@ -4801,7 +4894,12 @@ components:
         it still stands.'
       required:
       - id
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -7788,6 +7886,7 @@ components:
       - pin
       - mfa
     StepUpPolicy:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by approveUnifiedDecision, listRuleWorkflow
       x-ticvai-persistence: approvals.step_up_policy
       type: object
       required:

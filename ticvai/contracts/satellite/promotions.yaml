@@ -73,6 +73,102 @@ tags:
 - name: allocation
 - name: upsell
 - name: evaluation
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  bundleRecords:
+    module: promotions
+    table: promotions.bundle
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.bundle rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Bundle'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.bundle rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
+  couponCampaignRecords:
+    module: promotions
+    table: promotions.coupon_campaign
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.coupon_campaign rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CouponCampaign'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.coupon_campaign rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked in process within commerce, through the C# query interface Catalogue implements.
+    served: [in-process]
+  couponCodeRecords:
+    module: promotions
+    table: promotions.coupon_code
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.coupon_code rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CouponCode'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.coupon_code rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements.
+    served: [in-process]
+  promotionRecords:
+    module: promotions
+    table: promotions.promotion
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.promotion rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Promotion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.promotion rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements, and asked from another
+      deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  voucherRecords:
+    module: promotions
+    table: promotions.voucher
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.voucher rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Voucher'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.voucher rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements.
+    served: [in-process]
 paths:
   /promotions/{promotionId}/simulate:
     parameters:
@@ -84,6 +180,13 @@ paths:
         format: uuid
     post:
       operationId: simulatePromotion
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
         - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
@@ -230,6 +333,13 @@ paths:
   /recommendations:
     post:
       operationId: getRecommendations
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1561,6 +1671,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createBundle
+      x-ticvai-read-via:
+      - query: fnb#menuItemRecords
+        route: service
+        for: 'its read of fnb.menu_item, F&B''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
       x-ticvai-audience:
@@ -2125,6 +2239,10 @@ paths:
   /promotion-campaign:
     get:
       operationId: listPromotionCampaign
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-139 Promotion & Campaign Directory"
         - "P08 ADM-229 Campaign & Promotion Performance Explorer"
@@ -2527,6 +2645,16 @@ paths:
   /promotion-health-performance:
     get:
       operationId: listPromotionHealthPerformance
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-146 Promotion Health & Performance Monitor"
         - "P08 ADM-228 Promotion Performance Command Center"
@@ -2809,6 +2937,13 @@ paths:
   /customer-membership-segment:
     get:
       operationId: listCustomerMembershipSegment
+      x-ticvai-read-via:
+      - query: marketing-crm#programmeTierRecords
+        route: service
+        for: 'its read of marketing.programme_tier, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-153 Customer, Membership & Segment Discount Rules"
       parameters:
@@ -3122,6 +3257,10 @@ paths:
   /usage-capacity-frequency:
     get:
       operationId: listUsageCapacityFrequency
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-162 Usage, Capacity & Frequency Control"
       parameters:
@@ -3262,6 +3401,16 @@ paths:
   /redemption-code-lookup:
     get:
       operationId: listRedemptionCodeLookup
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-165 Redemption Monitor & Code Lookup"
       x-ticvai-audience:
@@ -3362,6 +3511,10 @@ paths:
   /code-security-fraud:
     get:
       operationId: listCodeSecurityFraud
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-166 Code Security, Fraud & Exception Center"
       parameters:
@@ -3410,6 +3563,13 @@ paths:
   /redemption:
     get:
       operationId: listRedemption
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-167 Redemption Analytics, Audit & AI Optimization"
       x-ticvai-audience:
@@ -3503,6 +3663,10 @@ paths:
   /advanced-offer:
     get:
       operationId: listAdvancedOffer
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-168 Advanced Offer Command Center"
       x-ticvai-audience:
@@ -3848,6 +4012,16 @@ paths:
   /bundle-combo:
     get:
       operationId: listBundleCombo
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-178 Bundle & Combo Command Center"
       x-ticvai-audience:
@@ -4255,6 +4429,10 @@ paths:
   /dynamic-bundle:
     get:
       operationId: listDynamicBundle
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-188 Dynamic Bundle Operations Command Center"
         - "P08 ADM-197 Dynamic Bundle Simulation & AI Optimization"
@@ -4609,6 +4787,13 @@ paths:
   /bundle-availability-forecast:
     get:
       operationId: listBundleAvailabilityForecast
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-196 Bundle Availability Forecast, Alerts & Recovery"
       parameters:
@@ -4695,6 +4880,16 @@ paths:
   /targeting-eligibility:
     get:
       operationId: listTargetingEligibility
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-198 Targeting & Eligibility Command Center"
       x-ticvai-audience:
@@ -4823,6 +5018,13 @@ paths:
   /crm-customer-segment:
     get:
       operationId: listCrmCustomerSegment
+      x-ticvai-read-via:
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-200 CRM & Customer Segment Manager"
       parameters:
@@ -4868,6 +5070,13 @@ paths:
   /membership-loyalty-guest:
     get:
       operationId: listMembershipLoyaltyGuest
+      x-ticvai-read-via:
+      - query: marketing-crm#loyaltyPositionRecords
+        route: service
+        for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#programmeTierRecords
+        route: service
+        for: 'its read of marketing.programme_tier, Marketing''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-201 Membership, Loyalty & Guest Eligibility"
       parameters:
@@ -4913,6 +5122,22 @@ paths:
   /behavioral-transaction-targeting:
     get:
       operationId: listBehavioralTransactionTargeting
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-202 Behavioral & Transaction Targeting"
       parameters:
@@ -5040,6 +5265,19 @@ paths:
   /audience-preview-reach:
     get:
       operationId: listAudiencePreviewReach
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-205 Audience Preview, Reach & Eligibility Simulator"
       parameters:
@@ -5084,6 +5322,10 @@ paths:
   /targeting-conflict-frequency:
     get:
       operationId: listTargetingConflictFrequency
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-206 Targeting Conflict, Frequency & Exclusion Controls"
       parameters:
@@ -5127,6 +5369,19 @@ paths:
   /audience-discovery-targeting:
     get:
       operationId: listAudienceDiscoveryTargeting
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-207 AI Audience Discovery & Targeting Optimization"
         - "P08 BO-761 AI Audience Discovery"
@@ -5178,6 +5433,10 @@ paths:
   /stacking-conflict:
     get:
       operationId: listStackingConflict
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-208 Stacking & Conflict Command Center"
       parameters:
@@ -5537,6 +5796,16 @@ paths:
   /promotion-decision-trace:
     get:
       operationId: listPromotionDecisionTrace
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-216 Promotion Decision Trace & Transaction Explainer"
       parameters:
@@ -5627,6 +5896,13 @@ paths:
   /campaign-governance-budget:
     get:
       operationId: listCampaignGovernanceBudget
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-218 Campaign Governance & Budget Command Center"
       parameters:
@@ -5766,6 +6042,10 @@ paths:
   /budget-consumption-forecast:
     get:
       operationId: listBudgetConsumptionForecast
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-221 Budget Consumption & Forecast Monitor"
       parameters:
@@ -5955,6 +6235,13 @@ paths:
   /campaign-financial-commercial:
     get:
       operationId: listCampaignFinancialCommercial
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-225 Campaign Financial & Commercial Simulator"
       parameters:
@@ -5998,6 +6285,13 @@ paths:
   /campaign-experiment-test:
     get:
       operationId: listCampaignExperimentTest
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-226 Campaign Experiment & A/B Test Manager"
       parameters:
@@ -6086,6 +6380,16 @@ paths:
   /promotion-performance:
     get:
       operationId: listPromotionPerformance
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-146 Promotion Health & Performance Monitor"
         - "P08 ADM-228 Promotion Performance Command Center"
@@ -6212,6 +6516,16 @@ paths:
   /campaign-promotion-performance:
     get:
       operationId: listCampaignPromotionPerformance
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-139 Promotion & Campaign Directory"
         - "P08 ADM-228 Promotion Performance Command Center"
@@ -6259,6 +6573,16 @@ paths:
   /redemption-conversion-funnel:
     get:
       operationId: listRedemptionConversionFunnel
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-230 Redemption, Conversion & Funnel Analytics"
       x-ticvai-audience:
@@ -6350,6 +6674,16 @@ paths:
   /discount-margin-profitability:
     get:
       operationId: listDiscountMarginProfitability
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-231 Discount, Margin & Profitability Analytics"
       parameters:
@@ -6395,6 +6729,16 @@ paths:
   /bundle-bogo-advanced:
     get:
       operationId: listBundleBogoAdvanced
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-232 Bundle, BOGO & Advanced Offer Analytics"
       parameters:
@@ -6440,6 +6784,13 @@ paths:
   /upsell-cross-sell:
     get:
       operationId: listUpsellCrossSell
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-233 Upsell, Cross-Sell & Attach-Rate Analytics"
         - "P08 ADM-659 Cross-Sell Command Center"
@@ -6485,6 +6836,22 @@ paths:
   /customer-segment-channel:
     get:
       operationId: listCustomerSegmentChannel
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-234 Customer, Segment, Channel & Partner Analytics"
       parameters:
@@ -6530,6 +6897,16 @@ paths:
   /incrementality-attribution-cannibalization:
     get:
       operationId: listIncrementalityAttributionCannibalization
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-235 Incrementality, Attribution & Cannibalization Analysis"
       parameters:
@@ -6576,6 +6953,13 @@ paths:
   /next-best-action:
     get:
       operationId: listNextBestAction
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-236 AI Optimization & Next-Best-Action Center"
       parameters:
@@ -6625,6 +7009,16 @@ paths:
   /executive-promotion-reporting:
     get:
       operationId: listExecutivePromotionReporting
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-237 Executive Promotion Intelligence & Reporting Studio"
       x-ticvai-audience:
@@ -7005,6 +7399,13 @@ paths:
   /product-affinity:
     get:
       operationId: getProductAffinity
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-661 Product Affinity Matrix & Relationship Map"
         - "P08 ADM-662 Frequently Bought Together & Basket Pattern Engine"
@@ -7268,6 +7669,10 @@ paths:
   /recommendation-performance:
     get:
       operationId: getRecommendationPerformance
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-639 Recommendation Command Center"
         - "P08 ADM-649 Upsell & Upgrade Command Center"
@@ -8843,6 +9248,7 @@ components:
               the audit history (`promotions.promotion_audit`) and the channel publication monitor
               (`promotions.promotion_channel_publication`) name. (DM5, 29 September: data model for the agreed operations)'
     PromotionVariant:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listCampaignExperimentTest, listCampaignFinancialCommercial, listGovernanceRiskLaunch, listIncrementalityAttributionCannibalization and others
       x-ticvai-persistence: promotions.promotion_variant
       type: object
       description: 'One arm of a promotion A/B test (BL-114), written by `setPromotionVariants`. **Stored
@@ -8853,7 +9259,12 @@ components:
       required:
       - label
       - trafficPercent
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid

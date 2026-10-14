@@ -89,6 +89,156 @@ tags:
 - name: bookingFlows
 - name: appPublishing
 - name: kiosk
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  bannerRecords:
+    module: white-label
+    table: whitelabel.banner
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.banner rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Banner'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.banner rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  bookingFlowRecords:
+    module: white-label
+    table: whitelabel.booking_flow
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.booking_flow rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/BookingFlow'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.booking_flow rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  contentPageRecords:
+    module: white-label
+    table: whitelabel.content_page
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.content_page rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ContentPage'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.content_page rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  faqEntryRecords:
+    module: white-label
+    table: whitelabel.faq_entry
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.faq_entry rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/FaqCategory'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.faq_entry rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  guidedChoiceAnswerRecords:
+    module: white-label
+    table: whitelabel.guided_choice_answer
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.guided_choice_answer rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GuidedChoice'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.guided_choice_answer rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  homepageSectionRecords:
+    module: white-label
+    table: whitelabel.homepage_section
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.homepage_section rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/HomepageLayout'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.homepage_section rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  policyRecords:
+    module: white-label
+    table: whitelabel.policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Policy'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.policy rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface WhiteLabel implements, and asked from another
+      deployable through WhiteLabel's service route (serviceAuth).
+    served: [in-process, service]
+  promoBlockRecords:
+    module: white-label
+    table: whitelabel.promo_block
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.promo_block rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PromoBlock'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.promo_block rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
 paths:
   /tenant-domains:
     get:
@@ -126,6 +276,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: claimCustomDomain
+      x-ticvai-read-via:
+      - query: subscription#tenantRecords
+        route: in-process
+        for: 'its read of control.tenant, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-835 Site, Brand & Domain Setup"
         - "P09 ADM-017 Domain & Certificate Management"
@@ -1044,6 +1198,10 @@ paths:
   /content-blocks:
     get:
       operationId: listContentBlocks
+      x-ticvai-read-via:
+      - query: platform-ops#contentBlockRecords
+        route: in-process
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
       summary: The content blocks of a page
@@ -1085,6 +1243,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createContentBlock
+      x-ticvai-read-via:
+      - query: marketing-crm#segmentRecords
+        route: in-process
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: platform-ops#contentBlockRecords
+        route: in-process
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-839 Dynamic Product Pages"
         - "P13 CMS-007 Page Builder"
@@ -1134,6 +1299,13 @@ paths:
         format: uuid
     post:
       operationId: publishContentBlock
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: platform-ops#contentBlockRecords
+        route: in-process
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
       summary: Publish now, or schedule it
@@ -1576,6 +1748,10 @@ paths:
         format: uuid
     get:
       operationId: getPublishedKioskConfig
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'whether the workstation is in this venue (404 not-found) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P05 KSK-001 Attract Loop"
         - "P05 KSK-002 Language Select"
@@ -2515,6 +2691,10 @@ paths:
         format: uuid
     put:
       operationId: assignKiosk
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, ADM-582 assigns a kiosk to a kiosk group
@@ -3067,6 +3247,16 @@ paths:
   /tenant-config/modules:
     get:
       operationId: getModuleEnablement
+      x-ticvai-read-via:
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'its read of subscription.contract, Platform''s data (CHG-MOD-001)'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'its read of control.licence_add_on, Platform''s data (CHG-MOD-001)'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P13 CMS-001 Tenant Workspace"
@@ -3098,6 +3288,16 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setModuleEnablement
+      x-ticvai-read-via:
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'its read of subscription.contract, Platform''s data (CHG-MOD-001)'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'its read of control.licence_add_on, Platform''s data (CHG-MOD-001)'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P13 CMS-001 Tenant Workspace"
@@ -3823,6 +4023,10 @@ paths:
         format: uuid
     get:
       operationId: getKioskConfigValidation
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, the publish checks (docs/active/decisions/answers-5-october.md,
@@ -5116,6 +5320,13 @@ paths:
         format: uuid
     get:
       operationId: getPublishedBookingFlow
+      x-ticvai-read-via:
+      - query: catalogue#productCategoryRecords
+        route: service
+        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-005 Ticket Type Selection"
         - "P01 WEB-006 Date & Performance Selection"
@@ -5361,6 +5572,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: deleteBookingFlow
+      x-ticvai-read-via:
+      - query: catalogue#productCategoryRecords
+        route: service
+        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-103 Booking Flows"
       x-ticvai-agreed: '29 September: W12; shape follows deleteGuidedChoice'
@@ -5391,6 +5609,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [flow-in-use]
           description: A product or category still names this flow, or it is the default for products on
             sale; the problem names them
           content:
@@ -5833,6 +6052,10 @@ paths:
   /content-blocks/{blockId}:
     patch:
       operationId: updateContentBlock
+      x-ticvai-read-via:
+      - query: platform-ops#contentBlockRecords
+        route: in-process
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
       summary: Change a draft content block
@@ -7010,6 +7233,7 @@ components:
       - medium
       - large
     BookingFlowStep:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createBookingFlowDefinition, getBookingFlow, getKioskConfigValidation, listBookingFlows and others
       x-ticvai-persistence: whitelabel.booking_flow_step
       type: object
       description: One step of a venue's flow, in the venue's order (decided 29 September, W12).
@@ -7017,7 +7241,12 @@ components:
       - stepKey
       - enabled
       - sortOrder
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -9665,6 +9894,7 @@ components:
                 - null
                 description: For `heroBanner` only (decided 29 September, MOB-3).
     Banner:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.banner
       type: object
       required:
@@ -9715,6 +9945,7 @@ components:
         isActive:
           type: boolean
     PromoBlock:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.promo_block
       type: object
       required:
@@ -9890,6 +10121,7 @@ components:
           format: date-time
           readOnly: true
     ContentPage:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.content_page
       type: object
       required:
@@ -10544,6 +10776,7 @@ components:
           items:
             $ref: '#/components/schemas/KioskConfigFinding'
     ConfigVersion:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getKioskConfigValidation
       x-ticvai-persistence: whitelabel.config_version
       type: object
       required:

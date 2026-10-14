@@ -98,6 +98,9 @@ def classes(pol: dict) -> dict:
         elif helper == "apply_grant_holder_read_rls":
             m = re.search(r"'((?:[^']|'')*)'", args)
             r = ("any", write_of(m.group(1) if m else ""))
+        elif helper == "apply_grant_holder_subject_read_rls":
+            # a subject-owned table opened to staff grants, still read by its own guest (CHG-MOD-007)
+            r = ("any", "subject")
         elif helper in ("apply_parent_rls", "apply_parent_split_rls"):
             p = parent_of(args)
             pc = cls(p, depth + 1) if p else None

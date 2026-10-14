@@ -78,6 +78,65 @@ tags:
 - name: bill
 - name: kitchen
 - name: production
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  coldChainEventRecords:
+    module: fnb
+    table: fnb.cold_chain_event
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.cold_chain_event rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ColdChainEvent'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). F&B answers with its fnb.cold_chain_event rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface F&B implements.
+    served: [in-process]
+  menuItemRecords:
+    module: fnb
+    table: fnb.menu_item
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.menu_item rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MenuItem'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). F&B answers with its fnb.menu_item rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with
+      a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through F&B's service route (serviceAuth).
+    served: [service]
+  productionPlanRecords:
+    module: fnb
+    table: fnb.production_plan
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.production_plan rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ProductionPlan'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). F&B answers with its fnb.production_plan rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through F&B's service route (serviceAuth).
+    served: [service]
 paths:
   /reservation-policy:
     get:
@@ -349,6 +408,10 @@ paths:
         format: uuid
     post:
       operationId: verifyAllergens
+      x-ticvai-read-via:
+      - query: inventory#inventoryItemRecords
+        route: in-process
+        for: 'its read of inventory.inventory_item, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
         - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
@@ -484,6 +547,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: buildProductionPlan
+      x-ticvai-read-via:
+      - query: ai#suggestionRecords
+        route: service
+        for: 'its read of ai.suggestion, AI''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
       summary: Turn a forecast into a prep list
@@ -587,6 +654,10 @@ paths:
         format: uuid
     get:
       operationId: getProductionRun
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
@@ -626,6 +697,10 @@ paths:
         format: uuid
     post:
       operationId: sendBookingConfirmation
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-055 Create / Edit Reservation"
       summary: Confirm a booking, and ask them to confirm back
@@ -1017,6 +1092,10 @@ paths:
         format: uuid
     post:
       operationId: applyMenuActions
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: service
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
       summary: Do the same thing to many items at once
@@ -1133,6 +1212,10 @@ paths:
         format: uuid
     post:
       operationId: sendOrderNotification
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       summary: Tell the guest where their order is
       description: 'Board 3G. **Accepted, being made, ready, collected.** `getGuestOrderStatus` lets a
         guest ask; this tells them without asking.
@@ -1222,6 +1305,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCombo
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
       summary: A meal deal, priced as one thing
@@ -2038,6 +2125,10 @@ paths:
         format: uuid
     post:
       operationId: notifyServer
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P15 KIT-002 Kitchen Display System (KDS)"
       summary: The kitchen calls the server to the pass
@@ -2094,6 +2185,10 @@ paths:
         format: uuid
     post:
       operationId: transferOrderItems
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the target visit''s outlet (409 target-visit-not-open) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       summary: Move items to another table's bill
@@ -2242,6 +2337,10 @@ paths:
         format: uuid
     post:
       operationId: notifyWaitlistParty
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-056 Walk-In & Waitlist Management"
       summary: Their table is ready
@@ -2305,6 +2404,13 @@ paths:
         format: uuid
     post:
       operationId: enterCountLine
+      x-ticvai-read-via:
+      - query: inventory#inventoryItemRecords
+        route: in-process
+        for: 'its read of inventory.inventory_item, Inventory''s data (CHG-MOD-001)'
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-066 Stock Count & Cycle Count Management"
         - "P08 BO-079 Stock Count"
@@ -3122,6 +3228,10 @@ paths:
         format: uuid
     put:
       operationId: reassignServer
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-058 Live Table & Service Management"
       summary: Hand a table to another server
@@ -3184,6 +3294,10 @@ paths:
         format: uuid
     post:
       operationId: compItem
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-write-via:
@@ -3413,6 +3527,10 @@ paths:
   /food-safety/cold-chain:
     post:
       operationId: logColdChain
+      x-ticvai-read-via:
+      - query: inventory#goodsReceiptRecords
+        route: in-process
+        for: 'its read of inventory.goods_receipt, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-065 Receiving"
       summary: The temperature a delivery arrived at, and what was decided
@@ -3515,6 +3633,10 @@ paths:
         format: uuid
     post:
       operationId: signCorrectiveAction
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
         - "P08 BO-044 F&B Outlets"
@@ -3586,6 +3708,10 @@ paths:
   /production-runs:
     get:
       operationId: listProductionRuns
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
         - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
@@ -3654,6 +3780,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: planProductionRun
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
       summary: Plan a batch, for one outlet or several
@@ -3782,6 +3915,10 @@ paths:
         format: uuid
     post:
       operationId: transferTableVisit
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
         - "P06 EMP-058 Live Table & Service Management"
@@ -3855,6 +3992,10 @@ paths:
   /waitlist:
     post:
       operationId: joinRestaurantWaitlist
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
@@ -4016,6 +4157,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createTableReservation
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
@@ -4085,6 +4230,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TableReservation'
         '409':
+          x-ticvai-problem-types: [no-table-for-party-size, outlet-full-at-time]
           description: 'No cover available for that party size at that time. **The reason names the constraint**
             — a party of eight refused when a party of two would fit (`noTableForPartySize`) is a different
             answer from the outlet being full (`outletFullAtTime`).
@@ -4252,6 +4398,10 @@ paths:
         format: uuid
     get:
       operationId: listDiningOutlets
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
@@ -4600,6 +4750,10 @@ paths:
   /location-sessions:
     post:
       operationId: claimLocationSession
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'which outlets are open to deliver to the location (409 location-not-served) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
@@ -4665,7 +4819,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LocationSession'
         '400':
-          description: Neither a location code nor a seat reference supplied
+          description: Neither a location code nor a `seatReference` supplied
           content:
             application/problem+json:
               schema:
@@ -4677,6 +4831,7 @@ paths:
                       enum:
                       - locationNotSupplied
         '409':
+          x-ticvai-problem-types: [code-expired, code-unknown, location-out-of-service, location-not-served]
           description: 'Code expired or unknown, the location is out of service, or no outlet currently
             delivers to it — a cabana is useless as an address if nothing serves it. One reason per cause.
 
@@ -4814,6 +4969,10 @@ paths:
   /table-sessions:
     post:
       operationId: claimTableSession
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
       x-ticvai-audience:
       - guest
@@ -4869,6 +5028,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TableSession'
         '409':
+          x-ticvai-problem-types: [code-expired, code-unknown, outlet-closed, table-out-of-service]
           description: 'Code expired or unknown, the outlet is closed, or the table is out of service. One
             reason per cause.
 
@@ -4989,6 +5149,10 @@ paths:
   /outlets/{outletId}/fulfilment-slots:
     get:
       operationId: listFulfilmentSlots
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
@@ -5054,6 +5218,16 @@ paths:
   /guest-orders:
     post:
       operationId: createGuestFnbOrder
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the outlet''s admissionContext and whether it is taking orders (403 entry-ticket-required, 409 outlet-closed, 422 the outlet''s delivery policy) (CHG-MOD-003)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'the order''s payment (402 payment-required, payment-declined) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
@@ -5121,6 +5295,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestOrderResult'
         '409':
+          x-ticvai-problem-types: [item-unavailable, price-changed, location-session-expired, location-not-serviceable, outlet-closed, outlet-not-accepting-orders, modifier-constraint-unmet, order-too-large]
           description: 'An item became unavailable, the quoted total no longer matches, the location session
             expired, or the outlet stopped taking orders. The response names which in `refusedReason`.
 
@@ -5143,6 +5318,7 @@ paths:
                       - modifierConstraintUnmet
                       - orderTooLarge
         '422':
+          x-ticvai-problem-types: [collection-not-offered, delivery-not-offered, below-minimum-order, outside-delivery-area, fulfilment-slot-closed]
           description: The order breaks the outlet's `FnbDeliveryPolicy`. Names the rule in `refusedReason`.
           content:
             application/problem+json:
@@ -5159,6 +5335,7 @@ paths:
                       - outsideDeliveryArea
                       - fulfilmentSlotClosed
         '402':
+          x-ticvai-problem-types: [payment-required, payment-declined]
           description: Payment required or declined
           content:
             application/problem+json:
@@ -5240,6 +5417,10 @@ paths:
         format: uuid
     get:
       operationId: getGuestBill
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-038 F&B – Order Tracking"
         - "P02 GST-025 F&B – Order Tracking"
@@ -5806,6 +5987,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createFnbOrder
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the outlet an entitlement may be redeemed at (409 entitlement-not-redeemable) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-022 Send to Kitchen"
         - "P06 EMP-058 Live Table & Service Management"
@@ -5867,6 +6052,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
+          x-ticvai-problem-types: [item-unavailable, modifier-constraint-unmet, tracked-item-offline, entitlement-not-redeemable]
           description: 'An item is unavailable, modifier constraints are unmet, a tracked item was
             ordered offline, or a line''s `redeemEntitlementId` cannot be redeemed here
             (`entitlementNotRedeemable`: used, another item or outlet, not yet valid; MOB-4). One reason per
@@ -5902,6 +6088,10 @@ paths:
         format: uuid
     post:
       operationId: acceptFnbOrder
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'whether the outlet is taking orders (409 outlet-not-accepting-orders) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-029 Order Queue"
         - "P08 BO-020 F&B Order Management"
@@ -5955,6 +6145,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FnbOrder'
         '409':
+          x-ticvai-problem-types: [order-already-accepted, order-cancelled, outlet-not-accepting-orders]
           description: Already accepted, cancelled, or the outlet has stopped taking orders
           content:
             application/problem+json:
@@ -6511,6 +6702,10 @@ paths:
         format: uuid
     get:
       operationId: getBill
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
@@ -6639,6 +6834,10 @@ paths:
         format: uuid
     post:
       operationId: closeTableVisit
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'the payments taken against the bill (409 payments-short-of-bill) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
@@ -6720,6 +6919,7 @@ paths:
                     items:
                       type: string
         '409':
+          x-ticvai-problem-types: [payments-short-of-bill, lines-unserved]
           description: Payments do not cover the bill, or lines remain unserved (named in `lineIds`). One
             reason per cause
           content:
@@ -7052,6 +7252,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setKitchenStations
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'the display workstations it assigns (400 workstation-on-two-stations) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-134 Kitchen & Preparation Stations"
       x-ticvai-audience:
@@ -7096,6 +7300,7 @@ paths:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '400':
+          x-ticvai-problem-types: [workstation-on-two-stations, validation-failed]
           description: A workstation is assigned to more than one station (`displayWorkstationIds`, audit
             R277), or the body fails validation.
           content:
@@ -7168,6 +7373,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setRecipe
+      x-ticvai-read-via:
+      - query: inventory#inventoryItemRecords
+        route: in-process
+        for: 'its read of inventory.inventory_item, Inventory''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       x-ticvai-audience:
@@ -7217,6 +7426,10 @@ paths:
         format: uuid
     post:
       operationId: recordWaste
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
         - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
@@ -7345,6 +7558,10 @@ paths:
         format: uuid
     post:
       operationId: recordCorrectiveAction
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
       summary: Record what was done about a finding
@@ -7406,6 +7623,10 @@ paths:
         format: uuid
     post:
       operationId: escalateCorrectiveAction
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
       summary: Escalate a finding
@@ -7460,6 +7681,10 @@ paths:
         format: uuid
     post:
       operationId: closeCorrectiveAction
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
       summary: Close a signed finding
@@ -7940,6 +8165,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setKitchenRoutingRules
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the outlet the stations serve (422 unknown-station) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-135 Order Routing & KDS/Printer Rules"
       x-ticvai-audience:
@@ -8221,6 +8450,10 @@ paths:
         format: uuid
     put:
       operationId: setDeliveryLocationOutletMapping
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
         - "P08 BO-065 Venue Configuration"
@@ -8287,6 +8520,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [outlet-not-fnb-in-venue, location-of-another-venue]
           description: An outlet that is not an F&B outlet of this venue, or a location of another venue.
           content:
             application/problem+json:
@@ -8297,6 +8531,13 @@ paths:
   /delivery-locations:
     post:
       operationId: createDeliveryLocation
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
+      - query: seating#seatRecords
+        route: service
+        for: 'the seat a `seat` location names (422 seat-id-required) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 BO-065 Venue Configuration"
       x-ticvai-audience:
@@ -8370,6 +8611,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [table-id-required, seat-id-required, table-of-another-venue]
           description: A `table` location without `tableId`, a `seat` location without `seatId`, or a table of
             another venue.
           content:
@@ -9131,6 +9373,7 @@ components:
           type: boolean
           default: true
     ProductionPlan:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by buildProductionPlan, listProductionPlans, releaseProductionPlan, requestSuggestion
       type: object
       x-ticvai-persistence: fnb.production_plan + fnb.production_plan_line
       description: 'Board 2M. **Forecast demand against recipes, producing a prep list.** Built from `requestSuggestion(kind=prepPlan)`
@@ -9146,7 +9389,12 @@ components:
       - forDate
       - status
       - lines
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -9202,6 +9450,7 @@ components:
             format: uuid
           readOnly: true
     Combo:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createCombo, listCombos, setComboSlots
       type: object
       x-ticvai-persistence: fnb.combo
       description: 'Board 2G, 24 August. **A meal deal is one product with slots, not a bundle of products.**
@@ -9220,7 +9469,12 @@ components:
       - name
       - price
       - slots
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -9253,6 +9507,7 @@ components:
           type: boolean
           default: true
     ComboSlot:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createCombo, listCombos, setComboSlots
       type: object
       x-ticvai-persistence: fnb.combo_slot + fnb.combo_slot_option
       description: 'One choice within a combo. **`minSelect` and `maxSelect` are what make it a slot rather
@@ -9263,7 +9518,12 @@ components:
       - id
       - name
       - options
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -9301,6 +9561,7 @@ components:
 
                   '
     KitchenException:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by logKitchenException
       type: object
       x-ticvai-persistence: fnb.kitchen_exception
       description: 'Board 3, 24 August. **Something that cost the kitchen a service and left no other
@@ -9314,7 +9575,12 @@ components:
       - id
       - kind
       - raisedAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -9464,6 +9730,7 @@ components:
           - paid
           - voided
     TemperatureLog:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getHaccpStatus, logTemperature
       type: object
       x-ticvai-persistence: fnb.temperature_log
       description: 'Board 5J of the client F&B pack, 20 August. **HACCP records are a UAE regulatory obligation,
@@ -9483,7 +9750,12 @@ components:
       - recordedAt
       - valueCelsius
       - outcome
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -9644,6 +9916,7 @@ components:
 
             **Operations write it at `venue` scope.**'
     ColdChainEvent:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getHaccpStatus, getStockTransfer, logColdChain
       type: object
       x-ticvai-persistence: fnb.cold_chain_event
       description: 'Board 5G. **A delivery arriving warm is a rejection decision made at the door**, and
@@ -9658,7 +9931,12 @@ components:
       - recordedAt
       - valueCelsius
       - decision
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -11292,6 +11570,7 @@ components:
       - reserved
       - outOfService
     TableDefinition:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by clearTable, createDeliveryLocation, createTable, getTableMap and others
       x-ticvai-persistence: fnb.dining_table
       type: object
       description: A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable
@@ -11301,7 +11580,12 @@ components:
       - id
       - label
       - capacity
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -11800,13 +12084,19 @@ components:
           description: '**The table visit the ticket is for** (4 October 2026, CHG-FXC-011; KIT-002): the `{visitId}`
             `notifyServer` takes. Null for a counter or delivery order with no visit.'
     KitchenStation:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by chaseStation, createFnbOrder, listKitchenStations, logKitchenException and others
       x-ticvai-persistence: fnb.kitchen_station
       type: object
       required:
       - id
       - code
       - name
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid

@@ -77,6 +77,175 @@ x-ticvai-queries:
       `supervisor-step-up-refused` and nothing is written by it.'
     served: [in-process, service]
     operation: verifySupervisorStepUp
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  delegatedAccessRecords:
+    module: identity
+    table: identity.delegated_access
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.delegated_access rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/DelegatedAccess'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.delegated_access rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
+  principalRecords:
+    module: identity
+    table: identity.principal
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.principal rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Principal'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.principal rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
+  roleRecords:
+    module: identity
+    table: identity.role
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.role rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Role'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.role rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
+  rolePermissionRecords:
+    module: identity
+    table: identity.role_permission
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.role_permission rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/RolePermission'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.role_permission rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements.
+    served: [in-process]
+  segregationRuleRecords:
+    module: identity
+    table: identity.segregation_rule
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.segregation_rule rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SegregationRule'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.segregation_rule rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements.
+    served: [in-process]
+  subjectRecords:
+    module: identity
+    table: pii.subject
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The pii.subject rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A pii.subject row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its pii.subject rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
+  subjectBiometricRecords:
+    module: identity
+    table: pii.subject_biometric
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The pii.subject_biometric rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A pii.subject_biometric row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its pii.subject_biometric rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Identity's service route (serviceAuth).
+    served: [service]
+  subjectContactRecords:
+    module: identity
+    table: pii.subject_contact
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The pii.subject_contact rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A pii.subject_contact row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its pii.subject_contact rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Identity implements, and asked from another
+      deployable through Identity's service route (serviceAuth).
+    served: [in-process, service]
+  customerMembershipRecords:
+    module: identity
+    table: identity.customer_membership
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The identity.customer_membership rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Identity stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/IdentityCustomerMembership'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-003; ADR-0055 rule 2 as amended 14
+      October). Identity answers with its identity.customer_membership rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation. It is asked in process within commerce, through the C# query interface Identity implements.
+    served: [in-process]
 paths:
   /internal/step-up/verify:
     post:
@@ -241,6 +410,67 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/guest-sessions/end-for-device:
+    post:
+      operationId: endGuestDeviceSessions
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Sign a guest's revoked device out
+      description: '**The owner''s end of a guest''s sessions on one device** (14 October 2026, the lead''s decision on
+        ticket 27741: revoking a guest device also signs that device out; CHG-MOD-009; ADR-0055 rule 4).
+        `marketing-crm.revokeGuestDevice` (in `operations`) calls this, cell-internal over mTLS, after it has revoked
+        the device row, with the guest''s own `subjectId` from their session, the device''s `installationId` as
+        `deviceId`, and the `Idempotency-Key` it was called with. The guest sessions live in Identity''s session
+        registry (`GuestSession`, `identity.guest_session`), in `commerce`.
+
+
+        **What ends**: every live session of that subject whose sign-in named this `deviceId` (the app sends its
+        `installationId` as `deviceId` on `verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin` and
+        `guestUaePassLogin`), and the refresh token each holds (`TokenPair.refreshToken`), so the device''s next
+        `refreshToken` call is `401` and its access token is refused at its next request (the session registry is
+        read on every request). Sessions of the same guest on other devices stay. Nothing to end is not an error:
+        `endedSessions` is 0, and a repeat of the same call ends nothing more.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestDeviceSessionsEnd'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The device's sessions ended (none, if it had none).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestDeviceSessionsEnded'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/login:
@@ -1492,6 +1722,10 @@ paths:
   /auth/sessions/{sessionId}/force-logout:
     post:
       operationId: forceLogout
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P08 BO-053 Staff Directory"
@@ -2609,6 +2843,7 @@ paths:
                   maxLength: 10
                 deviceId:
                   type: string
+                  description: 'Send the app''s `installationId` (the value it registers its push token with, marketing-crm `registerGuestDevice`), so revoking that device signs this session out (`endGuestDeviceSessions`, CHG-MOD-009).'
                 venueId:
                   type: string
                   format: uuid
@@ -2706,7 +2941,7 @@ paths:
                   description: Compared with `GuestCredential.passwordHash` and never stored (ADR-0071, CHG-CRD-003).
                 deviceId:
                   type: string
-                  description: Names the device; a new sign-in here ends the previous session on it.
+                  description: 'Names the device; a new sign-in here ends the previous session on it. Send the app''s `installationId` (the value it registers its push token with, marketing-crm `registerGuestDevice`), so revoking that device signs this session out (`endGuestDeviceSessions`, CHG-MOD-009).'
                 venueId:
                   type: string
                   format: uuid
@@ -2781,6 +3016,7 @@ paths:
                   type: string
                 deviceId:
                   type: string
+                  description: 'Send the app''s `installationId` (the value it registers its push token with, marketing-crm `registerGuestDevice`), so revoking that device signs this session out (`endGuestDeviceSessions`, CHG-MOD-009).'
                 venueId:
                   type: string
                   format: uuid
@@ -2856,6 +3092,7 @@ paths:
                   type: string
                 deviceId:
                   type: string
+                  description: 'Send the app''s `installationId` (the value it registers its push token with, marketing-crm `registerGuestDevice`), so revoking that device signs this session out (`endGuestDeviceSessions`, CHG-MOD-009).'
                 venueId:
                   type: string
                   format: uuid
@@ -3013,6 +3250,7 @@ paths:
                     type: integer
                     description: The named booking plus any other orders with the same verified contact detail.
         '403':
+          x-ticvai-problem-types: [contact-mismatch]
           description: Contact detail on the order does not match the verified identifier
           content:
             application/problem+json:
@@ -6026,6 +6264,13 @@ paths:
   /role-suggestions:
     get:
       operationId: suggestRoleAssignment
+      x-ticvai-read-via:
+      - query: workforce#employeeRecords
+        route: in-process
+        for: 'its read of workforce.employee, Tenancy''s data (CHG-MOD-001)'
+      - query: workforce#workAssignmentRecords
+        route: in-process
+        for: 'its read of workforce.work_assignment, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-053 Staff Directory"
         - "P08 BO-054 Role Assignment"
@@ -6198,6 +6443,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAccessReviewCampaign
+      x-ticvai-read-via:
+      - query: workforce#employeeRecords
+        route: in-process
+        for: 'its read of workforce.employee, Tenancy''s data (CHG-MOD-001)'
+      - query: workforce#workAssignmentRecords
+        route: in-process
+        for: 'its read of workforce.work_assignment, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
       x-ticvai-audience:
@@ -6601,6 +6853,39 @@ components:
         capturedAt:
           type: string
           format: date-time
+    GuestDeviceSessionsEnd:
+      type: object
+      x-ticvai-persistence: none — request only; ends sessions in the session registry (identity.guest_session)
+      description: What `marketing-crm.revokeGuestDevice` sends `endGuestDeviceSessions` (CHG-MOD-009).
+      required:
+      - subjectId
+      - deviceId
+      properties:
+        subjectId:
+          type: string
+          format: uuid
+          description: The guest whose device was revoked (pii.subject), from the revoking guest's own session.
+        deviceId:
+          type: string
+          maxLength: 64
+          description: The revoked device's `GuestDevice.installationId`, which the app sent as `deviceId` when it
+            signed in. A device registered without an installationId has none, and the call is not made.
+        reason:
+          type: string
+          enum:
+          - deviceRevoked
+          default: deviceRevoked
+          description: Why the sessions end, kept on the ended session for the guest's security history.
+    GuestDeviceSessionsEnded:
+      type: object
+      x-ticvai-persistence: none — computed
+      required:
+      - endedSessions
+      properties:
+        endedSessions:
+          type: integer
+          minimum: 0
+          description: How many of the guest's sessions on that device ended, each with its refresh token.
     GuestSubjectDetailsUpdate:
       type: object
       x-ticvai-persistence: none — request only; lands on pii.subject
