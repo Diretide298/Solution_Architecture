@@ -373,7 +373,7 @@ screens:
     trigger: onLoad
   - operationId: requestSuggestion
     contract: ai
-    purpose: requestSuggestion
+    purpose: Ask the assistant for an answer about the figures on the command centre
     trigger: onAction
     invalidates:
     - listAlerts

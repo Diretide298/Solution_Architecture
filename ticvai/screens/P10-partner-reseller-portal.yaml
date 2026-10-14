@@ -2737,7 +2737,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add a product, its quantity and date to the partner's cart, priced against its rates
     trigger: onAction
     invalidates:
     - listPromotions

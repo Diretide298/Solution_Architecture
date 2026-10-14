@@ -1,0 +1,35 @@
+id: CHG-SCO-003
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Three api purposes on P10, P15 and P16 say what the call is for instead of repeating the operationId or the
+  contract''s placeholder summary.'
+decision:
+  what: 'PTR-010 addCartLine (was "Add something", the contract summary), KIT-008 getHaccpStatus and ANL-001
+    requestSuggestion (were the operationId) get a purpose read from the contract summary and the screen. Api purposes
+    are screen metadata; nothing the user sees changes.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, class check-screen-wiring S-PURPOSE-TEMPLATE (R260; audit root class A30
+  SCREEN-GENERATED), evidence audit/ticvai/runs/audit-1014/classes.json. Ruling (triage, lead 14 October: "go with
+  your recommendation"): each api purpose says what the call is for, from the contract summary. On these platforms:
+  3 members before, 0 after.'
+keys_touched:
+  screens: [PTR-010, KIT-008, ANL-001]
+  operations: [addCartLine, getHaccpStatus, requestSuggestion]
+  other: [S-PURPOSE-TEMPLATE]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: ['27925', '28227', '28246', '28523', '28542', '28545', '28574', '28576', '28732', '28733', '28735',
+    '28742', '28746', '28754', '29012', '29013', '29014', '29015']
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCO, 14 October 2026. The contract summary of addCartLine (orders.yaml) is still "Add something"; the
+  guest screens that inherit it are batch SCG''s, and the summary is contract text (batch SHP or the guest batch).'

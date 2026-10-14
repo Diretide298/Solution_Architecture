@@ -1740,7 +1740,7 @@ screens:
     - list86Events
   - operationId: getHaccpStatus
     contract: fnb
-    purpose: getHaccpStatus
+    purpose: Where the venue's food-safety checks stand right now, beside the exceptions
     trigger: onLoad
   - operationId: list86Events
     contract: fnb
