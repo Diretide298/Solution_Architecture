@@ -493,6 +493,15 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                 p.statements.append(stmt)
                 p.rollback.append(f"DROP INDEX IF EXISTS {k[1]};")
                 p.counts["indexes"] += 1
+            elif re.sub(r"lower\(\s*(\"?\w+\"?)\s*\)", r"\1", new.stmts[k]) == old.stmts[k]:
+                # **A unique index made case-insensitive is written** (CHG-GEN-006, ADAM CR-066 and CR-079): the same
+                # index on lower(column), as common.yaml promises. It touches no row; if two rows differ only in case
+                # the CREATE fails and the migration's transaction rolls back, which is the person's signal to merge
+                # them. Rollback puts the case-sensitive index back.
+                p.statements.append(f"DROP INDEX IF EXISTS {k[1]}")
+                p.statements.append(stmt)
+                p.rollback.append(f"DROP INDEX IF EXISTS {k[1]}; {old.stmts[k].rstrip(';')};")
+                p.counts["indexes"] += 1
             else:
                 review("index changed", k[1], f"`{old.stmts[k]}` -> `{new.stmts[k]}`",
                        "DROP INDEX and CREATE INDEX by hand (CONCURRENTLY on a live table)")

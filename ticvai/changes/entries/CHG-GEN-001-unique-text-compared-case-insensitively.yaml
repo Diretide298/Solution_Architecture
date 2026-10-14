@@ -42,30 +42,28 @@ keys_touched:
   - handoff/audit-baseline.json
   tickets:
   - '27764'
-  - '27674'
 root_class: A17 DDL-DERIVATION
 tickets:
   started:
   - '27764'
-  - '27674'
   unstarted: []
 release_tag: r6
 decision_owner: Chinmay
-adam_cr: CR-079 (ADAM); CR-066 (ADAM)
+adam_cr: CR-079 (ADAM)
 triage: blocker
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
 status: open
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
-  The databases already hold the 26 plain indexes (r1 910 and V0101/V0102); derive-ddl lists each as "index
-  changed" in handoff/migration-review.md, because replacing a unique index with a lower() one fails on rows that
-  differ only in case: a person checks for those, then DROP INDEX and CREATE UNIQUE INDEX ... (lower(code))
-  CONCURRENTLY in a forward migration. A handler''s ON CONFLICT names the same expression. New check rule
+  The databases already hold the 26 plain indexes (r1 910 and V0101/V0102); the forward migration replaces each
+  (DROP INDEX, CREATE UNIQUE INDEX ... (lower(...))) since CHG-GEN-006 taught ddl_forward that change. If two rows
+  differ only in case the CREATE fails and the migration rolls back: merge them first. A handler''s ON CONFLICT
+  names the same expression. CR-066 (promotion code) has its own entry, CHG-GEN-006. New check rule
   check-ddl-conventions D-UNIQUE-CASE reads the indexes the databases have (baseline, then each forward migration,
   with DROP INDEX) against common.yaml: a text member is lower() unless its property is exact, and common.yaml still
   states the rule. Run on the parent commit (r5, 1eb1d063) it fails (28 plain text members, plus the three exact
-  ids had they no mark); the 28 are baselined in handoff/audit-baseline.json and leave it when the forward
-  migration lands. Choice left open by the decision: the exemption is a property mark rather than a list in the
+  ids had they no mark); the 28 are baselined in handoff/audit-baseline.json and go when the gate writes the forward
+  migration. Choice left open by the decision: the exemption is a property mark rather than a list in the
   generator, so the contract says it where the field is described.
   mediaCode is exempt with the two ids the decision names: it is the same space as encodedIdentifier.'
