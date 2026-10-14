@@ -2237,8 +2237,13 @@ def my_board(
     by_key: dict = {}
     kids: dict = {}
     tree_read = True
+    project_read: dict = {}
     try:
         by_key, kids = _project_tree(account, scope)
+        # The same held read, already in memory: the statuses and sprint dates
+        # the My work page needs to say "6 of your 14 finished" by the rules
+        # Tasks uses (ticket-kinds.js), which a list of open tickets cannot.
+        project_read = _project_read(account, scope)["payload"]
     except HTTPException:
         tree_read = False
 
@@ -2285,6 +2290,35 @@ def my_board(
     every = [dressed(item) for item in items]
     shown = [i for i in every if not only or (only == "blocked") == bool(i["blockedBy"])]
 
+    # **Who you are in OpenProject**, by the name on your own tickets: ADAM and
+    # OpenProject are two account systems and the assignee's name is the only
+    # thing joining them, which is also how Tasks finds a person. None when you
+    # hold nothing and closed nothing this week, and then there is no sprint of
+    # yours to count either.
+    me = next((i.get("assignee") for i in items + finished if i.get("assignee")), None)
+    recent = [item for item in finished
+              if (item.get("updatedAt") or "") >= security.stamp(security.now() - timedelta(days=7))]
+    live = {i["key"] for i in items} | {i["key"] for i in recent}
+    # Your closed tickets from the shared project read, at most its five minutes
+    # old: the open list is live but holds only open work, and a sprint's "6 of
+    # your 14" has to count the ones closed before this week too.
+    closed_earlier = [
+        {**item, "touches": touching.get(item["key"], [])}
+        for item in project_read.get("items", [])
+        if me and item.get("assignee") == me and item["key"] not in live
+        and item.get("status") in {s["name"] for s in project_read.get("statuses", []) if s.get("isClosed")}
+    ]
+    mine_keys = live | {i["key"] for i in closed_earlier}
+    # When a ticket was closed through ADAM: the real moment, where `updatedAt`
+    # is only the last change. The same answer the overview gives (`closes`).
+    closes = {
+        row["external_key"]: row["at"] for row in db.all_rows(
+            "SELECT i.external_key, MAX(i.closed_at) AS at FROM test_batch_item i "
+            "JOIN test_batch b ON b.id = i.batch_id WHERE b.project_id = ? "
+            "GROUP BY i.external_key", (scope["project"],))
+        if row["external_key"] in mine_keys
+    }
+
     return {
         "total": len(items),
         "workable": sum(1 for i in every if not i["blockedBy"]),
@@ -2307,11 +2341,17 @@ def my_board(
         # The window is chosen here rather than asked of OpenProject: see
         # openproject.mine_finished for why a date filter is the wrong thing to
         # send to a 2019 instance.
-        "finished": [
-            {**item, "touches": touching.get(item["key"], [])}
-            for item in finished
-            if (item.get("updatedAt") or "") >= security.stamp(security.now() - timedelta(days=7))
-        ],
+        "finished": [{**item, "touches": touching.get(item["key"], [])} for item in recent],
+        # What the page needs to count your sprint by Tasks' rules: the
+        # instance's statuses, the sprints' dates, your closed tickets from
+        # before this week, and when ADAM saw any of them closed. Empty lists
+        # when the project read could not be had; the page falls back to the
+        # sprint calendar and to "open" and "closed" as the two lists say.
+        "assignee": me,
+        "statuses": project_read.get("statuses", []),
+        "versions": project_read.get("versions", []),
+        "closedEarlier": closed_earlier,
+        "closes": closes,
         # What is standing against this person on the testing gate, so a board
         # that is about to refuse the next close says so on the board rather
         # than at the moment of closing.
@@ -4819,20 +4859,37 @@ def list_batches(project_id: str = Query(default=""),
     # Waiting on a checker, and not this person's own — the whole point is that
     # they cannot be the one. Left out rather than shown and refused: a list of
     # buttons that all say no is a worse explanation than not being on the list.
+    #
+    # **With their tickets** (14 October). They came back without, so a checker
+    # passed a batch having read the notes and never seen what was closed — a
+    # check of somebody's account of their work rather than of the work. Who may
+    # see them is who may check them, which is the rule just above: a teammate
+    # who writes on this project, never the author.
     waiting = []
     if security.may_write(account["role"]):
         waiting = [
-            _batch_row(row, items=False) for row in db.all_rows(
+            _batch_row(row) for row in db.all_rows(
                 "SELECT * FROM test_batch WHERE project_id = ? AND submitted_at IS NOT NULL "
                 "AND verdict = '' AND account_id != ? ORDER BY submitted_at",
                 (project, account["id"]))
         ]
 
+    # Each ticket as a link the reader can open, on the OpenProject they read.
+    # The endpoint column only: nothing here needs the token decrypted.
+    saved = db.one("SELECT endpoint FROM account_secret WHERE account_id = ? AND kind = ?",
+                   (account["id"], OPENPROJECT))
+    endpoint = ((saved["endpoint"] if saved else "") or DEFAULT_PMS).rstrip("/")
+
+    def linked(batch: Optional[dict]) -> Optional[dict]:
+        for ticket in (batch or {}).get("tickets", []):
+            ticket["url"] = f"{endpoint}/work_packages/{ticket['key']}"
+        return batch
+
     return {
         "project": project,
         "every": TEST_EVERY,
-        "mine": _batch_row(mine) if mine else None,
-        "waiting": waiting,
+        "mine": linked(_batch_row(mine)) if mine else None,
+        "waiting": [linked(b) for b in waiting],
         "past": [_batch_row(row, items=False) for row in db.all_rows(
             "SELECT * FROM test_batch WHERE project_id = ? AND account_id = ? "
             "AND verdict = 'passed' ORDER BY id DESC LIMIT 10",

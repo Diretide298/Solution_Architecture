@@ -133,6 +133,31 @@ check('and the backlog one has neither', !byKey['7004']?.dueDate && !byKey['7004
 check('one is genuinely overdue, so the first section is not vacuous',
   new Date(byKey['7001'].dueDate) < new Date(), byKey['7001'].dueDate);
 
+// ── what My work needs to count a sprint by Tasks' rules ─────────────
+//
+// The page opens on "6 of your 14 finished, 2 behind an even pace", which
+// needs what Tasks has: the instance's statuses (which are closed, which one a
+// new ticket starts in), the sprints' dates, the person's closed tickets from
+// before this week, and when ADAM saw a close. All from the project read the
+// board already makes, so none of it is another call to OpenProject.
+
+check('the board names who you are in OpenProject, by your own tickets',
+  typeof mine.data?.assignee === 'string' && (mine.data?.items ?? []).every((t) => t.assignee === mine.data.assignee),
+  String(mine.data?.assignee));
+check('and carries the instance\'s statuses, closed ones marked',
+  (mine.data?.statuses ?? []).some((s) => s.isClosed) && (mine.data?.statuses ?? []).some((s) => s.isDefault),
+  (mine.data?.statuses ?? []).map((s) => `${s.name}${s.isClosed ? '*' : ''}`).join(' '));
+check('the project\'s versions with their dates, as a list',
+  Array.isArray(mine.data?.versions), JSON.stringify(mine.data?.versions ?? null).slice(0, 120));
+check('the closed tickets of yours from before this week, never one on the live lists',
+  Array.isArray(mine.data?.closedEarlier)
+    && mine.data.closedEarlier.every((t) => !keys(mine).includes(t.key)
+      && !(mine.data.finished ?? []).some((f) => f.key === t.key)
+      && t.assignee === mine.data.assignee),
+  (mine.data?.closedEarlier ?? []).map((t) => t.key).join(' ') || 'none');
+check('and ADAM\'s close times, as a map', mine.data?.closes && typeof mine.data.closes === 'object'
+  && !Array.isArray(mine.data.closes), JSON.stringify(mine.data?.closes));
+
 // ── the module a ticket is from, and the subtasks under it ───────────
 //
 // "What is on my board" is answered as a table of tasks against the epic each
