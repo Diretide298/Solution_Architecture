@@ -14,6 +14,12 @@ things that go wrong when a route table and a screen inventory drift apart:
   4. Offline-capable apps declare offline-core as a dependency. An app that queues writes
      without it does not queue them anywhere.
 
+**14 October 2026, CHG-RPO-002.** On a platform with a GitLab repository (docs/active/frontend-repos.yaml) the
+convention is that repository's profile: the component path is `frontend_repos.component_path()`, relative to the
+repository's root, not apps/<app>/src/routes/. And an offline-capable platform whose repository was read and has
+no offline-core package is a warning, not an error: its writes go through the repository's own single offline
+store (frontend-patterns 4.4), and the ticket says so where it has none.
+
 Run: python3 tools/check-frontend.py
 """
 import sys
@@ -21,6 +27,9 @@ from collections import defaultdict
 from pathlib import Path
 
 import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import frontend_repos as fr  # noqa: E402  (CHG-RPO-002)
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
@@ -55,7 +64,14 @@ def main() -> int:
             if packages and pkg not in packages:
                 ERRORS.append(f"{f.name}: declares package '{pkg}' which does not exist")
 
-        if plat.get("offlineCapable") and "offline-core" not in plat.get("packages", []):
+        prof = fr.profile(plat.get("code") or "")
+        if plat.get("offlineCapable") and "offline-core" not in plat.get("packages", []) and prof.get("read") \
+                and "offline-core" not in (prof.get("packages") or []):
+            WARNINGS.append(
+                f"{f.name}: {app} is offline-capable and {prof['repo']} has no offline-core package (observed "
+                f"{prof.get('observedDate')}); its offline-capable writes go through the repository's own single "
+                "offline store (frontend-patterns 4.4)")
+        elif plat.get("offlineCapable") and "offline-core" not in plat.get("packages", []):
             ERRORS.append(
                 f"{f.name}: {app} is offline-capable but does not depend on offline-core — "
                 "an app that queues writes without it does not queue them anywhere")
@@ -75,7 +91,12 @@ def main() -> int:
                 ERRORS.append(f"{f.name}: {s['id']} route '{route}' is not absolute")
 
             comp = imp.get("component", "")
-            if not comp.startswith(f"apps/{app}/src/routes/") or not comp.endswith(".tsx"):
+            if prof:
+                if comp != fr.component_path(plat.get("code"), comp) or not fr.component_tail(comp) \
+                        or not comp.endswith(".tsx"):
+                    ERRORS.append(f"{f.name}: {s['id']} component path '{comp}' is not where {prof['repo']}'s "
+                                  "profile puts it (tools/apply-repo-layout.py)")
+            elif not comp.startswith(f"apps/{app}/src/routes/") or not comp.endswith(".tsx"):
                 ERRORS.append(f"{f.name}: {s['id']} component path '{comp}' breaks the convention")
 
     print(f"apps in the repo: {len(existing)} — {', '.join(sorted(existing))}\n")

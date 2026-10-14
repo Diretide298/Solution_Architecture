@@ -1119,6 +1119,13 @@ def main() -> int:
                               ["Repository", "; ".join(
                                   f"{c} {fr.repo_of(c) or 'none yet: ask the lead'}" for c in sorted(
                                       {screens[x]['_platform'].get('code') for x in p['screens']}))],
+                              # what each repository holds, from its profile (CHG-RPO-003)
+                              ["Repository layout", "; ".join(
+                                  f"{c} {d['repo']}: {d['stack']}; package manager {d['packageManager']}; screens in "
+                                  f"{d['screens']}; scripts: {d['scripts']} ({d['known']})" for c, d in (
+                                      (c, fr.describe(c)) for c in sorted(
+                                          {screens[x]['_platform'].get('code') for x in p['screens']})) if d)
+                               or "no repository yet"],
                               ["Offline", "yes" if pf.get("offlineCapable") else "no"],
                               ["Themes", ", ".join(pf.get("themes") or [])],
                               ["Directions", ", ".join(pf.get("directions") or [])],
@@ -1142,7 +1149,7 @@ def main() -> int:
             w = fr.where(sid)
             repo_cell = (f"{w['repo']} ({w['url']})" + ("; assumed by the lead, not yet confirmed" if w["assumed"] else "")
                          if w["repo"] else "none yet: ask the lead")
-            loc = ([["Suggested location", f"`{w['path']}` ({fr.mapping()['layout']['wording']})"]]
+            loc = ([["Suggested location", f"`{w['path']}` ({fr.layout_note(w['platform'])})"]]  # CHG-RPO-003
                    if w["repo"] and w["path"] else [])
             L += table(["", ""], [["Module", s.get("module", "")], ["Wave", s.get("wave", "")],
                                   ["Licensed module", s.get("requiresModule", "")],

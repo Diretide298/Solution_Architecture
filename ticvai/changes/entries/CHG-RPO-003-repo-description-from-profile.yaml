@@ -1,0 +1,56 @@
+id: CHG-RPO-003
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'What a developer is told about a frontend repository comes from the same profile as the screen paths: ADAM
+  setup''s frontend CLAUDE.md carries a generated table of what each repository holds (how it is known, stack,
+  package manager, where screens go, scripts), a screen ticket''s build gate names its repository''s own package
+  manager and scripts (no `pnpm typecheck` for the guest app, which is npm with no typecheck script), and the
+  location wording and frontend spec pages say how far the path is observed or assumed.'
+decision:
+  what: 'tools/frontend_repos.py gains gate_line(), layout_note(), describe() and setup_block(). op-descriptions.py
+    writes a screen ticket''s gate from gate_line(): the one-workspace `pnpm lint`, `pnpm typecheck` and `pnpm test`
+    only where there is no repository; a read repository''s package manager with its missing scripts named as
+    missing; an unread repository''s own scripts with the package manager its lock file belongs to.
+    build-service-docs.py adds a "Repository layout" row to each frontend page and words the suggested location
+    from layout_note(). tools/apply-repo-layout.py --setup writes the block into
+    viewer/mcp/setup/starters/frontend/CLAUDE.md (ships in ADAM''s setup zip). check-frontend-repos FR-SETUP-TABLE
+    holds that block to the profile; check-starter-fit SF-DONE-GATES reports a ticket gating a read repository with
+    another package manager or a script it lacks; check-ticket-text counts the new gate as generic ("scripts pass").'
+  by: Chinmay
+  date: '2026-10-14'
+why: '#27741 problem 3 (CHG-SWP-003): the guest app''s agent was told an Nx/pnpm workspace with apps/guest-app and
+  asked for `pnpm lint`, `pnpm typecheck` and `pnpm test`; its repository is npm with no typecheck script. The audit
+  brief for batch RPO (classes check-frontend-repos/FR-OLD-PATH and FR-LAYOUT-UNCONFIRMED, evidence
+  outside git, rule 12: classes.json of the audit run audit-1014): the per-repository description developers get comes from the same
+  observed profile. Before: 76 guest-app screen tickets gated by `pnpm typecheck` (SF-DONE-GATES on the profile: 76);
+  after: 0.'
+keys_touched:
+  files:
+  - tools/frontend_repos.py
+  - tools/op-descriptions.py
+  - tools/build-service-docs.py
+  - tools/check-starter-fit.py
+  - tools/check-ticket-text.py
+  - tools/check-frontend-repos.py
+  - viewer/mcp/setup/starters/frontend/CLAUDE.md
+  other:
+  - SF-DONE-GATES
+  - FR-SETUP-TABLE
+root_class: A07 STARTER-GATES
+tickets:
+  started: []
+  unstarted:
+  - every Block A screen ticket of P01, P02, P04, P05, P06 and P08 (its gate and location lines change)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py
+status: open
+notes: 'Batch RPO (Block A audit), 14 October 2026. The setup CLAUDE.md change needs an ADAM deploy (setup zip) to
+  reach developers. frontend-patterns.md was read and left alone: it already defers to "the repository''s own"
+  tsconfig, lint and offline store in an app repository, and names no per-repository layout. No package-generated
+  per-repository CLAUDE.md exists (repos/ticvai-frontend is the old one-workspace mirror).'

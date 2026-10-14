@@ -97,7 +97,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sign-in
-    component: apps/venue-pos/src/routes/SignInTerminal.tsx
+    component: src/routes/SignInTerminal.tsx
     status: notStarted
   density: touchLarge
   pattern: form
@@ -340,7 +340,7 @@ screens:
   implementation:
     app: venue-pos
     route: /shift/begin-shift
-    component: apps/venue-pos/src/routes/shift/BeginShiftWizard.tsx
+    component: src/routes/shift/BeginShiftWizard.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
@@ -829,7 +829,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/sell-ticket-catalogue
-    component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+    component: src/routes/sell/SellTicketCatalogueBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2104,7 +2104,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/sell-ticket-catalogue/timedentry
-    component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+    component: src/routes/sell/SellTicketCatalogueBoard.tsx
     status: notStarted
     sectionOf: POS-002
   navigation:
@@ -2423,7 +2423,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/sell-ticket-catalogue/seatmap
-    component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+    component: src/routes/sell/SellTicketCatalogueBoard.tsx
     status: notStarted
     sectionOf: POS-002
   navigation:
@@ -2771,7 +2771,7 @@ screens:
   implementation:
     app: venue-pos
     route: /payment/payment
-    component: apps/venue-pos/src/routes/payment/PaymentForm.tsx
+    component: src/routes/payment/PaymentForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3398,7 +3398,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/held-orders
-    component: apps/venue-pos/src/routes/sell/HeldOrdersBoard.tsx
+    component: src/routes/sell/HeldOrdersBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3915,7 +3915,7 @@ screens:
   implementation:
     app: venue-pos
     route: /shift/close-shift
-    component: apps/venue-pos/src/routes/shift/CloseShiftWizard.tsx
+    component: src/routes/shift/CloseShiftWizard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4506,7 +4506,7 @@ screens:
   implementation:
     app: venue-pos
     route: /reports/reports
-    component: apps/venue-pos/src/routes/reports/ReportsDashboard.tsx
+    component: src/routes/reports/ReportsDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4744,7 +4744,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/staff-roster
-    component: apps/venue-pos/src/routes/sell/StaffRosterBoard.tsx
+    component: src/routes/sell/StaffRosterBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5029,7 +5029,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/add-to-existing-ticket
-    component: apps/venue-pos/src/routes/sell/AddToExistingTicketDetail.tsx
+    component: src/routes/sell/AddToExistingTicketDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5261,7 +5261,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/returns-refunds-exchanges
-    component: apps/venue-pos/src/routes/sell/ReturnsRefundsExchangesBoard.tsx
+    component: src/routes/sell/ReturnsRefundsExchangesBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5595,7 +5595,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/omnichannel-order-fulfilment-center
-    component: apps/venue-pos/src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx
+    component: src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5945,7 +5945,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/mobile-pos-event-sales-offline-operations
-    component: apps/venue-pos/src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx
+    component: src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6203,7 +6203,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/sales-exceptions-controls-operational-actions
-    component: apps/venue-pos/src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx
+    component: src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6394,7 +6394,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/cash-operations-dashboard
-    component: apps/venue-pos/src/routes/sell/CashOperationsDashboardBoard.tsx
+    component: src/routes/sell/CashOperationsDashboardBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6548,7 +6548,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/till-configuration
-    component: apps/venue-pos/src/routes/sell/TillConfigurationBoard.tsx
+    component: src/routes/sell/TillConfigurationBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6803,7 +6803,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/cash-in-cash-out-operations
-    component: apps/venue-pos/src/routes/sell/CashInCashOutOperationsBoard.tsx
+    component: src/routes/sell/CashInCashOutOperationsBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6940,7 +6940,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/safe-drop-cash-transfer-management
-    component: apps/venue-pos/src/routes/sell/SafeDropCashTransferManagementBoard.tsx
+    component: src/routes/sell/SafeDropCashTransferManagementBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7140,7 +7140,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/shift-templates-policies
-    component: apps/venue-pos/src/routes/sell/ShiftTemplatesPoliciesBoard.tsx
+    component: src/routes/sell/ShiftTemplatesPoliciesBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7358,7 +7358,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/shift-exceptions-alerts
-    component: apps/venue-pos/src/routes/sell/ShiftExceptionsAlertsBoard.tsx
+    component: src/routes/sell/ShiftExceptionsAlertsBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7673,7 +7673,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/sell---food-and-drink
-    component: apps/venue-pos/src/routes/sell/SellFoodDrinkBoard.tsx
+    component: src/routes/sell/SellFoodDrinkBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7979,7 +7979,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/send-to-kitchen
-    component: apps/venue-pos/src/routes/sell/SendToKitchenBoard.tsx
+    component: src/routes/sell/SendToKitchenBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8257,7 +8257,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/sell---merchandise
-    component: apps/venue-pos/src/routes/sell/SellMerchandiseBoard.tsx
+    component: src/routes/sell/SellMerchandiseBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8490,7 +8490,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/outlet-setup
-    component: apps/venue-pos/src/routes/sell/OutletSetupBoard.tsx
+    component: src/routes/sell/OutletSetupBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8716,7 +8716,7 @@ screens:
   implementation:
     app: venue-pos
     route: /home
-    component: apps/venue-pos/src/routes/home/TillHomeBoard.tsx
+    component: src/routes/home/TillHomeBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8985,7 +8985,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/receipt
-    component: apps/venue-pos/src/routes/sell/ReceiptReprintBoard.tsx
+    component: src/routes/sell/ReceiptReprintBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9214,7 +9214,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/guests
-    component: apps/venue-pos/src/routes/sell/GuestLookupBoard.tsx
+    component: src/routes/sell/GuestLookupBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9383,7 +9383,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/tables
-    component: apps/venue-pos/src/routes/sell/TableServiceBoard.tsx
+    component: src/routes/sell/TableServiceBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9714,7 +9714,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/queue
-    component: apps/venue-pos/src/routes/sell/OrderQueueBoard.tsx
+    component: src/routes/sell/OrderQueueBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9943,7 +9943,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/journal
-    component: apps/venue-pos/src/routes/sell/SalesJournalBoard.tsx
+    component: src/routes/sell/SalesJournalBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10297,7 +10297,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/reservations
-    component: apps/venue-pos/src/routes/sell/ReservationsGroupArrivalsBoard.tsx
+    component: src/routes/sell/ReservationsGroupArrivalsBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
