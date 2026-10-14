@@ -643,9 +643,16 @@ components:
         the rule that failed.
 
         - **A uniqueness rule sits on the property**, as `x-ticvai-unique: tenant` or
-        `x-ticvai-unique: venue`: no two rows in that scope share the value, compared
-        case-insensitively, and a clash is the shared `duplicate-code` type (audit R108). The value
-        is the scope the index is built on, never a hierarchy level in between.
+        `x-ticvai-unique: venue`: no two rows in that scope share the value, and a clash is the shared
+        `duplicate-code` type (audit R108). The value is the scope the index is built on, never a
+        hierarchy level in between. **Text is compared case-insensitively**: a code, a name, a
+        label, a number or a hostname a person types (`VIP` and `vip` are one role code, one
+        promotion code), and so is each text member of an `x-ticvai-unique-together` set; the
+        index is on `lower(column)` (CHG-GEN-001, ADAM CR-079, CR-066). **An opaque external id
+        is compared exactly**: a value another system or a device issues and a person never types
+        (the event id a payment provider sends, what a gate reads off a credential or a piece of
+        media, the id of a game reader) says so with `x-ticvai-unique-compare: exact` beside `x-ticvai-unique`. The
+        mark is the only exemption; an identifier (uuid) is never case-folded.
 
         '
       x-ticvai-problem-types:

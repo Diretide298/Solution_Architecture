@@ -69,7 +69,9 @@ column DEFAULT (storage-design.md, "Enum agreement": the database holds the same
 contract). **Uniqueness is carried where the contract marks it**: a property with
 `x-ticvai-unique: tenant` or `venue` becomes a `<table>_<columns>_uniq` unique index (audit R108,
 28 September). A contract schema's `x-ticvai-unique-together: [[a, b, ...]]` is a unique index over
-several columns, each named by property or by column (CHG-R6-006). Uniqueness and immutability rules
+several columns, each named by property or by column (CHG-R6-006). **A text member of either is
+indexed as `lower(column)`**, so a code is unique whatever its case, as common.yaml says; an opaque
+external id marked `x-ticvai-unique-compare: exact` is not (CHG-GEN-001). Uniqueness and immutability rules
 the contracts state only in prose are not -- there is nothing machine-readable to derive them from.
 **A storage-only column carries its own `enum`** (and `maxLength`, `default`) on its schema-reference
 record, and gets the same CHECK (CHG-R6-001).
@@ -1087,6 +1089,20 @@ def pg_type(t: str | None) -> str:
 
 
 
+# **Case-insensitive uniqueness** (CHG-GEN-001, ADAM CR-079, CR-066): the property mark that keeps a value exact.
+UNIQUE_COMPARE = "x-ticvai-unique-compare"
+
+
+def unique_key(col: str, col_type: dict, src_of: dict) -> str:
+    """One member of a unique index: `lower(col)` for a text column, unless its contract property says
+    `x-ticvai-unique-compare: exact` (an opaque external id); the column as it is otherwise. common.yaml
+    (`Problem`, the uniqueness rule) states the same rule, and check-ddl-conventions D-UNIQUE-CASE holds the
+    index to it."""
+    if col_type.get(col) == "text" and str((src_of.get(col) or {}).get(UNIQUE_COMPARE) or "") != "exact":
+        return f"lower({q(col)})"
+    return q(col)
+
+
 # `table -> [columns]` from `x-ticvai-primary-key`, filled in `main` before any key is asked for.
 DECLARED_PK: dict = {}
 
@@ -1326,6 +1342,8 @@ def main() -> int:
         tgt = f"{mreq.group(1)}.{mreq.group(2)}.{mreq.group(3)}"
         if tgt in contract_props and "x-ticvai-unique" not in contract_props[tgt]:
             contract_props[tgt] = {**contract_props[tgt], "x-ticvai-unique": lvl}
+            if spec.get(UNIQUE_COMPARE) and UNIQUE_COMPARE not in contract_props[tgt]:
+                contract_props[tgt][UNIQUE_COMPARE] = spec[UNIQUE_COMPARE]
 
     # ---- ADR-0056 and ADR-0058, accepted 30 September ---------------------------------------
     # **What the contract schema says about a table as a whole**: a named key
@@ -1454,6 +1472,7 @@ def main() -> int:
             out.append(f"CREATE TABLE IF NOT EXISTS {q(schema)}.{q(short)} (")
 
             body = []
+            col_type: dict = {}   # column -> its DDL type, for the case-insensitive unique indexes below
             names = [c["column"] for c in cols[t]]
             # **The key is whatever `key_of` says it is, not whatever is called `id`.** Until
             # 3 September this line read `if col == "id"`, so 84 tables reached Postgres with no
@@ -1519,6 +1538,7 @@ def main() -> int:
                 # into its type -- `requires_corrective_action_on_breachboolean` -- and five
                 # CREATE TABLE statements in four files could not be parsed.
                 body.append(f"    {q(col):<33} {typ}{pk}{nn}{rules}")
+                col_type[col] = typ
                 n_cols += 1
 
                 ref = c.get("references")
@@ -1651,6 +1671,13 @@ def main() -> int:
                     f"ON {q(schema)}.{q(short)} USING gist ({q(second)});"))
                 n_idx += 1
 
+            # **A code is unique whatever its case** (CHG-GEN-001, ADAM CR-079 and CR-066, 14 October 2026).
+            # common.yaml says a value under `x-ticvai-unique` is compared case-insensitively, and every index
+            # derived from it was a plain one, so `VIP` and `vip` were two role codes and two promotion codes.
+            # A text column in a unique index is indexed as `lower(column)`; an opaque external id whose property
+            # says `x-ticvai-unique-compare: exact` (a provider's event id, what a gate reads off a credential)
+            # is compared as it is. A key that is not text (`venue_id`, `scope_path`) is never wrapped.
+            src_of = {c["column"]: contract_props.get(str(c.get("source") or ""), {}) for c in cols[t]}
             # **Uniqueness the contract marks, as a unique index** (audit R108, 28 September).
             # `x-ticvai-unique: tenant` is unique within the tenant database -- one tenant per
             # database (ADR-0038), so the column alone, or with `tenant_id` where a table carries
@@ -1683,7 +1710,7 @@ def main() -> int:
                 idx_lines.append((schema,
                     f"-- unique per {level} (x-ticvai-unique): {t}.{col}\n"
                     f"CREATE UNIQUE INDEX IF NOT EXISTS {uname} ON {q(schema)}.{q(short)} "
-                    f"({', '.join(q(k) for k in keycols)}){where};"))
+                    f"({', '.join(unique_key(k, col_type, src_of) for k in keycols)}){where};"))
                 n_uniq += 1
 
             # **Uniqueness over several columns the contract schema names** (`x-ticvai-unique-together`,
@@ -1701,7 +1728,7 @@ def main() -> int:
                 idx_lines.append((schema,
                     f"-- unique together (x-ticvai-unique-together): {t} ({', '.join(group)})\n"
                     f"CREATE UNIQUE INDEX IF NOT EXISTS {uname} ON {q(schema)}.{q(short)} "
-                    f"({', '.join(q(k) for k in keycols)});"))
+                    f"({', '.join(unique_key(k, col_type, src_of) for k in keycols)});"))
                 n_uniq += 1
 
             if not inline_pk and pk_cols:

@@ -45,6 +45,8 @@ RULES = {
                      "bans in DDL, not a recorded exception (3.3) (CHG-R6-012, CR-011 CR-012 CR-014)",
     "D-RENAME-APPLIED": "a table or column rename declared in derive-schema-history.py that the schema reference "
                         "does not show (CHG-R6-010)",
+    "D-UNIQUE-CASE": "a unique index whose text column is compared otherwise than common.yaml says: lower() unless "
+                     "the property is x-ticvai-unique-compare: exact (CHG-GEN-001, CR-079 CR-066)",
 }
 
 # **Words naming-and-style bans in DDL** (CHG-R6-012, ADAM CR-011, CR-012 and CR-014, 12 October 2026). The
@@ -226,6 +228,99 @@ def check_banned_names(guard, tables: dict, ref_cols: dict, by: dict) -> None:
                     guard.add("D-BANNED-NAME", f"{t}.{col}={v}",
                               f"{t}.{col}: value '{v}' carries '{bad[0]}', banned in DDL; a wire value is "
                               "recorded in naming-and-style 3.3 or renamed in the contract")
+UNIQUE_COMPARE = "x-ticvai-unique-compare"
+
+
+def _exact_props(by: dict) -> set:
+    """`module.Schema.property` for every property marked `x-ticvai-unique-compare: exact`, as derive-ddl reads them:
+    through a local `allOf`, and from `Create<X>Request` / `Update<X>Request` onto `<X>`."""
+    def props(stem, s, depth=0):
+        out = {}
+        if not isinstance(s, dict) or depth > 6:
+            return out
+        for part in s.get("allOf") or []:
+            ref = str((part or {}).get("$ref") or "")
+            if ref.startswith("#/components/schemas/"):
+                out.update(props(stem, by.get((stem, ref.rsplit("/", 1)[-1])), depth + 1))
+            else:
+                out.update(props(stem, part, depth + 1))
+        out.update(s.get("properties") or {})
+        return out
+    exact = set()
+    for (stem, name), s in by.items():
+        for p, spec in props(stem, s).items():
+            if isinstance(spec, dict) and str(spec.get(UNIQUE_COMPARE) or "") == "exact":
+                exact.add(f"{stem}.{name}.{p}")
+                m = re.match(r"^(?:Create|Update)(\w+)Request$", name)
+                if m:
+                    exact.add(f"{stem}.{m.group(1)}.{p}")
+    return exact
+
+
+def check_unique_case(guard, backend, ref_cols: dict, by: dict) -> None:
+    """D-UNIQUE-CASE. **One rule for uniqueness, in common.yaml and in the indexes** (CHG-GEN-001, ADAM CR-079 and
+    CR-066, 14 October 2026). common.yaml said a value under `x-ticvai-unique` is compared case-insensitively and
+    every derived unique index was plain, so `VIP` and `vip` were two role codes. The indexes the databases have
+    (the frozen baseline, then each forward migration in order, with the DROP INDEX a person writes) are read
+    back: a text column is `lower(column)` unless its contract property is `x-ticvai-unique-compare: exact`, and an
+    exact one is not lowered. The r1 indexes stay plain until the forward migration a person writes from
+    handoff/migration-review.md ("index changed"), so they are baselined and leave the baseline when it lands."""
+    import ddl_forward as fwd
+    common = (g.ROOT / "contracts" / "shared" / "common.yaml").read_text(encoding="utf-8")
+    flat = " ".join(common.split())
+    if "compared case-insensitively" not in flat or f"{UNIQUE_COMPARE}: exact" not in flat:
+        guard.add("D-UNIQUE-CASE", "common.yaml", "contracts/shared/common.yaml no longer states the rule "
+                  "(text compared case-insensitively; an opaque external id marked x-ticvai-unique-compare: exact)")
+    exact_props = _exact_props(by)
+    exact_cols = {(t, c.get("column")) for t, cols in ref_cols.items() for c in cols
+                  if str(c.get("source") or "") in exact_props}
+    for db in ("tenant", "control"):
+        d = backend / db
+        if not d.exists():
+            continue
+        files = sorted(p for p in d.glob("*.sql") if not p.name.startswith("V"))
+        files += sorted((p for p in d.glob("V*.sql")), key=lambda p: int(re.match(r"V(\d+)", p.name).group(1)))
+        types, uniq = {}, {}
+        for f in files:
+            text = re.split(r"^-- =+\n-- ROLLBACK\b", f.read_text(encoding="utf-8"), maxsplit=1, flags=re.M)[0]
+            for st in fwd.split_statements(text):
+                s = fwd.norm(st)
+                m = re.match(r"CREATE TABLE (?:IF NOT EXISTS )?([a-z_]+\.\"?[a-z_0-9]+\"?)\s*\((.*)\)", s, re.S)
+                if m:
+                    t = m.group(1).replace('"', "")
+                    for item in fwd.top_level_split(m.group(2)):
+                        parts = item.split()
+                        if len(parts) > 1 and not item.upper().startswith(fwd.TABLE_LEVEL):
+                            types[(t, parts[0].replace('"', ""))] = parts[1].lower()
+                    continue
+                for t, c, typ in re.findall(r"ALTER TABLE ([a-z_]+\.[a-z_0-9]+) ADD COLUMN (?:IF NOT EXISTS )?"
+                                            r"\"?([a-z_0-9]+)\"? (\S+)", s):
+                    types[(t, c)] = typ.lower()
+                m = re.match(r"CREATE UNIQUE INDEX (?:IF NOT EXISTS )?(\S+) ON (?:ONLY )?([a-z_]+\.\"?[a-z_0-9]+\"?)"
+                             r"(?: USING \w+)?\s*\((.*)\)(?: WHERE .*)?$", s)
+                if m:
+                    uniq[m.group(1)] = (m.group(2).replace('"', ""), m.group(3))
+                    continue
+                m = re.match(r"DROP INDEX (?:CONCURRENTLY )?(?:IF EXISTS )?(?:[a-z_]+\.)?(\S+)", s)
+                if m:
+                    uniq.pop(m.group(1), None)
+        for name, (t, inner) in sorted(uniq.items()):
+            for member in fwd.top_level_split(inner):
+                lowered = re.match(r"^lower\(\s*\"?([a-z_0-9]+)\"?\s*\)$", member)
+                plain = re.match(r"^\"?([a-z_0-9]+)\"?$", member)
+                col = (lowered or plain).group(1) if (lowered or plain) else None
+                if not col or types.get((t, col)) != "text":
+                    continue
+                exact = (t, col) in exact_cols
+                if plain and not exact:
+                    guard.add("D-UNIQUE-CASE", f"{name}:{col}",
+                              f"{name} on {t}: {col} is text and compared case-sensitively; common.yaml says "
+                              "case-insensitively (lower(), or mark an opaque external id x-ticvai-unique-compare: exact)")
+                elif lowered and exact:
+                    guard.add("D-UNIQUE-CASE", f"{name}:{col}",
+                              f"{name} on {t}: {col} is x-ticvai-unique-compare: exact and indexed lower()")
+
+
 # `require_` beside `requires_`, as `allow_` beside `allows_` (CHG-GTRB-006: till_shift_policy.require_open_approval).
 BOOL_OK = re.compile(r"^(is|has|can|require|requires|allows|allow|should|was|were|did|does|must|needs|include|includes|"
                      r"show|shows|auto|use|uses|supports|accepts|enable|enabled|send|notify|override)_|"
@@ -523,6 +618,9 @@ def main() -> int:
 
     # CHG-R6-012 (ADAM CR-011, CR-012, CR-014, 12 October 2026): banned words in what the DDL takes after r1.
     check_banned_names(guard, tables, ref_cols, by)
+
+    # CHG-GEN-001 (ADAM CR-079, CR-066, 14 October 2026): a unique value is compared as common.yaml says.
+    check_unique_case(guard, backend, ref_cols, by)
 
     # R160: a renamed table's old name left in DDL comments and contract prose.
     renames = [(str(r.get("from")), str(r.get("to"))) for r in

@@ -2082,8 +2082,8 @@
   "note": "union of the working tree on 2026-10-01 (with other agents' uncommitted contract edits) and HEAD 278cc437, so neither state fails"
  },
  "check-ddl-conventions": {
-  "updated": "2026-10-12",
-  "commit": "4e841b3f",
+  "updated": "2026-10-14",
+  "commit": "1eb1d063",
   "rules": {
    "D-CHILD-PARENT": [
     "catalogue.performance_media",
@@ -2346,6 +2346,36 @@
     "platform.device_heartbeat",
     "platform.sale_board_tile",
     "platform.tenant"
+   ],
+   "D-UNIQUE-CASE": [
+    "account_code_uniq:code",
+    "asset_venue_id_asset_tag_uniq:asset_tag",
+    "credit_memo_credit_memo_number_uniq:credit_memo_number",
+    "data_retention_setting_data_class_uniq:data_class",
+    "event_code_uniq:code",
+    "external_provider_code_uniq:code",
+    "journal_entry_entry_number_uniq:entry_number",
+    "loyalty_programme_code_uniq:code",
+    "media_collection_name_uniq:name",
+    "outlet_template_scope_path_code_uniq:code",
+    "pass_type_venue_id_code_uniq:code",
+    "product_category_code_uniq:code",
+    "product_code_uniq:code",
+    "product_venue_id_family_key_uniq:family_key",
+    "promotion_code_uniq:code",
+    "role_code_uniq:code",
+    "route_venue_id_code_uniq:code",
+    "sales_order_order_number_uniq:order_number",
+    "seat_category_venue_id_code_uniq:code",
+    "seat_price_band_seat_category_id_code_uniq:code",
+    "seat_seat_map_id_section_code_row_label_seat_number_uniq:row_label",
+    "seat_seat_map_id_section_code_row_label_seat_number_uniq:seat_number",
+    "seat_seat_map_id_section_code_row_label_seat_number_uniq:section_code",
+    "station_venue_id_code_uniq:code",
+    "supplier_code_uniq:code",
+    "tax_code_code_uniq:code",
+    "tax_invoice_invoice_number_uniq:invoice_number",
+    "tenant_domain_tenant_id_hostname_uniq:hostname"
    ]
   }
  },

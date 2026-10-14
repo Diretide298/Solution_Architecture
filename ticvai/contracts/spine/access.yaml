@@ -25526,7 +25526,9 @@ components:
         mediaCode:
           type: string
           x-ticvai-unique: tenant
-          description: '**Unique within the tenant** (decided 28 September, audit R108): one entry per code. `addBlacklistEntry`
+          x-ticvai-unique-compare: exact
+          description: '**Unique within the tenant** (decided 28 September, audit R108): one entry per code, compared
+            exactly: it is what a gate reads off the media, an opaque external id (common.yaml, the uniqueness rule). `addBlacklistEntry`
             refuses a second entry with `409 duplicate-code`. **One code space for both lists** (decided 29 September, writers
             pass): a code on the blacklist cannot also be whitelisted; adding it to the other list is the same `409 duplicate-code`.
             Move a code between lists by removing and re-adding it.'
@@ -26584,6 +26586,7 @@ components:
         encodedIdentifier:
           type: string
           x-ticvai-unique: tenant
+          x-ticvai-unique-compare: exact
           description: What the gate reads from the credential. Never sent to webhook subscribers.
         validFrom:
           type: string

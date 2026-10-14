@@ -3476,6 +3476,7 @@ components:
           type: string
           maxLength: 255
           x-ticvai-unique: tenant
+          x-ticvai-unique-compare: exact
           description: The provider's own event id. Unique per provider.
         eventType:
           type: string
