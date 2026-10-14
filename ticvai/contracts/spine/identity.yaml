@@ -1601,7 +1601,7 @@ paths:
       - bearerAuth: []
       x-ticvai-self-scoped: principal
       x-ticvai-permission: null
-      x-ticvai-scope-level: workstation
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       summary: Current session and effective permissions
