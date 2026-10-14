@@ -1,0 +1,41 @@
+id: CHG-TKT-005
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A task that builds no operation, table or screen links the package files it is built to: its ADRs as files, the
+  files its description names, and for setup, DevOps and onboarding work the setup standards.'
+decision:
+  what: tools/adam-links.py adds `file` links (an ADR's docs/adr file, a path the description names, repos/ticvai-docs/setup/README.md
+    and quickstart.md or dependencies.md for Onboarding, DevOps and Setup tasks); viewer/mcp/tools.mjs lookupFor serves
+    `file` through adam_file, and viewer/lib/release-diff.mjs reads it from a release's tree.
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class adam-pull/task: nothing linked: 29 Block A tasks (26 due by 28 October; audit/ticvai/runs/audit-1014/classes.json),
+  e.g. SETUP-CLIENTS 27640, the 12 onboarding tickets and the ADR-only tasks (ADAM pulls files, not decisions). After the
+  fix 0. Audit finding, Block A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/adam-links.py
+  - ../viewer/mcp/tools.mjs
+  - ../viewer/lib/release-diff.mjs
+  tickets:
+  - SETUP-CLIENTS
+  - SETUP-SEED
+  - SETUP-DB
+  - ARCH-TESTS
+  - KERNEL-ID
+root_class: A14 TICKET-LINKS
+tickets:
+  started: []
+  unstarted:
+  - the 29 Block A tasks (27626-27644, 27654, 27655, 27684, 27688, 27689, 27695, 27702, 27724, 29022, 29023)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/adam-links.py::touches_from
+status: open
+notes: Needs an ADAM deploy for the `file` kind (viewer change on this branch). SVC-CATALOGUE-DRAFTED-3 (#28267) links nothing
+  because op-retire closes it (out of the plan); it is not one of the 29.

@@ -25,7 +25,13 @@ frontend tickets are read against the screens they build (tools/ticket_features.
   S-SCREEN-OP-UNBUILT  a frontend ticket's screen calls an operation in the ticket's scope that neither its feature
                        nor any ticket it depends on builds, so it can start before its back end exists
 
-The feature #27741 itself is not baselined (ticket_features.UNBASELINED): batch GAP fixes it.
+The feature #27741 itself is not baselined (ticket_features.UNBASELINED): its findings are always strict.
+
+**14 October 2026, CHG-TKT-001 and CHG-TKT-003** (the Block A audit: 741 S-FEATURE-OP-UNUSED, 6 S-SCREEN-OP-UNBUILT).
+A feature now lists, in its own "Builds:", the operations its screens call (build-service-docs.py); its back-end
+tasks' operations are a sentence of their own. S-FEATURE-OP-UNUSED reads that list (ticket_features.Feature.ops);
+S-SCREEN-OP-UNBUILT still asks whether a task under the feature, or one the frontend ticket depends on, builds the
+operation (Feature.built).
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -143,7 +149,7 @@ def feature_ops(guard, screens: dict) -> None:
         for task, sid in f.frontend:
             dep = set((task.get("dependsOn") or "").split())
             for o in sorted(tf.scope(task, sid, screens, by_key)):
-                if o in f.ops or o not in ops or built.get(o, set()) & dep:
+                if o in f.built or o not in ops or built.get(o, set()) & dep:
                     continue
                 where = ", ".join(sorted(built.get(o) or [])[:3]) or "no ticket"
                 guard.add("S-SCREEN-OP-UNBUILT", f"{task['key']}:{o}",

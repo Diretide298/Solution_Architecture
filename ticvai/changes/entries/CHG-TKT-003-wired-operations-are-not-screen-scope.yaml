@@ -1,0 +1,47 @@
+id: CHG-TKT-003
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'A frontend ticket whose screen operation a decided wiring task wires (the kiosk configuration) is not short of
+  a builder: its own Scope sentence leaves that operation to the wiring ticket.'
+decision:
+  what: 'tools/ticket_features.py scope() drops the operations a ticket''s text says another ticket wires ("the other one
+    (getPublishedKioskConfig) is wired by APP-KIOSK-CONFIG"). No wait was added: CHG-R4-003 decided the kiosk customisation
+    is wired into KSK-001 "without changing the A1 ticket''s scope, points or waits".'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-ticket-scope/S-SCREEN-OP-UNBUILT: 6 findings (KSK-001, -002, -008, -010, -013, -014 on getPublishedKioskConfig),
+  4 due by 28 October (audit/ticvai/runs/audit-1014/classes.json); after the fix 0. The triage''s default (add the dependency)
+  contradicts the lead''s CHG-R4-003; the ticket already names the wiring task, which builds it. Audit finding, Block A
+  audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/ticket_features.py
+  screens:
+  - KSK-001
+  - KSK-002
+  - KSK-008
+  - KSK-010
+  - KSK-013
+  - KSK-014
+  other:
+  - S-SCREEN-OP-UNBUILT
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted:
+  - APP-KIOSK-KSK-001
+  - APP-KIOSK-KSK-002
+  - APP-KIOSK-KSK-008
+  - APP-KIOSK-KSK-010
+  - APP-KIOSK-KSK-013
+  - APP-KIOSK-KSK-014
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-scope.py
+status: open
+notes: No ticket text changes. If the lead wants the waits after all, it is a plan change (CHG-R4-003 reversed).

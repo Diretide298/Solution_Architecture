@@ -1,0 +1,35 @@
+id: CHG-TKT-006
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Every ADAM link resolves: a table a declared rename retired is linked under its name now; an id that is no operation,
+  table or screen of the package is dropped.'
+decision:
+  what: 'tools/adam-links.py package_index/resolve: tables through derive-schema-history.py RENAMES (chains followed) against
+    handoff/schema-reference.json (the names adam_table knows), operations against the contracts, screens against screens/;
+    the run prints what it repointed and dropped.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class adam-pull/links ADAM cannot resolve: 55 Block A tickets (38 due by 28 October; audit/ticvai/runs/audit-1014/classes.json):
+  old table names on pushed sub-tasks (wallet.funding_rules, catalogue.inventory_hold), lineage views (platform.sale_board_for_catalogue),
+  platform.schema_version and sub-task parts read as operations (SETUP-HOSTS#commerce). After the fix 0 unresolved links
+  in adam-links.json. Audit finding, Block A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/adam-links.py
+  tables:
+  - catalogue.inventory_reservation
+  - wallet.funding_rule
+root_class: A14 TICKET-LINKS
+tickets:
+  started: []
+  unstarted:
+  - the 55 tickets with notFound > 0 in the 14 October pull
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/adam-links.py::resolve
+status: open

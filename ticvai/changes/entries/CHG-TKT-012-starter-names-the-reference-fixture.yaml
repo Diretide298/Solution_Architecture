@@ -1,0 +1,33 @@
+id: CHG-TKT-012
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: The backend starter has db/seed/reference-fixture.md, the place SETUP-SEED builds the reference fixture every Done-when
+  names.
+decision:
+  what: 'viewer/mcp/setup/starters/backend/db/seed/reference-fixture.md (new): what the fixture holds, that SETUP-SEED builds
+    it, how dotnet test and the mock server use it.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-starter-fit/SF-DONE-GATES (R027 R032 R034): 1 finding, tickets require the reference fixture and
+  nothing in the starter was named for it (audit/ticvai/runs/audit-1014/classes.json); after the fix 0. Audit finding, Block
+  A audit on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - ../viewer/mcp/setup/starters/backend/db/seed/reference-fixture.md
+  tickets:
+  - SETUP-SEED
+root_class: A07 STARTER-GATES
+tickets:
+  started: []
+  unstarted:
+  - SETUP-SEED (27684)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py
+status: open
+notes: Needs the setup zip rebuilt from a clean HEAD and an ADAM deploy (viewer change on this branch).

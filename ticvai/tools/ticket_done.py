@@ -42,7 +42,9 @@ def builds_of(r, part, lineage):
         c = lineage.get(op, {}).get("contract")
         return f"{c}#{op}" if c else op
 
-    if r["type"] == "Task" and not part and listed_builds(r.get("description")):
+    # an app-module feature builds what its "Builds:" lists: its screens and the operations they call, or for an
+    # API-only one its operations and tables (CHG-TKT-001, CHG-TKT-004)
+    if r["type"] in ("Task", "Feature") and not part and listed_builds(r.get("description")):
         out = []
         for b in listed_builds(r.get("description")):
             kind, _, name = b.partition(" ")
@@ -406,6 +408,54 @@ def merge_bindings(screens: dict) -> dict:
                 have.add(a["operationId"])
                 added.setdefault(into, []).append(a["operationId"])
     return added
+
+
+# **A feature ticket lists the operations its screens call, and only those** (14 October 2026, CHG-TKT-001 and
+# CHG-TKT-002; ADAM #27741, the Block A audit's S-FEATURE-OP-UNUSED and AM-TICKET-OP). An app-module's feature ticket
+# listed the operations of its back-end tasks as its operations: "Identity & Security · Guest App" named seven
+# marketing-crm operations -- the wishlist of GST-020, which is not on it, and searchGuests, a staff operation the
+# guest app must never call -- and none of the identity, orders and consent operations its three screens call. The
+# back end stays where it is planned (a pushed task keeps its operations, CHG-R6-052); what the feature says its
+# screens call is this list. The audience rule is check-audience-match's (typed_props.callable_by, kept in step here
+# so this module imports no checker): a guest-app screen (P01, P02, the kiosk P05) may call guest, anonymous and
+# public operations (the kiosk device ones too), a staff screen staff, device, service, anonymous and public ones;
+# a platform of another audience has no rule.
+CALLABLE_BY = {"guest": {"guest", "anonymous", "public"},
+               "staff": {"staff", "device", "service", "anonymous", "public"}}
+OPERATOR_AUDIENCE = {"guest": "guest", "venue": "staff", "ticvai": "staff", "partner": "partner", "public": "public"}
+DEVICE_GUEST_PLATFORMS = ("P05",)
+GUEST_PLATFORMS = ("P01", "P02", "P05")
+
+
+def platform_audience(platform: dict) -> set:
+    """What a screen on `platform` (a screens/P*.yaml `platform` block) may call; empty = no rule declared."""
+    aud = OPERATOR_AUDIENCE.get((platform or {}).get("operator"))
+    code = str((platform or {}).get("code") or "")
+    if aud not in CALLABLE_BY or (aud == "guest" and code not in GUEST_PLATFORMS):
+        return set()
+    ok = set(CALLABLE_BY[aud])
+    if aud == "guest" and code in DEVICE_GUEST_PLATFORMS:
+        ok.add("device")
+    return ok
+
+
+def screen_calls(screen: dict, platform: dict, audience_of) -> list:
+    """The operations `screen` calls that a caller on its platform may call, in its `apis` order: every distinct
+    operationId whose audience (`audience_of(op)` -> set, empty when the operation declares none) meets the
+    platform's. An operation outside it is a wiring defect check-audience-match reports, never ticket scope."""
+    ok, out = platform_audience(platform), []
+    for a in screen.get("apis") or []:
+        o = a.get("operationId") if isinstance(a, dict) else None
+        if not o or o in out:
+            continue
+        aud = set(audience_of(o) or ())
+        if ok and aud and not (aud & ok):
+            continue
+        out.append(o)
+    return out
+
+
+BACK_END_SENTENCE = "Back end built under it by its back-end tasks"
 
 
 def main_builder(rows, pace: float = 1.0, lead: str = "", days_of=None) -> str:

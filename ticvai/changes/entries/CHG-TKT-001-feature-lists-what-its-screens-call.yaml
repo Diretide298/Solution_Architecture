@@ -1,0 +1,46 @@
+id: CHG-TKT-001
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: A feature ticket's Builds list is its screens and the operations those screens call; the operations its back-end
+  tasks build are a sentence of their own, each called-elsewhere one with the screens and app-module tickets that call it.
+decision:
+  what: 'tools/build-service-docs.py (the app-module feature description) writes Builds from the feature''s screen tasks
+    (either track: a Venue Management screen is on the backend track) and ticket_done.screen_calls (setup slices respected);
+    tools/ticket_done.py builds_of reads a feature''s Builds; tools/ticket_features.py reads a feature''s operations from
+    its own Builds (Feature.ops) and keeps what its tasks build apart (Feature.built). The back-end tasks stay where they
+    are: a pushed task keeps its operations and parent (CHG-R6-052, CHG-R6-054).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit class check-ticket-scope/S-FEATURE-OP-UNUSED (#27741 problem 1; CHG-SWP-001): 741 findings, 1080 tickets, 500
+  due by 28 October (audit/ticvai/runs/audit-1014/classes.json); after the fix 0. Cause: a backend operations task is put
+  under the first feature that needs any of its group''s operations, and the feature listed the whole group as its own.
+  Regrouping the back-end tasks instead would have moved pushed sub-tasks (check-key-stability blocks it), so the list is
+  fixed where the developer reads it. Reuses the unfinished GAP rule (27741-ticket-rule patch). Audit finding, Block A audit
+  on audit-base b93b5a87.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  - tools/ticket_done.py
+  - tools/ticket_features.py
+  - tools/check-ticket-scope.py
+  tickets:
+  - AM-IDENTITY-SECURITY-P02
+  other:
+  - S-FEATURE-OP-UNUSED
+root_class: A10 TICKET-DRIFT
+tickets:
+  started:
+  - 27741 (AM-IDENTITY-SECURITY-P02)
+  unstarted:
+  - every feature ticket with screens (294 in the plan)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-scope.py
+status: open
+notes: 'Generator rule: tools/build-service-docs.py (feature block, back_end_sentence). Run on audit-base the check finds
+  741 (52 new); on this branch 0 after build-service-docs. the impact list is in the hand-back (scratchpad audit/fix/TKT/impact.csv).'

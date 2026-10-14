@@ -264,6 +264,9 @@ export function lookupFor(kind, id) {
     case 'module': return ['adam_module', { name: id }];
     case 'service': return ['adam_service', { name: id }];
     case 'adr': return ['adam_decisions', { id }];
+    // A package file a ticket is built to: an ADR's text, a setup standard, a doc its description names
+    // (TICVAI CHG-TKT-005, 14 October 2026: 29 Block A tasks arrived with nothing linked).
+    case 'file': return ['adam_file', { path: id }];
     default: return ['adam_search', { q: id }];
   }
 }
