@@ -1,0 +1,47 @@
+id: CHG-SWP-004
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'check-screen-wiring reads every screen''s offline story against frontend-patterns 4.4: an offline app''s
+  screen that refuses offline a write its contract marks offline-capable (S-OFFLINE-REFUSED), and a screen that
+  promises to queue a write that is not offline-capable, or a web app''s screen that queues at all (S-OFFLINE-QUEUED).'
+decision:
+  what: 'tools/check-screen-wiring.py gains S-OFFLINE-REFUSED and S-OFFLINE-QUEUED beside S-OFFLINE-CLAIM (R257, which
+    caught only a screen whose every write is online-only), with a narrower queue promise (QUEUE_PROMISE: not "queue"
+    the noun) and the words of a refusal (OFFLINE_REFUSAL). The 48 findings on r6 are added to the check''s baseline;
+    the check''s existing rules and their baseline are untouched.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding on r6 (594e51a2), the #27741 sweep, class C4 (Chinmay, 14 October 2026: "Once done can we check rest of the things for similar
+  patterns?"). frontend-patterns 4.4 (viewer/mcp/setup/starters/docs/frontend-patterns.md): in an offline app a write
+  marked x-ticvai-offline-capable true goes through the one offline store''s outbox; every other write is disabled
+  offline with the reason on screen; a web app queues nothing. The screens and contracts contradict it: GST-070
+  declares offline false while joinRestaurantWaitlist is offline-capable, POS-004 says "Not available offline" for
+  createOrder and createPayment, both offline-capable, BO-097 (a web back office) says "Queued locally" for five
+  writes, and EMP-006 says "Queues locally" for cancelWorkOrder, closeWorkOrder, recordWorkOrderParts and
+  verifyWorkOrder, none offline-capable. Either the contract flag or the screen is wrong; a person decides which.'
+keys_touched:
+  files:
+  - tools/check-screen-wiring.py
+  - handoff/audit-baseline.json
+  other:
+  - S-OFFLINE-REFUSED
+  - S-OFFLINE-QUEUED
+root_class: A34 SCREEN-CONTEXT
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Run on the parent commit 594e51a2: 48 new findings, exit 1; on this branch 0 new, exit 0.
+  S-OFFLINE-REFUSED 19 (P02 5, P04 10, P06 3, P07 1); S-OFFLINE-QUEUED 29 (P04 9, P06 13, P08 5 on BO-097 web, P15 2).
+  A keyword reading: a screen whose refusal covers one case and whose write is otherwise queued can be a false
+  finding (POS-006). GST-010 (#27741''s screen) reprintOrder is one S-OFFLINE-REFUSED finding; it is baselined
+  because batch GAP fixes the ticket''s composition, not the screen''s offline state.'

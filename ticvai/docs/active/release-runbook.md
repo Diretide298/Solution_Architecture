@@ -145,6 +145,10 @@ screen against three operation properties: its audience, whether it needs a sess
 the caller or a named customer. `check-audience-match` also reports an operation whose declared audience
 includes guests while its security admits no guest. They are report-only until the guest fixes and the POS loyalty swap land.
 The lead then records each baseline (`--update-baseline`) and takes the check out of `REPORT_ONLY`.
+**`check-audience-match` gates since 14 October 2026** (CHG-SWP-002): the guest fixes had landed (no guest-screen
+finding on r6), its baseline is recorded, and it also holds every app's feature ticket to the app's audience
+(AM-TICKET-OP, after #27741 listed the staff-only `searchGuests` on the guest app). `check-preauth-session` and
+`check-subject` stay report-only until the POS loyalty swap.
 
 **R12. Canary.** After each release, one AI session pulls **5 tickets** through ADAM at the new tag, as a
 developer would. A problem it finds is a CR. This comes before the wider §7 sample.

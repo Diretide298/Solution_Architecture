@@ -1,0 +1,55 @@
+id: CHG-SWP-001
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'check-ticket-scope reads every feature ticket that builds screens against those screens, in every block: a
+  feature that lists an operation none of its screens calls (S-FEATURE-OP-UNUSED), and a frontend ticket whose screen
+  calls an operation in its scope that neither its feature nor any ticket it depends on builds (S-SCREEN-OP-UNBUILT).'
+decision:
+  what: 'tools/check-ticket-scope.py gains S-FEATURE-OP-UNUSED and S-SCREEN-OP-UNBUILT, read from
+    handoff/service-docs/plan-tasks.csv through the new tools/ticket_features.py (a feature''s screens and operations
+    from its tasks'' builds, a frontend task''s scope: the screen''s operations, its setup slice, or the rest after the
+    sibling''s slice). The 700 findings on r6 (gate w146, HEAD 594e51a2) are baselined in handoff/audit-baseline.json;
+    the feature AM-IDENTITY-SECURITY-P02 (#27741) is in ticket_features.UNBASELINED, so its four findings are strict
+    and fail until batch GAP''s fix lands. The ticket-composition rule itself (build-service-docs.py) is batch GAP''s.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding on r6 (594e51a2, CHG-SWP sweep): a developer''s agent stopped on #27741 (AM-IDENTITY-SECURITY-P02, Identity & Security on the guest app): the
+  feature listed addToWishlist, getWishlist, removeFromWishlist and searchGuests (SVC-MARKETING-GUEST-1 and -2), which
+  none of GST-010, GST-042, GST-073 calls. Chinmay, 14 October 2026: "Once done can we check rest of the things for
+  similar patterns?" The sweep (ticvai/CLAUDE.md rule 13, checks first) found the class in 80 of the 295 features
+  that build screens: 694 listed operations no screen of the feature calls (260 called only by other apps, 228 by no
+  screen at all, 210 by another feature of the same app) and 6 kiosk tickets calling getPublishedKioskConfig, built
+  by APP-KIOSK-CONFIG and SVC-WHITELABEL-KIOSK-2, neither of which they depend on. A backend operations task is put
+  under the first feature that needs any of its group''s operations, so the feature carries the whole group.'
+keys_touched:
+  files:
+  - tools/check-ticket-scope.py
+  - tools/ticket_features.py
+  - handoff/audit-baseline.json
+  tickets:
+  - AM-IDENTITY-SECURITY-P02
+  other:
+  - S-FEATURE-OP-UNUSED
+  - S-SCREEN-OP-UNBUILT
+root_class: A10 TICKET-DRIFT
+tickets:
+  started:
+  - AM-IDENTITY-SECURITY-P02 (#27741, the ticket the developer's agent stopped on; batch GAP fixes it)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-scope.py
+status: open
+notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Run on the parent commit 594e51a2 with the gate''s derived plan (w146): the two rules find
+  704 findings, every one new, so the check fails there; on this branch the 700 are known and only the four strict
+  #27741 findings fail, by design, until batch GAP''s fix merges. By app and block (S-FEATURE-OP-UNUSED): P01 A 145,
+  P02 A 55, P04 A 79, P05 A 1, P06 A 17, P06 D 4, P07 B 19, P08 A 207, P08 B 55, P08 C 14, P08 D 16, P08/P13 A2 1,
+  P09 A 40, P10 B 1, P13 A 38, P14 A 4, P15 A 1, P16 A 1; S-SCREEN-OP-UNBUILT: P05 A 1, B 2, C 2, D 1. When GAP''s
+  composition rule regroups the backend tasks, a listed operation that moves to another feature and is still unused
+  there is a new key: the lead re-runs the check after that merge and records the baseline only for what remains.'

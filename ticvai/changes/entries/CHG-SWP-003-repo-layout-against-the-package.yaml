@@ -1,0 +1,53 @@
+id: CHG-SWP-003
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'check-frontend-repos reads what the package says a frontend repository holds against what was seen in it:
+  screens naming components under the old apps/<app>/ workspace (FR-OLD-PATH), repositories whose layout is still
+  only assumed (FR-LAYOUT-UNCONFIRMED), and an observed layout that contradicts the package (FR-LAYOUT-MISMATCH).'
+decision:
+  what: 'tools/check-frontend-repos.py gains FR-OLD-PATH, FR-LAYOUT-UNCONFIRMED and FR-LAYOUT-MISMATCH. A repository''s
+    real layout is recorded on its docs/active/frontend-repos.yaml entry as `observed: {by, date, workspace: none|nx,
+    packageManager, srcRoot, packages: [...]}`; FR-LAYOUT-MISMATCH then compares the suggested locations
+    (frontend_repos.relative_path) with srcRoot, the platform''s `packages` with the repository''s, and a non-Nx
+    repository with screens still under apps/<app>/. No observation is recorded by this batch (batch GAP owns the
+    #27741 case); the 1,941 findings on r6 are baselined.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'On #27741 (AM-IDENTITY-SECURITY-P02) the developer''s agent found ticvai-guest-app a single React Native CLI
+  app at the repository root, on npm, with src/, while ADAM''s screen GST-073 said
+  apps/guest-app/src/routes/account/SecuritySignIn.tsx (the one Nx/pnpm workspace of CHG-R6-058) and the platform
+  names the workspace packages design-tokens, ui, api-client and offline-core. check-frontend-repos (CHG-R6-059)
+  checked only the platform-to-repository mapping and the setup table; frontend-repos.yaml says the inside of every
+  repository is assumed. Chinmay, 14 October 2026: "Once done can we check rest of the things for similar patterns?"'
+keys_touched:
+  files:
+  - tools/check-frontend-repos.py
+  - handoff/audit-baseline.json
+  tickets:
+  - AM-IDENTITY-SECURITY-P02
+  other:
+  - FR-OLD-PATH
+  - FR-LAYOUT-UNCONFIRMED
+  - FR-LAYOUT-MISMATCH
+root_class: A05 STARTER-APPS
+tickets:
+  started:
+  - AM-IDENTITY-SECURITY-P02 (#27741)
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-frontend-repos.py
+status: open
+notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
+  today as an exception". Run on the parent commit 594e51a2: 1,941 findings, all new, exit 1; on this branch all
+  known, exit 0. FR-OLD-PATH by platform: P01 50, P02 77, P04 32, P05 17, P06 96, P08 1,663 (every screen of the six
+  platforms with a repository; the screens kept their authored path on 13 October and only the ticket text strips
+  it, so ADAM''s screen still serves apps/<app>/). FR-LAYOUT-UNCONFIRMED: P01, P02, P04, P05, P06, P08. Tried with a
+  temporary observed block on P02 (none, npm, src/, no packages; not committed): FR-LAYOUT-MISMATCH reports the four
+  shared packages and the 77 apps/guest-app/ paths. Recording that observation (GAP or the lead) turns those on;
+  they are new findings then, by design.'
