@@ -779,11 +779,30 @@ def main() -> int:
                    for t in known_tables)
 
     homeless: list[str] = []
+
+    # **A request that writes into a row is not the row's definition** (ADAM CR-065, 14 October 2026,
+    # CHG-DDL-001). `ShiftVarianceReasonRequest` persists to `orders.pos_shift` beside `Shift`, so the reason a
+    # cashier gives after a blind count lands on the shift. Merged as an equal, its `required: [reason]` made
+    # `pos_shift.cashier_reason` NOT NULL (it sorted after `Shift` and overrode Shift's nullable
+    # `cashierReason`), and migration-review.md asked for SET NOT NULL -- which would refuse every
+    # `openShift`, because a shift is opened long before any count. The request makes its field required on
+    # the wire, not on the row. Where a table is persisted by a schema of its own (not a `*Request` and not a
+    # `*Summary`), a `*Request` beside it that does not create the row (not `Create*`, and carrying no `id`
+    # of its own: `SubmitInspectionRequest` sends the client-generated id of the inspection it creates) is a
+    # later writer: its columns are nullable, and where the row's own schema carries the same column, the
+    # row's spec wins.
+    def _later_writer(sname: str, table: str) -> bool:
+        if not sname.endswith("Request") or sname.startswith("Create") \
+                or "id" in properties_of(all_schemas.get(sname) or {}, all_schemas):
+            return False
+        return any(o != sname and not o.endswith(("Request", "Summary"))
+                   for o in by_table.get(table, []))
+
     for sname, table in sorted(persisted.items()):
         if sname in projection_only:
             continue
         body = all_schemas.get(sname) or {}
-        required = required_of(body, all_schemas)
+        required = set() if _later_writer(sname, table) else required_of(body, all_schemas)
         cols = []
         for prop, spec in properties_of(body, all_schemas).items():
             if isinstance(spec, dict) and spec.get("type") == "array" \
@@ -847,7 +866,11 @@ def main() -> int:
             # Its sibling `cart_line` has `cart_id` and nothing flagged the difference. **A line
             # with no order is a row nobody can join**, and the ER diagram drew it floating.
             prior = derived.get(table)
-            if prior:
+            if prior and _later_writer(sname, table):
+                # the row's own schema (or an earlier writer) already named these columns: it wins (CHG-DDL-001)
+                had = {c["column"] for c in prior}
+                cols = prior + [c for c in cols if c["column"] not in had]
+            elif prior:
                 have = {c["column"] for c in cols}
                 cols = [c for c in prior if c["column"] not in have] + cols
             derived[table] = cols
