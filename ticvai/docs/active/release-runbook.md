@@ -48,13 +48,18 @@ and before anything is tagged or pushed (Block A audit plan, step 11a; lead, 14 
 can we simulate the results in the pulls?"):
 1. Tag `r<N>-rc` locally. Never push it.
 2. Run a local ADAM on the candidate, with the stand-in OpenProject (`viewer/api/fake-openproject.mjs`) loaded from
-   `r<N>`'s bundle (`handoff/service-docs/op-release.json`), so every ticket reads as it will after the apply.
+   `r<N>`'s bundle (`handoff/service-docs/op-release.json`), so every ticket reads as it will after the apply. Load
+   its ticket links the way production does (`viewer/api/load_links.py` on the release's `adam-links.json`), never
+   by the local setup: on r6 the rehearsal's setup loaded them and passed, while the live ADAM had none (P-22).
 3. Pull every ticket of the block being delivered (Block A: every feature and task) against it with the shipped
    connector, the same `adam_pull` a developer runs (the audit kit's `pull-direct.mjs`, with `ADAM_URL` set to the
    local ADAM).
 4. Compare ticket by ticket with the last live pull, and keep the difference: it is the developer impact list.
+5. Check the people as well as the links: no open ticket keeps someone who left (the bundle's `successors`) as
+   assignee **or Accountable**, started tickets included. On r6 the rehearsal checked assignees only, and 158 Ready
+   for QA tickets kept Tanmay Dukhande as Accountable (P-25).
 
-**It passes only with all four at zero:** 0 pull errors; release `r<N>` on every ticket (`release.current`); 0
+**It passes only with all four at zero** (and step 5's leaver count at zero): 0 pull errors; release `r<N>` on every ticket (`release.current`); 0
 tickets with nothing linked (`linked: 0`, features and tasks alike); 0 dead links (`notFound: 0`). Anything else is
 fixed in `r<N>` and the rehearsal runs again; the tag waits. On r5 the pull found 123 features and 29 tasks with
 nothing linked and 55 tickets with links ADAM could not find, after the release was out; this step finds them while
@@ -73,12 +78,23 @@ Once everything is green, the rehearsal pull included (section 4):
 5. Rebuild the setup zip from a clean HEAD.
 
 ## 6. Distribute
-- **OpenProject:** on the server, run `op-release-server.sh r<N>`: dry run, then `APPLY=1`. That one script:
+- **OpenProject:** on the server, run `op-release-server.sh dry-run r<N>`, then `op-release-server.sh apply r<N>`.
+  That one script:
+  - turns OpenProject's notifications off for the whole instance first (OpenProject 10 has no per-run switch; the
+    list is saved in `.release-out/notified_events.json`) and leaves them off for the steps below (P-23);
   - creates new tickets and writes pointer bodies;
-  - syncs assignee and week;
+  - syncs assignee and week; a started ticket keeps its owners except a field held by someone who left, which goes
+    to the plan's person or the successor (P-25);
   - sets build order and links;
-  - retires tickets that left the plan;
-  - runs a health check.
+  - retires tickets that left the plan, and removes the build-order links of the ones it rejects (P-24);
+  - runs a health check. Every health line must be zero apart from tickets the plan does not know; anything else is
+    fixed before the next step.
+  A manual fix after the apply names its tickets and people from the bundle (`op-release.json`: `responsible`,
+  `assignee`, `parent`), never from a list written by hand: r6's sheet named the wrong Accountable for two migration
+  families (P-26). Server scripts run on the container's Ruby (2.6 on OpenProject 10): nothing newer than 2.6.
+- **New ticket ids:** copy `.release-out/op-created-r<N>.json` to the workstation, then
+  `python3 tools/op-created-merge.py <file>`, `python3 tools/adam-links.py` (with `TICVAI_OP_TOKEN`), and commit and
+  push `pms-map.json` and `adam-links.json`.
 - **OpenProject, a release that creates nothing** (a change-request release): from any workstation,
   `python3 tools/op-release-api.py --from r<N-1> --to r<N>` (dry run), then `--apply`, with `TICVAI_OP_TOKEN`
   set. It applies only the tickets that differ between the two bundles, over the REST API, with the same rules
@@ -92,8 +108,16 @@ Once everything is green, the rehearsal pull included (section 4):
   owner, filed by the lead. If ADAM cannot create a child task (its apply answers 502 behind the proxy), make it
   on the OpenProject server with `tools/op-create.rb`, subject `[CR-nnn] ...`, under the CR's ticket, then record
   it in ADAM with `settle_changes.py --link-existing` (or `POST /api/changes/<n>/ticket/link`, admin) (CHG-ADM-003).
+- **Notifications back on:** once the CRs are settled and the child tasks are filed, on the OpenProject server:
+  `op-release-server.sh notify-on`. It refuses unless the restored list matches the saved one. Then send the team
+  and developer messages, so they reach people with the tickets already in their final state.
 - **ADAM:** on the box, run `git pull` and deploy. ADAM serves `r<N>`, and every developer and agent is always
   on the latest release: their next `/ticket` is at `r<N>` and shows what changed since their previous pull.
+- **ADAM's ticket links:** ADAM reads them from its own database, not from the release (P-22). After the new ids are
+  pushed, on the box: `git pull`, then as the service user
+  `python3 viewer/api/load_links.py ticvai/handoff/service-docs/adam-links.json --email <lead> --prune --db <ADAM db>`
+  (dry run), then the same with `--apply`. Without it every ticket the release linked pulls with "What this
+  touches (0)".
 - **Client:** send the release note, `python tools/release-notes.py r<N-1> r<N>`: what their answers changed, and what is waiting on them.
 - **Last, one pull through ADAM:** once ADAM is deployed, run one `adam_pull` of any ticket. Its release must say
   `r<N>`. If it names an older release, ADAM has not fetched the tag (on the box: `git fetch --tags`, then
@@ -101,7 +125,9 @@ Once everything is green, the rehearsal pull included (section 4):
 
 ## 7. Re-audit, every release
 - Every check is green.
-- Pull a **sample of 20 to 30 tickets** through ADAM at the new tag, across every developer's board.
+- Pull a **sample of 20 to 30 tickets** through ADAM at the new tag, across every developer's board. After a release
+  with a rehearsal, pull the whole rehearsal list on the live ADAM instead (the tickets the release created by their
+  real ids, not the rehearsal's stand-in ids) and compare: it must match the rehearsal.
 - A new root issue gets a check before it counts as closed.
 
 ## 8. Configuration promotion after go-live

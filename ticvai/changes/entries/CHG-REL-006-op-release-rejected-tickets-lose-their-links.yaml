@@ -1,0 +1,30 @@
+id: CHG-REL-006
+date: '2026-10-15'
+source: audit
+kind: process
+summary: The release apply removes the build-order links of the tickets it rejects, and stops if any survive.
+decision:
+  what: 'tools/op-release.rb retire phase: after moving tickets, every direct follows link to or from a ticket rejected
+    by this release (or already rejected by an earlier one) is removed with destroy!, counted again, and the run aborts
+    if any are left; the dry run lists them.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'r6 apply, 15 October (PROCESS-LOG P-24): health found 64 follows links to rejected tickets; a developer would see
+  a ticket waiting on one that never closes. The links phase only tidies links between plan tasks. The first hand delete
+  removed nothing without an error. Finding from the r6 release on the servers, after commit e1de1ce9.'
+keys_touched:
+  files:
+  - tools/op-release.rb
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r7
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/op-release.rb
+status: open
+notes: 'Not run yet (no Ruby on the workstation): server dry run before r7 (tracker F37).'
+adam_cr: pending (raised at the next settlement)

@@ -198,6 +198,9 @@ CHECKS = [
     # (handoff/approved-ui.json, docs/active/approved-ui-changes.yaml; CHG-GRD-002). Both strict: never baselined.
     "check-ticket-links",
     "check-approved-ui",
+    # 15 October (the r6 release, tracker F43, CHG-REL-008): the scripts run in OpenProject's container use nothing
+    # newer than its Ruby 2.6 (a fix script stopped on Array#tally on the server). Strict: never baselined.
+    "check-ruby-compat",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

@@ -1,0 +1,29 @@
+id: CHG-REL-008
+date: '2026-10-15'
+source: audit
+kind: process
+summary: A new strict check holds the OpenProject scripts to Ruby 2.6, the container's version.
+decision:
+  what: tools/check-ruby-compat.py (RB-NEWER) reads tools/*.rb for methods and syntax newer than Ruby 2.6 (tally, filter_map,
+    numbered parameters, endless methods, intersect?, hash shorthand); registered in run-checks.py, never baselined.
+  by: Chinmay
+  date: '2026-10-15'
+why: '15 October (tracker F43): a fix script used Array#tally and stopped with NoMethodError in rails runner on the server.
+  Finding from the r6 release on the servers, after commit e1de1ce9.'
+keys_touched:
+  files:
+  - tools/check-ruby-compat.py
+  - tools/run-checks.py
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r7
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: check-ruby-compat::RB-NEWER
+status: open
+notes: Self-tests cover a known-bad and a known-good sample; 9 scripts pass.
+adam_cr: pending (raised at the next settlement)

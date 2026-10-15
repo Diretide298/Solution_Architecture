@@ -1,0 +1,31 @@
+id: CHG-REL-007
+date: '2026-10-15'
+source: audit
+kind: process
+summary: op-release-server.sh apply turns OpenProject notifications off for the whole instance and saves them; notify-on
+  restores them after the CR settlement.
+decision:
+  what: 'tools/op-release-server.sh: apply saves Setting.notified_events to .release-out/notified_events.json, sets it to
+    [] and checks, then runs with QUIET_ANYWAY=1; it leaves notifications off and says so. A new notify-on command restores
+    the saved list and refuses unless it matches; status prints the current list.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'r6 apply, 15 October (PROCESS-LOG P-23): OpenProject 10.0.2 has no per-run mail switch, so the apply stopped twice;
+  QUIET_ANYWAY was not in the wrapper''s allowed settings. The lead switched notifications off by hand and ran docker exec
+  directly. Finding from the r6 release on the servers, after commit e1de1ce9.'
+keys_touched:
+  files:
+  - tools/op-release-server.sh
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r7
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/op-release-server.sh
+status: open
+notes: Not run yet on the server (tracker F37). bash -n passes.
+adam_cr: pending (raised at the next settlement)

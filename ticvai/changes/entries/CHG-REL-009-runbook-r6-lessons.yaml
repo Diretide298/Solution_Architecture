@@ -1,0 +1,31 @@
+id: CHG-REL-009
+date: '2026-10-15'
+source: audit
+kind: process
+summary: The release runbook loads ADAM's ticket links after the apply, restores notifications after the CR settlement,
+  reads manual owner fixes from the bundle, and the rehearsal checks Accountable and loads links as production does.
+decision:
+  what: 'docs/active/release-runbook.md: rehearsal steps 2 and 5 (links loaded by load_links.py; no leaver as assignee or
+    Accountable); section 6 gains the notification handling, new-id merge and adam-links rebuild, ADAM''s load_links step
+    and notify-on; section 7 re-pulls the whole rehearsal list live with real ids.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'r6 release, 15 October (PROCESS-LOG P-21 to P-26): links were never loaded on the live ADAM, the rehearsal passed
+  because its setup loaded them, the release sheet named the wrong Accountable for two migration families, and notifications
+  needed a manual switch. Finding from the r6 release on the servers, after commit e1de1ce9.'
+keys_touched:
+  files:
+  - docs/active/release-runbook.md
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r7
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: check-ticket-links::TL-REHEARSAL
+status: open
+notes: check-adam-latest-release and check-ticket-links pass on the new runbook.
+adam_cr: pending (raised at the next settlement)

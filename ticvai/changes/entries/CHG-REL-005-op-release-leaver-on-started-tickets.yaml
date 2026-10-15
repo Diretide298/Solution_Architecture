@@ -1,0 +1,32 @@
+id: CHG-REL-005
+date: '2026-10-15'
+source: audit
+kind: process
+summary: The release apply hands a field held by someone who left to the plan's person or the successor on started tickets
+  too, not only on New ones.
+decision:
+  what: 'tools/op-release.rb assign phase: on an open ticket that is not New, an assignee or Accountable who is in the bundle''s
+    successors (a leaver) is replaced by the plan''s person for that field, else the successor; other started-ticket owners
+    are still kept and commented as before.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'r6 apply, 15 October (PROCESS-LOG P-25): no open ticket was assigned to Tanmay Dukhande, but 158 Ready for QA tickets
+  still had him as Accountable, so a QA return would go to someone who left. Fixed by hand on the server; the rehearsal
+  checked assignees only. Finding from the r6 release on the servers, after commit e1de1ce9.'
+keys_touched:
+  files:
+  - tools/op-release.rb
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r7
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/op-release.rb
+status: open
+notes: 'Not run yet: the workstation has no Ruby. Test with a dry run on the OpenProject server before r7''s apply (tracker
+  F37).'
+adam_cr: pending (raised at the next settlement)
