@@ -75,14 +75,26 @@ def plan(status: str, ticket: str, child: str, closed) -> dict:
     return {"action": "comment", "key": target, "why": why}
 
 
+def _tag_number(tag: str) -> int:
+    digits = "".join(ch for ch in (tag or "") if ch.isdigit())
+    return int(digits) if digits else 0
+
+
 def _release_line(status: str, ref: str, served: str) -> str:
+    """Where the package change is. "Your next pull already has it" only when ADAM is serving that release:
+    on 15 October 2026 the settlement of CR-092..CR-136 named r7 while ADAM served r6, and 23 comments told
+    agents to look for a change that was not out yet (corrected by hand)."""
     if status == "rejected":
         return "Nothing in the package changes."
-    if ref:
+    if ref and served and _tag_number(ref) <= _tag_number(served):
         return (f"The package change is in release `{ref}`. ADAM always serves the latest release"
-                f"{f' (now `{served}`)' if served else ''}, so your next pull already has it: README.md lists "
+                f"{f' (now `{served}`)' if served != ref else ''}, so your next pull already has it: README.md lists "
                 "this request under \"Change requests on this ticket\", and spec-diff.md shows what moved "
                 "since your previous pull.")
+    if ref:
+        return (f"The package change comes in release `{ref}`"
+                f"{f', which is not out yet (ADAM serves `{served}`)' if served else ''}. Until it is out, the "
+                f"decision above is what to build to; your first pull after `{ref}` shows the change in spec-diff.md.")
     return ("The package change lands in the next release. Until it does, the decision above is what to "
             "build to; your next pull after that release shows the change in spec-diff.md.")
 

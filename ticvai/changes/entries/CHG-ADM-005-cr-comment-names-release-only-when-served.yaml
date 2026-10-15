@@ -1,0 +1,33 @@
+id: CHG-ADM-005
+date: '2026-10-15'
+source: audit
+kind: process
+summary: A settled CR's comment says the next pull already has the change only when ADAM is serving the release that carries
+  it; otherwise it says the release is not out yet and to build to the decision.
+decision:
+  what: viewer/api/cr_notice.py _release_line compares the CR's release with the one ADAM serves; settle_changes.py reads
+    the served release from ADAM (/api/board/mine) and passes it, as ADAM's own resolve route already did.
+  by: Chinmay
+  date: '2026-10-15'
+why: 'Finding of the 15 October retest pull of the 21 tickets answered for CR-092..CR-112, CR-135 and CR-136: the settlement
+  named r7 while ADAM served r6, and settle_changes.py passed no served release, so all 23 comments told agents "the package
+  change is in release r7 ... your next pull already has it". The 23 comments were corrected through the OpenProject API
+  the same day.'
+keys_touched:
+  files:
+  - ../viewer/api/cr_notice.py
+  - ../viewer/api/settle_changes.py
+  - tools/check-adam-cr-settlement.py
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r7
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: check-adam-cr-settlement::CS-OPEN-COMMENT
+status: open
+adam_cr: pending (raised at the next settlement)
+notes: Takes effect on ADAM after its next deploy (the resolve route) and at once for settle_changes.py runs from a workstation.

@@ -110,6 +110,17 @@ class Adam:
     def _post(self, path, body):
         return self._req("POST", path, body)
 
+    def served(self, project: str) -> str:
+        """The release tag ADAM serves, so a comment says "your next pull already has it" only when it does
+        (cr_notice._release_line; 15 October 2026). Blank when ADAM serves its working tree or cannot say."""
+        if not hasattr(self, "_served"):
+            try:
+                got = self._req("GET", f"/api/board/mine?project_id={urllib.parse.quote(project)}") or {}
+                self._served = (got.get("release") or {}).get("tag") or ""
+            except RuntimeError:
+                self._served = ""
+        return self._served
+
     def changes(self, project: str) -> dict:
         got = self._req("GET", f"/api/changes?project_id={urllib.parse.quote(project)}")
         return {c["id"]: c for c in (got.get("items") or got.get("changes") or [])}
@@ -222,7 +233,7 @@ def tell_ticket(adam, op, project: str, row: dict, cr: str, status: str, resolut
         return [f"      ticket: nothing to tell ({step['why']})"]
     step = cr_notice.plan(status, ticket, child, op.is_closed(step["key"]))
     text = lambda key: cr_notice.comment_text(  # noqa: E731
-        cr, row.get("title") or "", status, resolution, ref, key, "", row.get("artefacts") or [])
+        cr, row.get("title") or "", status, resolution, ref, key, (adam.served(project) if hasattr(adam, "served") else ""), row.get("artefacts") or [])
 
     if step["action"] == "ticket":
         if link_existing:
