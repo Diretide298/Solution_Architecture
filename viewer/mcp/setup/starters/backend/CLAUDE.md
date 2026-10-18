@@ -63,11 +63,17 @@ The kernel those documents name is here: `Money` and `Id` (Domain), `ITenantCont
 
 ADAM is connected for this folder. It holds the contracts, tables and screens; OpenProject holds the tickets.
 
+No ticket named? Do not ask for a number: `adam_board` with `only: "workable"` gives `startHere`, the first ticket
+you can finish or its first open sub-task of yours. Start that one.
+
 1. `adam_pull` the ticket with `dir` set to this folder. Read `.adam/work/<ticket>/README.md`,
    then only the linked files it lists. Ask ADAM (`adam_contract`, `adam_table`, `adam_search`)
    rather than guessing a name or a shape.
    **Read its Comments section too**, the newest last: a clarification or QA's reason for sending
    it back overrides the description where they differ - say so when it does.
+   **Sub-tasks** in README.md are the work under the ticket, in order: pull the first open one of yours and work
+   that, one at a time; work the ticket itself only when none of its open sub-tasks is yours. **Part of** names
+   the ticket it belongs to.
    **You are always on the latest release.** ADAM serves the package at its latest release tag
    (r1, r2, …) and every pull is at it; there is no release to choose and nothing to re-pin. If
    README.md says **What changed since your previous pull (rA -> rB)**, tell the person in one line

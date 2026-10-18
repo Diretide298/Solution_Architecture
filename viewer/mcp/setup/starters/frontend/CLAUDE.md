@@ -38,7 +38,10 @@ http://gitlab.softlabsgroup.in/ticvai-frontend). Do not build it in another app'
 
 **Open Claude Code in this folder, not in a repository folder.** ADAM is connected to this folder
 only: a session started inside `ticvai-pos/` does not get ADAM's tools, `/ticket` or these
-permissions.
+permissions. **If `adam_board` and `adam_pull` are not among your tools, this session was opened in the
+wrong folder.** Tell the person, in these words: "ADAM is not connected here: open the workspace folder
+in Claude Code (the folder this CLAUDE.md is in), not the app's folder", name that folder, and stop. Do
+not build the ticket from memory or from files in the repository.
 
 (If this folder is itself a git repository with a `package.json` at the top - somebody ran setup
 on their clone, or made the old one-workspace starter with setup's `-UseStarter` - the app code
@@ -108,6 +111,10 @@ repository keeps the equivalent; ask when it has none.
 ## Working a ticket (ADAM)
 
 ADAM is connected for this folder. It holds the screens, journeys and contracts; OpenProject holds the tickets.
+If ADAM's tools are missing, see the top of this file: say "open the workspace folder" and stop.
+
+No ticket named? Do not ask for a number: `adam_board` with `only: "workable"` gives `startHere`, the first ticket
+you can finish or its first open sub-task of yours. Start that one.
 
 1. `adam_pull` the ticket with `dir` set to this folder - the workspace, where this file is, not the
    repository folder - so `.adam/` stays out of the team's repository. Read `.adam/work/<ticket>/README.md`,
@@ -115,6 +122,9 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
    rather than guessing a name or a shape.
    **Read its Comments section too**, the newest last: a clarification or QA's reason for sending
    it back overrides the description where they differ - say so when it does.
+   **Sub-tasks** in README.md are the work under the ticket, in order: pull the first open one of yours and work
+   that, one at a time; work the ticket itself only when none of its open sub-tasks is yours. **Part of** names
+   the ticket it belongs to.
    **You are always on the latest release.** ADAM serves the package at its latest release tag
    (r1, r2, …) and every pull is at it; there is no release to choose and nothing to re-pin. If
    README.md says **What changed since your previous pull (rA -> rB)**, tell the person in one line

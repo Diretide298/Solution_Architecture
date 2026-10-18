@@ -10,6 +10,9 @@ Do not list the subtasks and do not summarise them: the `subtasks` column gives 
 they are only worth reading when I ask. If I do ask, run `adam_board` again with
 `subtasks: true` and show them under their ticket.
 
+If `subtaskNote` is present, say it in one line under the table: the sub-task counts could not be read, which is
+not the same as none.
+
 If `columns` includes `release`, it is the release tag each ticket was last pulled at. I am always on
 the latest release: `r1 -> r2` means the last pull was at r1 and the next `/ticket <n>` is at r2 and
 says what changed; say that in one line under the table. Blank means not pulled yet, which is not a
@@ -20,3 +23,6 @@ finished now. End with `firstWorkable`, the first ticket in that order that no b
 why, in one sentence, and say in one line which CR holds back each ticket above it. If I hit a blocker
 on a ticket, it is a change request (`/cr`, blocking), the ticket goes On hold, and we move to that next
 workable one - never a workaround.
+
+`startHere` is where `/ticket` with no number starts: the first ticket I can finish, or its first open sub-task of
+mine.

@@ -1,15 +1,26 @@
 ---
-description: Pull an OpenProject ticket through ADAM, build it, test it, and propose the update
-argument-hint: <ticket number>
+description: Work a ticket through ADAM - the one you name, or with no number the next one I can finish
+argument-hint: [ticket number, or nothing to start the next one]
 ---
 
-Work ticket $ARGUMENTS, following "Working a ticket (ADAM)" in CLAUDE.md:
+The ticket: "$ARGUMENTS".
 
-1. `adam_pull` ticket $ARGUMENTS with `dir` set to this folder. Read `.adam/work/$ARGUMENTS/README.md`
+**If that is empty, do not ask me for a number.** Run `adam_board` with `only: "workable"` and take its
+`startHere`: the first ticket I can finish now, or its first open sub-task that is mine. Say in one line which
+ticket it is and why, then work it as below. If there is no `startHere`, every ticket on my board is blocked: say
+so in one line, with the CR that holds back each, and stop.
+
+Work the ticket, following "Working a ticket (ADAM)" in CLAUDE.md:
+
+1. `adam_pull` the ticket with `dir` set to this folder. Read `.adam/work/<ticket>/README.md`
    and the linked files it lists. If nothing is linked, find the contract with `adam_search`, say
    what you found, and ask before linking it.
    **Read its Comments section too**, the newest last: a clarification or QA's reason for sending
    it back overrides the description where they differ - say so when it does.
+   **If README.md lists Sub-tasks**, they are the work under this ticket, in the order it is done: say in one
+   line which are still open, then pull the first open one that is mine (or nobody's) and work that, one at a
+   time. Work this ticket itself only when none of its open sub-tasks is mine. A **Part of** line names
+   the ticket this one belongs to; pull it only when you need the wider picture.
 2. **You are always on the latest release** (the README's `Release` line names it: r1, r2, …).
    Every pull is at it, so there is no release to choose and nothing to re-pin. If README.md has a
    section **What changed since your previous pull (rA -> rB)**, tell me in one line what changed
