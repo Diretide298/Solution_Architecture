@@ -377,23 +377,70 @@ End with one JSON block and nothing after it:
 
 
 def draft_prompt(cr: dict, facts: list, release: str, nxt: str, note: str = "") -> str:
-    raise NotImplementedError("Task 7")
+    lead = f"\nThe lead rejected the last draft: {note}\n" if note else ""
+    return PROMPT.format(release=release, next=nxt, ref=cr["ref"], raised=cr["raised"], raised_by=cr["raised by"],
+                         ticket=cr["ticket"] or "none", kind=cr["kind"], artefact=cr["artefact"],
+                         blocking=", blocking" if cr["blocking"] == "yes" else "", title=cr["title"],
+                         problem=cr["problem"], evidence=cr["evidence"] or "none", options=cr["options"] or "none",
+                         recommendation=cr["recommendation"] or "none",
+                         facts="\n".join(f"  - {x}" for x in facts), note=lead)
 
 
 def parse_draft(text: str, release: str) -> dict:
-    raise NotImplementedError("Task 7")
+    """The JSON block that ends a draft, checked. Raises ValueError naming what is wrong."""
+    blocks = re.findall(r"```json\s*(\{.*?\})\s*```", text, re.S)
+    raw = blocks[-1] if blocks else text.strip()
+    try:
+        d = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"the draft does not end with a JSON block ({e.msg})") from None
+    verdict = " ".join(str(d.get("verdict") or "").split()).upper()
+    if not any(verdict.startswith(v) for v in VERDICTS):
+        raise ValueError(f"verdict {d.get('verdict')!r} is not FIXED IN {release}, PARTLY FIXED, NOT FIXED or "
+                         f"NOT A PROBLEM")
+    resolution = " ".join(str(d.get("resolution") or "").split())
+    if not resolution:
+        raise ValueError("the draft has no resolution")
+    needs = str(d.get("needs") or "lead").strip().lower()
+    if needs not in NEEDS:
+        raise ValueError(f"needs {d.get('needs')!r} is not lead, client or none")
+    return {"verdict": verdict, "class": str(d.get("class") or ""), "recommendation": str(d.get("recommendation") or ""),
+            "resolution": resolution, "needs": needs, "misread": str(d.get("misread") or "")}
 
 
 def releases_from(tags) -> tuple:
-    raise NotImplementedError("Task 7")
+    """(the latest release tag r<N>, the next one r<N+1>) from tag names; r6-rc and the like are not releases."""
+    nums = [int(t[1:]) for t in tags if re.fullmatch(r"r\d+", t)]
+    if not nums:
+        raise RuntimeError("no release tag r<N> in the repository")
+    return f"r{max(nums)}", f"r{max(nums) + 1}"
 
 
 def settle_as(verdict: str, release: str, nxt: str) -> tuple:
-    raise NotImplementedError("Task 7")
+    """(status, ref) the request is settled with if the lead approves the draft as it stands."""
+    if verdict.startswith("FIXED IN"):
+        return "done", release
+    if verdict.startswith("NOT A PROBLEM"):
+        return "rejected", release
+    return "accepted", nxt
 
 
 def run_claude(prompt: str, cwd: Path, claude: str, timeout: int = DRAFT_MINUTES * 60) -> str:
-    raise NotImplementedError("Task 7")
+    """One headless Claude Code turn with read-only tools, in `cwd`. Returns its final text."""
+    p = subprocess.run([claude, "-p", "--output-format", "json", "--allowedTools", "Read,Grep,Glob",
+                        "--disallowedTools", "Bash,Edit,Write,NotebookEdit,WebFetch,WebSearch",
+                        "--no-session-persistence"],
+                       input=prompt, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       cwd=str(cwd), timeout=timeout)
+    if p.returncode != 0:
+        raise RuntimeError(f"claude exited {p.returncode}: {(p.stderr or p.stdout).strip()[:300]}")
+    try:
+        out = json.loads(p.stdout)
+    except json.JSONDecodeError:
+        raise RuntimeError("claude's output is not JSON") from None
+    if out.get("is_error"):
+        raise RuntimeError(f"claude reported an error: {str(out.get('result'))[:300]}")
+    return str(out.get("result") or "")
 
 
 # ------------------------------------------------------------------------------------------------- 4. review
