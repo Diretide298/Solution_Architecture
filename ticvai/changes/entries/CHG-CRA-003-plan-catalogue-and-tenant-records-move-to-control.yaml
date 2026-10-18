@@ -1,0 +1,82 @@
+id: CHG-CRA-003
+date: '2026-10-18'
+source: cr
+kind: contract
+summary: 'Fourteen subscription tables about a tenant rather than inside one move from the tenant template to the
+  control database (ADR-0039): the plan catalogue (plan, plan_limit, plan_module, module_listing; CR-097) and contract,
+  tier_allowance, tier_module, licensing_model, trial_config, capacity_pack, go_live_readiness, enforcement_policy,
+  vsi_model and vsi_assessment (CR-150). Their tenant keys go to control.tenant, control.tenant keys its plan and its
+  contract inside control, and the membership tables and partner_quote stay. A check now fails a new reference across
+  the control/tenant boundary.'
+decision:
+  what: 'ADAM CR-150, option A (published answer of 18 October 2026, completing CR-097 of 15 October): the 14 schemas''
+    x-ticvai-persistence move from subscription.<t> to control.<t> (contracts/satellite/subscription.yaml); tenantId
+    on Subscription, GoLiveReadiness and CapacityPack and CreatePlanRequest.offeredToTenantId reference control.tenant;
+    Tenant.planId references control.plan (CR-097); the queries Platform serves (contractRecords, planRecords) name
+    control.contract and control.plan; MembershipRenewalPolicy.cancellationPolicyId is no longer keyed by convention
+    to the enforcement policy (it is a refund policy; which table is the lead''s follow-up); VsiAssessment says
+    ADR-0043 decides which control database holds a prospect''s name and email. The moves are declared in
+    tools/derive-schema-history.py RENAMES, so ADAM links, ticket keys and the forward diff follow the tables. All
+    moves are forward migrations in the next release; no plan data exists yet. Operations on them go through
+    repository interfaces Platform serves on its control connection.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'ADAM CR-150 (Hrushikant Patkar, #36138) and CR-097 (15 October), accepted; class 4 of the 18 October triage
+  ("control-plane data kept in the tenant database"), against ADR-0039. Finding: control.tenant.subscription_id keyed
+  into every tenant''s subscription.contract, a cross-database reference nothing failed on.'
+keys_touched:
+  tables: [subscription.plan, subscription.plan_limit, subscription.plan_module, subscription.module_listing,
+    subscription.contract, subscription.tier_allowance, subscription.tier_module, subscription.licensing_model,
+    subscription.trial_config, subscription.capacity_pack, subscription.go_live_readiness,
+    subscription.enforcement_policy, subscription.vsi_model, subscription.vsi_assessment, control.tenant,
+    subscription.membership_renewal_policy]
+  schemas: [Plan, CreatePlanRequest, PlanRequestLimits, Subscription, SubscriptionTierAllowance,
+    SubscriptionTierModule, LicensingModel, TrialConfiguration, CapacityPack, GoLiveReadiness,
+    LicenceEnforcementPolicy, VsiModel, VsiAssessment, ModuleListing, Tenant, MembershipRenewalPolicy]
+  files:
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - tools/derive-schema-history.py
+  - tools/check-contract-storage.py
+  - tools/check-ddl-conventions.py
+  - tools/applied/control-plane-moves-18-october.py
+  - handoff/api-data-lineage.json
+  - docs/active/audit-runs/cr-answers-1018/impact-class4-control-plane-data.tsv
+  other:
+  - 'x-ticvai-queries subscription#contractRecords, subscription#planRecords: tables renamed to control.*'
+root_class: 'A-CONTROL-PLANE: control-plane data in the tenant database (class 4 of the 18 October triage)'
+tickets:
+  started:
+  - 'TEST-AM-FOUNDATION-DATABASE (27686, On hold): the tenant template loses 14 tables, control gains them'
+  unstarted:
+  - 'Finished migrations (a child task each, for the migration owner, at settlement): MIG-SUBSCRIPTION (27651) and its
+    sub-tasks for contract, module_listing, plan, plan_limit, plan_module; MIG-CONTROL (27647), MIG-CONTROL#control.tenant
+    (30167), MIG-FOREIGN-KEYS (27683). 430 New tickets link an operation or table that moves (impact file).'
+release_tag: r7
+decision_owner: Chinmay
+adam_cr: CR-150, CR-097
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Prevention: check-contract-storage ST-CROSS-DATABASE, a declared reference across the control/tenant boundary
+  that is not one of the 15 known crossings (each a person or scope a control row names in its owning database).
+  Shown failing on r6 (control.tenant.subscription_id -> subscription.contract) and passing after. Sibling query: the
+  same rule; backend/990 lists 15 crossings after the move (16 before). Database (derived at the release; this
+  branch''s derive kept in D:\wt\fix-cr-answers-1018-derived\class4): control V0105 creates the 14 tables with their
+  keys and indexes (9 foreign keys inside control); the tenant review lists the 14 tables dropped (no data exists:
+  DROP TABLE once the control tables serve), control.tenant''s two new keys (plan_id, subscription_id; NOT VALID then
+  VALIDATE) and the dropped convention index on membership_renewal_policy.cancellation_policy_id. The review still
+  words a cross-database move "a rename or a drop: decide" (the migration-generator lane owns that wording).
+  Follow-ups for the lead: which refund-policy table cancellation_policy_id names; which control database holds
+  vsi_assessment (ADR-0043). Ticket keys: MIG-SUBSCRIPTION#subscription.<t> follow the move through RENAMES
+  (build-service-docs table_moves); the release derive regenerates tasks.csv and the links. Lineage: derive-lineage
+  never removes a table, so tools/applied/control-plane-moves-18-october.py renames the 36 entries naming the old
+  tables (the CHG-XDW-001 pattern) and the renamed lineage is committed; nothing else derived is. Also in the tools:
+  derive-schema-history COLUMN_RENAMES for tier_allowance, tier_module and trial_config follow their tables, and
+  check-ddl-conventions reads `subscription_id` as naming the contract (control.tenant.subscription_id now keys inside
+  one database). Verified on this branch after the derive (then restored): build-service-docs, check-migration-tickets,
+  check-key-stability, check-plan-closure, check-ticket-builds, adam-links.py offline then check-ticket-links, all
+  0 new; check-lineage 0 errors; check-cross-module-reads 0 new.'

@@ -20060,8 +20060,8 @@ components:
         **Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json`
         as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that
         contradicts the schema is worse than a longer name. Not named `marketing.tier` either,
-        because `subscription.tier_allowance` is a SaaS plan's tier and one bare `tier` in a
-        package with two tier concepts is how `plan_id` came to point at `subscription.plan`.
+        because `control.tier_allowance` is a SaaS plan's tier and one bare `tier` in a
+        package with two tier concepts is how `plan_id` came to point at `control.plan`.
 
         **The denormalised copy on the position stays.** A till rendering *Gold* beside a
         balance must not join, and must certainly not cross a cell boundary to print a word.

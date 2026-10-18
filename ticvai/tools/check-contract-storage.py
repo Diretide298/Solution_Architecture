@@ -53,6 +53,25 @@ RULES = {
                             "(CR-145, CHG-CRA-002)",
     "ST-DEFAULT-DESCRIBED": "a stored enum's description names its starting value (`x` until ...) and the contract "
                             "declares no default (CR-151, CHG-CRA-002)",
+    "ST-CROSS-DATABASE": "a declared reference crosses the control/tenant database boundary and is not one of the "
+                         "known crossings: data about a tenant sits in the tenant template (ADR-0039; CR-150, "
+                         "CHG-CRA-003)",
+}
+# **Control-plane data kept in the tenant database** (class 4 of the 18 October triage, CHG-CRA-003). ADR-0039 made the
+# control plane a database of its own, so a declared reference between it and a tenant database is no longer a
+# constraint, only a rule application code must keep (backend/990-cross-database-references.sql). The plan catalogue and
+# the records about a tenant rather than inside one (CR-097, CR-150) stayed in the tenant template, and
+# `control.tenant.subscription_id -> subscription.contract` was the sign: the control plane's tenant row keyed into
+# every tenant's database. These are the crossings known when the tables moved; each is a person or scope the control
+# row names in the database that owns it. A new one fails until the table moves or the crossing is added here, with why.
+KNOWN_CROSSINGS = {
+    "control.cell.region_id", "control.cell_cluster.region_id", "control.channel_listing.product_id",
+    "control.channel_listing.price_list_id", "control.migration_run.started_by_principal_id",
+    "control.partner_agreement.approval_request_id", "control.partner_case.sla_policy_id",
+    "control.partner_user.principal_id", "control.production_access_request.decided_by_principal_id",
+    "control.rollout.started_by_principal_id", "control.rollout.approved_by_principal_id",
+    "control.support_notice.published_by_principal_id", "control.tenant.account_manager_principal_id",
+    "control.usage_record.venue_id", "platform.cell_endpoint.cell_id",
 }
 # **The description and the declared shape disagree** (class 11 of the 18 October triage, CHG-CRA-002). The generator
 # writes what the contract declares, so a rule stated only in a description reaches the table as its opposite:
@@ -306,7 +325,25 @@ def main() -> int:
                           f"{', '.join(present)} has no recorded_at")
     check_stale_and_secrets(guard, cols, by)
     check_described_shape(guard, cols, by)
+    check_cross_database(guard, cols)
     return guard.finish()
+
+
+def check_cross_database(guard, cols: dict) -> None:
+    """ST-CROSS-DATABASE (class 4 of the 18 October triage, CHG-CRA-003): a declared reference between the control
+    database and a tenant database that is not a known crossing."""
+    def db(t):
+        return "control" if t.split(".")[0] == "control" else "tenant"
+    for t, cs in sorted(cols.items()):
+        for c in cs:
+            ref = str(c.get("references") or "")
+            if not ref or ref not in cols or c.get("enforced") != "yes" or db(t) == db(ref):
+                continue
+            key = f"{t}.{c.get('column')}"
+            if key not in KNOWN_CROSSINGS:
+                guard.add("ST-CROSS-DATABASE", key,
+                          f"{key} -> {ref} crosses from the {db(t)} database to the {db(ref)} one: a record about a "
+                          f"tenant belongs in control (ADR-0039), or the crossing is listed in KNOWN_CROSSINGS with why")
 
 
 def check_described_shape(guard, cols: dict, by: dict) -> None:

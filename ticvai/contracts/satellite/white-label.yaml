@@ -3329,13 +3329,13 @@ paths:
       x-ticvai-read-via:
       - query: subscription#contractRecords
         route: in-process
-        for: 'its read of subscription.contract, Platform''s data (CHG-MOD-001)'
+        for: 'its read of control.contract, Platform''s data (CHG-MOD-001)'
       - query: subscription#licenceAddOnRecords
         route: in-process
         for: 'its read of control.licence_add_on, Platform''s data (CHG-MOD-001)'
       - query: subscription#planRecords
         route: in-process
-        for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
+        for: 'its read of control.plan, Platform''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3369,13 +3369,13 @@ paths:
       x-ticvai-read-via:
       - query: subscription#contractRecords
         route: in-process
-        for: 'its read of subscription.contract, Platform''s data (CHG-MOD-001)'
+        for: 'its read of control.contract, Platform''s data (CHG-MOD-001)'
       - query: subscription#licenceAddOnRecords
         route: in-process
         for: 'its read of control.licence_add_on, Platform''s data (CHG-MOD-001)'
       - query: subscription#planRecords
         route: in-process
-        for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
+        for: 'its read of control.plan, Platform''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:

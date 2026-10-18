@@ -126,9 +126,9 @@ x-ticvai-queries:
     served: [in-process, service]
   contractRecords:
     module: subscription
-    table: subscription.contract
+    table: control.contract
     inputs:
-      ids: {type: array, items: {type: string, format: uuid}, description: 'The subscription.contract rows asked for, by id.'}
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.contract rows asked for, by id.'}
       where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
     returns:
       type: array
@@ -136,7 +136,7 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/Subscription'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Platform answers with its subscription.contract rows, as it stores them and as the caller's
+      October). Platform answers with its control.contract rows, as it stores them and as the caller's
       scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
@@ -144,9 +144,9 @@ x-ticvai-queries:
     served: [in-process]
   planRecords:
     module: subscription
-    table: subscription.plan
+    table: control.plan
     inputs:
-      ids: {type: array, items: {type: string, format: uuid}, description: 'The subscription.plan rows asked for, by id.'}
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.plan rows asked for, by id.'}
       where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
     returns:
       type: array
@@ -154,7 +154,7 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/Plan'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Platform answers with its subscription.plan rows, as it stores them and as the caller's scope
+      October). Platform answers with its control.plan rows, as it stores them and as the caller's scope
       lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
@@ -11749,7 +11749,7 @@ components:
     SubscriptionTierAllowance:
       x-ticvai-retired-columns: [tier_id]
       type: object
-      x-ticvai-persistence: subscription.tier_allowance
+      x-ticvai-persistence: control.tier_allowance
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines usage/quantity allowances included in a subscription tier.'
       required:
       - tierId
@@ -11764,7 +11764,7 @@ components:
           format: uuid
         tierId:
           x-ticvai-column: plan_id
-          x-ticvai-references: subscription.plan
+          x-ticvai-references: control.plan
           type: string
           format: uuid
         code:
@@ -11794,7 +11794,7 @@ components:
     SubscriptionTierModule:
       x-ticvai-retired-columns: [tier_id]
       type: object
-      x-ticvai-persistence: subscription.tier_module
+      x-ticvai-persistence: control.tier_module
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines which TICVAI technical modules are commercially included in a subscription tier.'
       required:
       - tierId
@@ -11808,7 +11808,7 @@ components:
           format: uuid
         tierId:
           x-ticvai-column: plan_id
-          x-ticvai-references: subscription.plan
+          x-ticvai-references: control.plan
           type: string
           format: uuid
         code:
@@ -11831,7 +11831,7 @@ components:
           nullable: true
     VsiModel:
       type: object
-      x-ticvai-persistence: subscription.vsi_model
+      x-ticvai-persistence: control.vsi_model
       description: 'Board 3.2. **The number the whole commercial model hangs on**, and configurable so
         a prospect reaches a package without a sales call.
 
@@ -11894,8 +11894,11 @@ components:
           nullable: true
     VsiAssessment:
       type: object
-      x-ticvai-persistence: subscription.vsi_assessment
-      description: 'Board 2 — the ten-screen questionnaire, as data.'
+      x-ticvai-persistence: control.vsi_assessment
+      description: 'Board 2 — the ten-screen questionnaire, as data. **In the control database** (ADAM CR-150,
+        18 October 2026; CHG-CRA-003): a prospect''s sign-up answers are about a tenant to be, not inside one. It
+        holds an organisation name and a contact email, so **which control database holds it is ADR-0043''s
+        decision** (personal data stays in its region); the lead records it before rows are written.'
       properties:
         id:
           type: string
@@ -11961,7 +11964,7 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
     LicensingModel:
       type: object
-      x-ticvai-persistence: subscription.licensing_model
+      x-ticvai-persistence: control.licensing_model
       description: 'Boards 3.6 and 3.7. **The single most consequential commercial decision in the
         product.**
 
@@ -12036,7 +12039,7 @@ components:
           nullable: true
     ModuleListing:
       type: object
-      x-ticvai-persistence: subscription.module_listing
+      x-ticvai-persistence: control.module_listing
       description: 'Board 4.6. **A marketplace without a dependency graph sells combinations that
         cannot be provisioned.**
 
@@ -12201,7 +12204,7 @@ components:
           type: boolean
     TrialConfiguration:
       type: object
-      x-ticvai-persistence: subscription.trial_config
+      x-ticvai-persistence: control.trial_config
       description: 'Board 5.5. **A trial that expires with no conversion path is a tenant full of real
         data nobody can bill.**
 
@@ -12250,10 +12253,11 @@ components:
           default: 90
     GoLiveReadiness:
       type: object
-      x-ticvai-persistence: subscription.go_live_readiness
+      x-ticvai-persistence: control.go_live_readiness
       description: 'Board 8. **The screen that stops a launch going wrong in public.**'
       properties:
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         runAt:
@@ -12323,7 +12327,7 @@ components:
           nullable: true
     LicenceEnforcementPolicy:
       type: object
-      x-ticvai-persistence: subscription.enforcement_policy
+      x-ticvai-persistence: control.enforcement_policy
       description: 'Board 9.5. **Refusing service to a paying customer mid-season is a commercial
         decision.**
 
@@ -12404,7 +12408,7 @@ components:
           type: integer
     CapacityPack:
       type: object
-      x-ticvai-persistence: subscription.capacity_pack
+      x-ticvai-persistence: control.capacity_pack
       description: 'Board 3.8. **A good season should not require renegotiating a contract in
         August.**
 
@@ -12418,7 +12422,7 @@ components:
           type: string
           format: uuid
         tenantId:
-          x-ticvai-references: none
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         unit:
@@ -16677,6 +16681,7 @@ components:
           format: uuid
           nullable: true
         planId:
+          x-ticvai-references: control.plan
           type: string
           format: uuid
           nullable: true
@@ -16773,7 +16778,7 @@ components:
           nullable: true
           x-ticvai-column: limit_value
           description: Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and
-            `subscription.tier_allowance` already names the same figure `limit_value`.
+            `control.tier_allowance` already names the same figure `limit_value`.
         overageAllowed:
           type: boolean
           default: false
@@ -16848,6 +16853,7 @@ components:
           default: standard
           description: '**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay).'
         offeredToTenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
           nullable: true
@@ -16857,7 +16863,7 @@ components:
     PlanRequestLimits:
       type: object
       nullable: true
-      x-ticvai-persistence: none — embedded in subscription.plan as its request_limits jsonb column
+      x-ticvai-persistence: none — embedded in control.plan as its request_limits jsonb column
       description: '**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October;
         it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel
         middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees;
@@ -16915,9 +16921,9 @@ components:
           default: 10
           description: How long a burst may last.
     Plan:
-      x-ticvai-persistence: subscription.plan + subscription.plan_module + subscription.plan_limit
+      x-ticvai-persistence: control.plan + control.plan_module + control.plan_limit
       description: '**A plan''s modules and limits are rows, keyed on `plan_id`.** `licensedModules`
-        and `limits` are required on every plan, and `subscription.plan` alone had no column for
+        and `limits` are required on every plan, and `control.plan` alone had no column for
         either — so the licence position, the downgrade check and every module gate had nothing to
         read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per
         `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier
@@ -16974,7 +16980,10 @@ components:
           type: string
           maxLength: 500
     Subscription:
-      x-ticvai-persistence: subscription.contract
+      x-ticvai-persistence: control.contract
+      # Moved to the control database with the plan catalogue (ADAM CR-150, completing CR-097, 18 October 2026;
+      # CHG-CRA-003): what a tenant is paying for is about the tenant, not inside it (ADR-0039). Platform reads and
+      # writes it on its control connection.
       type: object
       required:
       - tenantId
@@ -16984,6 +16993,7 @@ components:
       - startsAt
       properties:
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         planId:
@@ -17131,8 +17141,8 @@ components:
           type: string
           maxLength: 500
     LicencePosition:
-      x-ticvai-persistence: none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module,
-        subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit
+      x-ticvai-persistence: none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module,
+        control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit
         by tenant_id)
       type: object
       required:
@@ -19897,6 +19907,7 @@ components:
               - suggestedTier
           description: Tier Movement (pack p.16)
         cancellationPolicyId:
+          x-ticvai-references: none
           type: string
           description: 'Cancellation/refund policy from the central policy management (MoM 25 Aug: refund and
             cancellation rules are managed centrally). Empty means no refund on cancellation unless the commercial
@@ -20014,6 +20025,7 @@ components:
               - suggestedTier
           description: Tier Movement (pack p.16)
         cancellationPolicyId:
+          x-ticvai-references: none
           type: string
           description: 'Cancellation/refund policy from the central policy management (MoM 25 Aug: refund and
             cancellation rules are managed centrally). Empty means no refund on cancellation unless the commercial
@@ -21142,6 +21154,10 @@ components:
             - suggestedTier
           description: Tier Movement (pack p.16)
         cancellationPolicyId:
+          # A refund policy, never licence enforcement (ADAM CR-150 follow-up, CHG-CRA-003): the naming convention
+          # keyed it to subscription.enforcement_policy, which moves to control. Which refund-policy table it names
+          # is the lead's follow-up; until then it is not a key.
+          x-ticvai-references: none
           type: string
           description: 'Cancellation/refund policy from the central policy management (MoM 25 Aug: refund
             and cancellation rules are managed centrally). Empty means no refund on cancellation unless
