@@ -547,35 +547,55 @@ def settle_argv(decisions: Path, base: str, apply: bool) -> list:
 
 # ------------------------------------------------------------------------------------------------- state and git
 def load_state(out: Path):
-    raise NotImplementedError("Task 9")
+    f = out / "state.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
 
 
 def _write(path: Path, text: str):
-    raise NotImplementedError("Task 9")
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
 
 
 def save_state(out: Path, state: dict):
-    raise NotImplementedError("Task 9")
+    _write(out / "state.json", json.dumps(state, indent=1, ensure_ascii=False) + "\n")
 
 
 def _log(out: Path, line: str):
-    raise NotImplementedError("Task 9")
+    with (out / "runs.log").open("a", encoding="utf-8") as f:
+        f.write(line + "\n")
 
 
 def _git(*args, cwd=REPO) -> str:
-    raise NotImplementedError("Task 9")
+    p = subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True)
+    if p.returncode != 0:
+        raise RuntimeError(f"git {' '.join(args)}: {p.stderr.strip()[:200]}")
+    return p.stdout.strip()
 
 
 def releases_live() -> tuple:
-    raise NotImplementedError("Task 9")
+    with contextlib.suppress(RuntimeError):
+        _git("fetch", "--tags", "--quiet", "origin")
+    return releases_from(_git("tag", "--list", "r*").split())
 
 
 def branches_live() -> set:
-    raise NotImplementedError("Task 9")
+    try:
+        refs = _git("for-each-ref", "--format=%(refname:short)", "refs/heads/fix", "refs/remotes/origin/fix").split()
+    except RuntimeError:
+        return set()
+    return {r[len("origin/"):] if r.startswith("origin/") else r for r in refs}
 
 
 def release_tree(path: Path, tag: str) -> Path:
-    raise NotImplementedError("Task 9")
+    """The watcher's own worktree at `tag`, made or moved as needed. Never the lead's checkout."""
+    if not (path / ".git").exists():
+        _git("worktree", "add", "--detach", str(path), tag)
+    elif _git("rev-parse", "HEAD", cwd=path) != _git("rev-parse", f"{tag}^{{commit}}"):
+        if _git("status", "--porcelain", cwd=path):
+            raise RuntimeError(f"{path} has local changes; the watcher reads releases only")
+        _git("checkout", "--detach", "--quiet", tag, cwd=path)
+    return path
 
 
 class Busy(RuntimeError):
@@ -584,24 +604,180 @@ class Busy(RuntimeError):
 
 @contextlib.contextmanager
 def locked(out: Path):
-    raise NotImplementedError("Task 9")
+    lock = out / "cr-watch.lock"
+    if lock.exists() and time.time() - lock.stat().st_mtime < LOCK_HOURS * 3600:
+        raise Busy(f"another run holds {lock} ({lock.read_text(encoding='utf-8').strip()})")
+    lock.write_text(f"pid {os.getpid()} since {_now()}", encoding="utf-8")
+    try:
+        yield
+    finally:
+        with contextlib.suppress(OSError):
+            lock.unlink()
 
 
 # ------------------------------------------------------------------------------------------------- run and settle
 def _fetch_live(a) -> str:
-    raise NotImplementedError("Task 9")
+    email, password = os.environ.get("ADAM_EMAIL", ""), os.environ.get("ADAM_PASSWORD", "")
+    if not email or not password:
+        raise AdamDown("ADAM_EMAIL and ADAM_PASSWORD are not set (environment or --env-file)")
+    return fetch_export(a.adam, email, password)
 
 
 def _draft_file(out: Path, p: dict, text: str):
-    raise NotImplementedError("Task 9")
+    d = p.get("draft") or {}
+    body = [f"# {p['ref']}: {p['title']}", "", f"Raised {p['raised']}; drafted {p.get('drafted_at') or 'not yet'}.",
+            "", "## What the watcher found (no AI)", "", *[f"- {x}" for x in p["facts_lines"]], ""]
+    if d:
+        body += ["## Draft", "", f"Verdict: {d['verdict']}", f"Class: {d['class']}", f"Needs: {d['needs']}",
+                 f"Recommendation: {d['recommendation']}", f"Misread: {d['misread'] or 'nothing'}", "",
+                 f"Resolution: {d['resolution']}", ""]
+    if p.get("draft_error"):
+        body += [f"Not drafted: {p['draft_error']}", ""]
+    if text:
+        body += ["## The agent's answer in full", "", text, ""]
+    _write(out / "drafts" / f"{p['ref']}.md", "\n".join(body))
 
 
 def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
-    raise NotImplementedError("Task 9")
+    """Steps 1-4. `fetch`, `drafter` (prompt, cwd) -> text, `tree`, `rel` and `branches` stand in for ADAM, Claude
+    Code and git in the self-tests."""
+    out = Path(a.out)
+    (out / "drafts").mkdir(parents=True, exist_ok=True)
+    stamp = _now()
+    state = load_state(out)
+    if state is None and not a.seed and a.start_id is None:
+        print("cr-watch: no state yet. Run once with --seed (start after every request ADAM has now) or "
+              "--start-id N (draft every open request after id N).")
+        return 2
+    state = state or {"project": a.project, "last_id": a.start_id or 0, "pending": {}}
+    pending = state["pending"]
+    review = out / "REVIEW.md"
+    for ref, m in (parse_review(review.read_text(encoding="utf-8")) if review.exists() else {}).items():
+        p = pending.get(ref)
+        if not p:
+            continue
+        if m["decision"] == "reject":
+            p.update(draft=None, draft_error="", decision="", note="", status="", ref_to="", resolution="",
+                     redraft_note=m["note"] or "no reason given")
+        else:
+            p.update(decision=m["decision"], note=m["note"], status=m["status"], ref_to=m["ref_to"],
+                     resolution=m["resolution"])
+    try:
+        text = Path(a.csv).read_text(encoding="utf-8-sig") if a.csv else (fetch or _fetch_live)(a)
+        rows = parse_export(text)
+    except (AdamDown, ValueError, OSError) as e:
+        line = (f"**Last run {stamp}: ADAM could not be read ({e}). Nothing new is known; the list below is as it "
+                f"was.**")
+        _write(review, render_review(pending, line))
+        save_state(out, state)
+        _log(out, f"{stamp} read failed: {e}")
+        print(f"cr-watch: ADAM could not be read ({e})")
+        return 2
+    new, top = new_requests(rows, state["project"], state["last_id"])
+    if a.seed:
+        state["last_id"] = top
+        save_state(out, state)
+        print(f"cr-watch: seeded at id {top}; {len(new)} open request(s) before it are left to the manual triage")
+        return 0
+    for r in new:
+        pending[r["ref"]] = _item(r)
+    classes = load_classes(a.classes)
+    baseline = g.load_json(a.baseline, {}) or {}
+    idx = g.link_index(a.links)
+    branches = branches_live() if branches is None else branches
+    try:
+        release, nxt = rel or releases_live()
+    except RuntimeError as e:
+        _write(review, render_review(pending, f"**Last run {stamp}: the release tags could not be read ({e}). "
+                                              f"Nothing was drafted.**"))
+        save_state(out, state)
+        print(f"cr-watch: the release tags could not be read ({e})")
+        return 2
+    by_ref = {r["ref"]: r for r in rows if r["project"] == state["project"]}
+    for p in pending.values():
+        p["cr"] = by_ref.get(p["ref"], p["cr"])          # the request as ADAM has it now
+        p["facts"] = sort_request(p["cr"], rows, classes, baseline, idx, branches)
+        p["facts_lines"] = facts_lines(p["cr"], p["facts"])
+    todo = [p for p in pending.values() if not p.get("draft")]
+    if todo and not a.no_draft:
+        claude = a.claude or shutil.which("claude") or ""
+        if drafter is None and not claude:
+            for p in todo:
+                p["draft_error"] = "Claude Code (claude) is not on PATH: pass --claude"
+        else:
+            draft = drafter or (lambda prompt, cwd: run_claude(prompt, cwd, claude))
+            try:
+                cwd = tree or release_tree(Path(a.release_dir), release)
+            except RuntimeError as e:
+                cwd = None
+                for p in todo:
+                    p["draft_error"] = f"no worktree at {release}: {e}"
+            for p in todo if cwd else []:
+                answer = ""
+                try:
+                    answer = draft(draft_prompt(p["cr"], p["facts_lines"], release, nxt, p.get("redraft_note", "")),
+                                   cwd)
+                    d = parse_draft(answer, release)
+                    status, ref_to = settle_as(d["verdict"], release, nxt)
+                    p.update(draft=d, draft_error="", drafted_at=_now(), status=status, ref_to=ref_to,
+                             resolution=d["resolution"], redraft_note="")
+                except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as e:
+                    p["draft_error"] = str(e)[:200]
+                _draft_file(out, p, answer)
+    for p in pending.values():
+        if not (out / "drafts" / f"{p['ref']}.md").exists():
+            _draft_file(out, p, "")
+    state["last_id"] = top
+    line = (f"Last run {stamp}: {len(new)} new request(s); {len(pending)} waiting for you; {len(rows)} rows read from "
+            f"ADAM; answers against {release}, fixes for {nxt}.")
+    _write(review, render_review(pending, line))
+    save_state(out, state)
+    _log(out, f"{stamp} {len(new)} new, {len(pending)} waiting, {len(todo)} to draft")
+    print(f"cr-watch: {len(new)} new, {len(pending)} waiting; {review}")
+    return 0
 
 
 def settle(a, runner=None, env=None, rel=None) -> int:
-    raise NotImplementedError("Task 9")
+    """Step 5: the requests the lead marked approve or change, through settle_changes.py (dry run unless --apply)."""
+    out = Path(a.out)
+    state = load_state(out)
+    review = out / "REVIEW.md"
+    if not state or not review.exists():
+        print("cr-watch settle: nothing to settle (no REVIEW.md yet)")
+        return 2
+    _, nxt = rel or releases_live()
+    spec, problems = decisions_for(state["pending"], parse_review(review.read_text(encoding="utf-8")),
+                                   state["project"], nxt)
+    for pr in problems:
+        print(f"  not settled: {pr}")
+    if not spec["items"]:
+        print("cr-watch settle: no request is marked approve or change")
+        return 1 if problems else 0
+    stamp = _now()
+    path = out / f"decisions-{stamp.replace(':', '').replace('-', '')}.json"
+    _write(path, json.dumps(spec, indent=1, ensure_ascii=False) + "\n")
+    env = dict(os.environ) if env is None else env
+    missing = [k for k in ("ADAM_EMAIL", "ADAM_PASSWORD", "TICVAI_OP_TOKEN") if not env.get(k)]
+    if missing:
+        print(f"cr-watch settle: {', '.join(missing)} not set; the decisions are in {path}")
+        return 2
+    print(f"cr-watch settle: {len(spec['items'])} request(s) in {path}; {'APPLY' if a.apply else 'dry run'}")
+    rc = (runner or (lambda argv, e: subprocess.run(argv, env=e).returncode))(settle_argv(path, a.adam, a.apply), env)
+    if rc != 0:
+        print(f"cr-watch settle: settle_changes.py exited {rc}; nothing was taken off the list (it is safe to run "
+              f"again)")
+        return rc
+    if a.apply:
+        with (out / "settled.jsonl").open("a", encoding="utf-8") as f:
+            for it in spec["items"]:
+                p = state["pending"].pop(it["cr"])
+                f.write(json.dumps({"cr": it["cr"], "status": it["status"], "raised": p["raised"],
+                                    "drafted": p.get("drafted_at", ""), "settled": stamp,
+                                    "decision": p.get("decision", "")}) + "\n")
+        save_state(out, state)
+        _write(review, render_review(state["pending"], f"Last settle {stamp}: {len(spec['items'])} request(s) "
+                                                         f"settled; {len(state['pending'])} waiting for you."))
+    return 0
 
 
 # ------------------------------------------------------------------------------------------------- self-tests
