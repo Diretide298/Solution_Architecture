@@ -1362,6 +1362,12 @@ def sql_literal(v) -> str:
     return "'" + str(v).replace("'", "''") + "'"
 
 
+def exactly_one_sql(short: str, group: list) -> str:
+    """`x-ticvai-exactly-one-of` (ADAM CR-158, CHG-CRA-002): the table CHECK line that exactly one column is set."""
+    return (f"    CONSTRAINT {obj_name(short, *group, 'one', suffix='chk')} CHECK ("
+            f"num_nonnulls({', '.join(q(k) for k in group)}) = 1)")
+
+
 def load_contract_props(docs: dict | None = None) -> dict:
     """`module.Schema.property` -> the contract property, with `$ref` and `allOf` followed.
 
@@ -1604,6 +1610,14 @@ def table_marks(cols: dict, tables) -> dict:
                 (column_of(str(p)) or f"?{p}",
                  {(column_of(str(k)) or f"?{k}"): v for k, v in (cond or {}).items()})
                 for p, cond in rw.items() if isinstance(cond, dict) and cond]
+        # **A row names exactly one of two things** (ADAM CR-158, 18 October 2026; CHG-CRA-002):
+        # `x-ticvai-exactly-one-of: [[permission, roleId]]` on the schema is a table CHECK that exactly one column of
+        # each set is set, `num_nonnulls(a, b) = 1`. A grant names a permission or a role, never both and never neither.
+        eo = marks.get("x-ticvai-exactly-one-of")
+        if isinstance(eo, list) and eo:
+            entry["exactly_one_of"] = [
+                [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group]
+                for group in eo if isinstance(group, list) and len(group) > 1]
         if len(entry) > 1:
             out[t] = entry
     return out
@@ -2354,6 +2368,13 @@ def main() -> int:
                                   else f"{q(k)} IS NULL OR {q(k)} NOT IN ({lits})")
                 body.append(f"    CONSTRAINT {obj_name(short, rcol, 'when', suffix='chk')} CHECK ("
                             f"{' OR '.join(exempt)} OR {q(rcol)} IS NOT NULL)")
+            # `x-ticvai-exactly-one-of` (ADAM CR-158, CHG-CRA-002): exactly one column of the set is set.
+            for group in (marks.get(t) or {}).get("exactly_one_of") or []:
+                bad = [k[1:] for k in group if k.startswith("?")]
+                if bad:
+                    no_unique.append(f"{t} (x-ticvai-exactly-one-of {group}): {', '.join(bad)} is not a column")
+                    continue
+                body.append(exactly_one_sql(short, group))
             out.append(",\n".join(body))
             # ADR-0056: range-partitioned by month; the partitions are in 930-partitioning.sql.
             out.append(f") PARTITION BY RANGE ({q(part_col)});" if part_col else ");")

@@ -872,3 +872,37 @@ changes:
     tag: r6
     producer-tickets: [SVC-VENUEOPS-CARD-1]
     consumer-tickets: [VM-BO-454, VM-BO-455, VM-BO-457, VM-BO-462, VM-BO-486, APP-WEB-WEB-021, APP-MOB-GST-011]
+  - id: BC-368
+    contract: payments
+    operation: getPaymentRules
+    change: "paymentPolicyId"
+    reason: 'ADAM CR-147, option 1 (published answer of 18 October 2026; CHG-CRA-002): getPaymentRules already said
+      "payment_policy_id was dropped from all three": no such table exists and it resolved to whitelabel.policy. The
+      rules are scoped by scopePath, channelId and businessArea. The field is removed from the currency, eligibility
+      and fee rule schemas (and PaymentsMethodConfig); a response field cannot be removed additively.'
+    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
+    tag: r7
+    producer-tickets: [SVC-ORDER-PAYMENTS-17]
+    consumer-tickets: [AM-PAYMENTS-P08, AM-PAYMENTS-P08-2]
+  - id: BC-369
+    contract: payments
+    operation: setPaymentRules
+    change: "paymentPolicyId"
+    reason: 'As BC-368 (ADAM CR-147; CHG-CRA-002): setPaymentRules neither takes nor returns paymentPolicyId. A client
+      still sending it has it ignored as an unknown field; the four columns lose NOT NULL first and are dropped after.'
+    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
+    tag: r7
+    producer-tickets: [SVC-ORDER-PAYMENTS-17]
+    consumer-tickets: [AM-PAYMENTS-API-BLOCK-A, AM-PAYMENTS-P08, TEST-AM-PAYMENTS-API-BLOCK-A]
+  - id: BC-370
+    contract: identity
+    operation: createDelegatedAccess
+    operations: [createDelegatedAccess, listDelegatedAccess, listDelegations, grantDelegation]
+    reason: 'ADAM CR-158, option A (published answer of 18 October 2026; CHG-CRA-002): a grant names exactly one of a
+      permission or a role, so DelegatedAccess.permission is null on a role grant. A response field that was never null
+      becomes nullable, which a strict client can reject; recorded here although check-contract-compat does not report
+      nullability. CreateGrantRequest requires one of permission and roleId (relaxing the request is additive).'
+    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
+    tag: r7
+    producer-tickets: [SVC-IDENTITY-ADMINISTRATION-8]
+    consumer-tickets: [APP-PARTNER-PTR-020, TEST-AM-IDENTITY-SECURITY-P10, SETUP-SEED]

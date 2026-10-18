@@ -11158,6 +11158,7 @@ components:
       - bundleComponentId
       - partnerId
       - externalProductId
+      - connectionStatus
       properties:
         id:
           type: string
@@ -11211,7 +11212,11 @@ components:
         connectionStatus:
           type: string
           readOnly: true
-          description: Written by the partner sync job only; `available` until its first reading.
+          default: available
+          description: 'Written by the partner sync job only; `available` until its first reading. **Declared as the
+            default and required** (ADAM CR-151, 18 October 2026; CHG-CRA-002): the column is `DEFAULT ''available''`
+            and NOT NULL, so a mapping row is never stored without a status. Until the default lands, the partner
+            bundle writer inserts `available` itself.'
           enum:
           - connected
           - available

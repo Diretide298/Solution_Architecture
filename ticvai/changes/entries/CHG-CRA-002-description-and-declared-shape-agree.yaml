@@ -1,0 +1,79 @@
+id: CHG-CRA-002
+date: '2026-10-18'
+source: cr
+kind: contract
+summary: 'Five contracts now declare what their own text already said: Release retires the out-of-date plan_id
+  (CR-145); RentalBooking.depositAuthorisationId keys to orders.payment (CR-146); the four payment rule schemas drop
+  paymentPolicyId (CR-147, breaking, approved); PartnerBundleProduct.connectionStatus defaults to available and is
+  required (CR-151); a grant names exactly one of a permission or a role, with permission nullable and a table CHECK
+  (CR-158, breaking, approved). Two siblings the new rule found get the default their text describes
+  (OutboxRepublish.status queued, RegisteredDevice.status unknown).'
+decision:
+  what: 'Published answers of 18 October 2026 (decisions-final.json): CR-145 option B, CR-146 option A, CR-147 option 1,
+    CR-151 option A, CR-158 option A. Contracts: platform-ops.yaml Release x-ticvai-retired-columns [plan_id] and
+    OutboxRepublish.status default queued; rental.yaml depositAuthorisationId x-ticvai-references orders.payment
+    (checkOutRental and RentalCheckOut texts); payments.yaml PaymentsCurrencyRule, PaymentsEligibilityRule,
+    PaymentsFeeRule, PaymentsMethodConfig lose paymentPolicyId and retire payment_policy_id (getPaymentRules text);
+    promotions.yaml PartnerBundleProduct.connectionStatus default available, required; identity.yaml DelegatedAccess
+    permission nullable, x-ticvai-exactly-one-of [[permission, roleId]], CreateGrantRequest oneOf permission or
+    roleId (400 validation for both or neither); tenancy.yaml RegisteredDevice.status default unknown. Breaking
+    changes BC-368 to BC-370. Generator: derive-ddl reads x-ticvai-exactly-one-of as CHECK (num_nonnulls(...) = 1).'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'ADAM CR-145 (#29186), CR-146 (#36155), CR-147 (#36121), CR-151 (#36131) and CR-158 (#27684), all Hrushikant
+  Patkar, accepted 18 October 2026; class 11 of the 18 October triage ("the description and the declared shape
+  disagree"). Finding: the generator faithfully wrote the half the contract declared; nothing compared a
+  relationship-graph column with its target, or a described starting value with a declared default.'
+keys_touched:
+  operations: [createRelease, checkOutRental, getPaymentRules, setPaymentRules, createDelegatedAccess,
+    listDelegatedAccess, listDelegations, grantDelegation]
+  tables: [control.release, rental.booking, payments.method_config, payments.currency_rule, payments.eligibility_rule,
+    payments.fee_rule, promotions.partner_bundle_product, identity.delegated_access, control.outbox_republish,
+    platform.device]
+  schemas: [Release, RentalBooking, RentalCheckOut, PaymentsCurrencyRule, PaymentsEligibilityRule, PaymentsFeeRule,
+    PaymentsMethodConfig, PartnerBundleProduct, DelegatedAccess, CreateGrantRequest, OutboxRepublish, RegisteredDevice]
+  files:
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/derive-ddl.py
+  - tools/check-contract-storage.py
+  - tools/tests/test_cr_answers_generator.py
+  - docs/active/audit-runs/cr-answers-1018/impact-class11-description-vs-shape.tsv
+  other:
+  - 'BC-368, BC-369, BC-370'
+  - 'x-ticvai-exactly-one-of (new generator mark)'
+root_class: 'new: description-vs-declared-shape (class 11 of the 18 October triage)'
+tickets:
+  started:
+  - 'TEST-AM-FOUNDATION-DATABASE (27686, On hold): measures against the package DDL; the review rows below are new'
+  - 'SVC-TENANCY-WORKSTATION-1#configureWorkstation (30794, In progress): platform.device.status gains DEFAULT unknown'
+  unstarted:
+  - 'SVC-ORDER-PAYMENTS-17 (setPaymentRules), SVC-IDENTITY-ADMINISTRATION-8 (createDelegatedAccess), APP-PARTNER-PTR-020,
+    SETUP-SEED (27684: seeds the seven staff role grants with role_id and no permission); 214 New in all (impact file)'
+release_tag: r7
+decision_owner: Chinmay
+adam_cr: CR-145, CR-146, CR-147, CR-151, CR-158
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Prevention: check-contract-storage ST-GRAPH-TARGET-GONE (a relationship-graph column whose target table the
+  package no longer has) and ST-DEFAULT-DESCRIBED (a stored enum whose description names its starting value with no
+  declared default); shown failing on r6 (1 + 3 new: control.release.plan_id; connectionStatus, OutboxRepublish.status,
+  RegisteredDevice.status) and passing after. Generator rule: derive-ddl x-ticvai-exactly-one-of (pytest
+  tools/tests/test_cr_answers_generator.py, failing on r6, passing after). Sibling query: both rules package-wide
+  (63 graph-sourced columns, one gone; every stored enum''s description). Database (derived at the release; the
+  derive of this branch, kept in D:\wt\fix-cr-answers-1018-derived\class11): migration-review rows for
+  control.release.plan_id (dropped), payment_policy_id x4 (dropped), identity.delegated_access.permission (NOT NULL
+  dropped) and delegated_access_permission_role_id_one_chk (constraint added: NOT VALID, then VALIDATE),
+  partner_bundle_product.connection_status (DEFAULT available, NOT NULL: backfill nulls first),
+  rental.booking deposit_authorisation_id key now to orders.payment, two DEFAULTs; no additive line, so no V0105 from
+  this class. The retired columns'' first step (drop NOT NULL at once) is the migration-generator lane''s fix (class
+  10, CR-157); until it lands the review row says "decide". Developers'' forward migrations may already carry these
+  statements (the published answers allowed it); the package''s next release carries the same.'

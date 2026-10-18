@@ -49,7 +49,17 @@ RULES = {
                        "column: the table kept an older run's columns (CHG-MKT-002, CR-087)",
     "ST-SECRET-FORM": "a stored write-only token, secret, credential, password or PIN that does not say how it is "
                       "stored (x-ticvai-secret; ADR-0063, ADR-0071) (CHG-MKT-001, CR-086)",
+    "ST-GRAPH-TARGET-GONE": "a column the relationship graph adds points at a table the package no longer has "
+                            "(CR-145, CHG-CRA-002)",
+    "ST-DEFAULT-DESCRIBED": "a stored enum's description names its starting value (`x` until ...) and the contract "
+                            "declares no default (CR-151, CHG-CRA-002)",
 }
+# **The description and the declared shape disagree** (class 11 of the 18 October triage, CHG-CRA-002). The generator
+# writes what the contract declares, so a rule stated only in a description reaches the table as its opposite:
+# `connectionStatus` was "`available` until its first reading" with no default (CR-151), and `control.release.plan_id`
+# was rebuilt by the relationship graph from an edge to `control.subscription_plan`, renamed away on 20 September (CR-145).
+DESCRIBED_START = r"(?<!as )`{v}`\s+(?:until|by default|at first)\b|(?:defaults? to|starts? as|initially)\s+`{v}`"
+GRAPH_TARGET = re.compile(r"Points at ([a-z_]+\.[a-z_0-9]+)")
 SERVER_SET = {"id", "scope_path", "created_at", "updated_at", "tenant_id", "venue_id", "region_id",
               "created_by_principal_id", "updated_by_principal_id", "version", "status", "recorded_at"}
 
@@ -295,7 +305,40 @@ def main() -> int:
                           f"{stem}.{name} is written offline by {written_offline[(stem, name)][0]} and "
                           f"{', '.join(present)} has no recorded_at")
     check_stale_and_secrets(guard, cols, by)
+    check_described_shape(guard, cols, by)
     return guard.finish()
+
+
+def check_described_shape(guard, cols: dict, by: dict) -> None:
+    """ST-GRAPH-TARGET-GONE and ST-DEFAULT-DESCRIBED (class 11 of the 18 October triage, CHG-CRA-002)."""
+    for t, cs in sorted(cols.items()):
+        for c in cs:
+            if not str(c.get("source") or "").startswith("relationship-graph"):
+                continue
+            m = GRAPH_TARGET.search(str(c.get("description") or ""))
+            target = c.get("references") or (m.group(1) if m else None)
+            if target and target not in cols:
+                guard.add("ST-GRAPH-TARGET-GONE", f"{t}.{c.get('column')}",
+                          f"{t}.{c.get('column')} comes from the relationship graph and points at {target}, which the "
+                          f"package no longer has: retire it (x-ticvai-retired-columns) or declare it on the contract")
+    for (stem, name), s in sorted(by.items()):
+        persist = str(s.get("x-ticvai-persistence") or "").strip()
+        if not persist or persist.lower().startswith("none"):
+            continue
+        for p, ps in sorted(props_of(s, stem, by).items()):
+            if not isinstance(ps, dict) or ps.get("x-ticvai-persisted") is False:
+                continue
+            tgt = (by.get((stem, g.ref_name(ps["$ref"]))) or {}) if ps.get("$ref") else {}
+            values = ps.get("enum") or tgt.get("enum") or []
+            if not values or "default" in ps or "default" in tgt:
+                continue
+            text = " ".join(str(ps.get("description") or "").split())
+            for v in values:
+                if re.search(DESCRIBED_START.format(v=re.escape(str(v))), text, re.I):
+                    guard.add("ST-DEFAULT-DESCRIBED", f"{stem}.{name}.{p}",
+                              f"{stem}.{name}.{p} says it is `{v}` until something writes it, and declares no "
+                              f"default: the column has no value until then (declare `default: {v}`)")
+                    break
 
 
 # derive-schema.py `_NOT_STORED`: a shape worked out on read gets no column (audit R111)

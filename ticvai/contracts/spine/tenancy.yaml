@@ -5028,6 +5028,7 @@ components:
           type: string
           readOnly: true
           enum: [online, offline, error, consumableLow, needsAttention, localMode, unknown]
+          default: unknown
           description: >
             What the device last said on its heartbeat; `unknown` until it has. `localMode` is an
             access-control device validating from its offline package with its link down (ADR-0067).

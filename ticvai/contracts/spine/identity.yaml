@@ -2564,8 +2564,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/DelegatedAccess'
         '400':
-          x-ticvai-problem-types: [wildcard-on-allow, scope-outside-own-grants]
-          description: Wildcard on an ALLOW, or scope outside the caller's own grants
+          x-ticvai-problem-types: [wildcard-on-allow, scope-outside-own-grants, validation]
+          description: Wildcard on an ALLOW, or scope outside the caller's own grants, or a grant naming both a
+            permission and a role, or neither (`validation`; ADAM CR-158)
           content:
             application/problem+json:
               schema:
@@ -10116,6 +10117,9 @@ components:
             '
     DelegatedAccess:
       x-ticvai-persistence: identity.delegated_access
+      # **A grant names exactly one of a permission or a role** (ADAM CR-158, option A, 18 October 2026;
+      # CHG-CRA-002): a table CHECK, `num_nonnulls(permission, role_id) = 1`, NOT VALID then VALIDATE.
+      x-ticvai-exactly-one-of: [[permission, roleId]]
       type: object
       required:
       - id
@@ -10134,9 +10138,15 @@ components:
           type: string
           format: uuid
           nullable: true
+          description: 'The role this grant gives, with its own and inherited permissions. **Exactly one of
+            `roleId` and `permission` is set** (ADAM CR-158; CHG-CRA-002): a role grant carries no permission.'
         permission:
           type: string
-          description: From the permission enum. `*` permitted on DENY only.
+          nullable: true
+          description: 'From the permission enum. `*` permitted on DENY only. **Null on a role grant** (ADAM
+            CR-158, 18 October 2026; CHG-CRA-002): a grant names exactly one of a permission or a role (`roleId`),
+            so a role grant stores `role_id` and no permission. Nullable in responses since then, a breaking change
+            approved by the lead (BC-370).'
         subjectId:
           type: string
           format: uuid
@@ -10248,10 +10258,15 @@ components:
           format: date-time
     CreateGrantRequest:
       type: object
+      description: '**A grant names exactly one of `permission` and `roleId`** (ADAM CR-158, option A, 18 October
+        2026; CHG-CRA-002): a single permission, or a role with its own and inherited permissions. Both, or neither,
+        is refused 400 `validation`. `*` stays DENY-only.'
       required:
-      - permission
       - scopePath
       - effect
+      oneOf:
+      - required: [permission]
+      - required: [roleId]
       properties:
         principalId:
           type: string

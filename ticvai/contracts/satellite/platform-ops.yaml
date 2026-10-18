@@ -2442,6 +2442,11 @@ components:
         - status
         - createdAt
         x-ticvai-persistence: control.release + control.release_component
+        # `plan_id` was a relationship-graph column pointing at `control.subscription_plan`, renamed to
+        # `subscription.plan` on 20 September. No operation writes or reads it, and a release is a manifest, not a
+        # plan (ADAM CR-145, option B, 18 October 2026; CHG-CRA-002): retired, so the generator stops rebuilding it;
+        # the review gives its drop, and until then its NOT NULL is dropped so an insert never supplies a plan.
+        x-ticvai-retired-columns: [plan_id]
         properties:
           id:
             type: string
@@ -3476,6 +3481,7 @@ components:
         status:
           type: string
           readOnly: true
+          default: queued
           enum:
           - queued
           - running
