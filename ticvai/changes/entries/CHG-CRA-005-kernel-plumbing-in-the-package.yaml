@@ -17,8 +17,9 @@ decision:
     workers job applies it, reactivate refuses tenant-not-suspended and cancels a pending suspension, terminating ->
     active described; CellTenant.rootScopePath. states/tenant.yaml: the timer transition. events/tenant-suspended.yaml:
     written to control.outbox, by the call or the job. white-label.yaml: TenantAppStatus.darkAppModules. New
-    tools/derive-release-flags.py writes handoff/release-flags.json (306 app-modules, 2,544 operations, 1,099 bound by
-    more than one). tools/derive-ddl.py: provision-tenant.sh creates the tenant''s root scope node and records its
+    tools/derive-release-flags.py writes handoff/release-flags.json (306 app-modules, 2,550 operations, 1,388 bound by
+    more than one, each screen''s operations included; corrected in fix round 1 from 2,544 and 1,099, when the
+    generator read no screen). tools/derive-ddl.py: provision-tenant.sh creates the tenant''s root scope node and records its
     path in control.cell_tenant. docs/active/cross-deployable-writes.yaml and check-cross-deployable-writes: the
     counter is the fifth kernel grant (SELECT, INSERT, UPDATE), which DB-ROLES creates. ADR-0057 (dead letters written
     directly by the consumer wrapper; the counter) and ADR-0058 (the control outbox; the counter) amended.'

@@ -11,8 +11,9 @@ This writes it from the plan (`handoff/service-docs/tasks.csv`: each app-module 
 `tools/ticket_done.py` builds_of, the list ADAM indexes) and the screens (`screens/*.yaml` `apis`).
 
 **The rule the backend applies** (the published answer): an operation is dark for a tenant only when **every**
-app-module that binds it is off for that tenant, because 1,099 of the 2,544 operations app-modules name are bound by
-more than one, and the "any" rule would darken live modules. A flag the configuration does not declare counts as on.
+app-module that binds it is off for that tenant, because many operations are bound by more than one app-module (the
+answer counted 1,099 of 2,544 from the plan's Builds; with each screen's operations read too, the map holds 2,550, 1,388
+of them shared), and the "any" rule would darken live modules. A flag the configuration does not declare counts as on.
 `TenantAppStatus.darkAppModules` (white-label) tells the apps which modules are off.
 
 ticvai-backend copies the file to `tools/release-flags/release-flags.json` and reads it from there; this one command
@@ -37,15 +38,26 @@ OUT = ROOT / "handoff" / "release-flags.json"
 NL, CR = chr(10), chr(13)
 
 
+def screen_ops_of(folder: Path) -> dict:
+    """screen id -> the operations its `apis` bind, from every `P*.yaml` in `folder`.
+
+    **A screen file is `{platform, screens: [...]}`, not a list** (lane H review, 18 October 2026, C-1): the first
+    version iterated the file's top-level keys, read no screen, and the map lost 668 module-to-operation bindings."""
+    out: dict = {}
+    for f in sorted(Path(folder).glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+        for s in (doc.get("screens") or []) if isinstance(doc, dict) else []:
+            if isinstance(s, dict) and s.get("id"):
+                out[s["id"]] = [a["operationId"] for a in s.get("apis") or []
+                                if isinstance(a, dict) and a.get("operationId")]
+    return out
+
+
 def build() -> dict:
     lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
     with (ROOT / "handoff" / "service-docs" / "tasks.csv").open(encoding="utf-8", newline="") as fh:
         rows = [r for r in csv.DictReader(fh) if "#" not in r["key"]]
-    screen_ops: dict = {}
-    for f in sorted((ROOT / "screens").glob("P*.yaml")):
-        for s in yaml.safe_load(f.read_text(encoding="utf-8")) or []:
-            if isinstance(s, dict) and s.get("id"):
-                screen_ops[s["id"]] = [a["operationId"] for a in s.get("apis") or [] if a.get("operationId")]
+    screen_ops = screen_ops_of(ROOT / "screens")
 
     def op_id(op):
         c = lineage.get(op, {}).get("contract")

@@ -75,3 +75,22 @@ def test_unique_when_names_columns_and_sql():
                               {"is_current": True}, ["scope_path"])
     assert sql.splitlines()[-1] == ("CREATE UNIQUE INDEX IF NOT EXISTS config_version_scope_path_uniq "
                                     "ON whitelabel.config_version (scope_path) WHERE is_current;")
+
+
+# - tools/derive-release-flags.py (ADAM CR-164; CHG-CRA-005): the map reads each screen's operations.
+_spec_rf = importlib.util.spec_from_file_location("derive_release_flags", TOOLS / "derive-release-flags.py")
+rf = importlib.util.module_from_spec(_spec_rf)
+_spec_rf.loader.exec_module(rf)
+
+
+def test_release_flags_reads_the_screens_operations(tmp_path):
+    (tmp_path / "P99-test.yaml").write_text(
+        "platform: P99\nscreens:\n- id: TST-001\n  apis:\n  - operationId: getThing\n    trigger: onLoad\n"
+        "  - operationId: setThing\n    trigger: onAction\n- id: TST-002\n  apis: []\n", encoding="utf-8")
+    ops = rf.screen_ops_of(tmp_path)
+    assert ops == {"TST-001": ["getThing", "setThing"], "TST-002": []}
+
+
+def test_release_flags_map_of_the_package_has_screen_operations():
+    ops = rf.screen_ops_of(TOOLS.parent / "screens")
+    assert "storePaymentToken" in ops.get("WEB-021", [])
