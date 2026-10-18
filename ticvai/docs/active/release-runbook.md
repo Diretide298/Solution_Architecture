@@ -17,6 +17,16 @@ Minutes, client answers, design returns, developer gaps and audit findings each 
 
 If a CR contradicts a registered decision (the Decisions Register or an ADR), it goes back to the lead. It is not applied.
 
+**Developer CRs are answered by the CR watcher** (`tools/cr-watch.py`; CHG-CRF-002). Every 30 minutes, on the lead's
+machine, it reads the requests ADAM has received since its last run, sorts each one with no AI (its class from
+`handoff/cr-classes.yaml` and the class's known members across the package, a duplicate, the open blocking requests
+it waits for, the tickets it touches), drafts one answer per request against the latest release, and lists them in
+`audit/ticvai/cr-watch/REVIEW.md`. The lead marks each `approve`, `change` or `reject: <why>`; the requests in a class
+with a written default ruling come first under one `approve all default-ruled` line that clears them with one mark.
+`python3 tools/cr-watch.py settle` (dry run), then `--apply`, settles the marked ones through
+`viewer/api/settle_changes.py`, which tells their tickets (section 6). Nothing is settled without the lead's mark. When
+ADAM cannot be read, the list says so at the top; the line under its title says when the watcher last ran.
+
 ## 2. Edit: agents on branches
 The rule for agent edits:
 - One CR, one branch (`cr/<id>-<slug>`).

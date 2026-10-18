@@ -1,0 +1,38 @@
+id: CHG-CRF-002
+date: '2026-10-18'
+source: plan
+kind: process
+summary: A new ADAM change request gets a sorted, drafted first answer within the hour, and the lead settles it from
+  one list; nothing is settled without the lead's mark.
+decision:
+  what: 'tools/cr-watch.py, run every 30 minutes on the lead''s machine: reads ADAM''s change-request export, keeps the
+    open requests it has not seen, sorts each with no AI (the class from handoff/cr-classes.yaml and the baselined
+    members of its checks, a duplicate on the same artefact, the open blocking requests it waits for, the class''s
+    siblings and the tickets they touch from adam-links.json), drafts one answer per request in a read-only Claude Code
+    turn at the latest release, and writes audit/ticvai/cr-watch/REVIEW.md with a decision line per request; requests
+    in a class with a written default ruling come first under one "approve all default-ruled" line. `settle` turns the
+    requests marked approve or change into a decisions file for viewer/api/settle_changes.py, dry run first. A reject
+    mark redrafts with the lead''s note; rejecting the request itself is a change mark with status rejected.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'Lead, 14 October 2026: "Also faster way to respond to dev CRs" (BLOCK-A-AUDIT-PLAN-R6.md, "Faster answers to
+  developer CRs"); post-r6 plan item 7. CR-137 to CR-169 (33 requests, 10 blocking) arrived on 16-18 October and waited
+  for a manual triage.'
+keys_touched:
+  files:
+  - tools/cr-watch.py
+  - handoff/cr-classes.yaml
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: pending (raised at the next settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/cr-watch.py::sort_request
+status: open
+notes: The scheduled task and the first `--seed` run are the lead's steps. Default rulings are shown in the draft and never
+  settled without the lead's mark.

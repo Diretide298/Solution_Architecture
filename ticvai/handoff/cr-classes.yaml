@@ -1,0 +1,127 @@
+# The classes a change request can belong to, read by the CR watcher (tools/cr-watch.py; CHG-CRF-002).
+#
+# Authored. Add a class when the watcher's draft says "new: <name>" and the lead agrees; add its check once one exists,
+# so its siblings are counted with no AI. The first nine are the 15 October triage's classes, in the order the post-r6
+# plan fixes them (audit/ticvai/POST-R6-PARALLEL-PLAN.md, item 4); the last seven are the 18 October triage's new ones
+# (audit/ticvai/cr-triage-1018/classes.json), with the requests of both triages listed under `crs`.
+#
+#   artefacts       ids a request names as its artefact (ADAM's `artefact` column) that belong to the class
+#   words           words or phrases (any case) that mark the class in a request's title or problem
+#   crs             requests already in the class; a request that names one of these is near it too, and an open
+#                   blocking one of them blocks a new request of the class
+#   checks          check -> rules whose baselined findings (handoff/audit-baseline.json) are the class's known members
+#   branch          the class fix's branch (default fix/<id>)
+#   default_ruling  a ruling the lead wrote for the class: the request is listed first in REVIEW.md under "approve all
+#                   default-ruled", and is still settled only when the lead marks it (never alone)
+#   needs           who decides by default: lead or client
+classes:
+- id: read-routes
+  name: Read routes between modules
+  artefacts: [ADR-0055]
+  words: [x-ticvai-read-via, read-via, readvia, read route, another module's, cross-module, x-ticvai-queries,
+          declared query, routes to]
+  crs: [CR-096, CR-135, CR-161, CR-167]
+  checks:
+    check-cross-module-reads: [XR-UNCOVERED, XR-QUERY, XR-ROUTE, XR-FOUNDATION, XR-LINEAGE, XR-VIEW-ACROSS]
+    check-error-sources: [E-READ-VIA, E-QUERY]
+  needs: lead
+- id: row-security
+  name: Row security fits its callers
+  words: [row security, row-level security, rls, scope_path, read-beneath, apply_parent_rls, parent policy,
+          security-definer, cannot reach the rows, scopes, tenant-root-only]
+  crs: [CR-095, CR-108, CR-149]
+  checks:
+    check-rls-scope-fit: [RF-TENANT-ROOT, RF-OWNED-ABOVE]
+  needs: lead
+- id: foundation-module-test
+  name: The Foundation module test
+  words: [module test, table records, record in adam, database migrations module, dead_letter]
+  crs: [CR-092, CR-093]
+  default_ruling: ADAM builds a table's record from the generated DDL plus the forward migrations (CR-092's fix); the
+    module test lists only its own tickets' tables. Nothing for the developer to change in the package.
+  needs: lead
+- id: control-data
+  name: Control data in the tenant database
+  words: [control database, tenant database, plan catalogue, subscription_plan, move to control, control.]
+  crs: [CR-097, CR-150]
+  needs: lead
+- id: stored-secrets
+  name: Stored forms for secrets, tokens and hashes
+  words: [secret, token, hash, credential, blind index, blind-index, adr-0063, adr-0071, writeonly, signing key]
+  crs: [CR-098, CR-100, CR-107]
+  checks:
+    check-contract-storage: [ST-SECRET-FORM]
+    check-stored-request-fields: [SR-SECRET-UNHASHED]
+  needs: lead
+- id: background-jobs
+  name: Background jobs
+  words: [background job, job, executor, worker, nothing drives, async work, scheduled, retry]
+  crs: [CR-105, CR-106, CR-140]
+  needs: lead
+- id: contract-storage
+  name: Contract against storage
+  words: [no column, has no column, can't store, cannot store, no storage, not null, nullable, unique, has no table,
+          no table, keyed to]
+  crs: [CR-099, CR-104, CR-111, CR-112, CR-154, CR-155, CR-165]
+  checks:
+    check-contract-storage: [ST-FIELD-NO-COLUMN, ST-TABLE-MISSING, ST-TYPE-MISMATCH, ST-ENUM-CHECK,
+                             ST-REQUIRED-MISMATCH]
+    check-storage-promises: [SP-ARRAY-NOWHERE, SP-DUPLICATE-409, SP-REQUEST-NOT-NULL, SP-KEY-UNDECLARED]
+    check-stored-request-fields: [SR-STORED-NO-COLUMN, SR-STUB-WRITE]
+    check-request-fields-stored: [RF-REQUEST-NOT-STORED]
+    check-ddl-conventions: [D-STUB-TABLE]
+  needs: lead
+- id: undecided-rules
+  name: Undecided rules
+  words: [no grammar, no state model, is not defined, undefined, leaves open, no rule, statutory, precondition,
+          open question]
+  crs: [CR-101, CR-102, CR-103, CR-109, CR-110, CR-141, CR-144, CR-162, CR-168, CR-169]
+  needs: lead
+- id: money-currency
+  name: Money currency
+  words: [currency, money, aed, denomination]
+  crs: [CR-094]
+  checks:
+    check-contract-shapes: [C-MONEY-NUMBER]
+  needs: client
+- id: forward-migration
+  name: The forward migration and its review lose what the generator derived
+  words: [migration-review, review row, forward migration, partition, truncated, cut before, retired columns,
+          x-ticvai-retired-columns, unique-together, required-when, generated object, statement dropped]
+  crs: [CR-138, CR-139, CR-148, CR-156, CR-157]
+  needs: lead
+- id: description-vs-shape
+  name: The description and the declared shape disagree
+  words: [description says, the record says, still requires, still marks, was dropped, names no table,
+          no foreign key, cannot hold, nullable because, contradicts]
+  crs: [CR-145, CR-146, CR-147, CR-151, CR-158]
+  needs: lead
+- id: state-model
+  name: The state model and the operations disagree
+  words: [state model, transition, requiresapproval, emittedwhen, terminal, resume, rolledback, from failed,
+          pendingconfirmation, two different rules]
+  crs: [CR-160]
+  needs: lead
+- id: build-place
+  name: The ticket or platform record names the wrong place to build
+  words: [ticvai-ai, ticvai-backend, assigned to, reassign, wrong board, component path, targetapp, scaffolded,
+          which app]
+  crs: [CR-137, CR-153]
+  needs: lead
+- id: screen-values
+  name: A screen action needs a value nothing on the screen supplies
+  words: [nothing on the screen, takes the id from, deep-link, deeplink, the screen declares no, consent block,
+          no source]
+  crs: [CR-142, CR-143]
+  needs: lead
+- id: platform-plumbing
+  name: Platform plumbing the kernel needs is not in the package
+  words: [outbox, relay, inbox, dead letter, fan-out, migrator, root scope, release flag, feature flag, kernel,
+          provisioning, routing]
+  crs: [CR-152, CR-163, CR-164, CR-166]
+  needs: lead
+- id: seed-data
+  name: Seed data does not cover the reference fixture
+  words: [seed, fixture, omr, oman, muscat, reference fixture]
+  crs: [CR-159]
+  needs: lead
