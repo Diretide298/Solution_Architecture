@@ -37,7 +37,7 @@ RULES = {
     "SF-OUTBOX-POLICIES": "a conflict policy the contracts use that offline-core does not declare (R035)",
     "SF-GLOSSARY": "a starter type named with a word the glossary bans (User for Principal) (R040)",
     "SF-FIXTURE-SEED": "a currency the reference fixture names has no denomination seed in "
-                       "docs/active/seed-data-proposal.md (ADAM CR-159, CHG-CRA-008)",
+                       "docs/active/seed-data-proposal.md (ADAM CR-159, CHG-CRA-001)",
 }
 
 
@@ -161,7 +161,7 @@ def main() -> int:
         guard.add("SF-DONE-GATES", "fixture", "tickets require the reference fixture; nothing in the backend "
                                               "starter is named for it (SETUP-SEED builds it)")
 
-    # **Every currency the fixture runs in has its cash seeded** (ADAM CR-159, 18 October 2026; CHG-CRA-008). Quality
+    # **Every currency the fixture runs in has its cash seeded** (ADAM CR-159, 18 October 2026; CHG-CRA-001). Quality
     # gates 8 runs every test on AED and OMR, and the only denomination seed was the UAE's, so a shift count or a
     # cash-up in Muscat had nothing to count. A seed section is a heading of seed-data-proposal.md naming
     # denominations and the currency code in brackets ("## 1. UAE denominations (AED)").

@@ -35,7 +35,7 @@ All rows seed `isActive: true`. The 1, 5 and 10 fils coins are left out because 
 
 ## 1a. Omani denominations (OMR)
 
-> **Status: Proposed, client to correct** (ADAM CR-159, decided 18 October 2026; CHG-CRA-008). **This is our
+> **Status: Proposed, client to correct** (ADAM CR-159, decided 18 October 2026; CHG-CRA-001). **This is our
 > proposal, not client data:** the client has not supplied an Omani set. When their set arrives it replaces this one.
 
 The reference fixture runs every test in two countries, AED and OMR (quality gates 8), and section 1 alone left a
