@@ -2381,6 +2381,11 @@ components:
         rather than a denomination, is not seeded, and is the kind of row a table refuses and a
         JSON blob accepts silently.
 
+        **Oman: section 1a** (ADAM CR-159, 18 October 2026; proposed by us, client to correct, not client
+        data): OMR at scale 3 (1 rial = 1,000 baisa); notes 100 baisa, half a rial, 1, 5, 10, 20 and 50
+        rials; coins 5, 10, 25 and 50 baisa. The reference fixture's Muscat region seeds from it, so a shift
+        count and a cash-up run in OMR.
+
         **Ordered for counting, not by value.** A cashier counts notes highest first and coins in
         the order they sit in the drawer, and `sortOrder` is what makes the count screen match the
         physical tray."

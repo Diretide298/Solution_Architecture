@@ -1,6 +1,6 @@
-# Seed data proposal: UAE denominations and starting permission configurations
+# Seed data proposal: UAE and Omani denominations and starting permission configurations
 
-> **Purpose:** The seed SETUP-SEED loads: the UAE cash denominations and the starting permission configurations (presets; no fixed roles)  
+> **Purpose:** The seed SETUP-SEED loads: the UAE and Omani cash denominations (the Omani set proposed 18 October 2026, section 1a) and the starting permission configurations (presets; no fixed roles)  
 > **Owner:** Chinmay  
 > **Status:** **Proposed, client to correct (audit R229, decided 28 September 2026)**  
 > **Who corrects it:** client operations and client finance
@@ -30,6 +30,39 @@ Loaded into `platform.denomination` through `setDenominations` (`shift.yaml`), o
 | 11 | coin | 0.25 | 25 fils | 25 فلس |
 
 All rows seed `isActive: true`. The 1, 5 and 10 fils coins are left out because they are not in everyday circulation. **If a venue still takes them, the client adds them here and they are seeded active.**
+
+---
+
+## 1a. Omani denominations (OMR)
+
+> **Status: Proposed, client to correct** (ADAM CR-159, decided 18 October 2026; CHG-CRA-008). **This is our
+> proposal, not client data:** the client has not supplied an Omani set. When their set arrives it replaces this one.
+
+The reference fixture runs every test in two countries, AED and OMR (quality gates 8), and section 1 alone left a
+shift count or a cash-up in Oman with nothing to count. **The fixture's Muscat region seeds from this section**, through
+`setDenominations` (`shift.yaml`) at that region's scope, one row per denomination, `currencyCode: OMR`.
+
+Values are `Money` with **scale 3**: one rial is 1,000 baisa, so half a rial is `0.500` and 100 baisa is `0.100`.
+`sortOrder` is counting order, as in section 1: notes highest first, then coins; the coin order is our guess at the tray.
+The 100 baisa and half-rial values are notes in Oman, not coins.
+
+| sortOrder | kind | value (OMR) | displayName (en) | displayName (ar) |
+|---|---|---|---|---|
+| 1 | note | 50.000 | OMR 50 | 50 ريال |
+| 2 | note | 20.000 | OMR 20 | 20 ريال |
+| 3 | note | 10.000 | OMR 10 | 10 ريالات |
+| 4 | note | 5.000 | OMR 5 | 5 ريالات |
+| 5 | note | 1.000 | OMR 1 | 1 ريال |
+| 6 | note | 0.500 | Half rial | نصف ريال |
+| 7 | note | 0.100 | 100 baisa | 100 بيسة |
+| 8 | coin | 0.050 | 50 baisa | 50 بيسة |
+| 9 | coin | 0.025 | 25 baisa | 25 بيسة |
+| 10 | coin | 0.010 | 10 baisa | 10 بيسات |
+| 11 | coin | 0.005 | 5 baisa | 5 بيسات |
+
+All rows seed `isActive: true`. **Who corrects it:** client finance, for the values in circulation and the drawer order.
+Until they do, SETUP-SEED marks these rows in its seed as the proposal, not client data, so shift counts and cash-ups
+run in OMR now and nobody mistakes the set for the client's.
 
 ---
 

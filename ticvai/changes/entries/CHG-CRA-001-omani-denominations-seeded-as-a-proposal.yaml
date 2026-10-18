@@ -1,0 +1,52 @@
+id: CHG-CRA-001
+date: '2026-10-18'
+source: cr
+kind: spec
+summary: 'The seed proposal gains section 1a, Omani denominations (OMR, scale 3), proposed by us and marked as a proposal
+  for the client to correct, so the reference fixture''s Muscat region has cash to count and shift counts and cash-ups
+  run in OMR. Denomination''s description names it. A check now fails when a currency the reference fixture runs in
+  has no denomination seed.'
+decision:
+  what: 'ADAM CR-159 accepted, option A (published answer of 18 October 2026, decisions-final.json): seed-data-proposal.md
+    section 1a beside the UAE section, at scale 3 (1 rial = 1,000 baisa), with sort order and English and Arabic names,
+    marked proposed and client to correct. Proposed set: coins 5, 10, 25 and 50 baisa; notes 100 baisa, half a rial,
+    1, 5, 10, 20 and 50 rials. The fixture''s Muscat region seeds from it, labelled as the proposal (not client data);
+    the client''s set replaces it when it arrives. contracts/spine/shift.yaml Denomination description names section
+    1a. No contract shape changes.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'ADAM CR-159 (Hrushikant Patkar, SETUP-SEED #27684): quality gates 8 runs every test on two countries, AED and OMR,
+  and the only denomination seed was section 1, the UAE set (triage of 18 October 2026, class 16, "seed data does not
+  cover the reference fixture"). Finding: nothing compared the fixture''s currencies with the seed.'
+keys_touched:
+  tables:
+  - platform.denomination
+  schemas:
+  - Denomination
+  files:
+  - docs/active/seed-data-proposal.md
+  - contracts/spine/shift.yaml
+  - tools/check-starter-fit.py
+  - docs/active/audit-runs/cr-answers-1018/impact-class16-seed-fixture.tsv
+  tickets:
+  - SETUP-SEED
+root_class: 'new: seed-covers-fixture (class 16 of the 18 October triage)'
+tickets:
+  started: []
+  unstarted:
+  - SETUP-SEED (27684, New in the r6 links cache; CR-159 was raised from it, so its agent gets the answer as a comment)
+release_tag: r7
+decision_owner: Chinmay
+adam_cr: CR-159
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py
+status: open
+notes: 'Prevention: check-starter-fit SF-FIXTURE-SEED reads the currencies the reference fixture names (the starter''s
+  docs/quality-gates.md section 8 and db/seed/reference-fixture.md) and fails for one with no "denominations (CCY)"
+  section in seed-data-proposal.md. Shown failing on r6 (OMR, 1 new) and passing after. Sibling query: the same rule;
+  AED and OMR are the only currencies the fixture names, so no other seed is missing. Impact (adam-links, r6 cache):
+  29 tickets, 1 started (#27686 module test, On hold: no change to what it measures), 2 finished (#27665, #30328 the
+  platform.denomination migration: no table change, so no child task), 26 new including SETUP-SEED. Client: corrects
+  the set (values in circulation and drawer order).'

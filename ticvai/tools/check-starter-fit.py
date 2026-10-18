@@ -36,6 +36,8 @@ RULES = {
     "SF-DONE-GATES": "a Done-when gate names a command or runner the starter cannot run (R027 R032 R034)",
     "SF-OUTBOX-POLICIES": "a conflict policy the contracts use that offline-core does not declare (R035)",
     "SF-GLOSSARY": "a starter type named with a word the glossary bans (User for Principal) (R040)",
+    "SF-FIXTURE-SEED": "a currency the reference fixture names has no denomination seed in "
+                       "docs/active/seed-data-proposal.md (ADAM CR-159, CHG-CRA-008)",
 }
 
 
@@ -158,6 +160,22 @@ def main() -> int:
             re.search(r"fixture", p.name, re.I) for p in list(be.rglob("*")) if "/obj/" not in p.as_posix()):
         guard.add("SF-DONE-GATES", "fixture", "tickets require the reference fixture; nothing in the backend "
                                               "starter is named for it (SETUP-SEED builds it)")
+
+    # **Every currency the fixture runs in has its cash seeded** (ADAM CR-159, 18 October 2026; CHG-CRA-008). Quality
+    # gates 8 runs every test on AED and OMR, and the only denomination seed was the UAE's, so a shift count or a
+    # cash-up in Muscat had nothing to count. A seed section is a heading of seed-data-proposal.md naming
+    # denominations and the currency code in brackets ("## 1. UAE denominations (AED)").
+    fixture_text = " ".join(p.read_text(encoding="utf-8") for p in
+                            (docs / "quality-gates.md", be / "db" / "seed" / "reference-fixture.md") if p.exists())
+    m = re.search(r"((?:[A-Z]{3}(?:, | and | or ))+[A-Z]{3})\b", fixture_text)
+    fixture_ccy = sorted(set(re.findall(r"\b[A-Z]{3}\b", m.group(1)))) if m else []
+    seed_doc = g.ROOT / "docs" / "active" / "seed-data-proposal.md"
+    seeded = set(re.findall(r"^#+ .*denominations? \(([A-Z]{3})\)", seed_doc.read_text(encoding="utf-8"),
+                            re.M | re.I)) if seed_doc.exists() else set()
+    for ccy in fixture_ccy:
+        if ccy not in seeded:
+            guard.add("SF-FIXTURE-SEED", ccy, f"the reference fixture runs in {ccy}; docs/active/seed-data-proposal.md "
+                                              f"has no denominations section for it, so SETUP-SEED has no cash to seed")
 
     # R035: the conflict policies offline-core must carry through its outbox.
     oc = fe / "packages" / "offline-core" / "src"
