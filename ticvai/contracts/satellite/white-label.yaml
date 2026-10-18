@@ -5002,6 +5002,7 @@ paths:
       operationId: getPublishedTenantConfig
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-021 Wallet & Gift Cards"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P02 GST-001 Home"
         - "P02 GST-043 Arabic / RTL Experience"

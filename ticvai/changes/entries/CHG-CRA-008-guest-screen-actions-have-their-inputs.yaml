@@ -1,0 +1,61 @@
+id: CHG-CRA-008
+date: '2026-10-18'
+source: cr
+kind: spec
+summary: 'WEB-021, the client-approved web wallet, now has what its actions send, with no visible change: it loads
+  getPublishedTenantConfig (the card provider and its hosted form) and listConsentPurposes (the stored-card purpose)
+  for "Add a card", as its app twin GST-071 does (CR-142), and its gift card and game card panels open only from a deep
+  link carrying cardCode and cardKind (CR-143). check-screen-wiring now fails a guest screen action whose id input
+  nothing on the screen supplies.'
+decision:
+  what: 'Published answers of 18 October 2026 (decisions-final.json): CR-142 accepted without a visible change (the two
+    reads bound, consent given on WEB-024 through recordConsent, Save card without it answers 409 consent-not-given and
+    the error offers WEB-024; whether the web also gets GST-071''s inline consent block is the client''s decision),
+    CR-143 accepted without a visible change (cardKind beside cardCode in the deep link; option 1, "Check a balance",
+    put to the client; no input or list until the client decides). screens/P01-guest-web-storefront.yaml WEB-021:
+    apis getPublishedTenantConfig and listConsentPurposes (background: loaded, never shown), getGiftCard and
+    getGameCard on load from the link only, entryState cardKind, the overlay body names where storePaymentToken''s ids
+    come from and the 409. getPublishedTenantConfig and listConsentPurposes list WEB-021 among their consumers.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'ADAM CR-142 and CR-143 (Chitrangi Mestry, #28308), accepted 18 October 2026; class 14 of the 18 October triage
+  ("a screen action needs a value nothing on the screen supplies"). CHG-FXS-003 (4 October) bound the two reads on
+  GST-071 and not on its web twin. Finding: no check asked where an action''s required ids come from.'
+keys_touched:
+  screens: [WEB-021]
+  operations: [storePaymentToken, getPublishedTenantConfig, listConsentPurposes, getGiftCard, getGameCard]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-screen-wiring.py
+  - docs/active/audit-runs/cr-answers-1018/impact-class14-screen-inputs.tsv
+root_class: 'new: screen-action-inputs (class 14 of the 18 October triage)'
+tickets:
+  started: []
+  unstarted:
+  - 'APP-WEB-WEB-021 (28310) and the wallet feature AM-WALLET-CASHLESS-P01 (28308, where the CRs were raised): 19 New
+    tickets link WEB-021 (impact file). No visible change, so no approved-UI entry.'
+release_tag: r7
+decision_owner: Chinmay
+adam_cr: CR-142, CR-143
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Prevention: check-screen-wiring S-INPUT-SOURCE: on a guest screen (WEB, GST, KSK), each required path
+  parameter and id-typed required body field of an onAction operation needs a source: an entry parameter of that
+  name, a field of that name in what a single-record read on the screen returns, a read whose response is the thing
+  the id names, or the guest''s session. Shown failing on r6 with WEB-021''s providerId and consentPurposeId among 28,
+  and passing for WEB-021 after (GST-071, its twin, passes on both). The 26 others are siblings for their owners, for
+  the lead to baseline: addCartLine variantId (GST-026, GST-027, GST-050, GST-070, GST-077, GST-078, WEB-033, WEB-041,
+  WEB-042, WEB-049, KSK-005, KSK-015, KSK-017), createPayment orderId (WEB-033, KSK-007), createResaleListing
+  entitlementId (WEB-030, GST-067), bindCredentialDevice deviceId (GST-013, GST-055), createReferral referrerSubjectId
+  (WEB-043, GST-036), shareEntitlement toSubjectId (WEB-018, GST-072), issueWalletPass entitlementId (GST-018),
+  grantDelegation overSubjectId (GST-015), redeemLoyaltyPoints programmeId (GST-071). Many take the id from a list row
+  or the cart, which the rule cannot see; each needs its owner''s look. CR-143''s card kind is not detectable by the
+  rule (the code was supplied, its kind was not). check-approved-ui 0 new (apis, entry state and overlay body are not
+  visible content); check-screens, check-bindings, check-binding-ratchet, check-navigation and
+  check-screen-permissions unchanged. The two reads are `background` so S-OP-UNREACHED, which asks for a component, is
+  not tripped by data a screen loads and never shows.'

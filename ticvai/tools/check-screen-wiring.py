@@ -73,6 +73,7 @@ RULES = {
     "S-MEDIA-LIBRARY": "a screen about the media a guest carries calls the digital-asset library (CF-114, CHG-WIR-025, CHG-R4-013)",
     "S-OFFLINE-REFUSED": "an offline app's screen refuses offline a write its contract marks offline-capable (4.4, CHG-SWP-004)",
     "S-OFFLINE-QUEUED": "a screen promises to queue a write that is not offline-capable, or a web app's screen queues (4.4, CHG-SWP-004)",
+    "S-INPUT-SOURCE": "a guest screen's action needs an id nothing on the screen supplies (CR-142, CHG-CRA-008)",
 }
 # **Two things are called media** (glossary; orders.yaml `getMediaEntitlements`): the QR, wristband or card a
 # guest carries, which orders and access read and write, and the images, video and documents of the asset
@@ -433,7 +434,86 @@ def main() -> int:
         if len(ids) > 1 and not all(division.get(i) for i in ids):
             guard.add("S-DUP-SCREEN", "+".join(sorted(ids)),
                       f"{plat}: {', '.join(sorted(ids))} declare the same {len(sig)} operations")
+    input_sources(guard, all_screens, ops, by_schema)
     return guard.finish()
+
+
+# **A guest action needs every id it sends from somewhere on the screen** (class 14 of the 18 October triage,
+# CHG-CRA-008). WEB-021's "Add a card" calls storePaymentToken, which requires providerId and consentPurposeId, and
+# nothing on the web screen supplied either: GST-071, its twin in the app, had been bound to getPublishedTenantConfig
+# and listConsentPurposes on 4 October (CHG-FXS-003) and the web screen was not (ADAM CR-142). A guest cannot type an
+# id, so an id-typed required input of an onAction operation needs a source: an entry parameter of that name, a field
+# of that name in what a single-record read on the screen returns, a read on the screen whose response is the thing
+# the id names (`consentPurposeId` <- `ConsentPurposeConfig`), or the guest's session.
+GUEST_SCREEN = re.compile(r"^(WEB|GST|KSK)-")
+SESSION_IDS = {"subjectId", "tenantId", "principalId", "venueId", "workstationId", "sessionId"}
+
+
+def input_sources(guard, all_screens, ops, by_schema) -> None:
+    def deref(node, stem, depth=0):
+        while isinstance(node, dict) and "$ref" in node and depth < 8:
+            m = re.match(r"^(?:\.\./)?(?:[\w-]+/)?([\w-]+)\.yaml#/components/schemas/(\w+)$", str(node["$ref"]))
+            if m:
+                stem, node = m.group(1), by_schema.get((m.group(1), m.group(2))) or {}
+            else:
+                node = by_schema.get((stem, g.ref_name(str(node["$ref"])))) or {}
+            depth += 1
+        return node, stem
+
+    def walk(node, stem, depth, fields, names):
+        if not isinstance(node, dict) or depth > 5:
+            return
+        if "$ref" in node:
+            names.add(g.ref_name(str(node["$ref"])).lower())
+            node, stem = deref(node, stem)
+        for k in ("allOf", "oneOf", "anyOf"):
+            for sub in node.get(k) or []:
+                walk(sub, stem, depth + 1, fields, names)
+        if isinstance(node.get("items"), dict):
+            walk(node["items"], stem, depth + 1, fields, names)
+        for p, ps in (node.get("properties") or {}).items():
+            fields.add(p)
+            walk(ps, stem, depth + 1, fields, names)
+
+    for plat, s in all_screens:
+        sid = s.get("id", "")
+        if not GUEST_SCREEN.match(sid):
+            continue
+        apis = [a for a in s.get("apis") or [] if isinstance(a, dict) and a.get("operationId") in ops]
+        have = set(SESSION_IDS) | {p.get("name") for p in ((s.get("entryState") or {}).get("params") or [])
+                                   if isinstance(p, dict)}
+        kinds: set = set()
+        for a in apis:
+            f = ops[a["operationId"]]
+            if f["method"] != "get" and a.get("trigger") != "onLoad":
+                continue
+            for code, r in (f["op"].get("responses") or {}).items():
+                if not str(code).startswith("2") or not isinstance(r, dict):
+                    continue
+                for media in (r.get("content") or {}).values():
+                    fields, names = set(), set()
+                    walk((media or {}).get("schema") or {}, f["contract"], 0, fields, names)
+                    kinds |= names
+                    if not a["operationId"].startswith("list"):   # a list's fields belong to whichever row is picked
+                        have |= fields
+        for a in apis:
+            if a.get("trigger") != "onAction":
+                continue
+            f = ops[a["operationId"]]
+            need = re.findall(r"\{(\w+)\}", f.get("path") or "")
+            rb = ((f["op"].get("requestBody") or {}).get("content") or {}).get("application/json") or {}
+            body, bst = deref(rb.get("schema") or {}, f["contract"])
+            req = set((body or {}).get("required") or [])
+            for b in (body or {}).get("allOf") or []:
+                req |= set((deref(b, bst)[0] or {}).get("required") or [])
+            need += [r for r in sorted(req) if r.endswith(("Id", "Code")) and r not in need]
+            for n in need:
+                thing = re.sub(r"(Id|Code)$", "", n).lower()
+                if n in have or (thing and any(thing in k for k in kinds)):
+                    continue
+                guard.add("S-INPUT-SOURCE", f"{sid}:{a['operationId']}:{n}",
+                          f"{sid} ({plat[:3]}): {a['operationId']} needs {n} and nothing on the screen supplies it "
+                          f"(an entry parameter, a read's field, or a read of what it names)")
 
 
 if __name__ == "__main__":

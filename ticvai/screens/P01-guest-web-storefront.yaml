@@ -5371,12 +5371,16 @@ screens:
     trigger: onLoad
   - operationId: getGiftCard
     contract: wallet
-    purpose: Check a gift card balance
-    trigger: onAction
+    purpose: 'The gift card a deep link names: called only when the screen is entered with `cardCode` and
+      `cardKind` giftCard (ADAM CR-143, 18 October 2026; CHG-CRA-008). Without such a link the panel stays closed'
+    trigger: onLoad
+    provenance: ADAM CR-143, 18 October 2026 (CHG-CRA-008); was onAction with nothing on the screen naming a card
   - operationId: getGameCard
     contract: games
-    purpose: Balance on a game card
-    trigger: onAction
+    purpose: 'The game card a deep link names: called only when the screen is entered with `cardCode` and
+      `cardKind` gameCard (ADAM CR-143; CHG-CRA-008). Without such a link the panel stays closed'
+    trigger: onLoad
+    provenance: ADAM CR-143, 18 October 2026 (CHG-CRA-008); was onAction with nothing on the screen naming a card
   - operationId: listPaymentTokens
     contract: orders
     purpose: Saved cards on this account
@@ -5389,6 +5393,18 @@ screens:
     contract: wallet
     purpose: Move value between wallets
     trigger: onAction
+  - operationId: getPublishedTenantConfig
+    contract: white-label
+    purpose: 'The provider the web tokenises cards with and its hosted card form (`paymentTokenisation`):
+      storePaymentToken''s `providerId` (ADAM CR-142, 18 October 2026; CHG-CRA-008)'
+    trigger: background
+    provenance: ADAM CR-142, 18 October 2026 (CHG-CRA-008), as GST-071 (CHG-FXS-003); nothing shows
+  - operationId: listConsentPurposes
+    contract: marketing-crm
+    purpose: 'The stored-card consent purpose''s id: storePaymentToken''s `consentPurposeId` (ADAM CR-142;
+      CHG-CRA-008)'
+    trigger: background
+    provenance: ADAM CR-142, 18 October 2026 (CHG-CRA-008), as GST-071 (CHG-FXS-003); nothing shows
   entryState:
     params:
     - name: cardCode
@@ -5396,7 +5412,16 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGiftCard`, `getGameCard`
         take the id from the record the user acts on, and an edge or link that holds one only pre-selects
-        it.'
+        it. **Carried with `cardKind`** (ADAM CR-143, 18 October 2026; CHG-CRA-008): the approved screen has no
+        input or list that yields a card code, so the gift card or game card panel opens only from a deep link
+        carrying both.'
+    - name: cardKind
+      from: deepLink
+      optional: true
+      notes: '`giftCard` or `gameCard` (ADAM CR-143; CHG-CRA-008): which panel `cardCode` opens, read with
+        `getGiftCard` or `getGameCard`, both limited to the guest''s own cards. Never shown. Without it, or without
+        `cardCode`, both panels stay closed and the empty state is as approved. How a guest reaches these panels
+        otherwise is the client''s decision (option 1, "Check a balance", put to the client).'
     - name: subjectId
       from: session
     - name: walletId
@@ -5435,7 +5460,12 @@ screens:
     component: modal
     trigger: Add a card
     body: '**The gateway''s own card form**, hosted by the provider; it returns the token that `storePaymentToken`
-      saves with the guest''s consent. No token, provider or consent id is ever a field.'
+      saves with the guest''s consent. No token, provider or consent id is ever a field. **Where they come from**
+      (ADAM CR-142, 18 October 2026; CHG-CRA-008): `providerId` and the hosted form from `getPublishedTenantConfig`
+      (`paymentTokenisation`), `consentPurposeId` from `listConsentPurposes` (the stored-card purpose); never a guessed
+      provider or purpose. The guest gives the consent itself on WEB-024 (`recordConsent`), already one of this
+      screen''s approved links: Save card without it answers `409 consent-not-given`, and the error says so and
+      offers the link to WEB-024.'
     confirm:
       label: Save card
       operation: storePaymentToken

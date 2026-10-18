@@ -4832,6 +4832,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-021 Wallet & Gift Cards"
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-039 Profile"
