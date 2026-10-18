@@ -223,6 +223,10 @@ paths:
         - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-read-via:
+      - query: promotions#promotionRecords
+        route: service
+        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Create a queue
       description: >
@@ -296,6 +300,10 @@ paths:
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
+      x-ticvai-read-via:
+      - query: promotions#promotionRecords
+        route: service
+        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Amend queue configuration
       tags: [queue]
@@ -356,6 +364,10 @@ paths:
         - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-read-via:
+      - query: promotions#promotionRecords
+        route: service
+        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Open, pause or close a queue
       description: >
@@ -1792,7 +1804,8 @@ components:
     QueueReading:
       x-ticvai-persistence: "queue.reading"
       type: object
-      required: [id, kind, value, observedAt]
+      # feedId: every reading comes from one feed, named in the submitQueueReading body (CHG-MGN-001).
+      required: [id, feedId, kind, value, observedAt]
       properties:
         id: { type: string, format: uuid }
         feedId:

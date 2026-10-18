@@ -101,12 +101,13 @@ x-ticvai-queries:
       items: {type: object, description: 'A control.tenant_domain row: the columns handoff/schema-reference.json lists for it.'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Platform answers with its control.tenant_domain rows, as it stores them and as the caller's
-      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Platform's service route (serviceAuth).
-    served: [service]
+      October). Platform answers with its control.tenant_domain rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
+      operations, through the C# query interface Platform implements, and asked from another deployable through
+      Platform's service route (serviceAuth).
+    served: [in-process, service]
   urlRedirectRecords:
     module: platform-ops
     table: control.url_redirect
@@ -124,6 +125,23 @@ x-ticvai-queries:
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within operations, through the C# query interface Platform implements.
+    served: [in-process]
+  hostnameHeldByAnotherTenant:
+    module: platform-ops
+    table: control.tenant_domain
+    inputs:
+      hostname: {type: string, description: 'The hostname being claimed.'}
+    returns:
+      type: object
+      required: [held]
+      properties:
+        held: {type: boolean, description: 'True when another tenant holds it; who holds it is never returned.'}
+    rule: >-
+      A rule question (ADAM CR-096, 15 October 2026, CHG-RTE-001). True when a control.tenant_domain row with
+      lower(hostname) equal to the asked hostname's, whose status is active, belongs to a tenant other than the
+      caller's. Platform answers on its control connection, across tenants, and returns nothing about the holder.
+      claimCustomDomain refuses the claim when it is true. It is asked in process within operations, through the C#
+      query interface Platform implements.
     served: [in-process]
 paths:
   /rollouts/{rolloutId}/cells/{cellId}/skip:

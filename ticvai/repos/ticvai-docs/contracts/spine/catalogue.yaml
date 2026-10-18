@@ -1222,6 +1222,10 @@ paths:
       operationId: bulkChangePrices
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Reprice a category or a whole catalogue
       description: '2.9.9. **`BulkUpdateSeatsRequest` is the only bulk operation in the package** and
         it takes a selection plus the attribute to set — a usable precedent, applied here.
@@ -3439,6 +3443,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the region''s time zone the series is read in: daysOfWeek, until, firstStart and lastStart (ADAM CR-096)'
       x-ticvai-audience:
       - staff
       summary: Create performances, singly or by schedule
@@ -3830,6 +3838,10 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-037 Offline Package Status"
+      x-ticvai-read-via:
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'the tax codes the bundle carries (ADAM CR-110)'
       x-ticvai-audience:
       - staff
       summary: Compute, sign and publish a catalogue bundle
@@ -4079,6 +4091,9 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       - service
@@ -18001,6 +18016,10 @@ paths:
       operationId: setMarketPricingConfiguration
       x-ticvai-consumed-by:
         - "P08 ADM-054 Market, Venue & Currency Pricing Structure"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "venue''s trading currency": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Create or update a node of the market pricing structure
       description: '**Global, country, region, market or venue** (29 September, writers pass). Creates or updates a
         `catalogue.pricing_market`: which price list and rounding profile the node uses and whether it inherits from
@@ -23155,9 +23174,11 @@ components:
       x-ticvai-retired-columns: [envelope_id]
       x-ticvai-persistence: catalogue.channel_envelope
       type: object
+      # channelCapacityId: an allocation always draws on one channel capacity, from the path (ADAM CR-139, CHG-MGN-001).
       required:
       - channel
       - allocatedUnits
+      - channelCapacityId
       properties:
         id:
           type: string
@@ -39187,6 +39208,7 @@ components:
     SalesChannelProfile:
       type: object
       x-ticvai-persistence: catalogue.sales_channel
+      x-ticvai-rls: read-beneath   # ADAM CR-095's rule, CHG-RSF-001: rows set at a chosen level (scope_level) govern every scope beneath them, so a scope reads the ones it inherits and still writes only its own
       description: >-
         **A named sales channel: its profile, ownership, governance and payment/fulfilment set-up** (29 September, data
         model DM3). One row per channel. Merges the channel profile (ADM-259), fees/payment/fulfilment (ADM-263), readiness
@@ -41878,6 +41900,7 @@ components:
     DynamicPricingControl:
       type: object
       x-ticvai-persistence: catalogue.dynamic_pricing_control
+      x-ticvai-rls: read-beneath   # ADAM CR-095's rule, CHG-RSF-001: rows set at a chosen level (scope_level) govern every scope beneath them, so a scope reads the ones it inherits and still writes only its own
       description: >-
         **The limits and the autonomy of dynamic pricing at one scope** (29 September, data model DM3). Merges guardrails
         (ADM-093) and automation policy (ADM-094, ADM-113): both are per-scope controls a price change must pass, and

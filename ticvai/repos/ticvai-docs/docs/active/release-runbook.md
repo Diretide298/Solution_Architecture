@@ -17,6 +17,16 @@ Minutes, client answers, design returns, developer gaps and audit findings each 
 
 If a CR contradicts a registered decision (the Decisions Register or an ADR), it goes back to the lead. It is not applied.
 
+**Developer CRs are answered by the CR watcher** (`tools/cr-watch.py`; CHG-CRF-002). Every 30 minutes, on the lead's
+machine, it reads the requests ADAM has received since its last run, sorts each one with no AI (its class from
+`handoff/cr-classes.yaml` and the class's known members across the package, a duplicate, the open blocking requests
+it waits for, the tickets it touches), drafts one answer per request against the latest release, and lists them in
+`REVIEW.md` in the watcher's folder on the lead's machine (outside git). The lead marks each `approve`, `change` or `reject: <why>`; the requests in a class
+with an active default ruling come first under one `approve all default-ruled` line that clears them with one mark.
+`python3 tools/cr-watch.py settle` (dry run), then `--apply`, settles the marked ones through
+`viewer/api/settle_changes.py`, which tells their tickets (section 6). Nothing is settled without the lead's mark. When
+ADAM cannot be read, the list says so at the top; the line under its title says when the watcher last ran.
+
 ## 2. Edit: agents on branches
 The rule for agent edits:
 - One CR, one branch (`cr/<id>-<slug>`).
@@ -37,28 +47,54 @@ The rule for agent edits:
 - **Ticket links:** every Block A feature and task links something ADAM pulls, and every link ADAM loads resolves to
   an operation, table (or declared read view), screen, ADR, tracked file or service the package has
   (`check-ticket-links`; CHG-GRD-001). It reads `handoff/service-docs/adam-links.json`, which a rebuild does not
-  write: run `python3 tools/adam-links.py` after the full refresh and before the release gate, so it checks the
-  links this release will load.
+  write: run `python3 tools/adam-links.py` with `TICVAI_OP_TOKEN` set after the full refresh and before the release
+  gate, so it checks the links this release will load and the next gate reads today's ticket statuses.
+- **Started tickets on known findings:** a baselined finding fails once a ticket that builds its operation or table
+  has started: a task or sub-task in any status but New, On hold or Rejected (`tools/audit_guard.py`; CHG-CRF-001).
+  The gate reads the status cached in `adam-links.json`, with no network; between releases,
+  `python3 tools/adam-links.py --status-only` (with `TICVAI_OP_TOKEN`) reads it again and leaves the links alone.
+  Fix the finding, or the lead runs the failing check with `--acknowledge-started "CR-nnn: why"` in a reviewed commit,
+  naming the request that will fix it (or the follow-up row on the tracker sheet, `F<n>`, when no request is raised).
+  The acknowledgement covers the tickets started now; a ticket that starts on the finding later fails again, and a
+  fixed finding takes its acknowledgement with it at `--update-baseline`.
 - **Approved UI:** no visible change to a client-approved screen without the client's approval recorded in
   `docs/active/approved-ui-changes.yaml` (`check-approved-ui` against `handoff/approved-ui.json`; CHG-GRD-002).
 
-### The rehearsal pull: the last gate step before the tag (CHG-GRD-003)
+### The rehearsal pull: the last gate step before the tag (CHG-GRD-003, CHG-RHS-001)
 The checks read the package; the rehearsal reads what a developer will get. It runs after the full gate is green
 and before anything is tagged or pushed (Block A audit plan, step 11a; lead, 14 October 2026: "before pushing r6
-can we simulate the results in the pulls?"):
-1. Tag `r<N>-rc` locally. Never push it.
-2. Run a local ADAM on the candidate, with the stand-in OpenProject (`viewer/api/fake-openproject.mjs`) loaded from
-   `r<N>`'s bundle (`handoff/service-docs/op-release.json`), so every ticket reads as it will after the apply.
-3. Pull every ticket of the block being delivered (Block A: every feature and task) against it with the shipped
-   connector, the same `adam_pull` a developer runs (the audit kit's `pull-direct.mjs`, with `ADAM_URL` set to the
-   local ADAM).
-4. Compare ticket by ticket with the last live pull, and keep the difference: it is the developer impact list.
+can we simulate the results in the pulls?"). Tag `r<N>-rc` locally first and never push it. Then, from `ticvai/`:
 
-**It passes only with all four at zero:** 0 pull errors; release `r<N>` on every ticket (`release.current`); 0
-tickets with nothing linked (`linked: 0`, features and tasks alike); 0 dead links (`notFound: 0`). Anything else is
-fixed in `r<N>` and the rehearsal runs again; the tag waits. On r5 the pull found 123 features and 29 tasks with
-nothing linked and 55 tickets with links ADAM could not find, after the release was out; this step finds them while
-they are still the package's to fix.
+    python3 tools/rehearse/prepare.py snapshot --out <work>/op-snapshot.json      (reads OpenProject; writes nothing)
+    bash tools/rehearse/rehearse.sh r<N>-rc --base <last live pull> --op-snapshot <work>/op-snapshot.json
+
+The last live pull is the previous release's live re-pull (section 7), its `direct/` folder. The one command:
+1. Clones the repository into its work folder at `r<N>-rc` (no remote; the mirrors as ADAM's release export keeps
+   them) and tags the candidate `r<N>` in that clone only.
+2. Runs a local ADAM on the candidate with the stand-in OpenProject (`tools/rehearse/stand-in-openproject.mjs`)
+   loaded from `r<N>`'s bundle (`handoff/service-docs/op-release.json`, or built at the candidate when the committed
+   one is older), applied with the apply's rules (`tools/rehearse/simulate.py`) to OpenProject as the snapshot shows
+   it, so every ticket reads as it will after the apply. Tickets the release creates get stand-in ids (990001 and up)
+   in `op-created-r<N>.json`, the file the apply writes.
+3. Loads the ticket links the way production does, never by its own setup: `tools/op-created-merge.py` with those
+   ids, `tools/adam-links.py`, then `viewer/api/load_links.py --prune` (dry run, then `--apply`) into the
+   rehearsal's database. On r6 the rehearsal's setup loaded them and passed, while the live ADAM had none (P-22).
+4. Pulls every ticket of the block being delivered (Block A: every feature and task) with the shipped connector,
+   the same `adam_pull` a developer runs (`tools/rehearse/pull-direct.mjs`, `ADAM_URL` set to the local ADAM).
+5. Compares ticket by ticket with the last live pull, and keeps the difference: it is the developer impact list
+   (`rehearsal-summary.md` and `rehearsal-report.json` in the work folder).
+6. Checks the people as well as the links: no open ticket keeps someone who left (the bundle's `successors`) as
+   assignee or Accountable, started tickets included, read from the stand-in's OpenProject state, because a pull does
+   not carry Accountable. On r6 the rehearsal checked assignees only, and 158 Ready for QA tickets kept Tanmay
+   Dukhande as Accountable (P-25). Without the snapshot this criterion is not judged and the rehearsal does not pass.
+
+**It passes only with all five at zero:** 0 pull errors; release `r<N>` on every ticket (`release.current`); 0
+tickets with nothing linked (`linked: 0`, features and tasks alike); 0 dead links (`notFound: 0`); 0 open tickets
+with someone who left as assignee or Accountable. Anything else is fixed in `r<N>` and the rehearsal runs again; the
+tag waits. On r5 the pull found 123 features and 29 tasks with nothing linked and 55 tickets with links ADAM could not
+find, after the release was out; this step finds them while they are still the package's to fix. It touches nothing
+live: the clone has no remote, ADAM's database is a scratch one, OpenProject's token is removed from every step, and
+it refuses the ports 4173, 8787 and 8798 (a local ADAM another session may be running).
 
 ## 5. Tag
 Once everything is green, the rehearsal pull included (section 4):
@@ -72,13 +108,65 @@ Once everything is green, the rehearsal pull included (section 4):
    `origin` or `github`.
 5. Rebuild the setup zip from a clean HEAD.
 
+## 5a. Light CR release: one class fix, out in minutes
+When the fix for a class of change requests has merged into `main`, it can go out on its own, between the Tuesday
+and Friday releases, without the OpenProject server apply over every ticket and without the full rehearsal pull
+(council of 14 October; the lead's list of 18 October, item 8; CHG-LCR-001). It creates no plan tickets, changes no
+build-order links and retires nothing: a fix that does any of those waits for the full release (section 6's server
+path). `tools/cr-release.py` runs the steps in this order. Each prints what it would do; only `--apply` does it.
+1. **Check:** `python3 tools/cr-release.py check`, then `--apply`. It refuses unless the branch is `main`, nothing is
+   left uncommitted, `main` here is `main` on both remotes, the last tag is on both remotes (a tag made here and never
+   pushed is never the starting point), and the change log passes since the last tag. Then it runs
+   the gate: only the checks the changed files reach when `run-checks.py --changed` is there, otherwise the full
+   refresh (`refresh-safe.sh --head-only --no-merge --parallel 4`, about half an hour). It says which.
+2. **Impact:** `python3 tools/cr-release.py impact`, with `TICVAI_OP_TOKEN` set. Every operation, screen, table,
+   file and ADR whose definition changed since the last tag (a renamed file counts under both names), and every
+   ticket that links one, split into not started, started and finished. The list is taken from the release diff,
+   never from the request's text. The links are the ones this release will load: `adam-links.py` is run on the
+   commit being released, in a throwaway worktree, and the last tag's links are added, so a ticket that linked
+   something the fix removed is on the list too. With the token, the statuses are read from OpenProject; without
+   it, from the committed `adam-links.json`. Service links are left out: every back-end task links its service.
+3. **Tag (the lead):** `python3 tools/cr-release.py tag --note "<the class>"`, then `--apply`. The next `r<N>`,
+   annotated, pushed by name to `origin` and `github`, then `check-adam-latest-release.py --remotes`. It refuses
+   unless the gate passed at this commit. The six mirror repositories are not tagged here; the next full release
+   tags them. If the fix changed ADAM's connector (`viewer/mcp`), rebuild the setup zip from a clean HEAD as well.
+4. **Deploy (the lead, on ADAM's box):** `git fetch --tags`, then `sudo ./deploy/deploy.sh`.
+5. **Links and the pull:** `python3 tools/cr-release.py after-deploy --apply` rebuilds `adam-links.json` and prints
+   the commit and the box's `load_links.py` commands (dry run, then `--apply`, as the ticvai user). Once they are
+   loaded, `after-deploy --stage pull --apply` pulls every ticket on the impact list with the shipped connector, the
+   same pull a developer runs. Each must say release `r<N>`, link something and have no link ADAM cannot find. Any
+   miss is fixed before the next step. It refuses an impact list computed on another commit than the tag's.
+6. **Rework:** `python3 tools/cr-release.py rework --note "<the requests>"`, then `--apply`. Each finished task or
+   sub-task the release changed gets one rework sub-task: over the API under a small parent, mail off; under a large
+   one (a migration task) through `tools/op-create.rb` on the OpenProject server, from the file it writes. Started
+   and not-started tickets need nothing: their next pull shows what changed since the previous one.
+7. **Settle:** `python3 tools/cr-release.py settle --crs <the requests> --resolution "<what changed>"`, then
+   `--apply`. The class's requests are marked done with `ref r<N>` through `viewer/api/settle_changes.py`, which tells
+   each request's ticket. `--apply` waits for step 5's pull to pass at `r<N>`, so nobody is told their next pull has
+   the fix before ADAM serves it.
+
+Developers and agents are always on the latest release: nobody is asked anything, and their next `/ticket` is at
+`r<N>`. The nightly full gate is the backstop for anything the scoped checks did not reach. Measure each one: the
+minutes from the merge to the last settled request.
+
 ## 6. Distribute
-- **OpenProject:** on the server, run `op-release-server.sh r<N>`: dry run, then `APPLY=1`. That one script:
+- **OpenProject:** on the server, run `op-release-server.sh dry-run r<N>`, then `op-release-server.sh apply r<N>`.
+  That one script:
+  - turns OpenProject's notifications off for the whole instance first (OpenProject 10 has no per-run switch; the
+    list is saved in `.release-out/notified_events.json`) and leaves them off for the steps below (P-23);
   - creates new tickets and writes pointer bodies;
-  - syncs assignee and week;
+  - syncs assignee and week; a started ticket keeps its owners except a field held by someone who left, which goes
+    to the plan's person or the successor (P-25);
   - sets build order and links;
-  - retires tickets that left the plan;
-  - runs a health check.
+  - retires tickets that left the plan, and removes the build-order links of the ones it rejects (P-24);
+  - runs a health check. Every health line must be zero apart from tickets the plan does not know; anything else is
+    fixed before the next step.
+  A manual fix after the apply names its tickets and people from the bundle (`op-release.json`: `responsible`,
+  `assignee`, `parent`), never from a list written by hand: r6's sheet named the wrong Accountable for two migration
+  families (P-26). Server scripts run on the container's Ruby (2.6 on OpenProject 10): nothing newer than 2.6.
+- **New ticket ids:** copy `.release-out/op-created-r<N>.json` to the workstation, then
+  `python3 tools/op-created-merge.py <file>`, `python3 tools/adam-links.py` (with `TICVAI_OP_TOKEN`), and commit and
+  push `pms-map.json` and `adam-links.json`.
 - **OpenProject, a release that creates nothing** (a change-request release): from any workstation,
   `python3 tools/op-release-api.py --from r<N-1> --to r<N>` (dry run), then `--apply`, with `TICVAI_OP_TOKEN`
   set. It applies only the tickets that differ between the two bundles, over the REST API, with the same rules
@@ -92,8 +180,16 @@ Once everything is green, the rehearsal pull included (section 4):
   owner, filed by the lead. If ADAM cannot create a child task (its apply answers 502 behind the proxy), make it
   on the OpenProject server with `tools/op-create.rb`, subject `[CR-nnn] ...`, under the CR's ticket, then record
   it in ADAM with `settle_changes.py --link-existing` (or `POST /api/changes/<n>/ticket/link`, admin) (CHG-ADM-003).
+- **Notifications back on:** once the CRs are settled and the child tasks are filed, on the OpenProject server:
+  `op-release-server.sh notify-on`. It refuses unless the restored list matches the saved one. Then send the team
+  and developer messages, so they reach people with the tickets already in their final state.
 - **ADAM:** on the box, run `git pull` and deploy. ADAM serves `r<N>`, and every developer and agent is always
   on the latest release: their next `/ticket` is at `r<N>` and shows what changed since their previous pull.
+- **ADAM's ticket links:** ADAM reads them from its own database, not from the release (P-22). After the new ids are
+  pushed, on the box: `git pull`, then as the service user
+  `python3 viewer/api/load_links.py ticvai/handoff/service-docs/adam-links.json --email <lead> --prune --db <ADAM db>`
+  (dry run), then the same with `--apply`. Without it every ticket the release linked pulls with "What this
+  touches (0)".
 - **Client:** send the release note, `python tools/release-notes.py r<N-1> r<N>`: what their answers changed, and what is waiting on them.
 - **Last, one pull through ADAM:** once ADAM is deployed, run one `adam_pull` of any ticket. Its release must say
   `r<N>`. If it names an older release, ADAM has not fetched the tag (on the box: `git fetch --tags`, then
@@ -101,7 +197,12 @@ Once everything is green, the rehearsal pull included (section 4):
 
 ## 7. Re-audit, every release
 - Every check is green.
-- Pull a **sample of 20 to 30 tickets** through ADAM at the new tag, across every developer's board.
+- Pull a **sample of 20 to 30 tickets** through ADAM at the new tag, across every developer's board. After a release
+  with a rehearsal, pull the whole rehearsal list on the live ADAM instead, the tickets the release created by their
+  real ids and not the rehearsal's stand-in ids, and compare: it must match the rehearsal. From `ticvai/`, with
+  `ADAM_URL`, `ADAM_EMAIL` and `ADAM_PASSWORD` set (the audit account; it reads tickets and records that account's own pull marks on live ADAM, nothing else):
+  `bash tools/rehearse/rehearse.sh live-repull r<N> --rehearsal <work> --created <op-created-r<N>.json>`. Its
+  `live/direct/` folder is the next rehearsal's last live pull.
 - A new root issue gets a check before it counts as closed.
 
 ## 8. Configuration promotion after go-live

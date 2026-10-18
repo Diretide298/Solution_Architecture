@@ -330,6 +330,15 @@ ROW_OWNER = {
     "orders.cash_count_line": "shift_id",                     # the shift's count, as at r1; the box is what was counted
     "orders.deposit_box_opening_denomination": "deposit_box_id",   # the box's opening float, as at r1; the coin is what
     "seating.seat_block_item": "block_id",                    # the block's seats; the seat is what the block holds
+    # CHG-MGN-001 (18 October 2026): two NOT NULL keys to one parent went to the first in alphabetical order. These two
+    # the published answers decide; the others are listed for a decision (pick_owner, an "owner undecided" review row).
+    "fnb.ingredient_substitute": "from_inventory_item_id",    # ADAM CR-148: the row belongs to the ingredient replaced
+    "ledger.inter_entity_obligation": "from_legal_entity_id",  # ADAM CR-149: writes stay with the selling entity; the
+                                                              # consuming side's read path is the row-security lane's
+    # The controller's ruling of 18 October 2026 (r7 integration gate, D-FWD-OWNER): an exchange belongs to the original
+    # sale it is made against; new_sale_id is the replacement sale it produces. V0104 had applied new_sale_id's parent
+    # policy (the alphabet); the next forward migration re-applies it on sale_id.
+    "retail.exchange": "sale_id",                             # CHG-MGN-001: the original sale, not the replacement
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------
@@ -809,6 +818,7 @@ assert VENUE_MARKER in RLS_HEAD
 RLS_PARENT = """
 -- A child table protected through the declared foreign key to the row that owns it. The row is
 -- visible, and may be written, exactly when its parent is visible to the same connection.
+-- A parent in another deployable is asked through platform.visible_parent_ids instead (apply_parent_across_rls).
 CREATE OR REPLACE FUNCTION platform.apply_parent_rls(target regclass, fk_column text,
                                                      parent regclass, parent_key text)
     RETURNS void
@@ -827,6 +837,212 @@ BEGIN
 END
 $$;
 """
+
+VISIBLE_PARENT_IDS_HEAD = """
+-- **The parent rows this connection may see** (ADAM CR-108, 18 October 2026; CHG-RSF-001). A child whose parent is in
+-- another deployable asks this instead of reading the parent with its host's own grants, which DB-ROLES does not give
+-- (each deployable has only its own schemas). SECURITY DEFINER: it runs as its owner, and every parent forces
+-- row-level security, so the parent's own policy still decides, against the caller's session settings; it returns
+-- exactly the parent ids the caller would see with a grant on the parent, and nothing else.
+-- **Set-based** (fix round 1, 18 October 2026, as the controller ruled): the child's policy is
+-- `<fk> IN (SELECT platform.visible_parent_ids(parent))`, an uncorrelated subquery, so the parent's policy runs once
+-- per query rather than once per child row. On 100,000 rows the per-row form took 10-19 s against r6's 23-58 ms; this
+-- takes 12 ms. It answers only the parents listed below (static SQL, no argument reaches a statement); any other
+-- raises. `for_write` applies the parent's write check where a split child needs it. Its search path is fixed;
+-- `public` is on it because the ltree type and operators the scope checks use live there (001-extensions.sql), and no
+-- host role may CREATE in it (DB-ROLES). Its owner and who may execute it: platform.visible_parent_ids_setup, below.
+CREATE OR REPLACE FUNCTION platform.visible_parent_ids(parent regclass, for_write boolean DEFAULT false)
+    RETURNS SETOF uuid
+    LANGUAGE plpgsql
+    STABLE
+    SECURITY DEFINER
+    SET search_path = pg_catalog, public, pg_temp
+AS $$
+BEGIN
+"""
+
+VISIBLE_PARENT_IDS_TAIL = """
+    RAISE EXCEPTION 'platform.visible_parent_ids: % is not a parent a policy names', parent;
+END
+$$;
+
+-- **Who owns platform.visible_parent_ids, and who may call it** (decision D5 as the lead ruled it, and fix round 1,
+-- 18 October 2026; CHG-RSF-001). A SECURITY DEFINER function runs as its owner, and a superuser or a BYPASSRLS role
+-- skips every policy, FORCE or not: owned by one, the function would return every parent and so show every child row.
+-- In production the migration role owns it, and DB-ROLES (#27655) gives that role neither.
+--   * Where its owner bypasses row-level security and the migration may create roles (a developer's or test database
+--     migrated as `postgres`), it gets a dedicated owner that does not, `ticvai_parent_visible` (no login, no
+--     superuser, no BYPASSRLS), with SELECT on every table a listed parent's own policy reads, up its chain (a parent
+--     with a parent of its own: catalogue.performance -> catalogue.event).
+--   * Where its owner bypasses row-level security and the migration may not create roles, **the migration refuses**.
+--     D5 forbids refusing at run time, which would break databases migrated as postgres; those never reach here.
+--   * EXECUTE is revoked from PUBLIC and granted to the deployable roles of DB-ROLES that exist (commerce, access,
+--     operations, workers, ticvai_ai): a policy runs with the querying role's EXECUTE right.
+-- Called by the across helpers, so every across policy applied re-checks it; it touches no row and takes no argument.
+CREATE OR REPLACE FUNCTION platform.visible_parent_ids_setup()
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    fn regprocedure := 'platform.visible_parent_ids(regclass, boolean)'::regprocedure;
+    owner_bypasses boolean;
+    me record;
+    t text;
+    rel regclass;
+    r text;
+BEGIN
+    SELECT o.rolsuper OR o.rolbypassrls INTO owner_bypasses
+      FROM pg_catalog.pg_proc f JOIN pg_catalog.pg_roles o ON o.oid = f.proowner WHERE f.oid = fn;
+    IF owner_bypasses THEN
+        SELECT m.rolsuper, m.rolcreaterole INTO me FROM pg_catalog.pg_roles m WHERE m.rolname = current_user;
+        IF me.rolsuper OR me.rolcreaterole THEN
+            IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = 'ticvai_parent_visible') THEN
+                CREATE ROLE ticvai_parent_visible NOLOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE;
+            END IF;
+            IF NOT me.rolsuper THEN
+                EXECUTE format('GRANT ticvai_parent_visible TO %I WITH INHERIT TRUE, SET TRUE', current_user);
+            END IF;
+            EXECUTE 'GRANT USAGE ON SCHEMA platform, public TO ticvai_parent_visible';
+            EXECUTE 'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA platform TO ticvai_parent_visible';
+            -- ALTER ... OWNER needs CREATE on the schema for the new owner; it is taken back at once
+            EXECUTE 'GRANT CREATE ON SCHEMA platform TO ticvai_parent_visible';
+            ALTER FUNCTION platform.visible_parent_ids(regclass, boolean) OWNER TO ticvai_parent_visible;
+            EXECUTE 'REVOKE CREATE ON SCHEMA platform FROM ticvai_parent_visible';
+        ELSE
+            RAISE EXCEPTION 'platform.visible_parent_ids is owned by %, which bypasses row-level security, and % may not create a role to own it instead: every child row of a parent in another deployable would be visible. Migrate as a role without BYPASSRLS (DB-ROLES), or as one that may create roles',
+                (SELECT f.proowner::regrole FROM pg_catalog.pg_proc f WHERE f.oid = fn), current_user;
+        END IF;
+    END IF;
+    IF (SELECT f.proowner::regrole::text FROM pg_catalog.pg_proc f WHERE f.oid = fn) = 'ticvai_parent_visible' THEN
+        FOREACH t IN ARRAY ARRAY[{owner_reads}]::text[] LOOP
+            rel := pg_catalog.to_regclass(t);
+            CONTINUE WHEN rel IS NULL;
+            EXECUTE format('GRANT USAGE ON SCHEMA %I TO ticvai_parent_visible',
+                           (SELECT n.nspname FROM pg_catalog.pg_class c
+                              JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.oid = rel));
+            EXECUTE format('GRANT SELECT ON %s TO ticvai_parent_visible', rel);
+        END LOOP;
+    END IF;
+    EXECUTE 'REVOKE EXECUTE ON FUNCTION platform.visible_parent_ids(regclass, boolean) FROM PUBLIC';
+    FOREACH r IN ARRAY ARRAY['commerce', 'access', 'operations', 'workers', 'ticvai_ai'] LOOP
+        IF EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = r) THEN
+            EXECUTE format('GRANT EXECUTE ON FUNCTION platform.visible_parent_ids(regclass, boolean) TO %I', r);
+        END IF;
+    END LOOP;
+END
+$$;
+
+-- **A child whose parent is in another deployable** (ADAM CR-108, 18 October 2026; CHG-RSF-001). Its host's role has
+-- no grant on the parent's schema (DB-ROLES grants each deployable only its own), so r6's EXISTS on the parent failed
+-- with "permission denied". The parent ids are asked of platform.visible_parent_ids, once per query, under the
+-- parent's own policy. **Only these children** (decision D9 as the lead ruled it, 18 October): a child whose parent is
+-- in its own deployable keeps apply_parent_rls. A chain that crosses further up (fnb.menu_item -> fnb.menu_section ->
+-- fnb.menu -> platform.outlet) crosses at one table, and only that table asks the function.
+CREATE OR REPLACE FUNCTION platform.apply_parent_across_rls(target regclass, fk_column text,
+                                                            parent regclass, parent_key text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+    predicate text := format('%I IN (SELECT platform.visible_parent_ids(%L::regclass))', fk_column, parent::text);
+BEGIN
+    IF parent_key <> 'id' THEN
+        RAISE EXCEPTION 'apply_parent_across_rls: % keys its parent % by %, and platform.visible_parent_ids returns a parent''s id',
+            target, parent, parent_key;
+    END IF;
+    PERFORM platform.visible_parent_ids_setup();
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING (%s) WITH CHECK (%s)',
+                   policy_name, target, predicate, predicate);
+END
+$$;
+
+-- The same for a child of a split parent in another deployable: read where the parent is visible, written only where
+-- the parent may be written (platform.visible_parent_ids' write branch carries the parent's write check;
+-- `parent_write` names the same check, kept so the call reads like apply_parent_split_rls's).
+CREATE OR REPLACE FUNCTION platform.apply_parent_split_across_rls(target regclass, fk_column text, parent regclass,
+                                                                  parent_key text, parent_write text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF parent_key <> 'id' THEN
+        RAISE EXCEPTION 'apply_parent_split_across_rls: % keys its parent % by %, and platform.visible_parent_ids returns a parent''s id',
+            target, parent, parent_key;
+    END IF;
+    PERFORM platform.visible_parent_ids_setup();
+    PERFORM platform.apply_split_rls(target,
+        format('%I IN (SELECT platform.visible_parent_ids(%L::regclass))', fk_column, parent::text),
+        format('%I IN (SELECT platform.visible_parent_ids(%L::regclass, true))', fk_column, parent::text));
+END
+$$;
+"""
+
+
+def parents_of(by_parent: list) -> dict:
+    """Each parent a parent policy names -> the write check its split children carry (on `parent_row`), or None."""
+    out: dict = {}
+    for t, _col, par, key, *rest in by_parent:
+        if key != "id":
+            raise ValueError(f"{t}: its parent {par} is keyed by {key}; platform.visible_parent_ids returns ids")
+        w = rest[0] if rest else None
+        if w and out.get(par) and out[par] != w:
+            raise ValueError(f"{par}: two write checks for one parent ({out[par]!r}, {w!r})")
+        out[par] = out.get(par) or w
+    return out
+
+
+TABLE_IN_CHECK = re.compile(r'FROM\s+("?[a-z_][a-z0-9_]*"?\."?[a-z_][a-z0-9_]*"?)\s+p\d+\b', re.I)
+
+
+def owner_reads(parents: dict, by_parent: list) -> list:
+    """Every table the function's dedicated owner must read (fix round 1, I1): each listed parent, every table up its
+    own parent chain, every table a split write check names, and platform.scope, which the scope checks read."""
+    up = {e[0]: e for e in by_parent}
+    out, todo = {"platform.scope"}, list(parents)
+    for par, w in parents.items():
+        todo += [m.group(1).replace('"', "") for m in TABLE_IN_CHECK.finditer(w or "")]
+    while todo:
+        t = todo.pop()
+        if t in out:
+            continue
+        out.add(t)
+        e = up.get(t)
+        if e:
+            todo.append(e[2])
+            if len(e) > 4:
+                todo += [m.group(1).replace('"', "") for m in TABLE_IN_CHECK.finditer(e[4] or "")]
+    return sorted(out)
+
+
+def visible_parent_ids_sql(parents: dict, reads: list) -> str:
+    """platform.visible_parent_ids with one branch per parent (see VISIBLE_PARENT_IDS_HEAD), then its setup and the
+    two across helpers. `reads`: owner_reads()."""
+    def qual(t: str) -> str:
+        sch, n = t.split(".", 1)
+        return f"{q(sch)}.{q(n)}"
+
+    branches = []
+    for par in sorted(parents):
+        rel = qual(par)
+        read = f"RETURN QUERY SELECT parent_row.id FROM {rel} parent_row;"
+        if parents[par]:
+            branches.append(
+                f"    IF parent = '{rel}'::regclass THEN\n"
+                f"        IF for_write THEN\n"
+                f"            RETURN QUERY SELECT parent_row.id FROM {rel} parent_row WHERE ({parents[par]});\n"
+                f"            RETURN;\n"
+                f"        END IF;\n"
+                f"        {read}\n"
+                f"        RETURN;\n"
+                f"    END IF;")
+        else:
+            branches.append(f"    IF parent = '{rel}'::regclass THEN\n        {read}\n        RETURN;\n    END IF;")
+    tail = VISIBLE_PARENT_IDS_TAIL.replace("{owner_reads}", ", ".join(sql_literal(t) for t in reads) or "NULL")
+    return VISIBLE_PARENT_IDS_HEAD + "\n".join(branches) + tail
 
 # **The scope tree protects itself on `path`, which is the column it calls its own scope_path.**
 # `platform.scope` is what every other policy resolves against, so leaving it open would make the
@@ -965,7 +1181,7 @@ CREATE TABLE IF NOT EXISTS platform.schema_version (
 def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: list,
              total: int, has_scope_table: bool, shared: dict | None = None,
              by_subject: list | None = None, tenant_only: list | None = None,
-             append_audit: list | None = None, split: list | None = None) -> str:
+             append_audit: list | None = None, split: list | None = None, across: set | None = None) -> str:
     """The functions, then one call per table -- by `scope_path` where it has one, by `venue_id`
     where it does not, and through its owning parent where it has neither.
 
@@ -973,7 +1189,10 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     `shared` maps a scoped table to the second path column that also admits a caller;
     `append_audit` is `(table, why)` for an APPEND_AUDIT trail (CHG-R6-002); `split` is `(table, call, why)` for a
     table marked `x-ticvai-rls` (CHG-GEN-005), and a `by_parent` entry with a fifth member, the parent's write check,
-    follows a split parent for reading only."""
+    follows a split parent for reading only. Every parent a `by_parent` entry names gets a branch of
+    platform.visible_parent_ids: those whose table is in `across` (a parent in another deployable, decision D9) are
+    applied with apply_parent_across_rls / apply_parent_split_across_rls, which ask it; the rest keep r6's helpers
+    (CHG-RSF-001)."""
     shared = shared or {}
     head = RLS_HEAD.replace("{n_venue}", str(len(by_venue)))
     if db != "tenant":
@@ -990,8 +1209,12 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     tenant_only = tenant_only or []
     append_audit = append_audit or []
     split = split or []
+    across = across or set()
     if by_parent:
         body.append(RLS_PARENT)
+    if any(e[0] in across for e in by_parent):
+        cross = parents_of([e for e in by_parent if e[0] in across])
+        body.append(visible_parent_ids_sql(cross, owner_reads(cross, by_parent)))
     if by_subject or tenant_only or append_audit:
         body.append(RLS_TENANT)
     if append_audit:
@@ -1050,12 +1273,14 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         # the parent's policy has to exist for that read to be scoped at all.
         body.append("\n-- Scoped through the parent that owns the row (a NOT NULL declared foreign key).")
         for t, col, par, key, *rest in by_parent:
+            # a parent in another deployable is asked through platform.visible_parent_ids (CHG-RSF-001, decision D9)
+            how = "across_" if t in across else ""
             if rest:
                 # follows a split parent for reading; written where the parent may be written (CHG-GEN-005)
-                body.append(f"SELECT platform.apply_parent_split_rls('{qual(t)}'::regclass, '{col}', "
+                body.append(f"SELECT platform.apply_parent_split_{how}rls('{qual(t)}'::regclass, '{col}', "
                             f"'{qual(par)}'::regclass, '{key}', {sql_literal(rest[0])});")
             else:
-                body.append(f"SELECT platform.apply_parent_rls('{qual(t)}'::regclass, '{col}', "
+                body.append(f"SELECT platform.apply_parent_{how}rls('{qual(t)}'::regclass, '{col}', "
                             f"'{qual(par)}'::regclass, '{key}');")
     if by_subject:
         body.append("\n-- By subject (SD-015): the session's own subject, or the tenant root.")
@@ -1137,17 +1362,19 @@ def sql_literal(v) -> str:
     return "'" + str(v).replace("'", "''") + "'"
 
 
-def load_contract_props() -> dict:
+def load_contract_props(docs: dict | None = None) -> dict:
     """`module.Schema.property` -> the contract property, with `$ref` and `allOf` followed.
 
     The schema reference names each column's contract `source` but does not carry its enum,
-    maxLength or default, so they are read from the contracts here."""
-    docs = {}
-    for f in sorted((ROOT / "contracts").glob("*/*.yaml")):
-        try:
-            docs[f.stem] = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
-        except yaml.YAMLError:
-            continue
+    maxLength or default, so they are read from the contracts here. `docs` (stem -> parsed contract) lets a check that
+    has already read the contracts reuse them (check-ddl-conventions, CHG-MGN-001)."""
+    if docs is None:
+        docs = {}
+        for f in sorted((ROOT / "contracts").glob("*/*.yaml")):
+            try:
+                docs[f.stem] = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+            except yaml.YAMLError:
+                continue
 
     def resolve(doc, node, depth=0):
         while isinstance(node, dict) and "$ref" in node and depth < 8:
@@ -1186,18 +1413,109 @@ def load_contract_props() -> dict:
             if isinstance(schema, dict):
                 SCHEMA_MARKS[f"{mod}.{name}"] = {k: v for k, v in schema.items()
                                                  if str(k).startswith("x-ticvai-")}
+                retired_columns(schema)
                 for prop, spec in props_of(doc, schema).items():
                     if isinstance(spec, dict) and spec.get("type") == "array":
+                        ARRAY_PROPS.add(f"{mod}.{name}.{prop}")
                         ref = str((spec.get("items") or {}).get("$ref") or "")
                         if ref.startswith("#/components/schemas/"):
                             ITEM_SCHEMA[f"{mod}.{name}.{prop}"] = f"{mod}.{ref.rsplit('/', 1)[-1]}"
     return found
 
 
+def retired_columns(schema: dict) -> None:
+    """**The columns a contract withdraws** (`x-ticvai-retired-columns`), into RETIRED, read as derive-schema's
+    `retired_of` reads them: on the schema or an `allOf` branch, beside the persistence tag; a bare name is the
+    tagged table's column, `schema.table.column` a child table's (CHG-FXC-003). Frozen mode hands them to ddl_forward,
+    so a retired column's row says drop it rather than "a rename or a drop: decide" (CHG-MGN-001, ADAM CR-157)."""
+    branches = [schema] + [b for b in (schema.get("allOf") or []) if isinstance(b, dict)]
+    tag = next((b.get("x-ticvai-persistence") for b in branches if isinstance(b.get("x-ticvai-persistence"), str)),
+               None)
+    table = tag.split("+")[0].strip() if tag and "." in tag and "\u2014" not in tag else None
+    for b in branches:
+        for rc in (b.get("x-ticvai-retired-columns") or []) if isinstance(b.get("x-ticvai-retired-columns"),
+                                                                          list) else []:
+            rc = str(rc)
+            if rc.count(".") == 2:
+                t, c = rc.rsplit(".", 1)
+                RETIRED.setdefault(t, set()).add(c)
+            elif table:
+                RETIRED.setdefault(table, set()).add(rc)
+
+
 # `module.Schema` -> its `x-ticvai-*` keys, and `module.Schema.arrayProp` -> `module.ItemSchema`.
-# Filled by `load_contract_props`, read by `table_marks`.
+# Filled by `load_contract_props`, read by `table_marks`. RETIRED: table -> the columns its contract withdraws.
 SCHEMA_MARKS: dict = {}
 ITEM_SCHEMA: dict = {}
+ARRAY_PROPS: set = set()     # `module.Schema.arrayProp`, every array property (a child table's parent key names one)
+RETIRED: dict = {}
+
+
+# **A key into a partitioned table is indexed, never constrained** (ADR-0056; CHG-MGN-001, ADAM CR-138, 18 October
+# 2026). Nothing points at a partitioned table, so the contract leaves such a key undeclared (`x-ticvai-references:
+# none`) and the code checks it; `none` also drops the reference the index is written from, and r1 had the index (a
+# convention). `(table, column) -> the partitioned table it names`: the generator writes the index and its comment as
+# for a convention, with no foreign key and no inbound key for partition_plan.
+UNENFORCED_KEYS = {
+    ("marketing.message_dispatch_attempt", "message_dispatch_id"): "marketing.message_dispatch",
+}
+
+
+def apply_unenforced_keys(cols: dict) -> None:
+    """Mark UNENFORCED_KEYS' columns as convention references (indexed, not constrained) where nothing else names
+    their target."""
+    for (t, col), ref in UNENFORCED_KEYS.items():
+        for c in cols.get(t, []):
+            if c.get("column") == col and not c.get("references"):
+                c.update({"references": ref, "referenceHow": "convention", "enforced": "no"})
+
+
+def pick_owner(t: str, cands: list) -> tuple:
+    """The key a child's row-level security follows, among its NOT NULL keys to protected parents: `(pick, undecided)`.
+
+    `pick` is `(column, parent, key)`, or None when the keys reach different parents (a modelling decision; the table
+    stays unscoped). **Two keys to the same parent are a decision too** (CHG-MGN-001, ADAM CR-148, CR-149, 18 October
+    2026): `sorted(cands)[0]` took the first in alphabetical order, which was right for fnb.ingredient_substitute and
+    left ledger.inter_entity_obligation's consuming entity unable to read its obligations. The first is still taken, so
+    nothing moves until a person decides, but `undecided` names the columns, and derive-ddl lists the table for a
+    decision in ROW_OWNER ("owner undecided" in migration-review.md)."""
+    if not cands or len({o[1] for o in cands}) != 1:
+        return None, []
+    cols = sorted({o[0] for o in cands})
+    return sorted(cands)[0], (cols if len(cols) > 1 else [])
+
+
+# Tables pick_owner found with two keys to one parent and no ROW_OWNER entry: table -> (columns, parent, column taken).
+OWNER_UNDECIDED: dict = {}
+
+
+def partition_plan(marks: dict, inbound: dict) -> tuple:
+    """Which append-only tables are range-partitioned by month (ADR-0056 section 2): `(partitioned, declined,
+    refused)`. `partitioned`: table -> time column. `declined`: `(table, why)` for one the contract marks but that
+    cannot be partitioned (no such column, not in the tenant template). `refused`: `(table, [inbound keys])` for one
+    something declares a key into.
+
+    **An inbound key fails the run instead of turning partitioning off** (CHG-MGN-001, ADAM CR-138, 18 October
+    2026). Until then it moved the table to `declined` with a line in the run's output: CHG-STO-001 declared
+    `MessageDispatchAttempt.messageDispatchId` on 14 October, marketing.message_dispatch lost its partitioning in the
+    generated DDL, and the migration review asked the migration owner to un-partition a table built partitioned.
+    ADR-0056: nothing points at a partitioned table."""
+    partitioned: dict = {}
+    declined: list = []
+    refused: list = []
+    for t, m in sorted(marks.items()):
+        col = m.get("append_only")
+        if not col:
+            continue
+        if col.startswith("?"):
+            declined.append((t, f"the contract names {col[1:]}, which is not a column of the table"))
+        elif area(t.split(".")[0]) != "tenant":
+            declined.append((t, "not in the tenant template"))
+        elif inbound.get(t):
+            refused.append((t, sorted(inbound[t])))
+        else:
+            partitioned[t] = col
+    return partitioned, declined, refused
 
 
 def table_marks(cols: dict, tables) -> dict:
@@ -1214,21 +1532,30 @@ def table_marks(cols: dict, tables) -> dict:
         # **A child table derived from an array is not its parent** (14 October 2026, CHG-CRD-001). Its parent-key
         # column's source names the parent's array (`identity.PrincipalCredential.history`), which voted for the parent
         # schema, so `identity.principal_credential_history` took `PrincipalCredential`'s unique-together and failed to
-        # key it. Where a table has item columns (`...array[].prop`), only those vote.
-        _items = any("[]." in str(c.get("source") or "") for c in cols.get(t, []))
+        # key it. Where a table has item columns (`...array[].prop`) that resolve to an item schema, only those vote.
+        #
+        # **...and a parent key never votes** (CHG-MGN-001, ADAM CR-156, 18 October 2026). `platform.sale_board_tile`'s
+        # parent key comes from `tenancy.SaleBoard.pages[].tiles`, an item-shaped source whose array (`pages`) has
+        # inline items, so it resolved to nothing; under the rule above it was the table's only item column, every
+        # `tenancy.SaleBoardTile.*` column was skipped, and the table got no marks: its unique (sale_board_page_id,
+        # position) and its three required-when CHECKs were never derived. Item columns vote when one resolves;
+        # otherwise the plain columns do, less any whose source is an array property (the parent's, naming the parent).
+        item_votes: dict = defaultdict(int)
         for c in cols.get(t, []):
             src = str(c.get("source") or "")
-            if _items and "[]." not in src:
-                continue
             m = re.match(r"^([\w-]+)\.(\w+)\.(\w+)\[\]\.\w+$", src)
             if m:
                 key = ITEM_SCHEMA.get(f"{m.group(1)}.{m.group(2)}.{m.group(3)}")
                 if key:
-                    votes[key] += 1
+                    item_votes[key] += 1
+                continue
+            if "[]." in src or src in ARRAY_PROPS:
                 continue
             m = re.match(r"^([\w-]+)\.(\w+)\.\w+$", src)
             if m:
                 votes[f"{m.group(1)}.{m.group(2)}"] += 1
+        if item_votes:
+            votes = item_votes
         if not votes:
             continue
         schema = max(sorted(votes), key=lambda k: votes[k])
@@ -1469,7 +1796,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
                 old.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", text, maxsplit=1, flags=re.M)[0])
         for name in sorted(n for n in files if n.startswith(area_dir + "/") and n.endswith(".sql")):
             new.add_file(files[name])
-        plans.append(ddl_forward.diff(area_dir, old, new, renames))
+        plans.append(ddl_forward.diff(area_dir, old, new, renames, retired=RETIRED))
     # **Root-level files are documentation of references that are not constraints** (990): nothing
     # applies them, so a change is listed rather than migrated.
     for name in sorted(n for n in files if "/" not in n and n.endswith(".sql")):
@@ -1477,6 +1804,14 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         if was is not None and was.decode("utf-8").replace("\r\n", "\n") != files[name]:
             extra.append(("both", "file changed", name, "the generator would write it differently",
                           "not applied anywhere: bring the application rules it documents up to date by hand"))
+    # **Two keys to one parent wait for a decision** (CHG-MGN-001, ADAM CR-148, CR-149): listed, not resolved
+    # alphabetically. Nothing to migrate until the package decides; the policy then reaches a forward migration.
+    for t, (cols, par, took) in sorted(OWNER_UNDECIDED.items()):
+        extra.append(("tenant" if area(t.split(".")[0]) == "tenant" else CONTROL, "owner undecided", t,
+                      f"two NOT NULL keys to {par} ({', '.join(cols)}); its row-level security follows {took}, the "
+                      "first in alphabetical order, until the row's owner is decided",
+                      "nothing to migrate yet: the package decides which key owns the row (tools/derive-ddl.py "
+                      "ROW_OWNER) and the next release writes the policy"))
 
     written = []
     for p in plans:
@@ -1537,6 +1872,7 @@ def main() -> int:
         cols[t] = [c for c in cols[t] if not (
             c.get("references") and "." in str(c["references"]) and ":" not in str(c["references"])
             and not VALID_TABLE.match(str(c["references"])))]
+    apply_unenforced_keys(cols)
 
     by_schema: dict[str, list] = defaultdict(list)
     for t in sorted(real):
@@ -1688,20 +2024,15 @@ def main() -> int:
             if (ref in real and c.get("enforced") == "yes" and key_of(ref, cols)
                     and area(t.split(".")[0]) == area(ref.split(".")[0])):
                 inbound[ref].add(f"{t}.{c['column']}")
-    partitioned: dict = {}
-    declined: list = []
-    for t, m in sorted(marks.items()):
-        col = m.get("append_only")
-        if not col:
-            continue
-        if col.startswith("?"):
-            declined.append((t, f"the contract names {col[1:]}, which is not a column of the table"))
-        elif area(t.split(".")[0]) != "tenant":
-            declined.append((t, "not in the tenant template"))
-        elif inbound.get(t):
-            declined.append((t, "referenced by " + ", ".join(sorted(inbound[t]))))
-        else:
-            partitioned[t] = col
+    partitioned, declined, refused = partition_plan(marks, inbound)
+    if refused:
+        for t, refs in refused:
+            print(f"  ! {t} is partitioned by month (x-ticvai-append-only, ADR-0056) and {', '.join(refs)} "
+                  "declares a key into it. Nothing points at a partitioned table: mark that property "
+                  "`x-ticvai-references: none` (the code checks it; UNENFORCED_KEYS keeps its index), then run "
+                  "derive-schema before derive-ddl")
+        print("  derive-ddl refuses to drop a table's partitioning; nothing written (CHG-MGN-001, ADAM CR-138)")
+        return 1
 
     # **Composite keys where venue_id already exists** (ADR-0056 section 3). A declared reference
     # between two tables that both carry a NOT NULL `venue_id` becomes `(venue_id, <column>) ->
@@ -2164,9 +2495,12 @@ def main() -> int:
             if t in ROW_OWNER:
                 own = [o for o in own if o[0] == ROW_OWNER[t]]
             cands = [o for o in own if o[1] in protected]
-            if cands and len({o[1] for o in cands}) == 1:
-                col, par, key = sorted(cands)[0]
+            pick, undecided = pick_owner(t, cands)
+            if pick:
+                col, par, key = pick
                 round_.append((t, col, par, key))
+                if undecided:
+                    OWNER_UNDECIDED[t] = (undecided, par, col)
         if not round_:
             break
         for t, col, par, key in round_:
@@ -2273,6 +2607,15 @@ def main() -> int:
             print(f"  ! {t} is in APPEND_AUDIT but protected by another rule; its append policy is not applied")
     unscoped_all = [t for t in sorted(real)
                     if t not in protected and t not in venue_only and t != SCOPE_TABLE]
+    # **A child whose parent is in another deployable** (ADAM CR-108, CHG-RSF-001): its host cannot read the parent
+    # with its own grants (DB-ROLES), so its policy asks platform.visible_parent_ids. The deployables are the authored
+    # boundary in handoff/service-decomposition.json.
+    services = (json.loads((ROOT / "handoff" / "service-decomposition.json").read_text(encoding="utf-8"))
+                .get("services") or {})
+    dep_of_schema = {sc: v.get("deployable") for v in services.values() for sc in v.get("schemas") or []}
+    across = {t for t, _c, par, *_r in by_parent
+              if dep_of_schema.get(t.split(".", 1)[0]) and dep_of_schema.get(par.split(".", 1)[0])
+              and dep_of_schema[t.split(".", 1)[0]] != dep_of_schema[par.split(".", 1)[0]]}
     for db in ("tenant", CONTROL):
         mine = [t for t in scoped if area(t.split(".")[0]) == db and t not in split_calls]
         vmine = [t for t in venue_only if area(t.split(".")[0]) == db and t not in split_calls]
@@ -2299,7 +2642,8 @@ def main() -> int:
             has_scope_table=(SCOPE_TABLE in real and db == "tenant"),
             shared={t: c for t, c in shared_scope.items() if t in mine},
             by_subject=smine, tenant_only=tmine, append_audit=amine,
-            split=[(t, c, w) for t, (c, w) in sorted(split_calls.items()) if area(t.split(".")[0]) == db])
+            split=[(t, c, w) for t, (c, w) in sorted(split_calls.items()) if area(t.split(".")[0]) == db],
+            across=across)
 
     # **Range partitioning by month** (ADR-0056). The tables declare `PARTITION BY RANGE` where they
     # are created; this file holds each one's DEFAULT partition and the months ahead.
@@ -2361,6 +2705,9 @@ def main() -> int:
           f"foreign key(s) onto {len(composite_parents)} parent(s)")
     for t, why in declined:
         print(f"     append-only but not partitioned: {t} -- {why}")
+    for t, (cols, par, took) in sorted(OWNER_UNDECIDED.items()):
+        print(f"  ! {t}: two keys to {par} ({', '.join(cols)}), owner not decided in ROW_OWNER; follows {took} "
+              "for now (listed in migration-review.md)")
     print(f"  row-level security: {len(scoped)} by scope_path · {len(venue_only)} carry venue_id · "
           f"{len(by_parent)} through their owner · {n_subject_rls[0]} by subject · "
           f"{n_tenant_rls[0]} tenant root only · {n_append_rls[0]} append-only audit · "

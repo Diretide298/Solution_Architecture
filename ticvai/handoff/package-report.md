@@ -1,6 +1,6 @@
 # Package report
 
-**Generated 2026-10-15 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
+**Generated 2026-10-18 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
 
 ## Scale
 
@@ -15,7 +15,7 @@
 | Stores | 10 |
 | Foreign Keys | 815 |
 | Indexes | 2924 |
-| Relationships | 3196 |
+| Relationships | 3195 |
 | Flows | 98 |
 | Boards | 218 |
 | Adrs | 71 |
@@ -39,7 +39,7 @@
 
 ## What crosses a service boundary
 
-**3196 declared references. 1966 stay inside one service; 1230 cross two.**
+**3195 declared references. 1965 stay inside one service; 1230 cross two.**
 
 **637 of the 1230 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
 

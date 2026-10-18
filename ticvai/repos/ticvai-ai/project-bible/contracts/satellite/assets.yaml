@@ -117,12 +117,13 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/MediaAsset'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). VenueOps answers with its assets.media_asset rows, as it stores them and as the caller's scope
-      lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through VenueOps' service route (serviceAuth).
-    served: [service]
+      October). VenueOps answers with its assets.media_asset rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
+      operations, through the C# query interface VenueOps implements, and asked from another deployable through
+      VenueOps' service route (serviceAuth).
+    served: [in-process, service]
 paths:
   /media:
     get:

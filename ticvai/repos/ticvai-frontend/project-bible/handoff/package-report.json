@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-15",
+ "generated": "2026-10-18",
  "note": "The package measured in one pass. Derived by tools/build-package-report.py from the files the refresh writes -- never from prose.",
  "counts": {
   "operations": 2804,
@@ -9,7 +9,7 @@
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3196,
+  "relationships": 3195,
   "states": 207,
   "events": 89,
   "flows": 98,
@@ -87,8 +87,8 @@
   }
  ],
  "boundaries": {
-  "edgesTotal": 3196,
-  "insideOneService": 1966,
+  "edgesTotal": 3195,
+  "insideOneService": 1965,
   "crossingTwoServices": 1230,
   "endpointNotOwned": 0,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",

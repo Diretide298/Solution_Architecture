@@ -282,7 +282,8 @@
   "type": "object",
   "required": [
    "channel",
-   "allocatedUnits"
+   "allocatedUnits",
+   "channelCapacityId"
   ],
   "properties": {
    "id": {

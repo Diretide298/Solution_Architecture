@@ -284,6 +284,9 @@ paths:
       - query: subscription#tenantRecords
         route: in-process
         for: 'its read of control.tenant, Platform''s data (CHG-MOD-001)'
+      - query: platform-ops#hostnameHeldByAnotherTenant
+        route: in-process
+        for: 'refused where another tenant already holds the hostname (ADAM CR-096)'
       summary: Claim a domain and get a verification token
       description: '**Claiming is not owning.** The response carries the record the tenant must publish
         (`verificationRecord`), and nothing happens until it resolves.
@@ -730,6 +733,13 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-read-via:
+      - query: platform-ops#tenantDomainRecords
+        route: in-process
+        for: 'the platform-issued address, the tenant''s platform subdomain row (ADAM CR-096)'
+      - query: subscription#cellRecords
+        route: in-process
+        for: 'the tenant''s cell, whose name the address carries (ADAM CR-096)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1509,6 +1519,10 @@ paths:
       operationId: setMaintenanceMode
       x-ticvai-consumed-by:
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'TenantAppStatus.venues: only the active venues are listed (ADAM CR-096)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -1610,6 +1624,13 @@ paths:
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-004 Logo & Assets"
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-read-via:
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'showPoweredBy false: the tenant''s licence add-on keyed poweredByRemoval, else 403 powered-by-locked (ADAM CR-096)'
+      - query: assets#mediaAssetRecords
+        route: in-process
+        for: 'each asset''s type, size and dimensions: PNG or SVG, up to 2 MB (ADAM CR-096)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -1701,6 +1722,10 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: in-process
+        for: 'the 1024x1024 source''s type, size and dimensions (ADAM CR-096)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -1919,6 +1944,10 @@ paths:
       operationId: setBookingFlowConfig
       x-ticvai-consumed-by:
         - "P13 CMS-016 Site Settings"
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Set how the guest booking flow looks and steps
@@ -3567,6 +3596,13 @@ paths:
         - "P13 CMS-006 Component Preview"
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-read-via:
+      - query: orders#ticketTemplateRecords
+        route: service
+        for: 'the ticket and pass templates the PDF ticket and Wallet passes are rendered from (ADAM CR-096)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'productId: the product whose own ticket is rendered (ADAM CR-096)'
       x-ticvai-audience:
       - staff
       summary: Generate a preview link
@@ -3688,6 +3724,10 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-103 Booking Flows"
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -3994,6 +4034,10 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-015 Version History"
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-config-scope: tenant
       x-ticvai-audience:
       - staff
@@ -4709,6 +4753,10 @@ paths:
       operationId: setAnalyticsProvider
       x-ticvai-consumed-by:
         - "P13 CMS-016 Site Settings"
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: '422: a venueId not among the tenant''s active venues (ADAM CR-096)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: matrix 22.10.29; Chinmay''s brief for the build (venue configuration: provider, measurement id, the consent category it waits on); BL-073 design §4a; shape follows setBookingFlowConfig'

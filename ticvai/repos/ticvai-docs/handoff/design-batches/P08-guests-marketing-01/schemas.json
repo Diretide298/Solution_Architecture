@@ -1558,6 +1558,7 @@
  },
  "DeviceBinding": {
   "x-ticvai-persistence": "platform.device",
+  "description": "A device as its workstation is configured with it. **Binding a device here moves its row to the workstation's scope**: `platform.device.scope_path` becomes the workstation's path, so the device's own session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).\n",
   "type": "object",
   "required": [
    "kind",

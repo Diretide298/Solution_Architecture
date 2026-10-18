@@ -675,7 +675,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-004 |
+| Block | Block B · ticket #35737 (APP-CONSOLE-ADM-004) |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (3 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAiInteractions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

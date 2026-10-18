@@ -248,12 +248,13 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/VenueSettings'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Tenancy answers with its platform.venue_settings rows, as it stores them and as the caller's
-      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within commerce, through the C# query interface Tenancy implements.
-    served: [in-process]
+      October). Tenancy answers with its platform.venue_settings rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
+      commerce, through the C# query interface Tenancy implements, and asked from another deployable through
+      Tenancy's service route (serviceAuth).
+    served: [in-process, service]
   workstationRecords:
     module: tenancy
     table: platform.workstation
@@ -290,6 +291,27 @@ x-ticvai-queries:
       transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  activeVenues:
+    module: tenancy
+    table: platform.scope
+    inputs:
+      venueIds: {type: array, items: {type: string, format: uuid}, description: 'The venues asked about; omitted, every active venue of the tenant.'}
+    returns:
+      type: array
+      description: 'The active venues in name order; a venue asked about that is not active, or that the caller cannot see, is absent.'
+      items:
+        type: object
+        required: [venueId, name]
+        properties:
+          venueId: {type: string, format: uuid}
+          name: {type: string}
+    rule: >-
+      A rule question (ADAM CR-096, 15 October 2026, CHG-RTE-001). A venue is active when its node in the scope
+      tree (platform.scope, level venue) has is_active true. Tenancy answers for the tenant whose database the caller
+      is connected to, under the caller's scope. White Label refuses a venueId that is absent (setAnalyticsProvider,
+      422) and lists only these venues in TenantAppStatus.venues. It is asked from another deployable through
+      Tenancy's service route (serviceAuth).
     served: [service]
 paths:
   /tenant-domains/{hostname}:
@@ -1280,6 +1302,12 @@ paths:
       - query: access#accessPointRecords
         route: service
         for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'displayCurrencies: a code the region has no rate for is refused 400 (ADAM CR-096)'
+      - query: orders#venueChargeCurrencies
+        route: in-process
+        for: 'chargeCurrencies: each must be one the venue''s payment provider can charge (ADAM CR-096)'
       summary: Set support hours, quiet hours, segregated access and alerting
       description: >
         **The four things a venue answers and no other level can** (CF-100, CF-130, CF-134).
@@ -2229,7 +2257,8 @@ paths:
       x-ticvai-audience: [staff]
       summary: Register a device
       description: >
-        Binds a device to a workstation and names the driver. Drivers are built to open
+        Binds a device to a workstation and names the driver; a bound device's `scopePath` is that workstation's
+        path (ADAM CR-095, CHG-RSF-001). Drivers are built to open
         standards where they exist — ESC/POS, UnifiedPOS, OSDP — so adding a vendor is a
         driver plus configuration rather than a core change (ADR-0015).
 
@@ -4871,7 +4900,7 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
+          description: 'Where the row is owned. **While the device is bound to a workstation (`workstationId` set) it is that workstation''s path**, set by the server when the device is bound (`registerDevice`, `configureWorkstation`) and moved when it is bound elsewhere, so the device''s own session, scoped to its workstation, may write its heartbeat (`recordDeviceHeartbeat`; ADAM CR-095, CHG-RSF-001). Unbound, it is the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope. Never taken from a request. Row-level security reads it (MOD audit, 14 October 2026, CHG-MOD-007).'
         id: { type: string, format: uuid, readOnly: true }
         kind: { $ref: '#/components/schemas/DeviceKind' }
         driver:
@@ -6248,6 +6277,10 @@ components:
 
     DeviceBinding:
       x-ticvai-persistence: "platform.device"
+      description: >
+        A device as its workstation is configured with it. **Binding a device here moves its row to the
+        workstation's scope**: `platform.device.scope_path` becomes the workstation's path, so the device's own
+        session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).
       type: object
       required: [kind, driver]
       properties:

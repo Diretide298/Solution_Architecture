@@ -1320,7 +1320,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
 | workstation.currencyScale | integer |  | (min 0; max 4) |
 | workstation.timezone | string |  |  |
-| workstation.cellName | string |  | The cell serving this workstation's region. |
+| workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
 | workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | openedAt | string (date-time) |  |  |
@@ -1576,7 +1576,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | session.workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
 | session.workstation.currencyScale | integer |  | (min 0; max 4) |
 | session.workstation.timezone | string |  |  |
-| session.workstation.cellName | string |  | The cell serving this workstation's region. |
+| session.workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
 | session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | session.workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | session.openedAt | string (date-time) |  |  |
@@ -1702,7 +1702,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
 | workstation.currencyScale | integer |  | (min 0; max 4) |
 | workstation.timezone | string |  |  |
-| workstation.cellName | string |  | The cell serving this workstation's region. |
+| workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
 | workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | openedAt | string (date-time) |  |  |
@@ -2099,7 +2099,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | session.workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
 | session.workstation.currencyScale | integer |  | (min 0; max 4) |
 | session.workstation.timezone | string |  |  |
-| session.workstation.cellName | string |  | The cell serving this workstation's region. |
+| session.workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
 | session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | session.workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | session.openedAt | string (date-time) |  |  |

@@ -3055,7 +3055,7 @@ tables:
 - table: marketing.message_dispatch_attempt
   columns: 15
   store: postgres
-  parent: marketing.message_dispatch
+  parent: null
   writtenBy:
   - marketing-crm
   foreignWriters: null

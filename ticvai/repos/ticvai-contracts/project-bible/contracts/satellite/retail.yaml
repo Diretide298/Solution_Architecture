@@ -494,6 +494,9 @@ paths:
       - query: tenancy#workstationRecords
         route: service
         for: 'the caller''s workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003)'
+      - query: promotions#liveEffectivePrice
+        route: service
+        for: 'the price after any live promotion (ADAM CR-096)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -1130,6 +1133,13 @@ paths:
       operationId: createShopAndDrop
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: service
+        for: 'the retail lines lineIds names on the orderId path (ADAM CR-096)'
+      - query: fnb#deliveryLocationRecords
+        route: in-process
+        for: 'collectionPointClosed: the collection point and its serving outlets (ADAM CR-096; the hours rule is CR-104)'
       x-ticvai-audience: [staff, service]
       security:
         - bearerAuth: []
@@ -1226,6 +1236,10 @@ paths:
         - "P02 GST-062 Shop & Drop Collection"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P08 BO-143 Retail Global Settings & Controls"
+      x-ticvai-read-via:
+      - query: fnb#deliveryLocationRecords
+        route: in-process
+        for: 'what its text calls "collection point": fnb.delivery_location, F&B''s data (CHG-RTE-001)'
       security:
       - guestAuth: []
       - bearerAuth: []

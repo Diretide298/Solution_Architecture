@@ -739,6 +739,7 @@
  "DynamicPricingControl": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.dynamic_pricing_control",
+  "x-ticvai-rls": "read-beneath",
   "description": "**The limits and the autonomy of dynamic pricing at one scope** (29 September, data model DM3). Merges guardrails (ADM-093) and automation policy (ADM-094, ADM-113): both are per-scope controls a price change must pass, and they share the rate-of-change limits. The most specific scope wins; guardrails are re-checked at execution (`createLiveDynamicPrice`). `automationLevel` is the one vocabulary: the strategy screen's `monitor`/`recommend` read as `advisory`, `prepareChange` as `humanInTheLoop`, `autoExecuteWithinGuardrails` as `conditionalAutonomous`.",
   "required": [
    "id",

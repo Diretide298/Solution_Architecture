@@ -427,6 +427,7 @@
  "AiProvider": {
   "type": "object",
   "x-ticvai-persistence": "ai.provider",
+  "x-ticvai-rls": "read-beneath",
   "required": [
    "kind",
    "capability",

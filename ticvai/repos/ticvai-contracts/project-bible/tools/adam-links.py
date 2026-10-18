@@ -15,15 +15,20 @@ them from the package:
 
 Writes handoff/service-docs/adam-links.json, loaded on the ADAM server by viewer/api/load_links.py. With
 TICVAI_OP_TOKEN set it also reads each ticket's subject, status, type and assignee from OpenProject, the cached
-columns ADAM shows on a board (a copy, labelled as one; OpenProject stays the truth).
+columns ADAM shows on a board (a copy, labelled as one; OpenProject stays the truth). The gate reads the same
+columns, offline, to fail a baselined finding once a ticket building it has started (tools/audit_guard.py,
+CHG-CRF-001), so they carry when they were read (`statusReadAt`), and a run without the token keeps the last file's
+columns rather than dropping them.
 
-  python3 tools/adam-links.py
+  python3 tools/adam-links.py                  # links from the package; ticket columns read or carried
+  python3 tools/adam-links.py --status-only    # ticket columns read again, links untouched (TICVAI_OP_TOKEN)
 """
 from __future__ import annotations
 
 import base64
 import collections
 import csv
+import datetime
 import json
 import os
 import re
@@ -66,7 +71,90 @@ def snapshot(token):
         off += 1
 
 
+COLUMNS = ("subject", "status", "type", "assignee")
+
+
+def _now() -> str:
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def carried_status(previous: dict) -> tuple:
+    """The cached columns of an earlier adam-links.json by work package id, and when they were read (CHG-CRF-001).
+    A run without TICVAI_OP_TOKEN keeps them, so the gate's started-ticket rule never loses them silently."""
+    snap = {}
+    for ln in (previous or {}).get("links") or []:
+        if not ln.get("status"):
+            continue
+        try:
+            wp = int(ln.get("key"))
+        except (TypeError, ValueError):
+            continue
+        snap.setdefault(wp, {k: ln.get(k) or "" for k in COLUMNS})
+    read_at = ((previous or {}).get("statusReadAt") or "") if snap else ""
+    return snap, read_at
+
+
+def status_source(token: str, previous: dict) -> tuple:
+    """(cached columns by work package id, when they were read, how) for this run: OpenProject when the token is
+    set, else the last file's."""
+    if token:
+        return snapshot(token), _now(), "read from OpenProject"
+    snap, read_at = carried_status(previous)
+    if snap:
+        return snap, read_at, (f"carried from the last adam-links.json, read {read_at or 'at an earlier release'} "
+                               f"(no TICVAI_OP_TOKEN)")
+    return {}, "", "none (no TICVAI_OP_TOKEN and no earlier file)"
+
+
+def restatus(doc: dict, snap: dict, read_at: str) -> dict:
+    """`doc` with each link's cached columns taken from `snap`; which tickets link what is left as it is."""
+    links = []
+    for ln in doc.get("links") or []:
+        row = {k: v for k, v in ln.items() if k not in COLUMNS}
+        try:
+            row.update(snap.get(int(ln.get("key")), {}))
+        except (TypeError, ValueError):
+            pass
+        links.append(row)
+    out = {k: v for k, v in doc.items() if k not in ("cached", "statusReadAt", "links")}
+    out.update({"cached": bool(snap), "statusReadAt": read_at if snap else "", "links": links})
+    return out
+
+
+def status_only() -> int:
+    """Read every ticket's status again and rewrite only the cached columns of adam-links.json (CHG-CRF-001): before
+    a gate between releases, so the started-ticket rule judges today's statuses. Never writes on a failed read."""
+    path = DOCS / "adam-links.json"
+    token = os.environ.get("TICVAI_OP_TOKEN", "")
+    if not token:
+        print("adam-links --status-only: TICVAI_OP_TOKEN is not set; nothing read, nothing written")
+        return 2
+    if not path.exists():
+        print(f"adam-links --status-only: {path} is missing; run tools/adam-links.py first")
+        return 2
+    try:
+        snap = snapshot(token)
+    except Exception as e:  # network, HTTP or JSON: say so and keep the file
+        print(f"adam-links --status-only: OpenProject could not be read ({e.__class__.__name__}: {e}); "
+              f"adam-links.json left as it was")
+        return 2
+    if not snap:
+        print("adam-links --status-only: OpenProject returned no work packages; adam-links.json left as it was")
+        return 2
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    before = {(ln.get("key"), ln.get("kind"), ln.get("id")): ln.get("status") for ln in doc.get("links") or []}
+    out = restatus(doc, snap, _now())
+    moved = sum(1 for ln in out["links"]
+                if before.get((ln.get("key"), ln.get("kind"), ln.get("id"))) != ln.get("status"))
+    path.write_text(json.dumps(out, indent=0), encoding="utf-8")
+    print(f"ticket status read for {len(snap)} work packages at {out['statusReadAt']}; {moved} of "
+          f"{len(out['links'])} link rows changed status; which tickets link what is unchanged")
+    return 0
+
+
 def main() -> int:
+    if "--status-only" in sys.argv[1:]:
+        return status_only()
     rows = {r["key"]: r for r in csv.DictReader((DOCS / "tasks.csv").open(encoding="utf-8"))}
     mp = json.loads((DOCS / "pms-map.json").read_text(encoding="utf-8"))
     lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
@@ -80,8 +168,9 @@ def main() -> int:
                   for sid, s in screens.items()}
     known = package_index(screens)
     touches = touches_from(rows, lineage, screen_ops, known)
-    token = os.environ.get("TICVAI_OP_TOKEN", "")
-    snap = snapshot(token) if token else {}
+    path = DOCS / "adam-links.json"
+    previous = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    snap, read_at, how = status_source(os.environ.get("TICVAI_OP_TOKEN", ""), previous)
     links, per_kind, bare, bare_keys = [], collections.Counter(), 0, []
     for key, wp in mp.items():
         if key.startswith(("_", "VERSION")):
@@ -95,11 +184,12 @@ def main() -> int:
             per_kind[kind] += 1
             links.append({"key": str(wp), "kind": kind, "id": target, "url": f"{PMS}/work_packages/{wp}",
                           **snap.get(wp, {})})
-    out = {"project": "ticvai", "openproject": PMS, "cached": bool(snap), "links": links}
-    (DOCS / "adam-links.json").write_text(json.dumps(out, indent=0), encoding="utf-8")
+    out = {"project": "ticvai", "openproject": PMS, "cached": bool(snap), "statusReadAt": read_at if snap else "",
+           "links": links}
+    path.write_text(json.dumps(out, indent=0), encoding="utf-8")
     tickets = len([k for k in mp if not k.startswith(("_", "VERSION"))])
     print(f"{len(links)} links for {tickets - bare} of {tickets} tickets ({bare} with nothing to link: out of the "
-          f"plan or sub-tasks of such); {dict(per_kind)}; cached columns: {bool(snap)}")
+          f"plan or sub-tasks of such); {dict(per_kind)}; cached columns: {how}")
     print(f"repointed to a table's name now: {sum(known['repointed'].values())} link(s) "
           f"({', '.join(f'{a} -> {b}' for a, b in sorted(known['repointed'])[:8])}); dropped as not in the package: "
           f"{sum(known['dropped'].values())} ({', '.join(f'{k} {i}' for k, i in sorted(known['dropped'])[:12])})")

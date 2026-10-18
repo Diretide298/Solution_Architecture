@@ -94,6 +94,7 @@
  "AiCustomerServiceCopilotKnowledgeWorkspaceInput": {
   "type": "object",
   "x-ticvai-persistence": "marketing.service_copilot_config",
+  "x-ticvai-rls": "read-beneath",
   "description": "The customer-service copilot's configuration for one scope (pack 10.1.10). A field left out takes its default, not its old value.",
   "required": [
    "scopeLevel",

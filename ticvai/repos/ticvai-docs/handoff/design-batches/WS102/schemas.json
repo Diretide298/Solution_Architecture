@@ -764,6 +764,7 @@
  "PaymentProvider": {
   "type": "object",
   "x-ticvai-persistence": "payments.provider",
+  "x-ticvai-rls": "read-beneath",
   "description": "BL-116, CF-131. **`Payment` carried `providerName` and `providerReference`, which records a provider and does not abstract one.**\nTwo gateways are confirmed for Phase 1 — **Network International and Stripe** — and that is exactly the number that forces this: **one gateway can be hard-coded and two cannot.**\nCredentials live in the vault and never here, following `ai.AiProvider` (ADR-0020's rule applied outside AI): **no surface ever holds a provider key.**\n",
   "required": [
    "id",

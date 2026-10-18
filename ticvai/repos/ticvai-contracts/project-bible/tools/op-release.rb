@@ -447,10 +447,27 @@ if rel_run?("assign")
     want[:assigned_to_id] = a.id if a && w.assigned_to_id != a.id
     want[:responsible_id] = r.id if r && w.responsible_id != r.id
     want[version_col] = v if v && w.send(version_col) != v
-    next if want.empty?
+    # A started ticket keeps its owners, except a field on someone who left: nobody answers QA for a leaver. It
+    # goes to the plan's person, else the successor (r6, 15 October: 158 Ready for QA tickets kept Tanmay
+    # Dukhande as accountable, P-25).
+    leaver = {}
+    if w.status_id != NEW_ID && !w.status.is_closed
+      [[:assigned_to_id, w.assigned_to, a], [:responsible_id, w.responsible, r]].each do |col, cur, planned|
+        next unless cur && left.key?(cur.name)
+        s = hand_on.call(planned, cur)
+        leaver[col] = s.id if s && s.id != cur.id
+      end
+    end
+    next if want.empty? && leaver.empty?
     if w.status_id == NEW_ID
       change[id] = want
       moves["#{w.assigned_to ? w.assigned_to.name : '(none)'} -> #{a.name}"] += 1 if want[:assigned_to_id]
+    elsif leaver.any?
+      change[id] = leaver
+      leaver.each do |col, uid|
+        was = col == :assigned_to_id ? w.assigned_to : w.responsible
+        moves["#{was.name} -> #{User.find(uid).name} (#{col == :assigned_to_id ? 'assignee' : 'accountable'}, started, left the project)"] += 1
+      end
     elsif ENV["ASSIGN_COMMENT"] != "0" && !noted.include?(id) && !w.status.is_closed
       text = "**#{ASSIGN_MARKER}:** this ticket is now planned for **#{a ? a.name : t['assignee']}**" +
              (v ? " in **#{versions[v]}**" : "") + ", accountable **#{r ? r.name : t['responsible']}**. It is " \
@@ -462,7 +479,7 @@ if rel_run?("assign")
   rel_say "fields still on someone who left, handed to the successor (the plan's person has no account yet): " +
           handed.map { |m, n| "#{n} #{m}" }.join(", ") if handed.any?
   n_of = lambda { |k| change.values.count { |x| x.key?(k) } }
-  rel_say "New tickets to change: #{change.size} (assignee #{n_of.call(:assigned_to_id)}, accountable " \
+  rel_say "tickets to change (New ones, and started ones on someone who left): #{change.size} (assignee #{n_of.call(:assigned_to_id)}, accountable " \
       "#{n_of.call(:responsible_id)}, sprint #{n_of.call(version_col)}); started tickets that get a comment: #{notes.size}" +
       (ENV["ASSIGN_COMMENT"] == "0" ? " (ASSIGN_COMMENT=0: none)" : "") + "; #{noted.size} already have this release's"
   rel_list(moves.sort_by { |_, n| -n }.map { |m, n| "#{n.to_s.rjust(4)}  #{m}" } +
@@ -602,7 +619,22 @@ if rel_run?("retire")
     end
     rel_say "done: #{act.size} moved"
   end
-  results << "retire: #{act.size} #{APPLY ? 'moved' : 'to move'}, #{B['unexplained'].size} unexplained listed"
+  # A rejected ticket never closes, so a follows link to or from it would hold its neighbour forever. The links
+  # phase only tidies links between plan tasks; these are removed here, and every order the plan needs is linked
+  # directly (r6, 15 October: 64 were left, P-24). destroy! raises instead of quietly keeping one.
+  gone_ids = act.select { |_, t| t.id == status_rejected.id }.map { |e, _| e["id"] } +
+             done_already.select { |e| e["action"] != "defer" }.map { |e| e["id"] }
+  follows = Relation.where(follows: 1, hierarchy: 0, relates: 0, duplicates: 0, blocks: 0, includes: 0, requires: 0)
+  dead = gone_ids.empty? ? [] : follows.where(from_id: gone_ids).or(follows.where(to_id: gone_ids)).to_a
+  rel_say "follows links on rejected tickets: #{dead.size} #{APPLY ? 'removed' : 'to remove'}"
+  rel_list(dead.map { |x| "##{x.from_id} follows ##{x.to_id}" })
+  if APPLY && dead.any?
+    rel_quietly { WorkPackage.transaction { dead.each(&:destroy!) } }
+    left_over = follows.where(from_id: gone_ids).or(follows.where(to_id: gone_ids)).count
+    abort("retire: #{left_over} follows links on rejected tickets survived the delete") if left_over > 0
+  end
+  results << "retire: #{act.size} #{APPLY ? 'moved' : 'to move'}, #{dead.size} links on rejected tickets " \
+             "#{APPLY ? 'removed' : 'to remove'}, #{B['unexplained'].size} unexplained listed"
 end
 
 # --------------------------------------------------------------------------------------------------- descriptions

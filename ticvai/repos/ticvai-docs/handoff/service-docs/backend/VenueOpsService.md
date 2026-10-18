@@ -6188,7 +6188,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| feed_id | uuid | no | The feed that sent it, taken from the submitQueueReading body. |
+| feed_id | uuid | yes | The feed that sent it, taken from the submitQueueReading body. |
 | disposition | text | no | Set on receipt. |
 | kind | text | yes | Deliberately narrow. |
 | value | numeric | yes |  |

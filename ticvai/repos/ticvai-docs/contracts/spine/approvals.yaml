@@ -5292,6 +5292,7 @@ components:
     ApprovalMatrix:
       type: object
       x-ticvai-persistence: approvals.matrix
+      x-ticvai-rls: read-beneath   # ADAM CR-095, CHG-RSF-001: a matrix set at the tenant or a region governs every venue beneath it, so a venue reads the matrices it inherits (approvals.rule follows its matrix for reading) and still writes only its own
       required:
       - kind
       - scopeLevel

@@ -17,6 +17,8 @@
 #   /opt/ticvai-release/ticvai/tools/op-release-server.sh dry-run r1
 #   /opt/ticvai-release/ticvai/tools/op-release-server.sh apply r1
 #   /opt/ticvai-release/ticvai/tools/op-release-server.sh apply r1 ONLY=descriptions BATCH=200   (staged pointers)
+#   ... settle the CRs, file the child tasks, then:
+#   /opt/ticvai-release/ticvai/tools/op-release-server.sh notify-on
 #
 # dry-run  fetches the tags, checks out rN (refuses a dirty checkout), copies tools/op-release.rb and
 #          handoff/service-docs/op-release.json into the container and runs the dry run. The log is kept in
@@ -25,6 +27,11 @@
 #          the database up (NO_BACKUP=1 skips; never on the first apply of a release), runs APPLY=1, then copies
 #          /tmp/op-created.json out of the container to .release-out/op-created-rN.json and prints it. The lead
 #          scp's it back (or copies the printed JSON) and merges it: python3 tools/op-created-merge.py <file>.
+#          OpenProject 10 has no per-run mail switch, so apply turns notifications off for the whole instance
+#          first (the list is saved in .release-out/notified_events.json) and leaves them off: the CR settlement
+#          and child tasks that follow a release must not mail either (P-23, 15 October).
+# notify-on  puts the saved notification list back. Run it once the release's follow-up writes are done.
+#            status shows whether notifications are on.
 #
 # Extra settings after the tag are passed to op-release.rb: ONLY, BATCH, SHOW, LIMIT, AUTHOR, ASSIGN_COMMENT,
 # RETITLE (see the header of op-release.rb). Anything else is refused.
@@ -40,6 +47,43 @@ BUNDLE="$PKG/handoff/service-docs/op-release.json"
 ALLOWED="ONLY BATCH SHOW LIMIT AUTHOR ASSIGN_COMMENT RETITLE"
 
 die() { echo "op-release-server: $*" >&2; exit 1; }
+
+# rails runner on a one-line Ruby script; the last line of its output is the answer ("hook registered" and other
+# boot noise come first)
+rails_line() {
+  docker exec "$CONTAINER" bash -c "cd /app && bundle exec rails runner /tmp/$1" 2>/dev/null | tail -1
+}
+put_rb() {   # $1 = name, $2 = Ruby source
+  printf '%s
+' "$2" > "$OUT/$1"
+  docker cp "$OUT/$1" "$CONTAINER:/tmp/$1" >/dev/null
+}
+
+notify_off() {
+  local saved="$OUT/notified_events.json" now
+  put_rb notify-get.rb 'puts Setting.notified_events.to_json'
+  now=$(rails_line notify-get.rb)
+  [[ "$now" == \[* ]] || die "could not read the notification settings (got '$now'); nothing applied"
+  if [ "$now" != "[]" ]; then
+    printf '%s
+' "$now" > "$saved"
+  else
+    [ -s "$saved" ] || die "notifications are already off and $saved holds no list to restore later; nothing applied"
+  fi
+  put_rb notify-off.rb 'Setting.notified_events = []; puts Setting.notified_events.to_json'
+  [ "$(rails_line notify-off.rb)" = "[]" ] || die "notifications could not be switched off; nothing applied"
+  echo "== notifications off for the whole instance (saved: $saved). After the CR settlement: $0 notify-on"
+}
+
+notify_on() {
+  local saved="$OUT/notified_events.json" now
+  [ -s "$saved" ] || die "no saved list in $saved"
+  docker cp "$saved" "$CONTAINER:/tmp/notified_events.json" >/dev/null
+  put_rb notify-on.rb 'Setting.notified_events = JSON.parse(File.read("/tmp/notified_events.json")); puts Setting.notified_events.to_json'
+  now=$(rails_line notify-on.rb)
+  [ "$now" = "$(cat "$saved")" ] || die "notifications not restored: now '$now', saved '$(cat "$saved")'"
+  echo "== notifications on again: $now"
+}
 
 usage() {
   sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
@@ -153,8 +197,9 @@ apply() {
   copy_in
   docker exec "$CONTAINER" rm -f /tmp/op-created.json
   log="$OUT/$tag-apply-$stamp.log"
+  notify_off
   local rc=0
-  run_rb "$log" -e APPLY=1 -e "EXPECT_RELEASE=$tag" ${ENV_ARGS[@]+"${ENV_ARGS[@]}"} || rc=$?
+  run_rb "$log" -e APPLY=1 -e QUIET_ANYWAY=1 -e "EXPECT_RELEASE=$tag" ${ENV_ARGS[@]+"${ENV_ARGS[@]}"} || rc=$?
   touch "$OUT/$tag-applied"
   # copied whatever happened later: the create phase commits on its own, so its ids must never be lost
   if docker exec "$CONTAINER" test -f /tmp/op-created.json; then
@@ -165,6 +210,7 @@ apply() {
     echo "== no op-created.json (the create phase did not run)"
   fi
   echo "== log kept in $log"
+  echo "== notifications are still OFF: settle the CRs and file the child tasks, then: $0 notify-on"
   [ "$rc" = "0" ] || die "op-release.rb stopped with status $rc; the phases before the failure are committed (see the log)"
 }
 
@@ -173,6 +219,11 @@ status() {
   echo "checkout: $(git -C "$CHECKOUT" describe --tags --always) ($(git -C "$CHECKOUT" rev-parse --short HEAD))"
   echo "latest tags: $(git -C "$CHECKOUT" tag --list 'r*' --sort=-v:refname | head -5 | tr '\n' ' ')"
   ls -1t "$OUT" 2>/dev/null | head -10
+  if docker inspect "$CONTAINER" >/dev/null 2>&1; then
+    mkdir -p "$OUT"
+    put_rb notify-get.rb 'puts Setting.notified_events.to_json'
+    echo "notifications: $(rails_line notify-get.rb)"
+  fi
 }
 
 cmd=${1:-}
@@ -182,5 +233,6 @@ case "$cmd" in
   dry-run) [ $# -ge 1 ] || usage; dry_run "$@" ;;
   apply)   [ $# -ge 1 ] || usage; apply "$@" ;;
   status)  status ;;
+  notify-on) notify_on ;;
   *)       usage ;;
 esac

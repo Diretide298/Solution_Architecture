@@ -21,10 +21,13 @@ OpenProject id, kind and id; viewer/api/load_links.py), against the plan and the
                        git does not track or ADAM's release export leaves out, a service
                        service-decomposition.json does not have, or a kind ADAM has no lookup for.
     TL-REHEARSAL       docs/active/release-runbook.md section 4 does not hold the rehearsal pull as the gate step
-                       before the tag (CHG-GRD-003; audit plan step 11a): a local ADAM on `r<N>-rc` with the stand-in
-                       OpenProject, every block ticket pulled with the shipped connector, compared with the last live
-                       pull, passing only with 0 pull errors, `r<N>` on every ticket, 0 tickets with nothing linked
-                       and 0 dead links. The checks read the package; only a pull reads what a developer gets.
+                       before the tag (CHG-GRD-003, CHG-RHS-001; audit plan step 11a): one command
+                       (tools/rehearse/rehearse.sh) running a local ADAM on `r<N>-rc` with the stand-in OpenProject
+                       (tools/rehearse/stand-in-openproject.mjs), ticket links loaded by viewer/api/load_links.py as
+                       production loads them, every block ticket pulled with the shipped connector, compared with the
+                       last live pull, passing only with 0 pull errors, `r<N>` on every ticket, 0 tickets with nothing
+                       linked, 0 dead links and no open ticket with someone who left as assignee or Accountable. The
+                       checks read the package; only a pull reads what a developer gets.
 
 **15 October 2026** (the r6 rehearsal pull, batch GT3, CHG-GT3-001): 36 links on 18 SETUP tickets named
 `repos/ticvai-docs/setup/*.md`, files git tracks and this passed, but ADAM serves a tag from an export that empties
@@ -65,7 +68,7 @@ PULLED = {"screen", "flow", "contract", "operation", "schema", "table", "module"
 RULES = {
     "TL-NOTHING-LINKED": "a Block A feature or task has no link adam_pull pulls (an ADR alone is nothing)",
     "TL-DEAD-LINK": "a link in adam-links.json names an operation, table, screen, ADR, file or service HEAD lacks",
-    "TL-REHEARSAL": "the release runbook does not gate the tag on a rehearsal pull with its four zero criteria",
+    "TL-REHEARSAL": "the release runbook does not gate the tag on a rehearsal pull with its five zero criteria",
 }
 
 # What the runbook's section 4 must say about the rehearsal pull (CHG-GRD-003): each phrase, whitespace collapsed.
@@ -73,13 +76,16 @@ REHEARSAL = {
     "the step": "rehearsal pull",
     "before the tag": "before the tag",
     "the candidate tag": "r<N>-rc",
-    "the stand-in OpenProject": "viewer/api/fake-openproject.mjs",
+    "the one command": "tools/rehearse/rehearse.sh",
+    "the stand-in OpenProject": "tools/rehearse/stand-in-openproject.mjs",
+    "links loaded as production loads them": "viewer/api/load_links.py",
     "the shipped connector": "shipped connector",
     "the last live pull": "last live pull",
     "0 pull errors": "0 pull errors",
     "r<N> on every ticket": "release `r<N>` on every ticket",
     "0 tickets with nothing linked": "0 tickets with nothing linked",
     "0 dead links": "0 dead links",
+    "no leaver as assignee or Accountable": "someone who left as assignee or Accountable",
 }
 
 
@@ -260,9 +266,10 @@ def self_test() -> list:
     blk, gone = block_tickets(rows, bundle)
     if blk != {"AM-A": "Feature", "T-C": "Task"} or gone != ["T-GONE"]:
         fails.append(f"block_tickets gave {blk} and gone {gone}")
-    good = ("## 4. Gates\n### The rehearsal pull: before the tag\nTag `r<N>-rc`; viewer/api/fake-openproject.mjs; the "
-            "shipped connector; compare with the last live pull. 0 pull errors; release `r<N>` on every\nticket; 0 "
-            "tickets with nothing linked; 0 dead links.\n## 5. Tag\n")
+    good = ("## 4. Gates\n### The rehearsal pull: before the tag\nTag `r<N>-rc`; `bash tools/rehearse/rehearse.sh`; "
+            "tools/rehearse/stand-in-openproject.mjs; viewer/api/load_links.py; the shipped connector; compare with "
+            "the last live pull. 0 pull errors; release `r<N>` on every\nticket; 0 tickets with nothing linked; 0 dead "
+            "links; 0 open tickets with someone who left as assignee or Accountable.\n## 5. Tag\n")
     if rehearsal_findings(good):
         fails.append(f"TL-REHEARSAL refused a runbook that holds the step: {rehearsal_findings(good)}")
     outside = "## 4. Gates\nNothing.\n## 5. Tag\n" + good.split("## 4. Gates\n", 1)[1].replace("## 5. Tag\n", "")

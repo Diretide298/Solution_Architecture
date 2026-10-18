@@ -2836,7 +2836,7 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of RegisteredDevice | yes |  |
-| items[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| items[].scopePath | string | yes | Where the row is owned. (read-only) |
 | items[].id | string (uuid) | yes | (read-only) |
 | items[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
 | items[].driver | string | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |
@@ -3260,7 +3260,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | state | text | yes | The target state, not the current one. |
 | reason | text | no | Recorded on the tenancy.device_audit row, not on the device. |
 | test_result | jsonb | no | The acceptance test, recorded on the move to provisioned (DEC-245; CHG-CSP-011). |
-| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
+| scope_path | text | yes | Where the row is owned. |
 | id | uuid | yes |  |
 | kind | text | yes |  |
 | driver | text | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |

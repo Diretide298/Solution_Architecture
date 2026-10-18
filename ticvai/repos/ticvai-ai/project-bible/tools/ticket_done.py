@@ -280,15 +280,47 @@ _AR1 = [
     (re.compile(r"^CREATE (?:UNIQUE )?INDEX (?:IF NOT EXISTS )?(\w+) ON (?:ONLY )?(\w+\.\w+)"), "index"),
     (re.compile(r"^SELECT platform\.(apply_\w+)\('(\w+\.\w+)'"), "row-level security"),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) (.+?);?$"), "change"),
+    # a retired column's guarded DROP NOT NULL (ddl_forward.retire_not_null, CHG-MGN-001)
+    (re.compile(r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM information_schema\.columns WHERE .*? THEN ALTER TABLE "
+                r"(\w+\.\w+) ALTER COLUMN (\w+) DROP NOT NULL"), "column"),
 ]
+
+
+def declared_moves(root) -> dict:
+    """Every table name a declared rename or move retired -> the table's name now (tools/derive-schema-history.py
+    RENAMES, chains followed). The same reading as build-service-docs.table_moves."""
+    import importlib.util as _iu
+    from pathlib import Path
+    try:
+        sp_ = _iu.spec_from_file_location("derive_schema_history", Path(root) / "tools" / "derive-schema-history.py")
+        mod_ = _iu.module_from_spec(sp_)
+        sp_.loader.exec_module(mod_)
+        step = {r["from"]: r["to"] for r in mod_.RENAMES}
+    except Exception:                       # noqa: BLE001 -- no history: nothing has moved
+        step = {}
+    out = {}
+    for a in step:
+        b, seen = step[a], {a}
+        while b in step and b not in seen:
+            seen.add(b)
+            b = step[b]
+        out[a] = b
+    return out
 
 
 def after_r1_changes(root) -> dict:
     """{(file path relative to the package, table): [(kind, name), ...]} for every table a frozen after-r1 file
     (backend/<db>/V01nn__after_r1_<date>.sql, derive-ddl's frozen mode) changes but does not create (CHG-R5-002, the
     lead's check of 7 October: V0101 adds three catalogue columns no migration ticket cited). A table the same file
-    creates is left out: the ticket that creates it cites that file already (src_files)."""
+    creates is left out: the ticket that creates it cites that file already (src_files).
+
+    **A table is keyed by its name now** (18 October 2026, CHG-RSF-001): a forward migration names a table whose move
+    is declared but not yet applied by its old name (V0105 re-applies sync.dsar_request's policy as
+    platform.dsar_request, ddl_forward), while the migration ticket that creates it lists its name now (MIG-PLATFORM:
+    sync.dsar_request). Keyed by the old name, no ticket was found to cite the file (check-migration-wording
+    MW-AFTER-R1). The item says the name the file uses."""
     from pathlib import Path
+    moves = declared_moves(root)
     out = {}
     for f in sorted((Path(root) / "backend").glob("*/V0*.sql")):
         if not AFTER_R1_FILE.match(f.name):
@@ -308,9 +340,15 @@ def after_r1_changes(root) -> dict:
                 else:
                     seen.append((m.group(1), kind, m.group(2)))
                 break
+        made |= {moves[t] for t in made if t in moves}
         for t, kind, name in seen:
-            if t not in made:
-                out.setdefault((rel, t), []).append((kind, name))
+            now = moves.get(t, t)
+            if t in made or now in made:
+                continue
+            items = out.setdefault((rel, now), [])
+            if now != t and ("change", f"named {t} in the file, its name before the declared move") not in items:
+                items.append(("change", f"named {t} in the file, its name before the declared move"))
+            items.append((kind, name))
     return out
 
 

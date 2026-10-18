@@ -47,7 +47,63 @@ RULES = {
                         "does not show (CHG-R6-010)",
     "D-UNIQUE-CASE": "a unique index whose text column is compared otherwise than common.yaml says: lower() unless "
                      "the property is x-ticvai-unique-compare: exact (CHG-GEN-001, CR-079 CR-066)",
+    # CHG-MGN-001 (ADAM CR-138, CR-139, CR-148, CR-149, CR-156, CR-157): what the generator hands the migration owner.
+    "D-FWD-PARTITION": "the migration review changes a table's partitioning (ADR-0056: nothing points at a "
+                       "partitioned table) (CHG-MGN-001, CR-138)",
+    "D-FWD-KEY-NULL": "the migration review relaxes a NOT NULL key the contract does not mark nullable (CHG-MGN-001, "
+                      "CR-139)",
+    "D-FWD-CUT": "a statement in the migration review cut short (CHG-MGN-001, CR-148)",
+    "D-FWD-CARRIED": "a unique-together index or required-when CHECK the contract declares that no baseline, forward "
+                     "migration or review row carries (CHG-MGN-001, CR-156)",
+    "D-FWD-RETIRED": "a column the contract retires left as 'a rename or a drop: decide' (CHG-MGN-001, CR-157)",
+    "D-FWD-OWNER": "a table with two keys to one parent whose owner is not decided in derive-ddl ROW_OWNER "
+                   "(CHG-MGN-001, CR-148 CR-149)",
 }
+
+REVIEW_ROW = re.compile(r"^\| (.+?) \| (\w+) \| `([^`]*)` \| (.*) \| (.*) \|$")
+STATEMENT = re.compile(r"^(?:SELECT|CREATE|ALTER|DROP|UPDATE|INSERT|COMMENT)\b", re.I)
+
+
+def check_forward_migration(guard, review: str, series: str, retired: dict, nullable_keys: set,
+                            derived: dict) -> None:
+    """D-FWD-*: what derive-ddl's frozen mode handed the migration owner, read back (CHG-MGN-001).
+
+    `review`: handoff/migration-review.md. `series`: every baseline and forward migration under backend/, as one text.
+    `retired`: table -> columns the contracts withdraw (`x-ticvai-retired-columns`). `nullable_keys`: (table, column)
+    whose contract property is `nullable: true`. `derived`: the name of every unique-together index and required-when
+    CHECK the contracts declare -> its table. On r6's review these rules list the class (the 18 October triage, class
+    10); on a review the fixed generator writes they find nothing but tables waiting for a decision."""
+    for line in review.splitlines():
+        m = REVIEW_ROW.match(line.replace("\\|", "\x00"))
+        if not m:
+            continue
+        kind, _db, obj, change, todo = (x.replace("\x00", "|") for x in m.groups())
+        if kind == "table changed" and "PARTITION" in change.upper():
+            guard.add("D-FWD-PARTITION", obj, f"{obj}: the review changes its partitioning ({change}); a key into "
+                      "it must stay undeclared (derive-ddl UNENFORCED_KEYS) and derive-ddl must refuse it")
+        if kind == "column changed" and "." in obj:
+            t, c = obj.rsplit(".", 1)
+            cm = re.match(r"^`(.+?)` -> `(.+?)`$", change)
+            if (cm and c.endswith("_id") and re.search(r"\bNOT NULL\b", cm.group(1))
+                    and not re.search(r"\bNOT NULL\b|PRIMARY KEY", cm.group(2)) and (t, c) not in nullable_keys):
+                guard.add("D-FWD-KEY-NULL", obj, f"{obj}: NOT NULL in the databases and nullable in the derived DDL, "
+                          "and the contract does not say nullable: a key the path supplies is required "
+                          "(derive-schema path_supplied_keys) or belongs in `required`")
+        for item in re.findall(r"`([^`]*)`", f"{change} {todo}"):
+            if STATEMENT.match(item.strip()) and item.count("(") != item.count(")"):
+                guard.add("D-FWD-CUT", obj, f"{obj}: a statement cut short in the review: {item[:80]!r}")
+                break
+        if kind == "column dropped" and "." in obj:
+            t, c = obj.rsplit(".", 1)
+            if c in (retired.get(t) or ()):
+                guard.add("D-FWD-RETIRED", obj, f"{obj}: the contract retires it (x-ticvai-retired-columns) and the "
+                          "review says 'decide'")
+        if kind == "owner undecided":
+            guard.add("D-FWD-OWNER", obj, f"{obj}: {change}; decide its owner in tools/derive-ddl.py ROW_OWNER")
+    for name, t in sorted(derived.items()):
+        if not re.search(r"(?<![\w])" + re.escape(name) + r"(?![\w])", series + "\n" + review):
+            guard.add("D-FWD-CARRIED", name, f"{t}: {name} is declared by its contract and in no baseline, forward "
+                      "migration or migration-review row")
 
 # **Words naming-and-style bans in DDL** (CHG-R6-012, ADAM CR-011, CR-012 and CR-014, 12 October 2026). The
 # derived DDL had taken Hold, Booking, Allocation and Pool, drawer, POS, plural table names and bare money names,
@@ -758,6 +814,34 @@ def main() -> int:
 
     # CHG-GEN-001 (ADAM CR-079, CR-066, 14 October 2026): a unique value is compared as common.yaml says.
     check_unique_case(guard, backend, ref_cols, by)
+
+    # CHG-MGN-001 (ADAM CR-138, CR-139, CR-148, CR-149, CR-156, CR-157, 18 October 2026): the forward migration and its
+    # review, read back against what the contracts declare. derive-ddl's own readers give the names and the retired
+    # columns, so the check and the generator cannot disagree on them.
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("derive_ddl", g.ROOT / "tools" / "derive-ddl.py")
+    dd = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(dd)
+    props = dd.load_contract_props({stem: doc for stem, _rel, doc in g.contracts()})
+    real = [t for t in ref_cols if "." in t and ":" not in t
+            and ref_store.get(t, "postgres") in ("postgres", "postgres-analytical")]
+    derived = {}
+    for t, mk in dd.table_marks(ref_cols, real).items():
+        short = t.split(".", 1)[1]
+        ao = mk.get("append_only")
+        part = [ao] if ao and not ao.startswith("?") and _area(t) == "tenant" else []
+        for group in mk.get("unique_together") or []:
+            if not any(k.startswith("?") for k in group):
+                derived[dd.obj_name(short, *group, *[x for x in part if x not in group], suffix="uniq")] = t
+        for rcol, cond in mk.get("required_when") or []:
+            if not rcol.startswith("?") and not any(k.startswith("?") for k in cond):
+                derived[dd.obj_name(short, rcol, "when", suffix="chk")] = t
+    nullable_keys = {(t, c.get("column")) for t, cs in ref_cols.items() for c in cs
+                     if (props.get(str(c.get("source") or "")) or {}).get("nullable") is True}
+    series = "\n".join(f.read_text(encoding="utf-8") for db in ("tenant", "control")
+                       for f in sorted((backend / db).glob("*.sql")))
+    check_forward_migration(guard, review.read_text(encoding="utf-8") if review.exists() else "", series,
+                            dd.RETIRED, nullable_keys, derived)
 
     # R160: a renamed table's old name left in DDL comments and contract prose.
     renames = [(str(r.get("from")), str(r.get("to"))) for r in

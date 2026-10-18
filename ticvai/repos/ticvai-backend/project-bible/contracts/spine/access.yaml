@@ -23257,6 +23257,7 @@ components:
     AccessPolicyScopeAssignment:
       type: object
       x-ticvai-persistence: access.policy_scope_assignment
+      x-ticvai-rls: read-beneath   # ADAM CR-095's rule, CHG-RSF-001: rows set at a chosen level (scope_level) govern every scope beneath them, so a scope reads the ones it inherits and still writes only its own
       description: One placement of a dynamic access policy in the scope hierarchy - level and target, policy category and its rank, mandatory flag and conflict resolution. Unique per policy, scope level and scope id (declared 29 September, data-model close-out DM1).
       required:
       - id

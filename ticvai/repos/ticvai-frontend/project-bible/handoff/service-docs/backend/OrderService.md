@@ -6872,6 +6872,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 
 5.8.1 and 5.8.3. **The opening float may be a total or a denomination breakdown** — the 14 August MoM found POS-001 offered only denominations, and a supervisor handing over a counted bag should not have to re-count it into fields.
 **Either is accepted, and a denomination count takes precedence** (decided 28 September, audit R123 (9)). Where `openingDenominations` is sent, `openingFloat` is computed from it and any total sent alongside is ignored; where only `openingFloat` is sent, it is the float.
+**The box trades in the venue's currency** (ADAM CR-135, 17 October 2026; CHG-RTE-001). Its currency is the venue's frozen trading currency, venue settings' `currencyCode` (naming-and-style 5.1), asked of Tenancy through `tenancy#venueSettingsRecords`, which also gives the venue's `cashDrawerLimit` where the box's workstation has none; the face values of `openingDenominations` come from `tenancy#denominationRecords`. An `openingFloat` in another currency is refused `400`, and so is `foreignHoldings` on allocation: a box opens with no foreign cash.
 
 |  |  |
 |---|---|
@@ -6916,7 +6917,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | overDrawerLimit | boolean |  | The box holds more than its till's drawer limit (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against tenancy.Workstation.cashDrawerLi… (default False; read-only) |
 | foreignHoldings | array of object |  | 4.6.11 and 6.1.10. |
-| foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not the region's. (pattern ^[A-Z]{3}$) |
+| foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not in the box's own currency. (pattern ^[A-Z]{3}$) |
 | foreignHoldings[].expectedAmount | object |  | The sum of tenders taken in this currency during the shift. |
 | foreignHoldings[].expectedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | foreignHoldings[].expectedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -6974,7 +6975,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | overDrawerLimit | boolean |  | The box holds more than its till's drawer limit (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against tenancy.Workstation.cashDrawerLi… (default False; read-only) |
 | foreignHoldings | array of object |  | 4.6.11 and 6.1.10. |
-| foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not the region's. (pattern ^[A-Z]{3}$) |
+| foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not in the box's own currency. (pattern ^[A-Z]{3}$) |
 | foreignHoldings[].expectedAmount | object |  | The sum of tenders taken in this currency during the shift. |
 | foreignHoldings[].expectedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | foreignHoldings[].expectedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -7012,6 +7013,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 |  | The body breaks a rule of the box (ADAM CR-135; CHG-RTE-001): openingFloat in a currency other than the venue's trading currency, with errors[] naming openingFloat.currency; or foreignHoldings sent a… |
 | 201 |  | Allocated |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -7751,7 +7753,7 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].overDrawerLimit | boolean |  | The box holds more than its till's drawer limit (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against tenancy.Workstation.cashDrawerLi… (default False; read-only) |
 | items[].foreignHoldings | array of object |  | 4.6.11 and 6.1.10. |
-| items[].foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not the region's. (pattern ^[A-Z]{3}$) |
+| items[].foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not in the box's own currency. (pattern ^[A-Z]{3}$) |
 | items[].foreignHoldings[].expectedAmount | object |  | The sum of tenders taken in this currency during the shift. |
 | items[].foreignHoldings[].countedAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].foreignHoldings[].variance | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -8814,7 +8816,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | overDrawerLimit | boolean |  | The box holds more than its till's drawer limit (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against tenancy.Workstation.cashDrawerLi… (default False; read-only) |
 | foreignHoldings | array of object |  | 4.6.11 and 6.1.10. |
-| foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not the region's. (pattern ^[A-Z]{3}$) |
+| foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not in the box's own currency. (pattern ^[A-Z]{3}$) |
 | foreignHoldings[].expectedAmount | object |  | The sum of tenders taken in this currency during the shift. |
 | foreignHoldings[].expectedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | foreignHoldings[].expectedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -9163,7 +9165,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | deposit_box_id | uuid | yes | The parent row. |
-| currency | text | yes | Stored, because it is the one thing that is not the region's. |
+| currency | text | yes | Stored, because it is the one thing that is not in the box's own currency. |
 | expected_amount | numeric(18,4) | no | The sum of tenders taken in this currency during the shift. |
 | counted_amount | numeric(18,4) | yes |  |
 | variance_amount | numeric(18,4) | no |  |

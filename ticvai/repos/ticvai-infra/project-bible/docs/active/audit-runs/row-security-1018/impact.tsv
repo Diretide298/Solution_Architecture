@@ -1,0 +1,466 @@
+#27645	New	Hrushikant Patkar	Foundation · Database migrations	ai.provider, approvals.matrix, approvals.rule, catalogue.dynamic_pricing_control, catalogue.sales_channel, fnb.allergen_verdict, fnb.bill_split, fnb.kitchen_sla, fnb.kitchen_ticket, fnb.kitchen_ticket
+#27650	Ready for QA	Hrushikant Patkar	[DB] Migration V0007__pii.sql: pii (5 tables)	pii.subject_biometric
+#27658	Ready for QA	Hrushikant Patkar	[DB] Migration V0010__approvals.sql: approvals (6 tables)	approvals.matrix, approvals.rule
+#27662	Ready for QA	Hrushikant Patkar	[DB] Migration V0012__sync.sql: sync (1 tables)	sync.rejection
+#27664	Ready for QA	Hrushikant Patkar	[DB] Migration V0014__ai.sql: ai (49 tables)	ai.provider
+#27665	Ready for QA	Hrushikant Patkar	[DB] Migration V0017__platform.sql: platform (17 tables)	platform.device, sync.dsar_request
+#27671	Ready for QA	Hrushikant Patkar	[DB] Migration V0022__catalogue.sql: catalogue (22 tables)	catalogue.dynamic_pricing_control, catalogue.sales_channel
+#27678	Ready for QA	Hrushikant Patkar	[DB] Migration V0029__fnb.sql: fnb (41 tables)	fnb.allergen_verdict, fnb.bill_split, fnb.kitchen_sla, fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu, fnb.menu_item, fnb.menu_item_modifier, fnb.menu_section, fnb.production_run, fnb.recipe, f
+#27679	Ready for QA	Hrushikant Patkar	[DB] Migration V0030__payments.sql: payments (12 tables)	payments.provider
+#27682	Ready for QA	Hrushikant Patkar	[DB] Migration V0032__retail.sql: retail (10 tables)	retail.merchandise, retail.reservation, retail.reservation_line, retail.return, retail.return_line, retail.return_policy, retail.sale, retail.sale_line
+#27683	Ready for QA	Hrushikant Patkar	[DB] Migration V0034__cross_schema_foreign_keys.sql (35 keys	ai.provider, pii.subject_biometric, sync.rejection
+#27686	On hold	Pranay Shinde	[Test] Module test: Foundation · Database migrations	ai.provider, approvals.matrix, approvals.rule, catalogue.dynamic_pricing_control, catalogue.sales_channel, fnb.allergen_verdict, fnb.bill_split, fnb.kitchen_sla, fnb.kitchen_ticket, fnb.kitchen_ticket
+#27691	New	Pranay Shinde	[BE] Observability with tenant and venue on every trace, and	access.policy_scope_assignment, sync.rejection
+#27703	New	Chinmay Patkar	[Test] Module test: Foundation · Platform kernel	access.policy_scope_assignment, sync.rejection
+#27705	New	Pradnya Yeram	[BE] Offline journal in packages/offline-core: record, repla	access.policy_scope_assignment, sync.rejection
+#27707	New	Hrushikant Patkar	[BE] syncOrders: a result per entry, and a bad entry quarant	sync.rejection
+#27708	New	Hrushikant Patkar	[BE] A POS sale reaches the kitchen: routing online, and the	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu_item, fnb.service_order, fnb.service_order_line
+#27709	New	Deep Khanvilkar	[Test] Module test: Foundation · Offline: POS, Kitchen Displ	access.policy_scope_assignment, fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu_item, fnb.service_order, fnb.service_order_line, sync.rejection
+#27711	New	Kalpita Mejari	[AI] AI gateway, governance decision point and usage meterin	ai.provider
+#27713	New	Kalpita Mejari	[AI] Content translation English and Arabic for the CMS	ai.provider
+#27715	New	Sanket Keluskar	[BE] AiService: setSuggestionProvider, testAiProvider	ai.provider
+#27721	New	Kalpita Mejari	[AI] Guest concierge: retrieval over the venue's knowledge, 	ai.provider
+#27787	New	Pranay Shinde	Tenancy & Venues · POS	tenancy#configureWorkstation
+#27789	New	Pranay Shinde	[BE] TenancyService: configureWorkstation, createOutlet, cre	platform.device, tenancy#configureWorkstation
+#27790	New	Sanket Keluskar	[BE] TenancyService: listDevices, listSaleBoards, updateOutl	platform.device
+#27793	New	Pradnya Yeram	[FE] POS-016 Till Configuration	tenancy#configureWorkstation
+#27794	New	Deep Khanvilkar	[Test] Module test: Tenancy & Venues · POS	platform.device, tenancy#configureWorkstation
+#27802	New	Pranay Shinde	[BE] TenancyService: listDeviceAuditRecords, listDeviceTampe	platform.device
+#27803	New	Deep Khanvilkar	[BE] TenancyService: recordDeviceHeartbeat	platform.device, tenancy#recordDeviceHeartbeat
+#27805	New	Chinmay Patkar	[BE] OrderService: resolveSyncRejection	sync.rejection
+#27812	New	Deep Khanvilkar	[BE] TenancyService: approveMatrixMultiLevel, approveRoleAut	approvals#approveMatrixMultiLevel, approvals.matrix, approvals.rule
+#27813	New	Pranay Shinde	[BE] TenancyService: createApprovalRequest, decideApprovalRe	approvals.matrix, approvals.rule
+#27820	New	Deep Khanvilkar	[BE] RetailService: collectShopAndDrop, createShopAndDrop, l	retail.merchandise
+#27821	New	Chinmay Patkar	[BE] RetailService: reserveMerchandise	retail.reservation, retail.reservation_line
+#27822	New	Pranay Shinde	[BE] RetailService: createMerchandise, listMerchandise, upda	retail.merchandise
+#27823	New	Pranay Shinde	[BE] RetailService: createRetailReturn, getReturnPolicy, loo	retail.return, retail.return_line, retail.return_policy, retail.sale, retail.sale_line
+#27824	New	Pranay Shinde	[BE] RetailService: createRetailSale, getRetailSale, listRet	retail.sale, retail.sale_line
+#27829	New	Pranay Shinde	[BE] TenancyService: escalateApprovalRequest, getApprovalReq	approvals.rule
+#27831	New	Deep Khanvilkar	[BE] TenancyService: approveUnifiedDecision, listAutomationE	approvals.rule
+#27832	New	Narayan Gaonkar	[BE] TenancyService: assignApprovalRequest, cancelApprovalRe	approvals.rule
+#27833	New	Deep Khanvilkar	[BE] TenancyService: submitApprovalRequest	approvals#submitApprovalRequest, approvals.rule
+#27841	New	Hrushikant Patkar	[BE] AiService: createKnowledgeCollection, ingestKnowledgeDo	fnb.menu_item, retail.merchandise
+#27854	New	Hrushikant Patkar	[BE] AccessService: revokeFacePass, setAccessPointGroup, set	pii.subject_biometric
+#27863	New	Deep Khanvilkar	[BE] OrderService: listBillingStatements, listMyOrders, list	payments.provider
+#27864	New	Pranay Shinde	[BE] OrderService: setPaymentProvider, shareEntitlement, sto	payments.provider
+#27913	New	Deep Khanvilkar	[BE] AiService: createAiConversation, listAiConversations, s	ai.provider
+#27918	New	Sanket Keluskar	[BE] AiService: proposeMarketingContent	ai.provider
+#27925	New	Pranay Shinde	[BE] AiService: getTranslationProposals, proposeTranslations	ai.provider
+#27931	New	Deep Khanvilkar	Platform Foundation · Venue Management (setup)	approvals#setApprovalMatrix
+#27932	New	Chinmay Patkar	[BE] TenancyService: createApprovalDelegation	approvals.matrix, approvals.rule
+#27934	New	Deep Khanvilkar	[BE] TenancyService: setApprovalExternalProvider, setApprova	approvals#setApprovalMatrix, approvals.matrix, approvals.rule
+#27939	New	Surendra Loke	[FE] BO-087 Approval Delegations (setup: 2 of its 5 operatio	approvals#setApprovalMatrix
+#27941	New	Deep Khanvilkar	[BE] TenancyService: getWorkstationHealth, setVenueSettings,	platform.device
+#27943	New	Narayan Gaonkar	[BE] FnbService: setCourseRules, setKitchenSla, setSubstitut	fnb.kitchen_sla, fnb.substitution_rule
+#27945	New	Narayan Gaonkar	[Test] Module test: Platform Foundation · Venue Management (	approvals#setApprovalMatrix, approvals.matrix, approvals.rule
+#27950	New	Chinmay Patkar	[BE] TenancyService: listApprovalMatrices	approvals.matrix, approvals.rule
+#27973	New	Narayan Gaonkar	[BE] OrderService: listPaymentProviders	payments.provider
+#28029	New	Narayan Gaonkar	[Test] Module test: Approvals · Venue Management (Block A)	approvals.rule
+#28046	New	Narayan Gaonkar	[BE] CatalogueService: createBundle, getBundle, getLatestBun	fnb.menu_item
+#28080	New	Pranay Shinde	[Test] Module test: Ticketing & Guest Commerce · Venue Manag	catalogue.sales_channel, fnb.menu_item
+#28130	New	Surendra Loke	[BE] FnbService: createCombo, setComboSlots	fnb.menu_item
+#28132	New	Narayan Gaonkar	[BE] AiService: generateConfiguration	ai.provider
+#28138	New	Pranay Shinde	[BE] OrderService: listSyncRejections, syncOrders	sync.rejection
+#28140	New	Sanket Keluskar	[Test] Module test: Tenancy & Venues · Venue Management (Blo	sync.rejection
+#28214	New	Surendra Loke	[BE] AiService: proposeWalkways	ai.provider
+#28217	New	Narayan Gaonkar	[Test] Module test: Seating & Maps · Venue Management (Block	ai.provider
+#28226	New	Narayan Gaonkar	[BE] FnbService: signCorrectiveAction, transferTableVisit, u	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_reservation, fnb.table_visit
+#28227	New	Narayan Gaonkar	[BE] FnbService: leaveRestaurantWaitlist, list86Events, list	fnb.menu_item, fnb.sold_out_item, fnb.table_reservation, fnb.waitlist_entry
+#28229	New	Narayan Gaonkar	[Test] Module test: Orders & Reservations · Guest Web	fnb.table_reservation, fnb.waitlist_entry
+#28243	New	Narayan Gaonkar	[BE] FnbService: claimLocationSession, createDeliveryLocatio	fnb.kitchen_ticket, fnb.menu_item, fnb.menu_item_modifier, fnb.service_order, fnb.table_visit
+#28244	New	Deep Khanvilkar	[BE] FnbService: listDeliveryLocations, listDiningOutlets, l	fnb.menu, fnb.service_order
+#28246	New	Deep Khanvilkar	[BE] FnbService: listKitchenStations, listKitchenTickets, pr	fnb.kitchen_ticket, fnb.kitchen_ticket_line
+#28248	New	Narayan Gaonkar	[BE] FnbService: createFnbOrder, getFnbOrder, listFnbOrders	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu_item, fnb.service_order, fnb.service_order_line
+#28249	New	Narayan Gaonkar	[BE] FnbService: acceptFnbOrder, cancelFnbOrder	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line
+#28250	New	Narayan Gaonkar	[BE] FnbService: clearTable, getTableMap, getTableVisit, ope	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#28251	New	Deep Khanvilkar	[BE] FnbService: setTableLayout, updateTableVisit	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#28304	New	Deep Khanvilkar	[BE] OrderService: listPaymentMethods, listPaymentProviderCo	payments.provider
+#28307	New	Narayan Gaonkar	[Test] Module test: Payments · API only (Block A)	payments.provider
+#28328	New	Narayan Gaonkar	[BE] AccessService: enrolFaceTag, getEntitlement, getEntitle	pii.subject_biometric
+#28331	New	Narayan Gaonkar	[BE] AccessService: approveManualOverrideSupervisor, bindCre	pii.subject_biometric
+#28332	New	Pranay Shinde	[BE] AccessService: getFacePassEnrolment, listEntitlements, 	pii.subject_biometric
+#28338	New	Pallavi Sawant	[Test] Module test: White Label · CMS	ai.provider
+#28356	New	Chitrangi Mestry	[Test] Module test: Admission & Access · Guest App	pii.subject_biometric
+#28366	New	Hrushikant Patkar	[DB] Forward migration V1019__access.sql: access for Venue M	access.policy_scope_assignment
+#28371	New	Deep Khanvilkar	[BE] AccessService: getOfflinePackage, listScans, syncScans	sync.rejection
+#28372	New	Narayan Gaonkar	[BE] AccessService: lookupTicket, overrideAccess, validateAc	access.policy_scope_assignment
+#28388	New	Narayan Gaonkar	[Test] Module test: Platform Foundation · TICVAI Console (se	payments.provider
+#28390	New	Narayan Gaonkar	[BE] AccessService: listEntryTemporaryExit, setHardwareModel	pii.subject_biometric
+#28391	New	Sanket Keluskar	[BE] FnbService: getMenu, setMenuItemDailyCount	fnb.menu, fnb.menu_item, fnb.menu_section
+#28412	New	Sanket Keluskar	[BE] LedgerService: closeFiscalPeriod, listFiscalPeriods	approvals.rule
+#28414	New	Pranay Shinde	[Test] Module test: Finance & Tax · API only (Block A comple	approvals.rule
+#28448	New	Hrushikant Patkar	[DB] Forward migration V1015__resources.sql: resources for V	resources.performance_participant
+#28522	New	Narayan Gaonkar	[BE] FnbService: attachModifierGroup, buildProductionPlan, c	fnb.kitchen_ticket, fnb.menu_item, fnb.menu_item_modifier, fnb.recipe, fnb.table_reservation
+#28523	New	Narayan Gaonkar	[BE] FnbService: getHaccpStatus, getKitchenSla, holdCourse, 	fnb.kitchen_sla, fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.waitlist_entry
+#28539	New	Narayan Gaonkar	[BE] FnbService: closeTableVisit, getBill, splitBill	fnb.bill_split, fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.sub_bill, fnb.table_session, fnb.table_visit
+#28540	New	Narayan Gaonkar	[BE] FnbService: createTableReservationForGuest, escalateCor	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.table_reservation
+#28542	New	Narayan Gaonkar	[BE] FnbService: listTableReservations, logColdChain, logKit	fnb.table_reservation
+#28543	New	Narayan Gaonkar	[BE] FnbService: markOrderCollected, notifyServer, printOrde	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu, fnb.menu_item, fnb.menu_section, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#28544	New	Narayan Gaonkar	[BE] FnbService: requestBill, rollbackMenu, scheduleMenuPubl	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu, fnb.menu_item, fnb.menu_section, fnb.service_order, fnb.service_order_line, fnb.table_reservation, fnb.table_session, fnb.table_visit
+#28545	New	Narayan Gaonkar	[BE] FnbService: createMenu, setItemAvailability, setMenuSec	fnb.menu, fnb.menu_item, fnb.menu_section
+#28547	New	Deep Khanvilkar	[Test] Module test: Platform Foundation · Venue Management (	approvals.matrix, approvals.rule
+#28552	New	Narayan Gaonkar	[BE] FnbService: rebalanceStationLoad, recallKitchenTicket, 	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.production_run
+#28553	New	Deep Khanvilkar	[BE] FnbService: getGuestBill, getGuestMenu, getGuestOrderSt	fnb.kitchen_ticket, fnb.service_order, fnb.table_session
+#28555	New	Pallavi Sawant	[Test] Module test: Orders & Reservations · Guest App	fnb.kitchen_ticket, fnb.menu_item, fnb.menu_item_modifier, fnb.service_order
+#28559	New	Deep Khanvilkar	[Test] Module test: Food & Beverage · Guest Web	fnb.table_reservation, fnb.waitlist_entry
+#28576	New	Chitrangi Mestry	[Test] Module test: Food & Beverage · Kitchen Display	fnb.kitchen_ticket, fnb.kitchen_ticket_line
+#28579	New	Narayan Gaonkar	[BE] FnbService: getWasteApprovalPolicy, listRecipes, record	fnb.menu_item, fnb.recipe
+#28580	New	Narayan Gaonkar	[BE] FnbService: compItem, listCorrectiveActions, moveTableV	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit, fnb.waitlist_entry
+#28584	New	Surendra Loke	[BE] FnbService: reassignServer, setServiceStage, transferOr	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#28586	New	Surendra Loke	[BE] FnbService: mergeTableVisits	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#28588	New	Deep Khanvilkar	[Test] Module test: Food & Beverage · Staff App (Block A)	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu_item, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#28592	New	Pranay Shinde	[BE] TenancyService: getWorkstation, listOutlets, listWorkst	platform.device, tenancy#registerDevice
+#28597	New	Chinmay Patkar	[BE] FnbService: amendFnbOrder	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line
+#28599	New	Narayan Gaonkar	[BE] FnbService: applyMenuActions, closeCorrectiveAction, cr	fnb.allergen_verdict, fnb.menu, fnb.menu_item
+#28602	New	Narayan Gaonkar	[BE] FnbService: listSubstitutionRules	fnb.substitution_rule
+#28604	New	Pranay Shinde	[BE] FnbService: listFnbRecommendations, listIngredientSubst	fnb.recipe, fnb.service_order
+#28606	New	Surendra Loke	[BE] FnbService: setFnbReservationPolicy, setIngredientSubst	fnb.allergen_verdict, fnb.menu_item, fnb.menu_item_modifier, fnb.recipe, fnb.substitution_rule, fnb.table_visit
+#28631	New	Deep Khanvilkar	[BE] VenueOpsService: getResourceBooking, getResourceQualifi	resources.performance_participant
+#28632	New	Narayan Gaonkar	[BE] VenueOpsService: bookResource, checkInResource, checkOu	resources.performance_participant
+#28677	New	Pranay Shinde	[BE] VenueOpsService: recordGamePlay, syncGamePlays	sync.rejection
+#28713	New	Pallavi Sawant	[Test] Module test: Venue Operations · Venue Management (set	resources.performance_participant
+#28731	New	Chinmay Patkar	[BE] FnbService: setRecipe	fnb.allergen_verdict, fnb.menu_item, fnb.recipe, fnb.substitution_rule
+#28735	New	Deep Khanvilkar	[Test] Module test: Approvals · POS	approvals.matrix, approvals.rule
+#28736	New	Pranay Shinde	[BE] ReportingService: askReportingQuestion, saveNaturalLang	ai.provider
+#28739	New	Pranay Shinde	[Test] Module test: Finance & Insights · Venue Management (s	ai.provider
+#28754	New	Pranay Shinde	[Test] Module test: Food & Beverage · POS	fnb.bill_split, fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu_item, fnb.service_order, fnb.service_order_line, fnb.sub_bill, fnb.table_reservation, fnb.table_session, fnb.table_visit
+#28756	New	Narayan Gaonkar	[BE] FnbService: listMenuSchedules, listMenuVersions, listMe	fnb.menu, fnb.menu_item, fnb.menu_section
+#28759	New	Narayan Gaonkar	[Test] Module test: Ticketing & Guest Commerce · Venue Manag	access.policy_scope_assignment, ai.provider, catalogue.dynamic_pricing_control, catalogue.sales_channel, fnb.menu_item
+#28761	New	Pranay Shinde	[Test] Module test: Food & Beverage · Venue Management (Bloc	fnb.allergen_verdict, fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu, fnb.menu_item, fnb.menu_item_modifier, fnb.menu_section, fnb.recipe, fnb.service_order, fnb.service_order_line, fnb.substit
+#28768	New	Chinmay Patkar	[Test] Module test: Food, Beverage & Retail · Venue Manageme	fnb.allergen_verdict, fnb.menu_item, fnb.recipe, fnb.substitution_rule
+#28781	New	Narayan Gaonkar	[BE] FnbService: enterCountLine, getProductionRun, listProdu	fnb.production_run, fnb.recipe
+#28785	New	Narayan Gaonkar	[BE] FnbService: completeProductionRun, listProductionPlans,	fnb.production_run, fnb.recipe
+#28796	New	Narayan Gaonkar	[Test] Module test: Food, Beverage & Retail · Venue Manageme	fnb.production_run, fnb.recipe
+#28892	New	Narayan Gaonkar	[Test] Module test: Admission & Access · Scanner (Block A)	access.policy_scope_assignment, sync.rejection
+#28911	New	Sanket Keluskar	[BE] MarketingService: setCallDisposition, startKioskAssist	platform.device
+#28916	New	Chinmay Patkar	[Test] Module test: Customer & Marketing · Venue Management 	platform.device
+#28949	New	Hrushikant Patkar	[DB] Forward migration V1187__marketing.sql: marketing for A	marketing.service_copilot_config
+#28953	New	Chinmay Patkar	[BE] MarketingService: setCustomerServiceCopilot	marketing.service_copilot_config
+#28955	New	Deep Khanvilkar	[BE] MarketingService: getCustomerServiceCopilot	marketing.service_copilot_config
+#28958	New	Deep Khanvilkar	[BE] AiService: getAiByokEnablement, getAiPolicy, listAiProv	ai.provider
+#28968	New	Narayan Gaonkar	[Test] Module test: AI & Intelligence · Venue Management (se	marketing.service_copilot_config
+#28979	New	Pallavi Sawant	[Test] Module test: AI & Intelligence · TICVAI Console (setu	ai.provider
+#29021	New		[Test] Module test: AI engine · Block A: gateway and guest A	ai.provider
+#29027	New		[AI] Day-one suggestions for the Block A screens: queue bala	ai.provider
+#29028	New	Kalpita Mejari	[Test] Module test: AI engine · Block A2: the AI work moved 	ai.provider
+#29102	New	Chitrangi Mestry	Tenancy & Venues · Staff App	tenancy#registerDevice
+#29103	New	Chitrangi Mestry	[FE] EMP-043 Device settings	tenancy#registerDevice
+#29105	New	Sanket Keluskar	Tenancy & Venues · Venue Management 1 of 3	tenancy#configureWorkstation, tenancy#registerDevice
+#29108	New	Deep Khanvilkar	[BE] TenancyService: createDeviceFirmware, getDeviceFirmware	platform.device
+#29109	New	Pranay Shinde	[BE] TenancyService: revokeDeviceCredential, rollbackDeviceF	platform.device
+#29119	New	Sanket Keluskar	[FE] BO-036 Device Registry	tenancy#configureWorkstation, tenancy#registerDevice
+#29126	New	Chinmay Patkar	[Test] Module test: Tenancy & Venues · Venue Management 1 of	platform.device
+#29127	New	Sanket Keluskar	Tenancy & Venues · Venue Management 2 of 3	tenancy#enrolDevice
+#29147	New	Sanket Keluskar	[BE] TenancyService: enrolDevice, getDeviceTelemetry	platform.device, tenancy#enrolDevice
+#29157	New	Sanket Keluskar	[Test] Module test: Tenancy & Venues · Venue Management 2 of	platform.device, tenancy#enrolDevice
+#29158	New	Chitrangi Mestry	Tenancy & Venues · Venue Management 3 of 3	tenancy#configureWorkstation
+#29168	New	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup	tenancy#configureWorkstation
+#29190	New	Surendra Loke	[BE] CrossRegionService: createDsarRequest, getDsarRequest	sync.dsar_request
+#29244	New	Narayan Gaonkar	[BE] PlatformService: getPlanTiers, listBurstEnvironments, l	sync.rejection
+#29417	New	Pranay Shinde	Approvals · Venue Management 1 of 5	approvals#setApprovalMatrix
+#29421	New	Sanket Keluskar	[FE] BO-086 Approval Matrix	approvals#setApprovalMatrix
+#29422	New	Pranay Shinde	[BE] TenancyService: actOnWorkflowInstance, listConditionDec	approvals.matrix, approvals.rule
+#29424	New	Chinmay Patkar	[BE] TenancyService: simulateWorkflowTestingImpact	approvals.matrix, approvals.rule
+#29428	New	Pradnya Yeram	[FE] BO-639 Reviewer Assignment & Delegation	approvals#setApprovalMatrix
+#29446	New	Pranay Shinde	[Test] Module test: Approvals · Venue Management 1 of 5	approvals.matrix, approvals.rule
+#29447	New	Sanket Keluskar	Approvals · Venue Management 2 of 5	approvals#setApprovalMatrix
+#29468	New	Chinmay Patkar	Approvals · Venue Management 3 of 5	approvals#setApprovalMatrix
+#29471	New	Deep Khanvilkar	[BE] TenancyService: createApprovalEvidencePackage, getAppro	approvals.rule
+#29493	New	Chinmay Patkar	[BE] TenancyService: listSlaEscalationReminder, signApproval	approvals.rule
+#29514	New	Chinmay Patkar	[Test] Module test: Approvals · Venue Management 4 of 5	approvals.rule
+#29546	New	Pallavi Sawant	Approvals · TICVAI Console	approvals#setApprovalMatrix
+#29682	New	Pranay Shinde	[BE] CatalogueService: publishActivationScheduler, publishCh	catalogue.sales_channel
+#29712	New	Hrushikant Patkar	[BE] CatalogueService: setDemandSignalConfiguration, setDyna	catalogue.dynamic_pricing_control
+#29719	New	Hrushikant Patkar	[BE] CatalogueService: createChannelProfile, createLiveDynam	catalogue.dynamic_pricing_control, catalogue.sales_channel
+#29725	New	Pranay Shinde	[BE] CatalogueService: setChannelPricingCommercial, setPrici	catalogue.dynamic_pricing_control, catalogue.sales_channel
+#29741	New	Narayan Gaonkar	[BE] CatalogueService: listDynamicPricingGuardrail, listInte	catalogue.dynamic_pricing_control
+#29760	New		[BE] CatalogueService: retryChannelIncident, setChannelConne	catalogue.sales_channel
+#29761	New		[BE] CatalogueService: testChannelConnection, updateChannelI	catalogue.sales_channel
+#29762	New	Surendra Loke	[BE] CatalogueService: publishChannelReadinessValidation, se	catalogue.sales_channel
+#29763	New	Hrushikant Patkar	[BE] CatalogueService: listChannelSaleRule, listChannelSaleS	catalogue.sales_channel
+#29764	New	Pranay Shinde	[BE] CatalogueService: listRevenueDemandImpact, listSaleChan	catalogue.sales_channel
+#29771	New	Narayan Gaonkar	[BE] CatalogueService: listChannel, listChannel2, listChanne	catalogue.sales_channel
+#29798	New	Deep Khanvilkar	[BE] CatalogueService: listGovernanceRiskLaunch, listRulePri	catalogue.dynamic_pricing_control
+#29799	New	Hrushikant Patkar	[BE] CatalogueService: listDemandBookingCurve, listDynamicPr	catalogue.dynamic_pricing_control
+#29830	New	Hrushikant Patkar	[BE] CatalogueService: listChannelCustomerSegment, listCompe	catalogue.dynamic_pricing_control
+#29845	New	Deep Khanvilkar	[Test] Module test: Ticketing · Venue Management 6 of 8	catalogue.sales_channel
+#29846	New		[BE] CatalogueService: listChannelExceptionIncident, listCha	catalogue.sales_channel
+#29873	New		[BE] CatalogueService: listFeeSurcharge, listFeeWaiverTax, l	catalogue.dynamic_pricing_control
+#30041	New	Sanket Keluskar	Wallet & Cashless · Venue Management 4 of 7	approvals#setApprovalMatrix
+#30043	New	Chinmay Patkar	Wallet & Cashless · Venue Management 6 of 7	approvals#setApprovalMatrix
+#30049	New	Narayan Gaonkar	Admission & Access · Venue Management 3 of 8	tenancy#approveDevice, tenancy#enrolDevice, tenancy#registerDevice
+#30082	New	Hrushikant Patkar	Resources & Capacity · Venue Management 1 of 4	approvals#setApprovalMatrix
+#30092	New	Chinmay Patkar	Games & Rides · Venue Management 1 of 4	tenancy#registerDevice
+#30172	Ready for QA	Hrushikant Patkar	[DB] pii.subject_biometric	pii.subject_biometric
+#30216	Ready for QA	Hrushikant Patkar	[DB] approvals.matrix	approvals.matrix
+#30218	Ready for QA	Hrushikant Patkar	[DB] approvals.rule	approvals.rule
+#30248	Ready for QA	Hrushikant Patkar	[DB] sync.rejection	sync.rejection
+#30319	Ready for QA	Hrushikant Patkar	[DB] ai.provider	ai.provider
+#30329	Ready for QA	Hrushikant Patkar	[DB] platform.device	platform.device
+#30331	Ready for QA	Hrushikant Patkar	[DB] platform.dsar_request	sync.dsar_request
+#30566	Ready for QA	Hrushikant Patkar	[DB] fnb.allergen_verdict	fnb.allergen_verdict
+#30567	Ready for QA	Hrushikant Patkar	[DB] fnb.bill_split	fnb.bill_split
+#30576	Ready for QA	Hrushikant Patkar	[DB] fnb.kitchen_sla	fnb.kitchen_sla
+#30578	Ready for QA	Hrushikant Patkar	[DB] fnb.kitchen_ticket	fnb.kitchen_ticket
+#30579	Ready for QA	Hrushikant Patkar	[DB] fnb.kitchen_ticket_line	fnb.kitchen_ticket_line
+#30581	Ready for QA	Hrushikant Patkar	[DB] fnb.menu	fnb.menu
+#30582	Ready for QA	Hrushikant Patkar	[DB] fnb.menu_item	fnb.menu_item
+#30583	Ready for QA	Hrushikant Patkar	[DB] fnb.menu_item_modifier	fnb.menu_item_modifier
+#30585	Ready for QA	Hrushikant Patkar	[DB] fnb.menu_section	fnb.menu_section
+#30592	Ready for QA	Hrushikant Patkar	[DB] fnb.production_run	fnb.production_run
+#30593	Ready for QA	Hrushikant Patkar	[DB] fnb.recipe	fnb.recipe
+#30596	Ready for QA	Hrushikant Patkar	[DB] fnb.service_order	fnb.service_order
+#30597	Ready for QA	Hrushikant Patkar	[DB] fnb.service_order_line	fnb.service_order_line
+#30598	Ready for QA	Hrushikant Patkar	[DB] fnb.sold_out_item	fnb.sold_out_item
+#30599	Ready for QA	Hrushikant Patkar	[DB] fnb.sub_bill	fnb.sub_bill
+#30600	Ready for QA	Hrushikant Patkar	[DB] fnb.substitution_rule	fnb.substitution_rule
+#30602	Ready for QA	Hrushikant Patkar	[DB] fnb.table_reservation	fnb.table_reservation
+#30603	Ready for QA	Hrushikant Patkar	[DB] fnb.table_session	fnb.table_session
+#30604	Ready for QA	Hrushikant Patkar	[DB] fnb.table_visit	fnb.table_visit
+#30606	Ready for QA	Hrushikant Patkar	[DB] fnb.waitlist_entry	fnb.waitlist_entry
+#30614	Ready for QA	Hrushikant Patkar	[DB] payments.provider	payments.provider
+#30631	Ready for QA	Hrushikant Patkar	[DB] retail.merchandise	retail.merchandise
+#30632	Ready for QA	Hrushikant Patkar	[DB] retail.reservation	retail.reservation
+#30633	Ready for QA	Hrushikant Patkar	[DB] retail.reservation_line	retail.reservation_line
+#30634	Ready for QA	Hrushikant Patkar	[DB] retail.return	retail.return
+#30635	Ready for QA	Hrushikant Patkar	[DB] retail.return_line	retail.return_line
+#30636	Ready for QA	Hrushikant Patkar	[DB] retail.return_policy	retail.return_policy
+#30637	Ready for QA	Hrushikant Patkar	[DB] retail.sale	retail.sale
+#30638	Ready for QA	Hrushikant Patkar	[DB] retail.sale_line	retail.sale_line
+#30643	New	Sanket Keluskar	[BE] setSuggestionProvider: PUT /ai/suggestion-providers	ai.provider
+#30644	New	Sanket Keluskar	[BE] testAiProvider: POST /ai-providers/{providerId}/test	ai.provider
+#30794	In progress	Pranay Shinde	[BE] configureWorkstation: PUT /workstations/{workstationId}	platform.device, tenancy#configureWorkstation
+#30798	New	Sanket Keluskar	[BE] listDevices: GET /devices	platform.device
+#30807	New	Pradnya Yeram	[FE] POS-016 Till Configuration: build with all states	tenancy#configureWorkstation
+#30808	New	Pradnya Yeram	[FE] POS-016 Till Configuration: connect to API	tenancy#configureWorkstation
+#30809	New	Pradnya Yeram	[FE] POS-016 Till Configuration: tests	tenancy#configureWorkstation
+#30830	New	Pranay Shinde	[BE] recordDeviceTamperEvent: POST /device-tamper-events	platform.device
+#30831	New	Deep Khanvilkar	[BE] recordDeviceHeartbeat: POST /devices/{deviceId}/heartbe	platform.device, tenancy#recordDeviceHeartbeat
+#30836	New	Chinmay Patkar	[BE] resolveSyncRejection: POST /sync/rejections/{rejectionI	sync.rejection
+#30846	New	Deep Khanvilkar	[BE] approveMatrixMultiLevel: PUT /matrix-multi-level	approvals#approveMatrixMultiLevel, approvals.matrix, approvals.rule
+#30847	New	Deep Khanvilkar	[BE] approveRoleAuthorityDelegation: PUT /role-authority-del	approvals.matrix, approvals.rule
+#30848	New	Pranay Shinde	[BE] createApprovalRequest: POST /approval-requests	approvals.matrix, approvals.rule
+#30849	New	Pranay Shinde	[BE] decideApprovalRequest: POST /approval-requests/{request	approvals.rule
+#30850	New	Pranay Shinde	[BE] evaluateApprovalRequirement: POST /approval-requests/ev	approvals.matrix, approvals.rule
+#30871	New	Deep Khanvilkar	[BE] lookupMerchandise: GET /merchandise/lookup	retail.merchandise
+#30873	New	Chinmay Patkar	[BE] reserveMerchandise: POST /outlets/{outletId}/reserve	retail.reservation, retail.reservation_line
+#30874	New	Pranay Shinde	[BE] createMerchandise: POST /merchandise	retail.merchandise
+#30875	New	Pranay Shinde	[BE] listMerchandise: GET /merchandise	retail.merchandise
+#30876	New	Pranay Shinde	[BE] updateMerchandise: PATCH /merchandise/{merchandiseId}	retail.merchandise
+#30877	New	Pranay Shinde	[BE] createRetailReturn: POST /retail-returns	retail.return, retail.return_line
+#30878	New	Pranay Shinde	[BE] getReturnPolicy: GET /outlets/{outletId}/return-policy	retail.return_policy
+#30879	New	Pranay Shinde	[BE] lookupRetailSale: GET /retail-sales/lookup	retail.sale, retail.sale_line
+#30880	New	Pranay Shinde	[BE] setReturnPolicy: PUT /outlets/{outletId}/return-policy	retail.return_policy
+#30881	New	Pranay Shinde	[BE] createRetailSale: POST /retail-sales	retail.sale, retail.sale_line
+#30882	New	Pranay Shinde	[BE] getRetailSale: GET /retail-sales/{saleId}	retail.sale, retail.sale_line
+#30883	New	Pranay Shinde	[BE] listRetailSales: GET /retail-sales	retail.sale, retail.sale_line
+#30884	New	Pranay Shinde	[BE] reprintReceipt: POST /retail-sales/{saleId}/reprint	retail.sale
+#30890	New	Pranay Shinde	[BE] escalateApprovalRequest: POST /approval-requests/{reque	approvals.rule
+#30897	New	Deep Khanvilkar	[BE] approveUnifiedDecision: PUT /unified-decision	approvals.rule
+#30901	New	Narayan Gaonkar	[BE] recordExternalApprovalDecision: POST /approval-requests	approvals.rule
+#30903	New	Deep Khanvilkar	[BE] submitApprovalRequest: POST /approval-requests/{request	approvals#submitApprovalRequest, approvals.rule
+#30917	New	Hrushikant Patkar	[BE] reindexSource: POST /index-sources/{sourceId}/reindex	fnb.menu_item, retail.merchandise
+#30952	New	Hrushikant Patkar	[BE] revokeFacePass: DELETE /face-pass/enrolments/{enrolment	pii.subject_biometric
+#30989	New	Deep Khanvilkar	[BE] payByLink: POST /payment-links/{token}/pay	payments.provider
+#30990	New	Pranay Shinde	[BE] setPaymentProvider: PUT /payment-providers/{providerId}	payments.provider
+#30992	New	Pranay Shinde	[BE] storePaymentToken: POST /payment-tokens	payments.provider
+#31138	New	Deep Khanvilkar	[BE] sendAiMessage: POST /conversations/{conversationId}/mes	ai.provider
+#31151	New	Sanket Keluskar	[BE] proposeMarketingContent: POST /ai/content-drafts	ai.provider
+#31170	New	Pranay Shinde	[BE] proposeTranslations: POST /ai/translate	ai.provider
+#31171	New	Pranay Shinde	[BE] proposeVenueLabels: POST /ai/venue-map/{mapId}/propose-	ai.provider
+#31172	New	Pranay Shinde	[BE] requestSuggestion: POST /ai/suggestions	ai.provider
+#31182	New	Chinmay Patkar	[BE] createApprovalDelegation: POST /delegations	approvals.matrix, approvals.rule
+#31185	New	Deep Khanvilkar	[BE] setApprovalMatrix: PUT /approval-matrices/{matrixId}	approvals#setApprovalMatrix, approvals.matrix, approvals.rule
+#31198	New	Surendra Loke	[FE] BO-087 Approval Delegations (setup: 2 of its 5 operatio	approvals#setApprovalMatrix
+#31199	New	Surendra Loke	[FE] BO-087 Approval Delegations (setup: 2 of its 5 operatio	approvals#setApprovalMatrix
+#31200	New	Surendra Loke	[FE] BO-087 Approval Delegations (setup: 2 of its 5 operatio	approvals#setApprovalMatrix
+#31204	New	Deep Khanvilkar	[BE] getWorkstationHealth: GET /workstations/{workstationId}	platform.device
+#31211	New	Narayan Gaonkar	[BE] setKitchenSla: PUT /outlets/{outletId}/kitchen-sla	fnb.kitchen_sla
+#31212	New	Narayan Gaonkar	[BE] setSubstitutionRules: PUT /substitution-rules	fnb.substitution_rule
+#31239	New	Chinmay Patkar	[BE] listApprovalMatrices: GET /approval-matrices	approvals.matrix, approvals.rule
+#31282	New	Narayan Gaonkar	[BE] listPaymentProviders: GET /payment-providers	payments.provider
+#31480	New	Narayan Gaonkar	[BE] createBundle: POST /bundles	fnb.menu_item
+#31704	New	Surendra Loke	[BE] createCombo: POST /combos	fnb.menu_item
+#31705	New	Surendra Loke	[BE] setComboSlots: PUT /combos/{comboId}/slots	fnb.menu_item
+#31707	New	Narayan Gaonkar	[BE] generateConfiguration: POST /generate/configuration	ai.provider
+#31718	New	Pranay Shinde	[BE] listSyncRejections: GET /sync/rejections	sync.rejection
+#31719	New	Pranay Shinde	[BE] syncOrders: POST /sync/orders	sync.rejection
+#31884	New	Surendra Loke	[BE] proposeWalkways: POST /ai/venue-map/{mapId}/propose-wal	ai.provider
+#31911	New	Narayan Gaonkar	[BE] transferTableVisit: POST /table-visits/{visitId}/transf	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#31912	New	Narayan Gaonkar	[BE] updateTableReservation: PATCH /table-reservations/{rese	fnb.table_reservation
+#31913	New	Narayan Gaonkar	[BE] leaveRestaurantWaitlist: POST /waitlist/{entryId}/leave	fnb.waitlist_entry
+#31914	New	Narayan Gaonkar	[BE] list86Events: GET /outlets/{outletId}/86-events	fnb.menu_item, fnb.sold_out_item
+#31915	New	Narayan Gaonkar	[BE] listMyTableReservations: GET /me/table-reservations	fnb.table_reservation, fnb.waitlist_entry
+#31956	New	Narayan Gaonkar	[BE] claimLocationSession: POST /location-sessions	fnb.table_visit
+#31958	New	Narayan Gaonkar	[BE] createGuestFnbOrder: POST /guest-orders	fnb.kitchen_ticket, fnb.menu_item, fnb.menu_item_modifier, fnb.service_order
+#31961	New	Deep Khanvilkar	[BE] listDiningOutlets: GET /venues/{venueId}/dining	fnb.menu, fnb.service_order
+#31963	New	Deep Khanvilkar	[BE] recordOrderHandover: POST /guest-orders/{orderId}/deliv	fnb.service_order
+#31968	New	Deep Khanvilkar	[BE] listKitchenTickets: GET /kitchen/tickets	fnb.kitchen_ticket, fnb.kitchen_ticket_line
+#31969	New	Deep Khanvilkar	[BE] prioritiseKitchenTicket: POST /kitchen/tickets/{ticketI	fnb.kitchen_ticket, fnb.kitchen_ticket_line
+#31970	New	Deep Khanvilkar	[BE] setKitchenTicketStatus: PUT /kitchen/tickets/{ticketId}	fnb.kitchen_ticket, fnb.kitchen_ticket_line
+#31972	New	Narayan Gaonkar	[BE] createFnbOrder: POST /fnb-orders	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu_item, fnb.service_order, fnb.service_order_line
+#31973	New	Narayan Gaonkar	[BE] getFnbOrder: GET /fnb-orders/{orderId}	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line
+#31974	New	Narayan Gaonkar	[BE] listFnbOrders: GET /fnb-orders	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line
+#31975	New	Narayan Gaonkar	[BE] acceptFnbOrder: POST /fnb-orders/{orderId}/accept	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line
+#31976	New	Narayan Gaonkar	[BE] cancelFnbOrder: POST /fnb-orders/{orderId}/cancel	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line
+#31977	New	Narayan Gaonkar	[BE] clearTable: POST /tables/{tableId}/clear	fnb.table_visit
+#31978	New	Narayan Gaonkar	[BE] getTableMap: GET /outlets/{outletId}/tables	fnb.table_visit
+#31979	New	Narayan Gaonkar	[BE] getTableVisit: GET /table-visits/{visitId}	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#31980	New	Narayan Gaonkar	[BE] openTableVisit: POST /table-visits	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#31981	New	Deep Khanvilkar	[BE] setTableLayout: PUT /outlets/{outletId}/tables	fnb.table_visit
+#31982	New	Deep Khanvilkar	[BE] updateTableVisit: PATCH /table-visits/{visitId}	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#32119	New	Deep Khanvilkar	[BE] simulatePaymentConfiguration: POST /payment-configurati	payments.provider
+#32159	New	Narayan Gaonkar	[BE] enrolFaceTag: POST /face-tag/enrolments	pii.subject_biometric
+#32167	New	Narayan Gaonkar	[BE] enrolFacePass: POST /face-pass/enrolments	pii.subject_biometric
+#32168	New	Pranay Shinde	[BE] getFacePassEnrolment: GET /face-pass/enrolments/{enrolm	pii.subject_biometric
+#32246	New	Hrushikant Patkar	[DB] access.policy_scope_assignment	access.policy_scope_assignment
+#32259	New	Deep Khanvilkar	[BE] syncScans: POST /access/scans	sync.rejection
+#32262	New	Narayan Gaonkar	[BE] validateAccess: POST /access/validate	access.policy_scope_assignment
+#32263	New	Narayan Gaonkar	[BE] validateGroupAccess: POST /access/group-validate	access.policy_scope_assignment
+#32300	New	Narayan Gaonkar	[BE] verifyIdentity: POST /identity-verifications	pii.subject_biometric
+#32301	New	Sanket Keluskar	[BE] getMenu: GET /menus/{menuId}	fnb.menu, fnb.menu_item, fnb.menu_section
+#32302	New	Sanket Keluskar	[BE] setMenuItemDailyCount: PUT /menu-items/{itemId}/daily-c	fnb.menu_item
+#32335	New	Sanket Keluskar	[BE] closeFiscalPeriod: POST /fiscal-periods/{periodId}/clos	approvals.rule
+#32427	New	Hrushikant Patkar	[DB] resources.performance_participant	resources.performance_participant
+#32557	On hold		[DB] catalogue.dynamic_pricing_control	catalogue.dynamic_pricing_control
+#32630	New	Narayan Gaonkar	[BE] attachModifierGroup: PUT /menu-items/{menuItemId}/modif	fnb.menu_item, fnb.menu_item_modifier
+#32631	New	Narayan Gaonkar	[BE] buildProductionPlan: POST /production-plans	fnb.menu_item, fnb.menu_item_modifier, fnb.recipe
+#32632	New	Narayan Gaonkar	[BE] chaseStation: POST /kitchen-stations/{stationId}/chase	fnb.kitchen_ticket
+#32633	New	Narayan Gaonkar	[BE] createTableReservation: POST /table-reservations	fnb.table_reservation
+#32635	New	Narayan Gaonkar	[BE] getKitchenSla: GET /outlets/{outletId}/kitchen-sla	fnb.kitchen_sla
+#32636	New	Narayan Gaonkar	[BE] holdCourse: POST /kitchen-tickets/{ticketId}/hold	fnb.kitchen_ticket, fnb.kitchen_ticket_line
+#32637	New	Narayan Gaonkar	[BE] joinRestaurantWaitlist: POST /waitlist	fnb.waitlist_entry
+#32677	New	Narayan Gaonkar	[BE] closeTableVisit: POST /table-visits/{visitId}/close	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#32678	New	Narayan Gaonkar	[BE] getBill: GET /table-visits/{visitId}/bill	fnb.service_order, fnb.table_session
+#32679	New	Narayan Gaonkar	[BE] splitBill: POST /table-visits/{visitId}/bill/split	fnb.bill_split, fnb.sub_bill
+#32680	New	Narayan Gaonkar	[BE] createTableReservationForGuest: POST /outlets/{outletId	fnb.table_reservation
+#32682	New	Narayan Gaonkar	[BE] fireCourse: POST /kitchen-tickets/{ticketId}/fire	fnb.kitchen_ticket, fnb.kitchen_ticket_line
+#32687	New	Narayan Gaonkar	[BE] listTableReservations: GET /table-reservations	fnb.table_reservation
+#32691	New	Narayan Gaonkar	[BE] markOrderCollected: POST /orders/{orderId}/collected	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line
+#32692	New	Narayan Gaonkar	[BE] notifyServer: POST /table-visits/{visitId}/notify-serve	fnb.table_visit
+#32693	New	Narayan Gaonkar	[BE] printOrderLabel: POST /kitchen-tickets/{ticketId}/label	fnb.kitchen_ticket
+#32694	New	Narayan Gaonkar	[BE] publishMenu: POST /menus/{menuId}/publish	fnb.menu, fnb.menu_item, fnb.menu_section
+#32695	New	Narayan Gaonkar	[BE] requestBill: POST /table-visits/{visitId}/request-bill	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#32696	New	Narayan Gaonkar	[BE] rollbackMenu: POST /menus/{menuId}/rollback	fnb.menu, fnb.menu_item, fnb.menu_section
+#32697	New	Narayan Gaonkar	[BE] scheduleMenuPublish: POST /menus/{menuId}/schedule	fnb.menu
+#32698	New	Narayan Gaonkar	[BE] seatTableReservation: POST /table-reservations/{reserva	fnb.table_reservation, fnb.table_session, fnb.table_visit
+#32699	New	Narayan Gaonkar	[BE] createMenu: POST /menus	fnb.menu, fnb.menu_item, fnb.menu_section
+#32700	New	Narayan Gaonkar	[BE] setItemAvailability: PUT /menu-items/{itemId}/availabil	fnb.menu_item
+#32701	New	Narayan Gaonkar	[BE] setMenuSections: PUT /menus/{menuId}/sections	fnb.menu, fnb.menu_item, fnb.menu_section
+#32702	New	Narayan Gaonkar	[BE] updateMenu: PATCH /menus/{menuId}	fnb.menu, fnb.menu_item, fnb.menu_section
+#32716	New	Narayan Gaonkar	[BE] recallKitchenTicket: POST /kitchen-tickets/{ticketId}/r	fnb.kitchen_ticket, fnb.kitchen_ticket_line
+#32717	New	Narayan Gaonkar	[BE] refireItem: POST /kitchen-tickets/{ticketId}/refire	fnb.kitchen_ticket, fnb.kitchen_ticket_line
+#32718	New	Narayan Gaonkar	[BE] releaseProductionPlan: POST /production-plans/{planId}/	fnb.production_run
+#32719	New	Deep Khanvilkar	[BE] getGuestBill: GET /table-sessions/{sessionId}/bill	fnb.service_order, fnb.table_session
+#32721	New	Deep Khanvilkar	[BE] getGuestOrderStatus: GET /guest-orders/{orderId}	fnb.kitchen_ticket, fnb.service_order
+#32783	New	Narayan Gaonkar	[BE] listRecipes: GET /recipes	fnb.recipe
+#32784	New	Narayan Gaonkar	[BE] recordWaste: POST /outlets/{outletId}/waste	fnb.menu_item
+#32786	New	Narayan Gaonkar	[BE] compItem: POST /table-visits/{visitId}/comp	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#32788	New	Narayan Gaonkar	[BE] moveTableVisit: POST /table-visits/{visitId}/move	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#32789	New	Narayan Gaonkar	[BE] quoteWaitTime: POST /waitlist/{entryId}/quote	fnb.table_visit, fnb.waitlist_entry
+#32798	New	Surendra Loke	[BE] reassignServer: PUT /table-visits/{visitId}/server	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#32799	New	Surendra Loke	[BE] setServiceStage: PUT /table-visits/{visitId}/stage	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#32800	New	Surendra Loke	[BE] transferOrderItems: POST /table-visits/{visitId}/transf	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#32804	New	Surendra Loke	[BE] mergeTableVisits: POST /table-visits/{visitId}/merge	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line, fnb.table_visit
+#32812	New	Pranay Shinde	[BE] getWorkstation: GET /workstations/{workstationId}	platform.device
+#32814	New	Pranay Shinde	[BE] listWorkstations: GET /workstations	platform.device
+#32815	New	Pranay Shinde	[BE] registerDevice: POST /devices	platform.device, tenancy#registerDevice
+#32822	New	Chinmay Patkar	[BE] amendFnbOrder: PATCH /fnb-orders/{orderId}	fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.service_order, fnb.service_order_line
+#32826	New	Narayan Gaonkar	[BE] applyMenuActions: POST /menus/{menuId}/actions	fnb.menu, fnb.menu_item
+#32829	New	Narayan Gaonkar	[BE] getAllergenVerification: GET /menu-items/{menuItemId}/a	fnb.allergen_verdict
+#32834	New	Narayan Gaonkar	[BE] listSubstitutionRules: GET /substitution-rules	fnb.substitution_rule
+#32837	New	Pranay Shinde	[BE] listIngredientSubstitutes: GET /recipes/{recipeId}/subs	fnb.recipe
+#32839	New	Pranay Shinde	[BE] sendOrderNotification: POST /fnb-orders/{orderId}/notif	fnb.service_order
+#32844	New	Surendra Loke	[BE] setIngredientSubstitutes: PUT /recipes/{recipeId}/subst	fnb.recipe
+#32845	New	Surendra Loke	[BE] updateTable: PUT /tables/{tableId}	fnb.table_visit
+#32846	New	Surendra Loke	[BE] verifyAllergens: POST /menu-items/{menuItemId}/verify-a	fnb.allergen_verdict, fnb.menu_item, fnb.menu_item_modifier, fnb.recipe, fnb.substitution_rule
+#32885	New	Deep Khanvilkar	[BE] reorderPerformanceManifest: PUT /performances/{performa	resources.performance_participant
+#32889	New	Narayan Gaonkar	[BE] getPerformanceManifest: GET /performances/{performanceI	resources.performance_participant
+#32997	New	Pranay Shinde	[BE] syncGamePlays: POST /game-plays/sync	sync.rejection
+#33087	New	Chinmay Patkar	[BE] setRecipe: PUT /recipes/{recipeId}	fnb.allergen_verdict, fnb.menu_item, fnb.recipe, fnb.substitution_rule
+#33096	New	Pranay Shinde	[BE] askReportingQuestion: POST /reports/ask	ai.provider
+#33097	New	Pranay Shinde	[BE] saveNaturalLanguageQuery: POST /reports/ask/{conversati	ai.provider
+#33138	New	Narayan Gaonkar	[BE] listMenuVersions: GET /menus/{menuId}/versions	fnb.menu_item, fnb.menu_section
+#33139	New	Narayan Gaonkar	[BE] listMenus: GET /menus	fnb.menu, fnb.menu_item, fnb.menu_section
+#33201	New	Narayan Gaonkar	[BE] getProductionRun: GET /production-runs/{runId}	fnb.production_run, fnb.recipe
+#33202	New	Narayan Gaonkar	[BE] listProductionRuns: GET /production-runs	fnb.production_run, fnb.recipe
+#33209	New	Narayan Gaonkar	[BE] completeProductionRun: POST /production-runs/{runId}/co	fnb.production_run, fnb.recipe
+#33211	New	Narayan Gaonkar	[BE] planProductionRun: POST /production-runs	fnb.production_run, fnb.recipe
+#33523	New	Sanket Keluskar	[BE] startKioskAssist: POST /kiosk-assists	platform.device
+#33600	New	Hrushikant Patkar	[DB] marketing.service_copilot_config	marketing.service_copilot_config
+#33606	New	Chinmay Patkar	[BE] setCustomerServiceCopilot: PUT /customer-service-copilo	marketing.service_copilot_config
+#33609	New	Deep Khanvilkar	[BE] getCustomerServiceCopilot: GET /customer-service-copilo	marketing.service_copilot_config
+#33615	New	Deep Khanvilkar	[BE] listAiProviders: GET /providers	ai.provider
+#33871	New	Chitrangi Mestry	[FE] EMP-043 Device settings: build with all states	tenancy#registerDevice
+#33872	New	Chitrangi Mestry	[FE] EMP-043 Device settings: connect to API	tenancy#registerDevice
+#33873	New	Chitrangi Mestry	[FE] EMP-043 Device settings: tests	tenancy#registerDevice
+#33879	New	Deep Khanvilkar	[BE] getDeviceFirmware: GET /device-firmware/{firmwareId}	platform.device
+#33881	New	Deep Khanvilkar	[BE] listDeviceFirmware: GET /device-firmware	platform.device
+#33885	New	Pranay Shinde	[BE] startDeviceFirmwareRollout: POST /device-firmware/rollo	platform.device
+#33913	New	Sanket Keluskar	[FE] BO-036 Device Registry: build with all states	tenancy#configureWorkstation, tenancy#registerDevice
+#33914	New	Sanket Keluskar	[FE] BO-036 Device Registry: connect to API	tenancy#configureWorkstation, tenancy#registerDevice
+#33915	New	Sanket Keluskar	[FE] BO-036 Device Registry: tests	tenancy#configureWorkstation, tenancy#registerDevice
+#33989	New	Sanket Keluskar	[BE] enrolDevice: POST /devices/{deviceId}/enrolment	platform.device, tenancy#enrolDevice
+#34021	New	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup: build with all stat	tenancy#configureWorkstation
+#34022	New	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup: connect to API	tenancy#configureWorkstation
+#34023	New	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup: tests	tenancy#configureWorkstation
+#34054	New	Surendra Loke	[BE] createDsarRequest: POST /dsar/requests	sync.dsar_request
+#34055	New	Surendra Loke	[BE] getDsarRequest: GET /dsar/requests/{requestId}	sync.dsar_request
+#34206	New	Narayan Gaonkar	[BE] reconcileBurstEnvironment: POST /burst-environments/{bu	sync.rejection
+#34650	New	Sanket Keluskar	[FE] BO-086 Approval Matrix: build with all states	approvals#setApprovalMatrix
+#34651	New	Sanket Keluskar	[FE] BO-086 Approval Matrix: connect to API	approvals#setApprovalMatrix
+#34652	New	Sanket Keluskar	[FE] BO-086 Approval Matrix: tests	approvals#setApprovalMatrix
+#34655	New	Pranay Shinde	[BE] listRuleWorkflow: GET /rule-workflow	approvals.matrix, approvals.rule
+#34661	New	Chinmay Patkar	[BE] simulateWorkflowTestingImpact: PUT /workflow-testing-im	approvals.matrix, approvals.rule
+#34669	New	Pradnya Yeram	[FE] BO-639 Reviewer Assignment & Delegation: build with all	approvals#setApprovalMatrix
+#34670	New	Pradnya Yeram	[FE] BO-639 Reviewer Assignment & Delegation: connect to API	approvals#setApprovalMatrix
+#34671	New	Pradnya Yeram	[FE] BO-639 Reviewer Assignment & Delegation: tests	approvals#setApprovalMatrix
+#34706	New	Deep Khanvilkar	[BE] listSlaEscalationBottleneck: GET /sla-escalation-bottle	approvals.rule
+#34708	New	Chinmay Patkar	[BE] listSlaEscalationReminder: GET /sla-escalation-reminder	approvals.rule
+#35134	On hold		[DB] catalogue.sales_channel	catalogue.sales_channel
+#35141	New	Pranay Shinde	[BE] publishChannelAvailability: PUT /channel-availability	catalogue.sales_channel
+#35172	New	Hrushikant Patkar	[BE] setDynamicPricingGuardrailPolicy: PUT /dynamic-pricing-	catalogue.dynamic_pricing_control
+#35173	New	Hrushikant Patkar	[BE] setPriceLadderMatrix: PUT /dynamic-pricing-strategies/{	catalogue.dynamic_pricing_control
+#35174	New	Hrushikant Patkar	[BE] transitionDynamicPricingStrategy: POST /dynamic-pricing	catalogue.dynamic_pricing_control
+#35181	New	Hrushikant Patkar	[BE] createChannelProfile: POST /channel-profile	catalogue.sales_channel
+#35182	New	Hrushikant Patkar	[BE] createLiveDynamicPrice: POST /live-dynamic-price	catalogue.dynamic_pricing_control
+#35183	New	Hrushikant Patkar	[BE] decidePricingRecommendation: POST /recommendation-revie	catalogue.dynamic_pricing_control
+#35184	New	Hrushikant Patkar	[BE] listAutomationPolicyAutonomous: GET /automation-policy-	catalogue.dynamic_pricing_control
+#35189	New	Pranay Shinde	[BE] setChannelPricingCommercial: PUT /channel-pricing-comme	catalogue.sales_channel
+#35190	New	Pranay Shinde	[BE] setPricing: PUT /pricing-2	catalogue.dynamic_pricing_control
+#35191	New	Pranay Shinde	[BE] setPricingExperiment: PUT /pricing-experiment	catalogue.dynamic_pricing_control
+#35192	New	Pranay Shinde	[BE] setProductCatalogue: PUT /product-catalogue	catalogue.sales_channel
+#35221	New	Narayan Gaonkar	[BE] listDynamicPricingGuardrail: GET /dynamic-pricing-guard	catalogue.dynamic_pricing_control
+#35232	New		[BE] setChannelConnectionConfiguration: PUT /channel-connect	catalogue.sales_channel
+#35233	New		[BE] setChannelSalesRule: PUT /channel-sales-rules/{ruleId}	catalogue.sales_channel
+#35234	New		[BE] setChannelSyncSetting: PUT /channel-syncs	catalogue.sales_channel
+#35235	New		[BE] testChannelConnection: POST /channel-connections/{conne	catalogue.sales_channel
+#35237	New	Surendra Loke	[BE] publishChannelReadinessValidation: PUT /channel-readine	catalogue.sales_channel
+#35238	New	Surendra Loke	[BE] setChannelFeePayment: PUT /channel-fee-payment	catalogue.sales_channel
+#35240	New	Hrushikant Patkar	[BE] listChannelSaleSchedule: GET /channel-sale-schedule	catalogue.sales_channel
+#35242	New	Hrushikant Patkar	[BE] listInventoryCapacityChannel: GET /inventory-capacity-c	catalogue.sales_channel
+#35244	New	Pranay Shinde	[BE] listSaleChannel: GET /sale-channel	catalogue.sales_channel
+#35247	New	Narayan Gaonkar	[BE] listChannel: GET /channel	catalogue.sales_channel
+#35250	New	Narayan Gaonkar	[BE] listChannelConnectionIntegration: GET /channel-connecti	catalogue.sales_channel
+#35284	New	Deep Khanvilkar	[BE] setRulePriorityConflict: PUT /rule-priority-conflict	catalogue.dynamic_pricing_control
+#35286	New	Hrushikant Patkar	[BE] listDynamicPricingStrategy: GET /dynamic-pricing-strate	catalogue.dynamic_pricing_control
+#35287	New	Hrushikant Patkar	[BE] listRevenue: GET /revenue	catalogue.dynamic_pricing_control
+#35329	New	Hrushikant Patkar	[BE] listDynamicPricingAutomation: GET /dynamic-pricing-auto	catalogue.dynamic_pricing_control
+#35334	New		[BE] listChannelExceptionIncident: GET /channel-exception-in	catalogue.sales_channel
+#35335	New		[BE] listChannelGovernanceSla: GET /channel-governance-sla	catalogue.sales_channel
+#35337	New		[BE] listChannelPerformanceCommercial: GET /channel-performa	catalogue.sales_channel
+#35388	New		[BE] listPricingChangeImpact: GET /pricing-change-impact	catalogue.dynamic_pricing_control
+#35700	New	Deep Khanvilkar	[BE] CrossRegionService: recordSyncRejection, recordSyncReje	sync.rejection
+#35701	New	Narayan Gaonkar	[Test] Module test: Platform Operations · API only (Block A 	sync.rejection
+#35772	New	Deep Khanvilkar	[BE] LedgerService: rejectJournal, reopenPeriod	approvals.rule
+#35774	New	Pallavi Sawant	[FE] ADM-530 AI Approval Requirement & Routing Configuration	approvals#setApprovalMatrix
+#35781	New	Hrushikant Patkar	[DB] sync.dsar_request	sync.dsar_request
+#35785	New	Hrushikant Patkar	[DB] catalogue.dynamic_pricing_control	catalogue.dynamic_pricing_control
+#35798	New	Hrushikant Patkar	[DB] catalogue.sales_channel	catalogue.sales_channel
+#35807	New	Deep Khanvilkar	[BE] recordSyncRejection: POST /sync-rejections	sync.rejection
+#35808	New	Deep Khanvilkar	[BE] recordSyncRejectionResolution: POST /sync-rejections/{r	sync.rejection
+#36016	New	Deep Khanvilkar	[BE] reopenPeriod: POST /fiscal-periods/{periodId}/reopen	approvals.rule
+#36018	New	Pallavi Sawant	[FE] ADM-530 AI Approval Requirement & Routing Configuration	approvals#setApprovalMatrix
+#36019	New	Pallavi Sawant	[FE] ADM-530 AI Approval Requirement & Routing Configuration	approvals#setApprovalMatrix
+#36020	New	Pallavi Sawant	[FE] ADM-530 AI Approval Requirement & Routing Configuration	approvals#setApprovalMatrix
+465 ticket(s)

@@ -919,7 +919,7 @@
    },
    "foreignHoldings": {
     "type": "array",
-    "description": "4.6.11 and 6.1.10. **Foreign cash accepted at this till, counted separately by currency.** A till taking USD and EUR alongside AED has three counts and three variances — collapsing them into a base-currency total makes a variance unattributable to the currency that caused it.\n**No opening float in a foreign currency and no change given in one.** Foreign cash only ever comes in, which is what keeps this to one number per currency rather than a full reconciliation each.\n",
+    "description": "4.6.11 and 6.1.10. **Foreign cash accepted at this till, counted separately by currency.** A till taking USD and EUR alongside AED has three counts and three variances — collapsing them into a base-currency total makes a variance unattributable to the currency that caused it.\n**No opening float in a foreign currency and no change given in one.** Foreign cash only ever comes in, which is what keeps this to one number per currency rather than a full reconciliation each. Refused on allocateDepositBox (400): a box opens with no foreign cash (ADAM CR-135).\n",
     "items": {
      "type": "object",
      "required": [
@@ -930,7 +930,7 @@
       "currency": {
        "type": "string",
        "pattern": "^[A-Z]{3}$",
-       "description": "**Stored, because it is the one thing that is not the region's.** A foreign holding is by definition cash in a currency the till does not trade in, so it cannot resolve from the region (ADR-0018) the way the box's own amounts do; it is the key of the row, one per currency per box. The amounts on this item are in this currency.\n"
+       "description": "**Stored, because it is the one thing that is not in the box's own currency.** A foreign holding is by definition cash in a currency the till does not trade in, so it cannot resolve the way the box's own amounts do (naming-and-style 5.1; ADAM CR-135); it is the key of the row, one per currency per box. The amounts on this item are in this currency.\n"
       },
       "expectedAmount": {
        "allOf": [

@@ -795,7 +795,14 @@
     "starts_at",
     "status"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the region's time zone the series is read in: daysOfWeek, until, firstStart and lastStart (ADAM CR-096)"
+   }
+  ]
  },
  "listChannelCapacities": {
   "contract": "catalogue",
@@ -1034,7 +1041,14 @@
   "audience": [
    "staff"
   ],
-  "fixNote": "4 October 2026 (CHG-FXC-004): the snapshot is built from the catalogue and the sale boards; 14 October 2026: reads platform.sale_board_page (CHG-TEN-001: the bundle carries every page of a board (ADAM CR-080)); 14 October 2026: platform.sale_board read as platform.sale_board_for_catalogue, platform.sale_board_page read as platform.sale_board_page_for_catalogue, platform.sale_board_tile read as platform.sale_board_tile_for_catalogue (CHG-R6G-007: the boards through the views named for Catalogue, bulk data within commerce (ADR-0055 rule 2))"
+  "fixNote": "4 October 2026 (CHG-FXC-004): the snapshot is built from the catalogue and the sale boards; 14 October 2026: reads platform.sale_board_page (CHG-TEN-001: the bundle carries every page of a board (ADAM CR-080)); 14 October 2026: platform.sale_board read as platform.sale_board_for_catalogue, platform.sale_board_page read as platform.sale_board_page_for_catalogue, platform.sale_board_tile read as platform.sale_board_tile_for_catalogue (CHG-R6G-007: the boards through the views named for Catalogue, bulk data within commerce (ADR-0055 rule 2))",
+  "readVia": [
+   {
+    "query": "finance#taxCodeRecords",
+    "route": "in-process",
+    "for": "the tax codes the bundle carries (ADAM CR-110)"
+   }
+  ]
  },
  "getLatestBundle": {
   "contract": "catalogue",
@@ -1200,6 +1214,11 @@
    ]
   },
   "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
+   },
    {
     "query": "tenancy#workstationRecords",
     "route": "in-process",
@@ -4314,7 +4333,14 @@
     "percentage",
     "refund_policy_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "createPayment": {
   "contract": "orders",
@@ -5161,7 +5187,14 @@
    "staff",
    "partner"
   ],
-  "lineageNote": "emits order.exchanged"
+  "lineageNote": "emits order.exchanged",
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "rescheduleOrder": {
   "contract": "orders",
@@ -5197,6 +5230,11 @@
     "query": "catalogue#performanceRecords",
     "route": "in-process",
     "for": "the target performance (409 target-unavailable) (CHG-MOD-003)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -5637,7 +5675,14 @@
     "seat_ids",
     "variant_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "getB2bCredit": {
   "contract": "orders",
@@ -8530,7 +8575,19 @@
    "key": "res:{tenantId}:{resolver}:{scopePath}",
    "bump": null,
    "affects": null
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "currency, currencyScale and timezone, from the workstation's region (ADAM CR-096)"
+   },
+   {
+    "query": "tenancy#workstationRecords",
+    "route": "in-process",
+    "for": "the session's workstation fields: code, regionId and devices (ADAM CR-096)"
+   }
+  ]
  },
  "listPrincipals": {
   "contract": "identity",
@@ -10244,7 +10301,14 @@
     "rate",
     "scope_path"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "updateTaxCode": {
   "contract": "finance",
@@ -10288,7 +10352,14 @@
     "rate",
     "scope_path"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "listTaxExemptions": {
   "contract": "finance",
@@ -10375,7 +10446,14 @@
     "verified_at",
     "verified_by"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "calculateTax": {
   "contract": "finance",
@@ -10537,6 +10615,11 @@
     "query": "orders#salesOrderRecords",
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -10699,7 +10782,14 @@
     "posted_at",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "getJournalEntry": {
   "contract": "finance",
@@ -10823,7 +10913,14 @@
     "posted_at",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "rejectJournal": {
   "contract": "finance",
@@ -10887,7 +10984,14 @@
     "posted_at",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "reverseJournalEntry": {
   "contract": "finance",
@@ -10952,7 +11056,14 @@
     "posted_at",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "listFxRates": {
   "contract": "finance",
@@ -11069,6 +11180,11 @@
     "query": "shift#posShiftRecords",
     "route": "in-process",
     "for": "its read of orders.pos_shift, Orders's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -11186,7 +11302,14 @@
     "source_id",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "getTrialBalance": {
   "contract": "finance",
@@ -11260,7 +11383,19 @@
     "variant_id",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "reviewPriceVariance": {
   "contract": "finance",
@@ -11414,6 +11549,11 @@
     "query": "payments#providerConnectionRecords",
     "route": "in-process",
     "for": "its read of payments.provider_connection, Orders's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -11726,7 +11866,14 @@
     "principal_id",
     "reason"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "abandonPeriodClose": {
   "contract": "finance",
@@ -11778,7 +11925,14 @@
     "principal_id",
     "reason"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "reopenPeriod": {
   "contract": "finance",
@@ -16662,7 +16816,14 @@
     "name",
     "sort_order"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "getMenu": {
   "contract": "fnb",
@@ -16795,7 +16956,14 @@
     "name",
     "sort_order"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "setMenuSections": {
   "contract": "fnb",
@@ -16865,7 +17033,14 @@
     "name",
     "sort_order"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "setItemAvailability": {
   "contract": "fnb",
@@ -22445,6 +22620,11 @@
   ],
   "readVia": [
    {
+    "query": "promotions#liveEffectivePrice",
+    "route": "service",
+    "for": "the price after any live promotion (ADAM CR-096)"
+   },
+   {
     "query": "tenancy#workstationRecords",
     "route": "service",
     "for": "the caller's workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003)"
@@ -23372,7 +23552,19 @@
     "quantity",
     "shop_and_drop_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "fnb#deliveryLocationRecords",
+    "route": "in-process",
+    "for": "collectionPointClosed: the collection point and its serving outlets (ADAM CR-096; the hours rule is CR-104)"
+   },
+   {
+    "query": "orders#orderLineRecords",
+    "route": "service",
+    "for": "the retail lines lineIds names on the orderId path (ADAM CR-096)"
+   }
+  ]
  },
  "lookupShopAndDrop": {
   "contract": "retail",
@@ -23423,7 +23615,14 @@
     "quantity",
     "shop_and_drop_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "fnb#deliveryLocationRecords",
+    "route": "in-process",
+    "for": "what its text calls \"collection point\": fnb.delivery_location, F&B's data (CHG-RTE-001)"
+   }
+  ]
  },
  "collectShopAndDrop": {
   "contract": "retail",
@@ -28456,7 +28655,14 @@
     "venue_id",
     "version"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue setting promotions.nearZeroLinePrice, the near-zero floor (ADAM CR-096)"
+   }
+  ]
  },
  "analysePromotionConflicts": {
   "contract": "promotions",
@@ -28479,6 +28685,13 @@
   "audience": [
    "staff",
    "partner"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue setting promotions.nearZeroLinePrice, the near-zero minimum (ADAM CR-096)"
+   }
   ]
  },
  "getPromotionUsage": {
@@ -30637,7 +30850,14 @@
     "queue_id",
     "to"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "promotions#promotionRecords",
+    "route": "service",
+    "for": "what its text calls \"live promotion\": promotions.promotion, Catalogue's data (CHG-RTE-001)"
+   }
+  ]
  },
  "getQueue": {
   "contract": "queue",
@@ -30786,7 +31006,14 @@
     "queue_id",
     "to"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "promotions#promotionRecords",
+    "route": "service",
+    "for": "what its text calls \"live promotion\": promotions.promotion, Catalogue's data (CHG-RTE-001)"
+   }
+  ]
  },
  "setQueueStatus": {
   "contract": "queue",
@@ -30861,7 +31088,14 @@
     "queue_id",
     "to"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "promotions#promotionRecords",
+    "route": "service",
+    "for": "what its text calls \"live promotion\": promotions.promotion, Catalogue's data (CHG-RTE-001)"
+   }
+  ]
  },
  "joinQueue": {
   "contract": "queue",
@@ -32236,6 +32470,13 @@
   ],
   "audience": [
    "staff"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "TenantAppStatus.venues: only the active venues are listed (ADAM CR-096)"
+   }
   ]
  },
  "getBrandIdentity": {
@@ -32285,6 +32526,18 @@
   ],
   "audience": [
    "staff"
+  ],
+  "readVia": [
+   {
+    "query": "assets#mediaAssetRecords",
+    "route": "in-process",
+    "for": "each asset's type, size and dimensions: PNG or SVG, up to 2 MB (ADAM CR-096)"
+   },
+   {
+    "query": "subscription#licenceAddOnRecords",
+    "route": "in-process",
+    "for": "showPoweredBy false: the tenant's licence add-on keyed poweredByRemoval, else 403 powered-by-locked (ADAM CR-096)"
+   }
   ]
  },
  "getAppIcons": {
@@ -32334,6 +32587,13 @@
   ],
   "audience": [
    "staff"
+  ],
+  "readVia": [
+   {
+    "query": "assets#mediaAssetRecords",
+    "route": "in-process",
+    "for": "the 1024x1024 source's type, size and dimensions (ADAM CR-096)"
+   }
   ]
  },
  "getTheme": {
@@ -33576,6 +33836,18 @@
   ],
   "audience": [
    "staff"
+  ],
+  "readVia": [
+   {
+    "query": "catalogue#productRecords",
+    "route": "service",
+    "for": "productId: the product whose own ticket is rendered (ADAM CR-096)"
+   },
+   {
+    "query": "orders#ticketTemplateRecords",
+    "route": "service",
+    "for": "the ticket and pass templates the PDF ticket and Wallet passes are rendered from (ADAM CR-096)"
+   }
   ]
  },
  "validateTenantConfig": {
@@ -33653,7 +33925,14 @@
     "snapshot",
     "version"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "listConfigVersions": {
   "contract": "white-label",
@@ -33865,7 +34144,14 @@
     "updated_at",
     "version"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "diffConfigVersion": {
   "contract": "white-label",
@@ -36780,6 +37066,11 @@
     "query": "marketing-crm#consentQuestionVersionRecords",
     "route": "service",
     "for": "its read of marketing.consent_question_version, Marketing's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue settings\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -37442,7 +37733,14 @@
     "taken_by_principal_id",
     "variant_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "createTableReservation": {
   "contract": "fnb",
@@ -39280,6 +39578,16 @@
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    },
    {
+    "query": "tenancy#denominationRecords",
+    "route": "in-process",
+    "for": "the face values of openingDenominations (ADAM CR-135)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's trading currency (currencyCode) and its cashDrawerLimit where the workstation has none (ADAM CR-135)"
+   },
+   {
     "query": "tenancy#workstationRecords",
     "route": "in-process",
     "for": "its read of platform.workstation, Tenancy's data (CHG-MOD-001)"
@@ -39349,7 +39657,19 @@
     "deposit_box_id",
     "id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#denominationRecords",
+    "route": "in-process",
+    "for": "what its text calls \"denominations\": platform.denomination, Tenancy's data (CHG-RTE-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue's cashDrawerLimit\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "withdrawFromDepositBox": {
   "contract": "shift",
@@ -39387,6 +39707,11 @@
     "query": "identity#verifySupervisorStepUp",
     "route": "in-process",
     "for": "the PIN step-up in `witnessStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller's transaction (ADR-0055 rule 2)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue's cashDrawerLimit\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
   ],
   "readColumns": {
@@ -39497,6 +39822,11 @@
     "query": "finance#fxRateRecords",
     "route": "in-process",
     "for": "its read of ledger.fx_rate, Ledger's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue's cashDrawerLimit\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -41008,6 +41338,13 @@
   ],
   "audience": [
    "staff"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
+   }
   ]
  },
  "listGuestMemberships": {
@@ -42774,6 +43111,16 @@
     "query": "access#accessPointRecords",
     "route": "service",
     "for": "its read of access.access_point, Access's data (CHG-MOD-001)"
+   },
+   {
+    "query": "finance#fxRateRecords",
+    "route": "in-process",
+    "for": "displayCurrencies: a code the region has no rate for is refused 400 (ADAM CR-096)"
+   },
+   {
+    "query": "orders#venueChargeCurrencies",
+    "route": "in-process",
+    "for": "chargeCurrencies: each must be one the venue's payment provider can charge (ADAM CR-096)"
    }
   ]
  },
@@ -43358,6 +43705,11 @@
     "query": "orders#paymentRecords",
     "route": "in-process",
     "for": "its read of orders.payment, Orders's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    },
    {
     "query": "wallet#walletTransactionRecords",
@@ -43992,6 +44344,11 @@
     "query": "finance#postingRecords",
     "route": "service",
     "for": "its read of ledger.posting, Ledger's data (CHG-MOD-001)"
+   },
+   {
+    "query": "finance#taxCodeRecords",
+    "route": "service",
+    "for": "what its text calls \"tax codes\": ledger.tax_code, Ledger's data (CHG-RTE-001)"
    },
    {
     "query": "orders#salesOrderRecords",
@@ -44861,6 +45218,11 @@
     "query": "subscription#partnerAgreementRecords",
     "route": "service",
     "for": "its read of control.partner_agreement, Platform's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -45039,6 +45401,11 @@
     "query": "catalogue#entitlementTemplateRecords",
     "route": "in-process",
     "for": "its read of catalogue.entitlement_template, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -49541,6 +49908,11 @@
     "query": "orders#orderLineRecords",
     "route": "service",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -50166,7 +50538,14 @@
     "status",
     "version"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "setSectionLayout": {
   "contract": "fnb",
@@ -50726,7 +51105,14 @@
     "refused_order_count",
     "source"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "markOrderCollected": {
   "contract": "fnb",
@@ -51099,6 +51485,11 @@
     "query": "catalogue#productRecords",
     "route": "service",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -51159,7 +51550,14 @@
     "menu_item_id",
     "upcharge"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "attachModifierGroup": {
   "contract": "fnb",
@@ -51593,6 +51991,11 @@
     "query": "catalogue#priceRecords",
     "route": "service",
     "for": "its read of catalogue.price, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "finance#taxCodeRecords",
+    "route": "service",
+    "for": "what its text calls \"tax code\": ledger.tax_code, Ledger's data (CHG-RTE-001)"
    }
   ]
  },
@@ -51844,6 +52247,11 @@
     "query": "catalogue#productRecords",
     "route": "service",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "finance#taxCodeRecords",
+    "route": "service",
+    "for": "what its text calls \"tax code\": ledger.tax_code, Ledger's data (CHG-RTE-001)"
    }
   ]
  },
@@ -51912,6 +52320,13 @@
   ],
   "audience": [
    "staff"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
   ]
  },
  "getProductionRun": {
@@ -52003,6 +52418,11 @@
     "query": "inventory#movementRecords",
     "route": "in-process",
     "for": "its read of inventory.movement, Inventory's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -52171,6 +52591,11 @@
     "query": "ai#suggestionRecords",
     "route": "service",
     "for": "its read of ai.suggestion, AI's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -52221,7 +52646,14 @@
     "suggested_quantity",
     "uom"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "listAuditRecords": {
   "contract": "tenancy",
@@ -52727,6 +53159,11 @@
   },
   "readVia": [
    {
+    "query": "platform-ops#hostnameHeldByAnotherTenant",
+    "route": "in-process",
+    "for": "refused where another tenant already holds the hostname (ADAM CR-096)"
+   },
+   {
     "query": "subscription#tenantRecords",
     "route": "in-process",
     "for": "its read of control.tenant, Platform's data (CHG-MOD-001)"
@@ -53080,6 +53517,11 @@
     "query": "identity#principalRecords",
     "route": "service",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -60473,7 +60915,6 @@
     "communication_provider_id",
     "failure_category",
     "id",
-    "message_dispatch_id",
     "next_attempt_at"
    ],
    "marketing.message_template": [
@@ -95264,6 +95705,11 @@
     "query": "tenancy#outletRecords",
     "route": "service",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -95497,7 +95943,14 @@
    "key": "res:{tenantId}:{resolver}:{scopePath}",
    "bump": "INCR resver:{tenantId}:{resolver}",
    "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "setDepositPolicy": {
   "contract": "orders",
@@ -102555,7 +103008,14 @@
     "scope_path",
     "updated_at"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "setResourceBookingProgress": {
   "contract": "resources",
@@ -103897,7 +104357,14 @@
     "verified_at",
     "verified_by"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "voidEntitlement": {
   "contract": "orders",
@@ -107717,7 +108184,14 @@
     "updated_at",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"venue's trading currency\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "setMediaBindingRule": {
   "contract": "access",
@@ -113485,7 +113959,14 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "analytical replica; emirate from the venue address"
+  "lineageNote": "analytical replica; emirate from the venue address",
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "getWalletAutoReloadSetting": {
   "contract": "wallet",
@@ -113887,6 +114368,11 @@
     "query": "orders#salesOrderRecords",
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -116151,7 +116637,14 @@
     "tax_rate",
     "unit_amount"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
+  ]
  },
  "listWebhookEventTypes": {
   "contract": "public-api",
@@ -118725,7 +119218,14 @@
     "updated_at",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "422: a venueId not among the tenant's active venues (ADAM CR-096)"
+   }
+  ]
  },
  "setApprovalExternalProvider": {
   "contract": "approvals",
@@ -120721,6 +121221,11 @@
     "query": "catalogue#variantRecords",
     "route": "service",
     "for": "its read of catalogue.variant, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -121906,6 +122411,11 @@
     "query": "orders#salesOrderRecords",
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -122681,6 +123191,11 @@
     "query": "catalogue#productEligibilityRuleRecords",
     "route": "service",
     "for": "its read of catalogue.product_eligibility_rule, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
    }
   ]
  },
@@ -124368,6 +124883,18 @@
   "stores": [
    "postgres",
    "redis"
+  ],
+  "readVia": [
+   {
+    "query": "platform-ops#tenantDomainRecords",
+    "route": "in-process",
+    "for": "the platform-issued address, the tenant's platform subdomain row (ADAM CR-096)"
+   },
+   {
+    "query": "subscription#cellRecords",
+    "route": "in-process",
+    "for": "the tenant's cell, whose name the address carries (ADAM CR-096)"
+   }
   ]
  },
  "getPrepSheetTemplate": {
@@ -126260,6 +126787,13 @@
    "postgres",
    "postgres-analytical",
    "redis"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "service",
+    "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   }
   ]
  },
  "listMyTableReservations": {

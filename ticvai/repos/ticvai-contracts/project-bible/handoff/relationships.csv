@@ -822,7 +822,7 @@ catalogue.channel_capacity,via forceReleaseInventoryHold,catalogue.inventory_res
 catalogue.channel_capacity,via relinquishInventoryHold,catalogue.inventory_reservation,ambient,lineage,,
 catalogue.channel_capacity,via renewInventoryHold,catalogue.inventory_reservation,ambient,lineage,,
 catalogue.channel_connection,sales_channel_id,catalogue.sales_channel,reference,declared,,yes
-catalogue.channel_envelope,channel_capacity_id,catalogue.channel_capacity,reference,declared,,
+catalogue.channel_envelope,channel_capacity_id,catalogue.channel_capacity,reference,declared,,yes
 catalogue.channel_envelope,sales_channel_id,catalogue.sales_channel,reference,convention,,
 catalogue.channel_envelope,via acquireInventoryHold,catalogue.channel_capacity,ambient,lineage,,
 catalogue.channel_envelope,via acquireInventoryHold,catalogue.inventory_reservation,ambient,lineage,,
@@ -868,7 +868,7 @@ catalogue.event_reschedule,new_space_id,catalogue.space,reference,convention,,
 catalogue.event_resource_plan,event_id,catalogue.event,child,convention,,
 catalogue.event_schedule,event_id,catalogue.event,child,convention,,
 catalogue.fee_rule,fee_id,catalogue.fee,child,convention,,
-catalogue.group_package,product_id,catalogue.product,reference,declared,,
+catalogue.group_package,product_id,catalogue.product,reference,declared,,yes
 catalogue.import_job,change_request_id,catalogue.change_request,reference,convention,,
 catalogue.import_job,requested_by_principal_id,identity.principal,reference,convention,yes,
 catalogue.import_job,via commitCatalogueImport,catalogue.product,ambient,lineage,,
@@ -988,7 +988,7 @@ catalogue.product_category,booking_flow_id,whitelabel.booking_flow,reference,con
 catalogue.product_category,image_asset_id,assets.media_asset,reference,convention,yes,
 catalogue.product_channel_assignment,product_id,catalogue.product,child,declared,,yes
 catalogue.product_channel_assignment,sales_channel_id,catalogue.sales_channel,reference,convention,,
-catalogue.product_eligibility_rule,product_id,catalogue.product,child,declared,,
+catalogue.product_eligibility_rule,product_id,catalogue.product,child,declared,,yes
 catalogue.product_link,source_product_id,catalogue.product,child,declared,,yes
 catalogue.product_media,asset_id,assets.media_asset,reference,declared,yes,yes
 catalogue.product_media,product_id,catalogue.product,child,declared,,yes
@@ -2044,7 +2044,6 @@ marketing.message_dispatch,via createPaymentLink,orders.payment_link,ambient,lin
 marketing.message_dispatch,via createPaymentLink,orders.sales_order,ambient,lineage,yes,
 marketing.message_dispatch,via resendPaymentLink,orders.payment_link,ambient,lineage,yes,
 marketing.message_dispatch_attempt,communication_provider_id,marketing.communication_provider,reference,declared,,yes
-marketing.message_dispatch_attempt,message_dispatch_id,marketing.message_dispatch,child,declared,,yes
 marketing.message_template,provider_template_id,marketing.message_template,reference,convention,,
 marketing.message_template,tenant_id,platform.tenant,reference,declared,yes,yes
 marketing.message_template,via createMessageTemplate,marketing.message_template_version,ambient,lineage,,
@@ -2663,7 +2662,7 @@ queue.queue,parent_queue_id,queue.queue,reference,declared,,
 queue.queue,venue_id,platform.scope,reference,declared,yes,yes
 queue.queue,via createQueue,queue.queue_operating_window,ambient,lineage,,
 queue.queue_operating_window,queue_id,queue.queue,child,declared,,yes
-queue.reading,feed_id,queue.feed,reference,declared,,
+queue.reading,feed_id,queue.feed,reference,declared,,yes
 queue.reading,queue_id,queue.queue,reference,declared,,yes
 rental.agreement,order_id,orders.sales_order,reference,declared,yes,yes
 rental.agreement,venue_id,platform.scope,reference,declared,yes,yes

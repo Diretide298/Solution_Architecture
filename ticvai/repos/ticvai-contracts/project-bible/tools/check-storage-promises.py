@@ -59,7 +59,8 @@ BELOW_TENANT = {"region", "brand", "venue", "workstation"}
 JUDGED_AUDIENCE = {"staff", "partner"}
 # The policies derive-ddl's parent rule passes on to a child. A split parent (read-beneath, grant-holder-read)
 # passes none (SPLIT_CHILDREN), so a key to it (`identity.principal`) names who, not an owner.
-PARENT_POLICIES = {"apply_scope_rls", "apply_venue_rls", "apply_parent_rls", "apply_subject_rls"}
+PARENT_POLICIES = {"apply_scope_rls", "apply_venue_rls", "apply_parent_rls", "apply_subject_rls",
+                   "apply_parent_across_rls"}   # CHG-RSF-001: a parent policy across deployables
 # A rule whose findings may not be baselined for an operation the first release builds.
 SLICE_RULES = {"SP-ARRAY-NOWHERE"}
 DUPLICATE = re.compile(r"\b(already (?:in use|exists?|taken|used)|duplicate|not unique|is taken)\b", re.I)

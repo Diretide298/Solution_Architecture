@@ -169,6 +169,39 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Catalogue implements.
     served: [in-process]
+  liveEffectivePrice:
+    module: promotions
+    table: promotions.promotion
+    inputs:
+      venueId: {type: string, format: uuid}
+      channel: {$ref: '../shared/common.yaml#/components/schemas/SalesChannel'}
+      items:
+        type: array
+        items:
+          type: object
+          required: [itemRef, unitPrice]
+          properties:
+            itemRef: {type: string, description: 'The asker''s key for the item (a merchandise or variant id).'}
+            productId: {type: string, format: uuid, nullable: true}
+            unitPrice: {$ref: '../shared/common.yaml#/components/schemas/Money'}
+    returns:
+      type: array
+      description: 'One entry per item asked, in the order asked.'
+      items:
+        type: object
+        required: [itemRef, effectiveUnitPrice, promotionIds]
+        properties:
+          itemRef: {type: string}
+          effectiveUnitPrice: {$ref: '../shared/common.yaml#/components/schemas/Money'}
+          promotionIds: {type: array, items: {type: string, format: uuid}}
+    rule: >-
+      A rule question (ADAM CR-096, 15 October 2026, CHG-RTE-001). The promotions live now for the venue and channel
+      (status live, not paused, valid_from at or before now, valid_to null or after now), applied to a basket of
+      one unit of each item as evaluatePromotions applies them (stacking, precedence, the zero floor). A buyer's own
+      conditions (segments, codes) are not applied, so this is the price any buyer pays. An item no promotion
+      touches comes back at its unitPrice with no promotionIds. It is asked from another deployable through
+      Catalogue's service route (serviceAuth).
+    served: [service]
 paths:
   /promotions/{promotionId}/simulate:
     parameters:
@@ -948,6 +981,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-141 Promotion Lifecycle & Status Manager"
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue setting promotions.nearZeroLinePrice, the near-zero floor (ADAM CR-096)'
       x-ticvai-names-for-context: [promotions.promotion_conflict]
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
@@ -1010,6 +1047,10 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue setting promotions.nearZeroLinePrice, the near-zero minimum (ADAM CR-096)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff

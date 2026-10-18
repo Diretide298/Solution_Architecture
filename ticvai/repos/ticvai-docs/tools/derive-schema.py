@@ -514,6 +514,86 @@ def retired_of(body) -> list[str]:
     return out
 
 
+def path_supplied_keys(contracts: dict) -> dict:
+    """`(schema, property) -> (operationId, path, parameter)`: a declared key the request path always supplies, so its
+    column is NOT NULL.
+
+    **A key filled from the path is not in `required`, and that made it nullable** (CHG-MGN-001, ADAM CR-139, 18
+    October 2026). `ChannelAllocation.channelCapacityId` is readOnly, "from the path of setChannelAllocations"
+    (`/channel-capacities/{channelCapacityId}/channel-allocations`), and a declared reference; the contract never
+    listed it as required because the caller never sends it. So `catalogue.channel_envelope.channel_capacity_id` came
+    out nullable, a nullable key owns no row (derive-ddl), and the table fell to the tenant root.
+
+    The rule: a readOnly property with `x-ticvai-references` naming a table, not nullable, whose name is a `{param}` of
+    a path in the same contract with an operation that takes or returns **the schema itself**: its request body or a
+    response is that schema, or an array of it. A schema reached through another schema's properties does not count
+    (fix round 1: `testQueueFeed` under `/queue-feeds/{feedId}/test` returns a sample QueueReading inside its result,
+    which made queue.reading.feed_id NOT NULL by a coincidence of names). A nullable key is an association and stays
+    nullable; one the caller sends is not the path's. main prints every key this adds (path_key_lines)."""
+    def top(schema, schemas, depth=0):
+        """The component schema a body is, or is an array of; None for an inline object."""
+        if not isinstance(schema, dict) or depth > 2:
+            return None
+        r = schema.get("$ref")
+        if isinstance(r, str) and r.startswith("#/components/schemas/"):
+            name = r.rsplit("/", 1)[-1]
+            body = schemas.get(name)
+            if isinstance(body, dict) and body.get("type") == "array":
+                return top(body.get("items"), schemas, depth + 1)
+            return name
+        if schema.get("type") == "array":
+            return top(schema.get("items"), schemas, depth + 1)
+        return None
+
+    def bodies(op):
+        rb = op.get("requestBody")
+        for part in [rb] + list((op.get("responses") or {}).values()):
+            for media in ((part or {}).get("content") or {}).values() if isinstance(part, dict) else []:
+                if isinstance(media, dict):
+                    yield media.get("schema")
+
+    out: dict = {}
+    for _name, (_tier, doc) in contracts.items():
+        if not isinstance(doc, dict):
+            continue
+        schemas = (doc.get("components") or {}).get("schemas") or {}
+        carried: dict = {}
+        for path, item in (doc.get("paths") or {}).items():
+            params = sorted(set(re.findall(r"\{(\w+)\}", str(path))))
+            if not params or not isinstance(item, dict):
+                continue
+            for verb, op in item.items():
+                if verb not in ("get", "put", "post", "patch", "delete") or not isinstance(op, dict):
+                    continue
+                for b in bodies(op):
+                    name = top(b, schemas)
+                    if name:
+                        for prm in params:
+                            carried.setdefault((name, prm), (op.get("operationId") or verb.upper(), str(path), prm))
+        for sname, body in schemas.items():
+            if not isinstance(body, dict):
+                continue
+            for branch in [body] + [b for b in (body.get("allOf") or []) if isinstance(b, dict)]:
+                for prop, spec in (branch.get("properties") or {}).items():
+                    ref = spec.get("x-ticvai-references") if isinstance(spec, dict) else None
+                    if (isinstance(ref, str) and "." in ref and spec.get("readOnly") is True
+                            and not is_nullable(spec) and (sname, prop) in carried):
+                        out[(sname, prop)] = carried[(sname, prop)]
+    return out
+
+
+def path_key_lines(keys: dict, table_of: dict, column_of) -> list:
+    """One line per key path_supplied_keys makes required: `table.column`, the operation and the path parameter that
+    justify it, so the derive log shows every column the rule turns NOT NULL. `table_of`: schema -> table;
+    `column_of(table, property)` -> column."""
+    lines = []
+    for (sname, prop), (op, path, prm) in sorted(keys.items()):
+        t = table_of.get(sname)
+        if t:
+            lines.append(f"     {t}.{column_of(t, prop)}: {op} {path} supplies {{{prm}}}")
+    return lines
+
+
 def persistence_of(body) -> str | None:
     """The persistence tag, wherever it sits.
 
@@ -957,11 +1037,18 @@ def main() -> int:
         return any(o != sname and not o.endswith(("Request", "Summary"))
                    for o in by_table.get(table, []))
 
+    # A key the request path supplies is required on its row (CHG-MGN-001, ADAM CR-139): see path_supplied_keys.
+    _path_keys = path_supplied_keys(contracts)
+    _path_added: dict = {}         # (schema, property) -> why, for the keys the rule makes required (printed below)
+    _path_cols: dict = {}          # (table, property) -> column
     for sname, table in sorted(persisted.items()):
         if sname in projection_only:
             continue
         body = all_schemas.get(sname) or {}
-        required = set() if _later_writer(sname, table) else required_of(body, all_schemas)
+        _req = required_of(body, all_schemas)
+        if not _later_writer(sname, table):
+            _path_added.update({k: v for k, v in _path_keys.items() if k[0] == sname and k[1] not in _req})
+        required = set() if _later_writer(sname, table) else (_req | {p for s, p in _path_keys if s == sname})
         cols = []
         for prop, spec in properties_of(body, all_schemas).items():
             if isinstance(spec, dict) and spec.get("type") == "array" \
@@ -1005,6 +1092,7 @@ def main() -> int:
                 "table": table,
                 **({"references": fk} if fk else {}),
             })
+        _path_cols.update({(table, str(c.get("source") or "").rsplit(".", 1)[-1]): c["column"] for c in cols})
         if table in parent_key and not any(c["column"] == parent_key[table]["column"] for c in cols):
             cols.insert(0, dict(parent_key[table]))
         for c in cols:
@@ -1057,6 +1145,11 @@ def main() -> int:
     if filled:
         print("   ", ", ".join(sorted(filled)[:8]) + (" …" if len(filled) > 8 else ""))
     print(f"  tables whose column count changes: {len(changed)}")
+    _path_lines = path_key_lines(_path_added, {s: t for s, t in persisted.items() if s not in projection_only},
+                                 lambda t, prop: _path_cols.get((t, prop), snake(prop)))
+    print(f"  keys made NOT NULL because the request path supplies them (CHG-MGN-001): {len(_path_lines)}")
+    for _l in _path_lines:
+        print(_l)
     print(f"  arrays stored nowhere (no column, no child table): {len(homeless)}")
     for h in homeless:
         print(f"     {h}")

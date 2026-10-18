@@ -1844,6 +1844,13 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the session''s workstation fields: code, regionId and devices (ADAM CR-096)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'currency, currencyScale and timezone, from the workstation''s region (ADAM CR-096)'
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -10537,9 +10544,10 @@ components:
           type: string
         cellName:
           type: string
-          description: 'The cell serving this workstation''s region. One cell per tenant per region (ADR-0014).
-            A client uses this only for diagnostics and telemetry tagging — never for routing, which the
-            Control Plane resolves.
+          description: 'The cell this workstation''s region is served from, which is the cell the commerce host
+            answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it
+            from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for
+            diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.
 
             '
         deploymentProfile:

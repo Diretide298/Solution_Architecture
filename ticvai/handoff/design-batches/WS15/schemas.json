@@ -99,6 +99,7 @@
  "ApprovalMatrix": {
   "type": "object",
   "x-ticvai-persistence": "approvals.matrix",
+  "x-ticvai-rls": "read-beneath",
   "required": [
    "kind",
    "scopeLevel",

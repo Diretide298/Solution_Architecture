@@ -7550,7 +7550,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | leased_units | integer | no | Held by terminals on this channel but not yet sold. |
 | remaining_units | integer | no |  |
 | release_at | timestamptz | no | Unsold units return to the general pool at this time. |
-| channel_capacity_id | uuid | no | The capacity envelope this allocation draws from (catalogue.channel_capacity), from the path of setChannelAllocations. |
+| channel_capacity_id | uuid | yes | The capacity envelope this allocation draws from (catalogue.channel_capacity), from the path of setChannelAllocations. |
 | sales_channel_id | uuid | no | The channel profile (catalogue.sales_channel) this allocation serves (29 September, data model DM3). |
 | envelope_type | text | no | How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row. |
 | minimum_units | integer | no |  |
@@ -7860,7 +7860,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| product_id | uuid | no |  |
+| product_id | uuid | yes |  |
 | kind | text | yes |  |
 | max_participants | integer | yes | Pupils or children, e.g. |
 | duration_minutes | integer | yes |  |
@@ -8294,7 +8294,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| product_id | uuid | no |  |
+| product_id | uuid | yes |  |
 | min_age_years | integer | no |  |
 | max_age_years | integer | no |  |
 | min_height_cm | integer | no |  |

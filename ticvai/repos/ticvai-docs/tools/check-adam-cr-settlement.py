@@ -56,6 +56,9 @@ class FakeAdam:
         self.rows = {r["id"]: dict(r) for r in rows}
         self.resolves, self.tickets, self.links, self.next = [], [], [], 9000
 
+    def served(self, project):
+        return "r6"
+
     def changes(self, project):
         return {k: dict(v) for k, v in self.rows.items()}
 

@@ -32480,6 +32480,7 @@ components:
     AiCustomerServiceCopilotKnowledgeWorkspaceInput:
       type: object
       x-ticvai-persistence: marketing.service_copilot_config
+      x-ticvai-rls: read-beneath   # ADAM CR-095's rule, CHG-RSF-001: rows set at a chosen level (scope_level) govern every scope beneath them, so a scope reads the ones it inherits and still writes only its own
       description: The customer-service copilot's configuration for one scope (pack 10.1.10). A field left
         out takes its default, not its old value.
       required:
@@ -37838,9 +37839,13 @@ components:
           format: uuid
           readOnly: true
         messageDispatchId:
-          x-ticvai-references: marketing.message_dispatch
+          x-ticvai-references: none
           type: string
-          description: The `MessageDispatch.id`.
+          format: uuid
+          description: 'The `MessageDispatch.id`. **Not a declared reference** (ADAM CR-138, 18 October 2026,
+            CHG-MGN-001): marketing.message_dispatch is range-partitioned by month on queued_at (ADR-0056), and
+            nothing points at a partitioned table, so the attempt keeps message_dispatch_id with no foreign key and
+            the code checks it; derive-ddl still indexes it (UNENFORCED_KEYS).'
         attemptNumber:
           type: integer
           minimum: 1
