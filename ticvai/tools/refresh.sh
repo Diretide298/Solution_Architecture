@@ -423,6 +423,7 @@ audit-screen-promises                                              # ranks scree
 build-tracker-index                                                # intake: reads the two task-tracker workbooks at the repository root, outside git, once per tracker drop (1 October)
 push-openproject op-release op-release-api op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links cr-release   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
 release-notes                                                      # per release, between two tags
+cr-watch                                                           # the lead's scheduled CR watcher (every 30 minutes, his machine): reads ADAM, drafts answers; not a derive step (18 October, CHG-CRF-002)
 build-decisions-workbook build-hld-lld build-readiness-page build-readiness-questions build-client-readiness build-closeout-register build-audit-decisions   # hand-run documents for people; each carries dated content a rebuild must not churn
 fix-audit-contract-screens fix-audit-conventions fix-audit-derived-labels fix-audit-load-triggers fix-audit-op-descriptions fix-audit-stale-graph-refs fix-audit-stale-inventory-questions fix-audit-state-models   # one-off audit fixes, already applied
 link-reference-frames md-to-docx                                   # one-off / on request
