@@ -1,0 +1,109 @@
+id: CHG-MGN-001
+date: '2026-10-18'
+source: cr
+kind: process
+summary: 'The forward migration and its review carry what the generator derived, whole: a declared key never turns
+  a table''s partitioning off, a key the request path supplies is NOT NULL, review rows hold every statement in full,
+  a new table CHECK reaches the forward migration and a new index on a renamed column is listed whole, a column the
+  contract retires is a drop with its NOT NULL dropped at once, and two keys to one parent are listed for a decision.'
+decision:
+  what: 'tools/derive-ddl.py partition_plan refuses (exits 1) when a declared key points into an append-only table it
+    partitions; UNENFORCED_KEYS keeps an index on a key left undeclared for that reason; table_marks lets a parent
+    key never vote, so platform.sale_board_tile gets its unique-together and required-when marks; pick_owner lists a
+    table with two keys to one parent ("owner undecided" in migration-review.md) and ROW_OWNER records the two the
+    published answers decide; load_contract_props collects x-ticvai-retired-columns (RETIRED) for frozen mode.
+    tools/derive-schema.py path_supplied_keys makes a readOnly declared key named by a path parameter of an operation
+    carrying its schema NOT NULL. tools/ddl_forward.py writes every review statement whole, words a retired column as
+    the four-step drop and writes its guarded DROP NOT NULL, writes a new table CHECK as DROP IF EXISTS, ADD ... NOT
+    VALID, VALIDATE, and lists a new index on a renamed column whole. tools/ticket_done.py reads the guarded statement
+    so the creating migration ticket cites the file. Contracts: MessageDispatchAttempt.messageDispatchId is
+    x-ticvai-references none (format uuid); ChannelAllocation.required gains channelCapacityId.
+    tools/check-ddl-conventions.py gains D-FWD-PARTITION, D-FWD-KEY-NULL, D-FWD-CUT, D-FWD-CARRIED, D-FWD-RETIRED
+    and D-FWD-OWNER.'
+  by: Chinmay
+  date: '2026-10-18'
+  quote: 'Published answers to CR-138, CR-139, CR-148, CR-149, CR-156 and CR-157 (audit/ticvai/cr-triage-1018/decisions-final.json,
+    settled 18 October 2026): "the generator will fail rather than drop partitioning again", "the next release makes
+    channelCapacityId required", "the next release writes every statement whole, and lists a table with two keys to
+    one parent for a decision", "the next release fixes the generator and carries them", "the next release words a
+    retired column as a drop, and its migration drops NOT NULL at once".'
+why: 'ADAM CR-138, CR-139, CR-148, CR-149, CR-156 and CR-157 (Hrushikant Patkar, writing r6''s forward-migration child
+  tasks; triage of 18 October, class 10). At r6 (86a3fa6f) handoff/migration-review.md asked him to un-partition
+  marketing.message_dispatch (CHG-STO-001 declared the attempt''s key into it, ADR-0056), relaxed
+  catalogue.channel_envelope.channel_capacity_id to nullable and dropped its parent policy to the tenant root, cut 19
+  of the 26 policy statements in its "after rename" rows at 70 characters, never derived sale_board_tile''s unique
+  (sale_board_page_id, position) and three required-when CHECKs (CHG-TEN-001), left 8 retired columns as "a rename
+  or a drop: decide", and scoped two-key tables by the alphabet. Each was a generator defect, not a decision.'
+keys_touched:
+  tables:
+  - marketing.message_dispatch
+  - marketing.message_dispatch_attempt
+  - catalogue.channel_envelope
+  - marketing.campaign_variant
+  - promotions.promotion_variant
+  - queue.reading
+  - catalogue.product_eligibility_rule
+  - catalogue.group_package
+  - platform.sale_board_tile
+  - marketing.invitation
+  - platform.venue_settings
+  - platform.workstation
+  - wallet.fund_reservation
+  - fnb.ingredient_substitute
+  - ledger.inter_entity_obligation
+  - retail.exchange
+  files:
+  - tools/derive-ddl.py
+  - tools/derive-schema.py
+  - tools/ddl_forward.py
+  - tools/ticket_done.py
+  - tools/check-ddl-conventions.py
+  - tools/tests/test_migration_generator.py
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/catalogue.yaml
+  other:
+  - handoff/migration-review.md (derived; rewritten by the next refresh)
+  - backend/tenant/V0105 (derived; the next forward migration)
+root_class: A12 MIGRATION-PLAN
+tickets:
+  started:
+  - MIG-MARKETING
+  - MIG-PARTITIONS
+  - MIG-CATALOGUE
+  - MIG-PROMOTIONS
+  - MIG-QUEUE
+  - MIG-FNB
+  - MIG-INVENTORY
+  - MIG-ORDERS
+  - MIG-RESOURCES
+  - MIG-SEATING
+  - MIG-PLATFORM
+  - MIG-WALLET
+  - MIG-FOREIGN-KEYS
+  unstarted:
+  - MIG-MARKETING-9
+  - MIG-FNB-4
+  - VM-MIG-INVENTORY
+  - MIG-PLATFORM-3
+  - MIG-WALLET-2
+  - MIG-LEDGER-2
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-138, CR-139, CR-148, CR-149, CR-156, CR-157
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Open until the next release refresh writes the forward migration and the review (derived files are not in
+  this branch). Verified in the worktree with derive-schema, derive-relationships, derive-schema, derive-ddl --apply:
+  the review went from 963 rows to 948, the tenant V0105 holds 7 statements (the three sale_board_tile CHECKs, NOT
+  VALID then validated, and the guarded DROP NOT NULL of workstation.org_unit_id, venue_settings.org_unit_id,
+  invitation.product_id and invitation.offered_by_principal_id), a second derive writes nothing, and every D-FWD rule
+  passes but D-FWD-OWNER on retail.exchange (new_sale_id or sale_id), left to the row-security lane. Siblings the class
+  rule reaches beyond the six requests: five more readOnly path keys become NOT NULL (marketing.campaign_variant,
+  promotions.promotion_variant, queue.reading: "not null" rows; catalogue.group_package and
+  catalogue.product_eligibility_rule: their type rows now include NOT NULL), and marketing.invitation''s five retired
+  columns and wallet.fund_reservation.wallet_hold_id are worded as drops. access.access_change is not a two-key table
+  (new_entitlement_id is nullable). ledger.inter_entity_obligation''s read path through to_legal_entity_id is CR-149''s
+  and the row-security lane''s.'
