@@ -449,6 +449,50 @@ ok(['apps', 'packages', 'nx.json', 'package.json', 'CLAUDE.md', '.claude', 'proj
   && readdirSync(path.join(OLD, 'apps')).length === 13, 'the old starter: 13 apps, packages, nx.json, ADAM\'s files');
 ok(existsSync(path.join(OLD, '.git')) && !/Clone your app/.test(old.text), 'as a git repository, with no clone lines');
 
+// ── 5. a workspace from before a change ────────────────────────────
+
+section('a re-run refreshes ADAM\'s command files, and CLAUDE.md only between ADAM\'s markers (CHG-ADM-006)');
+const OLDWS = path.join(PLACES, 'ticvai-old-workspace');
+const madeNow = await setup(['-Role', 'frontend', '-Folder', OLDWS]);
+ok(madeNow.code === 0, 'a workspace is made', madeNow.text.slice(-600));
+const starterMd = readFileSync(path.join(OLDWS, 'CLAUDE.md'), 'utf8');
+ok(/<!-- ADAM:start working-a-ticket -->/.test(starterMd) && /<!-- ADAM:end working-a-ticket -->/.test(starterMd),
+  'its CLAUDE.md carries ADAM\'s markers');
+// As a workspace made before this change has it: the old /ticket and /board, and an old section in a CLAUDE.md
+// the team has added its own text to.
+const wsCmd = (f) => path.join(OLDWS, '.claude', 'commands', f);
+const newTicket = readFileSync(wsCmd('ticket.md'), 'utf8');
+writeFileSync(wsCmd('ticket.md'), 'Run that repository\'s lint, typecheck and test\nargument-hint: <ticket number>\n');
+writeFileSync(wsCmd('board.md'), 'old board\n');
+writeFileSync(path.join(OLDWS, 'CLAUDE.md'), `# Our team\n\nOur own rule.\n\n${starterMd.replace(
+  /(<!-- ADAM:start working-a-ticket -->\r?\n)[\s\S]*?(<!-- ADAM:end working-a-ticket -->)/, '$1## Working a ticket (ADAM)\n\nOLD TEXT\n\n$2')}`);
+const oldSettings = readFileSync(path.join(OLDWS, '.claude', 'settings.json'), 'utf8');
+const rerun = await setup(['-Role', 'frontend', '-Folder', OLDWS]);
+ok(rerun.code === 0, 'setup on it again finishes with 0', rerun.text.slice(-800));
+ok(readFileSync(wsCmd('ticket.md'), 'utf8') === newTicket && /startHere/.test(readFileSync(wsCmd('board.md'), 'utf8')),
+  '**/ticket and /board are the starters\' again**', readFileSync(wsCmd('ticket.md'), 'utf8').slice(0, 200));
+const refreshedMd = readFileSync(path.join(OLDWS, 'CLAUDE.md'), 'utf8');
+ok(!refreshedMd.includes('OLD TEXT') && refreshedMd.startsWith('# Our team\n\nOur own rule.\n\n'),
+  '**CLAUDE.md has the new section and still has the team\'s own text**', refreshedMd.slice(0, 200));
+ok(readFileSync(path.join(OLDWS, '.claude', 'settings.json'), 'utf8') === oldSettings, 'settings.json is not touched');
+ok(/refreshed .*ticket\.md/.test(rerun.text) && /Working a ticket \(ADAM\)/.test(rerun.text), 'and setup says what it refreshed', rerun.text.slice(-900));
+ok(readdirSync(path.join(OLDWS, '.adam')).some((n) => n.startsWith('backup-workspace-')), 'the old files are kept in .adam');
+const settledWs = hashes(OLDWS);
+const thirdRun = await setup(['-Role', 'frontend', '-Folder', OLDWS]);
+ok(thirdRun.code === 0 && sameFiles(settledWs, hashes(OLDWS)).length === 0 && Object.keys(hashes(OLDWS)).length === Object.keys(settledWs).length,
+  'a third run changes nothing', sameFiles(settledWs, hashes(OLDWS)).join(', '));
+
+// The same, with a CLAUDE.md from before the markers: left alone, with a line saying what to do.
+const bareMd = starterMd.replace(/<!-- ADAM:(start|end) [a-z-]+ -->\r?\n/g, '').replace('Do not ask for a number', 'Ask for a number');
+writeFileSync(path.join(OLDWS, 'CLAUDE.md'), bareMd);
+writeFileSync(wsCmd('ticket.md'), 'Run that repository\'s lint, typecheck and test\n');
+const noMarks = await setup(['-Role', 'frontend', '-Folder', OLDWS]);
+ok(readFileSync(path.join(OLDWS, 'CLAUDE.md'), 'utf8') === bareMd, '**a CLAUDE.md with no markers is left exactly as it is**');
+ok(readFileSync(wsCmd('ticket.md'), 'utf8') === newTicket, 'while the command files are still refreshed');
+ok(/no ADAM markers/.test(noMarks.text) && /Working a ticket \(ADAM\)/.test(noMarks.text)
+  && noMarks.text.includes(path.join(OLDWS, '.adam', 'new-claude-sections.md')),
+  'and one line says which section to replace and where the new text is', noMarks.text.slice(-900));
+
 // ── done ─────────────────────────────────────────────────────────────
 
 server.close();

@@ -36,12 +36,14 @@ goes in the repository for that ticket's platform.** If that repository is not c
 the person clones it into this folder (setup printed the clone lines; the group is
 http://gitlab.softlabsgroup.in/ticvai-frontend). Do not build it in another app's repository.
 
+<!-- ADAM:start open-the-workspace -->
 **Open Claude Code in this folder, not in a repository folder.** ADAM is connected to this folder
 only: a session started inside `ticvai-pos/` does not get ADAM's tools, `/ticket` or these
 permissions. **If `adam_board` and `adam_pull` are not among your tools, this session was opened in the
 wrong folder.** Tell the person, in these words: "ADAM is not connected here: open the workspace folder
 in Claude Code (the folder this CLAUDE.md is in), not the app's folder", name that folder, and stop. Do
 not build the ticket from memory or from files in the repository.
+<!-- ADAM:end open-the-workspace -->
 
 (If this folder is itself a git repository with a `package.json` at the top - somebody ran setup
 on their clone, or made the old one-workspace starter with setup's `-UseStarter` - the app code
@@ -108,6 +110,7 @@ repository keeps the equivalent; ask when it has none.
   `Idempotency-Key`, and an error - RFC 9457 problem details - is told apart by its problem `type`,
   never by the status or the text (api-conventions).
 
+<!-- ADAM:start working-a-ticket -->
 ## Working a ticket (ADAM)
 
 ADAM is connected for this folder. It holds the screens, journeys and contracts; OpenProject holds the tickets.
@@ -145,6 +148,8 @@ To see a teammate's work, ask ("what is Hrushikant working on?", "what's everyon
 A ticket's commit holds the ticket's change, made in the repository folder. Where ADAM's files sit
 inside a repository (the setup-on-a-clone case above), setup has listed them in
 `.git/info/exclude`; they are still not part of any ticket, so never force-add them.
+
+<!-- ADAM:end working-a-ticket -->
 
 ## Ticket kinds
 

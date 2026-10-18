@@ -5,13 +5,17 @@ kind: process
 summary: A pull lists the ticket's sub-tasks at every depth with status and holder and names a sub-task's parent; the
   board says when sub-tasks could not be read; /ticket with no number starts the first ticket the developer can
   finish or its first open sub-task of theirs; a frontend session opened in an app's folder is told to open the
-  workspace folder.
+  workspace folder; and /update-adam and a setup re-run bring ADAM's new command files and marked CLAUDE.md
+  sections to workspaces made before.
 decision:
   what: viewer/api/openproject.py descendants (a parent filter per level with every status, each ticket's children
     links when the filter is refused); /api/work-packages/{key} answers subtasks and partOf, read for the ticket and
     never from the held project read; /api/board/mine answers subtasksKnown and startHere; the connector's README.md
     has "Sub-tasks (n)" and "Part of", adam_board shows ? with a note and hands on startHere; /ticket, /board and both
-    CLAUDE.md starters use startHere; the frontend CLAUDE.md says "open the workspace folder".
+    CLAUDE.md starters use startHere; the frontend CLAUDE.md says "open the workspace folder"; update.mjs --refresh-workspace (what /update-adam
+    and a setup re-run run, from /connector/workspace or the zip's starters) replaces the five ADAM-owned command
+    files in the workspace and the CLAUDE.md sections between ADAM markers, and leaves a CLAUDE.md without markers
+    alone with one line saying which section to replace.
   by: Chinmay
   date: '2026-10-18'
 why: 'Finding of the 18 October live pull on ADAM (items 1 and 17 of the 18 October list): pulling #27735 gave no list of
@@ -24,6 +28,10 @@ keys_touched:
   - ../viewer/api/main.py
   - ../viewer/mcp/tools.mjs
   - ../viewer/mcp/server.mjs
+  - ../viewer/mcp/update.mjs
+  - ../viewer/mcp/setup/setup.ps1
+  - ../viewer/server.mjs
+  - ../viewer/lib/workspace-files.mjs
   - ../viewer/mcp/setup/starters/backend/.claude/commands/ticket.md
   - ../viewer/mcp/setup/starters/frontend/.claude/commands/ticket.md
   - ../viewer/mcp/setup/starters/backend/.claude/commands/board.md
@@ -44,6 +52,9 @@ prevention:
 status: open
 adam_cr: pending (raised at the next settlement)
 notes: Takes effect on ADAM after its deploy and, for developers, after /update-adam and a restart of Claude Code.
-  Existing workspaces keep their old /ticket, /board and CLAUDE.md until refreshed (lane A ship step); the
+  The first /update-adam on an older connector brings the new updater and cannot use it (the running code is the
+  old one), so a second /update-adam, run in the workspace folder, refreshes that workspace's command files and
+  marked CLAUDE.md sections; a setup re-run does it at once. A CLAUDE.md made before the markers is not edited;
+  the update prints which section to replace and writes the new text to .adam/new-claude-sections.md. The
   connector's instructions and adam_pull's whole-board answer carry startHere meanwhile. The lead registers
   tools/check-adam-subtasks.py in run-checks.py after the merge and closes this entry on that commit.

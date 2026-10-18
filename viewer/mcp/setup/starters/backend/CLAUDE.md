@@ -59,6 +59,7 @@ The kernel those documents name is here: `Money` and `Id` (Domain), `ITenantCont
   `IBrokerPublisher` is the relay's; no module calls it or a broker client (backend-patterns 3.5).
 - A contract comes first: build what the ADAM contract says - status codes, error codes, field names.
 
+<!-- ADAM:start working-a-ticket -->
 ## Working a ticket (ADAM)
 
 ADAM is connected for this folder. It holds the contracts, tables and screens; OpenProject holds the tickets.
@@ -88,6 +89,8 @@ you can finish or its first open sub-task of yours. Start that one.
 
 To see a teammate's work, ask ("what is Hrushikant working on?", "what's everyone doing?"):
 `adam_team` answers, read-only, with their open and in-progress tickets and what they finished lately.
+
+<!-- ADAM:end working-a-ticket -->
 
 ## Ticket kinds
 

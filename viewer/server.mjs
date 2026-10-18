@@ -45,6 +45,7 @@ import { buildView, diffTicket } from './lib/release-diff.mjs';
 // The connector's own manifest, so the two sides compute the build the same
 // way rather than agreeing by coincidence.
 import { acceptedOf as connectorAccepted, buildOf as connectorBuild, filesOf as connectorFiles } from './mcp/version.mjs';
+import { workspaceFilesOf } from './lib/workspace-files.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
 import { frameDocument } from './lib/wireframes.mjs';
 import { gate, callerIp, DROP_PATH, DROP_HASH } from './lib/session.mjs';
@@ -995,6 +996,16 @@ const server = http.createServer(async (req, res) => {
       }
       return send(res, 200, JSON.stringify({ build, files: await connectorFiles(undefined, names) }),
         MIME['.json']);
+    }
+
+    // ADAM's own files for a developer's workspace (CHG-ADM-006): the five command files and the starter's
+    // CLAUDE.md, so /update-adam can refresh a workspace made before a change. Before the gate for the same
+    // reason as the bundle above (an old connector is the one that needs it), and the same text the setup zip
+    // already hands everyone. A role that is neither backend nor frontend is refused.
+    if (url.pathname === '/connector/workspace') {
+      const files = await workspaceFilesOf(url.searchParams.get('role') ?? '');
+      if (!files) return send(res, 400, JSON.stringify({ error: 'role is backend or frontend' }), MIME['.json']);
+      return send(res, 200, JSON.stringify(files), MIME['.json']);
     }
 
     // Which package, and which route of it. Before the gate, because the gate's

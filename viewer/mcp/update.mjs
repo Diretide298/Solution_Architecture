@@ -5,6 +5,8 @@
  *     node update.mjs --check          # say whether an update exists, write nothing
  *     node update.mjs --install-hooks  # put the usage hooks into settings.json (setup runs this)
  *     node update.mjs --remove-hooks   # take ADAM's hooks out again (uninstall runs this)
+ *     node update.mjs --refresh-workspace <folder> [--role backend|frontend] [--from <starters>]
+ *                                      # replace ADAM's command files, and CLAUDE.md between ADAM's markers
  *
  * **This downloads code and runs it afterwards, so it is written like something
  * that does.** Four rules, and each one closes a way this could go wrong:
@@ -373,8 +375,209 @@ async function hooksOnly() {
   process.exit(done ? 0 : 5);
 }
 
+// ── ADAM's own files in the workspace ────────────────────────────────
+//
+// Setup only ever added the files a folder lacked, and this script only replaced the connector, so a workspace made
+// before a change kept its old /ticket, /board and CLAUDE.md for good (18 October 2026, CHG-ADM-006). Now:
+//
+//   **The five command files are ADAM's** (`.claude/commands/ticket|board|cr|done|update-adam.md`): an existing one
+//   that differs is replaced, the old one kept in `.adam/backup-workspace-<time>/`. One that is missing is not
+//   created here - setup adds missing files and keeps them out of git, and this does not know the repository.
+//
+//   **CLAUDE.md is the team's.** Only a section between ADAM's markers (`<!-- ADAM:start name -->` ...
+//   `<!-- ADAM:end name -->`, in the starters) is replaced, and the text around it is never touched. A CLAUDE.md
+//   that has ADAM's section but no markers (made before them) is left exactly as it is: one line says which
+//   section to replace, and the new text is written to `.adam/new-claude-sections.md` to copy from.
+//
+// Where the new text comes from: the same ADAM this connector already reads (`/connector/workspace`), or - setup,
+// which has the starters in the unzipped folder - `--from <starters folder>`. Names are taken only from the lists
+// below, so an answer naming anything else is refused whole, as for the connector's own files.
+
+const COMMAND_NAMES = ['ticket.md', 'board.md', 'cr.md', 'done.md', 'update-adam.md'];
+const SECTIONS = {
+  'working-a-ticket': {
+    title: 'Working a ticket (ADAM)', seen: '## Working a ticket (ADAM)',
+  },
+  'open-the-workspace': {
+    title: 'the paragraph that starts "Open Claude Code in this folder"',
+    seen: 'Open Claude Code in this folder, not in a repository folder',
+  },
+};
+const argAfter = (flag) => {
+  const at = process.argv.indexOf(flag);
+  return at >= 0 ? process.argv[at + 1] : undefined;
+};
+const REFRESH_DIR = argAfter('--refresh-workspace');
+const lf = (text) => String(text).replace(/\r\n/g, '\n');
+const readOrNull = (file) => readFile(file, 'utf8').catch(() => null);
+
+/** backend or frontend, from the folder's own files; null when they do not say. */
+async function roleOf(folder) {
+  const ticket = await readOrNull(path.join(folder, '.claude', 'commands', 'ticket.md')) ?? '';
+  const claude = await readOrNull(path.join(folder, 'CLAUDE.md')) ?? '';
+  if (/dotnet test/i.test(ticket)) return 'backend';
+  if (/lint, typecheck|screen or contract|repository for the ticket's platform/i.test(ticket)) return 'frontend';
+  if (/dotnet/i.test(claude)) return 'backend';
+  if (/workspace|pnpm|package\.json/i.test(claude)) return 'frontend';
+  return null;
+}
+
+async function hasAdamCommands(folder) {
+  for (const name of COMMAND_NAMES) {
+    if (await readOrNull(path.join(folder, '.claude', 'commands', name)) !== null) return true;
+  }
+  return false;
+}
+
+/** What the workspace should hold, from ADAM or from a starters folder; refused whole if it names anything else. */
+async function workspaceSource(role, startersDir) {
+  let got;
+  if (startersDir) {
+    const commands = [];
+    for (const name of COMMAND_NAMES) {
+      const text = await readOrNull(path.join(startersDir, role, '.claude', 'commands', name));
+      if (text !== null) commands.push({ name, text });
+    }
+    got = { role, commands, claudeMd: await readOrNull(path.join(startersDir, role, 'CLAUDE.md')) ?? '' };
+  } else {
+    got = await ask(`/connector/workspace?role=${role}`);
+  }
+  const commands = Array.isArray(got?.commands) ? got.commands : [];
+  const odd = commands.filter((c) => !COMMAND_NAMES.includes(c?.name) || typeof c.text !== 'string');
+  if (odd.length || typeof got?.claudeMd !== 'string') {
+    const error = new Error('refused: the workspace files name something that is not one of ADAM\'s: '
+      + `${odd.map((c) => String(c?.name)).join(', ') || 'CLAUDE.md'}`);
+    error.refused = true;
+    throw error;
+  }
+  return { commands, claudeMd: got.claudeMd };
+}
+
+const markedRe = (name) => new RegExp(`(<!-- ADAM:start ${name} -->\\r?\\n)([\\s\\S]*?)(<!-- ADAM:end ${name} -->)`);
+
+/** The marked sections of a starter CLAUDE.md that this updater knows, as name -> text between the markers. */
+function sectionsOf(markdown) {
+  const out = {};
+  for (const m of lf(markdown).matchAll(/<!-- ADAM:start ([a-z0-9-]+) -->\n([\s\S]*?)<!-- ADAM:end \1 -->/g)) {
+    if (m[1] in SECTIONS) out[m[1]] = m[2];
+  }
+  return out;
+}
+
+/**
+ * Bring the workspace's ADAM-owned files up to `source`. Says what it did; `quiet` says nothing when there was
+ * nothing to do (the update's own path, which has already said "already current"). Returns what changed.
+ */
+async function refreshWorkspace(folder, source, quiet) {
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace('T', '-').slice(0, 15);
+  const kept = path.join(folder, '.adam', `backup-workspace-${stamp}`);
+  const keep = async (name, text) => {
+    await mkdir(kept, { recursive: true });
+    await writeFile(path.join(kept, name), text, 'utf8');
+  };
+  const changed = [];
+
+  for (const name of COMMAND_NAMES) {
+    const target = path.join(folder, '.claude', 'commands', name);
+    const have = await readOrNull(target);
+    const want = source.commands.find((c) => c.name === name);
+    if (have === null || !want || lf(have) === lf(want.text)) continue;
+    await keep(name, have);
+    await writeFile(target, want.text, 'utf8');
+    changed.push(name);
+  }
+  if (changed.length) {
+    say(`workspace: refreshed ${changed.map((n) => `.claude/commands/${n}`).join(', ')} in ${folder} `
+      + `(the old ones are in ${kept}).`);
+  }
+
+  const mdPath = path.join(folder, 'CLAUDE.md');
+  const local = await readOrNull(mdPath);
+  const unmarked = [];
+  if (local !== null) {
+    // The file's own bytes stay as they are: only the text between ADAM's markers is swapped, written with the
+    // file's line endings, so a team's lines are never re-ended.
+    const crlf = /\r\n/.test(local);
+    let text = local;
+    const done = [];
+    for (const [name, inner] of Object.entries(sectionsOf(source.claudeMd))) {
+      const re = markedRe(name);
+      const at = text.match(re);
+      if (at) {
+        if (lf(at[2]) !== inner) {
+          const put = crlf ? inner.replace(/\n/g, '\r\n') : inner;
+          text = text.replace(re, (_, a, _old, b) => a + put + b);
+          done.push(name);
+        }
+      } else if (text.includes(SECTIONS[name].seen)) {
+        unmarked.push(name);
+      }
+    }
+    if (done.length) {
+      await keep('CLAUDE.md', local);
+      await writeFile(mdPath, text, 'utf8');
+      say(`workspace: CLAUDE.md ${done.map((n) => `"${SECTIONS[n].title}"`).join(' and ')} refreshed between its ADAM `
+        + `markers; the rest of the file is yours and was not touched (the old file is in ${kept}).`);
+      changed.push('CLAUDE.md');
+    }
+  }
+  if (unmarked.length) {
+    const fresh = path.join(folder, '.adam', 'new-claude-sections.md');
+    const sections = sectionsOf(source.claudeMd);
+    await mkdir(path.dirname(fresh), { recursive: true });
+    await writeFile(fresh, '# New text for CLAUDE.md\n\nReplace each section in CLAUDE.md with the text under its '
+      + 'heading here. Keep the ADAM:start and ADAM:end comment lines around it: with them, /update-adam refreshes '
+      + 'the section for you from then on.\n\n'
+      + unmarked.map((n) => `<!-- section: ${SECTIONS[n].title} -->\n${sections[n]}`).join('\n'), 'utf8');
+    say('workspace: CLAUDE.md has no ADAM markers, so it was left exactly as it is. Replace its '
+      + `${unmarked.map((n) => `"${SECTIONS[n].title}"`).join(' and ')} with the new text in ${fresh}.`);
+  }
+  if (!changed.length && !unmarked.length && !quiet) {
+    say(`workspace: already current - nothing to refresh in ${folder}.`);
+  }
+  return changed;
+}
+
+/** `--refresh-workspace <folder> [--role r] [--from <starters>]`: setup's call, and the same code /update-adam runs. */
+async function refreshOnly() {
+  const folder = path.resolve(REFRESH_DIR);
+  if (!await hasAdamCommands(folder)) {
+    say(`workspace: ${folder} is not an ADAM workspace (no ADAM command files in .claude/commands), so nothing was written.`);
+    return;
+  }
+  const role = argAfter('--role') ?? await roleOf(folder);
+  if (!['backend', 'frontend'].includes(role)) {
+    say(`workspace: could not tell a backend from a frontend folder in ${folder}. `
+      + 'Run again with  --role backend  or  --role frontend.');
+    process.exit(2);
+  }
+  let source;
+  try {
+    source = await workspaceSource(role, argAfter('--from'));
+  } catch (error) {
+    say(error.refused ? error.message
+      : `could not read the workspace files from ADAM at ${BASE} (from ${FROM}) - ${error.message}`);
+    process.exit(error.refused ? 3 : 2);
+  }
+  await refreshWorkspace(folder, source, false);
+}
+
+/** After an update, or finding none: the workspace this was run in, when it is one. Never fails the update. */
+async function refreshHere() {
+  try {
+    const folder = process.cwd();
+    if (!await hasAdamCommands(folder)) return;
+    const role = await roleOf(folder);
+    if (!role) return;
+    await refreshWorkspace(folder, await workspaceSource(role), true);
+  } catch (error) {
+    say(`workspace files not refreshed - ${error.message}`);
+  }
+}
+
 async function main() {
   if (INSTALL_HOOKS || REMOVE_HOOKS) return hooksOnly();
+  if (REFRESH_DIR) return refreshOnly();
   const mine = await buildOf(HERE);
 
   // **A plugin updates through the marketplace and must not be written here.**
@@ -409,7 +612,7 @@ async function main() {
     // Still worth a look: an install that took the hook when settings.json
     // could not be read gets it now that it can.
     if (CHECK_ONLY) await sayHooks();
-    else await ensureHooks();
+    else { await ensureHooks(); await refreshHere(); }
     return;
   }
 
@@ -464,6 +667,8 @@ async function main() {
 
   say(`updated to ${now}. The previous build is in ${backup}.`);
   await ensureHooks();
+  // The code running is the one just replaced, so a refresh that arrived with this update is made by the next run.
+  await refreshHere();
   say('Restart Claude Code to load it — the running connector is still the old one.');
 }
 

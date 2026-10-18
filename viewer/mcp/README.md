@@ -147,6 +147,17 @@ you to restart. The one other file it touches is `~/.claude/settings.json`, once
 hooks — with its own code, keeping a backup, never against a file it cannot parse, and never again
 after somebody has taken them out (`hooks/README.md`).
 
+**The workspace's own files follow it** (CHG-ADM-006). Setup adds only what a folder lacks, so a workspace made
+before a change used to keep its old `/ticket`, `/board` and `CLAUDE.md` for good. Now `/update-adam`, run in the
+workspace folder, and a re-run of setup replace ADAM's five command files there
+(`.claude/commands/ticket|board|cr|done|update-adam.md`, the old ones kept in `.adam/backup-workspace-*`), reading
+them from the viewer's `/connector/workspace?role=` (the same starters the zip carries) or, for setup, from the
+unzipped starters. `CLAUDE.md` is the team's: only the part between `<!-- ADAM:start name -->` and
+`<!-- ADAM:end name -->` is replaced; a `CLAUDE.md` made before the markers is left exactly as it is, with one
+line saying which section to replace and the new text in `.adam/new-claude-sections.md`. Missing files are not
+created here (setup adds them and keeps them out of git). The first `/update-adam` on an older connector brings the
+new updater and cannot use it yet, so run `/update-adam` a second time. `mcp/workspace-check.mjs` holds all of it.
+
 **By hand**, for Git Bash or a machine where the zip is not an option:
 
 A viewer must be reachable — the MCP reads through it and has no other source. **Most developers

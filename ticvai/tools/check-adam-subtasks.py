@@ -14,6 +14,9 @@ an app's clone had no ADAM tools and did not say why. This holds:
     ST-NO-NUMBER  /ticket, CLAUDE.md "Working a ticket" or the connector's instructions do not start `startHere` when
                   no ticket is named, or /ticket still requires a number
     ST-WORKSPACE  the frontend starter does not tell an agent without ADAM's tools to say "open the workspace folder"
+    ST-REFRESH    a new starter /ticket or CLAUDE.md section cannot reach a workspace made before it: /update-adam
+                  (update.mjs --refresh-workspace), the viewer's /connector/workspace, setup's re-run
+                  (Update-AdamFiles) or the ADAM markers in the starters' CLAUDE.md are missing
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -33,6 +36,7 @@ RULES = {
     "ST-BOARD": "the board says when sub-tasks could not be read and where work starts (startHere) (CHG-ADM-006)",
     "ST-NO-NUMBER": "/ticket with no number starts startHere and never asks for a number (CHG-ADM-006)",
     "ST-WORKSPACE": "a frontend agent without ADAM's tools says: open the workspace folder (CHG-ADM-006)",
+    "ST-REFRESH": "an existing workspace gets ADAM's new command files and marked CLAUDE.md sections on /update-adam and on a setup re-run (CHG-ADM-006)",
 }
 VIEWER = g.ROOT.parent / "viewer"
 STARTERS = VIEWER / "mcp" / "setup" / "starters"
@@ -119,6 +123,21 @@ def main() -> int:
     for phrase in ("open the workspace folder", "not among your tools"):
         if phrase not in text:
             guard.add("ST-WORKSPACE", f"{rel(frontend)}:{phrase}", f"{rel(frontend)} does not say \"{phrase}\"")
+
+    # An existing workspace is refreshed: the updater, the route it reads, setup's re-run and the markers.
+    for path, needs in ((VIEWER / "mcp" / "update.mjs", ("--refresh-workspace", "COMMAND_NAMES", "ADAM:start")),
+                        (VIEWER / "server.mjs", ("/connector/workspace",)),
+                        (VIEWER / "lib" / "workspace-files.mjs", ("COMMAND_FILES", "claudeMd")),
+                        (VIEWER / "mcp" / "setup" / "setup.ps1", ("Update-AdamFiles", "--refresh-workspace"))):
+        text = read(path)
+        for need in needs:
+            if need not in text:
+                guard.add("ST-REFRESH", f"{rel(path)}:{need}", f"{rel(path)} has no {need}")
+    for side in ("backend", "frontend"):
+        starter = STARTERS / side / "CLAUDE.md"
+        if "<!-- ADAM:start working-a-ticket -->" not in read(starter) or "<!-- ADAM:end working-a-ticket -->" not in read(starter):
+            guard.add("ST-REFRESH", f"{rel(starter)}:markers",
+                      f"{rel(starter)} has no ADAM markers around \"Working a ticket (ADAM)\", so a workspace made from it cannot be refreshed")
     return guard.finish()
 
 

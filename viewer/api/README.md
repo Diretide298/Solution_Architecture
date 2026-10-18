@@ -418,7 +418,11 @@ the same through the connector: README.md's "Sub-tasks" and "Part of", and adam_
 ```bash
 node api/subtasks-check.mjs
 node mcp/subtasks-check.mjs
+node mcp/workspace-check.mjs
 ```
+
+`../mcp/workspace-check.mjs` (CHG-ADM-006) holds the refresh of a workspace's own files: its own viewer on 8861, no accounts
+service.
 
 `changes-import-check.mjs` — 52 assertions over the change request round trip,
 most of them about the half that does not write: a rejection with no reason, a

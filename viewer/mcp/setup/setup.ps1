@@ -474,6 +474,25 @@ function Add-AdamFiles([string]$Target, [string]$RoleName, $picked) {
     return ,$added
 }
 
+# On a re-run, ADAM's own command files that differ from this zip's starters are replaced, and so is the part of
+# CLAUDE.md between ADAM's markers (CHG-ADM-006: a workspace made before a change otherwise kept its old /ticket for
+# good, because Add-AdamFiles adds only what is missing). Done by update.mjs, so setup and /update-adam make the same
+# edit with the same code: the old file is kept in .adam/backup-workspace-*, the team's own text in CLAUDE.md is never
+# touched, a CLAUDE.md with no markers is left as it is with one line saying which section to replace and where the
+# new text is. Never creates a file (Add-AdamFiles does, and git-excludes it). A failure is a Note, not a stop.
+function Update-AdamFiles([string]$Target, [string]$RoleName) {
+    $updater = Join-Path $Here 'update.mjs'
+    $nodeExe = Get-Command node -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $nodeExe -or -not (Test-Path -LiteralPath $updater) -or -not (Test-Path -LiteralPath (Join-Path $Starters $RoleName))) { return }
+    $ErrorActionPreference = 'Continue'
+    $said = @(& $nodeExe.Source $updater '--refresh-workspace' $Target '--role' $RoleName '--from' $Starters 2>&1 |
+        ForEach-Object { "$_" -replace '^\[adam\]\s*', '' })
+    $ErrorActionPreference = 'Stop'
+    foreach ($line in $said) {
+        if ($line -and $line -notmatch 'already current') { Note $line }
+    }
+}
+
 # Kept out of git on this machine only. .git\info\exclude is git's own per-clone ignore list: it
 # is never committed or pushed, so the team's .gitignore - a tracked file - is not touched, and a
 # file the repository tracks is never hidden by it. Listed, when the folder is itself a repository
@@ -991,6 +1010,7 @@ if ($Folder -ne 'all') {
         Good "$where (existing files left as they are)"
         $added = Add-AdamFiles $where $Role $picked
         Show-Added $added (Add-GitExcludes $where $added)
+        Update-AdamFiles $where $Role
     }
 } else {
     # Every folder: connected only. Which folders would get ADAM's files is not setup's to guess.
