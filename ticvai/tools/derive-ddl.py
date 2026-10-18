@@ -1808,8 +1808,9 @@ def main() -> int:
     if refused:
         for t, refs in refused:
             print(f"  ! {t} is partitioned by month (x-ticvai-append-only, ADR-0056) and {', '.join(refs)} "
-                  "declares a key into it. Nothing points at a partitioned table: leave that reference undeclared "
-                  "(no x-ticvai-references; the code checks it), as the outbox and inbox event ids are (CHG-STO-001)")
+                  "declares a key into it. Nothing points at a partitioned table: mark that property "
+                  "`x-ticvai-references: none` (the code checks it; UNENFORCED_KEYS keeps its index), then run "
+                  "derive-schema before derive-ddl")
         print("  derive-ddl refuses to drop a table's partitioning; nothing written (CHG-MGN-001, ADAM CR-138)")
         return 1
 
