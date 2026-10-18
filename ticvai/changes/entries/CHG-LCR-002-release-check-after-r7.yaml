@@ -39,6 +39,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/derive-id-register.py::write_register
-status: open
+status: closed
+closed_by_commit: 7d301fc7
 notes: 'Self-tests: cr-release (branch rule), check-changelog (exemption file and sha exemption), and
   tools/tests/test_derive_id_register.py.'
