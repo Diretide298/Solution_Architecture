@@ -20,6 +20,10 @@ call, with the old call as its rollback. It touches no row and can be run twice,
 for a person; listed for one instead, CR-005's append-only audit policies stayed off the databases while the
 review row was read as done. The old call it replaces is not listed as dropped.
 
+**A changed generated helper is written too** (CHG-RSF-001, 18 October 2026): `platform.apply_*_rls`,
+`platform.parent_visible` and `platform.parent_visible_owner` are replaced with CREATE OR REPLACE, and every table
+whose policy an `apply_*_rls` helper built is applied again; any other changed function is still listed.
+
 **A NOT NULL column without a default is added nullable** and listed: added as NOT NULL it fails on
 the first table that already has rows. Setting NOT NULL after the backfill is the person's migration.
 
@@ -244,6 +248,22 @@ SCOPE_FILL_FROM = {
     "orders.invitation": ("product_id", "catalogue.product"),
 }
 
+# **A row whose path is its parent's while it is bound** (ADAM CR-095, 18 October 2026; CHG-RSF-001). A device bound
+# to a workstation carries that workstation's path, set by the server when it is bound and moved when it is bound
+# elsewhere, so the device's own session, scoped to the workstation, can write its heartbeat. table -> (key column,
+# parent table, the level its rows then sit at). check-rls-scope-fit reads it (RF-DEVICE-ABOVE); the backfill below
+# moves existing rows.
+SCOPE_FOLLOWS = {
+    "platform.device": ("workstation_id", "platform.workstation", "workstation"),
+}
+
+# **A generated row-level-security helper is the generator's own** (ADAM CR-108, 18 October 2026; CHG-RSF-001). No
+# policy depends on an `apply_*_rls` helper: a policy stores the predicate the helper built when it ran, so a changed
+# helper is written with CREATE OR REPLACE and every table that uses it is applied again. `platform.parent_visible`,
+# which policies do call, keeps its OID through CREATE OR REPLACE and needs no re-apply; `parent_visible_owner` is
+# called only by the helpers. Any other changed function is still listed for a person.
+REPLACEABLE = re.compile(r"^platform\.(apply_\w+_rls|parent_visible|parent_visible_owner)\s*\(", re.I)
+
 
 
 
@@ -253,6 +273,11 @@ SCOPE_FILL_FROM = {
 def scope_path_backfill(t: str, cols, was_tenant_root: bool = False) -> str | None:
     """The statements that fill and then close a scope_path added nullable to `t`, or None when the owner is unknown.
     `was_tenant_root`: the table's policy before this migration was the tenant root's alone."""
+    if t in SCOPE_FOLLOWS and SCOPE_FOLLOWS[t][0] in cols:
+        key, parent, _level = SCOPE_FOLLOWS[t]
+        return (f"UPDATE {t} x SET scope_path = p.scope_path FROM {parent} p WHERE p.id = x.{key} AND x.scope_path IS "
+                f"DISTINCT FROM p.scope_path; UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level "
+                f"= 'tenant') WHERE scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
     if t in SCOPE_FILL_FROM and SCOPE_FILL_FROM[t][0] in cols:
         key, parent = SCOPE_FILL_FROM[t]
         return (f"UPDATE {t} x SET scope_path = p.scope_path FROM {parent} p WHERE p.id = x.{key} AND x.scope_path IS "
@@ -552,6 +577,7 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                + "; then rename its key, indexes, constraints and policies to the generated names and apply its "
                  "row-level security again (the \"after rename\" row for it)")
 
+    restore, replaced_helpers = [], set()
     for k, stmt in new.order:
         kind = k[0]
         if k in old.stmts and old.stmts[k] == new.stmts[k]:
@@ -739,6 +765,13 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             if k not in old.stmts:
                 p.statements.append(stmt)
                 p.counts["other"] += 1
+            elif REPLACEABLE.match(k[1]):
+                p.statements.append(stmt)
+                restore.append(old.stmts[k])
+                p.counts["other"] += 1
+                name = REPLACEABLE.match(k[1]).group(1).lower()
+                if name.startswith("apply_"):
+                    replaced_helpers.add(name)
             else:
                 review("function changed", k[1], "body or signature changed",
                        "CREATE OR REPLACE is not additive when a policy or trigger depends on it: review, then "
@@ -793,6 +826,21 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
         else:
             review("statement added", ", ".join(sorted(refs)) or "(database)", f"`{s}`",
                    "touches objects that already exist: write it into a forward migration by hand")
+
+    # Every table a replaced helper applied its policy to gets it again (CHG-RSF-001), once, after the helpers.
+    if replaced_helpers:
+        done = {c[1] for c in (rls_call(s) for s in p.statements) if c and c[0] != "drop_rls_policies"}
+        for k, stmt in new.order:
+            c = rls_call(stmt) if k[0] == "stmt" else None
+            if not c or c[0] not in replaced_helpers or c[1] not in old.tables or c[1] in done:
+                continue
+            p.statements.append(f"SELECT platform.drop_rls_policies('{c[2]}'::regclass)")
+            p.statements.append(stmt)
+            p.rollback.append(f"SELECT platform.drop_rls_policies('{c[2]}'::regclass); {norm(stmt).rstrip(';')};")
+            p.counts["policies"] = p.counts.get("policies", 0) + 1
+            done.add(c[1])
+    # The old helpers come back first when the rollback runs (it runs in reverse), then each policy is applied again.
+    p.rollback += [r.rstrip().rstrip(";") + ";" for r in restore]
 
     removed_tables = set(old.tables) - set(new.tables)
     renamed_away = set(rt.values())

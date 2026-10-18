@@ -1,0 +1,81 @@
+"""Tests for generated RLS helpers and SCOPE_FOLLOWS in tools/ddl_forward.py (ADAM CR-095, CR-108; CHG-RSF-001).
+
+    python -m pytest ticvai/tools/tests/test_forward_rls_helpers.py -q
+"""
+import sys
+from pathlib import Path
+
+TOOLS = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(TOOLS))
+import ddl_forward as fwd  # noqa: E402
+
+TABLES = ("CREATE TABLE platform.outlet (id uuid PRIMARY KEY);\n"
+          "CREATE TABLE fnb.menu (id uuid PRIMARY KEY, outlet_id uuid NOT NULL);\n")
+OLD_HELPER = """CREATE OR REPLACE FUNCTION platform.apply_parent_rls(target regclass, fk_column text,
+                                                     parent regclass, parent_key text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    EXECUTE format('CREATE POLICY p ON %s USING (EXISTS (SELECT 1 FROM %s parent_row))', target, parent);
+END
+$$;
+"""
+NEW_HELPER = OLD_HELPER.replace("EXISTS (SELECT 1 FROM %s parent_row)", "platform.parent_visible(%L::regclass, %I)")
+CALL = "SELECT platform.apply_parent_rls('fnb.menu'::regclass, 'outlet_id', 'platform.outlet'::regclass, 'id');\n"
+PV = ("CREATE OR REPLACE FUNCTION platform.parent_visible(parent regclass, key_value uuid, for_write boolean DEFAULT "
+      "false) RETURNS boolean LANGUAGE plpgsql STABLE SECURITY DEFINER AS $$ BEGIN RETURN false; END $$;\n")
+
+
+def model(sql):
+    m = fwd.Model()
+    m.add_file(sql)
+    return m
+
+
+def flat(stmts):
+    return [fwd.norm(s).rstrip(";") for s in stmts]
+
+
+def test_a_changed_rls_helper_is_replaced_and_every_table_using_it_reapplied():
+    p = fwd.diff("tenant", model(TABLES + OLD_HELPER + CALL), model(TABLES + NEW_HELPER + CALL))
+    st = flat(p.statements)
+    i = next(n for n, s in enumerate(st) if s.startswith("CREATE OR REPLACE FUNCTION platform.apply_parent_rls"))
+    assert st[i + 1:] == ["SELECT platform.drop_rls_policies('fnb.menu'::regclass)", fwd.norm(CALL).rstrip(";")]
+    assert not [r for r in p.review if r[0] == "function changed"]
+    assert p.counts.get("policies") == 1
+    rb = list(reversed(p.rollback))           # the rollback runs reversed
+    assert rb[0].startswith("CREATE OR REPLACE FUNCTION platform.apply_parent_rls") and "EXISTS (SELECT 1" in rb[0]
+    assert "apply_parent_rls('fnb.menu'" in rb[1]
+
+
+def test_parent_visible_is_added_then_replaced_without_reapplying():
+    first = fwd.diff("tenant", model(TABLES + NEW_HELPER + CALL), model(TABLES + NEW_HELPER + PV + CALL))
+    assert flat(first.statements) == [fwd.norm(PV).rstrip(";")]
+    again = fwd.diff("tenant", model(TABLES + NEW_HELPER + PV + CALL),
+                     model(TABLES + NEW_HELPER + PV.replace("RETURN false", "RETURN true") + CALL))
+    st = flat(again.statements)
+    assert len(st) == 1 and st[0].startswith("CREATE OR REPLACE FUNCTION platform.parent_visible")
+    assert not again.review
+
+
+def test_the_owner_function_is_replaced_too():
+    f = ("CREATE OR REPLACE FUNCTION platform.parent_visible_owner(parent regclass DEFAULT NULL) RETURNS void "
+         "LANGUAGE plpgsql AS $$ BEGIN RETURN; END $$;\n")
+    p = fwd.diff("tenant", model(TABLES + f), model(TABLES + f.replace("RETURN;", "NULL;")))
+    assert len(p.statements) == 1 and not p.review
+
+
+def test_any_other_function_change_is_still_for_a_person():
+    f = ("CREATE OR REPLACE FUNCTION platform.in_scope(row_scope_path ltree) RETURNS boolean LANGUAGE sql "
+         "AS $$ SELECT true $$;\n")
+    p = fwd.diff("tenant", model(f), model(f.replace("SELECT true", "SELECT false")))
+    assert [r[0] for r in p.review] == ["function changed"] and not p.statements
+
+
+def test_a_device_takes_its_workstations_path():
+    assert fwd.SCOPE_FOLLOWS["platform.device"] == ("workstation_id", "platform.workstation", "workstation")
+    sql = fwd.scope_path_backfill("platform.device", {"workstation_id": "uuid", "scope_path": "ltree"})
+    assert ("UPDATE platform.device x SET scope_path = p.scope_path FROM platform.workstation p WHERE "
+            "p.id = x.workstation_id AND x.scope_path IS DISTINCT FROM p.scope_path") in sql
+    assert "WHERE scope_path IS NULL" in sql and sql.endswith("ALTER COLUMN scope_path SET NOT NULL")

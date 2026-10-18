@@ -287,7 +287,7 @@ def main() -> int:
                               f"({', '.join(sorted(writers[t]))}), so its rows sit above the reader: x-ticvai-rls "
                               "read-beneath, or say why the reader sees none")
     for rule, key, msg, strict in (inherited_findings(lin, pol, cl, levelled)
-                                   + device_findings(lin, cl, has_path, creators, getattr(fwd, "SCOPE_FOLLOWS", {}))
+                                   + device_findings(lin, cl, has_path, creators, fwd.SCOPE_FOLLOWS)
                                    + parent_across_findings(pol, dep_of_schema, helper_bodies(g.ROOT / "backend"))):
         guard.add(rule, key, msg, strict=strict)
     guard.note(f"{len(pol)} tenant tables with a policy; {len(lin)} operations")
