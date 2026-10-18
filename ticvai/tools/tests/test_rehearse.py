@@ -61,3 +61,30 @@ def test_rehearse_refuses(args, env, said):
                        env={**os.environ, **env}, timeout=120)
     assert r.returncode == 2, r.stdout + r.stderr
     assert said in r.stderr, r.stderr
+
+
+def test_rehearse_binds_every_service_to_loopback():
+    """Fix round 1: the viewer defaulted to every interface; every service the kit starts names 127.0.0.1."""
+    text = (KIT / "rehearse.sh").read_text(encoding="utf-8")
+    starts = [l for l in text.splitlines() if "uvicorn api.main:app" in l or "node server.mjs" in l]
+    assert len(starts) == 2
+    assert all("--host 127.0.0.1" in l for l in starts), starts
+    assert ".listen(PORT, '127.0.0.1'" in (KIT / "stand-in-openproject.mjs").read_text(encoding="utf-8")
+
+
+def test_judge_judging_nothing_is_not_judged():
+    j = load("judge")
+    state = {"statuses": [], "leavers": [], "accountableFrom": "openproject", "packages": {}, "key_of": {}}
+    left = [{"id": 9, "key": "OLD-9", "type": "Task", "set": j.LEFT}]
+    c = j.criteria(left, {}, "r7", state, 5)
+    assert j.verdict(c)[0] == 2 and any("NOT JUDGED" in l for l in j.verdict(c)[1])
+    out = j.live_compare([], {}, Path("."), [], {}, Path("."), "r7")
+    assert j.live_verdict(out) == 2
+
+
+@pytest.mark.skipif(_bash() is None, reason="no Git Bash or Linux bash")
+def test_live_repull_refuses_without_an_account_email():
+    r = subprocess.run([_bash(), str(KIT / "rehearse.sh"), "live-repull", "r7", "--rehearsal", "nowhere",
+                        "--created", "nowhere"], capture_output=True, text=True, timeout=120,
+                       env={**os.environ, "ADAM_URL": "http://example.invalid", "ADAM_EMAIL": "", "ADAM_PASSWORD": "x"})
+    assert r.returncode == 2 and "ADAM_EMAIL" in r.stderr

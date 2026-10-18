@@ -20,7 +20,8 @@
 #
 # live-repull: the rehearsal's list on the live ADAM after the release, each created ticket by its real id (the
 # apply's op-created-r<N>.json); release, links, dead links and what each ticket touches must match the rehearsal.
-# Needs ADAM_URL, ADAM_EMAIL and ADAM_PASSWORD (the audit account); it only reads. <out>/direct is the next
+# Needs ADAM_URL, ADAM_EMAIL and ADAM_PASSWORD (the audit account). It reads tickets;
+# it records the signed-in account's own pull marks on live ADAM, nothing else. <out>/direct is the next
 # rehearsal's --base.
 set -euo pipefail
 
@@ -199,7 +200,7 @@ rehearse() {
   PIDS+=($!)
   (cd "$W/rc/viewer" && exec env -u TICVAI_OP_TOKEN TICVAI_AUTH="http://127.0.0.1:$P_API" \
     TICVAI_ORIGINS="http://localhost:$P_VIEW" TICVAI_PROJECTS="$REG" ADAM_PACKAGE_REF="$REL" \
-    node server.mjs --port "$P_VIEW") >"$W/run/viewer.log" 2>&1 &
+    node server.mjs --host 127.0.0.1 --port "$P_VIEW") >"$W/run/viewer.log" 2>&1 &
   PIDS+=($!)
   wait_url "http://127.0.0.1:$P_OP/__rehearsal/stats" 60 "the stand-in OpenProject"
   wait_url "http://127.0.0.1:$P_API/api/health" 120 "ADAM's accounts service"
@@ -258,7 +259,7 @@ live_repull() {
     esac
   done
   [ -n "${ADAM_URL:-}" ] && [ -n "${ADAM_EMAIL:-}" ] && [ -n "${ADAM_PASSWORD:-}" ] \
-    || die "set ADAM_URL, ADAM_EMAIL and ADAM_PASSWORD (the audit account); the re-pull only reads"
+    || die "set ADAM_URL, ADAM_EMAIL and ADAM_PASSWORD (the audit account): the re-pull reads tickets and records that account's own pull marks on live ADAM, nothing else"
   for f in $FORBIDDEN; do
     case "$ADAM_URL" in *:$f|*:$f/*) die "ADAM_URL names port $f, another session's local ADAM";; esac
   done

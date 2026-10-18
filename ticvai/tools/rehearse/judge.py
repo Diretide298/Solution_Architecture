@@ -150,6 +150,9 @@ def verdict(c) -> tuple:
         f"- The stand-in OpenProject answered {c['requests']} calls -> "
         + ("PASS" if c["requests"] else "FAIL (ADAM read some other OpenProject)"),
     ]
+    if not c["tickets"]:
+        lines.append("- No ticket was judged (is --block right?) -> NOT JUDGED")
+        return 2, lines
     failed = c["errors"] or c["release"] or c["empty"] or c["dead"] or lv or not c["requests"]
     return (1 if failed else (0 if snap else 2)), lines
 
@@ -324,6 +327,13 @@ def run_rehearsal(work: Path, release: str, base: Path) -> int:
     return code
 
 
+def live_verdict(out) -> int:
+    """1 on any mismatch, 2 when nothing was compared, else 0."""
+    if out["mismatch"]:
+        return 1
+    return 0 if out["compared"] else 2
+
+
 def run_live(reh: Path, live: Path, release: str) -> int:
     rt, lt = load(reh / "tickets.json"), load(live / "tickets-live.json")
     if rt is None or lt is None:
@@ -344,7 +354,9 @@ def run_live(reh: Path, live: Path, release: str) -> int:
     (live / "live-repull-report.json").write_text(
         json.dumps({**out, "info": dict(out["info"])}, indent=1, ensure_ascii=False), encoding="utf-8")
     print("\n".join(lines[:12]))
-    return 1 if out["mismatch"] else 0
+    if not out["compared"]:
+        print("NOT JUDGED - the live re-pull compared no tickets")
+    return live_verdict(out)
 
 
 def main(argv=None) -> int:

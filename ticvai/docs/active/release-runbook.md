@@ -141,7 +141,7 @@ Once everything is green, the rehearsal pull included (section 4):
 - Pull a **sample of 20 to 30 tickets** through ADAM at the new tag, across every developer's board. After a release
   with a rehearsal, pull the whole rehearsal list on the live ADAM instead, the tickets the release created by their
   real ids and not the rehearsal's stand-in ids, and compare: it must match the rehearsal. From `ticvai/`, with
-  `ADAM_URL`, `ADAM_EMAIL` and `ADAM_PASSWORD` set (the audit account; it only reads):
+  `ADAM_URL`, `ADAM_EMAIL` and `ADAM_PASSWORD` set (the audit account; it reads tickets and records that account's own pull marks on live ADAM, nothing else):
   `bash tools/rehearse/rehearse.sh live-repull r<N> --rehearsal <work> --created <op-created-r<N>.json>`. Its
   `live/direct/` folder is the next rehearsal's last live pull.
 - A new root issue gets a check before it counts as closed.
