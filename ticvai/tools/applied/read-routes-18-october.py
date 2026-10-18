@@ -387,6 +387,14 @@ QUERY_FOR = {
     "ledger.tax_code": "finance#taxCodeRecords",
     "ledger.fx_rate": "finance#fxRateRecords",
 }
+# Where a reader asks a different question of the same table: (table, reader) -> query. A queue's priority rule asks
+# whether a guest qualifies for a promotion that is live (createQueue: "qualify for a live promotion in
+# `promotionIds`"), which is the promotion's own row, not a price after promotions.
+QUERY_FOR_READER = {
+    ("promotions.promotion", "VenueOpsService"): "promotions#promotionRecords",
+}
+# The name a module's own queries use for it ("F&B answers with its ..."), where it is not the service's.
+LABEL = {"FnbService": "F&B"}
 
 
 def main() -> int:
@@ -420,10 +428,11 @@ def main() -> int:
         if reader == "IdentityService" and tier_of.get(owner) != "foundation":
             skipped.append(f"{op}: {t} ({owner}) - Identity asks above the foundation tier only by projection")
             continue
-        words = phrase.replace("`", "").strip().lower()
-        plan.setdefault(op, []).append((QUERY_FOR[t], route_for(dep_of.get(reader), dep_of.get(owner)),
-                                        f"the {words} its text names: {t}, "
-                                        f"{owner[:-len('Service')]}'s data (CHG-RTE-001)"))
+        words = phrase.replace("`", "").strip()
+        label = LABEL.get(owner, owner[:-len("Service")])
+        plan.setdefault(op, []).append((QUERY_FOR_READER.get((t, reader), QUERY_FOR[t]),
+                                        route_for(dep_of.get(reader), dep_of.get(owner)),
+                                        f'what its text calls "{words}": {t}, {label}\'s data (CHG-RTE-001)'))
     ops = g.operations()
     n_via = 0
     need = {}

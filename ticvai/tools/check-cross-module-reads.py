@@ -140,8 +140,17 @@ FACTS = {
 }
 FACT_RES = [(re.compile(p, re.I), t) for p, t in FACTS.items()]
 # Phrases where a fact's words are not a read of it, removed before matching (check-error-sources NOT_ENTITY works
-# the same way). Empty until a change shows the need; each one added names it.
-NOT_READ: tuple = ()
+# the same way). Each one names the operations whose text showed the need (the CHG-RTE-001 dry run, 18 October).
+NOT_READ: tuple = tuple(re.compile(p, re.I) for p in (
+    r"never from another tenant's data",        # getAiVenueSettings, setAiVenueSettings: no other tenant is read
+    r"phone number or collection point",        # deliverCredential: a credential's collection desk, not F&B's
+    r"moves with the exchange rate",            # listChannelListings, setChannelListing, listPartnerAgreements
+    r"not the denomination of an amount",       # setCurrencyRoundingRule: the word, not a till denomination
+    r"Denominations, (?:validity, activation|whether an open amount)",   # setGiftCardProduct: gift card values
+    r"rather than a venue setting",             # listDiningOutlets: says what is not a venue setting
+    r"introduced later as a venue setting",     # createJournalEntry: a setting that does not exist yet
+    r"appears on tax codes, FX rates",          # listProducts, cloneProduct and the product family: a comparison
+))
 TABLE_IN_TEXT = re.compile(r"(?<![\w.])([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]+)\b")
 FIELD_IN_TEXT = re.compile(r"(?<![\w.])(?:([a-z][a-z-]+)\.)?([A-Z][A-Za-z0-9]+)\.([a-z][A-Za-z0-9]+)\b")
 SCHEMA_IN_TEXT = re.compile(r"`([A-Z][A-Za-z0-9]+)`")
