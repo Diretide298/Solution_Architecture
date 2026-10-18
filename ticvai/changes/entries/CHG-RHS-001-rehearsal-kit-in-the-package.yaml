@@ -40,7 +40,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-links.py
-status: open
+status: closed
+closed_by_commit: 66a60a5a
 notes: 'Batch RHS (branch tools/rehearsal), 18 October 2026. A pull cannot run inside the offline gate, so the gate
   holds the runbook text (TL-REHEARSAL) and the kit holds its own rules in self-tests that run on every invocation.
   Registering those self-tests in run-checks.py waits for the scoped-refresh lane, which owns that file.'
