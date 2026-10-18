@@ -386,6 +386,16 @@ class Model:
                         self.handled.add((t, unq(a.group(2))))
                         handled = True
                         continue
+                    # A table CHECK a forward migration added (NOT VALID, then VALIDATE; CHG-MGN-001) is the table's
+                    # constraint, as it is in the generated CREATE TABLE, so the next diff does not write it again.
+                    a = re.match(rf"ADD (CONSTRAINT {NAME} CHECK .*?)(?: NOT VALID)?$", action, re.I)
+                    if a:
+                        tab.constraints.add(norm(a.group(1)))
+                        handled = True
+                        continue
+                    if re.match(rf"VALIDATE CONSTRAINT {NAME}$", action, re.I):
+                        handled = True
+                        continue
                     a = re.match(rf"DROP CONSTRAINT (?:IF EXISTS )?({NAME})", action, re.I)
                     if a:
                         self.drop(lambda k: k[0] == "constraint" and k[1] == t and k[2] == unq(a.group(1)))
@@ -632,7 +642,29 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                         continue
                     review("column dropped", f"{t}.{c}", "no longer in the schema reference",
                            "a rename or a drop: decide, then RENAME COLUMN or the four-step drop by hand")
+            old_names = {re.match(r"CONSTRAINT (\S+) ", x).group(1) for x in a.constraints
+                         if re.match(r"CONSTRAINT (\S+) ", x)}
             for c in sorted(b.constraints - a.constraints):
+                chk = re.match(r"CONSTRAINT (\S+) CHECK\b", c, re.I)
+                if chk and chk.group(1) not in old_names:
+                    # **A new table CHECK is written** (CHG-MGN-001, ADAM CR-156): NOT VALID, so adding it takes no
+                    # long lock, then VALIDATE, which fails the migration's transaction if a row breaks it (the
+                    # person's signal, as CHG-GEN-006's case-insensitive index). One of the same name a person added by
+                    # hand is dropped first, so the statements apply either way. A CHECK naming a renamed column waits
+                    # for the RENAME COLUMN, whole.
+                    name = chk.group(1)
+                    named = set(re.findall(r"\b(\w+)\b", c)) & set(b.cols)
+                    add = f"ALTER TABLE {t} ADD {c} NOT VALID"
+                    if any((t, x) in rc for x in named):
+                        review("constraint after rename", f"{t} {name}", f"`{c}`",
+                               f"names a renamed column: after the RENAME COLUMN, {add}; ALTER TABLE {t} VALIDATE "
+                               f"CONSTRAINT {name}")
+                        continue
+                    p.statements += [f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}", add,
+                                     f"ALTER TABLE {t} VALIDATE CONSTRAINT {name}"]
+                    p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};")
+                    p.counts["other"] += 1
+                    continue
                 review("constraint added", t, f"`{c}`", "existing rows may violate it: validate, then add by hand")
             for c in sorted(a.constraints - b.constraints):
                 review("constraint dropped", t, f"`{c}`", "drop by hand if intended")
@@ -647,9 +679,19 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     follows[t].append(k[1].split(".", 1)[1])
                 continue
             if any(on_renamed_col(t, _cols_in_parens(stmt)) for t in on):
-                review("index after rename", k[1], f"`{new.stmts[k]}`",
-                       "names a renamed column: rename the old index to this name (ALTER INDEX ... RENAME TO) "
-                       "after the RENAME COLUMN")
+                # **Only an index that replaces an old one is renamed** (CHG-MGN-001, ADAM CR-156): one whose columns,
+                # under their old names, an old index on the table already covers. A new one (sale_board_tile's unique
+                # page and position) has nothing to rename: it is created after the RENAME COLUMN, and listed whole.
+                was = [{rc.get((t, c), c) for c in _cols_in_parens(stmt)} for t in on]
+                replaces = any(ok[0] == "index" and ok not in new.stmts and _cols_in_parens(ost) in was
+                               and on & tables_named(ost, known) for ok, ost in old.stmts.items())
+                if replaces:
+                    review("index after rename", k[1], f"`{new.stmts[k]}`",
+                           "names a renamed column: rename the old index to this name (ALTER INDEX ... RENAME TO) "
+                           "after the RENAME COLUMN")
+                else:
+                    review("index added after rename", k[1], "a new index on a renamed column",
+                           f"after the RENAME COLUMN, create it: {new.stmts[k]}")
                 continue
             if k not in old.stmts:
                 p.statements.append(stmt)

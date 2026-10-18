@@ -1189,6 +1189,7 @@ def load_contract_props() -> dict:
                 retired_columns(schema)
                 for prop, spec in props_of(doc, schema).items():
                     if isinstance(spec, dict) and spec.get("type") == "array":
+                        ARRAY_PROPS.add(f"{mod}.{name}.{prop}")
                         ref = str((spec.get("items") or {}).get("$ref") or "")
                         if ref.startswith("#/components/schemas/"):
                             ITEM_SCHEMA[f"{mod}.{name}.{prop}"] = f"{mod}.{ref.rsplit('/', 1)[-1]}"
@@ -1219,6 +1220,7 @@ def retired_columns(schema: dict) -> None:
 # Filled by `load_contract_props`, read by `table_marks`. RETIRED: table -> the columns its contract withdraws.
 SCHEMA_MARKS: dict = {}
 ITEM_SCHEMA: dict = {}
+ARRAY_PROPS: set = set()     # `module.Schema.arrayProp`, every array property (a child table's parent key names one)
 RETIRED: dict = {}
 
 
@@ -1236,21 +1238,30 @@ def table_marks(cols: dict, tables) -> dict:
         # **A child table derived from an array is not its parent** (14 October 2026, CHG-CRD-001). Its parent-key
         # column's source names the parent's array (`identity.PrincipalCredential.history`), which voted for the parent
         # schema, so `identity.principal_credential_history` took `PrincipalCredential`'s unique-together and failed to
-        # key it. Where a table has item columns (`...array[].prop`), only those vote.
-        _items = any("[]." in str(c.get("source") or "") for c in cols.get(t, []))
+        # key it. Where a table has item columns (`...array[].prop`) that resolve to an item schema, only those vote.
+        #
+        # **...and a parent key never votes** (CHG-MGN-001, ADAM CR-156, 18 October 2026). `platform.sale_board_tile`'s
+        # parent key comes from `tenancy.SaleBoard.pages[].tiles`, an item-shaped source whose array (`pages`) has
+        # inline items, so it resolved to nothing; under the rule above it was the table's only item column, every
+        # `tenancy.SaleBoardTile.*` column was skipped, and the table got no marks: its unique (sale_board_page_id,
+        # position) and its three required-when CHECKs were never derived. Item columns vote when one resolves;
+        # otherwise the plain columns do, less any whose source is an array property (the parent's, naming the parent).
+        item_votes: dict = defaultdict(int)
         for c in cols.get(t, []):
             src = str(c.get("source") or "")
-            if _items and "[]." not in src:
-                continue
             m = re.match(r"^([\w-]+)\.(\w+)\.(\w+)\[\]\.\w+$", src)
             if m:
                 key = ITEM_SCHEMA.get(f"{m.group(1)}.{m.group(2)}.{m.group(3)}")
                 if key:
-                    votes[key] += 1
+                    item_votes[key] += 1
+                continue
+            if "[]." in src or src in ARRAY_PROPS:
                 continue
             m = re.match(r"^([\w-]+)\.(\w+)\.\w+$", src)
             if m:
                 votes[f"{m.group(1)}.{m.group(2)}"] += 1
+        if item_votes:
+            votes = item_votes
         if not votes:
             continue
         schema = max(sorted(votes), key=lambda k: votes[k])

@@ -119,3 +119,98 @@ def test_derive_ddl_reads_retired_columns_as_derive_schema_does():
                                                                                 "whitelabel.navigation_item.item_id"]}]})
     assert dd.RETIRED == {"platform.workstation": {"org_unit_id"}, "platform.venue_settings": {"org_unit_id"},
                           "whitelabel.navigation_item": {"item_id"}}
+
+
+# ---- 4. a table CHECK and a composite unique index reach the migration (CR-156) -----------------------------------
+
+def test_table_marks_resolve_a_table_whose_parent_key_names_a_nested_inline_array():
+    """platform.sale_board_tile: its parent key's source is `tenancy.SaleBoard.pages[].tiles` (pages' items are
+    inline, so they resolve to no schema) and every other column's is `tenancy.SaleBoardTile.*`."""
+    dd = _load("derive_ddl_t4", "derive-ddl.py")
+    dd.SCHEMA_MARKS.clear(); dd.ITEM_SCHEMA.clear(); dd.ARRAY_PROPS.clear()
+    dd.SCHEMA_MARKS["tenancy.SaleBoardTile"] = {
+        "x-ticvai-unique-together": [["sale_board_page_id", "position"]],
+        "x-ticvai-required-when": {"variantId": {"kind": "product"}}}
+    dd.SCHEMA_MARKS["tenancy.SaleBoard"] = {}
+    dd.ARRAY_PROPS.add("tenancy.SaleBoard.pages")
+    cols = {"platform.sale_board_tile": [
+        {"column": "sale_board_page_id", "source": "tenancy.SaleBoard.pages[].tiles"},
+        {"column": "position", "source": "tenancy.SaleBoardTile.position"},
+        {"column": "kind", "source": "tenancy.SaleBoardTile.kind"},
+        {"column": "variant_id", "source": "tenancy.SaleBoardTile.variantId"},
+        {"column": "id", "source": "derive-schema.py (surrogate)"}]}
+    m = dd.table_marks(cols, cols)["platform.sale_board_tile"]
+    assert m["schema"] == "tenancy.SaleBoardTile"
+    assert m["unique_together"] == [["sale_board_page_id", "position"]]
+    assert m["required_when"] == [("variant_id", {"kind": "product"})]
+
+
+def test_a_parent_array_key_does_not_vote_for_the_parent_schema():
+    """CHG-CRD-001's case stays right: a child whose item columns resolve takes the item schema, and a key whose
+    source is the parent's array never makes a table the parent's."""
+    dd = _load("derive_ddl_t4b", "derive-ddl.py")
+    dd.SCHEMA_MARKS.clear(); dd.ITEM_SCHEMA.clear(); dd.ARRAY_PROPS.clear()
+    dd.SCHEMA_MARKS["identity.PrincipalCredential"] = {"x-ticvai-unique-together": [["principal_id"]]}
+    dd.SCHEMA_MARKS["identity.CredentialHistoryEntry"] = {"x-ticvai-append-only": "changedAt"}
+    dd.ITEM_SCHEMA["identity.PrincipalCredential.history"] = "identity.CredentialHistoryEntry"
+    dd.ARRAY_PROPS.add("identity.PrincipalCredential.history")
+    cols = {"identity.principal_credential_history": [
+        {"column": "principal_credential_id", "source": "identity.PrincipalCredential.history"},
+        {"column": "changed_at", "source": "identity.PrincipalCredential.history[].changedAt"}]}
+    m = dd.table_marks(cols, cols)["identity.principal_credential_history"]
+    assert m["schema"] == "identity.CredentialHistoryEntry" and "unique_together" not in m
+    cols2 = {"x.child": [{"column": "parent_id", "source": "x.Parent.lines"},
+                         {"column": "qty", "source": "x.Parent.lines[].qty"}]}
+    dd.SCHEMA_MARKS["x.Parent"] = {"x-ticvai-unique-together": [["qty"]]}
+    dd.ARRAY_PROPS.add("x.Parent.lines")
+    assert "x.child" not in dd.table_marks(cols2, cols2)
+
+
+TILE_OLD = ("CREATE TABLE IF NOT EXISTS platform.sale_board_tile (id uuid PRIMARY KEY, page_id uuid, "
+            "position integer, kind text, variant_id uuid);\n"
+            "CREATE INDEX IF NOT EXISTS sale_board_tile_page_id_idx ON platform.sale_board_tile (page_id);\n")
+CHK = ("CONSTRAINT sale_board_tile_variant_id_when_chk CHECK (kind IS DISTINCT FROM 'product' OR "
+       "variant_id IS NOT NULL)")
+TILE_NEW = ("CREATE TABLE IF NOT EXISTS platform.sale_board_tile (sale_board_page_id uuid NOT NULL, position integer, "
+            "kind text, variant_id uuid, id uuid PRIMARY KEY,\n    " + CHK + ");\n"
+            "CREATE INDEX IF NOT EXISTS sale_board_tile_sale_board_page_id_idx ON platform.sale_board_tile "
+            "(sale_board_page_id);\n"
+            "CREATE UNIQUE INDEX IF NOT EXISTS sale_board_tile_sale_board_page_id_position_uniq ON "
+            "platform.sale_board_tile (sale_board_page_id, position);\n")
+TILE_RENAMES = {"columns": {("platform.sale_board_tile", "page_id"): "sale_board_page_id"}}
+
+
+def test_a_table_check_on_an_existing_table_is_written_not_valid_then_validated():
+    p = fwd.diff("tenant", model(TILE_OLD), model(TILE_NEW), TILE_RENAMES)
+    body = [fwd.norm(s) for s in p.statements]
+    name = "sale_board_tile_variant_id_when_chk"
+    assert f"ALTER TABLE platform.sale_board_tile DROP CONSTRAINT IF EXISTS {name}" in body
+    add = [s for s in body if s.startswith(f"ALTER TABLE platform.sale_board_tile ADD CONSTRAINT {name} CHECK")]
+    assert add and add[0].endswith("NOT VALID")
+    assert f"ALTER TABLE platform.sale_board_tile VALIDATE CONSTRAINT {name}" in body
+    assert body.index(add[0]) < body.index(f"ALTER TABLE platform.sale_board_tile VALIDATE CONSTRAINT {name}")
+    assert not [r for r in p.review if r[0] == "constraint added" and name in r[2]], p.review
+    assert any(name in r for r in p.rollback)
+    again = fwd.diff("tenant", fold(TILE_OLD, p), model(TILE_NEW), TILE_RENAMES)
+    assert not [s for s in again.statements if name in s], again.statements
+
+
+def test_a_new_unique_index_on_a_renamed_column_is_listed_whole_to_create_after_the_rename():
+    p = fwd.diff("tenant", model(TILE_OLD), model(TILE_NEW), TILE_RENAMES)
+    uniq = [r for r in p.review if "sale_board_page_id_position_uniq" in r[1]]
+    assert uniq and uniq[0][0] == "index added after rename", p.review
+    assert "CREATE UNIQUE INDEX IF NOT EXISTS sale_board_tile_sale_board_page_id_position_uniq" in uniq[0][3]
+    assert "(sale_board_page_id, position)" in uniq[0][3]
+    # the index that replaces an old one is still a rename
+    idx = [r for r in p.review if r[1].endswith("sale_board_tile_sale_board_page_id_idx")]
+    assert idx and idx[0][0] == "index after rename"
+
+
+def test_a_table_check_naming_a_renamed_column_waits_for_the_rename_whole():
+    chk = "CONSTRAINT sale_board_tile_sale_board_page_id_when_chk CHECK (kind IS DISTINCT FROM 'x' OR " \
+          "sale_board_page_id IS NOT NULL)"
+    new = TILE_NEW.replace(CHK, CHK + ",\n    " + chk)
+    p = fwd.diff("tenant", model(TILE_OLD), model(new), TILE_RENAMES)
+    assert not [s for s in p.statements if "sale_board_page_id_when_chk" in s]
+    row = [r for r in p.review if "sale_board_page_id_when_chk" in r[2] or "sale_board_page_id_when_chk" in r[3]]
+    assert row and row[0][0] == "constraint after rename" and "IS NOT NULL" in row[0][3]
