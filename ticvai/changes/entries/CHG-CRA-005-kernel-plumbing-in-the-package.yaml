@@ -79,4 +79,10 @@ notes: 'Prevention: check-ticket-builds B-KERNEL-STORAGE (KERNEL_NEEDS: each ker
   `python3 tools/derive-release-flags.py` in tools/refresh.sh after build-service-docs (lane C''s file; until then run
   it by hand after a plan change; --check says when it is stale), and the mirror copy to ticvai-backend
   tools/release-flags/. The existing provision-tenant.sh INSERT into control.cell_tenant names no instance_id, which
-  CellTenant requires; not changed here. DB-ROLES'' ticket text is a started-ticket comment, not a rewrite.'
+  CellTenant requires; not changed here. DB-ROLES'' ticket text is a started-ticket comment, not a rewrite.
+  **Open for the lead (fix round 1, I-3): ADM-005, the client-approved Tenant Directory, calls suspendTenant and
+  reactivateTenant and has nothing that supplies an approvalRequestId**, so as the contract stands every suspend
+  or reactivate from that screen answers 409 approval-required. The screen is not changed. The smallest ways out:
+  (a) the operation raises the approval request itself (createApprovalRequest, as publishTenantConfig does) and
+  answers 202 with the request id, applying the change when approval.granted arrives: a contract change, no screen
+  change; or (b) a visible approval step on ADM-005, which the client decides through approved-ui-changes.yaml.'
