@@ -422,11 +422,16 @@ async function roleOf(folder) {
   return null;
 }
 
+/** Whether a command file's text is ADAM's: they all call ADAM's tools (adam_*) or its updater (update-adam.md). */
+const isAdamsCommand = (text) => /adam_|update\.mjs/.test(text);
+
+/**
+ * Whether this folder is an ADAM workspace: its /ticket calls ADAM's tools. A generic board.md or done.md is not
+ * enough - an app clone can have its own, and those are the team's (found in review, 18 October 2026).
+ */
 async function hasAdamCommands(folder) {
-  for (const name of COMMAND_NAMES) {
-    if (await readOrNull(path.join(folder, '.claude', 'commands', name)) !== null) return true;
-  }
-  return false;
+  const ticket = await readOrNull(path.join(folder, '.claude', 'commands', 'ticket.md'));
+  return ticket !== null && ticket.includes('adam_pull');
 }
 
 /** What the workspace should hold, from ADAM or from a starters folder; refused whole if it names anything else. */
@@ -481,7 +486,8 @@ async function refreshWorkspace(folder, source, quiet) {
     const target = path.join(folder, '.claude', 'commands', name);
     const have = await readOrNull(target);
     const want = source.commands.find((c) => c.name === name);
-    if (have === null || !want || lf(have) === lf(want.text)) continue;
+    // Only a file that is ADAM's: one the team wrote under the same name stays theirs.
+    if (have === null || !want || !isAdamsCommand(have) || lf(have) === lf(want.text)) continue;
     await keep(name, have);
     await writeFile(target, want.text, 'utf8');
     changed.push(name);
@@ -542,7 +548,7 @@ async function refreshWorkspace(folder, source, quiet) {
 async function refreshOnly() {
   const folder = path.resolve(REFRESH_DIR);
   if (!await hasAdamCommands(folder)) {
-    say(`workspace: ${folder} is not an ADAM workspace (no ADAM command files in .claude/commands), so nothing was written.`);
+    say(`workspace: ${folder} is not an ADAM workspace (its .claude/commands/ticket.md does not call adam_pull), so nothing was written.`);
     return;
   }
   const role = argAfter('--role') ?? await roleOf(folder);
@@ -669,6 +675,8 @@ async function main() {
   await ensureHooks();
   // The code running is the one just replaced, so a refresh that arrived with this update is made by the next run.
   await refreshHere();
+  say('This update also brings the part that refreshes the ADAM files in your workspace, and it can only start on the next run: '
+    + 'run /update-adam once more, from your workspace folder (or re-run setup.cmd).');
   say('Restart Claude Code to load it — the running connector is still the old one.');
 }
 

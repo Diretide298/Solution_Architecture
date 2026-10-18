@@ -2290,12 +2290,21 @@ def _start_here(every: list, closed: set, me: Optional[str], blocked_of) -> Opti
     order that no open blocking CR affects or, when it has sub-tasks, its first open one that is yours or nobody's
     and is not blocked itself. Without the project tree its sub-tasks are unknown, and your own open board rows
     directly under it stand in for them. None when every ticket is blocked."""
-    first = next((item for item in every if not item["blockedBy"]), None)
+    # Work that is finished or waiting is not where work starts: "Ready for QA" and "On hold" stay open in
+    # OpenProject, so closed alone would send somebody back into a ticket they have handed over.
+    def parked(status: str) -> bool:
+        return status in closed or _stage(status) in ("awaitingQA", "stalled")
+
+    first = next((item for item in every if not item["blockedBy"] and not parked(item["status"])), None)
     if not first:
         return None
     under = first.get("subtasks") or [item for item in every if str(item.get("parent") or "") == first["key"]]
+    live = {item["key"]: item for item in every}
     for sub in under:
-        if sub.get("status") in closed or (sub.get("assignee") and sub.get("assignee") != me):
+        # The board's own rows are read live; the project read can be minutes old, so a sub-task of yours is judged
+        # on its live status.
+        status = (live.get(sub["key"]) or sub).get("status")
+        if parked(status) or (sub.get("assignee") and sub.get("assignee") != me):
             continue
         if blocked_of(sub["key"]):
             continue

@@ -63,10 +63,10 @@ function updater(cwd, args = [], extra = {}) {
 function oldWorkspace(name, role, { markers }) {
   const dir = path.join(T, name);
   mkdirSync(path.join(dir, '.claude', 'commands'), { recursive: true });
-  for (const file of COMMANDS) writeFileSync(path.join(dir, '.claude', 'commands', file), `OLD ${file}\n`);
+  for (const file of COMMANDS) writeFileSync(path.join(dir, '.claude', 'commands', file), `OLD ${file} adam_board\n`);
   writeFileSync(path.join(dir, '.claude', 'commands', 'ticket.md'), role === 'backend'
-    ? 'Run `dotnet test TICVAI-Backend.slnx` until it passes.\nargument-hint: <ticket number>\n'
-    : 'Run that repository\'s lint, typecheck and test\nargument-hint: <ticket number>\n');
+    ? 'adam_pull. Run `dotnet test TICVAI-Backend.slnx` until it passes.\nargument-hint: <ticket number>\n'
+    : 'adam_pull. Run that repository\'s lint, typecheck and test\nargument-hint: <ticket number>\n');
   writeFileSync(path.join(dir, '.claude', 'settings.json'), '{ "team": "own" }\n');
   let md = lf(starter(role, 'CLAUDE.md'));
   md = md.replace(/(<!-- ADAM:start working-a-ticket -->\n)[\s\S]*?(<!-- ADAM:end working-a-ticket -->)/,
@@ -166,10 +166,32 @@ try {
   const own = path.join(T, 'own');
   mkdirSync(path.join(own, '.claude', 'commands'), { recursive: true });
   writeFileSync(path.join(own, 'CLAUDE.md'), '# the team\'s own\n');
-  writeFileSync(path.join(own, '.claude', 'commands', 'ticket.md'), 'lint, typecheck\n');
+  writeFileSync(path.join(own, '.claude', 'commands', 'ticket.md'), 'adam_pull. lint, typecheck\n');
   const d = updater(own, ['--refresh-workspace', own, '--from', STARTERS]);
   check('a CLAUDE.md that never had ADAM\'s section gets no line about markers and no new file',
     !/markers/.test(d.text) && !existsSync(path.join(own, '.adam', 'new-claude-sections.md')) && read(own, 'CLAUDE.md') === '# the team\'s own\n', d.text);
+
+  // ── 4b. a team's own command files are theirs (I-3) ───────────────
+  // An app clone with a board.md and done.md of its own, and a CLAUDE.md that mentions package.json: not an ADAM
+  // workspace, nothing in it is touched.
+  const app = path.join(T, 'app-clone');
+  mkdirSync(path.join(app, '.claude', 'commands'), { recursive: true });
+  writeFileSync(path.join(app, '.claude', 'commands', 'board.md'), 'Show the team board from Trello.\n');
+  writeFileSync(path.join(app, '.claude', 'commands', 'done.md'), 'Run package.json scripts and tag the release.\n');
+  writeFileSync(path.join(app, 'CLAUDE.md'), '# app\nuses package.json and pnpm\n');
+  const appBefore = tree(app);
+  const j = updater(app, ['--refresh-workspace', app, '--from', STARTERS]);
+  check('**a folder whose command files are the team\'s own is not treated as an ADAM workspace, and nothing in it changes**',
+    changed(appBefore, tree(app)).length === 0 && /not an ADAM workspace/.test(j.text), j.text);
+  const k = updater(app, ['--refresh-workspace', app, '--role', 'frontend', '--from', STARTERS]);
+  check('even when told the role', changed(appBefore, tree(app)).length === 0, k.text);
+  // An ADAM workspace in which one command file was replaced by the team's own: that one stays.
+  const mixed = oldWorkspace('fe-mixed', 'frontend', { markers: true });
+  writeFileSync(path.join(mixed, '.claude', 'commands', 'done.md'), 'Our own done command, nothing to do with ADAM.\n');
+  const l = updater(mixed, ['--refresh-workspace', mixed, '--from', STARTERS]);
+  check('**inside an ADAM workspace a command file that is not ADAM\'s is left alone, while ADAM\'s are refreshed**',
+    read(mixed, '.claude', 'commands', 'done.md') === 'Our own done command, nothing to do with ADAM.\n'
+      && lf(read(mixed, '.claude', 'commands', 'ticket.md')) === lf(starter('frontend', '.claude', 'commands', 'ticket.md')), l.text);
 
   // ── 5. line endings and the backend ────────────────────────────────
   const be = oldWorkspace('be-crlf', 'backend', { markers: true });

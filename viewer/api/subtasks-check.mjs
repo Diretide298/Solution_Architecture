@@ -151,6 +151,13 @@ try {
     keys(walked.data?.subtasks));
   await knob('off=1');
 
+  // An instance that accepts the parent filter and ignores it must not turn every ticket into a sub-task (I-1).
+  await knob('ignoreparent=1');
+  const ignored = await call('GET', '/api/work-packages/7400?project_id=ticvai');
+  check('**a parent filter the instance ignores does not make unrelated tickets sub-tasks**',
+    keys(ignored.data?.subtasks) === '7401 7402 7403 7404 7405', keys(ignored.data?.subtasks));
+  await knob('off=1');
+
   // ── the project read works again ──────────────────────────────────
   const healed = await call('GET', '/api/board/mine?project_id=ticvai');
   const first = (healed.data?.items ?? []).find((t) => t.key === '7400');
@@ -161,6 +168,26 @@ try {
     healed.data?.startHere?.key === '7403' && healed.data?.startHere?.partOf === '7400', short(healed.data?.startHere));
   const workable = await call('GET', '/api/board/mine?project_id=ticvai&only=workable');
   check('startHere is the same whatever `only` shows', workable.data?.startHere?.key === '7403', short(workable.data?.startHere));
+
+  // Work that is finished is not started again (I-2): Ready for QA stays open in OpenProject.
+  const move = (id, status) => fetch(`${PMS}/_status?id=${id}&status=${status}`).then((r) => r.ok);
+  await move(7403, 9);
+  const qaSub = await call('GET', '/api/board/mine?project_id=ticvai');
+  check('**a sub-task waiting for QA is not where work starts: the next open one of yours is**',
+    qaSub.data?.startHere?.key === '7404', short(qaSub.data?.startHere));
+  await knob('project=503');
+  const qaSubNoTree = await call('GET', '/api/board/mine?project_id=ticvai');
+  check('and the same without the project tree', qaSubNoTree.data?.startHere?.key === '7404', short(qaSubNoTree.data?.startHere));
+  await knob('off=1');
+  await move(7400, 4);
+  const heldFirst = await call('GET', '/api/board/mine?project_id=ticvai');
+  check('**a first ticket that is on hold is not started: the next ticket of yours in board order is**',
+    heldFirst.data?.startHere?.key === '7405' && heldFirst.data.startHere.partOf === '7404', short(heldFirst.data?.startHere));
+  await move(7400, 9);
+  const qaFirst = await call('GET', '/api/board/mine?project_id=ticvai');
+  check('and so is one waiting for QA', qaFirst.data?.startHere?.key === '7405', short(qaFirst.data?.startHere));
+  await move(7400, 1);
+  await move(7403, 1);
 
   // ── the same through the connector ────────────────────────────────
   // Straight at the accounts service: the pull of a ticket with no links reads nothing from the package, so the

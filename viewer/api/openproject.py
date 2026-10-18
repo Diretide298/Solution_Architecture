@@ -557,8 +557,13 @@ def _descendants_by_filter(endpoint: str, token: str, key: str, project_id: Opti
             "sortBy": json.dumps([["id", "asc"]]),
         })
         below = []
+        asked = set(level)
         for raw in page.get("_embedded", {}).get("elements", []):
             row = summarise(raw, endpoint, token)
+            # Only what hangs under a ticket asked about: an instance that takes the parent filter and ignores it
+            # answers every ticket, and none of those is a sub-task.
+            if str(row.get("parent") or "") not in asked:
+                continue
             if row["key"] in seen or (project_id is not None and row["projectId"] != project_id):
                 continue
             seen.add(row["key"])

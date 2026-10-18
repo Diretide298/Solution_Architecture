@@ -462,8 +462,8 @@ ok(/<!-- ADAM:start working-a-ticket -->/.test(starterMd) && /<!-- ADAM:end work
 // the team has added its own text to.
 const wsCmd = (f) => path.join(OLDWS, '.claude', 'commands', f);
 const newTicket = readFileSync(wsCmd('ticket.md'), 'utf8');
-writeFileSync(wsCmd('ticket.md'), 'Run that repository\'s lint, typecheck and test\nargument-hint: <ticket number>\n');
-writeFileSync(wsCmd('board.md'), 'old board\n');
+writeFileSync(wsCmd('ticket.md'), 'adam_pull. Run that repository\'s lint, typecheck and test\nargument-hint: <ticket number>\n');
+writeFileSync(wsCmd('board.md'), 'old board adam_board\n');
 writeFileSync(path.join(OLDWS, 'CLAUDE.md'), `# Our team\n\nOur own rule.\n\n${starterMd.replace(
   /(<!-- ADAM:start working-a-ticket -->\r?\n)[\s\S]*?(<!-- ADAM:end working-a-ticket -->)/, '$1## Working a ticket (ADAM)\n\nOLD TEXT\n\n$2')}`);
 const oldSettings = readFileSync(path.join(OLDWS, '.claude', 'settings.json'), 'utf8');
@@ -485,7 +485,7 @@ ok(thirdRun.code === 0 && sameFiles(settledWs, hashes(OLDWS)).length === 0 && Ob
 // The same, with a CLAUDE.md from before the markers: left alone, with a line saying what to do.
 const bareMd = starterMd.replace(/<!-- ADAM:(start|end) [a-z-]+ -->\r?\n/g, '').replace('Do not ask for a number', 'Ask for a number');
 writeFileSync(path.join(OLDWS, 'CLAUDE.md'), bareMd);
-writeFileSync(wsCmd('ticket.md'), 'Run that repository\'s lint, typecheck and test\n');
+writeFileSync(wsCmd('ticket.md'), 'adam_pull. Run that repository\'s lint, typecheck and test\n');
 const noMarks = await setup(['-Role', 'frontend', '-Folder', OLDWS]);
 ok(readFileSync(path.join(OLDWS, 'CLAUDE.md'), 'utf8') === bareMd, '**a CLAUDE.md with no markers is left exactly as it is**');
 ok(readFileSync(wsCmd('ticket.md'), 'utf8') === newTicket, 'while the command files are still refreshed');

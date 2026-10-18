@@ -5,6 +5,14 @@ upgrade. The exception is the **connector** — the part that runs on your own m
 changes when you run `/update-adam` in Claude Code and restart it. The top of this page says whether
 any of your machines is behind.
 
+## 18 October 2026
+
+### Sub-tasks on the pull, and `/ticket` with no number
+
+Pulling a ticket now lists the work under it, with each one's status and who holds it, and pulling a sub-task says which ticket it is part of. The board shows `?` and says so when the sub-tasks could not be read, instead of 0. `/ticket` with nothing after it no longer asks for a number: it starts the first ticket you can finish, or its first open sub-task that is yours, skipping anything waiting for QA or on hold. A frontend session opened in an app's folder now tells you to open the workspace folder.
+
+**What you have to do:** run `/update-adam` **twice**, from your workspace folder, then restart Claude Code. The first run brings the new connector; the second one refreshes ADAM's own files in your workspace (`/ticket`, `/board` and the rest). Re-running `setup.cmd` does the same in one go. `CLAUDE.md` is yours: only the part between ADAM's markers is replaced, and a `CLAUDE.md` without markers is left alone with one line saying which section to replace and where the new text is.
+
 ## 14 October 2026
 
 ### The pages are rebuilt the way Tasks is

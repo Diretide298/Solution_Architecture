@@ -497,7 +497,7 @@ let LOSE_CREATES = 0;
 // `/_break?project=503&children=400`: answer the whole-project read (a project filter with every status and no
 // parent filter) or the sub-task read (a parent filter) with that status, as a refusing or overloaded instance
 // would; 0 or `off=1` heals. 400 on the sub-task read is an instance that does not know the parent filter.
-const BREAK = { project: 0, children: 0 };
+const BREAK = { project: 0, children: 0, ignoreParent: 0 };
 
 const read = (req) => new Promise((resolve) => {
   const parts = [];
@@ -553,8 +553,18 @@ createServer(async (req, res) => {
     if (url.searchParams.has('call')) CALL_MS = Number(url.searchParams.get('call')) || 0;
     return json(res, 200, { pageMs: PAGE_MS, callMs: CALL_MS });
   }
+  if (path === '/_status') {
+    // `/_status?id=7403&status=9`: move a ticket to another status, as somebody working it would.
+    const wp = packages.get(String(url.searchParams.get('id')));
+    const st = STATUSES.find((s) => s.id === Number(url.searchParams.get('status')));
+    if (!wp || !st) return json(res, 404, { message: 'no such ticket or status' });
+    wp._links.status = { href: `/api/v3/statuses/${st.id}`, title: st.name };
+    return json(res, 200, { id: wp.id, status: st.name });
+  }
   if (path === '/_break') {
-    if (url.searchParams.has('off')) { BREAK.project = 0; BREAK.children = 0; }
+    if (url.searchParams.has('off')) { BREAK.project = 0; BREAK.children = 0; BREAK.ignoreParent = 0; }
+    // An instance that accepts the parent filter and ignores it: every ticket comes back, whatever was asked.
+    if (url.searchParams.has('ignoreparent')) BREAK.ignoreParent = Number(url.searchParams.get('ignoreparent')) || 0;
     if (url.searchParams.has('project')) BREAK.project = Number(url.searchParams.get('project')) || 0;
     if (url.searchParams.has('children')) BREAK.children = Number(url.searchParams.get('children')) || 0;
     return json(res, 200, BREAK);
@@ -634,6 +644,8 @@ createServer(async (req, res) => {
         rows = rows.filter((wp) => closedOf(wp));
       } else if (field === 'project') {
         rows = rows.filter((wp) => (wp._links?.project?.href ?? '').endsWith(`/${spec.values[0]}`));
+      } else if (field === 'parent' && BREAK.ignoreParent) {
+        // ignored on purpose (/_break?ignoreparent=1)
       } else if (field === 'parent') {
         // The work packages directly under any of the numbers given, as OpenProject's parent filter answers.
         rows = rows.filter((wp) => spec.values.some((v) => (wp._links?.parent?.href ?? '') === `/api/v3/work_packages/${v}`));
