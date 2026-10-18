@@ -778,19 +778,24 @@ BEGIN
 END
 $$;
 
--- A child of a split row: read where the parent is visible, written only where the parent may be written
--- (`parent_write`, the parent's write check on the alias `parent_row`).
+-- A child of a split row: read where the parent is visible, written only where the parent may be written. Both are
+-- asked of platform.parent_visible (ADAM CR-108, CHG-RSF-001), which carries the parent's write check for each split
+-- parent (derive-ddl writes both from the same entry). `parent_write` stays in the signature so the calls already in
+-- the forward migrations keep it.
 CREATE OR REPLACE FUNCTION platform.apply_parent_split_rls(target regclass, fk_column text, parent regclass,
                                                            parent_key text, parent_write text)
     RETURNS void
     LANGUAGE plpgsql
 AS $$
-DECLARE
-    link text := format('parent_row.%I = %s.%I', parent_key, target, fk_column);
 BEGIN
+    IF parent_key <> 'id' THEN
+        RAISE EXCEPTION 'apply_parent_split_rls: % keys its parent % by %, and platform.parent_visible reads a parent by id',
+            target, parent, parent_key;
+    END IF;
+    PERFORM platform.parent_visible_owner(parent);
     PERFORM platform.apply_split_rls(target,
-        format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s)', parent, link),
-        format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s AND (%s))', parent, link, parent_write));
+        format('platform.parent_visible(%L::regclass, %I)', parent::text, fk_column),
+        format('platform.parent_visible(%L::regclass, %I, true)', parent::text, fk_column));
 END
 $$;
 """
@@ -814,6 +819,10 @@ assert VENUE_MARKER in RLS_HEAD
 RLS_PARENT = """
 -- A child table protected through the declared foreign key to the row that owns it. The row is
 -- visible, and may be written, exactly when its parent is visible to the same connection.
+-- **The parent is asked through platform.parent_visible** (ADAM CR-108, 18 October 2026; CHG-RSF-001): a SECURITY
+-- DEFINER function, so a host whose role has no grant on the parent's schema (DB-ROLES grants each deployable only
+-- its own) is still answered, and the parent forces row-level security, so its own policy still runs against the
+-- caller's `ticvai.scope_paths`. A parent is read by `id`.
 CREATE OR REPLACE FUNCTION platform.apply_parent_rls(target regclass, fk_column text,
                                                      parent regclass, parent_key text)
     RETURNS void
@@ -821,9 +830,13 @@ CREATE OR REPLACE FUNCTION platform.apply_parent_rls(target regclass, fk_column 
 AS $$
 DECLARE
     policy_name text := platform.rls_policy_name(target);
-    predicate text := format('EXISTS (SELECT 1 FROM %s parent_row WHERE parent_row.%I = %s.%I)',
-                             parent, parent_key, target, fk_column);
+    predicate text := format('platform.parent_visible(%L::regclass, %I)', parent::text, fk_column);
 BEGIN
+    IF parent_key <> 'id' THEN
+        RAISE EXCEPTION 'apply_parent_rls: % keys its parent % by %, and platform.parent_visible reads a parent by id',
+            target, parent, parent_key;
+    END IF;
+    PERFORM platform.parent_visible_owner(parent);
     EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
     EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
     EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
@@ -832,6 +845,127 @@ BEGIN
 END
 $$;
 """
+
+PARENT_VISIBLE_HEAD = """
+-- **Is the parent row visible to this connection?** (ADAM CR-108, 18 October 2026; CHG-RSF-001.) The parent policies
+-- ask this instead of reading the parent with the caller's own grants. SECURITY DEFINER: it runs as its owner, and
+-- every parent forces row-level security, so the parent's own policy still decides, against the caller's session
+-- settings; it answers exactly what the caller would see with a grant on the parent, and nothing else. It answers
+-- only the parents listed below (static SQL, by `id`); any other raises, so it cannot be used to probe another table.
+-- `for_write` applies the parent's write check where a split child needs it. Its search path is fixed; `public` is
+-- on it because the ltree type and operators the scope checks use live there (001-extensions.sql), and no host role
+-- may CREATE in it (DB-ROLES).
+-- **Its owner must not bypass row-level security**, or every child row would be visible: see
+-- platform.parent_visible_owner below (decision D5 as the lead ruled it, 18 October 2026).
+CREATE OR REPLACE FUNCTION platform.parent_visible(parent regclass, key_value uuid, for_write boolean DEFAULT false)
+    RETURNS boolean
+    LANGUAGE plpgsql
+    STABLE
+    SECURITY DEFINER
+    SET search_path = pg_catalog, public, pg_temp
+AS $$
+BEGIN
+    IF key_value IS NULL THEN
+        RETURN false;
+    END IF;
+"""
+
+PARENT_VISIBLE_TAIL = """
+    RAISE EXCEPTION 'platform.parent_visible: % is not a parent a policy names', parent;
+END
+$$;
+
+-- **Who owns platform.parent_visible** (decision D5 as the lead ruled it, 18 October 2026; CHG-RSF-001). A SECURITY
+-- DEFINER function runs as its owner, and a superuser or a BYPASSRLS role skips every policy, FORCE or not: owned by
+-- one, the function would call every parent visible and so every child row. In production the migration role owns
+-- it, and DB-ROLES (#27655) gives that role neither. A local or test database migrated as `postgres` would not hold,
+-- so where the function's owner bypasses row-level security and the migration may create roles, this gives it a
+-- dedicated owner that does not, `ticvai_parent_visible` (no login, no superuser, no BYPASSRLS), with SELECT on each
+-- parent a policy names as that policy is applied. Where the migration may not create roles it warns and leaves the
+-- owner, and tools/tests/test_parent_visible_pg.py checks the owner a production-like migration leaves. The function
+-- never refuses to answer at run time: that would break every child-table test on a database migrated as postgres.
+-- Called by the parent helpers, so every parent policy applied re-checks it; it touches no row.
+CREATE OR REPLACE FUNCTION platform.parent_visible_owner(parent regclass DEFAULT NULL)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    fn regprocedure := 'platform.parent_visible(regclass, uuid, boolean)'::regprocedure;
+    owner_bypasses boolean;
+    me record;
+BEGIN
+    SELECT r.rolsuper OR r.rolbypassrls INTO owner_bypasses
+      FROM pg_catalog.pg_proc f JOIN pg_catalog.pg_roles r ON r.oid = f.proowner WHERE f.oid = fn;
+    IF owner_bypasses THEN
+        SELECT r.rolsuper, r.rolcreaterole INTO me FROM pg_catalog.pg_roles r WHERE r.rolname = current_user;
+        IF me.rolsuper OR me.rolcreaterole THEN
+            IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = 'ticvai_parent_visible') THEN
+                CREATE ROLE ticvai_parent_visible NOLOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE;
+            END IF;
+            IF NOT me.rolsuper THEN
+                EXECUTE format('GRANT ticvai_parent_visible TO %I WITH INHERIT TRUE, SET TRUE', current_user);
+            END IF;
+            EXECUTE 'GRANT USAGE ON SCHEMA platform, public TO ticvai_parent_visible';
+            EXECUTE 'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA platform TO ticvai_parent_visible';
+            IF to_regclass('platform.scope') IS NOT NULL THEN
+                EXECUTE 'GRANT SELECT ON platform.scope TO ticvai_parent_visible';
+            END IF;
+            -- ALTER ... OWNER needs CREATE on the schema for the new owner; it is taken back at once
+            EXECUTE 'GRANT CREATE ON SCHEMA platform TO ticvai_parent_visible';
+            ALTER FUNCTION platform.parent_visible(regclass, uuid, boolean) OWNER TO ticvai_parent_visible;
+            EXECUTE 'REVOKE CREATE ON SCHEMA platform FROM ticvai_parent_visible';
+        ELSE
+            RAISE WARNING 'platform.parent_visible is owned by %, which bypasses row-level security, and % may not create its owner: give it to a role without BYPASSRLS (DB-ROLES)',
+                (SELECT f.proowner::regrole FROM pg_catalog.pg_proc f WHERE f.oid = fn), current_user;
+        END IF;
+    END IF;
+    IF parent IS NOT NULL
+       AND (SELECT f.proowner::regrole::text FROM pg_catalog.pg_proc f WHERE f.oid = fn) = 'ticvai_parent_visible' THEN
+        EXECUTE format('GRANT USAGE ON SCHEMA %I TO ticvai_parent_visible',
+                       (SELECT n.nspname FROM pg_catalog.pg_class c
+                          JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.oid = parent));
+        EXECUTE format('GRANT SELECT ON %s TO ticvai_parent_visible', parent);
+    END IF;
+END
+$$;
+"""
+
+
+def parents_of(by_parent: list) -> dict:
+    """Each parent a parent policy names -> the write check its split children carry (on `parent_row`), or None."""
+    out: dict = {}
+    for t, _col, par, key, *rest in by_parent:
+        if key != "id":
+            raise ValueError(f"{t}: its parent {par} is keyed by {key}; platform.parent_visible reads a parent by id")
+        w = rest[0] if rest else None
+        if w and out.get(par) and out[par] != w:
+            raise ValueError(f"{par}: two write checks for one parent ({out[par]!r}, {w!r})")
+        out[par] = out.get(par) or w
+    return out
+
+
+def parent_visible_sql(parents: dict) -> str:
+    """platform.parent_visible with one branch per parent (see PARENT_VISIBLE_HEAD), then its owner's function."""
+    def qual(t: str) -> str:
+        sch, n = t.split(".", 1)
+        return f"{q(sch)}.{q(n)}"
+
+    branches = []
+    for par in sorted(parents):
+        rel = qual(par)
+        read = f"RETURN EXISTS (SELECT 1 FROM {rel} parent_row WHERE parent_row.id = key_value);"
+        if parents[par]:
+            branches.append(
+                f"    IF parent = '{rel}'::regclass THEN\n"
+                f"        IF for_write THEN\n"
+                f"            RETURN EXISTS (SELECT 1 FROM {rel} parent_row WHERE parent_row.id = key_value "
+                f"AND ({parents[par]}));\n"
+                f"        END IF;\n"
+                f"        {read}\n"
+                f"    END IF;")
+        else:
+            branches.append(f"    IF parent = '{rel}'::regclass THEN\n        {read}\n    END IF;")
+    return PARENT_VISIBLE_HEAD + "\n".join(branches) + PARENT_VISIBLE_TAIL
 
 # **The scope tree protects itself on `path`, which is the column it calls its own scope_path.**
 # `platform.scope` is what every other policy resolves against, so leaving it open would make the
@@ -978,7 +1112,8 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     `shared` maps a scoped table to the second path column that also admits a caller;
     `append_audit` is `(table, why)` for an APPEND_AUDIT trail (CHG-R6-002); `split` is `(table, call, why)` for a
     table marked `x-ticvai-rls` (CHG-GEN-005), and a `by_parent` entry with a fifth member, the parent's write check,
-    follows a split parent for reading only."""
+    follows a split parent for reading only. Every parent a `by_parent` entry names gets a branch of
+    platform.parent_visible, which the parent helpers ask (CHG-RSF-001)."""
     shared = shared or {}
     head = RLS_HEAD.replace("{n_venue}", str(len(by_venue)))
     if db != "tenant":
@@ -997,6 +1132,7 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     split = split or []
     if by_parent:
         body.append(RLS_PARENT)
+        body.append(parent_visible_sql(parents_of(by_parent)))
     if by_subject or tenant_only or append_audit:
         body.append(RLS_TENANT)
     if append_audit:
