@@ -1,0 +1,44 @@
+id: CHG-CRF-001
+date: '2026-10-18'
+source: plan
+kind: process
+summary: A baselined finding fails the gate once a ticket that builds its operation or table has started; the lead can
+  acknowledge the tickets already started with the request that will fix them, and a ticket that starts later fails again.
+decision:
+  what: 'tools/audit_guard.py: every baseline-aware guard reads, offline, the ticket status cached in
+    handoff/service-docs/adam-links.json (link_index, finding_artefacts, started_tickets). A known finding whose
+    operation or table a started task or sub-task builds (a status other than New, On hold or Rejected) prints BUILT and
+    fails; `--acknowledge-started "CR-nnn: why"` (or a tracker row, "F14: why") records those tickets under the guard''s
+    `started` in handoff/audit-baseline.json (lead only), and --update-baseline keeps an acknowledgement only while its
+    finding is found. tools/adam-links.py stamps `statusReadAt`, carries the last statuses when run without
+    TICVAI_OP_TOKEN, and `--status-only` reads them again without touching the links. Release runbook section 4 runs
+    adam-links.py with the token before the gate.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'Post-r6 plan item 9 (audit/ticvai/POST-R6-PARALLEL-PLAN.md, lane D; the council of 14 October 2026,
+  council/council-transcript-2026-10-14-1830.md: class checks fail only on new findings). A baselined finding never
+  failed again, so a developer could start building on a known defect and nothing in the gate said so. Finding counts on
+  r6 (86a3fa6f, adam-links.json read 15 October): 102 known findings in six guards are built on by 46 started tickets,
+  79 of them RF-TENANT-ROOT on migrations already Ready for QA.'
+keys_touched:
+  files:
+  - tools/audit_guard.py
+  - tools/adam-links.py
+  - tools/tests/test_audit_guard_started.py
+  - tools/tests/test_adam_links_status.py
+  - docs/active/release-runbook.md
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: pending (raised at the next settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/audit_guard.py::started_tickets
+status: open
+notes: The gate goes red on merge for the findings already built on; the lead acknowledges them per guard with the
+  request that fixes their class (row security CR-095/CR-108, read routes CR-096) or leaves them failing until the class
+  fixes land. Screens are not judged (operations and tables only).

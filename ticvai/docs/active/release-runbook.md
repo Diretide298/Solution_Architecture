@@ -37,8 +37,16 @@ The rule for agent edits:
 - **Ticket links:** every Block A feature and task links something ADAM pulls, and every link ADAM loads resolves to
   an operation, table (or declared read view), screen, ADR, tracked file or service the package has
   (`check-ticket-links`; CHG-GRD-001). It reads `handoff/service-docs/adam-links.json`, which a rebuild does not
-  write: run `python3 tools/adam-links.py` after the full refresh and before the release gate, so it checks the
-  links this release will load.
+  write: run `python3 tools/adam-links.py` with `TICVAI_OP_TOKEN` set after the full refresh and before the release
+  gate, so it checks the links this release will load and the next gate reads today's ticket statuses.
+- **Started tickets on known findings:** a baselined finding fails once a ticket that builds its operation or table
+  has started: a task or sub-task in any status but New, On hold or Rejected (`tools/audit_guard.py`; CHG-CRF-001).
+  The gate reads the status cached in `adam-links.json`, with no network; between releases,
+  `python3 tools/adam-links.py --status-only` (with `TICVAI_OP_TOKEN`) reads it again and leaves the links alone.
+  Fix the finding, or the lead runs the failing check with `--acknowledge-started "CR-nnn: why"` in a reviewed commit,
+  naming the request that will fix it (or the follow-up row on the tracker sheet, `F<n>`, when no request is raised).
+  The acknowledgement covers the tickets started now; a ticket that starts on the finding later fails again, and a
+  fixed finding takes its acknowledgement with it at `--update-baseline`.
 - **Approved UI:** no visible change to a client-approved screen without the client's approval recorded in
   `docs/active/approved-ui-changes.yaml` (`check-approved-ui` against `handoff/approved-ui.json`; CHG-GRD-002).
 
