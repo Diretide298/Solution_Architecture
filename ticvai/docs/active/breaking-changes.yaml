@@ -898,10 +898,13 @@ changes:
     contract: identity
     operation: createDelegatedAccess
     operations: [createDelegatedAccess, listDelegatedAccess, listDelegations, grantDelegation]
+    change: "`permission` is now nullable"
     reason: 'ADAM CR-158, option A (published answer of 18 October 2026; CHG-CRA-002): a grant names exactly one of a
       permission or a role, so DelegatedAccess.permission is null on a role grant. A response field that was never null
-      becomes nullable, which a strict client can reject; recorded here although check-contract-compat does not report
-      nullability. CreateGrantRequest requires one of permission and roleId (relaxing the request is additive).'
+      becomes nullable, which a strict client can reject. **check-contract-compat cannot see this change**: it does not
+      compare nullability, so this entry matches nothing it reports (it prints a NOTE) and approves nothing else on the
+      four operations; it is the record of the lead''s approval. CreateGrantRequest requires one of permission and
+      roleId (relaxing the request is additive).'
     approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
     tag: r7
     producer-tickets: [SVC-IDENTITY-ADMINISTRATION-8]
