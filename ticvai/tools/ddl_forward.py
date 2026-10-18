@@ -647,7 +647,9 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
         refs = tables_named(s, known)
         if refs & set(rt):
             for t in refs & set(rt):
-                follows[t].append(s[:70])
+                # **Whole, never cut** (CHG-MGN-001, ADAM CR-148): `s[:70]` cut 19 of the 26 policy calls in these rows
+                # before their key or parent, so the person could not tell which parent the table follows.
+                follows[t].append(s)
             continue
         if refs and refs <= new_tables:
             p.statements.append(stmt)
@@ -678,7 +680,7 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
             p.counts["policies"] = p.counts.get("policies", 0) + 1
             continue
         else:
-            review("statement added", ", ".join(sorted(refs)) or "(database)", f"`{s[:160]}`",
+            review("statement added", ", ".join(sorted(refs)) or "(database)", f"`{s}`",
                    "touches objects that already exist: write it into a forward migration by hand")
 
     removed_tables = set(old.tables) - set(new.tables)
@@ -725,7 +727,7 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
         else:
             refs = tables_named(old.stmts[k], known)
             if not (refs and refs <= removed_tables):
-                review("statement dropped", ", ".join(sorted(refs)) or "(database)", f"`{old.stmts[k][:160]}`",
+                review("statement dropped", ", ".join(sorted(refs)) or "(database)", f"`{old.stmts[k]}`",
                        "undo it by hand if intended")
     return p
 
