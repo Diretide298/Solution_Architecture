@@ -28,3 +28,7 @@ def test_judge_self_tests():
 
 def test_simulate_self_tests():
     assert load("simulate").self_test() == []
+
+
+def test_prepare_self_tests():
+    assert load("prepare").self_test() == []
