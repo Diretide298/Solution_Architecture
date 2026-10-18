@@ -451,27 +451,98 @@ ALL_DEFAULT = re.compile(r"^approve all default-ruled \(\d+\):[ \t]*(.*)$", re.M
 
 
 def _item(r: dict) -> dict:
-    raise NotImplementedError("Task 8")
+    return {"id": r["id"], "ref": r["ref"], "raised": r["raised"], "title": r["title"], "ticket": r["ticket"],
+            "blocking": r["blocking"], "cr": dict(r), "facts": {}, "facts_lines": [], "draft": None,
+            "draft_error": "", "drafted_at": "", "decision": "", "note": "", "status": "", "ref_to": "",
+            "resolution": "", "redraft_note": ""}
 
 
 def _default_ruled(p: dict) -> bool:
-    raise NotImplementedError("Task 8")
+    return bool((p.get("facts") or {}).get("default_ruling"))
 
 
 def render_review(pending: dict, status_line: str) -> str:
-    raise NotImplementedError("Task 8")
+    """REVIEW.md: a summary table, then one block per request with the lines the lead edits. Requests in a class with
+    a default ruling come first, under one `approve all default-ruled (n)` line, then the blocking ones."""
+    order = sorted(pending.values(), key=lambda p: (not _default_ruled(p), p["blocking"] != "yes", p["id"]))
+    lines = ["# Change requests waiting for you", "", status_line, "",
+             "Mark each request on its `decision:` line: `approve` (settle it as drafted), `change` (edit its "
+             "`status:`, `ref:` or `resolution:` line first), or `reject: <why>` (nothing is settled; the next run "
+             "drafts it again with your note). Then:", "",
+             "    python ticvai/tools/cr-watch.py settle            # what would be settled (dry run)",
+             "    python ticvai/tools/cr-watch.py settle --apply    # settle in ADAM and tell the tickets", ""]
+    open_default = [p for p in order if _default_ruled(p) and not p.get("decision")]
+    if open_default:
+        lines += ["These requests are in a class with a written default ruling, shown in each block. Write `approve` "
+                  "after the colon to approve every one of them that has no mark of its own; nothing is settled "
+                  "until you run `settle`.", "",
+                  f"approve all default-ruled ({len(open_default)}): ", ""]
+    lines += ["| Request | Verdict | Class | Blocking | Needs | Decision |", "|---|---|---|---|---|---|"]
+    for p in order:
+        d = p.get("draft") or {}
+        verdict = d.get("verdict") or ("no draft" if p.get("draft_error") else "waiting for a draft")
+        lines.append(f"| {p['ref']} | {verdict} | {p['facts'].get('class_name') or 'none'} | {p['blocking']} | "
+                     f"{d.get('needs', '')} | {p.get('decision', '')} |")
+    for p in order:
+        d = p.get("draft") or {}
+        note = f": {p['note']}" if p.get("decision") == "reject" and p.get("note") else ""
+        err = f" (not written: {p['draft_error']})" if p.get("draft_error") else ""
+        lead = [f"your last note: {p['redraft_note']}"] if p.get("redraft_note") and not d else []
+        default = ["default ruled: yes"] if _default_ruled(p) else []
+        lines += ["", f"## {p['ref']} · {d.get('verdict', 'no draft yet')} · "
+                      f"{p['facts'].get('class_name') or 'no known class'}" + (" · blocking" if p["blocking"] == "yes"
+                                                                               else ""),
+                  "> " + " ".join(p["title"].split()), f"decision: {p.get('decision', '')}{note}",
+                  f"status: {p.get('status', '')}",
+                  f"ref: {p.get('ref_to', '')}", f"resolution: {p.get('resolution', '')}",
+                  "facts: " + " ".join(" · ".join(p["facts_lines"]).split()), *default, *lead,
+                  f"draft: drafts/{p['ref']}.md{err}"]
+    return "\n".join(lines) + "\n"
 
 
 def parse_review(text: str) -> dict:
-    raise NotImplementedError("Task 8")
+    """ref -> {"decision", "note", "status", "ref_to", "resolution", "default"} as the lead left them in REVIEW.md.
+    A request in a default-ruled class with no mark of its own takes `approve` when the lead marked the
+    `approve all default-ruled` line."""
+    out = {}
+    parts = BLOCK.split(text)
+    bulk = ALL_DEFAULT.search(parts[0])
+    approve_all = bool(bulk and bulk.group(1).strip().lower().startswith("approve"))
+    for ref, body in zip(parts[1::2], parts[2::2]):
+        got = {}
+        for line in body.splitlines():
+            m = re.match(r"^(decision|status|ref|resolution|default ruled):[ \t]?(.*)$", line)
+            if m and m.group(1) not in got:
+                got[m.group(1)] = m.group(2).strip()
+        dm = re.match(r"^(approve|change|reject)\b\s*:?\s*(.*)$", got.get("decision", ""), re.I)
+        default = got.get("default ruled", "").lower() == "yes"
+        out[ref] = {"decision": dm.group(1).lower() if dm else "", "note": dm.group(2).strip() if dm else "",
+                    "status": got.get("status", ""), "ref_to": got.get("ref", ""),
+                    "resolution": got.get("resolution", ""), "default": default}
+        if approve_all and default and not out[ref]["decision"]:
+            out[ref]["decision"] = "approve"
+    return out
 
 
 def decisions_for(pending: dict, marks: dict, project: str, nxt: str) -> tuple:
-    raise NotImplementedError("Task 8")
+    """(the decisions file settle_changes.py reads, problems). Only requests marked approve or change are in it."""
+    items, problems = [], []
+    for ref in sorted(marks, key=lambda r: int(r[3:])):
+        m = marks[ref]
+        if ref not in pending or m["decision"] not in ("approve", "change"):
+            continue
+        status = m["status"].lower()
+        if status not in STATUSES:
+            problems.append(f"{ref}: status {m['status']!r} is not one of {', '.join(STATUSES)}")
+        elif not m["resolution"]:
+            problems.append(f"{ref}: no resolution to settle with")
+        else:
+            items.append({"cr": ref, "status": status, "resolution": m["resolution"], "ref": m["ref_to"] or nxt})
+    return {"project": project, "ref": nxt, "items": items}, problems
 
 
 def settle_argv(decisions: Path, base: str, apply: bool) -> list:
-    raise NotImplementedError("Task 8")
+    return [sys.executable, str(SETTLE), str(decisions), "--adam", base] + (["--apply"] if apply else [])
 
 
 # ------------------------------------------------------------------------------------------------- state and git
