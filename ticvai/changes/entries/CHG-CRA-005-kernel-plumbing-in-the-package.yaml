@@ -1,0 +1,81 @@
+id: CHG-CRA-005
+date: '2026-10-18'
+source: cr
+kind: contract
+summary: 'What the kernel tickets build now has its storage in the package: a control-database outbox for
+  tenant.suspended, approval before suspendTenant and reactivateTenant, a timer for a future suspension and the full
+  set of reactivate refusals (CR-152); control.cell_tenant.root_scope_path written at provisioning (CR-163);
+  TenantAppStatus.darkAppModules and a generated app-module map, handoff/release-flags.json (CR-164); the outbox''s
+  occurred_at, its (aggregate_id, sequence) index and a per-aggregate counter every host may use, with ADR-0057 and
+  ADR-0058 amended (CR-166). A check now names each kernel ticket''s storage and fails when one goes missing.'
+decision:
+  what: 'Published answers of 18 October 2026 (decisions-final.json): CR-152 1a, 2a, 3a and 4; CR-163 option A; CR-164
+    option A; CR-166 option A. platform-ops.yaml: OutboxEntry.occurredAt (required) and x-ticvai-index
+    [[aggregateId, sequence]]; OutboxSequence -> platform.outbox_sequence (aggregate_id key, last_sequence bigint, the
+    aggregate''s scope_path); ControlOutboxEntry -> control.outbox. subscription.yaml: suspendTenant and
+    reactivateTenant take a granted approvalRequestId (409 approval-required), a future effectiveAt is pending and a
+    workers job applies it, reactivate refuses tenant-not-suspended and cancels a pending suspension, terminating ->
+    active described; CellTenant.rootScopePath. states/tenant.yaml: the timer transition. events/tenant-suspended.yaml:
+    written to control.outbox, by the call or the job. white-label.yaml: TenantAppStatus.darkAppModules. New
+    tools/derive-release-flags.py writes handoff/release-flags.json (306 app-modules, 2,544 operations, 1,099 bound by
+    more than one). tools/derive-ddl.py: provision-tenant.sh creates the tenant''s root scope node and records its
+    path in control.cell_tenant. docs/active/cross-deployable-writes.yaml and check-cross-deployable-writes: the
+    counter is the fifth kernel grant (SELECT, INSERT, UPDATE), which DB-ROLES creates. ADR-0057 (dead letters written
+    directly by the consumer wrapper; the counter) and ADR-0058 (the control outbox; the counter) amended.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'ADAM CR-152 (Narayan Gaonkar, #27775), CR-163 (#27692), CR-164 (#27695) and CR-166 (#27697), Hrushikant Patkar
+  for the last three, accepted 18 October 2026; class 15 of the 18 October triage ("platform plumbing the kernel needs
+  is not in the package"). Finding: the kernel tickets named mechanisms (outbox, fan-out, release flags) and nothing
+  checked that the package held the tables and fields they need.'
+keys_touched:
+  operations: [suspendTenant, reactivateTenant, getTenantAppStatus]
+  tables: [control.outbox, control.cell_tenant, control.tenant, platform.outbox, platform.outbox_sequence]
+  schemas: [OutboxEntry, OutboxSequence, ControlOutboxEntry, CellTenant, TenantAppStatus]
+  files:
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/white-label.yaml
+  - states/tenant.yaml
+  - events/tenant-suspended.yaml
+  - docs/adr/0057-events-travel-on-rabbitmq-or-kafka.md
+  - docs/adr/0058-one-relay-per-region-and-an-inbox-per-tenant-database.md
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-cross-deployable-writes.py
+  - tools/derive-ddl.py
+  - tools/derive-release-flags.py
+  - handoff/release-flags.json
+  - tools/check-ticket-builds.py
+  - docs/active/audit-runs/cr-answers-1018/impact-class15-kernel-plumbing.tsv
+  tickets: [PLATFORM-OUTBOX, PLATFORM-KERNEL, PLATFORM-FLAGS, DB-ROLES, PLATFORM-MIGRATE]
+root_class: 'new: kernel-plumbing-missing (class 15 of the 18 October triage)'
+tickets:
+  started:
+  - 'TEST-AM-FOUNDATION-DATABASE (27686, On hold): new control.outbox, platform.outbox_sequence, columns'
+  unstarted:
+  - 'Finished (a child task each, for its owner): DB-ROLES (27655: the counter grant), MIG-CONTROL and
+    MIG-CONTROL#control.cell_tenant (root_scope_path), MIG-PLATFORM and MIG-PLATFORM#platform.outbox (occurred_at, the
+    index), MIG-PARTITIONS (the counter survives partitions). The kernel tickets PLATFORM-OUTBOX (27697),
+    PLATFORM-KERNEL (27692), PLATFORM-FLAGS (27695) and the suspendTenant and reactivateTenant tickets are New in the
+    r6 cache but their developers raised these CRs: the settlement comments reach their agents. 353 New in all.'
+release_tag: r7
+decision_owner: Chinmay
+adam_cr: CR-152, CR-163, CR-164, CR-166
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: open
+notes: 'Prevention: check-ticket-builds B-KERNEL-STORAGE (KERNEL_NEEDS: each kernel ticket''s table, column, index,
+  grant, contract field or file), read from the contracts as well as the schema reference so it holds before the
+  release derive. Shown failing on r6 (8 new) and passing after. Also held: check-cross-deployable-writes X-KERNEL
+  now requires the counter grant. Sibling query: the KERNEL_NEEDS list is the class; PLATFORM-MIGRATE''s resume is
+  class 12 (CHG-CRA-006). Database (derived at the release; this branch''s derive in
+  D:\wt\fix-cr-answers-1018-derived\class15): control V0105 adds control.outbox and cell_tenant.root_scope_path
+  (added nullable; the review row says backfill then SET NOT NULL); tenant V0105 adds platform.outbox_sequence (scope
+  policy), platform.outbox.occurred_at (added nullable; backfill from created_at, then NOT NULL) and
+  outbox_aggregate_id_sequence_idx. provision-tenant.sh (derived) creates the root node. For the lead: register
+  `python3 tools/derive-release-flags.py` in tools/refresh.sh after build-service-docs (lane C''s file; until then run
+  it by hand after a plan change; --check says when it is stale), and the mirror copy to ticvai-backend
+  tools/release-flags/. The existing provision-tenant.sh INSERT into control.cell_tenant names no instance_id, which
+  CellTenant requires; not changed here. DB-ROLES'' ticket text is a started-ticket comment, not a rewrite.'

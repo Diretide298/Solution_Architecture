@@ -1,0 +1,362 @@
+group	ticket	plan_key	status	type	assignee	subject	links
+started	27686	TEST-AM-FOUNDATION-DATABASE	On hold	Task	Pranay Shinde	[Test] Module test: Foundation · Database migrations	table:control.cell_tenant, table:control.tenant, table:platform.dead_letter, table:platform.outbox
+finished	27647	MIG-CONTROL	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0002__control.sql: control (21 tables)	table:control.cell_tenant, table:control.tenant
+finished	27649	MIG-PARTITIONS	Ready for QA	Task	Hrushikant Patkar	[DB] Monthly partitions: create three months ahead, detach what retention has expired	table:platform.dead_letter, table:platform.outbox
+finished	27655	DB-ROLES	Ready for QA	Task	Hrushikant Patkar	[BE] One Postgres role per deployable; the AI role read-only	raised the CR
+finished	27665	MIG-PLATFORM	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0017__platform.sql: platform (17 tables)	table:platform.outbox
+finished	30151	MIG-CONTROL#control.cell_tenant	Ready for QA	Sub Task	Hrushikant Patkar	[DB] control.cell_tenant	table:control.cell_tenant
+finished	30167	MIG-CONTROL#control.tenant	Ready for QA	Sub Task	Hrushikant Patkar	[DB] control.tenant	table:control.tenant
+finished	30334	MIG-PLATFORM#platform.outbox	Ready for QA	Sub Task	Hrushikant Patkar	[DB] platform.outbox	table:platform.outbox
+new	27645	AM-FOUNDATION-DATABASE	New	Feature	Hrushikant Patkar	Foundation · Database migrations	table:control.cell_tenant, table:control.tenant, table:platform.outbox
+new	27666	SETUP-AUTH	New	Task	Pranay Shinde	[DevOps] Sign-in working end to end against IdentityService	table:platform.outbox
+new	27685	TEST-AM-FOUNDATION-SETUP	New	Task	Deep Khanvilkar	[Test] Module test: Foundation · Setup and environments	table:platform.outbox
+new	27690	PLATFORM-MIGRATE	New	Task	Pranay Shinde	[BE] Migration fan-out across tenant databases, and expand-then-contract changes	raised the CR
+new	27691	PLATFORM-OBSERVE	New	Task	Pranay Shinde	[BE] Observability with tenant and venue on every trace, and the first dashboards	table:platform.outbox
+new	27692	PLATFORM-KERNEL	New	Task	Pranay Shinde	[BE] Request kernel: hostname to tenant routing, per-transaction scope, error model and 42	raised the CR, table:control.cell_tenant, table:control.tenant
+new	27695	PLATFORM-FLAGS	New	Task	Hrushikant Patkar	[BE] Release flags per tenant	raised the CR
+new	27697	PLATFORM-OUTBOX	New	Task	Pranay Shinde	[BE] Outbox, relay and inbox behind the kernel broker interface, on a local RabbitMQ	file:docs/adr/0057-events-travel-on-rabbitmq-or-kafka.md, file:docs/adr/0058-one-relay-per-region-and-an-inbox-per-tenant-database.md, raised the CR, table:platform.dead_letter, table:platform.outbox
+new	27699	PLATFORM-PAYMENTS	New	Task	Hrushikant Patkar	[BE] Payment adapter and signed webhook against the provider's test mode	table:platform.outbox
+new	27700	PLATFORM-REPUBLISH	New	Task	Hrushikant Patkar	[BE] Republish from the outbox by tenant and time range	file:docs/adr/0058-one-relay-per-region-and-an-inbox-per-tenant-database.md, table:platform.outbox
+new	27701	PLATFORM-SAGA-PAID	New	Task	Hrushikant Patkar	[BE] Order paid to tickets issued: the saga proven end to end	file:docs/adr/0058-one-relay-per-region-and-an-inbox-per-tenant-database.md, table:platform.outbox
+new	27703	TEST-AM-FOUNDATION-PLATFORM	New	Task	Chinmay Patkar	[Test] Module test: Foundation · Platform kernel	table:control.cell_tenant, table:control.tenant, table:platform.dead_letter, table:platform.outbox
+new	27705	OFFLINE-JOURNAL	New	Task	Pradnya Yeram	[BE] Offline journal in packages/offline-core: record, replay and the conflict policies	table:platform.outbox
+new	27707	OFFLINE-SYNC	New	Task	Hrushikant Patkar	[BE] syncOrders: a result per entry, and a bad entry quarantined instead of blocking the t	table:platform.outbox
+new	27708	POS-KDS-ROUTING	New	Task	Hrushikant Patkar	[BE] A POS sale reaches the kitchen: routing online, and the LAN path decision	table:platform.outbox
+new	27709	TEST-AM-FOUNDATION-OFFLINE	New	Task	Deep Khanvilkar	[Test] Module test: Foundation · Offline: POS, Kitchen Display and scanner	table:platform.outbox
+new	27728	SVC-IDENTITY-GUESTAUTH-3	New	Task	Hrushikant Patkar	[BE] IdentityService: registerGuest, requestGuestOtp, submitGuestIdentityDocument, verifyG	table:platform.outbox
+new	27730	SVC-IDENTITY-MFA-2	New	Task	Sanket Keluskar	[BE] IdentityService: verifyMfaChallenge, verifyMfaEnrolment	table:platform.outbox
+new	27731	SVC-IDENTITY-GUESTAUTH-2	New	Task	Hrushikant Patkar	[BE] IdentityService: guestPasswordLogin, guestSocialLogin, guestUaePassLogin, linkGuestCh	table:platform.outbox
+new	27732	SVC-IDENTITY-IDENTITY-2	New	Task	Hrushikant Patkar	[BE] IdentityService: grantDelegation, listDelegations, login, refreshToken	table:platform.outbox
+new	27736	SVC-ORDER-ORDER-2	New	Task	Pranay Shinde	[BE] OrderService: exchangeOrderLines, getMediaEntitlements, getOrder, getOrderCalendarEve	table:platform.outbox
+new	27738	SVC-MARKETING-CONSENT-1	New	Task	Pranay Shinde	[BE] MarketingService: claimDeviceConsent, createConsentQuestion, getCookieConsentRuntime,	table:platform.outbox
+new	27740	TEST-AM-IDENTITY-SECURITY-P01	New	Task	Sanket Keluskar	[Test] Module test: Identity & Security · Guest Web	table:platform.outbox
+new	27757	SVC-IDENTITY-SSO-1	New	Task	Deep Khanvilkar	[BE] IdentityService: completeSsoAuthorization, listSsoProviders, startSsoAuthorization	table:platform.outbox
+new	27759	TEST-AM-IDENTITY-SECURITY-P06-BLOCK-A	New	Task	Pallavi Sawant	[Test] Module test: Identity & Security · Staff App (Block A)	table:platform.outbox
+new	27775	SVC-PLATFORM-TENANT-1	New	Task	Narayan Gaonkar	[BE] PlatformService: createTenant, listTenants, reactivateTenant, suspendTenant	operation:subscription#reactivateTenant, operation:subscription#suspendTenant, raised the CR, table:control.tenant, table:platform.outbox
+new	27777	SVC-WHITELABEL-OVERVIEW-2	New	Task	Deep Khanvilkar	[BE] WhiteLabelService: recordStorefrontSessionEvents, setAnalyticsProvider, setMaintenanc	table:platform.outbox
+new	27779	SVC-WHITELABEL-PUBLISHING-2	New	Task	Narayan Gaonkar	[BE] WhiteLabelService: getSitePackage, getSiteSetupProgress, listConfigVersions, publishT	table:platform.outbox
+new	27792	SVC-ORDER-SHIFT-1	New	Task	Pranay Shinde	[BE] OrderService: acceptShiftVariance, allocateDepositBox, approveShiftOpen, closeShift	table:platform.outbox
+new	27802	SVC-TENANCY-DEVICES-3	New	Task	Pranay Shinde	[BE] TenancyService: listDeviceAuditRecords, listDeviceTamperEvents, recordDeviceTamperEve	table:platform.outbox
+new	27803	SVC-TENANCY-WORKSTATION-3	New	Task	Deep Khanvilkar	[BE] TenancyService: recordDeviceHeartbeat	table:platform.outbox
+new	27813	SVC-TENANCY-REQUEST-1	New	Task	Pranay Shinde	[BE] TenancyService: createApprovalRequest, decideApprovalRequest, evaluateApprovalRequire	table:platform.outbox
+new	27814	SVC-WALLET-CARD-1	New	Task	Sanket Keluskar	[BE] WalletService: loadGameCredits	table:platform.outbox
+new	27817	SVC-WALLET-WALLET-2	New	Task	Pranay Shinde	[BE] WalletService: setWalletFundingRules, setWalletRefundPolicy, topUpWallet	table:platform.outbox
+new	27819	SVC-WALLET-RETAIL-1	New	Task	Pranay Shinde	[BE] WalletService: getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadS	table:platform.outbox
+new	27829	VM-TENANCY-REQUEST-1	New	Task	Pranay Shinde	[BE] TenancyService: escalateApprovalRequest, getApprovalRequest, resubmitApprovalRequest,	table:platform.outbox
+new	27831	SVC-TENANCY-APPROVALS-4	New	Task	Deep Khanvilkar	[BE] TenancyService: approveUnifiedDecision, listAutomationExecutions	table:platform.outbox
+new	27832	SVC-TENANCY-REQUEST-2	New	Task	Narayan Gaonkar	[BE] TenancyService: assignApprovalRequest, cancelApprovalRequest, recordExternalApprovalD	table:platform.outbox
+new	27833	SVC-TENANCY-REQUEST-3	New	Task	Deep Khanvilkar	[BE] TenancyService: submitApprovalRequest	table:platform.outbox
+new	27844	AM-WHITE-LABEL-P01	New	Feature	Hrushikant Patkar	White Label · Guest Web	operation:white-label#getTenantAppStatus
+new	27854	SVC-ACCESS-ACCESS-4	New	Task	Hrushikant Patkar	[BE] AccessService: revokeFacePass, setAccessPointGroup, setBiometricVerificationProfile, 	table:platform.outbox
+new	27860	SVC-ORDER-ORDER-1	New	Task	Pranay Shinde	[BE] OrderService: appendEntitlementToMedia, applyManualDiscount, claimTicketTransfer, cre	table:platform.outbox
+new	27861	SVC-ORDER-ORDER-5	New	Task	Pranay Shinde	[BE] OrderService: resumeOrder, setVisitReminder, transferOrderTickets, voidOrder	table:platform.outbox
+new	27862	SVC-ORDER-ORDERS-4	New	Task	Pranay Shinde	[BE] OrderService: previewProductTickets, recordGroupCheckIn, reissueEntitlement, requestG	table:platform.outbox
+new	27863	SVC-ORDER-ORDERS-3	New	Task	Deep Khanvilkar	[BE] OrderService: listBillingStatements, listMyOrders, listPaymentTokens, payByLink	table:platform.outbox
+new	27864	SVC-ORDER-ORDERS-5	New	Task	Pranay Shinde	[BE] OrderService: setPaymentProvider, shareEntitlement, storePaymentToken, updateTicketTe	table:platform.outbox
+new	27866	SVC-MARKETING-CONSENT-3	New	Task	Pranay Shinde	[BE] MarketingService: listPublishedTrackingTechnologies, recordConsent, recordConsentAnsw	table:platform.outbox
+new	27867	AM-WHITE-LABEL-P02	New	Feature	Pranay Shinde	White Label · Guest App	operation:white-label#getTenantAppStatus
+new	27871	SVC-MARKETING-MARKETING-3	New	Task	Pranay Shinde	[BE] MarketingService: getMyProfile, getSeoMetadata, getWaiverStatus, handoverToAgent	table:platform.outbox
+new	27874	AM-WHITE-LABEL-P13	New	Feature	Chinmay Patkar	White Label · CMS	operation:white-label#getTenantAppStatus
+new	27885	SVC-WHITELABEL-OVERVIEW-1	New	Task	Hrushikant Patkar	[BE] WhiteLabelService: getPublishedTenantConfig, getTenantAppStatus, getTenantConfig, lis	operation:white-label#getTenantAppStatus
+new	27887	TEST-AM-IDENTITY-SECURITY-P09	New	Task	Deep Khanvilkar	[Test] Module test: Identity & Security · TICVAI Console 1 of 5	table:control.tenant
+new	27888	APP-WEB-WEB-028	New	Task	Chinmay Patkar	[FE] WEB-028 Contact & Venue Information	operation:white-label#getTenantAppStatus
+new	27889	APP-WEB-WEB-029	New	Task	Chitrangi Mestry	[FE] WEB-029 Error / Sold Out / Maintenance	operation:white-label#getTenantAppStatus
+new	27890	APP-WEB-WEB-045	New	Task	Chinmay Patkar	[FE] WEB-045 Help Centre & Accessibility	operation:white-label#getTenantAppStatus
+new	27891	APP-MOB-GST-040	New	Task	Chitrangi Mestry	[FE] GST-040 Help & Support	operation:white-label#getTenantAppStatus
+new	27893	APP-MOB-GST-047	New	Task	Chitrangi Mestry	[FE] GST-047 Maintenance / Upgrade Page	operation:white-label#getTenantAppStatus
+new	27894	SVC-WHITELABEL-WHITE-LABEL-1	New	Task	Deep Khanvilkar	[BE] WhiteLabelService: claimCustomDomain, getPlatformSubdomain, listCustomDomains, regene	table:control.tenant
+new	27904	APP-WL-CMS-001	New	Task	Chinmay Patkar	[FE] CMS-001 Tenant Workspace	operation:white-label#getTenantAppStatus
+new	27906	APP-WL-CMS-014	New	Task	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow	operation:white-label#getTenantAppStatus
+new	27908	APP-WL-CMS-102	New	Task	Chitrangi Mestry	[FE] CMS-102 Site Builder	operation:white-label#getTenantAppStatus
+new	27910	SVC-ORDER-CART-1	New	Task	Pranay Shinde	[BE] OrderService: abandonCart, addCartLine, applyCartPromoCode, checkoutCart	table:platform.outbox
+new	27949	VM-IDENTITY-ADMINISTRATION-1	New	Task	Hrushikant Patkar	[BE] IdentityService: createPrincipal, getPrincipal, listPlatformStaffGrants, resetPrincip	table:platform.outbox
+new	27961	AM-SETUP-PLATFORM-FOUNDATION-P09	New	Feature	Surendra Loke	Platform Foundation · TICVAI Console (setup)	operation:subscription#reactivateTenant, operation:subscription#suspendTenant
+new	27962	SVC-PLATFORM-PLAN-1	New	Task	Deep Khanvilkar	[BE] PlatformService: createPlan, createPlanVersion	table:control.tenant
+new	27963	SVC-PLATFORM-TENANT-2	New	Task	Sanket Keluskar	[BE] PlatformService: terminateTenant, updateTenant	table:control.tenant
+new	27964	APP-SETUP-ADM-005	New	Task	Surendra Loke	[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations)	operation:subscription#reactivateTenant, operation:subscription#suspendTenant
+new	27967	TEST-AM-SETUP-PLATFORM-FOUNDATION-P09	New	Task	Narayan Gaonkar	[Test] Module test: Platform Foundation · TICVAI Console (setup)	table:control.tenant
+new	27990	SVC-TENANCY-TENANCY-4	New	Task	Surendra Loke	[BE] TenancyService: resolveTenantHost, setTenantDomainMapping	table:control.tenant, table:platform.outbox
+new	27994	SVC-PLATFORM-CELL-3	New	Task	Pranay Shinde	[BE] PlatformService: cancelDecommission, decommissionCell, getCell, getCellCapacity	table:control.cell_tenant
+new	27997	SVC-PLATFORM-PUBLICAPI-9	New	Task	Sanket Keluskar	[BE] PlatformService: replayEvents	table:platform.outbox
+new	27998	TEST-AM-PUBLIC-API-API-BLOCK-A-COMPLETION	New	Task	Surendra Loke	[Test] Module test: Public API · API only (Block A completion)	table:platform.outbox
+new	28001	SVC-PLATFORM-CELL-6	New	Task	Pranay Shinde	[BE] PlatformService: provisionCell	table:control.cell_tenant
+new	28002	SVC-PLATFORM-CELL-4	New	Task	Narayan Gaonkar	[BE] PlatformService: getCellHealth, listCellJobs, listCells, listTenantCells	table:control.cell_tenant
+new	28004	SVC-PLATFORM-TENANT-3	New	Task	Pranay Shinde	[BE] PlatformService: getTenant	table:control.cell_tenant, table:control.tenant
+new	28020	SVC-CATALOGUE-EVENTS-1	New	Task	Deep Khanvilkar	[BE] CatalogueService: cloneEvent, setEventLifecycleState	table:platform.outbox
+new	28027	SVC-CATALOGUE-PROMOTION-2	New	Task	Deep Khanvilkar	[BE] CatalogueService: listPromotions, publishPromotion, updatePromotion	table:platform.outbox
+new	28029	TEST-AM-APPROVALS-P08-BLOCK-A	New	Task	Narayan Gaonkar	[Test] Module test: Approvals · Venue Management (Block A)	table:platform.outbox
+new	28047	SVC-ORDER-ORDERS-1	New	Task	Pranay Shinde	[BE] OrderService: cloneTicketTemplate, createResaleListing, createTicketTemplate, getBill	table:platform.outbox
+new	28048	SVC-ORDER-PAYMENTS-1	New	Task	Pranay Shinde	[BE] OrderService: createInstalmentPlan, createPaymentProviderConnection, listInstalmentPl	table:platform.outbox
+new	28080	TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08	New	Task	Pranay Shinde	[Test] Module test: Ticketing & Guest Commerce · Venue Management (setup)	table:platform.outbox
+new	28100	VM-CATALOGUE-PRODUCT-1	New	Task	Narayan Gaonkar	[BE] CatalogueService: transitionProductLifecycle	table:platform.outbox
+new	28116	SVC-CATALOGUE-PROMOTION-3	New	Task	Narayan Gaonkar	[BE] CatalogueService: endPromotion, listCommercialCampaigns, pausePromotion, unschedulePr	table:platform.outbox
+new	28135	SVC-CATALOGUE-LEASE-1	New	Task	Deep Khanvilkar	[BE] CatalogueService: acquireInventoryHold, convertInventoryHold, listInventoryHolds	table:platform.outbox
+new	28138	SVC-ORDER-SYNC-1	New	Task	Pranay Shinde	[BE] OrderService: listSyncRejections, syncOrders	table:platform.outbox
+new	28140	TEST-AM-TENANCY-VENUES-P08-BLOCK-A	New	Task	Sanket Keluskar	[Test] Module test: Tenancy & Venues · Venue Management (Block A)	table:platform.dead_letter
+new	28144	SVC-ORDER-PAYMENT-1	New	Task	Pranay Shinde	[BE] OrderService: addTip, capturePayment, createPayment, inquirePaymentStatus	table:platform.outbox
+new	28153	AM-TICKETING-P02	New	Feature	Chitrangi Mestry	Ticketing · Guest App	operation:white-label#getTenantAppStatus
+new	28174	VM-CATALOGUE-EVENT-1	New	Task	Sanket Keluskar	[BE] CatalogueService: cancelPerformance, getEvent	table:platform.outbox
+new	28191	AM-SEATING-MAPS-P01	New	Feature	Narayan Gaonkar	Seating & Maps · Guest Web	operation:white-label#getTenantAppStatus
+new	28192	SVC-CATALOGUE-HOLD-1	New	Task	Narayan Gaonkar	[BE] CatalogueService: createSeatHold, extendSeatHold, getSeatHold, relinquishSeatHold	table:platform.outbox
+new	28196	TEST-AM-TICKETING-P08-BLOCK-A	New	Task	Narayan Gaonkar	[Test] Module test: Ticketing · Venue Management (Block A)	table:platform.outbox
+new	28200	APP-WEB-WEB-050	New	Task	Chinmay Patkar	[FE] WEB-050 Plan Your Visit	operation:white-label#getTenantAppStatus
+new	28232	SVC-ORDER-REFUND-1	New	Task	Pranay Shinde	[BE] OrderService: createRefund, createRefundRequest, listOrderRefunds	table:platform.outbox
+new	28243	SVC-FNB-GUESTORDERING-1	New	Task	Narayan Gaonkar	[BE] FnbService: claimLocationSession, createDeliveryLocation, createGuestFnbOrder, getFnb	table:platform.outbox
+new	28246	SVC-FNB-KITCHEN-1	New	Task	Deep Khanvilkar	[BE] FnbService: listKitchenStations, listKitchenTickets, prioritiseKitchenTicket, setKitc	table:platform.outbox
+new	28248	SVC-FNB-ORDER-1	New	Task	Narayan Gaonkar	[BE] FnbService: createFnbOrder, getFnbOrder, listFnbOrders	table:platform.outbox
+new	28249	SVC-FNB-SERVICE-1	New	Task	Narayan Gaonkar	[BE] FnbService: acceptFnbOrder, cancelFnbOrder	table:platform.outbox
+new	28254	SVC-LEDGER-TAX-1	New	Task	Narayan Gaonkar	[BE] LedgerService: createTaxCode, getTaxDocumentRendition, getTaxInvoice, issueCreditMemo	table:platform.outbox
+new	28255	SVC-LEDGER-TAX-2	New	Task	Narayan Gaonkar	[BE] LedgerService: issueTaxInvoice, listCreditMemos, listTaxInvoices, setEInvoicingProvid	table:platform.outbox
+new	28280	VM-ORDER-ORDERS-2	New	Task	Pranay Shinde	[BE] OrderService: getChargebackAnalytics, listDeposits, recordChargeback, recordChargebac	table:platform.outbox
+new	28285	SVC-ORDER-ORDERS-14	New	Task	Surendra Loke	[BE] OrderService: revokeEntitlementShare	table:platform.outbox
+new	28292	SVC-ORDER-ORDERS-12	New	Task	Pranay Shinde	[BE] OrderService: convertToTermProduct, issueInvitation, listInvitationAllowances, listMe	table:platform.outbox
+new	28321	SVC-WALLET-WALLET-8	New	Task	Pranay Shinde	[BE] WalletService: captureWalletHold, holdWalletFunds, listWalletDisputes, releaseWalletH	table:platform.outbox
+new	28328	SVC-ACCESS-ACCESS-2	New	Task	Narayan Gaonkar	[BE] AccessService: enrolFaceTag, getEntitlement, getEntitlementCredential, getEntitlement	table:platform.outbox
+new	28331	SVC-ACCESS-ACCESS-1	New	Task	Narayan Gaonkar	[BE] AccessService: approveManualOverrideSupervisor, bindCredentialDevice, deleteAccessPoi	table:platform.outbox
+new	28333	APP-WEB-WEB-001	New	Task	Chinmay Patkar	[FE] WEB-001 Home / Landing	operation:white-label#getTenantAppStatus
+new	28335	APP-MOB-GST-001	New	Task	Chitrangi Mestry	[FE] GST-001 Home	operation:white-label#getTenantAppStatus
+new	28338	TEST-AM-WHITE-LABEL-P13	New	Task	Pallavi Sawant	[Test] Module test: White Label · CMS	table:control.tenant
+new	28344	TEST-AM-ORDERS-RESERVATIONS-P04	New	Task	Chitrangi Mestry	[Test] Module test: Orders & Reservations · POS	table:platform.outbox
+new	28356	TEST-AM-ADMISSION-ACCESS-P02	New	Task	Chitrangi Mestry	[Test] Module test: Admission & Access · Guest App	table:platform.outbox
+new	28371	VM-ACCESS-SYNC-1	New	Task	Deep Khanvilkar	[BE] AccessService: getOfflinePackage, listScans, syncScans	table:platform.outbox
+new	28372	VM-ACCESS-VALIDATION-1	New	Task	Narayan Gaonkar	[BE] AccessService: lookupTicket, overrideAccess, validateAccess, validateGroupAccess	table:platform.outbox
+new	28382	SVC-ACCESS-VALIDATION-2	New	Task	Deep Khanvilkar	[BE] AccessService: issueOrderEntitlements	table:platform.outbox
+new	28385	TEST-AM-SUBSCRIPTION-LICENSING-P09	New	Task	Sanket Keluskar	[Test] Module test: Subscription & Licensing · TICVAI Console 1 of 6	table:control.cell_tenant, table:control.tenant
+new	28388	TEST-AM-SETUP-PLATFORM-FOUNDATION-P09-REST	New	Task	Narayan Gaonkar	[Test] Module test: Platform Foundation · TICVAI Console (setup, the rest of the screens)	table:control.cell_tenant
+new	28409	SVC-LEDGER-LEDGER-3	New	Task	Surendra Loke	[BE] LedgerService: listInterEntityObligations, postOrderRevenue, runFxRevaluation	table:platform.outbox
+new	28412	VM-LEDGER-FISCAL-1	New	Task	Sanket Keluskar	[BE] LedgerService: closeFiscalPeriod, listFiscalPeriods	table:platform.outbox
+new	28414	TEST-AM-FINANCE-TAX-API-BLOCK-A-COMPLETION	New	Task	Pranay Shinde	[Test] Module test: Finance & Tax · API only (Block A completion)	table:platform.outbox
+new	28482	SVC-LEDGER-TAX-3	New	Task	Sanket Keluskar	[BE] LedgerService: transmitEInvoices, updateTaxCode	table:platform.outbox
+new	28524	AM-FOOD-BEVERAGE-P02	New	Feature	Chinmay Patkar	Food & Beverage · Guest App	operation:white-label#getTenantAppStatus
+new	28525	APP-MOB-GST-029	New	Task	Chinmay Patkar	[FE] GST-029 Venue Info & Services	operation:white-label#getTenantAppStatus
+new	28528	SVC-ORDER-SHIFT-3	New	Task	Pranay Shinde	[BE] OrderService: giveShiftVarianceReason, listDenominations, listDepositBoxes, listShift	table:platform.outbox
+new	28529	SVC-ORDER-SHIFT-5	New	Task	Pranay Shinde	[BE] OrderService: resumeShift, setDenominations, setTillShiftPolicy, submitShiftCount	table:platform.outbox
+new	28555	TEST-AM-ORDERS-RESERVATIONS-P02	New	Task	Pallavi Sawant	[Test] Module test: Orders & Reservations · Guest App	table:platform.outbox
+new	28593	SVC-ORDER-SHIFT-7	New	Task	Narayan Gaonkar	[BE] OrderService: adjustDepositBoxFloat, approveShiftClose	table:platform.outbox
+new	28655	VM-VENUEOPS-WORKORDER-1	New	Task	Narayan Gaonkar	[BE] VenueOpsService: completeWorkOrder, createVendorServiceRequest, createWorkOrder, getW	table:platform.outbox
+new	28663	TEST-AM-MAINTENANCE-SAFETY-P06-BLOCK-A	New	Task	Pranay Shinde	[Test] Module test: Maintenance & Safety · Staff App (Block A)	table:platform.outbox
+new	28668	VM-VENUEOPS-WORKORDER-3	New	Task	Deep Khanvilkar	[BE] VenueOpsService: updateWorkOrder, verifyWorkOrder	table:platform.outbox
+new	28682	APP-MOB-GST-038	New	Task	Pradnya Yeram	[FE] GST-038 At the Venue	operation:white-label#getTenantAppStatus
+new	28691	TEST-AM-SEATING-MAPS-P01	New	Task	Deep Khanvilkar	[Test] Module test: Seating & Maps · Guest Web	table:platform.outbox
+new	28701	APP-MOB-GST-051	New	Task	Chitrangi Mestry	[FE] GST-051 Plan	operation:white-label#getTenantAppStatus
+new	28718	SVC-INVENTORY-RECEIPT-1	New	Task	Pranay Shinde	[BE] InventoryService: createGoodsReceipt, rejectReceivedGoods	table:platform.outbox
+new	28721	TEST-AM-SETUP-FOOD-BEVERAGE-RETAIL-P06	New	Task	Narayan Gaonkar	[Test] Module test: Food, Beverage & Retail · Staff App (setup)	table:platform.outbox
+new	28735	TEST-AM-APPROVALS-P04	New	Task	Deep Khanvilkar	[Test] Module test: Approvals · POS	table:platform.outbox
+new	28736	SVC-REPORTING-NATURALLANGUAGE-1	New	Task	Pranay Shinde	[BE] ReportingService: askReportingQuestion, saveNaturalLanguageQuery	table:platform.outbox
+new	28739	TEST-AM-SETUP-FINANCE-INSIGHTS-P08	New	Task	Pranay Shinde	[Test] Module test: Finance & Insights · Venue Management (setup)	table:platform.outbox
+new	28754	TEST-AM-FOOD-BEVERAGE-P04	New	Task	Pranay Shinde	[Test] Module test: Food & Beverage · POS	table:platform.outbox
+new	28759	TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST	New	Task	Narayan Gaonkar	[Test] Module test: Ticketing & Guest Commerce · Venue Management (setup, the rest of the 	table:platform.outbox
+new	28790	TEST-AM-MAINTENANCE-SAFETY-P08-BLOCK-A	New	Task	Deep Khanvilkar	[Test] Module test: Maintenance & Safety · Venue Management (Block A)	table:platform.outbox
+new	28797	AM-MARKETING-CRM-P01	New	Feature	Chitrangi Mestry	Marketing & CRM · Guest Web	operation:white-label#getTenantAppStatus
+new	28806	APP-WEB-WEB-025	New	Task	Chitrangi Mestry	[FE] WEB-025 Help Centre / FAQ	operation:white-label#getTenantAppStatus
+new	28892	TEST-AM-ADMISSION-ACCESS-P07-BLOCK-A	New	Task	Narayan Gaonkar	[Test] Module test: Admission & Access · Scanner (Block A)	table:platform.outbox
+new	29109	VM-TENANCY-DEVICES-2	New	Task	Pranay Shinde	[BE] TenancyService: revokeDeviceCredential, rollbackDeviceFirmware, setDeviceFirmwareStat	table:platform.outbox
+new	29126	TEST-AM-TENANCY-VENUES-P08	New	Task	Chinmay Patkar	[Test] Module test: Tenancy & Venues · Venue Management 1 of 3	table:platform.outbox
+new	29147	SVC-TENANCY-DEVICES-4	New	Task	Sanket Keluskar	[BE] TenancyService: enrolDevice, getDeviceTelemetry	table:platform.outbox
+new	29157	TEST-AM-TENANCY-VENUES-P08-2	New	Task	Sanket Keluskar	[Test] Module test: Tenancy & Venues · Venue Management 2 of 3	table:platform.outbox
+new	29202	MIG-PLATFORM-4	New	Task	Hrushikant Patkar	[DB] Forward migration V1236__platform.sql: platform for Tenancy & Venues · Venue Manageme	table:platform.dead_letter
+new	29212	SVC-PLATFORM-PLATFORM-OPS-2	New	Task	Pranay Shinde	[BE] PlatformService: cancelOutboxRepublish, getOutboxRepublish, listDeadLetters, listOutb	table:platform.dead_letter, table:platform.outbox
+new	29213	SVC-PLATFORM-PLATFORM-OPS-3	New	Task	Sanket Keluskar	[BE] PlatformService: replayDeadLetter, republishOutbox	table:platform.dead_letter, table:platform.outbox
+new	29226	TEST-AM-PLATFORM-OPERATIONS-P09	New	Task	Chinmay Patkar	[Test] Module test: Platform Operations · TICVAI Console	table:platform.dead_letter, table:platform.outbox
+new	29237	SVC-PLATFORM-SUBSCRIPTION-4	New	Task	Surendra Loke	[BE] PlatformService: actOnPartnerCommissionLine, actOnPartnerReconciliationException, act	table:control.tenant
+new	29243	SVC-PLATFORM-SUBSCRIPTION-5	New	Task	Surendra Loke	[BE] PlatformService: createPartnerAgreement, decommissionBurstEnvironment, drainBurstEnvi	table:platform.outbox
+new	29244	SVC-PLATFORM-SUBSCRIPTION-6	New	Task	Narayan Gaonkar	[BE] PlatformService: getPlanTiers, listBurstEnvironments, listPartnerUsers, reconcileBurs	table:platform.outbox
+new	29448	SVC-TENANCY-APPROVALS-8	New	Task	Pranay Shinde	[BE] TenancyService: createAutomationAutonomouAction, listCrossModuleOrchestration, listPr	table:platform.outbox
+new	29527	TEST-AM-APPROVALS-P08-2	New	Task	Pallavi Sawant	[Test] Module test: Approvals · Venue Management 2 of 5	table:platform.outbox
+new	29642	AM-WHITE-LABEL-P05	New	Feature	Chitrangi Mestry	White Label · Kiosk	operation:white-label#getTenantAppStatus
+new	29643	APP-KIOSK-KSK-002	New	Task	Chitrangi Mestry	[FE] KSK-002 Language Select	operation:white-label#getTenantAppStatus
+new	29644	APP-KIOSK-KSK-014	New	Task	Chitrangi Mestry	[FE] KSK-014 Out of service	operation:white-label#getTenantAppStatus
+new	29680	SVC-CATALOGUE-CATALOGUE-9	New	Task		[BE] CatalogueService: decideCatalogueAiFinding, requestPricingRollback, setConfigurationT	table:platform.outbox
+new	29701	SVC-CATALOGUE-CATALOGUE-11	New	Task	Hrushikant Patkar	[BE] CatalogueService: cancelPricingRollback, setCurrencyRoundingRule, setFeeDefinition, s	table:platform.outbox
+new	29702	SVC-CATALOGUE-DRAFTED-17	New	Task	Pranay Shinde	[BE] CatalogueService: approvePricingWorkflowAuthority, decidePricingChangeRequest, listBu	table:platform.outbox
+new	29703	SVC-CATALOGUE-DRAFTED-20	New	Task	Narayan Gaonkar	[BE] CatalogueService: publishPricingEffectiveDate, setFeeApplicabilityCharging, setPricin	table:platform.outbox
+new	29712	SVC-CATALOGUE-CATALOGUE-12	New	Task	Hrushikant Patkar	[BE] CatalogueService: setDemandSignalConfiguration, setDynamicPricingGuardrailPolicy, set	table:platform.outbox
+new	29719	SVC-CATALOGUE-DRAFTED-25	New	Task	Hrushikant Patkar	[BE] CatalogueService: createChannelProfile, createLiveDynamicPrice, decidePricingRecommen	table:platform.outbox
+new	29760	SVC-CATALOGUE-CATALOGUE-14	New	Task		[BE] CatalogueService: retryChannelIncident, setChannelConnectionConfiguration, setChannel	table:platform.outbox
+new	29797	SVC-CATALOGUE-CATALOGUE-16	New	Task		[BE] CatalogueService: freezeEntitlement, reinstateEntitlement, setMembershipBenefit	table:platform.outbox
+new	29813	TEST-AM-TICKETING-P08-2	New	Task	Pranay Shinde	[Test] Module test: Ticketing · Venue Management 2 of 8	table:platform.outbox
+new	29851	TEST-AM-TICKETING-P08-7	New	Task	Pranay Shinde	[Test] Module test: Ticketing · Venue Management 7 of 8	table:platform.outbox
+new	29852	SVC-CATALOGUE-ENTITLEMENT-3	New	Task	Deep Khanvilkar	[BE] CatalogueService: suspendEntitlement	table:platform.outbox
+new	29878	TEST-AM-TICKETING-P08-4	New	Task	Narayan Gaonkar	[Test] Module test: Ticketing · Venue Management 4 of 8	table:platform.outbox
+new	30658	SVC-IDENTITY-GUESTAUTH-3#registerGuest	New	Sub Task	Hrushikant Patkar	[BE] registerGuest: POST /auth/guest/register	table:platform.outbox
+new	30659	SVC-IDENTITY-GUESTAUTH-3#requestGuestOtp	New	Sub Task	Hrushikant Patkar	[BE] requestGuestOtp: POST /auth/guest/otp	table:platform.outbox
+new	30661	SVC-IDENTITY-GUESTAUTH-3#verifyGuestOtp	New	Sub Task	Hrushikant Patkar	[BE] verifyGuestOtp: POST /auth/guest/otp/verify	table:platform.outbox
+new	30666	SVC-IDENTITY-MFA-2#verifyMfaChallenge	New	Sub Task	Sanket Keluskar	[BE] verifyMfaChallenge: POST /auth/mfa/challenge/{challengeId}/verify	table:platform.outbox
+new	30668	SVC-IDENTITY-GUESTAUTH-2#guestPasswordLogin	New	Sub Task	Hrushikant Patkar	[BE] guestPasswordLogin: POST /auth/guest/password	table:platform.outbox
+new	30669	SVC-IDENTITY-GUESTAUTH-2#guestSocialLogin	New	Sub Task	Hrushikant Patkar	[BE] guestSocialLogin: POST /auth/guest/social	table:platform.outbox
+new	30670	SVC-IDENTITY-GUESTAUTH-2#guestUaePassLogin	New	Sub Task	Hrushikant Patkar	[BE] guestUaePassLogin: POST /auth/guest/uae-pass	table:platform.outbox
+new	30671	SVC-IDENTITY-GUESTAUTH-2#linkGuestCheckout	New	Sub Task	Hrushikant Patkar	[BE] linkGuestCheckout: POST /auth/guest/link-checkout	table:platform.outbox
+new	30674	SVC-IDENTITY-IDENTITY-2#login	New	Sub Task	Hrushikant Patkar	[BE] login: POST /auth/login	table:platform.outbox
+new	30685	SVC-ORDER-ORDER-2#exchangeOrderLines	New	Sub Task	Pranay Shinde	[BE] exchangeOrderLines: POST /orders/{orderId}/exchanges	table:platform.outbox
+new	30692	SVC-MARKETING-CONSENT-1#claimDeviceConsent	New	Sub Task	Pranay Shinde	[BE] claimDeviceConsent: POST /guests/{subjectId}/consents/claim-device	table:platform.outbox
+new	30729	SVC-IDENTITY-SSO-1#completeSsoAuthorization	New	Sub Task	Deep Khanvilkar	[BE] completeSsoAuthorization: POST /auth/sso/{providerId}/callback	table:platform.outbox
+new	30756	SVC-PLATFORM-TENANT-1#createTenant	New	Sub Task	Narayan Gaonkar	[BE] createTenant: POST /tenants	table:control.tenant
+new	30757	SVC-PLATFORM-TENANT-1#listTenants	New	Sub Task	Narayan Gaonkar	[BE] listTenants: GET /tenants	table:control.tenant
+new	30758	SVC-PLATFORM-TENANT-1#reactivateTenant	New	Sub Task	Narayan Gaonkar	[BE] reactivateTenant: POST /tenants/{tenantId}/reactivate	operation:subscription#reactivateTenant, table:control.tenant
+new	30759	SVC-PLATFORM-TENANT-1#suspendTenant	New	Sub Task	Narayan Gaonkar	[BE] suspendTenant: POST /tenants/{tenantId}/suspend	operation:subscription#suspendTenant, table:control.tenant, table:platform.outbox
+new	30764	SVC-WHITELABEL-OVERVIEW-2#recordStorefrontSessionEvents	New	Sub Task	Deep Khanvilkar	[BE] recordStorefrontSessionEvents: POST /storefront/session-events	table:platform.outbox
+new	30774	SVC-WHITELABEL-PUBLISHING-2#publishTenantConfig	New	Sub Task	Narayan Gaonkar	[BE] publishTenantConfig: POST /tenant-config/publish	table:platform.outbox
+new	30803	SVC-ORDER-SHIFT-1#acceptShiftVariance	New	Sub Task	Pranay Shinde	[BE] acceptShiftVariance: POST /shifts/{shiftId}/accept-variance	table:platform.outbox
+new	30806	SVC-ORDER-SHIFT-1#closeShift	New	Sub Task	Pranay Shinde	[BE] closeShift: POST /shifts/{shiftId}/close	table:platform.outbox
+new	30830	SVC-TENANCY-DEVICES-3#recordDeviceTamperEvent	New	Sub Task	Pranay Shinde	[BE] recordDeviceTamperEvent: POST /device-tamper-events	table:platform.outbox
+new	30831	SVC-TENANCY-WORKSTATION-3#recordDeviceHeartbeat	New	Sub Task	Deep Khanvilkar	[BE] recordDeviceHeartbeat: POST /devices/{deviceId}/heartbeat	table:platform.outbox
+new	30849	SVC-TENANCY-REQUEST-1#decideApprovalRequest	New	Sub Task	Pranay Shinde	[BE] decideApprovalRequest: POST /approval-requests/{requestId}/decide	table:platform.outbox
+new	30852	SVC-WALLET-CARD-1#loadGameCredits	New	Sub Task	Sanket Keluskar	[BE] loadGameCredits: POST /game-cards/{cardCode}/load	table:platform.outbox
+new	30860	SVC-WALLET-WALLET-2#topUpWallet	New	Sub Task	Pranay Shinde	[BE] topUpWallet: POST /wallets/{subjectId}/top-ups	table:platform.outbox
+new	30868	SVC-WALLET-RETAIL-1#settleWalletAtExit	New	Sub Task	Pranay Shinde	[BE] settleWalletAtExit: POST /wallets/{walletId}/exit-settlement	table:platform.outbox
+new	30890	VM-TENANCY-REQUEST-1#escalateApprovalRequest	New	Sub Task	Pranay Shinde	[BE] escalateApprovalRequest: POST /approval-requests/{requestId}/escalate	table:platform.outbox
+new	30897	SVC-TENANCY-APPROVALS-4#approveUnifiedDecision	New	Sub Task	Deep Khanvilkar	[BE] approveUnifiedDecision: PUT /unified-decision	table:platform.outbox
+new	30901	SVC-TENANCY-REQUEST-2#recordExternalApprovalDecision	New	Sub Task	Narayan Gaonkar	[BE] recordExternalApprovalDecision: POST /approval-requests/{requestId}/external-decision	table:platform.outbox
+new	30903	SVC-TENANCY-REQUEST-3#submitApprovalRequest	New	Sub Task	Deep Khanvilkar	[BE] submitApprovalRequest: POST /approval-requests/{requestId}/submit	table:platform.outbox
+new	30952	SVC-ACCESS-ACCESS-4#revokeFacePass	New	Sub Task	Hrushikant Patkar	[BE] revokeFacePass: DELETE /face-pass/enrolments/{enrolmentId}	table:platform.outbox
+new	30974	SVC-ORDER-ORDER-1#appendEntitlementToMedia	New	Sub Task	Pranay Shinde	[BE] appendEntitlementToMedia: POST /media/{mediaCode}/entitlements	table:platform.outbox
+new	30976	SVC-ORDER-ORDER-1#claimTicketTransfer	New	Sub Task	Pranay Shinde	[BE] claimTicketTransfer: POST /ticket-transfers/{transferId}/claim	table:platform.outbox
+new	30977	SVC-ORDER-ORDER-1#createOrder	New	Sub Task	Pranay Shinde	[BE] createOrder: POST /orders	table:platform.outbox
+new	30980	SVC-ORDER-ORDER-5#transferOrderTickets	New	Sub Task	Pranay Shinde	[BE] transferOrderTickets: POST /orders/{orderId}/transfer	table:platform.outbox
+new	30981	SVC-ORDER-ORDER-5#voidOrder	New	Sub Task	Pranay Shinde	[BE] voidOrder: POST /orders/{orderId}/voids	table:platform.outbox
+new	30984	SVC-ORDER-ORDERS-4#reissueEntitlement	New	Sub Task	Pranay Shinde	[BE] reissueEntitlement: POST /entitlements/{entitlementId}/reissue	table:platform.outbox
+new	30989	SVC-ORDER-ORDERS-3#payByLink	New	Sub Task	Deep Khanvilkar	[BE] payByLink: POST /payment-links/{token}/pay	table:platform.outbox
+new	30991	SVC-ORDER-ORDERS-5#shareEntitlement	New	Sub Task	Pranay Shinde	[BE] shareEntitlement: POST /entitlements/{entitlementId}/share	table:platform.outbox
+new	30992	SVC-ORDER-ORDERS-5#storePaymentToken	New	Sub Task	Pranay Shinde	[BE] storePaymentToken: POST /payment-tokens	table:platform.outbox
+new	30999	SVC-MARKETING-CONSENT-3#recordDeviceConsent	New	Sub Task	Pranay Shinde	[BE] recordDeviceConsent: POST /consent/device	table:platform.outbox
+new	31013	SVC-MARKETING-MARKETING-3#handoverToAgent	New	Sub Task	Pranay Shinde	[BE] handoverToAgent: POST /conversations/{conversationId}/handover	table:platform.outbox
+new	31053	SVC-WHITELABEL-OVERVIEW-1#getTenantAppStatus	New	Sub Task	Hrushikant Patkar	[BE] getTenantAppStatus: GET /tenant-config/status	operation:white-label#getTenantAppStatus
+new	31059	APP-WEB-WEB-028#build	New	Sub Task	Chinmay Patkar	[FE] WEB-028 Contact & Venue Information: build with all states	operation:white-label#getTenantAppStatus
+new	31060	APP-WEB-WEB-028#wire	New	Sub Task	Chinmay Patkar	[FE] WEB-028 Contact & Venue Information: connect to API	operation:white-label#getTenantAppStatus
+new	31061	APP-WEB-WEB-028#test	New	Sub Task	Chinmay Patkar	[FE] WEB-028 Contact & Venue Information: tests	operation:white-label#getTenantAppStatus
+new	31062	APP-WEB-WEB-029#build	New	Sub Task	Chitrangi Mestry	[FE] WEB-029 Error / Sold Out / Maintenance: build with all states	operation:white-label#getTenantAppStatus
+new	31063	APP-WEB-WEB-029#wire	New	Sub Task	Chitrangi Mestry	[FE] WEB-029 Error / Sold Out / Maintenance: connect to API	operation:white-label#getTenantAppStatus
+new	31064	APP-WEB-WEB-029#test	New	Sub Task	Chitrangi Mestry	[FE] WEB-029 Error / Sold Out / Maintenance: tests	operation:white-label#getTenantAppStatus
+new	31065	APP-WEB-WEB-045#build	New	Sub Task	Chinmay Patkar	[FE] WEB-045 Help Centre & Accessibility: build with all states	operation:white-label#getTenantAppStatus
+new	31066	APP-WEB-WEB-045#wire	New	Sub Task	Chinmay Patkar	[FE] WEB-045 Help Centre & Accessibility: connect to API	operation:white-label#getTenantAppStatus
+new	31067	APP-WEB-WEB-045#test	New	Sub Task	Chinmay Patkar	[FE] WEB-045 Help Centre & Accessibility: tests	operation:white-label#getTenantAppStatus
+new	31068	APP-MOB-GST-040#build	New	Sub Task	Chitrangi Mestry	[FE] GST-040 Help & Support: build with all states	operation:white-label#getTenantAppStatus
+new	31069	APP-MOB-GST-040#wire	New	Sub Task	Chitrangi Mestry	[FE] GST-040 Help & Support: connect to API	operation:white-label#getTenantAppStatus
+new	31070	APP-MOB-GST-040#test	New	Sub Task	Chitrangi Mestry	[FE] GST-040 Help & Support: tests	operation:white-label#getTenantAppStatus
+new	31074	APP-MOB-GST-047#build	New	Sub Task	Chitrangi Mestry	[FE] GST-047 Maintenance / Upgrade Page: build with all states	operation:white-label#getTenantAppStatus
+new	31075	APP-MOB-GST-047#wire	New	Sub Task	Chitrangi Mestry	[FE] GST-047 Maintenance / Upgrade Page: connect to API	operation:white-label#getTenantAppStatus
+new	31076	APP-MOB-GST-047#test	New	Sub Task	Chitrangi Mestry	[FE] GST-047 Maintenance / Upgrade Page: tests	operation:white-label#getTenantAppStatus
+new	31077	SVC-WHITELABEL-WHITE-LABEL-1#claimCustomDomain	New	Sub Task	Deep Khanvilkar	[BE] claimCustomDomain: POST /tenant-domains	table:control.tenant
+new	31107	APP-WL-CMS-001#build	New	Sub Task	Chinmay Patkar	[FE] CMS-001 Tenant Workspace: build with all states	operation:white-label#getTenantAppStatus
+new	31108	APP-WL-CMS-001#wire	New	Sub Task	Chinmay Patkar	[FE] CMS-001 Tenant Workspace: connect to API	operation:white-label#getTenantAppStatus
+new	31109	APP-WL-CMS-001#test	New	Sub Task	Chinmay Patkar	[FE] CMS-001 Tenant Workspace: tests	operation:white-label#getTenantAppStatus
+new	31113	APP-WL-CMS-014#build	New	Sub Task	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow: build with all states	operation:white-label#getTenantAppStatus
+new	31114	APP-WL-CMS-014#wire	New	Sub Task	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow: connect to API	operation:white-label#getTenantAppStatus
+new	31115	APP-WL-CMS-014#test	New	Sub Task	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow: tests	operation:white-label#getTenantAppStatus
+new	31119	APP-WL-CMS-102#build	New	Sub Task	Chitrangi Mestry	[FE] CMS-102 Site Builder: build with all states	operation:white-label#getTenantAppStatus
+new	31120	APP-WL-CMS-102#wire	New	Sub Task	Chitrangi Mestry	[FE] CMS-102 Site Builder: connect to API	operation:white-label#getTenantAppStatus
+new	31121	APP-WL-CMS-102#test	New	Sub Task	Chitrangi Mestry	[FE] CMS-102 Site Builder: tests	operation:white-label#getTenantAppStatus
+new	31129	SVC-ORDER-CART-1#checkoutCart	New	Sub Task	Pranay Shinde	[BE] checkoutCart: POST /carts/{cartId}/checkout	table:platform.outbox
+new	31238	VM-IDENTITY-ADMINISTRATION-1#resetPrincipalCredential	New	Sub Task	Hrushikant Patkar	[BE] resetPrincipalCredential: POST /principals/{principalId}/credential-reset	table:platform.outbox
+new	31262	SVC-PLATFORM-PLAN-1#createPlan	New	Sub Task	Deep Khanvilkar	[BE] createPlan: POST /plans	table:control.tenant
+new	31263	SVC-PLATFORM-PLAN-1#createPlanVersion	New	Sub Task	Deep Khanvilkar	[BE] createPlanVersion: POST /plans/{planId}	table:control.tenant
+new	31264	SVC-PLATFORM-TENANT-2#terminateTenant	New	Sub Task	Sanket Keluskar	[BE] terminateTenant: POST /tenants/{tenantId}/terminate	table:control.tenant
+new	31265	SVC-PLATFORM-TENANT-2#updateTenant	New	Sub Task	Sanket Keluskar	[BE] updateTenant: PATCH /tenants/{tenantId}	table:control.tenant
+new	31266	APP-SETUP-ADM-005#build	New	Sub Task	Surendra Loke	[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations): build with all states	operation:subscription#reactivateTenant, operation:subscription#suspendTenant
+new	31267	APP-SETUP-ADM-005#wire	New	Sub Task	Surendra Loke	[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations): connect to API	operation:subscription#reactivateTenant, operation:subscription#suspendTenant
+new	31268	APP-SETUP-ADM-005#test	New	Sub Task	Surendra Loke	[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations): tests	operation:subscription#reactivateTenant, operation:subscription#suspendTenant
+new	31313	SVC-TENANCY-TENANCY-4#setTenantDomainMapping	New	Sub Task	Surendra Loke	[BE] setTenantDomainMapping: PUT /tenant-domains/{hostname}	table:control.tenant, table:platform.outbox
+new	31355	SVC-PLATFORM-CELL-3#getCell	New	Sub Task	Pranay Shinde	[BE] getCell: GET /cells/{cellId}	table:control.cell_tenant
+new	31358	SVC-PLATFORM-PUBLICAPI-9#replayEvents	New	Sub Task	Sanket Keluskar	[BE] replayEvents: POST /webhook-subscriptions/{subscriptionId}/replay	table:platform.outbox
+new	31363	SVC-PLATFORM-CELL-6#provisionCell	New	Sub Task	Pranay Shinde	[BE] provisionCell: POST /tenants/{tenantId}/cells	table:control.cell_tenant
+new	31366	SVC-PLATFORM-CELL-4#listCells	New	Sub Task	Narayan Gaonkar	[BE] listCells: GET /cells	table:control.cell_tenant
+new	31367	SVC-PLATFORM-CELL-4#listTenantCells	New	Sub Task	Narayan Gaonkar	[BE] listTenantCells: GET /tenants/{tenantId}/cells	table:control.cell_tenant
+new	31371	SVC-PLATFORM-TENANT-3#getTenant	New	Sub Task	Pranay Shinde	[BE] getTenant: GET /tenants/{tenantId}	table:control.cell_tenant, table:control.tenant
+new	31410	SVC-CATALOGUE-EVENTS-1#setEventLifecycleState	New	Sub Task	Deep Khanvilkar	[BE] setEventLifecycleState: POST /events/{eventId}/lifecycle	table:platform.outbox
+new	31428	SVC-CATALOGUE-PROMOTION-2#publishPromotion	New	Sub Task	Deep Khanvilkar	[BE] publishPromotion: POST /promotions/{promotionId}/publish	table:platform.outbox
+new	31485	SVC-ORDER-ORDERS-1#createResaleListing	New	Sub Task	Pranay Shinde	[BE] createResaleListing: POST /resale-listings	table:platform.outbox
+new	31488	SVC-ORDER-PAYMENTS-1#createInstalmentPlan	New	Sub Task	Pranay Shinde	[BE] createInstalmentPlan: POST /instalment-plans	table:platform.outbox
+new	31633	VM-CATALOGUE-PRODUCT-1#transitionProductLifecycle	New	Sub Task	Narayan Gaonkar	[BE] transitionProductLifecycle: POST /products/{productId}/lifecycle	table:platform.outbox
+new	31671	SVC-CATALOGUE-PROMOTION-3#endPromotion	New	Sub Task	Narayan Gaonkar	[BE] endPromotion: POST /promotions/{promotionId}/end	table:platform.outbox
+new	31673	SVC-CATALOGUE-PROMOTION-3#pausePromotion	New	Sub Task	Narayan Gaonkar	[BE] pausePromotion: POST /promotions/{promotionId}/pause	table:platform.outbox
+new	31712	SVC-CATALOGUE-LEASE-1#convertInventoryHold	New	Sub Task	Deep Khanvilkar	[BE] convertInventoryHold: POST /inventory-holds/{inventoryHoldId}/convert	table:platform.outbox
+new	31719	SVC-ORDER-SYNC-1#syncOrders	New	Sub Task	Pranay Shinde	[BE] syncOrders: POST /sync/orders	table:platform.outbox
+new	31733	SVC-ORDER-PAYMENT-1#capturePayment	New	Sub Task	Pranay Shinde	[BE] capturePayment: POST /payments/{paymentId}/capture	table:platform.outbox
+new	31734	SVC-ORDER-PAYMENT-1#createPayment	New	Sub Task	Pranay Shinde	[BE] createPayment: POST /payments	table:platform.outbox
+new	31735	SVC-ORDER-PAYMENT-1#inquirePaymentStatus	New	Sub Task	Pranay Shinde	[BE] inquirePaymentStatus: POST /payments/{paymentId}/inquiry	table:platform.outbox
+new	31804	VM-CATALOGUE-EVENT-1#cancelPerformance	New	Sub Task	Sanket Keluskar	[BE] cancelPerformance: POST /performances/{performanceId}/cancel	table:platform.outbox
+new	31839	SVC-CATALOGUE-HOLD-1#createSeatHold	New	Sub Task	Narayan Gaonkar	[BE] createSeatHold: POST /seat-holds	table:platform.outbox
+new	31842	SVC-CATALOGUE-HOLD-1#relinquishSeatHold	New	Sub Task	Narayan Gaonkar	[BE] relinquishSeatHold: DELETE /seat-holds/{holdId}	table:platform.outbox
+new	31855	APP-WEB-WEB-050#build	New	Sub Task	Chinmay Patkar	[FE] WEB-050 Plan Your Visit: build with all states	operation:white-label#getTenantAppStatus
+new	31856	APP-WEB-WEB-050#wire	New	Sub Task	Chinmay Patkar	[FE] WEB-050 Plan Your Visit: connect to API	operation:white-label#getTenantAppStatus
+new	31857	APP-WEB-WEB-050#test	New	Sub Task	Chinmay Patkar	[FE] WEB-050 Plan Your Visit: tests	operation:white-label#getTenantAppStatus
+new	31924	SVC-ORDER-REFUND-1#createRefund	New	Sub Task	Pranay Shinde	[BE] createRefund: POST /orders/{orderId}/refunds	table:platform.outbox
+new	31958	SVC-FNB-GUESTORDERING-1#createGuestFnbOrder	New	Sub Task	Narayan Gaonkar	[BE] createGuestFnbOrder: POST /guest-orders	table:platform.outbox
+new	31970	SVC-FNB-KITCHEN-1#setKitchenTicketStatus	New	Sub Task	Deep Khanvilkar	[BE] setKitchenTicketStatus: PUT /kitchen/tickets/{ticketId}/status	table:platform.outbox
+new	31972	SVC-FNB-ORDER-1#createFnbOrder	New	Sub Task	Narayan Gaonkar	[BE] createFnbOrder: POST /fnb-orders	table:platform.outbox
+new	31975	SVC-FNB-SERVICE-1#acceptFnbOrder	New	Sub Task	Narayan Gaonkar	[BE] acceptFnbOrder: POST /fnb-orders/{orderId}/accept	table:platform.outbox
+new	31988	SVC-LEDGER-TAX-1#issueCreditMemo	New	Sub Task	Narayan Gaonkar	[BE] issueCreditMemo: POST /tax-invoices/{invoiceId}/credit-memos	table:platform.outbox
+new	31989	SVC-LEDGER-TAX-2#issueTaxInvoice	New	Sub Task	Narayan Gaonkar	[BE] issueTaxInvoice: POST /tax-invoices	table:platform.outbox
+new	32066	VM-ORDER-ORDERS-2#recordChargeback	New	Sub Task	Pranay Shinde	[BE] recordChargeback: POST /chargebacks/intake	table:platform.outbox
+new	32067	VM-ORDER-ORDERS-2#recordChargebackOutcome	New	Sub Task	Pranay Shinde	[BE] recordChargebackOutcome: POST /chargebacks/{chargebackId}/outcome	table:platform.outbox
+new	32078	SVC-ORDER-ORDERS-14#revokeEntitlementShare	New	Sub Task	Surendra Loke	[BE] revokeEntitlementShare: POST /entitlements/{entitlementId}/share/{shareId}/revoke	table:platform.outbox
+new	32093	SVC-ORDER-ORDERS-12#issueInvitation	New	Sub Task	Pranay Shinde	[BE] issueInvitation: POST /invitations	table:platform.outbox
+new	32142	SVC-WALLET-WALLET-8#captureWalletHold	New	Sub Task	Pranay Shinde	[BE] captureWalletHold: POST /wallet-holds/{walletHoldId}/capture	table:platform.outbox
+new	32143	SVC-WALLET-WALLET-8#holdWalletFunds	New	Sub Task	Pranay Shinde	[BE] holdWalletFunds: POST /wallets/{walletId}/holds	table:platform.outbox
+new	32145	SVC-WALLET-WALLET-8#releaseWalletHold	New	Sub Task	Pranay Shinde	[BE] releaseWalletHold: POST /wallet-holds/{walletHoldId}/release	table:platform.outbox
+new	32159	SVC-ACCESS-ACCESS-2#enrolFaceTag	New	Sub Task	Narayan Gaonkar	[BE] enrolFaceTag: POST /face-tag/enrolments	table:platform.outbox
+new	32167	SVC-ACCESS-ACCESS-1#enrolFacePass	New	Sub Task	Narayan Gaonkar	[BE] enrolFacePass: POST /face-pass/enrolments	table:platform.outbox
+new	32172	APP-WEB-WEB-001#build	New	Sub Task	Chinmay Patkar	[FE] WEB-001 Home / Landing: build with all states	operation:white-label#getTenantAppStatus
+new	32173	APP-WEB-WEB-001#wire	New	Sub Task	Chinmay Patkar	[FE] WEB-001 Home / Landing: connect to API	operation:white-label#getTenantAppStatus
+new	32174	APP-WEB-WEB-001#test	New	Sub Task	Chinmay Patkar	[FE] WEB-001 Home / Landing: tests	operation:white-label#getTenantAppStatus
+new	32175	APP-MOB-GST-001#build	New	Sub Task	Chitrangi Mestry	[FE] GST-001 Home: build with all states	operation:white-label#getTenantAppStatus
+new	32176	APP-MOB-GST-001#wire	New	Sub Task	Chitrangi Mestry	[FE] GST-001 Home: connect to API	operation:white-label#getTenantAppStatus
+new	32177	APP-MOB-GST-001#test	New	Sub Task	Chitrangi Mestry	[FE] GST-001 Home: tests	operation:white-label#getTenantAppStatus
+new	32259	VM-ACCESS-SYNC-1#syncScans	New	Sub Task	Deep Khanvilkar	[BE] syncScans: POST /access/scans	table:platform.outbox
+new	32262	VM-ACCESS-VALIDATION-1#validateAccess	New	Sub Task	Narayan Gaonkar	[BE] validateAccess: POST /access/validate	table:platform.outbox
+new	32282	SVC-ACCESS-VALIDATION-2#issueOrderEntitlements	New	Sub Task	Deep Khanvilkar	[BE] issueOrderEntitlements: POST /internal/orders/{orderId}/entitlements	table:platform.outbox
+new	32331	SVC-LEDGER-LEDGER-3#postOrderRevenue	New	Sub Task	Surendra Loke	[BE] postOrderRevenue: POST /internal/order-postings	table:platform.outbox
+new	32335	VM-LEDGER-FISCAL-1#closeFiscalPeriod	New	Sub Task	Sanket Keluskar	[BE] closeFiscalPeriod: POST /fiscal-periods/{periodId}/close	table:platform.outbox
+new	32529	SVC-LEDGER-TAX-3#transmitEInvoices	New	Sub Task	Sanket Keluskar	[BE] transmitEInvoices: POST /e-invoicing/transmissions	table:platform.outbox
+new	32638	APP-MOB-GST-029#build	New	Sub Task	Chinmay Patkar	[FE] GST-029 Venue Info & Services: build with all states	operation:white-label#getTenantAppStatus
+new	32639	APP-MOB-GST-029#wire	New	Sub Task	Chinmay Patkar	[FE] GST-029 Venue Info & Services: connect to API	operation:white-label#getTenantAppStatus
+new	32640	APP-MOB-GST-029#test	New	Sub Task	Chinmay Patkar	[FE] GST-029 Venue Info & Services: tests	operation:white-label#getTenantAppStatus
+new	32649	SVC-ORDER-SHIFT-5#submitShiftCount	New	Sub Task	Pranay Shinde	[BE] submitShiftCount: POST /shifts/{shiftId}/count	table:platform.outbox
+new	32817	SVC-ORDER-SHIFT-7#approveShiftClose	New	Sub Task	Narayan Gaonkar	[BE] approveShiftClose: POST /shifts/{shiftId}/approve-close	table:platform.outbox
+new	32939	VM-VENUEOPS-WORKORDER-1#completeWorkOrder	New	Sub Task	Narayan Gaonkar	[BE] completeWorkOrder: POST /work-orders/{workOrderId}/complete	table:platform.outbox
+new	32974	VM-VENUEOPS-WORKORDER-3#verifyWorkOrder	New	Sub Task	Deep Khanvilkar	[BE] verifyWorkOrder: POST /work-orders/{workOrderId}/verify	table:platform.outbox
+new	33002	APP-MOB-GST-038#build	New	Sub Task	Pradnya Yeram	[FE] GST-038 At the Venue: build with all states	operation:white-label#getTenantAppStatus
+new	33003	APP-MOB-GST-038#wire	New	Sub Task	Pradnya Yeram	[FE] GST-038 At the Venue: connect to API	operation:white-label#getTenantAppStatus
+new	33004	APP-MOB-GST-038#test	New	Sub Task	Pradnya Yeram	[FE] GST-038 At the Venue: tests	operation:white-label#getTenantAppStatus
+new	33038	APP-MOB-GST-051#build	New	Sub Task	Chitrangi Mestry	[FE] GST-051 Plan: build with all states	operation:white-label#getTenantAppStatus
+new	33039	APP-MOB-GST-051#wire	New	Sub Task	Chitrangi Mestry	[FE] GST-051 Plan: connect to API	operation:white-label#getTenantAppStatus
+new	33040	APP-MOB-GST-051#test	New	Sub Task	Chitrangi Mestry	[FE] GST-051 Plan: tests	operation:white-label#getTenantAppStatus
+new	33063	SVC-INVENTORY-RECEIPT-1#createGoodsReceipt	New	Sub Task	Pranay Shinde	[BE] createGoodsReceipt: POST /goods-receipts	table:platform.outbox
+new	33096	SVC-REPORTING-NATURALLANGUAGE-1#askReportingQuestion	New	Sub Task	Pranay Shinde	[BE] askReportingQuestion: POST /reports/ask	table:platform.outbox
+new	33097	SVC-REPORTING-NATURALLANGUAGE-1#saveNaturalLanguageQuery	New	Sub Task	Pranay Shinde	[BE] saveNaturalLanguageQuery: POST /reports/ask/{conversationId}/save	table:platform.outbox
+new	33259	APP-WEB-WEB-025#build	New	Sub Task	Chitrangi Mestry	[FE] WEB-025 Help Centre / FAQ: build with all states	operation:white-label#getTenantAppStatus
+new	33260	APP-WEB-WEB-025#wire	New	Sub Task	Chitrangi Mestry	[FE] WEB-025 Help Centre / FAQ: connect to API	operation:white-label#getTenantAppStatus
+new	33261	APP-WEB-WEB-025#test	New	Sub Task	Chitrangi Mestry	[FE] WEB-025 Help Centre / FAQ: tests	operation:white-label#getTenantAppStatus
+new	33883	VM-TENANCY-DEVICES-2#rollbackDeviceFirmware	New	Sub Task	Pranay Shinde	[BE] rollbackDeviceFirmware: POST /device-firmware/rollouts/{rolloutId}/rollback	table:platform.outbox
+new	33884	VM-TENANCY-DEVICES-2#setDeviceFirmwareStatus	New	Sub Task	Pranay Shinde	[BE] setDeviceFirmwareStatus: POST /device-firmware/{firmwareId}/status	table:platform.outbox
+new	33989	SVC-TENANCY-DEVICES-4#enrolDevice	New	Sub Task	Sanket Keluskar	[BE] enrolDevice: POST /devices/{deviceId}/enrolment	table:platform.outbox
+new	34084	MIG-PLATFORM-4#platform.dead_letter	New	Sub Task	Hrushikant Patkar	[DB] platform.dead_letter	table:platform.dead_letter
+new	34114	SVC-PLATFORM-PLATFORM-OPS-2#listDeadLetters	New	Sub Task	Pranay Shinde	[BE] listDeadLetters: GET /dead-letters	table:platform.dead_letter, table:platform.outbox
+new	34116	SVC-PLATFORM-PLATFORM-OPS-3#replayDeadLetter	New	Sub Task	Sanket Keluskar	[BE] replayDeadLetter: POST /dead-letters/{deadLetterId}/replay	table:platform.dead_letter
+new	34117	SVC-PLATFORM-PLATFORM-OPS-3#republishOutbox	New	Sub Task	Sanket Keluskar	[BE] republishOutbox: POST /outbox-republishes	table:platform.outbox
+new	34182	SVC-PLATFORM-SUBSCRIPTION-4#cancelSubscription	New	Sub Task	Surendra Loke	[BE] cancelSubscription: POST /subscriptions/{subscriptionId}/cancel	table:control.tenant
+new	34200	SVC-PLATFORM-SUBSCRIPTION-5#decommissionBurstEnvironment	New	Sub Task	Surendra Loke	[BE] decommissionBurstEnvironment: POST /burst-environments/{burstEnvironmentId}/decommiss	table:platform.outbox
+new	34206	SVC-PLATFORM-SUBSCRIPTION-6#reconcileBurstEnvironment	New	Sub Task	Narayan Gaonkar	[BE] reconcileBurstEnvironment: POST /burst-environments/{burstEnvironmentId}/reconcile	table:platform.outbox
+new	34696	SVC-TENANCY-APPROVALS-8#listCrossModuleOrchestration	New	Sub Task	Pranay Shinde	[BE] listCrossModuleOrchestration: GET /cross-module-orchestration	table:platform.outbox
+new	35048	APP-KIOSK-KSK-002#build	New	Sub Task	Chitrangi Mestry	[FE] KSK-002 Language Select: build with all states	operation:white-label#getTenantAppStatus
+new	35049	APP-KIOSK-KSK-002#wire	New	Sub Task	Chitrangi Mestry	[FE] KSK-002 Language Select: connect to API	operation:white-label#getTenantAppStatus
+new	35050	APP-KIOSK-KSK-002#test	New	Sub Task	Chitrangi Mestry	[FE] KSK-002 Language Select: tests	operation:white-label#getTenantAppStatus
+new	35051	APP-KIOSK-KSK-014#build	New	Sub Task	Chitrangi Mestry	[FE] KSK-014 Out of service: build with all states	operation:white-label#getTenantAppStatus
+new	35052	APP-KIOSK-KSK-014#wire	New	Sub Task	Chitrangi Mestry	[FE] KSK-014 Out of service: connect to API	operation:white-label#getTenantAppStatus
+new	35053	APP-KIOSK-KSK-014#test	New	Sub Task	Chitrangi Mestry	[FE] KSK-014 Out of service: tests	operation:white-label#getTenantAppStatus
+new	35136	SVC-CATALOGUE-CATALOGUE-9#requestPricingRollback	New	Sub Task		[BE] requestPricingRollback: POST /pricing-rollback-emergency	table:platform.outbox
+new	35156	SVC-CATALOGUE-CATALOGUE-11#cancelPricingRollback	New	Sub Task	Hrushikant Patkar	[BE] cancelPricingRollback: POST /pricing-rollback-emergency/{actionId}/cancel	table:platform.outbox
+new	35161	SVC-CATALOGUE-DRAFTED-17#decidePricingChangeRequest	New	Sub Task	Pranay Shinde	[BE] decidePricingChangeRequest: POST /pricing-change-request/{changeId}/decision	table:platform.outbox
+new	35164	SVC-CATALOGUE-DRAFTED-20#publishPricingEffectiveDate	New	Sub Task	Narayan Gaonkar	[BE] publishPricingEffectiveDate: PUT /pricing-effective-date	table:platform.outbox
+new	35167	SVC-CATALOGUE-DRAFTED-20#submitPricingChangeRequest	New	Sub Task	Narayan Gaonkar	[BE] submitPricingChangeRequest: POST /pricing-change-request/{changeId}/submit	table:platform.outbox
+new	35172	SVC-CATALOGUE-CATALOGUE-12#setDynamicPricingGuardrailPolicy	New	Sub Task	Hrushikant Patkar	[BE] setDynamicPricingGuardrailPolicy: PUT /dynamic-pricing-controls	table:platform.outbox
+new	35182	SVC-CATALOGUE-DRAFTED-25#createLiveDynamicPrice	New	Sub Task	Hrushikant Patkar	[BE] createLiveDynamicPrice: POST /live-dynamic-price	table:platform.outbox
+new	35183	SVC-CATALOGUE-DRAFTED-25#decidePricingRecommendation	New	Sub Task	Hrushikant Patkar	[BE] decidePricingRecommendation: POST /recommendation-review-decision/{recommendationId}/	table:platform.outbox
+new	35231	SVC-CATALOGUE-CATALOGUE-14#retryChannelIncident	New	Sub Task		[BE] retryChannelIncident: POST /channel-incidents/{incidentId}/retry	table:platform.outbox
+new	35279	SVC-CATALOGUE-CATALOGUE-16#freezeEntitlement	New	Sub Task		[BE] freezeEntitlement: POST /entitlements/{entitlementId}/freeze	table:platform.outbox
+new	35280	SVC-CATALOGUE-CATALOGUE-16#reinstateEntitlement	New	Sub Task		[BE] reinstateEntitlement: POST /entitlements/{entitlementId}/reinstate	table:platform.outbox
+new	35338	SVC-CATALOGUE-ENTITLEMENT-3#suspendEntitlement	New	Sub Task	Deep Khanvilkar	[BE] suspendEntitlement: POST /entitlements/{entitlementId}/suspend	table:platform.outbox
+new	35606	SVC-ORDER-SHIFT-3#giveShiftVarianceReason	New	Sub Task	Pranay Shinde	[BE] giveShiftVarianceReason: POST /shifts/{shiftId}/variance-reason	table:platform.outbox
+new	35698	SVC-TENANCY-TENANCY-7	New	Task	Deep Khanvilkar	[BE] TenancyService: requeueDeadLetter	table:platform.dead_letter, table:platform.outbox
+new	35719	TEST-AM-WALLET-CASHLESS-API-BLOCK-A	New	Task	Chinmay Patkar	[Test] Module test: Wallet & Cashless · API only (Block A)	table:platform.outbox
+new	35806	SVC-TENANCY-TENANCY-7#requeueDeadLetter	New	Sub Task	Deep Khanvilkar	[BE] requeueDeadLetter: POST /internal/dead-letters/{deadLetterId}/replays	table:platform.dead_letter, table:platform.outbox

@@ -64,7 +64,80 @@ RULES = {
     "B-NOT-BUILT": "a ticket builds a screen or operation the spec says is not built: merged, listed, stub, deprecated (CHG-FXP-002, -003)",
     "B-DEFINE-WAIT": "a build of a screen that needs a person starts before its definition or does not say it waits (CHG-FXP-004)",
     "B-BARE-TASK": "a hand-written task links nothing a pull carries: no operation, table, screen or service (CHG-FXP-005)",
+    "B-KERNEL-STORAGE": "a kernel ticket's mechanism needs a table, column, field, grant or file the package does not "
+                        "have (CR-152, CR-163, CR-164, CR-166; CHG-CRA-005)",
 }
+# **The kernel tickets name a mechanism; the package must hold what it needs** (class 15 of the 18 October triage,
+# CHG-CRA-005). Hrushikant Patkar found each gap building the kernel: no outbox in the control database for
+# tenant.suspended (CR-152), no root scope path in control for the migrator (CR-163), no app-module map and no field
+# telling the apps which modules are dark (CR-164), no per-aggregate sequence that survives a partition leaving and
+# no occurred_at on the outbox (CR-166). Each need is stated once here, by the ticket that needs it; a need the
+# package loses fails. `table` and `column` are found in the schema reference or in a contract schema persisted to
+# the table, so the rule holds between a contract change and the release derive.
+KERNEL_NEEDS = {
+    "PLATFORM-OUTBOX": [
+        ("column", "platform.outbox.occurred_at", "the envelope's occurredAt (CR-166)"),
+        ("table", "platform.outbox_sequence", "the per-aggregate counter that survives partitions leaving (CR-166)"),
+        ("index", "platform-ops.OutboxEntry:aggregateId,sequence", "the per-aggregate index (CR-166)"),
+        ("grant", "platform.outbox_sequence", "every host allocates a sequence in its writing transaction (CR-166)"),
+        ("table", "control.outbox", "the control database's outbox, for tenant.suspended (CR-152)"),
+    ],
+    "PLATFORM-KERNEL": [
+        ("column", "control.cell_tenant.root_scope_path", "the tenant database's root scope path (CR-163)"),
+    ],
+    "PLATFORM-FLAGS": [
+        ("field", "white-label.TenantAppStatus.darkAppModules", "the apps learn which modules are dark (CR-164)"),
+        ("file", "handoff/release-flags.json", "the app-module to screens and operations map (CR-164)"),
+    ],
+}
+
+
+def kernel_storage(guard, tables: set) -> None:
+    """B-KERNEL-STORAGE: every need in KERNEL_NEEDS is in the package."""
+    import yaml
+    ref = g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}
+    cols = {t: {c.get("column") for c in cs} for t, cs in (ref.get("cols") or {}).items()}
+    by, _ = g.schemas()
+    persisted: dict = {}
+    for (stem, name), s in by.items():
+        tag = str((s or {}).get("x-ticvai-persistence") or "").strip().strip('"')
+        for t in re.findall(r"\b([a-z_]+\.[a-z_0-9]+)\b", tag) if tag and not tag.lower().startswith("none") else []:
+            persisted.setdefault(t, []).append((stem, name, s))
+
+    def props(s):
+        out = dict((s or {}).get("properties") or {})
+        for b in (s or {}).get("allOf") or []:
+            if isinstance(b, dict):
+                out.update(b.get("properties") or {})
+        return out
+
+    kernel = ((yaml.safe_load((g.ROOT / "docs" / "active" / "cross-deployable-writes.yaml").read_text(encoding="utf-8"))
+               or {}).get("kernel") or [])
+    granted = {str(k.get("table")) for k in kernel if isinstance(k, dict)}
+    for key, needs in sorted(KERNEL_NEEDS.items()):
+        for kind, what, why in needs:
+            ok = True
+            if kind == "table":
+                ok = what in tables or what in persisted
+            elif kind == "column":
+                t, c = what.rsplit(".", 1)
+                ok = c in cols.get(t, set()) or any(g.snake(p) == c or (ps or {}).get("x-ticvai-column") == c
+                                                    for _st, _n, s in persisted.get(t, []) for p, ps in props(s).items())
+            elif kind == "index":
+                sch, want = what.split(":")
+                stem, name = sch.split(".")
+                marks = (by.get((stem, name)) or {}).get("x-ticvai-index") or []
+                ok = want.split(",") in [list(m) for m in marks if isinstance(m, list)]
+            elif kind == "grant":
+                ok = what in granted
+            elif kind == "field":
+                stem, name, field = what.split(".")
+                ok = field in props(by.get((stem, name)) or {})
+            elif kind == "file":
+                ok = (g.ROOT / what).exists()
+            if not ok:
+                guard.add("B-KERNEL-STORAGE", f"{key}:{kind}:{what}",
+                          f"{key} needs {kind} {what}: {why}, and the package does not have it")
 
 
 def main() -> int:
@@ -237,6 +310,7 @@ def main() -> int:
                                         "builds in block-a-extra-tasks.json `builds`")
     guard.note(f"{n} build ids on {sum(1 for b in builds.values() if b)} tickets, {n_tests} module tests, "
                f"{n_setup} setup and rest tickets checked")
+    kernel_storage(guard, tables)
     return guard.finish()
 
 

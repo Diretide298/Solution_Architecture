@@ -23,15 +23,26 @@ transitions:
   operation: suspendTenant
   trigger: operation
   guard: Commercial or compliance. **Access validation continues under every mode** — a dispute must
-    not strand guests at a gate
+    not strand guests at a gate. **Approved before the call** (a granted `approvalRequestId`, else 409
+    `approval-required`; ADAM CR-152, CHG-CRA-005). Only with no `effectiveAt`, or one not in the future; a
+    future one is pending and the timer below applies it
   requiresApproval: true
+  emits:
+  - tenant.suspended
+- from: active
+  to: suspended
+  trigger: timer
+  guard: '**A pending suspension falls due** (ADAM CR-152, 18 October 2026; CHG-CRA-005): a workers job moves
+    the tenant at `control.tenant.suspension_effective_at` and writes `tenant.suspended` to `control.outbox`
+    in the same transaction. `reactivateTenant` before then cancels it'
   emits:
   - tenant.suspended
 - from: suspended
   to: active
   operation: reactivateTenant
   trigger: operation
-  guard: Resolved
+  guard: Resolved. **Approved before the call** (a granted `approvalRequestId`, else 409 `approval-required`;
+    ADAM CR-152, CHG-CRA-005)
   isReversal: true
   requiresApproval: true
 - from: active

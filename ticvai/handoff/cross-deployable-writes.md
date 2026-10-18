@@ -27,6 +27,7 @@
 | `platform.scope` | SELECT | Every host resolves the caller's scope and its row-level security reads it (ADR-0005). Read only: a write to platform.scope from another deployable is not exempt. |
 | `platform.audit_record` | INSERT | Every operation that audits itself appends its audit row in its own transaction (CHG-R6-002). |
 | `platform.idempotency_record` | SELECT, INSERT, UPDATE | Every host claims, completes and replays an Idempotency-Key in the transaction of the write it guards. |
+| `platform.outbox_sequence` | SELECT, INSERT, UPDATE | Every host allocates the next sequence of the aggregate it changes, in the transaction that writes the outbox row (INSERT ... ON CONFLICT DO UPDATE ... RETURNING), so a sequence survives the outbox's monthly partitions leaving (ADAM CR-166, 18 October 2026; CHG-CRA-005; ADR-0057 and ADR-0058 as amended). DB-ROLES grants it to commerce, access, operations and workers. |
 
 Every other table in another deployable's schema is reached by one of the routes below.
 

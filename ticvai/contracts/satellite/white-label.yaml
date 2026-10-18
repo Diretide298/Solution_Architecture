@@ -1484,7 +1484,7 @@ paths:
 
         **Two views of one schema.** Called without a staff session, the response carries only `tenantId`,
         `isPublished`, `publishedVersion`, `publishedAt`, `isInMaintenance`, `maintenanceMessage`,
-        `expectedBackAt`, `minimumAppVersion`, `contact`, `availability`, `availabilityMessage`, `venues` and `whatsNew`. The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module
+        `expectedBackAt`, `minimumAppVersion`, `contact`, `availability`, `availabilityMessage`, `venues`, `whatsNew` and `darkAppModules` (ADAM CR-164). The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module
         and page counts, `recentChanges`) are returned only to a staff session holding `TENANT_CONFIGURE`
         — a public, cacheable response must not carry who changed what.
 
@@ -8810,6 +8810,18 @@ components:
           type: boolean
           x-ticvai-derived: onRead
           description: True once any version has been published.
+        darkAppModules:
+          type: array
+          readOnly: true
+          x-ticvai-derived: onRead
+          description: '**The app-modules switched off for this tenant** (ADAM CR-164, option A, 18 October 2026;
+            CHG-CRA-005): their keys (for example `AM-MARKETING-CRM-P01`), from the tenant''s release flags. Returned
+            to guests and staff alike; the apps leave those modules'' screens out of navigation (the map is
+            `handoff/release-flags.json`). An operation is dark for the tenant only when every app-module that binds
+            it is off, so an operation shared with a live module stays callable. A flag the configuration does not
+            declare counts as on. Additive: nothing new shows on screen.'
+          items:
+            type: string
         publishedVersion:
           type: string
           nullable: true

@@ -1364,6 +1364,18 @@ paths:
         **Access validation continues under every suspension mode.** A commercial dispute must not strand
         guests at a gate holding valid tickets.
 
+        **Approval comes before the call** (ADAM CR-152, 18 October 2026; CHG-CRA-005), as the partner operations
+        do: the request names a granted `approvalRequestId` (kind `configurationChange`, its subject this tenant), and
+        without one the call is refused `409 approval-required` and nothing changes.
+
+        **Now or later.** With no `effectiveAt`, or one not in the future, the tenant moves `active` to `suspended`
+        in this transaction and `tenant.suspended` is written to the control database''s outbox (`control.outbox`)
+        in the same transaction, with `tenantId` the suspended tenant and its scope path the tenant''s root
+        (`control.cell_tenant.root_scope_path`). With a future `effectiveAt` the suspension is **pending**: it is
+        recorded (`control.tenant.suspension_effective_at`, the mode and the notice), the tenant stays `active`, and
+        a job on the workers host moves it to `suspended` at that time and writes `tenant.suspended` then (the
+        timer transition of states/tenant.yaml). `reactivateTenant` cancels a pending suspension.
+
         '
       tags:
       - tenant
@@ -1392,8 +1404,15 @@ paths:
                 effectiveAt:
                   type: string
                   format: date-time
+                  description: 'When the suspension applies. Absent or not in the future: now. In the future: a
+                    pending suspension the workers job applies then (CR-152).'
                 noticeMessage:
                   $ref: '#/components/schemas/LocalisedText'
+                approvalRequestId:
+                  type: string
+                  format: uuid
+                  description: '**The granted approval for this suspension** (ADAM CR-152; CHG-CRA-005). Without a
+                    granted one, `409 approval-required`.'
       responses:
         '200':
           headers:
@@ -1405,8 +1424,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tenant'
         '409':
-          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). Nothing changes.'
-          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active]
+          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`), or the request names no granted approval (`approval-required`; ADAM CR-152). Nothing changes.'
+          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active, approval-required]
           content:
             application/problem+json:
               schema:
@@ -1428,6 +1447,13 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Lift a suspension
+      description: '**Reactivates a suspended tenant, cancels a pending suspension, or cancels a termination within
+        its notice period** (ADAM CR-152, 18 October 2026; CHG-CRA-005). `suspended` moves to `active`;
+        `terminating` moves back to `active` while the notice period runs (states/tenant.yaml); an `active` tenant
+        with a pending suspension (`suspension_effective_at` in the future) has it cancelled and stays `active`.
+        An `active` tenant with nothing pending, or an `onboarding` one, is refused `409 tenant-not-suspended`; a
+        `terminated` one `409 tenant-terminated`. **Approval comes before the call**, as for `suspendTenant`: a
+        granted `approvalRequestId`, else `409 approval-required`.'
       tags:
       - tenant
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -1436,6 +1462,17 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approvalRequestId:
+                  type: string
+                  format: uuid
+                  description: The granted approval for this reactivation (ADAM CR-152; CHG-CRA-005).
       responses:
         '200':
           headers:
@@ -1447,8 +1484,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tenant'
         '409':
-          x-ticvai-problem-types: [tenant-terminated]
-          description: Tenant is terminated, not suspended. Termination is not reversible here
+          x-ticvai-problem-types: [tenant-terminated, tenant-not-suspended, approval-required]
+          description: 'Tenant is terminated, not suspended; termination is not reversible here (`tenant-terminated`).
+            Or it is `active` with no pending suspension, or `onboarding` (`tenant-not-suspended`), or the request
+            names no granted approval (`approval-required`; ADAM CR-152, CHG-CRA-005). Nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -17534,10 +17573,21 @@ components:
       - instanceId
       - databaseName
       - status
+      - rootScopePath
       properties:
         id:
           type: string
           format: uuid
+        rootScopePath:
+          type: string
+          readOnly: true
+          pattern: '^[a-z0-9_]+$'
+          description: '**The tenant database''s root scope path** (ADAM CR-163, option A, 18 October 2026;
+            CHG-CRA-005): the `path` of the `level` tenant node the cell creates in that database at provisioning
+            (`provision-tenant.sh`), written then and never changed. It sits here because the path belongs to one
+            database. The migrator and the fan-out read it with `databaseName`, and `tenant.suspended` carries it
+            as its scope path. **Never derived from `control.tenant.code`**, whose pattern allows hyphens a scope
+            label does not.'
         cellId:
           x-ticvai-references: control.cell
           type: string

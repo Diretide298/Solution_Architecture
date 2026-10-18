@@ -3307,6 +3307,8 @@ components:
       x-ticvai-append-only: createdAt
       type: object
       x-ticvai-persistence: platform.outbox
+      # One aggregate's events in order (ADAM CR-166, 18 October 2026; CHG-CRA-005): outbox_aggregate_id_sequence_idx.
+      x-ticvai-index: [[aggregateId, sequence]]
       description: '**Written in the same transaction as the state change** (ADR-0033). That is what makes
         it exactly-once — the row and the change commit together or neither does.
 
@@ -3327,6 +3329,7 @@ components:
       - aggregateId
       - sequence
       - payload
+      - occurredAt
       - createdAt
       properties:
         id:
@@ -3371,7 +3374,16 @@ components:
           type: integer
           description: '**Monotonic per aggregate** (SD-030: was *per scope*), allocated in the writing
             transaction. A consumer that missed one knows it missed one — ordering is the difference between
-            at-least-once and unusable — and ordering is only ever promised within one aggregate.'
+            at-least-once and unusable — and ordering is only ever promised within one aggregate. **Allocated from
+            `platform.outbox_sequence`** (ADAM CR-166, 18 October 2026; CHG-CRA-005): `INSERT ... ON CONFLICT
+            (aggregate_id) DO UPDATE SET last_sequence = last_sequence + 1 RETURNING last_sequence` in the writing
+            transaction, never `max(sequence) + 1`, which restarts when a monthly partition leaves (ADR-0058).'
+        occurredAt:
+          type: string
+          format: date-time
+          description: '**The envelope''s `occurredAt`** (ADAM CR-166; CHG-CRA-005): when the change happened, set in
+            the writing transaction. `createdAt` is when the row was written and partitions the table; a consumer
+            reads `occurredAt`.'
         traceId:
           type: string
           maxLength: 64
@@ -3388,6 +3400,108 @@ components:
           type: integer
           default: 0
           description: '**Five, exponential from one second, jittered.** Then `platform.dead_letter`.'
+        lastError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    OutboxSequence:
+      type: object
+      x-ticvai-persistence: platform.outbox_sequence
+      x-ticvai-primary-key: [aggregateId]
+      description: '**The last outbox sequence given to each aggregate** (ADAM CR-166, 18 October 2026; CHG-CRA-005).
+        One row per aggregate, updated with `INSERT ... ON CONFLICT (aggregate_id) DO UPDATE ... RETURNING` in the
+        transaction that writes the outbox row, so two writers of one aggregate queue on the row lock and a sequence
+        survives the monthly partitions of `platform.outbox` leaving (ADR-0058). **Every host role holds SELECT,
+        INSERT and UPDATE on it** (a kernel grant in docs/active/cross-deployable-writes.yaml, which DB-ROLES
+        creates), because access and operations allocate like commerce.'
+      required:
+      - aggregateId
+      - lastSequence
+      - scopePath
+      properties:
+        aggregateId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The aggregate (any table's row id; ADR-0056), as `OutboxEntry.aggregateId`.
+        lastSequence:
+          type: integer
+          format: int64
+          description: The last sequence given; the next writer gets this plus one.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The aggregate''s own scope path**, the one its outbox rows carry, set on the first insert
+            and never changed. Row-level security reads it like any scoped row, so every principal allowed to change
+            the aggregate can allocate its next sequence, from any host, and no other can (CHG-CRA-005).'
+    ControlOutboxEntry:
+      type: object
+      x-ticvai-persistence: control.outbox
+      description: '**The control database''s outbox** (ADAM CR-152, option 1a, 18 October 2026; CHG-CRA-005). The
+        tenant outbox''s columns without `scopePath` and with no row security (the control database has no scope
+        tree, ADR-0039), drained by the workers host''s relay like each tenant''s. A control-plane state change that
+        must reach anything outside its transaction writes its event here in the same transaction (ADR-0033):
+        `tenant.suspended` by `suspendTenant` or by the suspension job, with `tenantId` the suspended tenant and
+        the event''s scope path its root (`control.cell_tenant.root_scope_path`).'
+      required:
+      - id
+      - eventId
+      - eventName
+      - tenantId
+      - aggregateType
+      - aggregateId
+      - sequence
+      - payload
+      - occurredAt
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The envelope's event id (ADR-0058; UUIDv7, ADR-0056), the consumer inbox key.
+        eventName:
+          type: string
+          description: The `name` of an event in `events/`.
+        eventVersion:
+          type: integer
+          minimum: 1
+        tenantId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The tenant the change is about (`control.tenant`).
+        aggregateType:
+          type: string
+        aggregateId:
+          type: string
+          format: uuid
+        payload:
+          type: object
+          description: The event as it happened.
+        sequence:
+          type: integer
+          description: Monotonic per aggregate, allocated in the writing transaction.
+        traceId:
+          type: string
+          maxLength: 64
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null until the relay publishes it; unpublished rows in sequence order are the work.
+        attempts:
+          type: integer
+          default: 0
         lastError:
           type: string
           nullable: true

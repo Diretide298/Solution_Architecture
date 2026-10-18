@@ -6,7 +6,10 @@ version: 1
 publisher: subscription
 description: A tenant has been suspended, in one of three modes.
 aggregate: tenant
-emittedWhen: TenantStatus active to suspended
+emittedWhen: 'TenantStatus active to suspended: at suspendTenant for an immediate suspension, or by the workers
+  job at control.tenant.suspension_effective_at for a future one. Written to control.outbox in the same transaction
+  as the status change, with tenantId the suspended tenant and the scope path its root
+  (control.cell_tenant.root_scope_path); drained by the workers relay (ADAM CR-152, 18 October 2026; CHG-CRA-005)'
 emittedBy:
 - suspendTenant
 payload:
