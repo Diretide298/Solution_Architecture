@@ -283,3 +283,23 @@ def test_a_key_named_none_or_on_no_carrying_path_is_not_required():
     cat = _catalogue()
     cat["catalogue"][1]["paths"].pop("/channel-capacities/{channelCapacityId}/channel-allocations")
     assert ("ChannelAllocation", "channelCapacityId") not in ds.path_supplied_keys(cat)
+
+
+# ---- 6. two keys to one parent are a decision, not the alphabet (CR-148, CR-149) ---------------------------------
+
+def test_two_keys_to_one_parent_are_reported_undecided_and_kept_provisionally():
+    dd = _load("derive_ddl_t6", "derive-ddl.py")
+    cands = [("sale_id", "retail.sale", "id"), ("new_sale_id", "retail.sale", "id")]
+    pick, undecided = dd.pick_owner("retail.exchange", cands)
+    assert pick == ("new_sale_id", "retail.sale", "id")      # unchanged until decided: no policy moves
+    assert undecided == ["new_sale_id", "sale_id"]
+    one = dd.pick_owner("retail.sale_line", [("sale_id", "retail.sale", "id")])
+    assert one == (("sale_id", "retail.sale", "id"), [])
+    two_parents = dd.pick_owner("x.y", [("a_id", "x.a", "id"), ("b_id", "x.b", "id")])
+    assert two_parents == (None, [])
+
+
+def test_the_published_answers_decide_two_of_the_two_key_tables():
+    dd = _load("derive_ddl_t6b", "derive-ddl.py")
+    assert dd.ROW_OWNER["fnb.ingredient_substitute"] == "from_inventory_item_id"      # CR-148
+    assert dd.ROW_OWNER["ledger.inter_entity_obligation"] == "from_legal_entity_id"   # CR-149 (writes)

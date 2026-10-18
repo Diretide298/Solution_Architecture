@@ -330,6 +330,11 @@ ROW_OWNER = {
     "orders.cash_count_line": "shift_id",                     # the shift's count, as at r1; the box is what was counted
     "orders.deposit_box_opening_denomination": "deposit_box_id",   # the box's opening float, as at r1; the coin is what
     "seating.seat_block_item": "block_id",                    # the block's seats; the seat is what the block holds
+    # CHG-MGN-001 (18 October 2026): two NOT NULL keys to one parent went to the first in alphabetical order. These two
+    # the published answers decide; the others are listed for a decision (pick_owner, an "owner undecided" review row).
+    "fnb.ingredient_substitute": "from_inventory_item_id",    # ADAM CR-148: the row belongs to the ingredient replaced
+    "ledger.inter_entity_obligation": "from_legal_entity_id",  # ADAM CR-149: writes stay with the selling entity; the
+                                                              # consuming side's read path is the row-security lane's
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------
@@ -1243,6 +1248,25 @@ def apply_unenforced_keys(cols: dict) -> None:
                 c.update({"references": ref, "referenceHow": "convention", "enforced": "no"})
 
 
+def pick_owner(t: str, cands: list) -> tuple:
+    """The key a child's row-level security follows, among its NOT NULL keys to protected parents: `(pick, undecided)`.
+
+    `pick` is `(column, parent, key)`, or None when the keys reach different parents (a modelling decision; the table
+    stays unscoped). **Two keys to the same parent are a decision too** (CHG-MGN-001, ADAM CR-148, CR-149, 18 October
+    2026): `sorted(cands)[0]` took the first in alphabetical order, which was right for fnb.ingredient_substitute and
+    left ledger.inter_entity_obligation's consuming entity unable to read its obligations. The first is still taken, so
+    nothing moves until a person decides, but `undecided` names the columns, and derive-ddl lists the table for a
+    decision in ROW_OWNER ("owner undecided" in migration-review.md)."""
+    if not cands or len({o[1] for o in cands}) != 1:
+        return None, []
+    cols = sorted({o[0] for o in cands})
+    return sorted(cands)[0], (cols if len(cols) > 1 else [])
+
+
+# Tables pick_owner found with two keys to one parent and no ROW_OWNER entry: table -> (columns, parent, column taken).
+OWNER_UNDECIDED: dict = {}
+
+
 def partition_plan(marks: dict, inbound: dict) -> tuple:
     """Which append-only tables are range-partitioned by month (ADR-0056 section 2): `(partitioned, declined,
     refused)`. `partitioned`: table -> time column. `declined`: `(table, why)` for one the contract marks but that
@@ -1558,6 +1582,14 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         if was is not None and was.decode("utf-8").replace("\r\n", "\n") != files[name]:
             extra.append(("both", "file changed", name, "the generator would write it differently",
                           "not applied anywhere: bring the application rules it documents up to date by hand"))
+    # **Two keys to one parent wait for a decision** (CHG-MGN-001, ADAM CR-148, CR-149): listed, not resolved
+    # alphabetically. Nothing to migrate until the package decides; the policy then reaches a forward migration.
+    for t, (cols, par, took) in sorted(OWNER_UNDECIDED.items()):
+        extra.append(("tenant" if area(t.split(".")[0]) == "tenant" else CONTROL, "owner undecided", t,
+                      f"two NOT NULL keys to {par} ({', '.join(cols)}); its row-level security follows {took}, the "
+                      "first in alphabetical order, until the row's owner is decided",
+                      "nothing to migrate yet: the package decides which key owns the row (tools/derive-ddl.py "
+                      "ROW_OWNER) and the next release writes the policy"))
 
     written = []
     for p in plans:
@@ -2240,9 +2272,12 @@ def main() -> int:
             if t in ROW_OWNER:
                 own = [o for o in own if o[0] == ROW_OWNER[t]]
             cands = [o for o in own if o[1] in protected]
-            if cands and len({o[1] for o in cands}) == 1:
-                col, par, key = sorted(cands)[0]
+            pick, undecided = pick_owner(t, cands)
+            if pick:
+                col, par, key = pick
                 round_.append((t, col, par, key))
+                if undecided:
+                    OWNER_UNDECIDED[t] = (undecided, par, col)
         if not round_:
             break
         for t, col, par, key in round_:
@@ -2437,6 +2472,9 @@ def main() -> int:
           f"foreign key(s) onto {len(composite_parents)} parent(s)")
     for t, why in declined:
         print(f"     append-only but not partitioned: {t} -- {why}")
+    for t, (cols, par, took) in sorted(OWNER_UNDECIDED.items()):
+        print(f"  ! {t}: two keys to {par} ({', '.join(cols)}), owner not decided in ROW_OWNER; follows {took} "
+              "for now (listed in migration-review.md)")
     print(f"  row-level security: {len(scoped)} by scope_path · {len(venue_only)} carry venue_id · "
           f"{len(by_parent)} through their owner · {n_subject_rls[0]} by subject · "
           f"{n_tenant_rls[0]} tenant root only · {n_append_rls[0]} append-only audit · "
