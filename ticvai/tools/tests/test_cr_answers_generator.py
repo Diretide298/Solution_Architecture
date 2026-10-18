@@ -116,3 +116,15 @@ def test_pending_approval_approves_nothing(tmp_path, monkeypatch):
     entries, errors = cc.load_breaking()
     assert [e["id"] for e in entries] == ["BC-902"]
     assert any("BC-901" in e and "pending" in e for e in errors)
+
+
+# - provision-tenant.sh (fix round 1 I-4; ADAM CR-163; CHG-CRA-005): platform.scope forces row security, so the root
+#   node is inserted in a transaction that first grants the session its own root path; without it only a superuser
+#   could insert it and provisioning stops after createdb on a managed server.
+def test_provision_inserts_the_root_node_under_its_own_scope():
+    text = ddl.PROVISION
+    i_scope = text.index("INSERT INTO platform.scope")
+    block = text[text.rindex("BEGIN;", 0, i_scope):text.index("COMMIT;", i_scope)]
+    assert "SET LOCAL ticvai.scope_paths = '$ROOT_PATH';" in block
+    assert block.index("SET LOCAL ticvai.scope_paths") < block.index("INSERT INTO platform.scope")
+    assert "-v ON_ERROR_STOP=1" in text[text.rindex("psql", 0, i_scope):i_scope]
