@@ -15,7 +15,7 @@ decision:
     adam-links.py with the token before the gate.'
   by: Chinmay
   date: '2026-10-18'
-why: 'Post-r6 plan item 9 (audit/ticvai/POST-R6-PARALLEL-PLAN.md, lane D; the council of 14 October 2026,
+why: 'Post-r6 plan item 9 (the post-r6 parallel plan, lane D; the council of 14 October 2026,
   council/council-transcript-2026-10-14-1830.md: class checks fail only on new findings). A baselined finding never
   failed again, so a developer could start building on a known defect and nothing in the gate said so. Finding counts on
   r6 (86a3fa6f, adam-links.json read 15 October): 102 known findings in six guards are built on by 46 started tickets,

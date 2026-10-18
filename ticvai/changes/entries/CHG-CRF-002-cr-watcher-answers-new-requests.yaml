@@ -9,8 +9,8 @@ decision:
     open requests it has not seen, sorts each with no AI (the class from handoff/cr-classes.yaml and the baselined
     members of its checks, a duplicate on the same artefact, the open blocking requests it waits for, the class''s
     siblings and the tickets they touch from adam-links.json), drafts one answer per request in a read-only Claude Code
-    turn at the latest release, and writes audit/ticvai/cr-watch/REVIEW.md with a decision line per request; requests
-    in a class with a written default ruling come first under one "approve all default-ruled" line. `settle` turns the
+    turn at the latest release, and writes REVIEW.md, in a folder on the lead''s machine outside git,
+    with a decision line per request; requests in a class with a written default ruling come first under one "approve all default-ruled" line. `settle` turns the
     requests marked approve or change into a decisions file for viewer/api/settle_changes.py, dry run first. A reject
     mark redrafts with the lead''s note; rejecting the request itself is a change mark with status rejected.'
   by: Chinmay
