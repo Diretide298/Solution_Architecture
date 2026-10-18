@@ -14,11 +14,14 @@ does those steps for one fix, in order, each printing exactly what it would do; 
                 then the gate: lane C's change-scoped checks (`run-checks.py --changed-from`) when this checkout has
                 them, else `refresh-safe.sh --head-only --no-merge --parallel 4` (it says which and how long).
                 --apply runs the gate; the result (check.json) is what `tag` requires.
-  impact        the release diff (`git diff r<N-1>..HEAD`) to artefacts whose definition changed (operations by
-                operationId, through any `$ref`; screens by id; tables by their schema-reference entry; files and
-                ADRs), then to the tickets that link them in adam-links.json, split new / started / finished, as a
-                pull list in audit/kit/pull-direct.mjs's format. Service links are not used (every back-end task
-                links its service). --live-status reads the statuses from OpenProject (GET only).
+  impact        the release diff (`git diff --no-renames r<N-1>..HEAD`) to artefacts whose definition changed
+                (operations by operationId, through any `$ref`; screens by id; tables by their schema-reference entry;
+                files and ADRs), then to the tickets that link them, split new / started / finished, as a pull list in
+                audit/kit/pull-direct.mjs's format. The links are rebuilt by adam-links.py from the candidate tree (a
+                throwaway worktree), with r<N-1>'s links added so a removed artefact still finds its tickets; the
+                statuses come from OpenProject when TICVAI_OP_TOKEN is set (GET only; --cached-status: not), else
+                from the committed file by ticket id. Service links are not used (every back-end task links its
+                service).
   tag           the next r<N> (from this checkout's tags and both remotes'), annotated, pushed by name to origin and
                 github, then check-adam-latest-release --remotes. Refuses unless the gate passed at HEAD.
   after-deploy  once the lead has deployed (on ADAM's box: git fetch --tags, sudo ./deploy/deploy.sh): rebuild
@@ -32,7 +35,10 @@ does those steps for one fix, in order, each printing exactly what it would do; 
                 ADAM's viewer/api/settle_changes.py (its dry run, then --apply).
 
 Release numbers: before the tag (check, impact, tag) the release is the next r<N> after the newest tag; after it
-(after-deploy, rework, settle) it is the newest tag. --release r<N> names it. Files go to
+(after-deploy, rework, settle) it is the newest tag. Every step reads both remotes' tags and refuses a tag that is
+not on both (a tag made here and never pushed is never a base) or a remote ahead of this checkout. after-deploy and
+rework refuse an impact list computed on another commit than the tag's; settle --apply refuses until the pull after
+the deploy passed at r<N> (--without-pull-check overrides, and says so). --release r<N> names it. Files go to
 audit/ticvai/releases/r<N>/ (gitignored). Secrets come from audit/audit.env (--env-file) and are never printed.
 
 Self-tests run first, every time; `self-test` runs only them. No test reads the network or writes anything outside
@@ -40,7 +46,7 @@ memory.
 
     python3 tools/cr-release.py self-test
     python3 tools/cr-release.py check [--apply]
-    python3 tools/cr-release.py impact [--live-status]
+    python3 tools/cr-release.py impact [--cached-status] [--links FILE]
     python3 tools/cr-release.py tag [--note "read routes"] [--apply]
     python3 tools/cr-release.py after-deploy [--stage links|pull|all] [--lead-email E] [--log FILE] [--apply]
     python3 tools/cr-release.py rework [--note CR-161] [--large-at 20] [--apply]
@@ -354,6 +360,153 @@ def class_crs(classes_doc, class_id):
     return None
 
 
+def plan_release(local, remotes, release, after_tag):
+    """(base, release) from this checkout's tags and the remotes' ({name: tags, or None when unreadable}).
+    ADAM serves only what it fetched from the remotes, so every tag the steps build on must be on both: a tag made
+    here and never pushed (r5 on 14 October, P-20) is refused, never used as the base, and so is a remote that has a
+    newer tag than this checkout (fetch the tags first). Raises ValueError with the reason."""
+    for name, tags in remotes.items():
+        if tags is None:
+            raise ValueError(f"cannot read the tags on {name}: the release numbers need both remotes")
+    nums = release_numbers(local)
+    if not nums:
+        raise ValueError("no release tag r<N> here (git fetch --tags first)")
+    for name, tags in remotes.items():
+        ahead = [n for n in release_numbers(tags) if n > nums[-1]]
+        if ahead:
+            raise ValueError(f"{name} has r{ahead[-1]}, newer than this checkout's r{nums[-1]}: git fetch --tags first")
+    if release:
+        m = RELEASE_TAG.match(release)
+        if not m:
+            raise ValueError(f"--release takes r<N>, not {release}")
+        n = int(m.group(1))
+        below = [x for x in nums if x < n]
+        if not below:
+            raise ValueError(f"no release tag below {release} to compare with")
+        base, rel, is_tag = f"r{below[-1]}", release, n in nums
+    elif after_tag:
+        if len(nums) < 2:
+            raise ValueError("only one release tag: nothing to compare it with")
+        base, rel, is_tag = f"r{nums[-2]}", f"r{nums[-1]}", True
+    else:
+        base, rel, is_tag = f"r{nums[-1]}", next_release(local, [t for ts in remotes.values() for t in ts]), False
+    need = [base] + ([rel] if is_tag else [])
+    for t in need:
+        missing = [name for name, tags in remotes.items() if t not in tags]
+        if missing:
+            raise ValueError(f"{t} is not on {' or '.join(missing)}: push it by name (git push <remote> {t}) "
+                             f"or it is not a release ADAM can serve")
+    return base, rel
+
+
+LINK_COLUMNS = ("status", "type", "subject", "assignee")
+
+
+def merge_links(candidate, committed_head, base_links):
+    """The links impact reads: the ones adam-links.py built from the candidate tree, then the base release's (a
+    ticket that linked an artefact the release removed still has it there), each (ticket, kind, id) once. Every link
+    of a ticket carries one set of cached columns: the rebuild's when it read OpenProject (the token), else the
+    committed file's at the candidate, else the base's, by ticket id (a rebuild without the token has none, and
+    would put every ticket under "new")."""
+    cols = {}
+    for src in (base_links, committed_head, candidate):          # later sources win
+        for ln in src:
+            if ln.get("status"):
+                cols[str(ln.get("key"))] = {c: ln.get(c) or "" for c in LINK_COLUMNS}
+    out, seen = [], set()
+    for ln in list(candidate) + list(base_links):
+        k = (str(ln.get("key")), ln.get("kind"), ln.get("id"))
+        if k in seen:
+            continue
+        seen.add(k)
+        out.append(dict(ln, key=k[0], **cols.get(k[0], {c: ln.get(c) or "" for c in LINK_COLUMNS})))
+    return out
+
+
+def diff_args(base, head):
+    """git diff for the files a release changed. --no-renames: a renamed file is its old path deleted and its new
+    path added, so links to the old path (and a renamed contract's old operation keys) are still hit."""
+    return ["diff", "--name-only", "--no-renames", f"{base}..{head}"]
+
+
+def _child_id(child):
+    href = child.get("href") or ""
+    return int(href.rstrip("/").rsplit("/", 1)[-1]) if href.rstrip("/").rsplit("/", 1)[-1].isdigit() else None
+
+
+def create_rework(op, items, users, large_at, save):
+    """Make each rework sub-task over the API, one at a time. Before each: the parent's children are read, and one
+    with the same subject is not made twice; a parent with `large_at` children or more is moved to the server file.
+    A create that fails (Cloudflare's 524, a timeout) is checked by reading the children again, because OpenProject
+    often makes the ticket anyway; then the run goes on. `save(made)` is called after every create, so a run that
+    stops still leaves its record. {made, there, failed, moved}."""
+    res = {"made": [], "there": [], "failed": [], "moved": []}
+
+    def find(parent, subject):
+        kids = (parent.get("_links") or {}).get("children") or []
+        return next((c for c in kids if c.get("title") == subject), None), kids
+
+    for x in items:
+        try:
+            parent = op.req("GET", f"/work_packages/{x['parent_id']}")
+        except Exception as e:  # noqa: BLE001
+            res["failed"].append({"parent_id": x["parent_id"], "key": x["key"], "why": f"reading the parent: {e}"})
+            continue
+        hit, kids = find(parent, x["subject"])
+        if hit:
+            res["there"].append({"parent_id": x["parent_id"], "key": x["key"], "id": _child_id(hit)})
+            continue
+        if len(kids) >= large_at:
+            res["moved"].append(dict(x, children=len(kids)))
+            continue
+        links = {"type": {"href": f"/api/v3/types/{SUB_TASK}"}, "priority": {"href": f"/api/v3/priorities/{NORMAL}"},
+                 "parent": {"href": f"/api/v3/work_packages/{x['parent_id']}"}}
+        if x.get("assignee") and users.get(x["assignee"]):
+            links["assignee"] = {"href": f"/api/v3/users/{users[x['assignee']]}"}
+        try:
+            got = op.req("POST", f"/projects/{OP_PROJECT}/work_packages?notify=false",
+                         {"subject": x["subject"], "description": {"format": "markdown", "raw": x["description"]},
+                          "_links": links})
+            res["made"].append({"key": x["key"], "id": got["id"], "parent_id": x["parent_id"]})
+        except Exception as e:  # noqa: BLE001
+            try:
+                hit, _ = find(op.req("GET", f"/work_packages/{x['parent_id']}"), x["subject"])
+            except Exception:  # noqa: BLE001
+                hit = None
+            if hit:
+                res["made"].append({"key": x["key"], "id": _child_id(hit), "parent_id": x["parent_id"],
+                                    "note": f"made despite: {e}"})
+            else:
+                res["failed"].append({"parent_id": x["parent_id"], "key": x["key"], "why": str(e)})
+                continue
+        save(res["made"])
+    return res
+
+
+def settle_gate(verdict, impact, release):
+    """None when the requests may be settled done with ref `release`: the pull after the deploy found every impact
+    ticket at `release` (pull-verdict.json, 0 failures), or the release touched no linked ticket. Else the reason."""
+    if not impact:
+        return None
+    if not verdict:
+        return f"no pull result for {release}: run `cr-release.py after-deploy --stage pull --apply` first"
+    if verdict.get("release") != release:
+        return f"the pull result is for {verdict.get('release')}, not {release}"
+    if verdict.get("failures"):
+        return f"{len(verdict['failures'])} impact ticket(s) failed the pull at {release} (pull-verdict.json)"
+    return None
+
+
+def impact_matches(artefacts, tag_sha, release):
+    """None when the impact list was computed on the commit the tag points at; else the reason."""
+    if not artefacts:
+        return f"no impact list for {release}: run `cr-release.py impact --release {release}`"
+    if artefacts.get("head_sha") != tag_sha:
+        return (f"the impact list was computed on {str(artefacts.get('head_sha'))[:9]}, but {release} is "
+                f"{tag_sha[:9]}: run `cr-release.py impact --release {release}` again")
+    return None
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Self-tests: made-up tags, contracts, screens, tables and links the functions must read right. No git, no network.
 # ---------------------------------------------------------------------------------------------------------------------
@@ -544,6 +697,113 @@ def self_test() -> list:
         case("settle: an unknown class", class_crs(classes, "nope"), None)
     except Exception as e:  # noqa: BLE001
         fails.append(f"settle raised {type(e).__name__}: {e}")
+
+    # -- fix round 1 (lane D4 review): numbering against the remotes (I3) ---------------------------------------------
+    def refused(fn, *a):
+        try:
+            return ("ok", fn(*a))
+        except ValueError as e:
+            return ("refused", str(e))
+    both = lambda tags: {"origin": list(tags), "github": list(tags)}
+    try:
+        case("numbers: before the tag, the newest tag on both remotes is the base",
+             refused(plan_release, ["r5", "r6", "r6-rc"], both(["r5", "r6"]), None, False), ("ok", ("r6", "r7")))
+        case("numbers: after the tag, the newest tag and the one below",
+             refused(plan_release, ["r5", "r6"], both(["r5", "r6"]), None, True), ("ok", ("r5", "r6")))
+        got = refused(plan_release, ["r5", "r6", "r7"], dict(both(["r5", "r6", "r7"]), github=["r5", "r6"]), None, False)
+        case("numbers: a tag never pushed to one remote is refused, not used as the base (P-20)",
+             (got[0], "r7" in got[1] and "github" in got[1]), ("refused", True))
+        got = refused(plan_release, ["r5", "r6"], both(["r5", "r6", "r7"]), None, False)
+        case("numbers: a remote ahead of this checkout is refused (fetch the tags)",
+             (got[0], "r7" in got[1] and "fetch" in got[1]), ("refused", True))
+        got = refused(plan_release, ["r5", "r6"], {"origin": ["r5", "r6"], "github": None}, None, False)
+        case("numbers: a remote that cannot be read is refused", (got[0], "github" in got[1]), ("refused", True))
+        case("numbers: --release names it; the base is the highest tag below",
+             refused(plan_release, ["r5", "r6", "r7"], both(["r5", "r6", "r7"]), "r7", True), ("ok", ("r6", "r7")))
+        got = refused(plan_release, ["r5", "r6", "r7"], dict(both(["r5", "r6", "r7"]), origin=["r5", "r6"]), "r7", True)
+        case("numbers: after the tag, the release must be on both remotes", (got[0], "origin" in got[1]),
+             ("refused", True))
+    except Exception as e:  # noqa: BLE001
+        fails.append(f"plan_release raised {type(e).__name__}: {e}")
+
+    # -- the links impact reads: rebuilt from the candidate tree, statuses kept, the base's links added (C1) ----------
+    try:
+        cand = [{"key": "10", "kind": "operation", "id": "a#new"},                       # rebuilt with no token
+                {"key": "11", "kind": "operation", "id": "a#x", "status": "In progress", "type": "Task",
+                 "subject": "now", "assignee": "Al"}]                                    # rebuilt with the token
+        head_c = [{"key": "10", "kind": "operation", "id": "a#old", "status": "Ready for QA", "type": "Task",
+                   "subject": "S10", "assignee": "Bo"},
+                  {"key": "11", "kind": "operation", "id": "a#x", "status": "New", "type": "Task", "subject": "old",
+                   "assignee": "Cy"}]
+        base_l = [{"key": "12", "kind": "operation", "id": "a#removed", "status": "Closed", "type": "Sub Task",
+                   "subject": "S12", "assignee": "Di"},
+                  {"key": "10", "kind": "operation", "id": "a#new", "status": "New"}]
+        merged = merge_links(cand, head_c, base_l)
+        by = {(l["key"], l["id"]): l for l in merged}
+        case("links: the rebuilt links, then the base's (once each)", sorted(by),
+             [("10", "a#new"), ("11", "a#x"), ("12", "a#removed")])
+        case("links: a rebuild without the token keeps the committed status by ticket id",
+             {k: by[("10", "a#new")].get(k) for k in ("status", "type", "subject", "assignee")},
+             {"status": "Ready for QA", "type": "Task", "subject": "S10", "assignee": "Bo"})
+        case("links: statuses read with the token win", by[("11", "a#x")]["status"], "In progress")
+        case("links: a ticket only the base linked keeps its base status (a removed artefact still finds it)",
+             by[("12", "a#removed")]["status"], "Closed")
+        case("links: one ticket, one status on every link",
+             {l["status"] for l in merged if l["key"] == "10"}, {"Ready for QA"})
+        case("diff: renames off, so a renamed file's old path is in the list (I1)",
+             "--no-renames" in diff_args("r6", "HEAD"), True)
+    except Exception as e:  # noqa: BLE001
+        fails.append(f"merge_links / diff_args raised {type(e).__name__}: {e}")
+
+    # -- rework over the API survives a timeout, and records every create as it goes (I2) -----------------------------
+    try:
+        class FakeOP:
+            def __init__(self):
+                self.children = {101: [], 102: [], 103: []}
+                self.next = 900
+
+            def req(self, method, path, body=None):
+                if method == "GET":
+                    pid = int(path.rsplit("/", 1)[1])
+                    return {"_links": {"children": [dict(c) for c in self.children[pid]]}}
+                pid = int(body["_links"]["parent"]["href"].rsplit("/", 1)[1])
+                self.next += 1
+                if pid == 101:              # Cloudflare 524, but OpenProject made it anyway
+                    self.children[pid].append({"title": body["subject"], "href": f"/api/v3/work_packages/{self.next}"})
+                    raise RuntimeError("POST: 524 timeout")
+                if pid == 102:              # failed and nothing was made
+                    raise RuntimeError("POST: 502")
+                self.children[pid].append({"title": body["subject"], "href": f"/api/v3/work_packages/{self.next}"})
+                return {"id": self.next}
+        items = [{"key": f"REWORK-r7-{i}", "subject": f"[r7 rework] {i}", "description": "d", "parent_id": i,
+                  "assignee": None, "children": 0} for i in (101, 102, 103)]
+        saved = []
+        res = create_rework(FakeOP(), items, {}, 20, lambda made: saved.append(list(made)))
+        case("rework api: a timed-out create that OpenProject made is found, not made twice",
+             [(m["parent_id"], m["id"], m.get("note", "")) for m in res["made"]],
+             [(101, 901, "made despite: POST: 524 timeout"), (103, 903, "")])
+        case("rework api: a failed create is reported and the run goes on",
+             [(f["parent_id"], f["why"]) for f in res["failed"]], [(102, "POST: 502")])
+        case("rework api: the record is saved after every create", len(saved) >= 2 and saved[-1] == res["made"], True)
+    except Exception as e:  # noqa: BLE001
+        fails.append(f"create_rework raised {type(e).__name__}: {e}")
+
+    # -- settle waits for a passing pull (I4); after-deploy and rework use the tagged commit's impact (I5) ------------
+    try:
+        case("settle: no pull result refuses", bool(settle_gate(None, [{"id": 1}], "r7")), True)
+        case("settle: a failed pull refuses", bool(settle_gate({"release": "r7", "ok": [], "failures": [{"id": 1}]},
+                                                                [{"id": 1}], "r7")), True)
+        case("settle: another release's pull refuses", bool(settle_gate({"release": "r6", "ok": [1], "failures": []},
+                                                                          [{"id": 1}], "r7")), True)
+        case("settle: a clean pull of r<N> passes", settle_gate({"release": "r7", "ok": [1], "failures": []},
+                                                               [{"id": 1}], "r7"), None)
+        case("settle: an empty impact list passes", settle_gate(None, [], "r7"), None)
+        case("impact: computed on the tagged commit passes", impact_matches({"head_sha": "abc"}, "abc", "r7"), None)
+        case("impact: another commit refuses", "impact --release r7" in (impact_matches({"head_sha": "abd"}, "abc",
+                                                                                          "r7") or ""), True)
+        case("impact: none computed refuses", bool(impact_matches(None, "abc", "r7")), True)
+    except Exception as e:  # noqa: BLE001
+        fails.append(f"settle_gate / impact_matches raised {type(e).__name__}: {e}")
     return fails
 
 
@@ -598,35 +858,40 @@ def load_env(path):
     return got
 
 
+REMOTE_TAGS = {}
+
+
+def remotes_tags():
+    """Each remote's tags, read once per run (git ls-remote: reads only)."""
+    if not REMOTE_TAGS:
+        for r in REMOTES:
+            REMOTE_TAGS[r] = remote_tags(r)
+    return REMOTE_TAGS
+
+
 def resolve_release(release, after_tag):
     """(base, release, head): the release before, the release being made, and the ref that holds it.
     Before the tag (check, impact, tag): base = the newest release tag, release = the next number, head = HEAD.
     After it (after-deploy, rework, settle): release = the newest tag, base = the one below it, head = that tag.
-    --release rN names the release instead: base is the highest tag below it, head its tag if it exists, else HEAD."""
+    --release rN names the release instead: base is the highest tag below it, head its tag if it exists, else HEAD.
+    Numbered from this checkout's tags and both remotes' (plan_release): a tag that is not on both remotes is refused."""
     local = git("tag", "-l", "r*").split()
-    nums = release_numbers(local)
-    if release:
-        m = RELEASE_TAG.match(release)
-        if not m:
-            sys.exit(f"cr-release: --release takes r<N>, not {release}")
-        n = int(m.group(1))
-        below = [x for x in nums if x < n]
-        if not below:
-            sys.exit(f"cr-release: no release tag below {release} to compare with")
-        return f"r{below[-1]}", release, (release if n in nums else "HEAD")
-    if not nums:
-        sys.exit("cr-release: no release tag r<N> here (git fetch --tags first)")
-    if after_tag:
-        if len(nums) < 2:
-            sys.exit("cr-release: only one release tag: nothing to compare it with")
-        return f"r{nums[-2]}", f"r{nums[-1]}", f"r{nums[-1]}"
-    return f"r{nums[-1]}", next_release(local), "HEAD"
+    try:
+        base, rel = plan_release(local, remotes_tags(), release, after_tag)
+    except ValueError as e:
+        sys.exit(f"cr-release: {e}")
+    return base, rel, (rel if rel in local else "HEAD")
 
 
 def out_dir(args, release):
     d = Path(args.out) if args.out else REPO / "audit" / "ticvai" / "releases" / release
     d.mkdir(parents=True, exist_ok=True)
     return d
+
+
+def read_json(path):
+    p = Path(path)
+    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else None
 
 
 def write_json(path, data):
@@ -683,7 +948,7 @@ def gate_command(changed_file, json_out):
     flag = scoped_flag()
     if flag == "--changed-from":
         paths = [p for p in Path(changed_file).read_text(encoding="utf-8").split("\n") if p]
-        return ("change-scoped checks (lane C's run-checks.py --changed): only the checks that read a changed file",
+        return ("change-scoped checks (lane C's run-checks.py --changed-from): only the checks that read a changed file",
                 [sys.executable, "tools/run-checks.py", "--changed-from", str(changed_file), "--json", str(json_out)],
                 len(paths))
     if flag == "--changed":
@@ -724,7 +989,7 @@ def cmd_check(args):
         refuse.append(f"HEAD is {base} itself: nothing to release")
     elif subprocess.run(["git", "merge-base", "--is-ancestor", base, "HEAD"], cwd=str(REPO)).returncode:
         refuse.append(f"{base} is not behind HEAD")
-    changed = [p for p in git("diff", "--name-only", f"{base}..HEAD").split("\n") if p]
+    changed = [p for p in git(*diff_args(base, "HEAD")).split("\n") if p]
     changed_file = out / "changed.txt"
     changed_file.write_text("\n".join(changed) + "\n", encoding="utf-8")
     print(f"  {len(changed)} file(s) changed since {base} ({sum(p.startswith('ticvai/') for p in changed)} in the "
@@ -770,7 +1035,7 @@ def cmd_check(args):
 
 def release_artefacts(base, head):
     """The changed files and the artefacts whose definitions changed between two refs."""
-    changed = [p for p in git("diff", "--name-only", f"{base}..{head}").split("\n") if p]
+    changed = [p for p in git(*diff_args(base, head)).split("\n") if p]
     pkg = lambda p: p[len("ticvai/"):]
     contracts = [p for p in changed if p.startswith("ticvai/contracts/") and p.endswith((".yaml", ".yml"))]
     old_docs = {pkg(p): load_yaml(git_show(base, p)) for p in contracts}
@@ -791,14 +1056,32 @@ def release_artefacts(base, head):
     return changed, art
 
 
-def live_statuses(links):
-    """Subject, status, type and assignee read from OpenProject now (GET only; TICVAI_OP_TOKEN), over the cached ones."""
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("adam_links", PKG / "tools" / "adam-links.py")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    snap = mod.snapshot(os.environ["TICVAI_OP_TOKEN"])
-    return [dict(ln, **snap.get(int(ln["key"]), {})) if str(ln.get("key", "")).isdigit() else ln for ln in links]
+def candidate_links(sha, out, use_token):
+    """adam-links.py run on the candidate tree (a throwaway worktree at `sha`, removed after), so the impact list
+    follows the links this release will load into ADAM, not the ones committed before the fix. With the token it
+    reads the statuses from OpenProject (GET only). The result is kept in the release folder."""
+    import shutil
+    import tempfile
+    tmp = Path(tempfile.mkdtemp(prefix="cr-release-links-"))
+    tree = tmp / "tree"
+    env = dict(os.environ)
+    if not use_token:
+        env.pop("TICVAI_OP_TOKEN", None)
+    try:
+        git("worktree", "add", "--detach", "--quiet", str(tree), sha)
+        p = subprocess.run([sys.executable, "tools/adam-links.py"], cwd=str(tree / "ticvai"), env=env,
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if p.returncode:
+            sys.exit(f"cr-release impact: adam-links.py on the candidate tree failed: "
+                     f"{(p.stderr or p.stdout).strip()[-400:]}")
+        built = tree / LINKS
+        shutil.copyfile(built, out / "adam-links-candidate.json")
+        print(f"  links rebuilt from the candidate tree ({sha[:9]}): {(p.stdout.strip().splitlines() or [''])[0][:160]}")
+    finally:
+        git("worktree", "remove", "--force", str(tree), check=False)
+        shutil.rmtree(tmp, ignore_errors=True)
+        git("worktree", "prune", check=False)
+    return json.loads((out / "adam-links-candidate.json").read_text(encoding="utf-8"))
 
 
 def impact_md(base, release, art, imp, changed):
@@ -824,11 +1107,17 @@ def cmd_impact(args):
     out = out_dir(args, release)
     started = time.time()
     changed, art = release_artefacts(base, head)
-    links = (json.loads(git_show(head, LINKS) or "{}")).get("links") or []
-    if args.live_status:
-        if not os.environ.get("TICVAI_OP_TOKEN"):
-            sys.exit("cr-release impact: --live-status needs TICVAI_OP_TOKEN")
-        links = live_statuses(links)
+    sha = git("rev-parse", f"{head}^{{commit}}").strip()
+    use_token = bool(os.environ.get("TICVAI_OP_TOKEN")) and not args.cached_status
+    if args.links:
+        built = json.loads(Path(args.links).read_text(encoding="utf-8"))
+        print(f"  links from {args.links} (given; not rebuilt)")
+    else:
+        built = candidate_links(sha, out, use_token)
+    statuses = ("read from OpenProject by the rebuild" if built.get("cached") and not args.links else
+                "the committed adam-links.json's, by ticket id" if not built.get("cached") else "the given file's")
+    links = merge_links(built.get("links") or [], (json.loads(git_show(head, LINKS) or "{}")).get("links") or [],
+                        (json.loads(git_show(base, LINKS) or "{}")).get("links") or [])
     mp = json.loads(git_show(head, PMS_MAP) or "{}")
     keys_by_id = {str(v): k for k, v in mp.items() if isinstance(v, int) and not k.startswith(("_", "VERSION"))}
     imp = impact_tickets(links, art, keys_by_id)
@@ -836,18 +1125,18 @@ def cmd_impact(args):
     for b in ("new", "started", "finished"):
         write_json(out / f"impact-{b}.json", [t for t in imp["tickets"] if t["bucket"] == b])
     write_json(out / "artefacts.json", {"base": base, "release": release, "head": head,
-                                        "head_sha": git("rev-parse", f"{head}^{{commit}}").strip(),
+                                        "head_sha": sha,
                                         "changed_files": changed, "skipped": imp["skipped"],
-                                        "statuses": "live" if args.live_status else "cached in adam-links.json",
+                                        "statuses": statuses, "links": "rebuilt from the candidate tree, plus "
+                                        f"{base}'s" if not args.links else f"{args.links}, plus {base}'s",
                                         **{k: sorted(v) for k, v in art.items()}})
     (out / "impact.md").write_text(impact_md(base, release, art, imp, changed), encoding="utf-8")
     count = {b: sum(t["bucket"] == b for t in imp["tickets"]) for b in ("new", "started", "finished")}
     print(f"cr-release impact: {base} -> {release} ({head}): {len(changed)} file(s) changed; "
           + ", ".join(f"{len(v)} {k}(s)" for k, v in sorted(art.items())) + " changed")
     print(f"  {len(imp['tickets'])} ticket(s): {count['new']} new, {count['started']} started, {count['finished']} "
-          f"finished; {len(imp['skipped'])} rejected skipped; statuses "
-          f"{'read from OpenProject now' if args.live_status else 'as cached in adam-links.json'} "
-          f"({round(time.time() - started)} s)")
+          f"finished; {len(imp['skipped'])} rejected skipped; links from the candidate tree and {base}; statuses "
+          f"{statuses} ({round(time.time() - started)} s)")
     print(f"  -> {out / 'impact.json'} (the pull list), impact-new/started/finished.json, impact.md")
     return 0
 
@@ -865,14 +1154,9 @@ def remote_tags(remote):
 
 
 def cmd_tag(args):
-    base, _, _ = resolve_release(None, after_tag=False)
+    base, release, _ = resolve_release(args.release, after_tag=False)
     local = git("tag", "-l", "r*").split()
-    remote = {}
-    for r in REMOTES:
-        remote[r] = remote_tags(r)
-        if remote[r] is None:
-            print(f"  note: cannot read {r}'s tags; numbering from this checkout and the other remote")
-    release = args.release or next_release(local, [t for ts in remote.values() if ts for t in ts])
+    remote = remotes_tags()
     taken = [r for r, ts in remote.items() if ts and release in ts] + (["here"] if release in local else [])
     out = out_dir(args, release)
     head = head_sha()
@@ -931,7 +1215,11 @@ def cmd_after_deploy(args):
           f"{'APPLY' if args.apply else 'dry run (--apply rebuilds the links and pulls: a pull moves ADAM pins)'}")
     if args.log:
         return judge_and_report(out, release, Path(args.log))
+    tag_sha = git("rev-parse", f"{release}^{{commit}}").strip()
     links_file = PKG / "handoff" / "service-docs" / "adam-links.json"
+    if args.apply and args.stage in ("links", "all") and head_sha() != tag_sha:
+        sys.exit(f"cr-release after-deploy: HEAD is {head_sha()[:9]}, {release} is {tag_sha[:9]}: the links are "
+                 f"rebuilt from this tree, so check out {release} (or main at it) first")
     if args.stage in ("links", "all"):
         print("  1. ADAM's links, rebuilt from the package with the OpenProject statuses (TICVAI_OP_TOKEN):")
         if args.apply and not os.environ.get("TICVAI_OP_TOKEN"):
@@ -964,8 +1252,9 @@ def cmd_after_deploy(args):
             return 0
     if args.stage in ("pull", "all"):
         tickets_file = out / "impact.json"
-        if not tickets_file.is_file():
-            print(f"  no impact list for {release} ({tickets_file}): run `cr-release.py impact --release {release}`")
+        why = impact_matches(read_json(out / "artefacts.json"), tag_sha, release)
+        if why or not tickets_file.is_file():
+            print(f"  REFUSE  {why or 'no impact.json: run `cr-release.py impact --release ' + release + '`'}")
             return 1
         tickets = json.loads(tickets_file.read_text(encoding="utf-8"))
         kit = Path(args.kit) if args.kit else REPO / "audit" / "kit" / "pull-direct.mjs"
@@ -1057,14 +1346,17 @@ def cmd_rework(args):
     src = out / "impact-finished.json"
     if not src.is_file():
         print(f"  no impact list for {release} ({src}): run `cr-release.py impact --release {release}` "
-              f"(--live-status reads the statuses from OpenProject now)")
+              f"(with TICVAI_OP_TOKEN set it reads the statuses from OpenProject)")
         return 1
     finished = json.loads(src.read_text(encoding="utf-8"))
-    meta = out / "artefacts.json"
-    how = json.loads(meta.read_text(encoding="utf-8")).get("statuses", "") if meta.is_file() else ""
-    if how != "live":
-        print("  note: the statuses are the ones cached in adam-links.json; `impact --live-status` reads them from "
-              "OpenProject now, so a ticket finished since is not missed")
+    meta = read_json(out / "artefacts.json")
+    why = impact_matches(meta, git("rev-parse", f"{release}^{{commit}}").strip(), release)
+    if why:
+        print(f"  REFUSE  {why}")
+        return 1
+    if not str(meta.get("statuses", "")).startswith("read from OpenProject"):
+        print(f"  note: the statuses are {meta.get('statuses')}; with TICVAI_OP_TOKEN set, `impact --release "
+              f"{release}` reads them from OpenProject, so a ticket finished since is not missed")
     mp = json.loads(git_show("HEAD", PMS_MAP) or "{}")
     plan = rework_plan(finished, mp, release, base, args.large_at, args.note or "")
     rw = out / "rework"
@@ -1081,30 +1373,21 @@ def cmd_rework(args):
         if not os.environ.get("TICVAI_OP_TOKEN"):
             sys.exit("cr-release rework: TICVAI_OP_TOKEN is not set (audit.env)")
         op = OpenProject(os.environ.get("TICVAI_PMS_URL", "https://pms.softlabsgroup.in"), os.environ["TICVAI_OP_TOKEN"])
-        users = op.users(OP_PROJECT)
-        made = []
-        for x in list(plan["api"]):
-            parent = op.req("GET", f"/work_packages/{x['parent_id']}")
-            children = (parent.get("_links") or {}).get("children") or []
-            if any(c.get("title") == x["subject"] for c in children):
-                print(f"    there   #{x['parent_id']} already has \"{x['subject']}\"")
-                continue
-            if len(children) >= args.large_at:
-                print(f"    server  #{x['parent_id']} has {len(children)} children in OpenProject: moved to the server file")
-                plan["api"].remove(x)
-                plan["server"].append(dict(x, children=len(children)))
-                continue
-            links = {"type": {"href": f"/api/v3/types/{SUB_TASK}"}, "priority": {"href": f"/api/v3/priorities/{NORMAL}"},
-                     "parent": {"href": f"/api/v3/work_packages/{x['parent_id']}"}}
-            if x["assignee"] and users.get(x["assignee"]):
-                links["assignee"] = {"href": f"/api/v3/users/{users[x['assignee']]}"}
-            got = op.req("POST", f"/projects/{OP_PROJECT}/work_packages?notify=false",
-                         {"subject": x["subject"], "description": {"format": "markdown", "raw": x["description"]},
-                          "_links": links})
-            made.append({"key": x["key"], "id": got["id"], "parent_id": x["parent_id"]})
-            print(f"    made    #{got['id']} under #{x['parent_id']}")
-        write_json(rw / "api-made.json", made)
-        print(f"  {len(made)} sub-task(s) made over the API -> {rw / 'api-made.json'}")
+        res = create_rework(op, plan["api"], op.users(OP_PROJECT), args.large_at,
+                            lambda made: write_json(rw / "api-made.json", made))
+        write_json(rw / "api-made.json", res["made"])
+        write_json(rw / "api-failed.json", res["failed"])
+        for m in res["made"]:
+            print(f"    made    #{m['id']} under #{m['parent_id']}{'  (' + m['note'] + ')' if m.get('note') else ''}")
+        for m in res["there"]:
+            print(f"    there   #{m['parent_id']} already has it (#{m['id']})")
+        for m in res["moved"]:
+            print(f"    server  #{m['parent_id']} has {m['children']} children in OpenProject: moved to the server file")
+        for m in res["failed"]:
+            print(f"    FAILED  under #{m['parent_id']}: {m['why']}")
+        plan["server"] += res["moved"]
+        print(f"  {len(res['made'])} made, {len(res['there'])} already there, {len(res['failed'])} failed "
+              f"-> {rw / 'api-made.json'}{', ' + str(rw / 'api-failed.json') + ' (run again: made ones are skipped)' if res['failed'] else ''}")
     server = [{k: v for k, v in x.items() if k != "children"} for x in plan["server"]]
     write_json(rw / "op-create.json", server)
     if server:
@@ -1144,15 +1427,17 @@ def cmd_settle(args):
     d = out / "settle"
     d.mkdir(exist_ok=True)
     write_json(d / "decisions.json", dec)
-    verdict = out / "pull-verdict.json"
-    v = json.loads(verdict.read_text(encoding="utf-8")) if verdict.is_file() else None
+    why = settle_gate(read_json(out / "pull-verdict.json"), read_json(out / "impact.json"), release)
     print(f"cr-release settle: {len(dec['items'])} request(s) {args.status} with ref {release}: "
           f"{', '.join(x['cr'] for x in dec['items'])} -> {d / 'decisions.json'}")
-    if v is None:
-        print(f"  note: no pull verdict for {release} yet (after-deploy): a comment says \"your next pull already has "
-              f"it\" only once ADAM serves {release}")
-    elif v.get("failures"):
-        print(f"  note: {len(v['failures'])} impact ticket(s) failed the pull after the deploy (pull-verdict.json)")
+    if why and args.apply and not args.without_pull_check:
+        print(f"  REFUSE  {why}. Settling now would tell developers their next pull has a release ADAM may not serve; "
+              f"--without-pull-check overrides")
+        return 1
+    if why and args.without_pull_check:
+        print(f"  OVERRIDE (--without-pull-check): settling although {why}")
+    elif why:
+        print(f"  note: {why}; --apply will refuse until it passes")
     cmd = [sys.executable, "viewer/api/settle_changes.py", str(d / "decisions.json")] + (["--apply"] if args.apply else [])
     print(f"  ADAM's settle_changes.py ({'APPLY' if args.apply else 'its own dry run: reads ADAM and OpenProject, writes nothing'}; "
           f"ADAM_EMAIL, ADAM_PASSWORD, TICVAI_OP_TOKEN):")
@@ -1161,7 +1446,6 @@ def cmd_settle(args):
         print("  (not run: the environment has no ADAM_EMAIL, ADAM_PASSWORD or TICVAI_OP_TOKEN)")
         return 0 if not args.apply else 1
     return run_shown(cmd, apply=True)
-
 
 
 def main(argv=None) -> int:
@@ -1182,7 +1466,9 @@ def main(argv=None) -> int:
 
     common(sub.add_parser("check", help="main, clean and pushed; the gate"))
     p = common(sub.add_parser("impact", help="the tickets the release touches, for the pull"))
-    p.add_argument("--live-status", action="store_true", help="read statuses from OpenProject now (GET only)")
+    p.add_argument("--cached-status", action="store_true",
+                   help="do not read statuses from OpenProject: use the committed file's (default: the token's)")
+    p.add_argument("--links", help="an adam-links.json already built from the candidate tree (skips the rebuild)")
     p = common(sub.add_parser("tag", help="the next r<N>, annotated, pushed by name to both remotes (lead)"))
     p.add_argument("--note", help="a few words for the tag message: the class or requests it carries")
     p = common(sub.add_parser("after-deploy", help="ADAM's links, then pull every impact ticket"))
@@ -1199,6 +1485,8 @@ def main(argv=None) -> int:
     p.add_argument("--class", dest="cls", help="the class id in handoff/cr-classes.yaml (lane D2)")
     p.add_argument("--resolution", help="what the developer reads: the decision and what changed")
     p.add_argument("--status", default="done", choices=("done", "accepted"))
+    p.add_argument("--without-pull-check", action="store_true",
+                   help="settle although the pull after the deploy has not passed at r<N> (said in the output)")
     a = ap.parse_args(argv)
     if a.cmd in (None, "self-test"):
         return 0

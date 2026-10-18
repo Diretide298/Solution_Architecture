@@ -115,13 +115,17 @@ and Friday releases, without the OpenProject server apply over every ticket and 
 build-order links and retires nothing: a fix that does any of those waits for the full release (section 6's server
 path). `tools/cr-release.py` runs the steps in this order. Each prints what it would do; only `--apply` does it.
 1. **Check:** `python3 tools/cr-release.py check`, then `--apply`. It refuses unless the branch is `main`, nothing is
-   left uncommitted, `main` here is `main` on both remotes, and the change log passes since the last tag. Then it runs
+   left uncommitted, `main` here is `main` on both remotes, the last tag is on both remotes (a tag made here and never
+   pushed is never the starting point), and the change log passes since the last tag. Then it runs
    the gate: only the checks the changed files reach when `run-checks.py --changed` is there, otherwise the full
    refresh (`refresh-safe.sh --head-only --no-merge --parallel 4`, about half an hour). It says which.
-2. **Impact:** `python3 tools/cr-release.py impact --live-status`. Every operation, screen, table, file and ADR whose
-   definition changed since the last tag, and every ticket that links one, split into not started, started and
-   finished. The list is taken from the release diff, never from the request's text. Service links are left out:
-   every back-end task links its service.
+2. **Impact:** `python3 tools/cr-release.py impact`, with `TICVAI_OP_TOKEN` set. Every operation, screen, table,
+   file and ADR whose definition changed since the last tag (a renamed file counts under both names), and every
+   ticket that links one, split into not started, started and finished. The list is taken from the release diff,
+   never from the request's text. The links are the ones this release will load: `adam-links.py` is run on the
+   commit being released, in a throwaway worktree, and the last tag's links are added, so a ticket that linked
+   something the fix removed is on the list too. With the token, the statuses are read from OpenProject; without
+   it, from the committed `adam-links.json`. Service links are left out: every back-end task links its service.
 3. **Tag (the lead):** `python3 tools/cr-release.py tag --note "<the class>"`, then `--apply`. The next `r<N>`,
    annotated, pushed by name to `origin` and `github`, then `check-adam-latest-release.py --remotes`. It refuses
    unless the gate passed at this commit. The six mirror repositories are not tagged here; the next full release
@@ -131,14 +135,15 @@ path). `tools/cr-release.py` runs the steps in this order. Each prints what it w
    the commit and the box's `load_links.py` commands (dry run, then `--apply`, as the ticvai user). Once they are
    loaded, `after-deploy --stage pull --apply` pulls every ticket on the impact list with the shipped connector, the
    same pull a developer runs. Each must say release `r<N>`, link something and have no link ADAM cannot find. Any
-   miss is fixed before the next step.
+   miss is fixed before the next step. It refuses an impact list computed on another commit than the tag's.
 6. **Rework:** `python3 tools/cr-release.py rework --note "<the requests>"`, then `--apply`. Each finished task or
    sub-task the release changed gets one rework sub-task: over the API under a small parent, mail off; under a large
    one (a migration task) through `tools/op-create.rb` on the OpenProject server, from the file it writes. Started
    and not-started tickets need nothing: their next pull shows what changed since the previous one.
 7. **Settle:** `python3 tools/cr-release.py settle --crs <the requests> --resolution "<what changed>"`, then
    `--apply`. The class's requests are marked done with `ref r<N>` through `viewer/api/settle_changes.py`, which tells
-   each request's ticket.
+   each request's ticket. `--apply` waits for step 5's pull to pass at `r<N>`, so nobody is told their next pull has
+   the fix before ADAM serves it.
 
 Developers and agents are always on the latest release: nobody is asked anything, and their next `/ticket` is at
 `r<N>`. The nightly full gate is the backstop for anything the scoped checks did not reach. Measure each one: the

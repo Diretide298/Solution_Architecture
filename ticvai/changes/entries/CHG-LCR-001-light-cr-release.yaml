@@ -8,12 +8,14 @@ summary: 'A light change-request release: a merged class fix is checked, tagged,
 decision:
   what: 'New tool tools/cr-release.py with six steps, each a dry run unless --apply: check (main, clean, pushed, change
     log, then the gate: change-scoped checks when run-checks.py has --changed, else the full refresh), impact (the
-    release diff to the tickets that link a changed operation, screen, table, file or ADR, split new, started and
-    finished, as a pull list), tag (the lead''s tag and push by name to both remotes), after-deploy (ADAM''s links
+    release diff, renames as both names, to the tickets that link a changed operation, screen, table, file or ADR in
+    the links adam-links.py builds from the released commit plus the last tag''s, split new, started and finished,
+    as a pull list), tag (the lead''s tag and push by name to both remotes), after-deploy (ADAM''s links
     rebuilt and loaded, every impact ticket pulled at r<N> with every link found), rework (a sub-task under each
     finished ticket, over the API or op-create.rb on the server for a large parent) and settle (the class''s requests
     done with ref r<N> through settle_changes.py). Runbook section 5a says when and how; service links are not used
-    to pick tickets, and the mirror repositories are tagged at the next full release.'
+    to pick tickets, and the mirror repositories are tagged at the next full release. Every step refuses a release
+    tag that is not on both remotes; settle waits for the pull to pass at r<N> (lane D4 review, fix round 1).'
   by: Chinmay
   date: '2026-10-18'
 why: 'The council of 14 October (Gate and ingestion after the audit) planned a light release for change-request class
