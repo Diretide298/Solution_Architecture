@@ -394,6 +394,29 @@ def test_a_retired_columns_guarded_statement_names_its_table_for_the_migration_t
     assert got == {("backend/tenant/V0105__after_r1_20261018.sql", "platform.workstation"): [("column", "org_unit_id")]}
 
 
+def test_a_table_the_file_names_before_its_declared_move_is_keyed_by_its_name_now():
+    """V0105 re-applies sync.dsar_request's policy as platform.dsar_request (its move is declared, not applied); the
+    migration ticket lists sync.dsar_request, so the change is keyed by that name and says the name the file uses
+    (check-migration-wording MW-AFTER-R1, CHG-RSF-001)."""
+    import tempfile
+    import ticket_done as td
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "tools").mkdir()
+        (root / "tools" / "derive-schema-history.py").write_text(
+            'RENAMES = [{"from": "platform.dsar_request", "to": "sync.dsar_request"}]\n', encoding="utf-8")
+        d = root / "backend" / "tenant"
+        d.mkdir(parents=True)
+        (d / "V0105__after_r1_20261018.sql").write_text(
+            "SELECT platform.drop_rls_policies('platform.dsar_request'::regclass);\n"
+            "SELECT platform.apply_parent_across_rls('platform.dsar_request'::regclass, 'request_id', "
+            "'approvals.request'::regclass, 'id');\n", encoding="utf-8")
+        got = td.after_r1_changes(root)
+    assert got == {("backend/tenant/V0105__after_r1_20261018.sql", "sync.dsar_request"): [
+        ("change", "named platform.dsar_request in the file, its name before the declared move"),
+        ("row-level security", "apply_parent_across_rls")]}
+
+
 # ---- 2, fix round 1: only what the operation itself takes or returns counts, and every key the rule adds is printed
 
 def _queue(required=("id",)):
