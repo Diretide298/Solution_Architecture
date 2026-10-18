@@ -1390,10 +1390,6 @@ paths:
         - "P09 ADM-018 Interface Languages"
         - "P13 CMS-009 Navigation & Menus"
         - "P13 CMS-011 Translations"
-      x-ticvai-read-via:
-      - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       - guest
@@ -1912,10 +1908,6 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-006 Component Preview"
         - "P13 CMS-016 Site Settings"
-      x-ticvai-read-via:
-      - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
       summary: How the guest booking flow looks and steps
       tags:
       - branding
@@ -4000,10 +3992,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-015 Version History"
-      x-ticvai-read-via:
-      - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
       description: '**Order.** Newest first, by `publishedAt` descending, then by `approvalRequestId`.'
       x-ticvai-audience:
       - staff
@@ -4994,10 +4982,6 @@ paths:
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P02 GST-071 Payment Methods"
         - "P05 KSK-002 Language Select"
-      x-ticvai-read-via:
-      - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - anonymous
       - guest

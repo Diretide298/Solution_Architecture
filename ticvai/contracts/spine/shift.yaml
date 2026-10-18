@@ -563,12 +563,6 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      - query: tenancy#denominationRecords
-        route: in-process
-        for: 'what its text calls "denominations": platform.denomination, Tenancy''s data (CHG-RTE-001)'
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'what its text calls "venue''s cashDrawerLimit": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Cash boxes and who holds them
       description: >

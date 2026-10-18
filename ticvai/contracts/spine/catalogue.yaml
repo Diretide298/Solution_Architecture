@@ -3928,10 +3928,6 @@ paths:
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
-      x-ticvai-read-via:
-      - query: finance#taxCodeRecords
-        route: in-process
-        for: 'what its text calls "tax codes": ledger.tax_code, Ledger''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica

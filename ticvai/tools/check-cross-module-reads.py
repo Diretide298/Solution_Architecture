@@ -141,7 +141,14 @@ FACTS = {
 FACT_RES = [(re.compile(p, re.I), t) for p, t in FACTS.items()]
 # Phrases where a fact's words are not a read of it, removed before matching (check-error-sources NOT_ENTITY works
 # the same way). Each one names the operations whose text showed the need (the CHG-RTE-001 dry run, 18 October).
-NOT_READ: tuple = tuple(re.compile(p, re.I) for p in (
+NOT_READ: tuple = tuple(re.compile(p, re.I | re.S) for p in (
+    # fix round 1 (18 October 2026, the task review):
+    r"cell serving this region",                # getRegionSettings, updateRegionSettings: the region's own cell_name
+    r"under its cell's stem",                   # resolveTenantHost: how the hostname is built; its row has cellId
+    # the stored-currency sentence repeated in five schemas (Shift, RegionSettings, ...): it names four tables to
+    # say they keep their own currency, not to read them; its wrapping breaks inside words (`ledger.ac\ncount`)
+    r"Four\s+tables\s+genuinely\s+differ\s+from\s+their\s+region\s+and\s+keep\s+a\s+stored\s+currency"
+    r".*?`control\.partner_agreement`",
     r"never from another tenant's data",        # getAiVenueSettings, setAiVenueSettings: no other tenant is read
     r"phone number or collection point",        # deliverCredential: a credential's collection desk, not F&B's
     r"moves with the exchange rate",            # listChannelListings, setChannelListing, listPartnerAgreements
@@ -302,10 +309,11 @@ def facts_named(text: str, reader: str, owner_of_schema: dict, tables: set, pers
     return out
 
 
-def fact_findings() -> list:
+def fact_findings(ignore=None) -> list:
     """[(operation, reader, table, owner, how, phrase)] for every fact an operation's text names that no query it
     asks covers, the operation's own lineage reads and writes left to the rules that judge them. Shared by main(),
-    `--list-facts` and tools/applied/read-routes-18-october.py."""
+    `--list-facts` and tools/applied/read-routes-18-october.py. `ignore(route) -> bool` leaves routes out of the
+    coverage (the sweep ignores the routes it wrote itself, so a second run sees what justifies each)."""
     lin = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
     services = (g.load_json(g.ROOT / "handoff" / "service-decomposition.json", {}) or {}).get("services") or {}
     owner_of_schema = {sc: s for s, v in services.items() for sc in v.get("schemas") or []}
@@ -323,6 +331,8 @@ def fact_findings() -> list:
         # The contract's own routes as well as the lineage's, so the class query sees a route as soon as it is
         # written, before derive-lineage copies it (XR-LINEAGE keeps the two equal).
         via = [r for r in (f["op"].get("x-ticvai-read-via") or []) if isinstance(r, dict)] + (e.get("readVia") or [])
+        if ignore:
+            via = [r for r in via if not ignore(r)]
         cov_t, cov_o = covered_by(via, qtables)
         skip = set(e.get("reads") or []) | set(e.get("writes") or [])
         skip |= {str(w.get("table")) for w in e.get("writeVia") or [] if isinstance(w, dict)}

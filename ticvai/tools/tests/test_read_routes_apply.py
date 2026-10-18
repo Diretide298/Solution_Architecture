@@ -80,3 +80,54 @@ def test_a_query_is_added_once():
 def test_route_follows_the_deployables():
     assert rr.route_for("operations", "operations") == "in-process"
     assert rr.route_for("operations", "commerce") == "service"
+
+
+SWEPT = """paths:
+  /c:
+    get:
+      operationId: getC
+      x-ticvai-read-via:
+      - query: things#thingRecords
+        route: service
+        for: 'its read of things.thing, Things''s data (CHG-MOD-001)'
+      - query: other#xRecords
+        route: service
+        for: 'what its text calls "x": other.x, Other''s data (CHG-RTE-001)'
+      summary: Get a C
+  /d:
+    get:
+      operationId: getD
+      x-ticvai-read-via:
+      - query: other#xRecords
+        route: service
+        for: 'what its text calls "x": other.x, Other''s data (CHG-RTE-001)'
+      summary: Get a D
+"""
+
+
+def test_a_swept_route_no_longer_justified_is_removed_and_nothing_else():
+    out, n = rr.remove_read_via(SWEPT, "getC", "other#xRecords")
+    assert n == 1
+    doc = yaml.safe_load(out)["paths"]
+    assert [v["query"] for v in doc["/c"]["get"]["x-ticvai-read-via"]] == ["things#thingRecords"]
+    out2, n2 = rr.remove_read_via(out, "getD", "other#xRecords")
+    assert n2 == 1 and "x-ticvai-read-via" not in yaml.safe_load(out2)["paths"]["/d"]["get"]
+    # a route this script did not write is never removed
+    assert rr.remove_read_via(SWEPT, "getC", "things#thingRecords") == (SWEPT, 0)
+
+
+def test_served_follows_its_askers_but_never_drops_below_what_the_owner_declared():
+    out, _ = rr.add_served(CONTRACT, "thingRecords", "in-process", "operations")
+    back, changed = rr.set_served(out, "thingRecords", ["service"], "operations")
+    assert changed and yaml.safe_load(back)["x-ticvai-queries"]["thingRecords"]["served"] == ["service"]
+    assert yaml.safe_load(back)["x-ticvai-queries"]["thingRecords"]["rule"].endswith(
+        "It is asked from another deployable through Things' service route (serviceAuth).")
+    assert rr.served_for(["service"], {"in-process"}) == ["in-process", "service"]
+    assert rr.served_for(["service"], set()) == ["service"]
+
+
+def test_a_read_is_swept_only_where_its_own_text_names_the_fact():
+    # fix round 1: a GET whose phrase sits only in a shared response schema (a write rule) is not swept
+    assert rr.sweep_skips("get", "platform.scope", {})
+    assert not rr.sweep_skips("get", "platform.scope", {"platform.scope": [("fact", "active venues")]})
+    assert not rr.sweep_skips("post", "platform.scope", {})

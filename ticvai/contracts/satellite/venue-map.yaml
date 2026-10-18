@@ -1652,10 +1652,6 @@ paths:
         - "P02 GST-053 Your Plan"
         - "P02 GST-054 AI Planner"
         - "P02 GST-059 Plan in Progress"
-      x-ticvai-read-via:
-      - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
       security:
       - guestAuth: []
       x-ticvai-agreed: '29 September: MOB-6 (Plan tab Block A); shape follows getVenueMap (version query)'

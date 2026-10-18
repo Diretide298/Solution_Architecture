@@ -130,27 +130,90 @@ def route_sentence(label: str, deployable: str, served: list) -> str:
     return "It is " + ", and ".join(parts) + "."
 
 
-def add_served(text: str, name: str, route: str, deployable: str):
-    """Adds `route` to query `name`'s served list (in ROUTES order) and rewrites the rule's "It is asked ..." sentence,
-    which CHG-MOD-001 wrote from the routes. `deployable` is the owner's. Returns (text, changed)."""
+def served_of(text: str, name: str) -> list:
+    lines = text.split("\n")
+    i, end = _query_block(lines, name)
+    s = next(n for n in range(i, end) if re.match(r"^    served:\s*\[", lines[n]))
+    return [x.strip() for x in re.match(r"^    served:\s*\[(.*)\]", lines[s]).group(1).split(",") if x.strip()]
+
+
+def set_served(text: str, name: str, routes: list, deployable: str):
+    """Sets query `name`'s served list (in ROUTES order) and rewrites the rule's "It is asked ..." sentence, which
+    CHG-MOD-001 wrote from the routes. `deployable` is the owner's. Returns (text, changed)."""
     lines = text.split("\n")
     i, end = _query_block(lines, name)
     s = next(n for n in range(i, end) if re.match(r"^    served:\s*\[", lines[n]))
     cur = [x.strip() for x in re.match(r"^    served:\s*\[(.*)\]", lines[s]).group(1).split(",") if x.strip()]
-    if route in cur:
+    new = [r for r in ROUTES if r in routes]
+    if new == cur:
         return text, False
-    cur = [r for r in ROUTES if r in cur or r == route]
-    lines[s] = f"    served: [{', '.join(cur)}]"
+    lines[s] = f"    served: [{', '.join(new)}]"
     r0 = next((n for n in range(i, end) if lines[n].startswith("    rule:")), None)
     body = [n for n in range(r0 + 1, end) if lines[n].startswith("      ")] if r0 is not None else []
     para = " ".join(lines[n].strip() for n in body)
-    m = re.search(r"\. (\S+) answers with its", para)
+    m = (re.search(r"\. (\S+) answers with its", para) or re.search(r"query interface (\S+) implements", para)
+         or re.search(r"through (\S+?)'s? service route", para))
     if body and m and "It is asked" in para:
-        para = para[:para.index("It is asked")] + route_sentence(m.group(1), deployable, cur)
+        para = para[:para.index("It is asked")] + route_sentence(m.group(1), deployable, new)
         lines[body[0]:body[-1] + 1] = textwrap.wrap(para, width=116, initial_indent="      ",
                                                      subsequent_indent="      ", break_long_words=False,
                                                      break_on_hyphens=False)
     return "\n".join(lines), True
+
+
+def add_served(text: str, name: str, route: str, deployable: str):
+    """Adds `route` to query `name`'s served list. Returns (text, changed)."""
+    cur = served_of(text, name)
+    if route in cur:
+        return text, False
+    return set_served(text, name, cur + [route], deployable)
+
+
+def served_for(declared: list, used: set) -> list:
+    """A query's served list: what its owner declared (r6, or the new query's own block) and every route an asker
+    takes, in ROUTES order. A route the sweep added and no asker takes any more goes (fix round 1)."""
+    return [r for r in ROUTES if r in declared or r in used]
+
+
+SWEPT_FOR = re.compile(r"^what its text calls \".*\(CHG-RTE-001\)$")
+
+
+def is_swept(route: dict) -> bool:
+    """A read route this script's sweep wrote (its `for` says what the operation's text calls the fact)."""
+    return bool(SWEPT_FOR.match(str((route or {}).get("for") or "")))
+
+
+def remove_read_via(text: str, op: str, query: str):
+    """Removes the operation's swept route to `query` (only one this sweep wrote); drops the list when it empties.
+    Returns (text, removed)."""
+    lines = text.split("\n")
+    i, end, ind = _op_block(lines, op)
+    k = next((n for n in range(i, end) if lines[n] == f"{ind}x-ticvai-read-via:"), None)
+    if k is None:
+        return text, 0
+    at, items = k + 1, []
+    while at < end and (lines[at].startswith(f"{ind}- ") or lines[at].startswith(f"{ind}  ")):
+        if lines[at].startswith(f"{ind}- "):
+            items.append([at, at + 1])
+        else:
+            items[-1][1] = at + 1
+        at += 1
+    for a, b in items:
+        block = lines[a:b]
+        q = re.match(r"^\s+- query:\s*(\S+)", block[0])
+        why = next((re.match(r"^\s+for:\s*'(.*)'\s*$", l) for l in block if re.match(r"^\s+for:", l)), None)
+        if q and q.group(1) == query and why and is_swept({"for": why.group(1).replace("''", "'")}):
+            del lines[a:b]
+            if len(items) == 1:
+                del lines[k]
+            return "\n".join(lines), 1
+    return text, 0
+
+
+def sweep_skips(method: str, table: str, own_facts: dict) -> bool:
+    """A read (GET) is swept only where its own words (summary, description, parameters, request body) name the fact;
+    a phrase that sits only in a shared response schema is a rule the writing operation keeps (fix round 1)."""
+    return method.lower() == "get" and table not in own_facts
 
 
 def add_query(text: str, name: str, block: str):
@@ -395,6 +458,16 @@ QUERY_FOR_READER = {
 }
 # The name a module's own queries use for it ("F&B answers with its ..."), where it is not the service's.
 LABEL = {"FnbService": "F&B"}
+# What the owners declared before this script, for the existing queries it may route to (r6, 86a3fa6f): a route it
+# added is withdrawn when no asker takes it any more, but these never drop (fix round 1).
+R6_SERVED = {
+    "tenancy#regionSettingsRecords": ["in-process", "service"], "tenancy#venueSettingsRecords": ["in-process"],
+    "tenancy#denominationRecords": ["in-process"], "tenancy#workstationRecords": ["in-process", "service"],
+    "subscription#licenceAddOnRecords": ["in-process"], "finance#fxRateRecords": ["in-process", "service"],
+    "promotions#promotionRecords": ["in-process", "service"], "assets#mediaAssetRecords": ["service"],
+    "platform-ops#tenantDomainRecords": ["service"], "orders#orderLineRecords": ["in-process", "service"],
+    "catalogue#productRecords": ["in-process", "service"],
+}
 
 
 def main() -> int:
@@ -422,8 +495,23 @@ def main() -> int:
     for op, q, route, why in EXPLICIT:
         plan.setdefault(op, []).append((q, route, why))
     explicit_ops = {e[0] for e in EXPLICIT}
-    for op, reader, t, owner, how, phrase in _check().fact_findings():
+    xr = _check()
+    ops = g.operations()
+    owner_of_schema = {sc: sv for sv, v in services.items() for sc in v.get("schemas") or []}
+    tables = set((g.load_json(ROOT / "handoff" / "schema-reference.json", {}) or {}).get("cols") or {})
+    by, names = g.schemas()
+    persist = xr.persisted(by, tables)
+    get_skipped = []
+    for op, reader, t, owner, how, phrase in xr.fact_findings(ignore=is_swept):
         if how != "fact" or t not in QUERY_FOR or op in explicit_ops:
+            continue
+        f = ops[op]
+        own = xr.op_text(f["contract"], {k: v for k, v in f["op"].items() if k != "responses"}, f["item"], by)
+        own_facts = {tt: [h for h in hs if h[0] == "fact"] for tt, hs in xr.facts_named(
+            own, reader, owner_of_schema, tables, persist, names, svc_of_contract).items()}
+        own_facts = {tt: hs for tt, hs in own_facts.items() if hs}
+        if sweep_skips(f["method"], t, own_facts):
+            get_skipped.append(f"{op}: {t} ({phrase!r} only in its response schema)")
             continue
         if reader == "IdentityService" and tier_of.get(owner) != "foundation":
             skipped.append(f"{op}: {t} ({owner}) - Identity asks above the foundation tier only by projection")
@@ -433,28 +521,47 @@ def main() -> int:
         plan.setdefault(op, []).append((QUERY_FOR_READER.get((t, reader), QUERY_FOR[t]),
                                         route_for(dep_of.get(reader), dep_of.get(owner)),
                                         f'what its text calls "{words}": {t}, {label}\'s data (CHG-RTE-001)'))
-    ops = g.operations()
     n_via = 0
-    need = {}
     for op, entries in sorted(plan.items()):
         rel = ops[op]["file"]
         texts[rel], n = add_read_via(text(rel), op, entries)
         n_via += n
         for q, route, why in entries:
-            need.setdefault(q, set()).add(route)
             if n:
                 print(f"  {op}: {q} ({route}) - {why}")
-    # 3. served routes
-    for q, routes in sorted(need.items()):
+    # 3. a swept route the sweep no longer justifies goes (fix round 1)
+    wanted = {(op, q) for op, entries in plan.items() for q, _r, _w in entries}
+    n_gone = 0
+    for op, f in sorted(ops.items()):
+        for r in f["op"].get("x-ticvai-read-via") or []:
+            if isinstance(r, dict) and is_swept(r) and (op, r.get("query")) not in wanted:
+                texts[f["file"]], n = remove_read_via(text(f["file"]), op, r.get("query"))
+                n_gone += n
+                if n:
+                    print(f"  {op}: {r.get('query')} removed - no longer named in its own text")
+    # 4. served routes: what the owner declared and every route an asker now takes
+    used = {}
+    for rel in sorted({f["file"] for f in ops.values()}):
+        for m in re.finditer(r"- query:\s*(\S+)\s*\n\s+route:\s*(\S+)", text(rel)):
+            used.setdefault(m.group(1), set()).add(m.group(2))
+    declared = dict(R6_SERVED)
+    for rel, qs in QUERIES.items():
+        stem = rel.split("/")[-1][:-5]
+        for name, block in qs:
+            declared[f"{stem}#{name}"] = re.search(r"served: \[(.*)\]", block).group(1).split(", ")
+    for q in sorted(declared):
         stem, name = q.split("#", 1)
         rel = next(r for r in (f"contracts/spine/{stem}.yaml", f"contracts/satellite/{stem}.yaml")
                    if (ROOT / r).exists())
-        for route in sorted(routes):
-            texts[rel], changed = add_served(text(rel), name, route, dep_of.get(svc_of_contract.get(stem)))
-            if changed:
-                print(f"  served {q}: + {route}")
+        want = served_for(declared[q], used.get(q, set()))
+        texts[rel], changed = set_served(text(rel), name, want, dep_of.get(svc_of_contract.get(stem)))
+        if changed:
+            print(f"  served {q}: {want}")
+    for s in get_skipped:
+        print(f"  NOT SWEPT (a read whose own text does not name it) {s}")
     for s in skipped:
         print(f"  NOT ROUTED (for the lead) {s}")
+    print(f"{n_gone} swept route(s) removed")
     changed = [rel for rel, t in texts.items() if t != _read(ROOT / rel)]
     print(f"{n_via} read route(s) in {len(plan)} operation(s); {len(changed)} contract file(s) change"
           + ("" if a.apply else " (nothing written, pass --apply)"))

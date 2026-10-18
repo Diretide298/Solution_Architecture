@@ -528,10 +528,6 @@ paths:
       operationId: listProductionPlans
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
-      x-ticvai-read-via:
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: The production plans
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; BO-112: release and the prep sheet take a planId nothing read).** The venue's production plans, ordered by `forDate` then outlet; `forDate` and `status` narrow it.
@@ -1344,10 +1340,6 @@ paths:
       operationId: listCombos
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
-      x-ticvai-read-via:
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The combos defined at the venue, with their slots
@@ -2835,10 +2827,6 @@ paths:
       operationId: listMenuVersions
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
-      x-ticvai-read-via:
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Every published version of a menu
       description: '**Added 26 September.** `publishMenu` promised that the previous version stays readable
         and `rollbackMenu` takes a `toVersion`, and nothing listed the versions — so the number a rollback
@@ -5706,10 +5694,6 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-045 Menu Management"
-      x-ticvai-read-via:
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5813,10 +5797,6 @@ paths:
         - "P08 BO-045 Menu Management"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
-      x-ticvai-read-via:
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica

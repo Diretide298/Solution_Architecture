@@ -84,3 +84,31 @@ def test_the_facts_the_crs_named_are_found_in_their_operations_text():
         if table not in xr.facts_named(text, reader, owner_of_schema, tables, persist, names, svc_of_contract):
             missed.append((op, table))
     assert missed == []
+
+
+# Fix round 1 (read routes, 18 October 2026): sentences that name a fact without reading it.
+FOUR_TABLES = ("the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their "
+               "region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, "
+               "`ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD")
+OWNER2 = dict(OWNER, inventory="InventoryService", control="PlatformService")
+TABLES2 = TABLES | {"orders.payment", "inventory.supplier", "control.partner_agreement"}
+
+
+def test_the_four_tables_sentence_names_none_of_them_even_broken_inside_a_word():
+    assert xr.facts_named(FOUR_TABLES, "LedgerService", OWNER2, TABLES2) == {}
+    assert xr.facts_named(FOUR_TABLES.replace("Four tables", "Five tables"), "LedgerService", OWNER2, TABLES2)
+
+
+def test_the_cell_serving_this_region_is_the_regions_own_column():
+    assert named("The cell serving this region. One cell per tenant per region (ADR-0014).", "TenancyService") == {}
+
+
+def test_a_hostname_under_its_cells_stem_reads_no_cell():
+    assert named("Every tenant has a platform subdomain under its cell's stem, `<venue>.<cell>.ticvai.app`",
+                 "TenancyService") == {}
+
+
+def test_every_not_read_phrase_still_leaves_the_real_fact_found():
+    # the exclusions are phrases, not words: the fact itself is still found next to them
+    text = "The cell serving this region. A venue not among the tenant's active venues is refused."
+    assert set(named(text, "WhiteLabelService")) == {"platform.scope"}

@@ -160,10 +160,6 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
-      x-ticvai-read-via:
-      - query: promotions#promotionRecords
-        route: service
-        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -279,10 +275,6 @@ paths:
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-      x-ticvai-read-via:
-      - query: promotions#promotionRecords
-        route: service
-        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a queue with live position
@@ -427,10 +419,6 @@ paths:
   /waiting-guests:
     get:
       operationId: listMyWaitingGuests
-      x-ticvai-read-via:
-      - query: promotions#promotionRecords
-        route: service
-        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [guest]
       x-ticvai-read-routing: primary
       summary: The caller's own queue entries
@@ -566,10 +554,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-040 Virtual Queue"
         - "P02 GST-023 Virtual Queue"
-      x-ticvai-read-via:
-      - query: promotions#promotionRecords
-        route: service
-        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [guest]
       x-ticvai-read-routing: primary
       summary: Read a queue entry
@@ -814,10 +798,6 @@ paths:
         - "P08 BO-001 Queue Directory"
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
-      x-ticvai-read-via:
-      - query: promotions#promotionRecords
-        route: service
-        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: List entries in a queue
