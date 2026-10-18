@@ -162,7 +162,38 @@ try {
   const workable = await call('GET', '/api/board/mine?project_id=ticvai&only=workable');
   check('startHere is the same whatever `only` shows', workable.data?.startHere?.key === '7403', short(workable.data?.startHere));
 
-  // CONNECTOR-SECTION (Task 4 inserts the connector assertions here)
+  // ── the same through the connector ────────────────────────────────
+  // Straight at the accounts service: the pull of a ticket with no links reads nothing from the package, so the
+  // viewer is not needed. A ViewerClient signs in at /api/auth/login, which the accounts service answers itself.
+  await mkdir(WORK, { recursive: true });
+  const client = new ViewerClient({ base: API, project: 'ticvai', email: EMAIL, password: PASSWORD });
+  const tool = (name, args) => BY_NAME.get(name).run(client, args);
+  const readme = (k) => readFile(path.join(WORK, '.adam', 'work', k, 'README.md'), 'utf8').catch(() => '');
+
+  const pulled = await tool('adam_pull', { key: '7400', dir: WORK });
+  const r7400 = await readme('7400');
+  check('**adam_pull of a ticket with sub-tasks lists them in README.md, with status and holder**',
+    pulled.found && pulled.subtasks === 5 && r7400.includes('## Sub-tasks (5)')
+      && r7400.includes('- #7402 createCart - New, Hrushikant Patkar\n')
+      && r7400.includes('- #7405 getCart: expiry rule - New, Sub Tasker (under #7404)\n'),
+    r7400.slice(0, 1200));
+  await tool('adam_pull', { key: '7405', dir: WORK });
+  check('**adam_pull of a sub-task names its parent**',
+    (await readme('7405')).includes('- **Part of:** #7404 getCart (New, Sub Tasker)\n'), (await readme('7405')).slice(0, 600));
+  await tool('adam_pull', { key: '7421', dir: WORK });
+  check('and names a parent that is somebody else\'s',
+    (await readme('7421')).includes('- **Part of:** #7420 Parent held by someone else (New, Hrushikant Patkar)\n'),
+    (await readme('7421')).slice(0, 600));
+  await knob('children=503');
+  const lost = await tool('adam_pull', { key: '7400', dir: WORK });
+  check('a sub-task read that fails is said in README.md',
+    lost.subtasks === 'could not be read' && (await readme('7400')).includes('_Could not be read from OpenProject.'),
+    JSON.stringify(lost).slice(0, 300));
+  await knob('off=1');
+  const shown = await tool('adam_board', { only: 'workable' });
+  check('**adam_board hands on startHere, and counts the sub-tasks it read**',
+    shown.startHere?.key === '7403' && shown.rows?.find((r) => r.ticket === '7400')?.subtasks === 5,
+    JSON.stringify({ startHere: shown.startHere, rows: shown.rows }).slice(0, 400));
 } catch (error) {
   check('the check ran to the end', false, error.stack ?? String(error));
   for (const child of children) console.log(child.log?.().slice(-2000));

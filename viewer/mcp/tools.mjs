@@ -420,10 +420,44 @@ function blockedSection(blockedBy) {
   return out;
 }
 
-function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined, blockedBy = []) {
+/**
+ * The ticket this one hangs under, for the header's "Part of" line (CHG-ADM-006): its number and subject, then its
+ * status and holder, or "could not be read" when ADAM could only name it. '' when it hangs under nothing.
+ */
+function partOfText(partOf) {
+  if (!partOf?.key) return '';
+  const about = partOf.read === false ? 'could not be read'
+    : `${partOf.status || 'no status'}, ${partOf.assignee || 'unassigned'}`;
+  return `#${partOf.key} ${String(partOf.subject ?? '').trim()} (${about})`;
+}
+
+/**
+ * The work under this ticket, at every depth, in the order ADAM gives (the board's order), never re-sorted here
+ * (CHG-ADM-006). Read by the service from OpenProject for this ticket, not from the held project read. `undefined`
+ * is an ADAM from before sub-tasks (no section); `null` a read that failed, which is said rather than shown as none.
+ */
+function subtaskSection(subtasks) {
+  if (subtasks === undefined) return '';
+  if (subtasks === null) {
+    return '\n## Sub-tasks\n\n_Could not be read from OpenProject. Open the ticket\'s link above to see them, '
+      + 'and pull again later._\n';
+  }
+  if (!subtasks.length) return '';
+  let out = `\n## Sub-tasks (${subtasks.length})\n\n`
+    + 'The work under this ticket, in the order it is done. Pull one (adam_pull with its number) before you work on it.\n\n';
+  for (const s of subtasks) {
+    out += `- #${s.key} ${String(s.subject ?? '').trim()} - ${s.status || 'no status'}, ${s.assignee || 'unassigned'}`
+      + `${s.depth > 1 && s.parent ? ` (under #${s.parent})` : ''}\n`;
+  }
+  return out;
+}
+
+function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined, blockedBy = [],
+  tree = {}) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
-  out += line('Project', wp.project) + line('Type', wp.type) + line('Status', wp.status)
+  out += line('Project', wp.project) + line('Type', wp.type) + line('Part of', partOfText(tree.partOf))
+    + line('Status', wp.status)
     + line('Milestone', wp.version) + line('Priority', wp.priority) + line('Assignee', wp.assignee)
     + line('Start', wp.startDate) + line('Due', wp.dueDate)
     + line('% done', wp.percentDone) + line('OpenProject', wp.url)
@@ -438,6 +472,7 @@ function ticketReadme(wp, files, missing, when, decisions = [], release = null, 
   out += blockedSection(blockedBy);
   out += changeSection(changes);
   out += releaseSection(release);
+  out += subtaskSection(tree.subtasks);
   out += '\n';
   out += `## Description\n\n${wp.description || '_No description in OpenProject._'}\n`;
   if (wp.descriptionTrimmed) out += '\n_Longer in OpenProject - open the link above for the rest._\n';
@@ -569,7 +604,8 @@ async function pullOne(client, key, base, when) {
   const answer = await client.service(`/api/work-packages/${encodeURIComponent(key)}?${await scoped(client)}`);
   if (answer.status === 428) return { key, needsSetup: true, error: answer.data?.detail };
   if (!answer.ok) return { key, error: answer.data?.detail ?? `HTTP ${answer.status}` };
-  const { workPackage: wp, touches = [], blockedBy = [] } = answer.data;
+  // `subtasks` and `partOf` from an ADAM with CHG-ADM-006; an older one sends neither and the README has neither.
+  const { workPackage: wp, touches = [], blockedBy = [], subtasks, partOf = null } = answer.data;
   const release = await releaseFor(client, wp.key, touches)
     .catch((error) => ({ available: false, why: error.message }));
   const changes = await changesFor(client, wp.key).catch(() => null);
@@ -606,8 +642,11 @@ async function pullOne(client, key, base, when) {
     ...(release.available ? { release: { current: release.current, previous: release.previous } } : {}),
     ...(Array.isArray(changes) ? { changeRequests: changes } : {}),
     ...(blockedBy.length ? { blockedBy } : {}),
+    ...(subtasks !== undefined ? { subtasks } : {}),
+    ...(partOf ? { partOf } : {}),
   }));
-  await writeFile(path.join(folder, 'README.md'), ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy));
+  await writeFile(path.join(folder, 'README.md'),
+    ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf }));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
@@ -628,6 +667,9 @@ async function pullOne(client, key, base, when) {
       ...(release.diffError ? { diffError: release.diffError } : {}),
     } } : {}),
     ...(blockedBy.length ? { blockedBy: blockedBy.map((c) => ({ id: c.id, status: c.status, title: c.title, via: c.via })) } : {}),
+    ...(Array.isArray(subtasks) && subtasks.length ? { subtasks: subtasks.length } : {}),
+    ...(subtasks === null ? { subtasks: 'could not be read' } : {}),
+    ...(partOf?.key ? { partOf: partOf.key } : {}),
     ...(Array.isArray(changes) && changes.length ? { changeRequests: {
       total: changes.length,
       open: changes.filter((c) => c.status === 'open').map((c) => c.id),
@@ -1123,6 +1165,10 @@ export const TOOLS = [
       + 'behind it. Subtasks and the artefacts each ticket touches come back with it and are '
       + 'held rather than shown — ask for them by ticket when you want them. Each row says which open '
       + 'blocking change requests affect it (`blocked`: the CR ids; blank is workable). '
+      + '`startHere` is where to start when the person asks to work without naming a ticket (a /ticket with no '
+      + 'number): the first ticket they can finish, or its first open sub-task that is theirs. Start it and say '
+      + 'which and why; never ask for a number. A subtasks count of ? (with `subtaskNote`) means the sub-tasks '
+      + 'could not be read, not that there are none. '
       + BLOCKER_RULE,
     inputSchema: {
       type: 'object',
@@ -1179,6 +1225,8 @@ export const TOOLS = [
       // last pulled at r1 while ADAM serves r2: the next pull is at r2 (every
       // pull is at the latest release) and says what changed.
       const served = board.release?.tag ?? null;
+      // False only from an ADAM whose project read failed: the counts are then unknown, shown as ?, never 0.
+      const subtasksKnown = board.subtasksKnown !== false;
       const rows = items.map((t) => ({
         order: t.buildOrder ?? '',
         ticket: t.key,
@@ -1187,7 +1235,7 @@ export const TOOLS = [
         status: t.status,
         due: t.dueDate ?? '',
         percent: t.percentDone ?? 0,
-        subtasks: (t.subtasks ?? []).length,
+        subtasks: subtasksKnown ? (t.subtasks ?? []).length : '?',
         ...(served ? { release: t.pin ? (t.pinStale ? `${t.pin} -> ${served}` : t.pin) : '' } : {}),
         // The open blocking CRs that affect it (CHG-ADM-004). Blank is workable now.
         blocked: (t.blockedBy ?? []).map((c) => c.id).join(', '),
@@ -1228,14 +1276,21 @@ export const TOOLS = [
         // Which OpenProject project this board is read from, so "nothing
         // assigned" is never mistaken for "nothing assigned anywhere".
         ...(board.openproject ? { openprojectProject: board.openproject } : {}),
+        // `subtasks` is the column /board and the display text below have always named (CHG-ADM-006).
         columns: served
-          ? ['order', 'ticket', 'task', 'module', 'status', 'due', 'release', 'blocked']
-          : ['order', 'ticket', 'task', 'module', 'status', 'due', 'blocked'],
+          ? ['order', 'ticket', 'task', 'module', 'status', 'due', 'subtasks', 'release', 'blocked']
+          : ['order', 'ticket', 'task', 'module', 'status', 'due', 'subtasks', 'blocked'],
         // How many of the whole board no open blocking CR affects, and how many one does (CHG-ADM-004).
         ...(board.workable !== undefined ? { workable: board.workable, blockedCount: board.blocked } : {}),
         ...(only ? { only } : {}),
         ...(Object.keys(blockedNotes).length ? { blockedBy: blockedNotes } : {}),
         ...(firstWorkable ? { firstWorkable: firstWorkable.key } : {}),
+        // Where /ticket with no number starts: ADAM's answer over the whole board (CHG-ADM-006).
+        ...(board.startHere ? { startHere: board.startHere } : {}),
+        ...(subtasksKnown ? {} : {
+          subtaskNote: 'Sub-tasks could not be read from OpenProject, so the subtasks column shows ? (not known), '
+            + 'not 0. Ask again in a minute.',
+        }),
         ...(served ? {
           release: served,
           releaseNote: `You are always on the latest release (${served}). A release like r1 -> ${served} means the `
@@ -1253,9 +1308,10 @@ export const TOOLS = [
         ...(wanted ? {} : { subtasksHeld: Object.keys(held).length }),
         touches: touching,
         display: wanted
-          ? 'Show `rows` as a markdown table using `columns`, then the subtasks under their ticket. '
+          ? 'Show `rows` as a markdown table using `columns`, then the subtasks under their ticket; if `subtaskNote` is '
+            + 'present, say it in one line. '
             + 'If `more` is present, say it in one line under the table.'
-          : 'Show `rows` as a markdown table using `columns`, and if `more` is present say it in one '
+          : 'Show `rows` as a markdown table using `columns`; if `subtaskNote` is present, say it in one line; if `more` is present say it in one '
             + 'line under the table; if any `release` reads "rN -> rM", say in one line that the next pull of '
             + 'those tickets is at the latest release and shows what changed; if any `blocked` is filled, say in '
             + 'one line that those wait on the CRs named (`blockedBy` says how each is affected) and that '
@@ -1742,8 +1798,11 @@ export const TOOLS = [
       + 'request raised from the ticket with its decision and the release that carries it, and above them a '
       + '"Blocked by" section naming the open blocking change requests that affect the ticket (`blockedBy`). '
       + 'A blocked ticket is not built: always raise a CR for a new blocker, propose the ticket On hold naming '
-      + 'the CR, and move to the next ticket you can finish (adam_board with only: "workable"). With no `key`, pulls '
-      + 'every open ticket assigned to you and writes .adam/board.md grouped by milestone. **Use '
+      + 'the CR, and move to the next ticket you can finish (adam_board with only: "workable"). README.md lists the '
+      + 'ticket\'s sub-tasks at every depth under "Sub-tasks" (status and who holds each, in the order they are '
+      + 'done), and a sub-task\'s README names its parent on a "Part of" line. With no `key`, pulls '
+      + 'every open ticket assigned to you and writes .adam/board.md grouped by milestone; to start work without a '
+      + 'ticket number, do not pull the whole board: adam_board\'s `startHere` is the ticket to start. **Use '
       + 'this at the start of work on a ticket**, then read the files you need instead of holding '
       + 'everything in the conversation. Always pass `dir`: the absolute path of the folder you are '
       + 'working in. .adam/ is git-ignored, so Grep skips it unless you pass --no-ignore; Read works as usual.',
@@ -1786,6 +1845,13 @@ export const TOOLS = [
             + ' under "Change requests on this ticket": follow the settled decisions'
             + `${crs.open.length ? `, and wait on the part ${crs.open.join(', ')} cover${crs.open.length === 1 ? 's' : ''}` : ''}.`;
         }
+        if (typeof one.subtasks === 'number') {
+          next += ` It has ${one.subtasks} sub-task${one.subtasks === 1 ? '' : 's'}, listed under "Sub-tasks" in `
+            + 'README.md in the order they are done; pull one before working on it.';
+        } else if (one.subtasks === 'could not be read') {
+          next += ' Its sub-tasks could not be read from OpenProject: say so in one line.';
+        }
+        if (one.partOf) next += ` It is part of #${one.partOf} (the "Part of" line in README.md).`;
         if (one.blockedBy?.length) {
           next = `Blocked: ${one.blockedBy.map((c) => `${c.id} (${c.status}, via ${c.via})`).join('; ')}. `
             + 'Read the "Blocked by" section of README.md. Do not build the blocked part and do not work around it: '
@@ -1822,6 +1888,12 @@ export const TOOLS = [
           ? { more: `${answer.data.total - items.length} more assigned; raise limit or pull them by key` }
           : {}),
         ...(answer.data.note ? { note: answer.data.note } : {}),
+        // For an older /ticket that, given no number, called this with no key: where to start (CHG-ADM-006).
+        ...(answer.data.startHere ? {
+          startHere: answer.data.startHere,
+          next: `If the person asked to start work without naming a ticket, start #${answer.data.startHere.key}; `
+            + 'do not ask for a number.',
+        } : {}),
       };
     },
   },
