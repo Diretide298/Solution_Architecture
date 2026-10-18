@@ -79,3 +79,20 @@ def test_a_device_takes_its_workstations_path():
     assert ("UPDATE platform.device x SET scope_path = p.scope_path FROM platform.workstation p WHERE "
             "p.id = x.workstation_id AND x.scope_path IS DISTINCT FROM p.scope_path") in sql
     assert "WHERE scope_path IS NULL" in sql and sql.endswith("ALTER COLUMN scope_path SET NOT NULL")
+
+
+def test_a_renamed_tables_old_policy_call_is_not_listed_as_dropped_when_its_helper_changes():
+    # sync.dsar_request was platform.dsar_request (CHG-XDW-001); its parent call becomes apply_parent_across_rls
+    # (CHG-RSF-001). The "after rename" row already tells the person to apply its policy again; the old call is
+    # replaced, not dropped.
+    old = model("CREATE TABLE approvals.request (id uuid PRIMARY KEY);\n"
+                "CREATE TABLE platform.dsar_request (id uuid PRIMARY KEY, request_id uuid NOT NULL);\n"
+                "SELECT platform.apply_parent_rls('platform.dsar_request'::regclass, 'request_id', "
+                "'approvals.request'::regclass, 'id');\n")
+    new = model("CREATE TABLE approvals.request (id uuid PRIMARY KEY);\n"
+                "CREATE TABLE sync.dsar_request (id uuid PRIMARY KEY, request_id uuid NOT NULL);\n"
+                "SELECT platform.apply_parent_across_rls('sync.dsar_request'::regclass, 'request_id', "
+                "'approvals.request'::regclass, 'id');\n")
+    p = fwd.diff("tenant", old, new, renames={"tables": {"platform.dsar_request": "sync.dsar_request"}})
+    assert not [r for r in p.review if r[0] == "statement dropped"]
+    assert [r[0] for r in p.review] == ["table renamed", "after rename"]

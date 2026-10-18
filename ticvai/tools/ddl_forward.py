@@ -861,6 +861,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
         old_call = rls_call(old.stmts[k]) if kind == "stmt" else None
         if old_call and (old_call[0] == "drop_rls_policies" or old_call[1] in reapplied):
             continue
+        if old_call and any(o == old_call[1] and n in reapplied for n, o in rt.items()):
+            continue   # a renamed table's policy: the "after rename" row applies it again (CHG-RSF-001)
         if kind == "table" and k[1] in renamed_away:
             continue
         if kind in ("constraint", "stmt") and subst(old.stmts[k]) in renamed_new_stmts:
