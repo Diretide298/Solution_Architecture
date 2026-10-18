@@ -268,7 +268,10 @@ def _catalogue(**over):
 
 def test_a_read_only_declared_key_the_path_supplies_is_required():
     ds = _load("derive_schema_t2", "derive-schema.py")
-    keys = ds.path_supplied_keys(_catalogue())
+    cat = _catalogue()
+    cat["catalogue"][1]["paths"]["/channel-capacities/{channelCapacityId}/channel-allocations"]["put"]["requestBody"] = {
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ChannelAllocation"}}}}
+    keys = ds.path_supplied_keys(cat)
     assert ("ChannelAllocation", "channelCapacityId") in keys
     # nullable (an association, not an owner) and writable (the caller sends it) keys are not
     assert ("ChannelAllocation", "salesChannelId") not in keys
@@ -389,3 +392,52 @@ def test_a_retired_columns_guarded_statement_names_its_table_for_the_migration_t
             fwd.retire_not_null("platform.workstation", "org_unit_id") + ";\n", encoding="utf-8")
         got = td.after_r1_changes(root)
     assert got == {("backend/tenant/V0105__after_r1_20261018.sql", "platform.workstation"): [("column", "org_unit_id")]}
+
+
+# ---- 2, fix round 1: only what the operation itself takes or returns counts, and every key the rule adds is printed
+
+def _queue(required=("id",)):
+    return {"queue": ("satellite", {
+        "paths": {
+            "/queue-feeds/{feedId}/test": {"post": {"operationId": "testQueueFeed", "responses": {"200": {"content": {
+                "application/json": {"schema": {"$ref": "#/components/schemas/FeedTestResult"}}}}}}},
+            "/queues/{queueId}/readings": {"get": {"operationId": "listQueueReadings", "responses": {"200": {
+                "content": {"application/json": {"schema": {"type": "array", "items": {
+                    "$ref": "#/components/schemas/QueueReading"}}}}}}}}},
+        "components": {"schemas": {
+            "FeedTestResult": {"type": "object", "properties": {
+                "sample": {"$ref": "#/components/schemas/QueueReading"}}},
+            "QueueReading": {"x-ticvai-persistence": "queue.reading", "type": "object", "required": list(required),
+                             "properties": {
+                                 "feedId": {"type": "string", "readOnly": True, "x-ticvai-references": "queue.feed"},
+                                 "queueId": {"type": "string", "readOnly": True,
+                                             "x-ticvai-references": "queue.queue"}}}}}})}
+
+
+def test_a_matching_name_in_a_nested_sample_schema_does_not_make_a_column_not_null():
+    ds = _load("derive_schema_f1", "derive-schema.py")
+    keys = ds.path_supplied_keys(_queue())
+    # testQueueFeed's response holds a sample reading two levels down: {feedId} does not supply the reading's feed
+    assert ("QueueReading", "feedId") not in keys
+    # listQueueReadings returns an array of readings at the top level: {queueId} is the path's
+    assert keys[("QueueReading", "queueId")] == ("listQueueReadings", "/queues/{queueId}/readings", "queueId")
+
+
+def test_the_wrapper_set_is_not_the_row_but_the_request_body_is():
+    ds = _load("derive_schema_f1b", "derive-schema.py")
+    cat = _catalogue()
+    keys = ds.path_supplied_keys(cat)
+    assert ("ChannelAllocation", "channelCapacityId") not in keys   # only inside ChannelAllocationSet.allocations
+    put = cat["catalogue"][1]["paths"]["/channel-capacities/{channelCapacityId}/channel-allocations"]["put"]
+    put["requestBody"] = {"content": {"application/json": {"schema": {
+        "type": "array", "items": {"$ref": "#/components/schemas/ChannelAllocation"}}}}}
+    assert ("ChannelAllocation", "channelCapacityId") in ds.path_supplied_keys(cat)
+
+
+def test_every_key_the_rule_adds_is_printed():
+    ds = _load("derive_schema_f1c", "derive-schema.py")
+    keys = ds.path_supplied_keys(_queue())
+    lines = ds.path_key_lines(keys, {"QueueReading": "queue.reading"},
+                              lambda table, prop: {"queueId": "queue_id", "feedId": "feed_id"}[prop])
+    assert len(lines) == len(keys) == 1
+    assert "queue.reading.queue_id" in lines[0] and "listQueueReadings" in lines[0] and "{queueId}" in lines[0]

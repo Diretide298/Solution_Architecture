@@ -1792,7 +1792,8 @@ components:
     QueueReading:
       x-ticvai-persistence: "queue.reading"
       type: object
-      required: [id, kind, value, observedAt]
+      # feedId: every reading comes from one feed, named in the submitQueueReading body (CHG-MGN-001).
+      required: [id, feedId, kind, value, observedAt]
       properties:
         id: { type: string, format: uuid }
         feedId:
