@@ -335,6 +335,10 @@ ROW_OWNER = {
     "fnb.ingredient_substitute": "from_inventory_item_id",    # ADAM CR-148: the row belongs to the ingredient replaced
     "ledger.inter_entity_obligation": "from_legal_entity_id",  # ADAM CR-149: writes stay with the selling entity; the
                                                               # consuming side's read path is the row-security lane's
+    # The controller's ruling of 18 October 2026 (r7 integration gate, D-FWD-OWNER): an exchange belongs to the original
+    # sale it is made against; new_sale_id is the replacement sale it produces. V0104 had applied new_sale_id's parent
+    # policy (the alphabet); the next forward migration re-applies it on sale_id.
+    "retail.exchange": "sale_id",                             # CHG-MGN-001: the original sale, not the replacement
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------

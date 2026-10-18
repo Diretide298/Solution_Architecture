@@ -11,7 +11,8 @@ decision:
     partitions; UNENFORCED_KEYS keeps an index on a key left undeclared for that reason; table_marks lets a parent
     key never vote, so platform.sale_board_tile gets its unique-together and required-when marks; pick_owner lists a
     table with two keys to one parent ("owner undecided" in migration-review.md) and ROW_OWNER records the two the
-    published answers decide; load_contract_props collects x-ticvai-retired-columns (RETIRED) for frozen mode.
+    published answers decide, and retail.exchange by the controller''s ruling of 18 October (sale_id, the original sale
+    the exchange is made against; new_sale_id is the replacement), re-applied in the next forward migration; load_contract_props collects x-ticvai-retired-columns (RETIRED) for frozen mode.
     tools/derive-schema.py path_supplied_keys makes a readOnly declared key named by a path parameter of an operation
     its request body or a response is (or is an array of) NOT NULL, and derive-schema prints every key it adds. tools/ddl_forward.py writes every review statement whole, words a retired column as
     the four-step drop and writes its guarded DROP NOT NULL, writes a new table CHECK as DROP IF EXISTS, ADD ... NOT
