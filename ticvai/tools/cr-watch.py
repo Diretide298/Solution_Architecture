@@ -153,47 +153,192 @@ def read_env_file(path) -> dict:
 
 # ------------------------------------------------------------------------------------------------- 2. sort
 def load_classes(path=None) -> list:
-    raise NotImplementedError("Task 6")
+    path = Path(path or CLASSES)
+    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    out = []
+    for c in doc.get("classes") or []:
+        if not isinstance(c, dict) or not c.get("id") or not c.get("name"):
+            raise ValueError(f"a class in {path.name} has no id or name: {c!r}")
+        out.append({"id": str(c["id"]), "name": str(c["name"]),
+                    "artefacts": [str(a) for a in c.get("artefacts") or []],
+                    "words": [str(w).lower() for w in c.get("words") or []],
+                    "crs": [str(x) for x in c.get("crs") or []],
+                    "checks": {str(k): [str(r) for r in v or []] for k, v in (c.get("checks") or {}).items()},
+                    "branch": str(c.get("branch") or f"fix/{c['id']}"),
+                    "default_ruling": str(c.get("default_ruling") or ""),
+                    "needs": str(c.get("needs") or "lead")})
+    return out
 
 
 def short_id(cr: dict) -> str:
-    raise NotImplementedError("Task 6")
+    """The id a finding's key would use for the request's artefact: `payByLink` for Operation `orders#payByLink`."""
+    a = (cr.get("artefact") or "").strip()
+    return a.split("#", 1)[1] if cr.get("kind") == "Operation" and "#" in a else a
 
 
 def key_tokens(key: str) -> set:
-    raise NotImplementedError("Task 6")
+    """The ids in a finding's key, split as audit_guard.finding_artefacts splits them."""
+    out = set()
+    for tok in re.split(r"[:|]", str(key)):
+        tok = tok.strip()
+        if tok:
+            out.add(tok)
+            if "." in tok:
+                out.update(tok.split(".", 1))
+    return out
 
 
 def _members(baseline: dict, check: str, rule: str) -> list:
-    raise NotImplementedError("Task 6")
+    return (((baseline.get(check) or {}).get("rules") or {}).get(rule)) or []
 
 
 def _has(text: str, word: str) -> bool:
-    raise NotImplementedError("Task 6")
+    return re.search(r"(?<![a-z0-9])" + re.escape(word), text) is not None
 
 
 def classify(cr: dict, classes: list, baseline: dict) -> list:
-    raise NotImplementedError("Task 6")
+    """[(score, class, reasons)] for every class scoring 3 or more, best first. No AI: the request's artefact (5), a
+    request of the class it names (3), its artefact as a known member of a class check (4 per check), and the class's
+    words (2 in the title, 1 in the problem, at most 4)."""
+    title, body = cr["title"].lower(), (cr.get("problem") or "").lower()
+    named = set(re.findall(r"\bCR-\d+\b", cr["title"] + " " + (cr.get("problem") or "")))
+    short = short_id(cr)
+    out = []
+    for c in classes:
+        score, why = 0, []
+        if cr["artefact"] in c["artefacts"]:
+            score += 5
+            why.append(f"artefact {cr['artefact']}")
+        hit = sorted(named & set(c["crs"]))
+        if hit:
+            score += 3
+            why.append(f"names {', '.join(hit)}")
+        for check, rules in c["checks"].items():
+            for rule in rules:
+                if short and any(short in key_tokens(k) for k in _members(baseline, check, rule)):
+                    score += 4
+                    why.append(f"{short} is a known member of {rule} ({check})")
+                    break
+        words = 0
+        for w in c["words"]:
+            if _has(title, w):
+                words += 2
+                why.append(f"'{w}' in the title")
+            elif _has(body, w):
+                words += 1
+                why.append(f"'{w}'")
+        score += min(words, 4)
+        if score >= 3:
+            out.append((score, c, why))
+    return sorted(out, key=lambda x: (-x[0], x[1]["id"]))
 
 
 def _words(text: str) -> set:
-    raise NotImplementedError("Task 6")
+    return {w for w in re.findall(r"[a-z0-9_]+", text.lower()) if len(w) > 2}
 
 
 def related(cr: dict, rows: list, main) -> dict:
-    raise NotImplementedError("Task 6")
+    """Duplicates, the open requests it names, and the open blocking ones it waits for, from the export alone."""
+    others = [r for r in rows if r["project"] == cr["project"] and r["ref"] != cr["ref"] and r["status"] in OPEN]
+    art = (cr["kind"], cr["artefact"].strip().lower())
+    dup = []
+    for r in others:
+        if (r["kind"], r["artefact"].strip().lower()) == art:
+            a, b = _words(cr["title"]), _words(r["title"])
+            jac = len(a & b) / len(a | b) if a | b else 0.0
+            dup.append({"ref": r["ref"], "title": r["title"], "likely": jac >= 0.5})
+    names = set(re.findall(r"\bCR-\d+\b", cr["title"] + " " + (cr.get("problem") or ""))) - {cr["ref"]}
+    follows = [r["ref"] for r in others if r["ref"] in names]
+    in_class = set(main["crs"]) if main else set()
+    blocked = []
+    for r in others:
+        if r["blocking"] != "yes":
+            continue
+        if cr["ticket"] and r["ticket"] == cr["ticket"]:
+            why = "the same ticket"
+        elif (r["kind"], r["artefact"].strip().lower()) == art:
+            why = "the same artefact"
+        elif r["ref"] in in_class:
+            why = "its class"
+        elif r["ref"] in names:
+            why = "it names it"
+        else:
+            continue
+        blocked.append({"ref": r["ref"], "why": why, "title": r["title"]})
+    return {"duplicates": dup, "follows": follows, "blocked_by": blocked}
 
 
 def siblings(main, baseline: dict, idx: dict) -> dict:
-    raise NotImplementedError("Task 6")
+    """The class's known members across the package (its checks' baselined findings), the tickets they touch, and
+    the started ones (audit_guard's index of adam-links.json, the same the gate reads)."""
+    if not main or not main["checks"]:
+        return {"counted": False, "members": 0, "by_rule": {}, "tickets": 0, "started": []}
+    by_rule, wps, started = {}, set(), {}
+    for check, rules in main["checks"].items():
+        for rule in rules:
+            keys = _members(baseline, check, rule)
+            by_rule[f"{check} {rule}"] = len(keys)
+            for k in keys:
+                arts = g.finding_artefacts(k, idx)
+                for a in arts:
+                    wps.update(t["wp"] for t in idx["tickets"].get(a, []))
+                for t in g.started_tickets(arts, idx):
+                    started.setdefault(t["wp"], t)
+    return {"counted": True, "members": sum(by_rule.values()), "by_rule": by_rule, "tickets": len(wps),
+            "started": [started[w] for w in sorted(started)]}
 
 
 def sort_request(cr: dict, rows: list, classes: list, baseline: dict, idx: dict, branches: set) -> dict:
-    raise NotImplementedError("Task 6")
+    ranked = classify(cr, classes, baseline)
+    main = ranked[0][1] if ranked else None
+    facts = {"class": main["id"] if main else "", "class_name": main["name"] if main else "",
+             "class_why": ranked[0][2] if ranked else [], "also": [c["name"] for _, c, _ in ranked[1:3]],
+             "unsure": len(ranked) > 1 and ranked[1][0] == ranked[0][0],
+             "siblings": siblings(main, baseline, idx),
+             "branch": main["branch"] if main else "", "branch_exists": bool(main) and main["branch"] in branches,
+             "default_ruling": main["default_ruling"] if main else "", "needs": main["needs"] if main else "lead",
+             "ticket_status": "", "status_cached": bool(idx.get("cached"))}
+    facts.update(related(cr, rows, main))
+    try:
+        t = idx["wps"].get(int(cr["ticket"]))
+    except (TypeError, ValueError):
+        t = None
+    if t:
+        facts["ticket_status"] = (t["status"] or "status not cached") + (f", {t['assignee']}" if t["assignee"] else "")
+    return facts
 
 
 def facts_lines(cr: dict, f: dict) -> list:
-    raise NotImplementedError("Task 6")
+    """The sort's facts in plain words: the draft's input and the lead's `facts:` line."""
+    s = f["siblings"]
+    lines = [f"Ticket #{cr['ticket'] or 'none'}" + (f" ({f['ticket_status']})" if f["ticket_status"] else "")]
+    if f["class"]:
+        lines.append(f"Known class: {f['class_name']}" + (" (tied with the next: check it)" if f["unsure"] else "")
+                     + f"; matched on {'; '.join(f['class_why'][:4])}")
+    else:
+        lines.append("Known class: none matched in handoff/cr-classes.yaml; the draft names a new one")
+    if f["also"]:
+        lines.append(f"Also near: {', '.join(f['also'])}")
+    if s["counted"]:
+        rules = ", ".join(f"{k} {v}" for k, v in s["by_rule"].items() if v) or "none baselined"
+        started = (": " + ", ".join(f"#{t['wp']} {t['status']}" for t in s["started"][:6])) if s["started"] else ""
+        lines.append(f"Siblings across the package: {s['members']} known member(s) ({rules}), touching "
+                     f"{s['tickets']} ticket(s), {len(s['started'])} started{started}"
+                     + ("" if f["status_cached"] else " (ticket status not cached)"))
+    elif f["class"]:
+        lines.append("Siblings across the package: the class has no check yet; the draft counts them")
+    for d in f["duplicates"]:
+        lines.append(f"{'Likely duplicate of' if d['likely'] else 'Same artefact as'} open {d['ref']}: "
+                     f"{d['title'][:100]}")
+    if f["follows"]:
+        lines.append(f"Names open request(s): {', '.join(f['follows'])}")
+    for b in f["blocked_by"]:
+        lines.append(f"Blocked by open blocking {b['ref']} ({b['why']}): {b['title'][:100]}")
+    if f["branch"]:
+        lines.append(f"Fix branch: {f['branch']} ({'exists' if f['branch_exists'] else 'not made yet'})")
+    if f["default_ruling"]:
+        lines.append(f"The class's default ruling: {f['default_ruling']}")
+    return lines
 
 
 # ------------------------------------------------------------------------------------------------- 3. draft
