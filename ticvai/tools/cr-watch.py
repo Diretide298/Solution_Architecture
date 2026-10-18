@@ -17,7 +17,7 @@ gives it a first answer the same hour, on a schedule (every 30 minutes on the le
   3. draft   one Claude Code turn per request (claude -p, read-only tools, in a worktree at the latest release tag):
              verdict, class, recommendation, the resolution the developer reads, who must decide.
   4. review  REVIEW.md: one block per request with a `decision:` line for the lead: approve, change or reject. The
-             requests in a class with a written default ruling come first, under one line, "approve all default-ruled
+             requests in a class with an active default ruling come first, under one line, "approve all default-ruled
              (n)", so the lead can clear them with one mark; each is still settled only by that mark.
   5. settle  only what the lead marked approve or change: a decisions file for viewer/api/settle_changes.py, dry run
              first, then --apply. A rejected draft is drafted again at the next run, with the lead's note.
@@ -78,8 +78,10 @@ DRAFT_MINUTES = 15
 MAX_TRIES = 2                        # a draft that fails this often is answered by hand (fix round 1, I-4)
 MAX_TURNS = "12"                     # the drafting turn's limits (fix round 1, I-4)
 MAX_BUDGET_USD = "1.00"
-# What the drafting turn must never read: the lead's credentials (fix round 1, I-3).
-NO_READ = ("Read(//d/Chinmay/adam/audit/**)", "Read(**/*.env)", "Read(**/.env*)")
+# What the drafting turn must never read, whatever folder it is in (fix rounds 1 and 2, I-3). Rule paths start with
+# `//` for an absolute path; the home-folder places are built from the home folder, not from a drive letter.
+NO_READ = ("Read(//**/*.env)", "Read(//**/.env*)", "Read(//d/Chinmay/adam/audit/**)")
+HOME_SECRETS = (".claude/.credentials.json", ".ssh/**", ".git-credentials", ".aws/**", ".azure/**", ".docker/**")
 
 
 def _now() -> str:
@@ -452,29 +454,44 @@ def child_env(environ=None) -> dict:
         u = k.upper()
         if u.startswith(("ANTHROPIC_", "CLAUDE_")):
             out[k] = v
-        elif u.startswith(("ADAM_", "TICVAI_")) or any(w in u for w in ("TOKEN", "PASSWORD", "SECRET")):
+        elif u.startswith(("ADAM_", "TICVAI_")) or any(w in u for w in ("TOKEN", "PASSWORD", "SECRET", "KEY",
+                                                                           "CREDENTIAL")):
             continue
         else:
             out[k] = v
     return out
 
 
-def claude_argv(claude: str) -> list:
-    """The drafting turn's command line: three read tools, no settings but the worktree's own, no outside MCP servers,
-    a turn and a money limit, and the credentials folder and any .env file refused (fix round 1, I-3, I-4). The
-    deny list is last: it takes a list."""
-    mine = "//" + REPO.resolve().as_posix().replace(":", "", 1)[0].lower() + REPO.resolve().as_posix()[2:] + "/audit/**"
-    deny = ["Bash", "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch", *NO_READ, f"Read({mine})"]
-    return [claude, "-p", "--output-format", "json", "--tools", "Read,Grep,Glob", "--allowedTools", "Read,Grep,Glob",
+def rule_path(path) -> str:
+    """A folder or file as a Claude permission rule writes an absolute path: `//d/wt/x` for D:/wt/x (the drive letter
+    becomes a folder), `//home/x` for /home/x."""
+    s = str(path).replace("\\", "/")
+    if not (s.startswith("/") or re.match(r"^[A-Za-z]:", s)):
+        s = Path(path).resolve().as_posix()
+    m = re.match(r"^([A-Za-z]):(/.*)?$", s)
+    return "//" + m.group(1).lower() + (m.group(2) or "") if m else "/" + s
+
+
+def claude_argv(claude: str, tree=None) -> list:
+    """The drafting turn's command line (fix rounds 1 and 2, I-3, I-4): three read tools, restricted mode, no settings
+    but the project's, no outside MCP servers, a turn and a money limit. It may read only inside `tree`, the release
+    worktree it runs in (no bare Read/Grep/Glob allow: that opens the whole disk), and it is refused every .env file,
+    the home-folder secret places and the credentials folder. The allow and deny lists come last: they take lists."""
+    where = rule_path(tree or RELEASE_DIR)
+    home = rule_path(Path.home())
+    allow = [f"{tool}({where}/**)" for tool in ("Read", "Grep", "Glob")]
+    deny = ["Bash", "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch", *NO_READ,
+            f"Read({rule_path(REPO)}/audit/**)", *[f"Read({home}/{x})" for x in HOME_SECRETS]]
+    return [claude, "-p", "--output-format", "json", "--restricted", "--tools", "Read,Grep,Glob",
             "--strict-mcp-config", "--setting-sources", "project", "--max-turns", MAX_TURNS,
             "--max-budget-usd", MAX_BUDGET_USD, "--no-session-persistence",
-            "--disallowedTools", *dict.fromkeys(deny)]
+            "--allowedTools", *allow, "--disallowedTools", *dict.fromkeys(deny)]
 
 
 def run_claude(prompt: str, cwd: Path, claude: str, timeout: int = DRAFT_MINUTES * 60) -> str:
     """One headless Claude Code turn with read-only tools, in `cwd` (the package worktree), with no credential in its
     environment. Returns its final text."""
-    p = subprocess.run(claude_argv(claude), input=prompt, capture_output=True, text=True, encoding="utf-8",
+    p = subprocess.run(claude_argv(claude, cwd), input=prompt, capture_output=True, text=True, encoding="utf-8",
                        errors="replace", cwd=str(cwd), timeout=timeout, env=child_env())
     if p.returncode != 0:
         raise RuntimeError(f"claude exited {p.returncode}: {(p.stderr or p.stdout).strip()[:300]}")
@@ -489,7 +506,7 @@ def run_claude(prompt: str, cwd: Path, claude: str, timeout: int = DRAFT_MINUTES
 
 # ------------------------------------------------------------------------------------------------- 4. review
 BLOCK = re.compile(r"^## (CR-\d+)\b.*$", re.M)
-# One line for the requests in a class with a written default ruling (controller ruling 4, 18 October): the lead
+# One line for the requests in a class with an active default ruling (controller ruling 4, 18 October): the lead
 # writes `approve` after the colon and each of them that has no mark of its own is approved.
 ALL_DEFAULT = re.compile(r"^approve all default-ruled \(\d+\):[ \t]*(.*)$", re.M)
 
@@ -529,7 +546,7 @@ def render_review(pending: dict, status_line: str) -> str:
              "    python ticvai/tools/cr-watch.py settle --apply    # settle in ADAM and tell the tickets", ""]
     open_default = [p for p in order if _default_ruled(p) and not p.get("decision") and p.get("draft")]
     if open_default:
-        lines += ["These requests are in a class with a written default ruling, shown in each block. Write `approve` "
+        lines += ["These requests are in a class with an active default ruling, shown in each block. Write `approve` "
                   "after the colon to approve every one of them that has no mark of its own; nothing is settled "
                   "until you run `settle`.", "",
                   f"approve all default-ruled ({len(open_default)}): ", ""]
@@ -1051,7 +1068,7 @@ def _t_review(fails):
 
 
 def _t_default(fails):
-    """Requests in a class with a written default ruling come first under one line the lead marks once (ruling 4)."""
+    """Requests in a class with an active default ruling come first under one line the lead marks once (ruling 4)."""
     pend = {}
     for i, ruled in ((1, False), (2, True), (3, True), (4, True)):
         p = _item(dict(_row(i), id=i, blocking="yes" if i == 1 else ""))
@@ -1270,22 +1287,46 @@ def _t_marks(fails):
 def _t_budget(fails):
     """Fix round 1, I-3 and I-4: the drafting turn is boxed in, and a failing draft stops after two tries."""
     env = {"PATH": "/bin", "HOME": "/h", "ADAM_PASSWORD": "a", "ADAM_EMAIL": "b", "TICVAI_OP_TOKEN": "c",
-           "GITHUB_TOKEN": "d", "MY_SECRET": "e", "DB_PASSWORD": "f", "ANTHROPIC_API_KEY": "kept"}
+           "GITHUB_TOKEN": "d", "MY_SECRET": "e", "DB_PASSWORD": "f", "ANTHROPIC_API_KEY": "kept",
+           "AWS_ACCESS_KEY_ID": "g", "my_api_key": "h", "AZURE_CREDENTIALS": "i", "GoogleCredential": "j"}
     _expect(fails, "the child environment carries no credential", sorted(child_env(env)),
             ["ANTHROPIC_API_KEY", "HOME", "PATH"])
-    argv = claude_argv("claude")
+    tree = Path("/work/release")
+    argv = claude_argv("claude", tree)
 
     def after(flag):
         return argv[argv.index(flag) + 1]
+
+    def listed(flag):
+        out = []
+        for x in argv[argv.index(flag) + 1:]:
+            if x.startswith("--"):
+                break
+            out.append(x)
+        return out
+
+    allow = listed("--allowedTools")
+    for bare in ("Read", "Grep", "Glob"):
+        if bare in allow or any(x.startswith(bare + ",") for x in allow):
+            fails.append(f"an unscoped {bare} allow is in the arguments: {allow}")
+    _expect(fails, "every allow is scoped to the release worktree", sorted(allow),
+            sorted(f"{tool}({rule_path(tree)}/**)" for tool in ("Read", "Grep", "Glob")))
+    _expect(fails, "restricted mode", "--restricted" in argv, True)
 
     _expect(fails, "tools are limited", after("--tools"), "Read,Grep,Glob")
     _expect(fails, "settings only from the project", after("--setting-sources"), "project")
     _expect(fails, "no outside MCP servers", "--strict-mcp-config" in argv, True)
     _expect(fails, "turn and money limits", (after("--max-turns"), after("--max-budget-usd")), ("12", "1.00"))
     deny = argv[argv.index("--disallowedTools") + 1:]
-    for want in ("Read(//d/Chinmay/adam/audit/**)", "Read(**/*.env)", "Bash"):
+    home = rule_path(Path.home())
+    for want in ("Bash", "Edit", "Write", "WebFetch", "Read(//**/*.env)", "Read(//**/.env*)",
+                 "Read(//d/Chinmay/adam/audit/**)", f"Read({home}/.claude/.credentials.json)", f"Read({home}/.ssh/**)",
+                 f"Read({home}/.git-credentials)", f"Read({home}/.aws/**)", f"Read({home}/.azure/**)",
+                 f"Read({home}/.docker/**)"):
         if want not in deny:
             fails.append(f"the deny list lacks {want!r}: {deny}")
+    _expect(fails, "rule paths have no drive letter", (rule_path(Path("D:/Chinmay/adam")), rule_path(Path("/home/x"))),
+            ("//d/Chinmay/adam", "//home/x"))
     seen = {}
 
     class Done:
@@ -1297,6 +1338,9 @@ def _t_budget(fails):
     try:
         subprocess.run = lambda *a_, **k_: seen.update(k_, argv=a_[0]) or Done()
         run_claude("prompt", Path("somewhere"), "claude")
+        _expect(fails, "the turn is allowed to read its own folder only",
+                [x for x in seen["argv"] if x.startswith("Read(") and "somewhere" in x],
+                [f"Read({rule_path(Path('somewhere'))}/**)"])
     finally:
         subprocess.run = real
         for k, v in saved.items():
