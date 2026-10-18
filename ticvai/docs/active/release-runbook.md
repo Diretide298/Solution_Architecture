@@ -42,28 +42,41 @@ The rule for agent edits:
 - **Approved UI:** no visible change to a client-approved screen without the client's approval recorded in
   `docs/active/approved-ui-changes.yaml` (`check-approved-ui` against `handoff/approved-ui.json`; CHG-GRD-002).
 
-### The rehearsal pull: the last gate step before the tag (CHG-GRD-003)
+### The rehearsal pull: the last gate step before the tag (CHG-GRD-003, CHG-RHS-001)
 The checks read the package; the rehearsal reads what a developer will get. It runs after the full gate is green
 and before anything is tagged or pushed (Block A audit plan, step 11a; lead, 14 October 2026: "before pushing r6
-can we simulate the results in the pulls?"):
-1. Tag `r<N>-rc` locally. Never push it.
-2. Run a local ADAM on the candidate, with the stand-in OpenProject (`viewer/api/fake-openproject.mjs`) loaded from
-   `r<N>`'s bundle (`handoff/service-docs/op-release.json`), so every ticket reads as it will after the apply. Load
-   its ticket links the way production does (`viewer/api/load_links.py` on the release's `adam-links.json`), never
-   by the local setup: on r6 the rehearsal's setup loaded them and passed, while the live ADAM had none (P-22).
-3. Pull every ticket of the block being delivered (Block A: every feature and task) against it with the shipped
-   connector, the same `adam_pull` a developer runs (the audit kit's `pull-direct.mjs`, with `ADAM_URL` set to the
-   local ADAM).
-4. Compare ticket by ticket with the last live pull, and keep the difference: it is the developer impact list.
-5. Check the people as well as the links: no open ticket keeps someone who left (the bundle's `successors`) as
-   assignee **or Accountable**, started tickets included. On r6 the rehearsal checked assignees only, and 158 Ready
-   for QA tickets kept Tanmay Dukhande as Accountable (P-25).
+can we simulate the results in the pulls?"). Tag `r<N>-rc` locally first and never push it. Then, from `ticvai/`:
 
-**It passes only with all four at zero** (and step 5's leaver count at zero): 0 pull errors; release `r<N>` on every ticket (`release.current`); 0
-tickets with nothing linked (`linked: 0`, features and tasks alike); 0 dead links (`notFound: 0`). Anything else is
-fixed in `r<N>` and the rehearsal runs again; the tag waits. On r5 the pull found 123 features and 29 tasks with
-nothing linked and 55 tickets with links ADAM could not find, after the release was out; this step finds them while
-they are still the package's to fix.
+    python3 tools/rehearse/prepare.py snapshot --out <work>/op-snapshot.json      (reads OpenProject; writes nothing)
+    bash tools/rehearse/rehearse.sh r<N>-rc --base <last live pull> --op-snapshot <work>/op-snapshot.json
+
+The last live pull is the previous release's live re-pull (section 7), its `direct/` folder. The one command:
+1. Clones the repository into its work folder at `r<N>-rc` (no remote; the mirrors as ADAM's release export keeps
+   them) and tags the candidate `r<N>` in that clone only.
+2. Runs a local ADAM on the candidate with the stand-in OpenProject (`tools/rehearse/stand-in-openproject.mjs`)
+   loaded from `r<N>`'s bundle (`handoff/service-docs/op-release.json`, or built at the candidate when the committed
+   one is older), applied with the apply's rules (`tools/rehearse/simulate.py`) to OpenProject as the snapshot shows
+   it, so every ticket reads as it will after the apply. Tickets the release creates get stand-in ids (990001 and up)
+   in `op-created-r<N>.json`, the file the apply writes.
+3. Loads the ticket links the way production does, never by its own setup: `tools/op-created-merge.py` with those
+   ids, `tools/adam-links.py`, then `viewer/api/load_links.py --prune` (dry run, then `--apply`) into the
+   rehearsal's database. On r6 the rehearsal's setup loaded them and passed, while the live ADAM had none (P-22).
+4. Pulls every ticket of the block being delivered (Block A: every feature and task) with the shipped connector,
+   the same `adam_pull` a developer runs (`tools/rehearse/pull-direct.mjs`, `ADAM_URL` set to the local ADAM).
+5. Compares ticket by ticket with the last live pull, and keeps the difference: it is the developer impact list
+   (`rehearsal-summary.md` and `rehearsal-report.json` in the work folder).
+6. Checks the people as well as the links: no open ticket keeps someone who left (the bundle's `successors`) as
+   assignee or Accountable, started tickets included, read from the stand-in's OpenProject state, because a pull does
+   not carry Accountable. On r6 the rehearsal checked assignees only, and 158 Ready for QA tickets kept Tanmay
+   Dukhande as Accountable (P-25). Without the snapshot this criterion is not judged and the rehearsal does not pass.
+
+**It passes only with all five at zero:** 0 pull errors; release `r<N>` on every ticket (`release.current`); 0
+tickets with nothing linked (`linked: 0`, features and tasks alike); 0 dead links (`notFound: 0`); 0 open tickets
+with someone who left as assignee or Accountable. Anything else is fixed in `r<N>` and the rehearsal runs again; the
+tag waits. On r5 the pull found 123 features and 29 tasks with nothing linked and 55 tickets with links ADAM could not
+find, after the release was out; this step finds them while they are still the package's to fix. It touches nothing
+live: the clone has no remote, ADAM's database is a scratch one, OpenProject's token is removed from every step, and
+it refuses the ports 4173, 8787 and 8798 (a local ADAM another session may be running).
 
 ## 5. Tag
 Once everything is green, the rehearsal pull included (section 4):
@@ -126,8 +139,11 @@ Once everything is green, the rehearsal pull included (section 4):
 ## 7. Re-audit, every release
 - Every check is green.
 - Pull a **sample of 20 to 30 tickets** through ADAM at the new tag, across every developer's board. After a release
-  with a rehearsal, pull the whole rehearsal list on the live ADAM instead (the tickets the release created by their
-  real ids, not the rehearsal's stand-in ids) and compare: it must match the rehearsal.
+  with a rehearsal, pull the whole rehearsal list on the live ADAM instead, the tickets the release created by their
+  real ids and not the rehearsal's stand-in ids, and compare: it must match the rehearsal. From `ticvai/`, with
+  `ADAM_URL`, `ADAM_EMAIL` and `ADAM_PASSWORD` set (the audit account; it only reads):
+  `bash tools/rehearse/rehearse.sh live-repull r<N> --rehearsal <work> --created <op-created-r<N>.json>`. Its
+  `live/direct/` folder is the next rehearsal's last live pull.
 - A new root issue gets a check before it counts as closed.
 
 ## 8. Configuration promotion after go-live
