@@ -1,0 +1,46 @@
+id: CHG-RHS-001
+date: '2026-10-18'
+source: audit
+kind: process
+summary: 'The rehearsal pull is one command in the package, tools/rehearse/rehearse.sh r<N>-rc. It loads ticket links
+  the way production does (op-created-merge.py, adam-links.py, viewer/api/load_links.py --prune), judges a fifth
+  criterion (no open ticket keeps someone who left as assignee or Accountable, read from OpenProject''s state), and its
+  live-repull mode pulls the tickets the release created by their real ids.'
+decision:
+  what: 'The r6 kit (a scratch folder) moves into ticvai/tools/rehearse/: simulate.py replays op-release.rb on
+    OpenProject as it is now and must name the same phases as op-release.rb; stand-in-openproject.mjs answers only
+    the routes, filters and sorts it knows; prepare.py, judge.py, pull-direct.mjs and rehearse.sh. Release runbook
+    section 4 names the command and the five criteria, section 7 the live re-pull. check-ticket-links TL-REHEARSAL
+    holds the runbook to the command, the stand-in, load_links.py and the Accountable criterion.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'Lead, 18 October 2026, item 11 of the list (tracker F41): the r6 rehearsal passed while live ADAM had no ticket
+  links, because its own setup loaded them (PROCESS-LOG P-22); its leaver check covered assignees only, and 158 Ready
+  for QA tickets kept a leaver as Accountable (P-25); tickets the release created had stand-in ids (990001 and up), so
+  the live re-pull needed a list with real ids. Follows CHG-GRD-003.'
+keys_touched:
+  files:
+  - tools/rehearse/rehearse.sh
+  - tools/rehearse/simulate.py
+  - tools/rehearse/prepare.py
+  - tools/rehearse/judge.py
+  - tools/rehearse/stand-in-openproject.mjs
+  - tools/rehearse/pull-direct.mjs
+  - tools/tests/test_rehearse.py
+  - tools/check-ticket-links.py
+  - docs/active/release-runbook.md
+root_class: REHEARSAL-PULL
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: pending (raised at the next settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-links.py
+status: open
+notes: 'Batch RHS (branch tools/rehearsal), 18 October 2026. A pull cannot run inside the offline gate, so the gate
+  holds the runbook text (TL-REHEARSAL) and the kit holds its own rules in self-tests that run on every invocation.
+  Registering those self-tests in run-checks.py waits for the scoped-refresh lane, which owns that file.'
