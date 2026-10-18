@@ -146,7 +146,7 @@ rehearse() {
   PATTERNS_TXT=$(py "$HERE/prepare.py" sparse --keep "$(native "$W/export-keep.json")") || die "prepare.py sparse failed"
   local -a PATTERNS
   mapfile -t PATTERNS <<<"$PATTERNS_TXT"
-  MSYS_NO_PATHCONV=1 git -C "$W/rc" sparse-checkout set --no-cone "${PATTERNS[@]}"
+  MSYS_NO_PATHCONV=1 git -C "$(native "$W/rc")" sparse-checkout set --no-cone "${PATTERNS[@]}"
   git -C "$W/rc" checkout -q --detach "$RC_COMMIT"
   local t
   for t in $(git -C "$W/rc" tag -l); do
