@@ -56,18 +56,34 @@ def test_a_parent_keyed_other_than_by_id_is_refused():
         ddl.parents_of([("a.c", "p_code", "a.p", "code")])
 
 
-def test_the_helpers_ask_the_function_and_never_read_the_parent_themselves():
-    out = ddl.rls_file("tenant", [], [], [("fnb.menu", "outlet_id", "platform.outlet", "id")], [], 1, False)
+# **Only a parent in another deployable is asked through the function** (decision D9 as the lead ruled it, 18 October
+# 2026): the per-row call measured far more than twice the r6 check on 100,000 rows, so a child whose parent is in
+# its own deployable keeps r6's EXISTS, which its host's grants can read.
+BY_PARENT = [("fnb.menu", "outlet_id", "platform.outlet", "id"), ("fnb.menu_section", "menu_id", "fnb.menu", "id")]
+
+
+def test_a_child_across_deployables_asks_the_function_and_one_within_keeps_the_r6_check():
+    out = ddl.rls_file("tenant", [], [], BY_PARENT, [], 2, False, across={"fnb.menu"})
     assert "CREATE OR REPLACE FUNCTION platform.parent_visible(" in out
     assert "IF parent = 'platform.outlet'::regclass THEN" in out
-    assert "platform.parent_visible(%L::regclass, %I)" in out
-    assert "EXISTS (SELECT 1 FROM %s parent_row" not in out
-    assert "PERFORM platform.parent_visible_owner(parent);" in ddl.RLS_PARENT
-    assert "SELECT platform.apply_parent_rls('fnb.menu'::regclass, 'outlet_id', 'platform.outlet'::regclass, 'id');" \
-        in out
+    assert "IF parent = 'fnb.menu'::regclass THEN" not in out           # only the parents across are answered
+    assert ("SELECT platform.apply_parent_across_rls('fnb.menu'::regclass, 'outlet_id', 'platform.outlet'::regclass, "
+            "'id');") in out
+    assert ("SELECT platform.apply_parent_rls('fnb.menu_section'::regclass, 'menu_id', 'fnb.menu'::regclass, "
+            "'id');") in out
+    assert "PERFORM platform.parent_visible_owner(parent);" in out
 
 
-def test_split_children_write_through_the_function():
-    assert "platform.parent_visible(%L::regclass, %I, true)" in ddl.RLS_SPLIT
-    assert "parent_row WHERE %s AND (%s)" not in ddl.RLS_SPLIT
-    assert "PERFORM platform.parent_visible_owner(parent);" in ddl.RLS_SPLIT
+def test_the_r6_helpers_are_unchanged_and_the_across_helpers_ask_the_function():
+    assert "EXISTS (SELECT 1 FROM %s parent_row WHERE parent_row.%I = %s.%I)" in ddl.RLS_PARENT
+    assert "parent_row WHERE %s AND (%s)" in ddl.RLS_SPLIT
+    sql = ddl.parent_visible_sql({"platform.outlet": None})
+    assert "FUNCTION platform.apply_parent_across_rls(" in sql
+    assert "FUNCTION platform.apply_parent_split_across_rls(" in sql
+    assert "platform.parent_visible(%L::regclass, %I)" in sql
+    assert "platform.parent_visible(%L::regclass, %I, true)" in sql
+
+
+def test_no_parent_across_writes_no_function():
+    out = ddl.rls_file("tenant", [], [], BY_PARENT[1:], [], 1, False, across=set())
+    assert "FUNCTION platform.parent_visible" not in out and "apply_parent_across_rls('" not in out

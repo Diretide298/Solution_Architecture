@@ -81,8 +81,19 @@ def test_the_definer_function_answering_each_parent_fits():
 
 
 def test_a_parent_the_function_does_not_answer_is_found():
-    missing = dict(FIXED, parent_visible=FIXED["parent_visible"].replace("'fnb.menu'::regclass", "'x.y'::regclass"))
-    assert keys(rf.parent_across_findings(POL, DEP, missing)) == ["fnb.menu_section"]
+    missing = dict(FIXED, parent_visible=FIXED["parent_visible"].replace("'platform.outlet'::regclass",
+                                                                        "'x.y'::regclass"))
+    assert keys(rf.parent_across_findings(POL, DEP, missing)) == ["fnb.menu", "fnb.menu_section"]
+
+
+def test_only_the_hop_across_deployables_needs_the_function():
+    # decision D9: fnb.menu asks the function for platform.outlet; fnb.menu_section keeps r6's EXISTS on fnb.menu,
+    # which its own host may read
+    pol = dict(POL, **{"fnb.menu": ("apply_parent_across_rls", POL["fnb.menu"][1])})
+    bodies = dict(R6, apply_parent_across_rls=FIXED["apply_parent_rls"], parent_visible=FIXED["parent_visible"])
+    assert rf.parent_chain("fnb.menu_section", pol) == ["fnb.menu", "platform.outlet"]
+    assert rf.parent_across_findings(pol, DEP, bodies) == []
+    assert rf.classes(pol)["fnb.menu_section"] == ("scope", "scope")
 
 
 def test_devices_are_judged_now():

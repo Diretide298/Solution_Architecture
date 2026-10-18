@@ -778,24 +778,19 @@ BEGIN
 END
 $$;
 
--- A child of a split row: read where the parent is visible, written only where the parent may be written. Both are
--- asked of platform.parent_visible (ADAM CR-108, CHG-RSF-001), which carries the parent's write check for each split
--- parent (derive-ddl writes both from the same entry). `parent_write` stays in the signature so the calls already in
--- the forward migrations keep it.
+-- A child of a split row: read where the parent is visible, written only where the parent may be written
+-- (`parent_write`, the parent's write check on the alias `parent_row`).
 CREATE OR REPLACE FUNCTION platform.apply_parent_split_rls(target regclass, fk_column text, parent regclass,
                                                            parent_key text, parent_write text)
     RETURNS void
     LANGUAGE plpgsql
 AS $$
+DECLARE
+    link text := format('parent_row.%I = %s.%I', parent_key, target, fk_column);
 BEGIN
-    IF parent_key <> 'id' THEN
-        RAISE EXCEPTION 'apply_parent_split_rls: % keys its parent % by %, and platform.parent_visible reads a parent by id',
-            target, parent, parent_key;
-    END IF;
-    PERFORM platform.parent_visible_owner(parent);
     PERFORM platform.apply_split_rls(target,
-        format('platform.parent_visible(%L::regclass, %I)', parent::text, fk_column),
-        format('platform.parent_visible(%L::regclass, %I, true)', parent::text, fk_column));
+        format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s)', parent, link),
+        format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s AND (%s))', parent, link, parent_write));
 END
 $$;
 """
@@ -819,10 +814,7 @@ assert VENUE_MARKER in RLS_HEAD
 RLS_PARENT = """
 -- A child table protected through the declared foreign key to the row that owns it. The row is
 -- visible, and may be written, exactly when its parent is visible to the same connection.
--- **The parent is asked through platform.parent_visible** (ADAM CR-108, 18 October 2026; CHG-RSF-001): a SECURITY
--- DEFINER function, so a host whose role has no grant on the parent's schema (DB-ROLES grants each deployable only
--- its own) is still answered, and the parent forces row-level security, so its own policy still runs against the
--- caller's `ticvai.scope_paths`. A parent is read by `id`.
+-- A parent in another deployable is asked through platform.parent_visible instead (apply_parent_across_rls, below).
 CREATE OR REPLACE FUNCTION platform.apply_parent_rls(target regclass, fk_column text,
                                                      parent regclass, parent_key text)
     RETURNS void
@@ -830,13 +822,9 @@ CREATE OR REPLACE FUNCTION platform.apply_parent_rls(target regclass, fk_column 
 AS $$
 DECLARE
     policy_name text := platform.rls_policy_name(target);
-    predicate text := format('platform.parent_visible(%L::regclass, %I)', parent::text, fk_column);
+    predicate text := format('EXISTS (SELECT 1 FROM %s parent_row WHERE parent_row.%I = %s.%I)',
+                             parent, parent_key, target, fk_column);
 BEGIN
-    IF parent_key <> 'id' THEN
-        RAISE EXCEPTION 'apply_parent_rls: % keys its parent % by %, and platform.parent_visible reads a parent by id',
-            target, parent, parent_key;
-    END IF;
-    PERFORM platform.parent_visible_owner(parent);
     EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
     EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
     EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
@@ -926,6 +914,55 @@ BEGIN
                           JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.oid = parent));
         EXECUTE format('GRANT SELECT ON %s TO ticvai_parent_visible', parent);
     END IF;
+END
+$$;
+
+-- **A child whose parent is in another deployable** (ADAM CR-108, 18 October 2026; CHG-RSF-001). Its host's role has
+-- no grant on the parent's schema (DB-ROLES grants each deployable only its own), so r6's EXISTS on the parent failed
+-- with "permission denied". The parent is asked through platform.parent_visible, by `id`, under the parent's own
+-- policy. **Only these children** (decision D9 as the lead ruled it, 18 October): the function costs a call per child
+-- row, measured at well over twice r6's check on 100,000 rows, so a child whose parent is in its own deployable keeps
+-- apply_parent_rls. A chain that crosses further up (fnb.menu_item -> fnb.menu_section -> fnb.menu -> platform.outlet)
+-- crosses at one table, and only that table asks the function.
+CREATE OR REPLACE FUNCTION platform.apply_parent_across_rls(target regclass, fk_column text,
+                                                            parent regclass, parent_key text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+    predicate text := format('platform.parent_visible(%L::regclass, %I)', parent::text, fk_column);
+BEGIN
+    IF parent_key <> 'id' THEN
+        RAISE EXCEPTION 'apply_parent_across_rls: % keys its parent % by %, and platform.parent_visible reads a parent by id',
+            target, parent, parent_key;
+    END IF;
+    PERFORM platform.parent_visible_owner(parent);
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING (%s) WITH CHECK (%s)',
+                   policy_name, target, predicate, predicate);
+END
+$$;
+
+-- The same for a child of a split parent in another deployable: read where the parent is visible, written only where
+-- the parent may be written (platform.parent_visible's write branch carries the parent's write check; `parent_write`
+-- names the same check, kept so the call reads like apply_parent_split_rls's).
+CREATE OR REPLACE FUNCTION platform.apply_parent_split_across_rls(target regclass, fk_column text, parent regclass,
+                                                                  parent_key text, parent_write text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF parent_key <> 'id' THEN
+        RAISE EXCEPTION 'apply_parent_split_across_rls: % keys its parent % by %, and platform.parent_visible reads a parent by id',
+            target, parent, parent_key;
+    END IF;
+    PERFORM platform.parent_visible_owner(parent);
+    PERFORM platform.apply_split_rls(target,
+        format('platform.parent_visible(%L::regclass, %I)', parent::text, fk_column),
+        format('platform.parent_visible(%L::regclass, %I, true)', parent::text, fk_column));
 END
 $$;
 """
@@ -1104,7 +1141,7 @@ CREATE TABLE IF NOT EXISTS platform.schema_version (
 def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: list,
              total: int, has_scope_table: bool, shared: dict | None = None,
              by_subject: list | None = None, tenant_only: list | None = None,
-             append_audit: list | None = None, split: list | None = None) -> str:
+             append_audit: list | None = None, split: list | None = None, across: set | None = None) -> str:
     """The functions, then one call per table -- by `scope_path` where it has one, by `venue_id`
     where it does not, and through its owning parent where it has neither.
 
@@ -1113,7 +1150,9 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     `append_audit` is `(table, why)` for an APPEND_AUDIT trail (CHG-R6-002); `split` is `(table, call, why)` for a
     table marked `x-ticvai-rls` (CHG-GEN-005), and a `by_parent` entry with a fifth member, the parent's write check,
     follows a split parent for reading only. Every parent a `by_parent` entry names gets a branch of
-    platform.parent_visible, which the parent helpers ask (CHG-RSF-001)."""
+    platform.parent_visible: those whose table is in `across` (a parent in another deployable, decision D9) are
+    applied with apply_parent_across_rls / apply_parent_split_across_rls, which ask it; the rest keep r6's helpers
+    (CHG-RSF-001)."""
     shared = shared or {}
     head = RLS_HEAD.replace("{n_venue}", str(len(by_venue)))
     if db != "tenant":
@@ -1130,9 +1169,11 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     tenant_only = tenant_only or []
     append_audit = append_audit or []
     split = split or []
+    across = across or set()
     if by_parent:
         body.append(RLS_PARENT)
-        body.append(parent_visible_sql(parents_of(by_parent)))
+    if any(e[0] in across for e in by_parent):
+        body.append(parent_visible_sql(parents_of([e for e in by_parent if e[0] in across])))
     if by_subject or tenant_only or append_audit:
         body.append(RLS_TENANT)
     if append_audit:
@@ -1191,12 +1232,14 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         # the parent's policy has to exist for that read to be scoped at all.
         body.append("\n-- Scoped through the parent that owns the row (a NOT NULL declared foreign key).")
         for t, col, par, key, *rest in by_parent:
+            # a parent in another deployable is asked through platform.parent_visible (CHG-RSF-001, decision D9)
+            how = "across_" if t in across else ""
             if rest:
                 # follows a split parent for reading; written where the parent may be written (CHG-GEN-005)
-                body.append(f"SELECT platform.apply_parent_split_rls('{qual(t)}'::regclass, '{col}', "
+                body.append(f"SELECT platform.apply_parent_split_{how}rls('{qual(t)}'::regclass, '{col}', "
                             f"'{qual(par)}'::regclass, '{key}', {sql_literal(rest[0])});")
             else:
-                body.append(f"SELECT platform.apply_parent_rls('{qual(t)}'::regclass, '{col}', "
+                body.append(f"SELECT platform.apply_parent_{how}rls('{qual(t)}'::regclass, '{col}', "
                             f"'{qual(par)}'::regclass, '{key}');")
     if by_subject:
         body.append("\n-- By subject (SD-015): the session's own subject, or the tenant root.")
@@ -2523,6 +2566,15 @@ def main() -> int:
             print(f"  ! {t} is in APPEND_AUDIT but protected by another rule; its append policy is not applied")
     unscoped_all = [t for t in sorted(real)
                     if t not in protected and t not in venue_only and t != SCOPE_TABLE]
+    # **A child whose parent is in another deployable** (ADAM CR-108, CHG-RSF-001): its host cannot read the parent
+    # with its own grants (DB-ROLES), so its policy asks platform.parent_visible. The deployables are the authored
+    # boundary in handoff/service-decomposition.json.
+    services = (json.loads((ROOT / "handoff" / "service-decomposition.json").read_text(encoding="utf-8"))
+                .get("services") or {})
+    dep_of_schema = {sc: v.get("deployable") for v in services.values() for sc in v.get("schemas") or []}
+    across = {t for t, _c, par, *_r in by_parent
+              if dep_of_schema.get(t.split(".", 1)[0]) and dep_of_schema.get(par.split(".", 1)[0])
+              and dep_of_schema[t.split(".", 1)[0]] != dep_of_schema[par.split(".", 1)[0]]}
     for db in ("tenant", CONTROL):
         mine = [t for t in scoped if area(t.split(".")[0]) == db and t not in split_calls]
         vmine = [t for t in venue_only if area(t.split(".")[0]) == db and t not in split_calls]
@@ -2549,7 +2601,8 @@ def main() -> int:
             has_scope_table=(SCOPE_TABLE in real and db == "tenant"),
             shared={t: c for t, c in shared_scope.items() if t in mine},
             by_subject=smine, tenant_only=tmine, append_audit=amine,
-            split=[(t, c, w) for t, (c, w) in sorted(split_calls.items()) if area(t.split(".")[0]) == db])
+            split=[(t, c, w) for t, (c, w) in sorted(split_calls.items()) if area(t.split(".")[0]) == db],
+            across=across)
 
     # **Range partitioning by month** (ADR-0056). The tables declare `PARTITION BY RANGE` where they
     # are created; this file holds each one's DEFAULT partition and the months ahead.

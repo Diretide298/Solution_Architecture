@@ -69,6 +69,8 @@ KERNEL = {"platform.outbox", "platform.idempotency_record", "platform.audit_reco
 # The tables ADAM CR-095 named, whose readers may never be baselined (RF-INHERITED).
 STRICT_INHERITED = {"approvals.matrix"}
 STRICT_DEVICE = {("recordDeviceHeartbeat", "platform.device")}
+PARENT_HELPERS = ("apply_parent_rls", "apply_parent_split_rls", "apply_parent_across_rls",
+                  "apply_parent_split_across_rls")
 CALL = re.compile(r"^SELECT platform\.(apply_\w+_rls)\('([^']+)'::regclass(.*)\)$", re.S)
 FUNC = re.compile(r"^CREATE (?:OR REPLACE )?FUNCTION platform\.(\w+)\s*\(", re.I)
 
@@ -118,7 +120,7 @@ def parent_of(args: str):
 def parent_chain(t: str, pol: dict) -> list:
     """The parents a parent-policy table is checked through, nearest first."""
     out, cur = [], t
-    while cur in pol and pol[cur][0] in ("apply_parent_rls", "apply_parent_split_rls") and len(out) < 20:
+    while cur in pol and pol[cur][0] in PARENT_HELPERS and len(out) < 20:
         p = parent_of(pol[cur][1])
         if not p or p in out:
             break
@@ -162,11 +164,11 @@ def classes(pol: dict) -> dict:
         elif helper == "apply_grant_holder_subject_read_rls":
             # a subject-owned table opened to staff grants, still read by its own guest (CHG-MOD-007)
             r = ("any", "subject")
-        elif helper in ("apply_parent_rls", "apply_parent_split_rls"):
+        elif helper in PARENT_HELPERS:
             p = parent_of(args)
             pc = cls(p, depth + 1) if p else None
             if pc:
-                r = pc if helper == "apply_parent_rls" else (pc[0], pc[1])
+                r = (pc[0], pc[1])
         memo[t] = r
         return r
 
@@ -216,30 +218,40 @@ def device_findings(lin: dict, cl: dict, has_path: set, creators: dict, follows:
 
 
 def parent_across_findings(pol: dict, dep_of_schema: dict, bodies: dict) -> list:
-    """RF-PARENT-ACROSS. `dep_of_schema`: schema -> deployable; `bodies`: helper_bodies()."""
+    """RF-PARENT-ACROSS. `dep_of_schema`: schema -> deployable; `bodies`: helper_bodies(). Judged hop by hop: a child
+    whose parent is in another deployable needs a helper that asks platform.parent_visible, SECURITY DEFINER and
+    answering that parent; a hop within one deployable may read its parent with the caller's grants (decision D9).
+    A table is found when any hop of its chain fails."""
     out = []
     pv = (bodies.get("parent_visible") or "").replace('"', "")
+
+    def dep(t):
+        return dep_of_schema.get(t.split(".", 1)[0])
+
+    def hop(child):
+        helper, args = pol[child]
+        par = parent_of(args)
+        if not par or dep(child) is None or dep(par) is None or dep(child) == dep(par):
+            return None
+        if "parent_visible" not in (bodies.get(helper) or ""):
+            return par, f"{helper} on {child} reads {par} with the caller's own grants"
+        if "SECURITY DEFINER" not in pv.upper():
+            return par, "platform.parent_visible is not SECURITY DEFINER"
+        if f"'{par}'::regclass" not in pv:
+            return par, f"platform.parent_visible does not answer for {par}"
+        return None
+
     for t, (helper, _args) in sorted(pol.items()):
-        if helper not in ("apply_parent_rls", "apply_parent_split_rls"):
+        if helper not in PARENT_HELPERS:
             continue
         chain = parent_chain(t, pol)
-        mine = dep_of_schema.get(t.split(".", 1)[0])
-        across = [p for p in chain if dep_of_schema.get(p.split(".", 1)[0]) not in (None, mine)]
-        if not chain or not across:
-            continue
-        why = None
-        if "parent_visible" not in (bodies.get(helper) or ""):
-            why = f"{helper} reads {chain[0]} with the caller's own grants"
-        elif "SECURITY DEFINER" not in pv.upper():
-            why = "platform.parent_visible is not SECURITY DEFINER"
-        elif f"'{chain[0]}'::regclass" not in pv:
-            why = f"platform.parent_visible does not answer for {chain[0]}"
-        if why:
-            far = across[-1]
+        nodes = [t] + [p for p in chain if p in pol and pol[p][0] in PARENT_HELPERS]
+        bad = [h for h in (hop(c) for c in nodes) if h]
+        if bad:
+            far, why = bad[0]
             out.append(("RF-PARENT-ACROSS", t,
-                        f"{t} ({mine}) is checked through {' -> '.join(chain)}, and {far} is "
-                        f"{dep_of_schema.get(far.split('.', 1)[0])}'s: {why} (DB-ROLES grants a deployable only its "
-                        f"own schemas)", True))
+                        f"{t} ({dep(t)}) is checked through {' -> '.join(chain)}, and {far} is {dep(far)}'s: {why} "
+                        f"(DB-ROLES grants a deployable only its own schemas)", True))
     return out
 
 

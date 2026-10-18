@@ -55,10 +55,10 @@ CREATE TABLE approvals.matrix (id uuid PRIMARY KEY, scope_path ltree NOT NULL);
 CREATE TABLE approvals.rule (id uuid PRIMARY KEY, matrix_id uuid NOT NULL);
 {helpers}
 SELECT platform.apply_scope_rls('platform.outlet'::regclass);
-SELECT platform.apply_parent_rls('fnb.menu'::regclass, 'outlet_id', 'platform.outlet'::regclass, 'id');
+SELECT platform.apply_parent_across_rls('fnb.menu'::regclass, 'outlet_id', 'platform.outlet'::regclass, 'id');
 SELECT platform.apply_read_beneath_rls('approvals.matrix'::regclass);
-SELECT platform.apply_parent_split_rls('approvals.rule'::regclass, 'matrix_id', 'approvals.matrix'::regclass, 'id',
-                                       '{WRITE}');
+SELECT platform.apply_parent_split_across_rls('approvals.rule'::regclass, 'matrix_id', 'approvals.matrix'::regclass,
+                                              'id', '{WRITE}');
 ALTER TABLE fnb.menu_r6 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fnb.menu_r6 FORCE ROW LEVEL SECURITY;
 CREATE POLICY menu_r6_scope ON fnb.menu_r6
@@ -165,8 +165,8 @@ def test_a_bypassing_owner_is_replaced_when_a_parent_policy_is_applied_again(pg)
     assert r.returncode == 0, r.stderr
     leak = rows(pg, "SELECT id FROM fnb.menu;", "localdev")
     assert leak == sorted([IDS["mA"], IDS["mB"]])     # the risk D5 names: a superuser owner shows every child row
-    r = run(pg, "SELECT platform.apply_parent_rls('fnb.menu'::regclass, 'outlet_id', 'platform.outlet'::regclass, "
-                "'id');", db="localdev")
+    r = run(pg, "SELECT platform.apply_parent_across_rls('fnb.menu'::regclass, 'outlet_id', "
+                "'platform.outlet'::regclass, 'id');", db="localdev")
     assert r.returncode == 0, r.stderr
     assert owner(pg, "localdev") == "ticvai_parent_visible|f|f"
     assert rows(pg, "SELECT id FROM fnb.menu;", "localdev") == [IDS["mA"]]
