@@ -219,6 +219,37 @@ def impact_tickets(links, artefacts, keys_by_id):
     return {"tickets": tickets, "skipped": skipped}
 
 
+def judge_pulls(rows, release, tickets):
+    """The pull log (audit/kit/pull-direct.mjs, one row per pull) against the impact list: each ticket's last pull
+    must have no error, release `release`, something linked and no link ADAM cannot find (runbook section 4's
+    criteria, on the live ADAM). {ok: [ids], failures: [{id, key, why}]}."""
+    last = {}
+    for r in rows:
+        last[str(r.get("id"))] = r
+    good, bad = [], []
+    for t in tickets:
+        r = last.get(str(t["id"]))
+        res = (r or {}).get("result") or {}
+        cur = (res.get("release") or {}).get("current")
+        if r is None:
+            why = "not pulled"
+        elif r.get("error"):
+            why = f"pull error: {str(r['error'])[:200]}"
+        elif r.get("found") is False or res.get("found") is False:
+            why = "ADAM does not know the ticket"
+        elif cur != release:
+            why = f"release {cur}, not {release}: ADAM is not serving {release} (on the box: git fetch --tags, deploy)"
+        elif int(res.get("notFound") or 0):
+            why = f"{res['notFound']} link(s) ADAM cannot find: a dead link in adam-links.json or ADAM's database"
+        elif not int(res.get("linked") or 0):
+            why = "nothing linked: ADAM's links were not loaded (load_links.py on the box)"
+        else:
+            good.append(t["id"])
+            continue
+        bad.append({"id": t["id"], "key": t.get("key"), "why": why})
+    return {"ok": good, "failures": bad}
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Self-tests: made-up tags, contracts, screens, tables and links the functions must read right. No git, no network.
 # ---------------------------------------------------------------------------------------------------------------------
@@ -352,6 +383,21 @@ def self_test() -> list:
         case("impact: a ticket with no plan key keeps its id as key", by.get(11, {}).get("key"), "11")
     except Exception as e:  # noqa: BLE001
         fails.append(f"impact_tickets raised {type(e).__name__}: {e}")
+
+    # -- the pull after the deploy: release r<N> on every ticket, every link found -----------------------------------
+    try:
+        ok = lambda i, cur="r7", linked=3, nf=0: {"id": i, "result": {"release": {"current": cur}, "linked": linked,
+                                                                      "notFound": nf}}
+        rows = [ok(1), {"id": 2, "error": "timeout"}, ok(2), ok(3, cur="r6"), ok(4, nf=2), ok(5, linked=0),
+                {"id": 6, "error": "boom"}, {"id": 8, "found": False, "result": {"found": False}}]
+        verdict = judge_pulls(rows, "r7", [{"id": i, "key": f"K{i}"} for i in range(1, 9)])
+        case("pulls: the ones that pass (a retry that passed counts)", verdict["ok"], [1, 2])
+        case("pulls: each failure with its reason", [(f["id"], f["why"].split(":")[0]) for f in verdict["failures"]],
+             [(3, "release r6, not r7"), (4, "2 link(s) ADAM cannot find"), (5, "nothing linked"),
+              (6, "pull error"), (7, "not pulled"), (8, "ADAM does not know the ticket")])
+        case("pulls: a ticket key travels with its failure", verdict["failures"][0]["key"], "K3")
+    except Exception as e:  # noqa: BLE001
+        fails.append(f"judge_pulls raised {type(e).__name__}: {e}")
     return fails
 
 
@@ -451,7 +497,8 @@ def show(cmd):
 
 def run_shown(cmd, cwd=None, apply=True):
     """Print the command; run it only when apply. Returns the exit code (0 for a command only shown)."""
-    print(f"    $ {show(cmd)}" + ("" if cwd is None else f"    (in {Path(cwd).relative_to(REPO).as_posix() or '.'})"))
+    where = "" if cwd is None or Path(cwd) == REPO else f"    (in {Path(cwd).relative_to(REPO).as_posix()}/)"
+    print(f"    $ {show(cmd)}{where}")
     if not apply:
         return 0
     return subprocess.run(cmd, cwd=str(cwd or REPO)).returncode
@@ -659,6 +706,166 @@ def cmd_impact(args):
     return 0
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# tag: the next r<N>, annotated, pushed by name to both remotes (the lead's step: printed, run only with --apply)
+# ---------------------------------------------------------------------------------------------------------------------
+
+def remote_tags(remote):
+    p = subprocess.run(["git", "ls-remote", "--tags", remote], cwd=str(REPO), capture_output=True, text=True)
+    if p.returncode:
+        return None
+    return [l.split("refs/tags/", 1)[1] for l in p.stdout.splitlines()
+            if "refs/tags/" in l and not l.endswith("^{}")]
+
+
+def cmd_tag(args):
+    base, _, _ = resolve_release(None, after_tag=False)
+    local = git("tag", "-l", "r*").split()
+    remote = {}
+    for r in REMOTES:
+        remote[r] = remote_tags(r)
+        if remote[r] is None:
+            print(f"  note: cannot read {r}'s tags; numbering from this checkout and the other remote")
+    release = args.release or next_release(local, [t for ts in remote.values() if ts for t in ts])
+    taken = [r for r, ts in remote.items() if ts and release in ts] + (["here"] if release in local else [])
+    out = out_dir(args, release)
+    head = head_sha()
+    print(f"cr-release tag: {release} on HEAD {head[:9]} (from {base}); "
+          f"{'APPLY' if args.apply else 'dry run (--apply tags and pushes: the lead step)'}")
+    refuse = []
+    if taken:
+        refuse.append(f"{release} already exists ({', '.join(taken)})")
+    if RELEASE_TAG.match(release) is None:
+        refuse.append(f"{release} is not r<N>")
+    chk = out / "check.json"
+    c = json.loads(chk.read_text(encoding="utf-8")) if chk.is_file() else {}
+    if not c:
+        refuse.append(f"no gate result for {release} ({chk}): run `cr-release.py check --apply` first")
+    elif c.get("head") != head:
+        refuse.append(f"the gate ran on {str(c.get('head'))[:9]}, HEAD is {head[:9]}: run check --apply again")
+    elif c.get("refused"):
+        refuse.append("check refused: " + "; ".join(c["refused"]))
+    elif not c.get("passed"):
+        refuse.append(f"the gate did not pass at HEAD ({'not run' if not c.get('ran') else 'exit %s' % c.get('rc')})")
+    note = f"{release}: light CR release from {base}" + (f" ({args.note})" if args.note else "")
+    cmds = [(["git", "tag", "-a", release, "-m", note], REPO)]
+    cmds += [(["git", "push", r, release], REPO) for r in REMOTES]
+    cmds.append(([sys.executable, "tools/check-adam-latest-release.py", "--remotes"], PKG))
+    for r in refuse:
+        print(f"  REFUSE  {r}")
+    print("  the lead's commands, in order:")
+    if refuse:
+        for cmd, cwd in cmds:
+            run_shown(cmd, cwd, apply=False)
+        print("cr-release tag: NOT READY")
+        return 1
+    for cmd, cwd in cmds:
+        rc = run_shown(cmd, cwd, apply=args.apply)
+        if rc:
+            print(f"cr-release tag: stopped, exit {rc} (fix it; nothing after this step ran)")
+            return 1
+    print("  then on ADAM's box (169.58.161.46, checkout ~/adam), the lead:")
+    print("    $ cd ~/adam && git fetch --tags && sudo ./deploy/deploy.sh")
+    print(f"  then: cr-release.py after-deploy{' --release ' + release if args.release else ''}")
+    return 0
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# after-deploy: ADAM's links rebuilt and loaded, then every impact ticket pulled as a developer pulls it
+# ---------------------------------------------------------------------------------------------------------------------
+
+def link_set(text):
+    return {(str(l.get("key")), l.get("kind"), l.get("id")) for l in (json.loads(text or "{}").get("links") or [])}
+
+
+def cmd_after_deploy(args):
+    base, release, head = resolve_release(args.release, after_tag=True)
+    out = out_dir(args, release)
+    print(f"cr-release after-deploy: {release} (from {base}); "
+          f"{'APPLY' if args.apply else 'dry run (--apply rebuilds the links and pulls: a pull moves ADAM pins)'}")
+    if args.log:
+        return judge_and_report(out, release, Path(args.log))
+    links_file = PKG / "handoff" / "service-docs" / "adam-links.json"
+    if args.stage in ("links", "all"):
+        print("  1. ADAM's links, rebuilt from the package with the OpenProject statuses (TICVAI_OP_TOKEN):")
+        if args.apply and not os.environ.get("TICVAI_OP_TOKEN"):
+            sys.exit("cr-release after-deploy: TICVAI_OP_TOKEN is not set (audit.env)")
+        rc = run_shown([sys.executable, "tools/adam-links.py"], PKG, apply=args.apply)
+        if rc:
+            print(f"cr-release after-deploy: adam-links.py failed (exit {rc})")
+            return 1
+        moved = 0
+        if args.apply:
+            at_tag, now = link_set(git_show(release, LINKS)), link_set(links_file.read_text(encoding="utf-8"))
+            moved = len(at_tag ^ now)
+            print(f"     links: {len(now)} now, {len(at_tag)} at {release}; {moved} differ")
+        lead = args.lead_email or "<the lead's ADAM email>"
+        db = "/srv/ticvai/viewer/api/ticvai.db"
+        load = (f"python3 viewer/api/load_links.py ticvai/handoff/service-docs/adam-links.json --email {lead} "
+                f"--prune --db {db}")
+        print("  2. the lead: commit and push the rebuilt file (it also carries the statuses ADAM shows on a board)")
+        print(f"    $ git add {LINKS}")
+        print(f"    $ git commit -m \"TICVAI {release}: ADAM's links rebuilt after the release\" "
+              f"-m \"CHG-exempt: distribution (adam-links.py after {release})\"")
+        print("    $ git push origin main && git push github main")
+        print("     then on ADAM's box (169.58.161.46), as the ticvai user, dry run first:")
+        print("    $ cd ~/adam && git pull --ff-only")
+        print(f"    $ sudo -u ticvai {load}")
+        print(f"    $ sudo -u ticvai {load} --apply")
+        if args.apply and args.stage == "all":
+            print("cr-release after-deploy: load the links on the box (above), then run "
+                  "`cr-release.py after-deploy --stage pull --apply`")
+            return 0
+    if args.stage in ("pull", "all"):
+        tickets_file = out / "impact.json"
+        if not tickets_file.is_file():
+            print(f"  no impact list for {release} ({tickets_file}): run `cr-release.py impact --release {release}`")
+            return 1
+        tickets = json.loads(tickets_file.read_text(encoding="utf-8"))
+        kit = Path(args.kit) if args.kit else REPO / "audit" / "kit" / "pull-direct.mjs"
+        pulls = out / f"pull-{time.strftime('%Y%m%d-%H%M%S')}"
+        print(f"  3. pull all {len(tickets)} impact ticket(s) with the shipped connector, as a developer does "
+              f"(ADAM_EMAIL, ADAM_PASSWORD):")
+        cmd = ["node", str(kit), "--connector", str(REPO / "viewer" / "mcp"), "--tickets", str(tickets_file),
+               "--out", str(pulls), "--jobs", str(args.jobs)]
+        if not tickets:
+            print("     nothing to pull: the release touches no linked ticket")
+            return 0
+        if args.apply:
+            if not (os.environ.get("ADAM_EMAIL") and os.environ.get("ADAM_PASSWORD")):
+                sys.exit("cr-release after-deploy: ADAM_EMAIL and ADAM_PASSWORD are not set (audit.env)")
+            if not kit.is_file():
+                sys.exit(f"cr-release after-deploy: no pull kit at {kit} (--kit)")
+        started = time.time()
+        rc = run_shown(cmd, apply=args.apply)
+        if not args.apply:
+            print(f"  4. each must say release {release}, link something, and have no link ADAM cannot find "
+                  f"(`--log <pull-log.jsonl>` judges a log again)")
+            return 0
+        print(f"     pulled in {round(time.time() - started)} s (exit {rc})")
+        return judge_and_report(out, release, pulls / "pull-log.jsonl")
+    return 0
+
+
+def judge_and_report(out, release, log):
+    if not log.is_file():
+        print(f"  no pull log at {log}")
+        return 1
+    rows = [json.loads(l) for l in log.read_text(encoding="utf-8").splitlines() if l.strip()]
+    impact = out / "impact.json"
+    tickets = (json.loads(impact.read_text(encoding="utf-8")) if impact.is_file()
+               else [{"id": r.get("id"), "key": r.get("key")} for r in rows])
+    v = judge_pulls(rows, release, tickets)
+    write_json(out / "pull-verdict.json", dict(v, release=release, log=str(log)))
+    print(f"  {len(v['ok'])} of {len(tickets)} ticket(s) pull at {release} with every link found; "
+          f"{len(v['failures'])} fail -> {out / 'pull-verdict.json'}")
+    for f in v["failures"][:40]:
+        print(f"    FAIL #{f['id']} {f['key']}: {f['why']}")
+    if len(v["failures"]) > 40:
+        print(f"    ... and {len(v['failures']) - 40} more (pull-verdict.json)")
+    return 1 if v["failures"] else 0
+
+
 #@@MORE@@
 
 def main(argv=None) -> int:
@@ -680,6 +887,14 @@ def main(argv=None) -> int:
     common(sub.add_parser("check", help="main, clean and pushed; the gate"))
     p = common(sub.add_parser("impact", help="the tickets the release touches, for the pull"))
     p.add_argument("--live-status", action="store_true", help="read statuses from OpenProject now (GET only)")
+    p = common(sub.add_parser("tag", help="the next r<N>, annotated, pushed by name to both remotes (lead)"))
+    p.add_argument("--note", help="a few words for the tag message: the class or requests it carries")
+    p = common(sub.add_parser("after-deploy", help="ADAM's links, then pull every impact ticket"))
+    p.add_argument("--stage", choices=("links", "pull", "all"), default="all")
+    p.add_argument("--lead-email", help="the ADAM account load_links.py records the links as made by")
+    p.add_argument("--kit", help="pull-direct.mjs (default audit/kit/pull-direct.mjs)")
+    p.add_argument("--jobs", type=int, default=4)
+    p.add_argument("--log", help="judge this pull log (pull-log.jsonl) instead of pulling")
     #@@ARGS@@
     a = ap.parse_args(argv)
     if a.cmd in (None, "self-test"):
@@ -690,7 +905,7 @@ def main(argv=None) -> int:
     return COMMANDS[a.cmd](a)
 
 
-COMMANDS = {"check": cmd_check, "impact": cmd_impact}
+COMMANDS = {"check": cmd_check, "impact": cmd_impact, "tag": cmd_tag, "after-deploy": cmd_after_deploy}
 
 
 if __name__ == "__main__":
