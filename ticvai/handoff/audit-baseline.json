@@ -296,6 +296,108 @@
     "linkGuestCheckout:orders.sales_order",
     "submitGuestIdentityDocument:assets.media_asset"
    ]
+  },
+  "started": {
+   "XR-FOUNDATION|exportSubjectData:marketing.consent_record": {
+    "tickets": [
+     27677,
+     30526
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-FOUNDATION|exportSubjectData:marketing.form_submission": {
+    "tickets": [
+     27677,
+     30536
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-FOUNDATION|exportSubjectData:marketing.guest_document": {
+    "tickets": [
+     27677,
+     30538
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-FOUNDATION|exportSubjectData:marketing.guest_profile": {
+    "tickets": [
+     27677,
+     30540
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-FOUNDATION|linkGuestCheckout:orders.sales_order": {
+    "tickets": [
+     27675,
+     30484,
+     30702
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-FOUNDATION|submitGuestIdentityDocument:assets.media_asset": {
+    "tickets": [
+     27659,
+     27683,
+     30220
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-UNCOVERED|exportSubjectData:marketing.consent_record": {
+    "tickets": [
+     27677,
+     30526
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-UNCOVERED|exportSubjectData:marketing.form_submission": {
+    "tickets": [
+     27677,
+     30536
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-UNCOVERED|exportSubjectData:marketing.guest_document": {
+    "tickets": [
+     27677,
+     30538
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-UNCOVERED|exportSubjectData:marketing.guest_profile": {
+    "tickets": [
+     27677,
+     30540
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-UNCOVERED|linkGuestCheckout:orders.sales_order": {
+    "tickets": [
+     27675,
+     30484,
+     30702
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   },
+   "XR-UNCOVERED|submitGuestIdentityDocument:assets.media_asset": {
+    "tickets": [
+     27659,
+     27683,
+     30220
+    ],
+    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
+    "on": "2026-10-18"
+   }
   }
  },
  "check-ddl-conventions": {
@@ -305,6 +407,16 @@
    "D-STUB-TABLE": [
     "platform.tenant"
    ]
+  },
+  "started": {
+   "D-STUB-TABLE|platform.tenant": {
+    "tickets": [
+     27665,
+     30341
+    ],
+    "why": "CR-078, CR-080: platform.tenant stays a stub until its columns are decided",
+    "on": "2026-10-18"
+   }
   }
  },
  "check-device-tiers": {
@@ -335,6 +447,15 @@
    "E-READ-VIA": [
     "linkGuestCheckout|403"
    ]
+  },
+  "started": {
+   "E-READ-VIA|linkGuestCheckout|403": {
+    "tickets": [
+     30702
+    ],
+    "why": "CR-096: linkGuestCheckout's 403 gets its read route in the read routes class fix",
+    "on": "2026-10-18"
+   }
   }
  },
  "check-frontend-repos": {
@@ -626,6 +747,48 @@
     "reconcileBurstEnvironment.burstEnvironmentId",
     "resolveProductByCode.partnerId"
    ]
+  },
+  "started": {
+   "P-NAMED-TABLE|addIncidentPerson.pii.subject": {
+    "tickets": [
+     27650,
+     30171
+    ],
+    "why": "F58: the five descriptions that name a table their lineage does not list are corrected in the next release",
+    "on": "2026-10-18"
+   },
+   "P-NAMED-TABLE|cancelPerformance.access.entitlement": {
+    "tickets": [
+     27676,
+     30503
+    ],
+    "why": "F58: the five descriptions that name a table their lineage does not list are corrected in the next release",
+    "on": "2026-10-18"
+   },
+   "P-NAMED-TABLE|getKpiValues.access.scan_event": {
+    "tickets": [
+     27649,
+     27676,
+     30510
+    ],
+    "why": "F58: the five descriptions that name a table their lineage does not list are corrected in the next release",
+    "on": "2026-10-18"
+   },
+   "P-NAMED-TABLE|listAgentWorkloadAvailability.workforce.shift": {
+    "tickets": [
+     27947
+    ],
+    "why": "F58: the five descriptions that name a table their lineage does not list are corrected in the next release",
+    "on": "2026-10-18"
+   },
+   "P-NAMED-TABLE|reportIncident.pii.subject": {
+    "tickets": [
+     27650,
+     30171
+    ],
+    "why": "F58: the five descriptions that name a table their lineage does not list are corrected in the next release",
+    "on": "2026-10-18"
+   }
   }
  },
  "check-plan-closure": {
@@ -801,6 +964,646 @@
     "validateWorkforceCompliance:workforce.employee:read",
     "verifyAllergens:fnb.ingredient_substitute:read"
    ]
+  },
+  "started": {
+   "RF-OWNED-ABOVE|setAiProvider:ai.byok_enablement": {
+    "tickets": [
+     27664,
+     30283
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|actOnWaiverRequirements:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|activateGiftCard:wallet.gift_card:write": {
+    "tickets": [
+     27669,
+     30372
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|adjustGameCard:wallet.balance:write": {
+    "tickets": [
+     27669,
+     30363
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|adjustWallet:wallet.wallet:write": {
+    "tickets": [
+     27669,
+     30379
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|approveReviewDecision:catalogue.product_version:read": {
+    "tickets": [
+     27671,
+     30404
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|blockGiftCard:wallet.gift_card:write": {
+    "tickets": [
+     27669,
+     30372
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|broadcastToGuests:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|bulkChangePrices:catalogue.product_version:write": {
+    "tickets": [
+     27671,
+     30404
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|captureWalletHold:wallet.balance:write": {
+    "tickets": [
+     27669,
+     30363
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|checkoutCart:marketing.consent_record:write": {
+    "tickets": [
+     27677,
+     30526
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|closeWallet:wallet.wallet:write": {
+    "tickets": [
+     27669,
+     30379
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|createAccessReviewCampaign:workforce.employee:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|createDeliveryLocation:fnb.delivery_location_outlet:write": {
+    "tickets": [
+     27678,
+     30572
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|createPaymentLink:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|createPrincipal:identity.principal:write": {
+    "tickets": [
+     27657,
+     27683,
+     30206
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|createPrincipal:identity.principal_credential:write": {
+    "tickets": [
+     27657,
+     30207
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|enrolFacePass:marketing.consent_record:write": {
+    "tickets": [
+     27677,
+     30526
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|expireCreditLots:wallet.wallet:write": {
+    "tickets": [
+     27669,
+     30379
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|forceLogout:identity.principal_credential:read": {
+    "tickets": [
+     27657,
+     30207
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|forceLogout:identity.principal_credential:write": {
+    "tickets": [
+     27657,
+     30207
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|getEmployee:workforce.employee:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|getEmployee:workforce.job_title:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|holdWalletFunds:wallet.balance:write": {
+    "tickets": [
+     27669,
+     30363
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|issueGiftCard:wallet.gift_card:write": {
+    "tickets": [
+     27669,
+     30372
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|launchCampaign:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listAccessDecisions:identity.authz_audit:read": {
+    "tickets": [
+     27948
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listAuditRecords:platform.audit_read:write": {
+    "tickets": [
+     27797
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listAuditRecords:platform.audit_record:read": {
+    "tickets": [
+     27649,
+     27665,
+     30327
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listConsentEvidenceWithdrawal:marketing.consent_propagation:read": {
+    "tickets": [
+     27677,
+     30521
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listEmployees:workforce.employee:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listJobTitles:workforce.job_title:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listPrivacyCompliance:marketing.consent_propagation:read": {
+    "tickets": [
+     27677,
+     30521
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listProductGovernance:catalogue.product_version:read": {
+    "tickets": [
+     27671,
+     30404
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listProductLifecycle:catalogue.product_version:read": {
+    "tickets": [
+     27671,
+     30404
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listProductTrailChange:catalogue.product_version:read": {
+    "tickets": [
+     27671,
+     30404
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listProductVersions:catalogue.product_version:read": {
+    "tickets": [
+     27671,
+     30404
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listRollbackRecovery:catalogue.product_version:read": {
+    "tickets": [
+     27671,
+     30404
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listSerialisedItems:inventory.serialised_item:read": {
+    "tickets": [
+     27673,
+     30433
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listShiftPatterns:workforce.shift:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listStaffConversations:workforce.employee:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|listSystemTransactionalTemplate:marketing.message_template_version:read": {
+    "tickets": [
+     27677,
+     30550
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|loadGameCredits:wallet.balance:write": {
+    "tickets": [
+     27669,
+     30363
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|loadGameCredits:wallet.wallet:write": {
+    "tickets": [
+     27669,
+     30379
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|logout:identity.refresh_token:write": {
+    "tickets": [
+     27657,
+     30208
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|notifyServer:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|notifyWaitlistParty:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|redeemGiftCard:wallet.gift_card:write": {
+    "tickets": [
+     27669,
+     30372
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|reinstateWallet:wallet.wallet:write": {
+    "tickets": [
+     27669,
+     30379
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|releaseWalletHold:wallet.balance:write": {
+    "tickets": [
+     27669,
+     30363
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|resendPaymentLink:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|resetPrincipalCredential:identity.principal:write": {
+    "tickets": [
+     27657,
+     27683,
+     30206
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|resetPrincipalCredential:identity.principal_credential:read": {
+    "tickets": [
+     27657,
+     30207
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|resetPrincipalCredential:identity.principal_credential:write": {
+    "tickets": [
+     27657,
+     30207
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|resetPrincipalCredential:identity.principal_credential_history:write": {
+    "tickets": [
+     27657
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|restoreProductVersion:catalogue.product_version:read": {
+    "tickets": [
+     27671,
+     30404
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|restoreProductVersion:catalogue.product_version:write": {
+    "tickets": [
+     27671,
+     30404
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|retryMessageDispatch:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|sendBookingConfirmation:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|sendOrderNotification:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|sendTransactionalMessage:marketing.message_dispatch:write": {
+    "tickets": [
+     27649,
+     27677,
+     30548
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|setDeliveryLocationOutletMapping:fnb.delivery_location_outlet:write": {
+    "tickets": [
+     27678,
+     30572
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|setJobTitle:workforce.job_title:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|setJobTitle:workforce.job_title:write": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|setShiftPattern:workforce.shift:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|setShiftPattern:workforce.shift:write": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|settleWalletAtExit:wallet.wallet:write": {
+    "tickets": [
+     27669,
+     30379
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|storePaymentToken:marketing.consent_record:write": {
+    "tickets": [
+     27677,
+     30526
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|storePaymentToken:payments.token:write": {
+    "tickets": [
+     27679,
+     30618
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|submitForm:marketing.consent_record:write": {
+    "tickets": [
+     27677,
+     30526
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|submitForm:marketing.form_submission:write": {
+    "tickets": [
+     27677,
+     30536
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|suggestRoleAssignment:workforce.employee:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|suggestWorkOrderAssignee:workforce.shift:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|suspendWallet:wallet.wallet:write": {
+    "tickets": [
+     27669,
+     30379
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|topUpWallet:wallet.balance:write": {
+    "tickets": [
+     27669,
+     30363
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|topUpWallet:wallet.wallet:write": {
+    "tickets": [
+     27669,
+     30379
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|transferWalletBalance:wallet.wallet:write": {
+    "tickets": [
+     27669,
+     30379
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|updatePrincipal:identity.principal:write": {
+    "tickets": [
+     27657,
+     27683,
+     30206
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|uploadGuestDocument:marketing.guest_document:write": {
+    "tickets": [
+     27677,
+     30538
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   },
+   "RF-TENANT-ROOT|validateWorkforceCompliance:workforce.employee:read": {
+    "tickets": [
+     27947
+    ],
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
+    "on": "2026-10-18"
+   }
   }
  },
  "check-screen-wiring": {
@@ -5505,6 +6308,29 @@
     "PTR-015:holdOrder",
     "PTR-015:resumeOrder"
    ]
+  },
+  "started": {
+   "S-OFFLINE-QUEUED|POS-016:configureWorkstation": {
+    "tickets": [
+     30794
+    ],
+    "why": "F59: the three screen findings (BO-1170, BO-602, POS-016) are fixed in the screen batch",
+    "on": "2026-10-18"
+   },
+   "S-OP-UNREACHED|BO-1170:listFiscalPeriods": {
+    "tickets": [
+     32336
+    ],
+    "why": "F59: the three screen findings (BO-1170, BO-602, POS-016) are fixed in the screen batch",
+    "on": "2026-10-18"
+   },
+   "S-OP-UNREACHED|BO-602:configureWorkstation": {
+    "tickets": [
+     30794
+    ],
+    "why": "F59: the three screen findings (BO-1170, BO-602, POS-016) are fixed in the screen batch",
+    "on": "2026-10-18"
+   }
   }
  },
  "check-starter-fit": {
