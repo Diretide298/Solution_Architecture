@@ -250,6 +250,70 @@ def judge_pulls(rows, release, tickets):
     return {"ok": good, "failures": bad}
 
 
+SUB_TASK = 10                 # OpenProject type ids (tools/push-openproject.py TYPES)
+NORMAL = 8                    # priority Normal
+NO_REWORK = ("Feature", "Epic")
+
+
+def rework_text(t, release, base, note):
+    lines = [f"The specification ticket #{t['id']} ({t['key']}) built changed in release {release} (a light "
+             f"change-request release from {base}){': ' + note if note else ''}.", "",
+             "What changed that this ticket links:", ""]
+    touches = t.get("touches") or []
+    lines += [f"- {x}" for x in touches[:40]]
+    if len(touches) > 40:
+        lines.append(f"- ... and {len(touches) - 40} more (the pull's README lists them all)")
+    lines += ["", f"Pull the parent with `/ticket {t['id']}`: its README says what changed since your previous pull, "
+                  f"and spec-diff.md has the differences. Change the built code to match, then move this sub-task to "
+                  f"Ready for QA. You are always on the latest release ({release})."]
+    return "\n".join(lines)
+
+
+def rework_plan(finished, pms_map, release, base, large_at=20, note=""):
+    """One rework sub-task per finished task or sub-task, in op-create.rb's shape. A parent with `large_at` or more
+    children in pms-map (a migration task) goes to the server (API creates under one time out behind Cloudflare's
+    100 s); the rest over the API. {api: [...], server: [...], skipped: [tickets]}."""
+    kids = {}
+    for k in pms_map:
+        if "#" in k:
+            kids[k.partition("#")[0]] = kids.get(k.partition("#")[0], 0) + 1
+    out = {"api": [], "server": [], "skipped": []}
+    for t in finished:
+        if t.get("kind") in NO_REWORK:
+            out["skipped"].append(t)
+            continue
+        item = {"key": f"REWORK-{release}-{t['id']}", "type_id": SUB_TASK,
+                "subject": f"[{release} rework] {t.get('subject') or t['key']}"[:255],
+                "description": rework_text(t, release, base, note), "parent_id": int(t["id"]),
+                "assignee": t.get("assignee") or None, "responsible": None, "priority_id": NORMAL,
+                "children": kids.get(str(t["key"]), 0)}
+        out["server" if item["children"] >= large_at else "api"].append(item)
+    return out
+
+
+def decisions_for(crs, release, resolution, status="done"):
+    """settle_changes.py's decisions file: each request once, `status` with ref `release`."""
+    if not str(resolution or "").strip():
+        raise ValueError("a resolution is needed: the text the request's developer reads")
+    nums = set()
+    for c in crs:
+        m = re.match(r"^\s*(?:CR-?)?0*(\d+)\s*$", str(c), re.I)
+        if not m:
+            raise ValueError(f"not a change request: {c!r}")
+        nums.add(int(m.group(1)))
+    return {"project": "ticvai", "ref": release,
+            "items": [{"cr": f"CR-{n:03d}", "status": status, "resolution": resolution.strip(), "ref": release}
+                      for n in sorted(nums)]}
+
+
+def class_crs(classes_doc, class_id):
+    """The requests handoff/cr-classes.yaml (lane D2, CHG-CRF-002) lists for a class; None if no such class."""
+    for c in (classes_doc or {}).get("classes") or []:
+        if c.get("id") == class_id:
+            return list(c.get("crs") or [])
+    return None
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Self-tests: made-up tags, contracts, screens, tables and links the functions must read right. No git, no network.
 # ---------------------------------------------------------------------------------------------------------------------
@@ -398,6 +462,48 @@ def self_test() -> list:
         case("pulls: a ticket key travels with its failure", verdict["failures"][0]["key"], "K3")
     except Exception as e:  # noqa: BLE001
         fails.append(f"judge_pulls raised {type(e).__name__}: {e}")
+
+    # -- rework sub-tasks for finished tickets -----------------------------------------------------------------------
+    try:
+        T = lambda i, key, kind="Task", subject="s", who="Pat", touches=("operation x#getX",): {
+            "id": i, "key": key, "kind": kind, "subject": subject, "assignee": who, "touches": list(touches),
+            "bucket": "finished", "status": "Ready for QA"}
+        fin = [T(100, "MIG-ORDERS", subject="Orders migrations", who="Hrushikant Patkar", touches=["table orders.o"]),
+               T(101, "SVC-X-1", subject="getX"), T(102, "SVC-X-1#be", "Sub Task", "getX back end", ""),
+               T(103, "AM-X", "Feature")]
+        pms = dict({"MIG-ORDERS": 100, "SVC-X-1": 101, "SVC-X-1#be": 102, "SVC-X-1#fe": 104, "AM-X": 103},
+                   **{f"MIG-ORDERS#m{i}": 1000 + i for i in range(25)})
+        plan = rework_plan(fin, pms, "r7", "r6", large_at=20, note="CR-161")
+        case("rework: a parent with many children goes to the server, small ones to the API",
+             ([x["parent_id"] for x in plan["server"]], [x["parent_id"] for x in plan["api"]]), ([100], [101, 102]))
+        case("rework: a feature gets none (its tasks do)", [x["id"] for x in plan["skipped"]], [103])
+        one = plan["api"][0] if plan["api"] else {}
+        case("rework: the sub-task's fields (op-create.rb's shape)",
+             {k: one.get(k) for k in ("key", "type_id", "subject", "parent_id", "assignee", "priority_id")},
+             {"key": "REWORK-r7-101", "type_id": 10, "subject": "[r7 rework] getX", "parent_id": 101,
+              "assignee": "Pat", "priority_id": 8})
+        case("rework: the description names what changed, the release and the request",
+             all(w in one.get("description", "") for w in ("operation x#getX", "r7", "r6", "CR-161", "/ticket 101")),
+             True)
+        case("rework: no assignee stays empty", plan["api"][1]["assignee"] if len(plan["api"]) > 1 else "?", None)
+    except Exception as e:  # noqa: BLE001
+        fails.append(f"rework_plan raised {type(e).__name__}: {e}")
+
+    # -- settling the class's requests -------------------------------------------------------------------------------
+    try:
+        d = decisions_for(["CR-167", "161", "cr-161", " CR-0170 "], "r7", "Fixed in r7: the read routes.")
+        case("settle: requests named any way, once each, in order", [x["cr"] for x in d["items"]],
+             ["CR-161", "CR-167", "CR-170"])
+        case("settle: done with ref r<N>, the file's ref too",
+             (d["ref"], {(x["status"], x["ref"], x["resolution"]) for x in d["items"]}),
+             ("r7", {("done", "r7", "Fixed in r7: the read routes.")}))
+        classes = {"classes": [{"id": "read-routes", "crs": ["CR-096", "CR-135"]}, {"id": "row-security"}]}
+        case("settle: a class's requests from cr-classes.yaml", class_crs(classes, "read-routes"),
+             ["CR-096", "CR-135"])
+        case("settle: a class with no requests", class_crs(classes, "row-security"), [])
+        case("settle: an unknown class", class_crs(classes, "nope"), None)
+    except Exception as e:  # noqa: BLE001
+        fails.append(f"settle raised {type(e).__name__}: {e}")
     return fails
 
 
@@ -866,7 +972,157 @@ def judge_and_report(out, release, log):
     return 1 if v["failures"] else 0
 
 
-#@@MORE@@
+# ---------------------------------------------------------------------------------------------------------------------
+# rework: a sub-task for each finished ticket the release changed
+# ---------------------------------------------------------------------------------------------------------------------
+
+class OpenProject:
+    """The few REST calls rework needs (TICVAI_OP_TOKEN). Reads to check, one POST per sub-task, mail off."""
+
+    def __init__(self, base, token):
+        import base64
+        self.base = base.rstrip("/") + "/api/v3"
+        self.auth = "Basic " + base64.b64encode(f"apikey:{token}".encode()).decode()
+
+    def req(self, method, path, body=None):
+        import urllib.error
+        import urllib.request
+        r = urllib.request.Request(self.base + path, data=json.dumps(body).encode() if body is not None else None,
+                                   method=method, headers={"authorization": self.auth, "user-agent": "curl/8.0",
+                                                           "content-type": "application/json"})
+        try:
+            with urllib.request.urlopen(r, timeout=120) as resp:
+                return json.loads(resp.read() or b"null")
+        except urllib.error.HTTPError as e:
+            raise RuntimeError(f"{method} {path}: {e.code} {e.read().decode('utf-8', 'replace')[:300]}") from None
+
+    def users(self, project):
+        out, offset = {}, 1
+        while True:
+            got = self.req("GET", f"/projects/{project}/available_assignees?pageSize=500&offset={offset}")
+            for u in got["_embedded"]["elements"]:
+                out[u["name"]] = u["id"]
+            if len(got["_embedded"]["elements"]) < 500:
+                return out
+            offset += 1
+
+
+OP_PROJECT = 153
+OP_SERVER = "193.34.144.157"
+
+
+def cmd_rework(args):
+    base, release, _ = resolve_release(args.release, after_tag=True)
+    out = out_dir(args, release)
+    src = out / "impact-finished.json"
+    if not src.is_file():
+        print(f"  no impact list for {release} ({src}): run `cr-release.py impact --release {release}` "
+              f"(--live-status reads the statuses from OpenProject now)")
+        return 1
+    finished = json.loads(src.read_text(encoding="utf-8"))
+    meta = out / "artefacts.json"
+    how = json.loads(meta.read_text(encoding="utf-8")).get("statuses", "") if meta.is_file() else ""
+    if how != "live":
+        print("  note: the statuses are the ones cached in adam-links.json; `impact --live-status` reads them from "
+              "OpenProject now, so a ticket finished since is not missed")
+    mp = json.loads(git_show("HEAD", PMS_MAP) or "{}")
+    plan = rework_plan(finished, mp, release, base, args.large_at, args.note or "")
+    rw = out / "rework"
+    rw.mkdir(exist_ok=True)
+    print(f"cr-release rework: {release}: {len(finished)} finished ticket(s): {len(plan['api'])} sub-task(s) over the "
+          f"API, {len(plan['server'])} on the OpenProject server (parents with {args.large_at}+ children), "
+          f"{len(plan['skipped'])} feature(s) skipped (their tasks get one); "
+          f"{'APPLY' if args.apply else 'dry run (--apply creates the API ones)'}")
+    for x in plan["api"] + plan["server"]:
+        print(f"    {'api   ' if x in plan['api'] else 'server'}  under #{x['parent_id']} ({x['children']} children): "
+              f"{x['subject']}  -> {x['assignee'] or 'nobody'}")
+    write_json(rw / "api.json", plan["api"])
+    if args.apply and plan["api"]:
+        if not os.environ.get("TICVAI_OP_TOKEN"):
+            sys.exit("cr-release rework: TICVAI_OP_TOKEN is not set (audit.env)")
+        op = OpenProject(os.environ.get("TICVAI_PMS_URL", "https://pms.softlabsgroup.in"), os.environ["TICVAI_OP_TOKEN"])
+        users = op.users(OP_PROJECT)
+        made = []
+        for x in list(plan["api"]):
+            parent = op.req("GET", f"/work_packages/{x['parent_id']}")
+            children = (parent.get("_links") or {}).get("children") or []
+            if any(c.get("title") == x["subject"] for c in children):
+                print(f"    there   #{x['parent_id']} already has \"{x['subject']}\"")
+                continue
+            if len(children) >= args.large_at:
+                print(f"    server  #{x['parent_id']} has {len(children)} children in OpenProject: moved to the server file")
+                plan["api"].remove(x)
+                plan["server"].append(dict(x, children=len(children)))
+                continue
+            links = {"type": {"href": f"/api/v3/types/{SUB_TASK}"}, "priority": {"href": f"/api/v3/priorities/{NORMAL}"},
+                     "parent": {"href": f"/api/v3/work_packages/{x['parent_id']}"}}
+            if x["assignee"] and users.get(x["assignee"]):
+                links["assignee"] = {"href": f"/api/v3/users/{users[x['assignee']]}"}
+            got = op.req("POST", f"/projects/{OP_PROJECT}/work_packages?notify=false",
+                         {"subject": x["subject"], "description": {"format": "markdown", "raw": x["description"]},
+                          "_links": links})
+            made.append({"key": x["key"], "id": got["id"], "parent_id": x["parent_id"]})
+            print(f"    made    #{got['id']} under #{x['parent_id']}")
+        write_json(rw / "api-made.json", made)
+        print(f"  {len(made)} sub-task(s) made over the API -> {rw / 'api-made.json'}")
+    server = [{k: v for k, v in x.items() if k != "children"} for x in plan["server"]]
+    write_json(rw / "op-create.json", server)
+    if server:
+        print(f"  the lead, on the OpenProject server ({OP_SERVER}), with {rw / 'op-create.json'} (dry run, then APPLY=1):")
+        print(f"    $ scp ticvai/tools/op-create.rb {rw / 'op-create.json'} <you>@{OP_SERVER}:/tmp/")
+        print("    $ docker cp /tmp/op-create.rb openproject:/tmp/ && docker cp /tmp/op-create.json openproject:/tmp/")
+        print("    $ docker exec openproject bash -c 'cd /app && bundle exec rails runner /tmp/op-create.rb /tmp/op-create.json'")
+        print("    $ docker exec -e APPLY=1 openproject bash -c 'cd /app && bundle exec rails runner /tmp/op-create.rb "
+              "/tmp/op-create.json'")
+        print("    (op-created.json lists the new ids; these are not plan tickets: do not merge them into pms-map.json)")
+    return 0
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# settle: the class's requests done, with ref r<N>, through ADAM's settle_changes.py
+# ---------------------------------------------------------------------------------------------------------------------
+
+def cmd_settle(args):
+    _, release, _ = resolve_release(args.release, after_tag=True)
+    out = out_dir(args, release)
+    crs = [c for c in (args.crs or "").split(",") if c.strip()]
+    if args.cls:
+        text = git_show("HEAD", "ticvai/handoff/cr-classes.yaml")
+        if text is None:
+            sys.exit("cr-release settle: handoff/cr-classes.yaml is not in this checkout yet (lane D2, the watcher): "
+                     "name the requests with --crs")
+        got = class_crs(load_yaml(text), args.cls)
+        if got is None:
+            sys.exit(f"cr-release settle: no class {args.cls} in handoff/cr-classes.yaml")
+        crs += got
+    if not crs:
+        sys.exit("cr-release settle: no requests (--crs, or --class)")
+    try:
+        dec = decisions_for(crs, release, args.resolution, args.status)
+    except ValueError as e:
+        sys.exit(f"cr-release settle: {e}")
+    d = out / "settle"
+    d.mkdir(exist_ok=True)
+    write_json(d / "decisions.json", dec)
+    verdict = out / "pull-verdict.json"
+    v = json.loads(verdict.read_text(encoding="utf-8")) if verdict.is_file() else None
+    print(f"cr-release settle: {len(dec['items'])} request(s) {args.status} with ref {release}: "
+          f"{', '.join(x['cr'] for x in dec['items'])} -> {d / 'decisions.json'}")
+    if v is None:
+        print(f"  note: no pull verdict for {release} yet (after-deploy): a comment says \"your next pull already has "
+              f"it\" only once ADAM serves {release}")
+    elif v.get("failures"):
+        print(f"  note: {len(v['failures'])} impact ticket(s) failed the pull after the deploy (pull-verdict.json)")
+    cmd = [sys.executable, "viewer/api/settle_changes.py", str(d / "decisions.json")] + (["--apply"] if args.apply else [])
+    print(f"  ADAM's settle_changes.py ({'APPLY' if args.apply else 'its own dry run: reads ADAM and OpenProject, writes nothing'}; "
+          f"ADAM_EMAIL, ADAM_PASSWORD, TICVAI_OP_TOKEN):")
+    if not (os.environ.get("ADAM_EMAIL") and os.environ.get("ADAM_PASSWORD") and os.environ.get("TICVAI_OP_TOKEN")):
+        run_shown(cmd, apply=False)
+        print("  (not run: the environment has no ADAM_EMAIL, ADAM_PASSWORD or TICVAI_OP_TOKEN)")
+        return 0 if not args.apply else 1
+    return run_shown(cmd, apply=True)
+
+
 
 def main(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else argv
@@ -895,7 +1151,14 @@ def main(argv=None) -> int:
     p.add_argument("--kit", help="pull-direct.mjs (default audit/kit/pull-direct.mjs)")
     p.add_argument("--jobs", type=int, default=4)
     p.add_argument("--log", help="judge this pull log (pull-log.jsonl) instead of pulling")
-    #@@ARGS@@
+    p = common(sub.add_parser("rework", help="rework sub-tasks for the finished impact tickets"))
+    p.add_argument("--large-at", type=int, default=20, help="children from which a parent goes to the server")
+    p.add_argument("--note", help="the request(s) or class, named in each sub-task")
+    p = common(sub.add_parser("settle", help="settle the class's requests done with ref r<N>"))
+    p.add_argument("--crs", help="the requests, comma-separated (CR-161,CR-167)")
+    p.add_argument("--class", dest="cls", help="the class id in handoff/cr-classes.yaml (lane D2)")
+    p.add_argument("--resolution", help="what the developer reads: the decision and what changed")
+    p.add_argument("--status", default="done", choices=("done", "accepted"))
     a = ap.parse_args(argv)
     if a.cmd in (None, "self-test"):
         return 0
@@ -905,7 +1168,8 @@ def main(argv=None) -> int:
     return COMMANDS[a.cmd](a)
 
 
-COMMANDS = {"check": cmd_check, "impact": cmd_impact, "tag": cmd_tag, "after-deploy": cmd_after_deploy}
+COMMANDS = {"check": cmd_check, "impact": cmd_impact, "tag": cmd_tag, "after-deploy": cmd_after_deploy,
+            "rework": cmd_rework, "settle": cmd_settle}
 
 
 if __name__ == "__main__":
