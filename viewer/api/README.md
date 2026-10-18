@@ -405,6 +405,21 @@ open ticket and files one child task under a closed one (CHG-ADM-001, CHG-ADM-00
 node api/release-check.mjs
 ```
 
+`subtasks-check.mjs` — the work under a ticket and where work starts (CHG-ADM-006). **Self-contained** like
+release-check: its own stand-in OpenProject with the sub-task dataset (`FAKE_SUBTASKS=1`) and accounts service on
+ports 8891-8892. It asserts that a work package lists every sub-task at every depth, a closed one and somebody
+else's included, in board order, **while the whole-project read is failing**, and through each ticket's `children`
+links when the instance refuses the parent filter; that a sub-task names its parent, also when that parent is
+somebody else's; that a sub-task read that fails is null, not none; that the board says `subtasksKnown: false`
+rather than 0; and that `startHere` is the first open sub-task of yours under the first ticket you can finish. Then
+the same through the connector: README.md's "Sub-tasks" and "Part of", and adam_board's `startHere`.
+`mcp/subtasks-check.mjs` holds the exact README wording against a stand-in client, with no services.
+
+```bash
+node api/subtasks-check.mjs
+node mcp/subtasks-check.mjs
+```
+
 `changes-import-check.mjs` — 52 assertions over the change request round trip,
 most of them about the half that does not write: a rejection with no reason, a
 decision outside the four, an id no request has, a reopen, a stale checksum,
