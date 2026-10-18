@@ -32,3 +32,10 @@ def test_simulate_self_tests():
 
 def test_prepare_self_tests():
     assert load("prepare").self_test() == []
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
+def test_stand_in_self_tests():
+    r = subprocess.run(["node", str(KIT / "stand-in-openproject.mjs"), "--self-test"], capture_output=True, text=True,
+                       timeout=120)
+    assert r.returncode == 0, r.stdout + r.stderr
