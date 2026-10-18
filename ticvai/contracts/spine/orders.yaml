@@ -21151,6 +21151,7 @@ components:
     PaymentProvider:
       type: object
       x-ticvai-persistence: payments.provider
+      x-ticvai-rls: read-beneath   # ADAM CR-095's rule, CHG-RSF-001: rows set at a chosen level (scope_level) govern every scope beneath them, so a scope reads the ones it inherits and still writes only its own
       description: 'BL-116, CF-131. **`Payment` carried `providerName` and `providerReference`, which
         records a provider and does not abstract one.**
 

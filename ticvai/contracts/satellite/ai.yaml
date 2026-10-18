@@ -17276,6 +17276,7 @@ components:
     AiProvider:
       type: object
       x-ticvai-persistence: ai.provider
+      x-ticvai-rls: read-beneath   # ADAM CR-095's rule, CHG-RSF-001: rows set at a chosen level (scope_level) govern every scope beneath them, so a scope reads the ones it inherits and still writes only its own
       required:
       - kind
       - capability

@@ -66,8 +66,10 @@ JUDGED_AUDIENCE = {"staff", "partner", "device"}
 LEVEL = {"tenant": 1, "brand": 2, "region": 3, "venue": 4, "outlet": 5, "workstation": 6}
 # Kernel tables every role writes at its own path (ADAM CR-002): never "created above" a writer.
 KERNEL = {"platform.outbox", "platform.idempotency_record", "platform.audit_record", "platform.scope"}
-# The tables ADAM CR-095 named, whose readers may never be baselined (RF-INHERITED).
-STRICT_INHERITED = {"approvals.matrix"}
+# The tables ADAM CR-095 named, and the six with the same shape the lead marked read-beneath too (decision D3, 18
+# October 2026), whose readers may never be baselined (RF-INHERITED).
+STRICT_INHERITED = {"approvals.matrix", "access.policy_scope_assignment", "ai.provider", "catalogue.dynamic_pricing_control",
+                    "catalogue.sales_channel", "marketing.service_copilot_config", "payments.provider"}
 STRICT_DEVICE = {("recordDeviceHeartbeat", "platform.device")}
 PARENT_HELPERS = ("apply_parent_rls", "apply_parent_split_rls", "apply_parent_across_rls",
                   "apply_parent_split_across_rls")

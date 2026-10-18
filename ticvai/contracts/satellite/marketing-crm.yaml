@@ -32480,6 +32480,7 @@ components:
     AiCustomerServiceCopilotKnowledgeWorkspaceInput:
       type: object
       x-ticvai-persistence: marketing.service_copilot_config
+      x-ticvai-rls: read-beneath   # ADAM CR-095's rule, CHG-RSF-001: rows set at a chosen level (scope_level) govern every scope beneath them, so a scope reads the ones it inherits and still writes only its own
       description: The customer-service copilot's configuration for one scope (pack 10.1.10). A field left
         out takes its default, not its old value.
       required:
