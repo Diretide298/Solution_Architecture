@@ -31,6 +31,20 @@ BASELINE = ROOT / "handoff" / "audit-baseline.json"
 CONTRACTS = ROOT / "contracts"
 SCREENS = ROOT / "screens"
 VERBS = ("get", "post", "put", "patch", "delete")
+LINKS = ROOT / "handoff" / "service-docs" / "adam-links.json"
+# **A baselined finding fails once its ticket starts** (18 October 2026, post-r6 plan item 9, CHG-CRF-001). A ticket
+# has started once OpenProject moves it off these (op-release.json `statuses`: new, on_hold, rejected). In progress,
+# Ready for QA, Closed and any status added later all count, so a new status name cannot hide a started ticket.
+NOT_STARTED = ("New", "On hold", "Rejected")
+# A feature or an epic is the parent of the tasks that build it and links what they link: only the work counts.
+PARENT_TYPES = ("Epic", "Feature")
+# What a baselined finding names that a ticket builds.
+STARTED_KINDS = ("operation", "table")
+# An acknowledgement names the request or change that will fix what was built, as check-changelog's `why` does, or
+# the follow-up row on the tracker sheet (`F<n>`) when no request is raised for it (controller ruling 7, 18 October).
+CITES = re.compile(r"\bCR-\d+\b|\bCHG-[A-Z][A-Z0-9]{1,5}-\d{3}\b|\bF\d+\b")
+# Older than this, the note says the cached ticket status should be read again.
+STALE_DAYS = 7
 
 _CACHE: dict = {}
 
@@ -191,6 +205,108 @@ def head_commit() -> str:
                               text=True).stdout.strip()
     except Exception:
         return ""
+
+
+def _rel(path) -> str:
+    try:
+        return Path(path).resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def link_index(path=None) -> dict:
+    """What handoff/service-docs/adam-links.json says each artefact's tickets are, offline (CHG-CRF-001).
+
+    adam-links.py writes one row per (ticket, kind, id) and, with TICVAI_OP_TOKEN, each ticket's subject, status, type
+    and assignee as OpenProject had them (`statusReadAt`). Returns
+      {"exists", "cached", "readAt",
+       "ops":     operationId -> {"<service>#<operationId>", ...},
+       "tables":  {schema.table}, "screens": {screen id},
+       "tickets": (kind, id) -> [{"wp", "status", "type", "assignee", "subject"}],
+       "wps":     wp -> the same row for that ticket}
+    """
+    path = Path(path or LINKS)
+    key = "__links__" + str(path)
+    if key in _CACHE:
+        return _CACHE[key]
+    doc = load_json(path, {}) or {}
+    idx = {"exists": path.exists(), "cached": bool(doc.get("cached")), "readAt": doc.get("statusReadAt") or "",
+           "ops": {}, "tables": set(), "screens": set(), "tickets": {}, "wps": {}}
+    for ln in doc.get("links") or []:
+        kind, ident = ln.get("kind"), str(ln.get("id") or "")
+        if kind == "operation" and "#" in ident:
+            idx["ops"].setdefault(ident.split("#", 1)[1], set()).add(ident)
+        elif kind == "table":
+            idx["tables"].add(ident)
+        elif kind == "screen":
+            idx["screens"].add(ident)
+        try:
+            wp = int(ln.get("key"))
+        except (TypeError, ValueError):
+            continue
+        row = {"wp": wp, "status": ln.get("status") or "", "type": ln.get("type") or "",
+               "assignee": ln.get("assignee") or "", "subject": ln.get("subject") or ""}
+        idx["wps"].setdefault(wp, row)
+        rows = idx["tickets"].setdefault((kind, ident), [])
+        if all(r["wp"] != wp for r in rows):
+            rows.append(row)
+    _CACHE[key] = idx
+    return idx
+
+
+def finding_artefacts(key: str, idx: dict) -> set:
+    """The operations and tables a finding's key names, as adam-links names them: {(kind, id)}.
+
+    Keys join ids with ':' or '|' ('exportSubjectData:marketing.consent_record', 'linkGuestCheckout|403'), or an
+    operation and a field or a table with '.' ('addIncidentPerson.pii.subject'). A token is an operation when
+    adam-links has `<service>#<token>` (or is that id itself), a table when adam-links has the table. Anything else (a
+    screen, a schema field, a file) names nothing this rule judges."""
+    out = set()
+    for tok in re.split(r"[:|]", str(key)):
+        tok = tok.strip()
+        if not tok:
+            continue
+        if "#" in tok and tok in idx["ops"].get(tok.split("#", 1)[1], ()):
+            out.add(("operation", tok))
+        elif tok in idx["ops"]:
+            out |= {("operation", o) for o in idx["ops"][tok]}
+        elif tok in idx["tables"]:
+            out.add(("table", tok))
+        elif "." in tok:
+            head, rest = tok.split(".", 1)
+            if head in idx["ops"]:
+                out |= {("operation", o) for o in idx["ops"][head]}
+            if rest in idx["tables"]:
+                out.add(("table", rest))
+    return {a for a in out if a[0] in STARTED_KINDS}
+
+
+def started_tickets(artefacts, idx: dict) -> list:
+    """The started tickets that build any of `artefacts`, by id: [{"wp", "status", "type", "assignee", "subject",
+    "on"}]. Started: a status not in NOT_STARTED, on a ticket that is not an epic or a feature."""
+    seen: dict = {}
+    for a in sorted(artefacts):
+        for t in idx["tickets"].get(a, []):
+            if t["status"] and t["status"] not in NOT_STARTED and t["type"] not in PARENT_TYPES:
+                seen.setdefault(t["wp"], dict(t, on=f"{a[0]} {a[1]}"))
+    return [seen[w] for w in sorted(seen)]
+
+
+def tickets_text(tickets: list, most: int = 4) -> str:
+    shown = [f"#{t['wp']} {t['status']}" + (f" ({t['assignee']})" if t.get("assignee") else "")
+             for t in tickets[:most]]
+    more = f" and {len(tickets) - most} more" if len(tickets) > most else ""
+    return ", ".join(shown) + more
+
+
+def _days_since(iso: str):
+    try:
+        then = datetime.datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if then.tzinfo is None:
+        then = then.replace(tzinfo=datetime.timezone.utc)
+    return (datetime.datetime.now(datetime.timezone.utc) - then).days
 
 
 class Guard:
