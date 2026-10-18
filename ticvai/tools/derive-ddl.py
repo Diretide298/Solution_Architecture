@@ -1142,17 +1142,19 @@ def sql_literal(v) -> str:
     return "'" + str(v).replace("'", "''") + "'"
 
 
-def load_contract_props() -> dict:
+def load_contract_props(docs: dict | None = None) -> dict:
     """`module.Schema.property` -> the contract property, with `$ref` and `allOf` followed.
 
     The schema reference names each column's contract `source` but does not carry its enum,
-    maxLength or default, so they are read from the contracts here."""
-    docs = {}
-    for f in sorted((ROOT / "contracts").glob("*/*.yaml")):
-        try:
-            docs[f.stem] = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
-        except yaml.YAMLError:
-            continue
+    maxLength or default, so they are read from the contracts here. `docs` (stem -> parsed contract) lets a check that
+    has already read the contracts reuse them (check-ddl-conventions, CHG-MGN-001)."""
+    if docs is None:
+        docs = {}
+        for f in sorted((ROOT / "contracts").glob("*/*.yaml")):
+            try:
+                docs[f.stem] = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+            except yaml.YAMLError:
+                continue
 
     def resolve(doc, node, depth=0):
         while isinstance(node, dict) and "$ref" in node and depth < 8:

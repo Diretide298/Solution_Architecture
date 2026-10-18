@@ -303,3 +303,74 @@ def test_the_published_answers_decide_two_of_the_two_key_tables():
     dd = _load("derive_ddl_t6b", "derive-ddl.py")
     assert dd.ROW_OWNER["fnb.ingredient_substitute"] == "from_inventory_item_id"      # CR-148
     assert dd.ROW_OWNER["ledger.inter_entity_obligation"] == "from_legal_entity_id"   # CR-149 (writes)
+
+
+# ---- 7. the prevention: check-ddl-conventions reads what the generator handed the migration owner -----------------
+
+class FakeGuard:
+    def __init__(self):
+        self.found = {}
+
+    def add(self, rule, key, message, strict=False):
+        self.found.setdefault(rule, {})[key] = message
+
+    def note(self, text):
+        pass
+
+
+REVIEW_R6 = "\n".join([
+    "| Kind | Database | Object | Change | What a person does |", "|---|---|---|---|---|",
+    "| table changed | tenant | `marketing.message_dispatch` | `PARTITION BY RANGE (queued_at)` -> `(none)` | "
+    "partitioning changed: a table rewrite, planned by hand |",
+    "| column changed | tenant | `catalogue.channel_envelope.channel_capacity_id` | `envelope_id uuid NOT NULL` -> "
+    "`channel_capacity_id uuid` | after the rename: write the ALTER COLUMN (and any data rewrite) by hand |",
+    "| column changed | tenant | `identity.otp_challenge.subject_id` | `subject_id uuid NOT NULL` -> `subject_id uuid` "
+    "| type, default, nullability or check changed: write the ALTER COLUMN (and any data rewrite) by hand |",
+    "| after rename | tenant | `fnb.ingredient_substitute` | 2 generated object(s) for the renamed table: "
+    "`ingredient_substitute_x_idx`, `SELECT platform.apply_parent_rls('fnb.ingredient_substitute'::regclass, 'from_inv` "
+    "| in the forward migration that renames the table |",
+    "| column dropped | tenant | `platform.workstation.org_unit_id` | no longer in the schema reference | a rename or a "
+    "drop: decide, then RENAME COLUMN or the four-step drop by hand |",
+    "| column dropped | tenant | `identity.role.grant_count` | no longer in the schema reference | a rename or a drop: "
+    "decide, then RENAME COLUMN or the four-step drop by hand |",
+    "| owner undecided | tenant | `retail.exchange` | two NOT NULL keys to retail.sale (new_sale_id, sale_id) | decide |",
+])
+
+
+def test_the_check_finds_every_defect_of_the_class_on_r6s_review():
+    cdc = _load("check_ddl_conventions_t7", "check-ddl-conventions.py")
+    guard = FakeGuard()
+    cdc.check_forward_migration(
+        guard, REVIEW_R6, series="CREATE TABLE platform.sale_board_tile (id uuid);",
+        retired={"platform.workstation": {"org_unit_id"}},
+        nullable_keys={("identity.otp_challenge", "subject_id")},
+        derived={"sale_board_tile_variant_id_when_chk": "platform.sale_board_tile",
+                 "sale_board_tile_sale_board_page_id_position_uniq": "platform.sale_board_tile"})
+    f = guard.found
+    assert set(f["D-FWD-PARTITION"]) == {"marketing.message_dispatch"}
+    assert set(f["D-FWD-KEY-NULL"]) == {"catalogue.channel_envelope.channel_capacity_id"}   # otp is nullable: true
+    assert set(f["D-FWD-CUT"]) == {"fnb.ingredient_substitute"}
+    assert set(f["D-FWD-RETIRED"]) == {"platform.workstation.org_unit_id"}                # grant_count is not retired
+    assert set(f["D-FWD-CARRIED"]) == {"sale_board_tile_variant_id_when_chk",
+                                       "sale_board_tile_sale_board_page_id_position_uniq"}
+    assert set(f["D-FWD-OWNER"]) == {"retail.exchange"}
+
+
+def test_the_check_passes_what_the_fixed_generator_writes():
+    cdc = _load("check_ddl_conventions_t7b", "check-ddl-conventions.py")
+    guard = FakeGuard()
+    review = "\n".join([
+        "| column retired | tenant | `platform.workstation.org_unit_id` | retired by the contract | drop it |",
+        "| after rename | tenant | `fnb.ingredient_substitute` | 1 generated object(s) for the renamed table: "
+        "`SELECT platform.apply_parent_rls('fnb.ingredient_substitute'::regclass, 'from_inventory_item_id', "
+        "'inventory.inventory_item'::regclass, 'id')` | rename |",
+        "| index added after rename | tenant | `platform.sale_board_tile_sale_board_page_id_position_uniq` | new | after "
+        "the RENAME COLUMN, create it: CREATE UNIQUE INDEX IF NOT EXISTS sale_board_tile_sale_board_page_id_position_uniq "
+        "ON platform.sale_board_tile (sale_board_page_id, position) |"])
+    series = ("ALTER TABLE platform.sale_board_tile ADD CONSTRAINT sale_board_tile_variant_id_when_chk CHECK "
+              "(kind IS DISTINCT FROM 'product' OR variant_id IS NOT NULL) NOT VALID;")
+    cdc.check_forward_migration(
+        guard, review, series=series, retired={"platform.workstation": {"org_unit_id"}}, nullable_keys=set(),
+        derived={"sale_board_tile_variant_id_when_chk": "platform.sale_board_tile",
+                 "sale_board_tile_sale_board_page_id_position_uniq": "platform.sale_board_tile"})
+    assert not any(guard.found.values()), guard.found
