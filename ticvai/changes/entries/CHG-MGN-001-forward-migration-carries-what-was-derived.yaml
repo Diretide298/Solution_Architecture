@@ -23,8 +23,8 @@ decision:
     and D-FWD-OWNER.'
   by: Chinmay
   date: '2026-10-18'
-  quote: 'Published answers to CR-138, CR-139, CR-148, CR-149, CR-156 and CR-157 (audit/ticvai/cr-triage-1018/decisions-final.json,
-    settled 18 October 2026): "the generator will fail rather than drop partitioning again", "the next release makes
+  quote: 'Published answers to CR-138, CR-139, CR-148, CR-149, CR-156 and CR-157 (the ADAM settlement of 18 October
+    2026, on each of those change requests): "the generator will fail rather than drop partitioning again", "the next release makes
     channelCapacityId required", "the next release writes every statement whole, and lists a table with two keys to
     one parent for a decision", "the next release fixes the generator and carries them", "the next release words a
     retired column as a drop, and its migration drops NOT NULL at once".'
