@@ -119,6 +119,17 @@ def test_acknowledge_needs_a_request_or_change(pkg, monkeypatch, capsys):
     assert "started" not in json.loads(base.read_text(encoding="utf-8"))["check-x"]
 
 
+def test_acknowledge_may_cite_a_tracker_row_instead_of_a_request(pkg, monkeypatch, capsys):
+    write, base = pkg
+    write(baseline={"check-x": {"rules": {"R-A": [KEY]}}},
+          rows=[link(27677, "table", "marketing.consent_record", status="Ready for QA")])
+    assert run(monkeypatch, [("R-A", KEY)], "--acknowledge-started", "F14: tracked on the follow-ups sheet") == 0
+    ack = json.loads(base.read_text(encoding="utf-8"))["check-x"]["started"]["R-A|" + KEY]
+    assert ack["why"].startswith("F14") and ack["tickets"] == [27677]
+    # a bare word that only looks like a row is not a reason
+    assert run(monkeypatch, [("R-A", KEY)], "--acknowledge-started", "Fix later, see FAQ") == 1
+
+
 def test_acknowledged_tickets_pass_and_a_new_one_fails(pkg, monkeypatch, capsys):
     write, base = pkg
     rows = [link(27677, "table", "marketing.consent_record", status="Ready for QA")]
