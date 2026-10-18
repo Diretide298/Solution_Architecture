@@ -37838,9 +37838,13 @@ components:
           format: uuid
           readOnly: true
         messageDispatchId:
-          x-ticvai-references: marketing.message_dispatch
+          x-ticvai-references: none
           type: string
-          description: The `MessageDispatch.id`.
+          format: uuid
+          description: 'The `MessageDispatch.id`. **Not a declared reference** (ADAM CR-138, 18 October 2026,
+            CHG-MGN-001): marketing.message_dispatch is range-partitioned by month on queued_at (ADR-0056), and
+            nothing points at a partitioned table, so the attempt keeps message_dispatch_id with no foreign key and
+            the code checks it; derive-ddl still indexes it (UNENFORCED_KEYS).'
         attemptNumber:
           type: integer
           minimum: 1

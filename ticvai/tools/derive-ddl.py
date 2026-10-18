@@ -1224,6 +1224,54 @@ ARRAY_PROPS: set = set()     # `module.Schema.arrayProp`, every array property (
 RETIRED: dict = {}
 
 
+# **A key into a partitioned table is indexed, never constrained** (ADR-0056; CHG-MGN-001, ADAM CR-138, 18 October
+# 2026). Nothing points at a partitioned table, so the contract leaves such a key undeclared (`x-ticvai-references:
+# none`) and the code checks it; `none` also drops the reference the index is written from, and r1 had the index (a
+# convention). `(table, column) -> the partitioned table it names`: the generator writes the index and its comment as
+# for a convention, with no foreign key and no inbound key for partition_plan.
+UNENFORCED_KEYS = {
+    ("marketing.message_dispatch_attempt", "message_dispatch_id"): "marketing.message_dispatch",
+}
+
+
+def apply_unenforced_keys(cols: dict) -> None:
+    """Mark UNENFORCED_KEYS' columns as convention references (indexed, not constrained) where nothing else names
+    their target."""
+    for (t, col), ref in UNENFORCED_KEYS.items():
+        for c in cols.get(t, []):
+            if c.get("column") == col and not c.get("references"):
+                c.update({"references": ref, "referenceHow": "convention", "enforced": "no"})
+
+
+def partition_plan(marks: dict, inbound: dict) -> tuple:
+    """Which append-only tables are range-partitioned by month (ADR-0056 section 2): `(partitioned, declined,
+    refused)`. `partitioned`: table -> time column. `declined`: `(table, why)` for one the contract marks but that
+    cannot be partitioned (no such column, not in the tenant template). `refused`: `(table, [inbound keys])` for one
+    something declares a key into.
+
+    **An inbound key fails the run instead of turning partitioning off** (CHG-MGN-001, ADAM CR-138, 18 October
+    2026). Until then it moved the table to `declined` with a line in the run's output: CHG-STO-001 declared
+    `MessageDispatchAttempt.messageDispatchId` on 14 October, marketing.message_dispatch lost its partitioning in the
+    generated DDL, and the migration review asked the migration owner to un-partition a table built partitioned.
+    ADR-0056: nothing points at a partitioned table."""
+    partitioned: dict = {}
+    declined: list = []
+    refused: list = []
+    for t, m in sorted(marks.items()):
+        col = m.get("append_only")
+        if not col:
+            continue
+        if col.startswith("?"):
+            declined.append((t, f"the contract names {col[1:]}, which is not a column of the table"))
+        elif area(t.split(".")[0]) != "tenant":
+            declined.append((t, "not in the tenant template"))
+        elif inbound.get(t):
+            refused.append((t, sorted(inbound[t])))
+        else:
+            partitioned[t] = col
+    return partitioned, declined, refused
+
+
 def table_marks(cols: dict, tables) -> dict:
     """What the contract schema a table is derived from says about the table as a whole.
 
@@ -1570,6 +1618,7 @@ def main() -> int:
         cols[t] = [c for c in cols[t] if not (
             c.get("references") and "." in str(c["references"]) and ":" not in str(c["references"])
             and not VALID_TABLE.match(str(c["references"])))]
+    apply_unenforced_keys(cols)
 
     by_schema: dict[str, list] = defaultdict(list)
     for t in sorted(real):
@@ -1721,20 +1770,14 @@ def main() -> int:
             if (ref in real and c.get("enforced") == "yes" and key_of(ref, cols)
                     and area(t.split(".")[0]) == area(ref.split(".")[0])):
                 inbound[ref].add(f"{t}.{c['column']}")
-    partitioned: dict = {}
-    declined: list = []
-    for t, m in sorted(marks.items()):
-        col = m.get("append_only")
-        if not col:
-            continue
-        if col.startswith("?"):
-            declined.append((t, f"the contract names {col[1:]}, which is not a column of the table"))
-        elif area(t.split(".")[0]) != "tenant":
-            declined.append((t, "not in the tenant template"))
-        elif inbound.get(t):
-            declined.append((t, "referenced by " + ", ".join(sorted(inbound[t]))))
-        else:
-            partitioned[t] = col
+    partitioned, declined, refused = partition_plan(marks, inbound)
+    if refused:
+        for t, refs in refused:
+            print(f"  ! {t} is partitioned by month (x-ticvai-append-only, ADR-0056) and {', '.join(refs)} "
+                  "declares a key into it. Nothing points at a partitioned table: leave that reference undeclared "
+                  "(no x-ticvai-references; the code checks it), as the outbox and inbox event ids are (CHG-STO-001)")
+        print("  derive-ddl refuses to drop a table's partitioning; nothing written (CHG-MGN-001, ADAM CR-138)")
+        return 1
 
     # **Composite keys where venue_id already exists** (ADR-0056 section 3). A declared reference
     # between two tables that both carry a NOT NULL `venue_id` becomes `(venue_id, <column>) ->

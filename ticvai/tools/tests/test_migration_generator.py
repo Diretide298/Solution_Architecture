@@ -214,3 +214,27 @@ def test_a_table_check_naming_a_renamed_column_waits_for_the_rename_whole():
     assert not [s for s in p.statements if "sale_board_page_id_when_chk" in s]
     row = [r for r in p.review if "sale_board_page_id_when_chk" in r[2] or "sale_board_page_id_when_chk" in r[3]]
     assert row and row[0][0] == "constraint after rename" and "IS NOT NULL" in row[0][3]
+
+
+# ---- 1. a declared key never turns partitioning off (CR-138) ------------------------------------------------------
+
+def test_an_inbound_key_into_a_partitioned_table_is_refused_not_declined():
+    dd = _load("derive_ddl_t1", "derive-ddl.py")
+    marks = {"marketing.message_dispatch": {"append_only": "queued_at"},
+             "marketing.scan": {"append_only": "scanned_at"},
+             "marketing.odd": {"append_only": "?when"}}
+    inbound = {"marketing.message_dispatch": {"marketing.message_dispatch_attempt.message_dispatch_id"}}
+    partitioned, declined, refused = dd.partition_plan(marks, inbound)
+    assert partitioned == {"marketing.scan": "scanned_at"}
+    assert refused == [("marketing.message_dispatch", ["marketing.message_dispatch_attempt.message_dispatch_id"])]
+    assert [t for t, _ in declined] == ["marketing.odd"]
+
+
+def test_a_key_into_a_partitioned_table_stays_an_index_not_a_constraint():
+    dd = _load("derive_ddl_t1b", "derive-ddl.py")
+    assert dd.UNENFORCED_KEYS[("marketing.message_dispatch_attempt", "message_dispatch_id")] == \
+        "marketing.message_dispatch"
+    cols = {"marketing.message_dispatch_attempt": [{"column": "message_dispatch_id", "type": "uuid"}]}
+    dd.apply_unenforced_keys(cols)
+    c = cols["marketing.message_dispatch_attempt"][0]
+    assert (c["references"], c["enforced"], c["referenceHow"]) == ("marketing.message_dispatch", "no", "convention")
