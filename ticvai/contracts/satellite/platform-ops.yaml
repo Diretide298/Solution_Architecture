@@ -1010,6 +1010,12 @@ paths:
         **Fans out per region** (ADR-0014). Cells advance in waves with a canary first, and a failure
         halts the wave rather than continuing into it.
 
+        **A failed run is resumed, not restarted** (ADAM CR-160, 18 October 2026; CHG-CRA-006; PLATFORM-MIGRATE''s
+        spec of 4 October). Applying the plan of a run that is `failed`, once the cause is fixed, moves that run back
+        to `running` (states/migration-run.yaml): tenants already `complete` stay complete, and the failed tenant is
+        retried from its `control.migration_run_tenant` row before the wave goes on. Only a run already rolled back
+        cannot be resumed (`409 migration-run-rolled-back`); its plan is planned again.
+
         '
       tags:
       - migration
@@ -1064,9 +1070,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/MigrationRun'
         '409':
-          x-ticvai-problem-types: [migration-plan-stale]
+          x-ticvai-problem-types: [migration-plan-stale, migration-run-rolled-back]
           description: 'The plan is stale — cell state changed since it was computed. Re-plan and review
-            before applying.
+            before applying. Or the plan''s run was rolled back and cannot be resumed
+            (`migration-run-rolled-back`; ADAM CR-160, CHG-CRA-006).
 
             '
           content:

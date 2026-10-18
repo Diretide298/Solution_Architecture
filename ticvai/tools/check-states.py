@@ -30,6 +30,13 @@ Checks:
      beside a transition into `draft`).
  13. (warning) A transition's operation writes the entity's table, per the lineage; and an
      operation does not "move" a record to the state it is already in.
+ 14. A `requiresApproval` transition's operation says how the approval enters (class 12 of the 18 October
+     triage, CHG-CRA-006): a granted `approvalRequestId` it takes (with `409 approval-required`), a 202 that
+     waits for the decision, or its own text about the approval. The operations that decide an approval are
+     the approval. The ones found on 18 October are listed in APPROVAL_ENTRY_KNOWN; a new one fails.
+ 15. The edges a decision fixed are there, and the operations it took away are not (DECIDED_EDGES):
+     migration-run resumes from `failed` through `applyMigration` and names its own operations, not the
+     rollout's (ADAM CR-160); a future suspension has its timer (CR-152).
 
 Run: python3 tools/check-states.py
 """
@@ -57,6 +64,61 @@ NO_TRANSITION_NOTE = re.compile(
     r"no (?:transitions?|way|path|moves?) (?:back )?(?:to|into) `?(\w+)`?", re.I)
 WARNINGS: list[str] = []
 
+# Rule 14: the requiresApproval transitions whose operation said nothing of how the approval enters, found by the
+# class 12 sweep of 18 October 2026 (CHG-CRA-006). Each is a decision for its module's owner (a granted
+# approvalRequestId, a 202 that waits, or an operation that is itself the approval); remove a line when its contract
+# says it. A transition not listed here fails.
+APPROVAL_ENTRY_KNOWN = {
+    "asset:underMaintenance->inService:verifyWorkOrder",
+    "asset:inService->retired:updateAsset",
+    "asset:outOfService->retired:updateAsset",
+    "asset:retired->disposed:updateAsset",
+    "cell:active->decommissioning:decommissionCell",
+    "cell:decommissioning->active:cancelDecommission",
+    "coupon:issued->voided:voidCouponCode",
+    "coupon:assigned->voided:voidCouponCode",
+    "game:maintenance->inService:verifyWorkOrder",
+    "game:inService->retired:updateGame",
+    "game:outOfService->retired:updateGame",
+    "incident:underInvestigation->closed:updateIncident",
+    "incident:reported->closed:updateIncident",
+    "incident:actionRequired->closed:updateIncident",
+    "invoice:disputed->issued:resolveInvoiceDispute",
+    "invoice:disputed->cancelled:cancelInvoice",
+    "lease:active->forceReleased:forceReleaseInventoryHold",
+    "operator-session:active->terminated:forceLogout",
+    "period:closing->open:abandonPeriodClose",
+    "release:inStaging->withdrawn:withdrawRelease",
+    "release:inProduction->withdrawn:withdrawRelease",
+    "seat-map:validated->published:publishSeatMap",
+    "seat-map:archived->published:publishSeatMap",
+    "settlement:hasExceptions->resolved:resolveSettlementException",
+    "tenant-migration:cuttingOver->rolledBack:rollbackTenantMigration",
+    "work-order:completed->verified:verifyWorkOrder",
+    "work-order:paused->closed:closeWorkOrder",
+    "work-order:awaitingParts->closed:closeWorkOrder",
+    "work-order:verified->closed:closeWorkOrder",
+    "work-order:completed->closed:closeWorkOrder",
+    "work-order:open->closed:closeWorkOrder",
+}
+APPROVAL_OPS = re.compile(r"^(decide|approve|reject|grant)")
+
+# Rule 15: edges a published decision fixed. `must`: (from, to, operation or None, trigger); `never`: operations
+# no edge of the model may name, with why.
+DECIDED_EDGES = {
+    "migration-run": {
+        "must": [("failed", "running", "applyMigration", "operation")],
+        "never": {"pauseRollout": "a rollout operation: a migration run is moved by its own operations (CR-160)",
+                  "rollbackRollout": "a rollout operation: a run is rolled back by rollbackMigrationRun (CR-160)"},
+        "why": "ADAM CR-160, 18 October 2026: PLATFORM-MIGRATE's spec, a failed tenant is resumed from its row",
+    },
+    "tenant": {
+        "must": [("active", "suspended", None, "timer")],
+        "never": {},
+        "why": "ADAM CR-152, 18 October 2026: a future effectiveAt is applied by a workers job",
+    },
+}
+
 
 def check_duplicate_paths() -> None:
     """Duplicate path keys are silent in YAML — the last one wins and the first vanishes.
@@ -76,6 +138,7 @@ def check_duplicate_paths() -> None:
 
 
 OP_VERBS: dict[str, str] = {}
+OP_TEXT: dict = {}   # operationId -> (its text, its response codes, its description), for rule 14
 
 
 def load_contracts() -> tuple[dict[str, list[str]], set[str], dict[str, set[str]]]:
@@ -113,6 +176,9 @@ def load_contracts() -> tuple[dict[str, list[str]], set[str], dict[str, set[str]
                         if oid := op.get("operationId"):
                             ops.add(oid)
                             OP_VERBS[oid] = verb
+                            OP_TEXT[oid] = (json.dumps(op, default=str),
+                                            {str(c) for c in (op.get("responses") or {})},
+                                            str(op.get("description") or ""))
     return enums, ops, object_schemas
 
 
@@ -234,6 +300,33 @@ def main() -> int:
                 WARNINGS.append(f"{name}: {t['from']}->{t['to']} via {t['operation']} changes no "
                                 "state -- if the operation moves the record, name the state it "
                                 "moves to; if it does not, it is not a transition")
+
+        # 14. a requiresApproval transition's operation says how the approval enters (CHG-CRA-006)
+        for t in d["transitions"]:
+            o = t.get("operation")
+            if not t.get("requiresApproval") or not o or o not in OP_TEXT or APPROVAL_OPS.match(o):
+                continue
+            text, codes, desc = OP_TEXT[o]
+            if "approvalRequestId" in text or "202" in codes or "approval-required" in text                     or "approval" in desc.lower():
+                continue
+            key = f"{f.stem}:{t['from']}->{t['to']}:{o}"
+            if key not in APPROVAL_ENTRY_KNOWN:
+                ERRORS.append(f"{name}: {t['from']}->{t['to']} requires approval and {o} does not say how it "
+                              "enters: take a granted approvalRequestId (409 approval-required without one), "
+                              "answer 202 until the decision, or say in its text (rule 14, CHG-CRA-006)")
+
+        # 15. the edges a published decision fixed (DECIDED_EDGES, CHG-CRA-006)
+        fixed = DECIDED_EDGES.get(f.stem)
+        if fixed:
+            for fr, to, op_, trig in fixed["must"]:
+                if not any(t["from"] == fr and t["to"] == to and (op_ is None or t.get("operation") == op_)
+                           and t.get("trigger") == trig for t in d["transitions"]):
+                    ERRORS.append(f"{name}: no {fr}->{to} " + (f"through {op_}" if op_ else f"by {trig}")
+                                  + f" ({fixed['why']}; rule 15)")
+            for t in d["transitions"]:
+                if t.get("operation") in fixed["never"]:
+                    ERRORS.append(f"{name}: {t['from']}->{t['to']} names {t['operation']}, "
+                                  f"{fixed['never'][t['operation']]} (rule 15)")
 
         # 5. emitted events are catalogued
         for t in d["transitions"]:

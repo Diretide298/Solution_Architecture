@@ -1,0 +1,57 @@
+id: CHG-CRA-006
+date: '2026-10-18'
+source: cr
+kind: contract
+summary: 'A failed migration run is resumed through applyMigration from the failed tenant''s row, with completed
+  tenants left as they are, and the migration-run model names its own operations instead of the rollout''s (CR-160).
+  check-states gains two rules: a requiresApproval transition''s operation says how the approval enters (31 found
+  are listed for their owners; a new one fails), and the edges a published decision fixed stay in their models.'
+decision:
+  what: 'ADAM CR-160, option A (published answer of 18 October 2026): states/migration-run.yaml failed -> running
+    through applyMigration (guard: the cause is fixed; tenants already complete stay complete; the failed tenant is
+    retried from its row; refused only for a run already rolled back), failed and paused -> rolledBack through
+    rollbackMigrationRun, running -> paused by the run itself (no operation pauses a run unless the lead adds one);
+    contracts/satellite/platform-ops.yaml applyMigration says so and adds 409 migration-run-rolled-back;
+    tools/derive-table-notes.py rewords control.migration_run''s note ("a retry is a new run" was wrong).'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'ADAM CR-160 (Hrushikant Patkar, PLATFORM-MIGRATE #27690), accepted 18 October 2026; class 12 of the 18 October
+  triage ("the state model and the operations disagree"). PLATFORM-MIGRATE''s spec of 4 October (CHG-FXP-005, "a
+  failed tenant stops its wave and is resumed from its row") is the later decision. Finding: check-states asked
+  whether a transition''s operation exists, never whether it is the entity''s, and nothing asked how an approval the
+  model requires enters the operation (37 such transitions, an upper bound, in the triage).'
+keys_touched:
+  operations: [applyMigration, rollbackMigrationRun]
+  tables: [control.migration_run, control.migration_run_tenant]
+  schemas: [MigrationRun]
+  files:
+  - states/migration-run.yaml
+  - contracts/satellite/platform-ops.yaml
+  - tools/derive-table-notes.py
+  - tools/check-states.py
+  - docs/active/audit-runs/cr-answers-1018/impact-class12-state-models.tsv
+root_class: 'new: state-model-vs-operations (class 12 of the 18 October triage)'
+tickets:
+  started: []
+  unstarted:
+  - 'PLATFORM-MIGRATE (27690, New in the r6 cache; CR-160 was raised from it): the transition table allows resume
+    from failed and refuses it only for a rolled-back run. MIG-CONTROL-6 (27991, Ready for QA): no table change. 19
+    New in all (impact file).'
+release_tag: r7
+decision_owner: Chinmay
+adam_cr: CR-160
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'Prevention: check-states rule 14 (a requiresApproval transition''s operation takes a granted approvalRequestId
+  with 409 approval-required, answers 202 until the decision, or says how the approval enters; the deciding
+  operations are the approval) and rule 15 (DECIDED_EDGES: migration-run''s failed -> running through applyMigration
+  and no rollout operation on its edges; the tenant''s suspension timer of CHG-CRA-005). Shown failing on r6 (rule 15,
+  4 errors) and passing after. Sibling query: rule 14 over every model finds 31 transitions (asset, cell, coupon,
+  game, incident, invoice, lease, operator-session, period, release, seat-map, settlement, tenant-migration,
+  work-order), listed in APPROVAL_ENTRY_KNOWN for their owners to decide; CR-152''s tenant transitions were fixed in
+  CHG-CRA-005 and are not listed. The broader "an edge names another entity''s operation" rule was tried and dropped:
+  cascades (createPayment paying an order, createRefund refunding one) are legitimate, so it cannot fail on the shape
+  alone.'
