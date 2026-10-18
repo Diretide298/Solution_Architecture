@@ -248,12 +248,13 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/VenueSettings'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Tenancy answers with its platform.venue_settings rows, as it stores them and as the caller's
-      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within commerce, through the C# query interface Tenancy implements.
-    served: [in-process]
+      October). Tenancy answers with its platform.venue_settings rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
+      commerce, through the C# query interface Tenancy implements, and asked from another deployable through
+      Tenancy's service route (serviceAuth).
+    served: [in-process, service]
   workstationRecords:
     module: tenancy
     table: platform.workstation
@@ -291,6 +292,27 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through Tenancy's service route (serviceAuth).
     served: [service]
+  activeVenues:
+    module: tenancy
+    table: platform.scope
+    inputs:
+      venueIds: {type: array, items: {type: string, format: uuid}, description: 'The venues asked about; omitted, every active venue of the tenant.'}
+    returns:
+      type: array
+      description: 'The active venues in name order; a venue asked about that is not active, or that the caller cannot see, is absent.'
+      items:
+        type: object
+        required: [venueId, name]
+        properties:
+          venueId: {type: string, format: uuid}
+          name: {type: string}
+    rule: >-
+      A rule question (ADAM CR-096, 15 October 2026, CHG-RTE-001). A venue is active when its node in the scope
+      tree (platform.scope, level venue) has is_active true. Tenancy answers for the tenant whose database the caller
+      is connected to, under the caller's scope. White Label refuses a venueId that is absent (setAnalyticsProvider,
+      422) and lists only these venues in TenantAppStatus.venues. It is asked from another deployable through
+      Tenancy's service route (serviceAuth).
+    served: [service]
 paths:
   /tenant-domains/{hostname}:
     parameters:
@@ -307,6 +329,9 @@ paths:
       - query: platform-ops#tenantDomainRecords
         route: service
         for: 'its read of control.tenant_domain, Platform''s data (CHG-MOD-001)'
+      - query: subscription#cellRecords
+        route: service
+        for: 'what its text calls "its cell": control.cell, Platform''s data (CHG-RTE-001)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -1280,6 +1305,12 @@ paths:
       - query: access#accessPointRecords
         route: service
         for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'displayCurrencies: a code the region has no rate for is refused 400 (ADAM CR-096)'
+      - query: orders#venueChargeCurrencies
+        route: in-process
+        for: 'chargeCurrencies: each must be one the venue''s payment provider can charge (ADAM CR-096)'
       summary: Set support hours, quiet hours, segregated access and alerting
       description: >
         **The four things a venue answers and no other level can** (CF-100, CF-130, CF-134).
@@ -6153,7 +6184,9 @@ components:
           type: string
           readOnly: true
           description: >
-            The cell serving this region. One cell per tenant per region (ADR-0014).
+            The cell this region is served from, which is the cell the commerce host answering this request
+            is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own
+            configuration and reads no table, as `WorkstationContext.cellName` does (ADAM CR-096, CHG-RTE-001).
 
     Placement:
       x-ticvai-persistence: "none — embedded in region_settings"

@@ -261,6 +261,25 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Ledger implements.
     served: [in-process]
+  taxCodeRecords:
+    module: finance
+    table: ledger.tax_code
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.tax_code rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/TaxCode'}
+    rule: >-
+      A data read, not a rule question (ADAM CR-110, 15 October 2026, CHG-RTE-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.tax_code rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with a
+      rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
+      commerce, through the C# query interface Ledger implements, and asked from another deployable through Ledger's
+      service route (serviceAuth).
+    served: [in-process, service]
 paths:
   /internal/order-postings:
     post:
@@ -272,6 +291,9 @@ paths:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -343,6 +365,9 @@ paths:
       - query: subscription#partnerAgreementRecords
         route: service
         for: 'its read of control.partner_agreement, Platform''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Write off an uncollectable balance
       description: '**Credit write-off was not a posting event type**, so a partner balance nobody will
         collect had nowhere to go and sat in receivables making the ledger look healthier than it is.
@@ -670,6 +695,9 @@ paths:
       - query: wallet#walletTransactionRecords
         route: in-process
         for: 'its read of wallet.wallet_transaction, Wallet''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Every money source against the ledger, in one view
       description: '4.2.19. **Reconciliation was per provider and the question is not per provider.**
         `ingestSettlementFile` and its siblings are good and gateway-scoped; **a venue closing a day needs
@@ -1335,6 +1363,10 @@ paths:
       operationId: listTaxCodes
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
@@ -1374,6 +1406,10 @@ paths:
       operationId: createTaxCode
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Create a tax code
@@ -1431,6 +1467,10 @@ paths:
       operationId: updateTaxCode
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Amend a tax code
@@ -1520,6 +1560,10 @@ paths:
       operationId: listTaxExemptions
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1556,6 +1600,10 @@ paths:
       operationId: createTaxExemption
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Grant a tax exemption
@@ -1728,6 +1776,9 @@ paths:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -1840,6 +1891,10 @@ paths:
       operationId: listJournalEntries
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
@@ -1887,6 +1942,10 @@ paths:
       operationId: createJournalEntry
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Post a manual journal voucher
@@ -1958,6 +2017,10 @@ paths:
       operationId: getJournalEntry
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1991,6 +2054,10 @@ paths:
       operationId: approveJournalEntry
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Approve a journal entry and post it
@@ -2072,6 +2139,10 @@ paths:
       operationId: rejectJournal
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Reject a journal awaiting approval
@@ -2136,6 +2207,10 @@ paths:
       operationId: reverseJournalEntry
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Reverse a posted entry
@@ -2397,6 +2472,9 @@ paths:
       - query: shift#posShiftRecords
         route: in-process
         for: 'its read of orders.pos_shift, Orders''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: What was taken in which currency
@@ -2584,6 +2662,10 @@ paths:
       operationId: listLedgerEntries
       x-ticvai-consumed-by:
         - "P08 BO-043 Daily Reconciliation"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       description: '**Order.** Newest first, by `postedAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
@@ -2692,6 +2774,13 @@ paths:
       operationId: listPriceVariances
       x-ticvai-consumed-by:
         - "P08 BO-077 FX Rates & Variances"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2837,6 +2926,10 @@ paths:
         - "P08 BO-101 Orders & Money"
         - "P09 ADM-619 Reconciliation & Settlement Command Center"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       description: '**Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
@@ -2894,6 +2987,9 @@ paths:
       - query: payments#providerConnectionRecords
         route: in-process
         for: 'its read of payments.provider_connection, Orders''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -3007,6 +3103,10 @@ paths:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
@@ -3265,6 +3365,10 @@ paths:
         - "P08 BO-090 Period Close"
         - "P08 BO-1170 Wallet Financial Period & Closing Controls"
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
@@ -3317,6 +3421,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Begin closing a period
@@ -3375,6 +3483,10 @@ paths:
       operationId: abandonPeriodClose
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Abandon a close in progress
@@ -3884,6 +3996,10 @@ paths:
       operationId: verifyTaxExemption
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: VM close-out follow-up; our build plan'
@@ -3976,6 +4092,10 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-1081 Finance Dashboard"
         - "P16 ANL-072 Finance Dashboard"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       - guest
@@ -4066,6 +4186,9 @@ paths:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       - guest
@@ -4188,6 +4311,10 @@ paths:
         - "P02 GST-019 Order History"
         - "P04 POS-026 Receipt & Reprint"
         - "P08 BO-022 Order Detail"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       - guest
@@ -4870,6 +4997,10 @@ paths:
       operationId: getVatReturn
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 6.1.23); shape follows getFinancialReport'

@@ -137,6 +137,24 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through F&B's service route (serviceAuth).
     served: [service]
+  deliveryLocationRecords:
+    module: fnb
+    table: fnb.delivery_location
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.delivery_location rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/DeliveryLocation'}
+    rule: >-
+      A data read, not a rule question (ADAM CR-096, 15 October 2026, CHG-RTE-001; ADR-0055 rule 2 as amended 14
+      October). F&B answers with its fnb.delivery_location rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with a
+      rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
+      operations, through the C# query interface F&B implements.
+    served: [in-process]
 paths:
   /reservation-policy:
     get:
@@ -510,6 +528,10 @@ paths:
       operationId: listProductionPlans
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: The production plans
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; BO-112: release and the prep sheet take a planId nothing read).** The venue's production plans, ordered by `forDate` then outlet; `forDate` and `status` narrow it.
@@ -561,6 +583,9 @@ paths:
       - query: ai#suggestionRecords
         route: service
         for: 'its read of ai.suggestion, AI''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Turn a forecast into a prep list
       description: 'Board 2M. **Demand forecast through recipes to quantities per item and per station.**
 
@@ -612,6 +637,10 @@ paths:
       operationId: releaseProductionPlan
       x-ticvai-consumed-by:
         - "P08 BO-112 Production Planning & Production Sheets"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Make the plan real
       description: 'Board 2M. **A plan becomes production runs, grouped by station** (decided 28 September,
         audit R125 (7)). Each line becomes a run of its recipe carrying the line''s `stationId`, and the
@@ -793,6 +822,10 @@ paths:
       operationId: resolveBookingConflict
       x-ticvai-consumed-by:
         - "P06 EMP-054 Reservation Calendar & Timeline"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Two bookings, one table — and what to do about it
       description: 'Board 4D. **Double bookings happen and the package had no way to see one.** A phone
         booking and an online booking land on the same table for the same hour, and the host finds out
@@ -1121,6 +1154,9 @@ paths:
       - query: catalogue#priceRecords
         route: service
         for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
+      - query: finance#taxCodeRecords
+        route: service
+        for: 'what its text calls "tax code": ledger.tax_code, Ledger''s data (CHG-RTE-001)'
       summary: Do the same thing to many items at once
       description: 'Board 2K. **Reprice a category by five per cent, retire a season, move ten items to
         a different section.** One at a time is forty edits and a mistake.
@@ -1308,6 +1344,10 @@ paths:
       operationId: listCombos
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The combos defined at the venue, with their slots
@@ -1348,6 +1388,9 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: A meal deal, priced as one thing
       description: 'Board 2G. **`listCatalogueBundles` bundles ticketing products, both fixed.** A burger
         with a choice of side and a choice of drink is a different shape, and the package could not express
@@ -1397,6 +1440,10 @@ paths:
       operationId: setComboSlots
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: What the guest chooses, and what it costs extra
       description: 'Board 2G. **The whole slot set in one call** — a combo edited slot by slot spends
         time in states that cannot be sold, and a till that reads it mid-edit offers a meal with no main.
@@ -1814,6 +1861,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
         - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: What came off the menu today, when, and for how long
       description: 'Board 5J. **`setItemAvailability` records the current state and not the history.**
         An item 86''d at 7pm on a Saturday is a lost-sales figure and a prep-planning signal, and the
@@ -2719,6 +2770,10 @@ paths:
       operationId: rollbackMenu
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Put the previous version back
       description: 'Board 2. **The reason to version a menu at all.** A price published wrong at 11am
         on a Saturday needs one action, not a re-edit of forty items under pressure.
@@ -2780,6 +2835,10 @@ paths:
       operationId: listMenuVersions
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Every published version of a menu
       description: '**Added 26 September.** `publishMenu` promised that the previous version stays readable
         and `rollbackMenu` takes a `toVersion`, and nothing listed the versions — so the number a rollback
@@ -3418,6 +3477,9 @@ paths:
       - query: orders#orderLineRecords
         route: service
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-write-via:
       - table: orders.order_line
         operation: applyManualDiscount
@@ -3849,6 +3911,9 @@ paths:
       - query: inventory#movementRecords
         route: in-process
         for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: What is being made, and what was
       description: 'Board 5D, 24 August. **`planProductionRun` and `completeProductionRun` existed and
         nothing read one** — found by mapping the board panels rather than the operations, which is the
@@ -4260,6 +4325,10 @@ paths:
         - "P06 EMP-051 Restaurant Service Command Center"
         - "P06 EMP-054 Reservation Calendar & Timeline"
         - "P06 EMP-060 Reservation & Table Performance"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       summary: Bookings for a service period
@@ -4630,6 +4699,10 @@ paths:
       operationId: listBookableOutlets
       x-ticvai-consumed-by:
         - "P02 GST-070 Reserve a Table"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-agreed: '3 October: Chinmay, Block A business rules, GST-070 ("a published list of bookable restaurants");
         CHG-RUL-013; shape follows listDiningOutlets (public, paged)'
       x-ticvai-audience:
@@ -5324,6 +5397,9 @@ paths:
       - query: tenancy#outletRecords
         route: service
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Collection times or delivery windows still open
       description: 'Computed from the outlet''s `FnbDeliveryPolicy` and its current load: ASAP plus fixed
         slots. A slot closes when the kitchen cannot make it, so the guest never picks a time that will
@@ -5630,6 +5706,10 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-045 Menu Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5681,6 +5761,10 @@ paths:
       operationId: createMenu
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
@@ -5729,6 +5813,10 @@ paths:
         - "P08 BO-045 Menu Management"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5754,6 +5842,10 @@ paths:
       operationId: updateMenu
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
@@ -5809,6 +5901,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
@@ -7854,6 +7950,9 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Escalate a finding
       description: 'Raised above the person who found it — a critical reading, or one nobody actioned
         in time. **Escalation is not a failure state**: it is how a finding reaches somebody with the

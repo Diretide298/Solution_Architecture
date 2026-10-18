@@ -1,0 +1,90 @@
+id: CHG-RTE-001
+date: '2026-10-18'
+source: cr
+kind: contract
+summary: 'A fact another module owns, named in an operation''s text, is asked of its owner by a declared query: the
+  fourteen Sprint 1 operations of ADAM CR-096, allocateDepositBox (CR-135) and publishBundle''s tax codes (CR-110)
+  name their read routes, eight owner queries are declared, two existing ones are also served in process, and every
+  other operation whose text names one of the same facts is routed the same way (115 read routes on 105
+  operations). allocateDepositBox refuses an opening float in another currency and foreign holdings on allocation
+  (400).'
+decision:
+  what: 'Published answers of 15 October (decisions-r7-crs.json): CR-096 option A, CR-135 option A with the
+    developer''s correction (currency from venue settings currency_code, not region settings), CR-110''s finance
+    tax-code query. New queries: tenancy#activeVenues, orders#venueChargeCurrencies (the active payment providers
+    at the nearest level that has any, ADR-0018), orders#ticketTemplateRecords, fnb#deliveryLocationRecords,
+    promotions#liveEffectivePrice, finance#taxCodeRecords, platform-ops#hostnameHeldByAnotherTenant,
+    subscription#cellRecords. Served in process too: assets#mediaAssetRecords, platform-ops#tenantDomainRecords;
+    served by service too, for askers in another deployable: tenancy#venueSettingsRecords, finance#taxCodeRecords,
+    subscription#cellRecords. The cell name (getCurrentSession''s WorkstationContext.cellName, and RegionSettings.cellName,
+    which says the same thing): the commerce host fills it from its own configuration, one cell per tenant per
+    region (ADR-0014), and reads no table, so no query is declared (lead''s ruling, 18 October). exportSubjectData''s
+    Marketing data arrives with CR-101''s export job (wave 3), not here. Siblings: every operation whose text names
+    one of the same facts, routed by tools/applied/read-routes-18-october.py; a queue''s "qualify for a live
+    promotion" asks promotions#promotionRecords, the promotion''s own row, not a price.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'ADAM CR-096 (#27941, Deep Khanvilkar) and CR-135, accepted 15 October; ADR-0055 rule 2 as amended 14 October
+  (CHG-GEN-009). Finding: check-cross-module-reads read only the lineage, whose reads are the tables behind response
+  schemas, so a rule stated in words was never judged; and it counted any query of the owner as covering all its
+  tables (CR-135). Class query (check-cross-module-reads --list-facts) before: 975 facts in 530 operations (table
+  453, field 265, fact 128, schema 129); after: 843 in 444 operations (table 453, field 263, schema 127), none of
+  them a phrase of the vocabulary (docs/active/audit-runs/read-routes-1018/facts-before.tsv, facts-after.tsv).'
+keys_touched:
+  operations: [abandonPeriodClose, acquireInventoryHold, adjustDepositBoxFloat, allocateDepositBox,
+    analysePromotionConflicts, applyMenuActions, approveJournalEntry, beginPeriodClose, buildProductionPlan,
+    bulkChangePrices, bulkUpdateProducts, claimCustomDomain, closeDepositBoxes, compItem, createCombo,
+    createJournalEntry, createMenu, createPerformances, createPreview, createQueue, createResaleListing,
+    createShopAndDrop, createTaxCode, createTaxExemption, escalateCorrectiveAction, exchangeOrderLines,
+    exportPartnerInvoice, extendCart, extendReservation, generateVisitPlan, getBookingFlowConfig,
+    getCurrentSession, getDeferredRevenue, getForeignTenderReport, getJournalEntry, getLatestBundle, getMenu,
+    getPlatformSubdomain, getPublishedTenantConfig, getQueue, getRefundPolicy, getSettlement, getTaxInvoice,
+    getTenantConfig, getUnifiedReconciliation, getVatReturn, getVisitPlan, getWaitingGuest,
+    ingestSettlementFile, issueTaxInvoice, list86Events, listBookableOutlets, listCombos, listConfigVersions,
+    listDepositBoxes, listFiscalPeriods, listFulfilmentSlots, listJournalEntries, listLedgerEntries,
+    listMenuVersions, listMenus, listMyWaitingGuests, listPriceVariances, listProductionPlans,
+    listProductionRuns, listQueueEntries, listQueues, listSettlements, listTableReservations, listTaxCodes,
+    listTaxExemptions, listTaxInvoices, lookupMerchandise, lookupShopAndDrop, postOrderRevenue, publishBundle,
+    publishPromotion, publishTenantConfig, recordWriteOff, rejectJournal, releaseProductionPlan,
+    rescheduleOrder, resolveBookingConflict, resolveTenantHost, restoreConfigVersion, reverseJournalEntry,
+    rollbackMenu, setAnalyticsProvider, setAppIcons, setBookingFlowConfig, setBrandIdentity, setComboSlots,
+    setMaintenanceMode, setMarketPricingConfiguration, setMenuSections, setQueueStatus,
+    setRefundCalculationPolicy, setRefundPolicy, setVenueSettings, updateMenu, updateQueue, updateTaxCode,
+    updateVisitPlan, verifyTaxExemption, withdrawFromDepositBox]
+  tables: []
+  schemas: [DepositBox, WorkstationContext, RegionSettings]
+  files:
+  - tools/check-cross-module-reads.py
+  - tools/applied/read-routes-18-october.py
+  - contracts/spine/shift.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/tenancy.yaml
+  other:
+  - 'x-ticvai-queries: 8 new, 2 served in process, 3 also served by service'
+  - 'x-ticvai-read-via: 115 entries on 105 operations'
+root_class: A22 LINEAGE
+tickets:
+  started: [28411, 32336]
+  unstarted: [27750, 27777, 27778, 27792, 27820, 27880, 27894, 27941, 28018, 28023, 28026, 28027, 30722, 30765,
+    30766, 30767, 30804, 30870, 30871, 31040, 31041, 31077, 31078, 31205, 31405, 31417, 31423, 31428]
+release_tag: r7
+decision_owner: Chinmay
+adam_cr: CR-096, CR-135, CR-110 (tax-code query)
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'XR-FACT (text) and per-table coverage (0 new XR-UNCOVERED on r6). MUST_FIX_FACTS keeps the fourteen CR pairs
+  from being baselined; on the unfixed package all fourteen failed as must-fix. The other 843 XR-FACT findings
+  (table, field and schema detectors) are for the lead to baseline at merge, and they fail when their ticket starts.
+  The dry run was read line by line: eight phrases that name a fact without reading it (another tenant''s data that
+  is never used, a credential''s collection desk, a limit that moves with the exchange rate, a gift card''s
+  denominations, and others) went into NOT_READ, each naming its operations. Not routed: none (no Identity operation
+  named a fact above its tier). Started tickets the sweep reaches: #28411 (In progress) and #32336 (Ready for QA),
+  both for listFiscalPeriods and getUnifiedReconciliation''s read of the region''s time zone: a comment for their
+  agent (14 October rule). The impact list (docs/active/audit-runs/read-routes-1018/impact.tsv) holds 715 tickets
+  (713 New), 215 of them on the CR-named operations; the 28 back-end tickets of those are listed above. Verified:
+  derive-lineage --apply; check-cross-module-reads (XR-FACT 843, none must-fix; every other rule 0 new),
+  check-error-sources, check-lineage, check-contract-shapes, check-contract-compat, check-problem-types,
+  check-storage-promises 0 new; derived files restored before the commit.'

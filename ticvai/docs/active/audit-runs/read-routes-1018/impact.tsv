@@ -1,0 +1,716 @@
+#27625	New	Pranay Shinde	Foundation · Setup and environments	identity#getCurrentSession
+#27666	New	Pranay Shinde	[DevOps] Sign-in working end to end against IdentityService	identity#getCurrentSession
+#27685	New	Deep Khanvilkar	[Test] Module test: Foundation · Setup and environments	identity#getCurrentSession
+#27704	New	Hrushikant Patkar	Foundation · Offline: POS, Kitchen Display and scanner	catalogue#acquireInventoryHold, catalogue#getLatestBundle
+#27706	New	Hrushikant Patkar	[BE] Signed catalogue and entitlement bundles, and the lease	catalogue#acquireInventoryHold, catalogue#getLatestBundle
+#27709	New	Deep Khanvilkar	[Test] Module test: Foundation · Offline: POS, Kitchen Displ	catalogue#acquireInventoryHold, catalogue#getLatestBundle
+#27734	New	Narayan Gaonkar	[BE] OrderService: listTicketTransfers, modifyOrder, reprint	orders#rescheduleOrder
+#27735	New	Pranay Shinde	[BE] OrderService: claimCart, createCart, extendCart, getCar	orders#extendCart
+#27736	New	Pranay Shinde	[BE] OrderService: exchangeOrderLines, getMediaEntitlements,	orders#exchangeOrderLines
+#27748	New	Deep Khanvilkar	Identity & Security · POS	identity#getCurrentSession
+#27750	New	Deep Khanvilkar	[BE] IdentityService: changeOwnCredential, exportSubjectData	identity#getCurrentSession
+#27751	New	Hrushikant Patkar	Identity & Security · Staff App (Block A)	identity#getCurrentSession
+#27754	New	Chitrangi Mestry	Identity & Security · Staff App (Block A completion)	identity#getCurrentSession
+#27755	New	Chitrangi Mestry	[FE] EMP-002 Select venue & role	identity#getCurrentSession
+#27758	New	Chitrangi Mestry	[FE] EMP-001 Sign in	identity#getCurrentSession
+#27760	New	Chitrangi Mestry	Identity & Security · Scanner (Block A)	identity#getCurrentSession
+#27761	New	Chitrangi Mestry	[FE] SCN-001 Sign in	identity#getCurrentSession
+#27767	New	Pradnya Yeram	[FE] POS-000 Sign In	identity#getCurrentSession
+#27768	New	Chinmay Patkar	[Test] Module test: Identity & Security · POS	identity#getCurrentSession
+#27771	New	Pallavi Sawant	Identity & Security · Support Console (Block A)	identity#getCurrentSession
+#27772	New	Pallavi Sawant	[FE] SUP-001 Venue Management Sign In	identity#getCurrentSession
+#27774	New	Narayan Gaonkar	Identity & Security · TICVAI Console 1 of 5	identity#getCurrentSession, white-label#getTenantConfig
+#27777	New	Deep Khanvilkar	[BE] WhiteLabelService: recordStorefrontSessionEvents, setAn	white-label#setAnalyticsProvider, white-label#setMaintenanceMode
+#27778	New	Deep Khanvilkar	[BE] WhiteLabelService: createPreview, diffConfigVersion, ex	white-label#createPreview
+#27779	New	Narayan Gaonkar	[BE] WhiteLabelService: getSitePackage, getSiteSetupProgress	white-label#listConfigVersions, white-label#publishTenantConfig
+#27780	New	Narayan Gaonkar	[BE] WhiteLabelService: restoreConfigVersion, setPublishRevi	white-label#restoreConfigVersion
+#27783	New	Sanket Keluskar	[FE] ADM-001 Platform Login / MFA	identity#getCurrentSession
+#27784	New	Surendra Loke	Identity & Security · Partner Portal (Block A)	identity#getCurrentSession
+#27785	New	Surendra Loke	[FE] PTR-001 Partner Login / MFA	identity#getCurrentSession
+#27787	New	Pranay Shinde	Tenancy & Venues · POS	shift#allocateDepositBox
+#27792	New	Pranay Shinde	[BE] OrderService: acceptShiftVariance, allocateDepositBox, 	shift#allocateDepositBox
+#27793	New	Pradnya Yeram	[FE] POS-016 Till Configuration	shift#allocateDepositBox
+#27794	New	Deep Khanvilkar	[Test] Module test: Tenancy & Venues · POS	shift#allocateDepositBox
+#27820	New	Deep Khanvilkar	[BE] RetailService: collectShopAndDrop, createShopAndDrop, l	retail#createShopAndDrop, retail#lookupMerchandise, retail#lookupShopAndDrop
+#27844	New	Hrushikant Patkar	White Label · Guest Web	white-label#getPublishedTenantConfig
+#27859	New	Narayan Gaonkar	[BE] CatalogueService: bulkChangePrices, cloneProduct, commi	catalogue#bulkChangePrices
+#27867	New	Pranay Shinde	White Label · Guest App	white-label#getPublishedTenantConfig
+#27874	New	Chinmay Patkar	White Label · CMS	white-label#claimCustomDomain, white-label#createPreview, white-label#getBookingFlowConfig, white-label#getPlatformSubdomain, white-label#getTenantConfig, white-label#listConfigVersions, white-label#publishTenantConfig, white-label#restoreConfigVersion, white-label#setAnalyticsProvider, white-label#setAppIcons, white-label#setBookingFlowConfig, white-label#setBrandIdentity, white-label#setMaintenanceMode
+#27880	New	Deep Khanvilkar	[BE] WhiteLabelService: getAppIcons, getBrandIdentity, setAp	white-label#setAppIcons, white-label#setBrandIdentity
+#27881	New	Hrushikant Patkar	[BE] WhiteLabelService: getBookingFlowConfig, setBookingFlow	white-label#getBookingFlowConfig, white-label#setBookingFlowConfig
+#27885	New	Hrushikant Patkar	[BE] WhiteLabelService: getPublishedTenantConfig, getTenantA	white-label#getPublishedTenantConfig, white-label#getTenantConfig
+#27886	New	Chitrangi Mestry	[FE] ADM-018 Interface Languages	white-label#getTenantConfig
+#27887	New	Deep Khanvilkar	[Test] Module test: Identity & Security · TICVAI Console 1 o	white-label#getTenantConfig
+#27889	New	Chitrangi Mestry	[FE] WEB-029 Error / Sold Out / Maintenance	white-label#getPublishedTenantConfig
+#27892	New	Chitrangi Mestry	[FE] GST-043 Arabic / RTL Experience	white-label#getPublishedTenantConfig
+#27893	New	Chitrangi Mestry	[FE] GST-047 Maintenance / Upgrade Page	white-label#getPublishedTenantConfig
+#27894	New	Deep Khanvilkar	[BE] WhiteLabelService: claimCustomDomain, getPlatformSubdom	white-label#claimCustomDomain, white-label#getPlatformSubdomain
+#27900	New	Chinmay Patkar	[FE] CMS-012 RTL Preview	white-label#createPreview
+#27901	New	Chinmay Patkar	[FE] CMS-015 Version History	white-label#listConfigVersions, white-label#restoreConfigVersion
+#27902	New	Chitrangi Mestry	[FE] CMS-017 Domain & Certificate	white-label#claimCustomDomain, white-label#getPlatformSubdomain
+#27903	New	Chitrangi Mestry	[FE] CMS-006 Component Preview	white-label#createPreview, white-label#getBookingFlowConfig
+#27904	New	Chinmay Patkar	[FE] CMS-001 Tenant Workspace	white-label#setMaintenanceMode
+#27905	New	Chitrangi Mestry	[FE] CMS-009 Navigation & Menus	white-label#getTenantConfig
+#27906	New	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow	white-label#createPreview, white-label#publishTenantConfig
+#27907	New	Chinmay Patkar	[FE] CMS-016 Site Settings	white-label#getBookingFlowConfig, white-label#setAnalyticsProvider, white-label#setBookingFlowConfig
+#27911	New	Chinmay Patkar	[FE] CMS-002 Brand Kit	white-label#setBrandIdentity
+#27912	New	Chitrangi Mestry	[FE] CMS-004 Logo & Assets	white-label#setAppIcons, white-label#setBrandIdentity
+#27914	New	Chinmay Patkar	[FE] CMS-104 App Build & Store Publishing	white-label#setBrandIdentity
+#27926	New	Chinmay Patkar	[FE] CMS-011 Translations	white-label#getTenantConfig
+#27927	New	Chitrangi Mestry	White Label · TICVAI Console	white-label#claimCustomDomain, white-label#createPreview, white-label#getPlatformSubdomain, white-label#listConfigVersions, white-label#publishTenantConfig, white-label#restoreConfigVersion, white-label#setAppIcons, white-label#setBrandIdentity
+#27928	New	Chitrangi Mestry	[FE] ADM-016 White-Label Branding Management	white-label#createPreview, white-label#listConfigVersions, white-label#publishTenantConfig, white-label#restoreConfigVersion, white-label#setAppIcons, white-label#setBrandIdentity
+#27929	New	Chinmay Patkar	[FE] ADM-017 Domain & Certificate Management	white-label#claimCustomDomain, white-label#getPlatformSubdomain
+#27941	New	Deep Khanvilkar	[BE] TenancyService: getWorkstationHealth, setVenueSettings,	tenancy#setVenueSettings
+#27945	New	Narayan Gaonkar	[Test] Module test: Platform Foundation · Venue Management (	tenancy#setVenueSettings
+#27946	New	Hrushikant Patkar	Platform Foundation · Venue Management (setup, the rest of t	fnb#getMenu, fnb#setMenuSections, tenancy#setVenueSettings
+#27990	New	Surendra Loke	[BE] TenancyService: resolveTenantHost, setTenantDomainMappi	tenancy#resolveTenantHost
+#28015	New	Narayan Gaonkar	Ticketing & Guest Commerce · Venue Management (setup)	catalogue#bulkChangePrices, catalogue#createPerformances, catalogue#publishBundle, promotions#publishPromotion
+#28018	New	Deep Khanvilkar	[BE] CatalogueService: createEvent, createPerformances, ente	catalogue#createPerformances
+#28023	New	Deep Khanvilkar	[BE] CatalogueService: publishBundle, updateBundle	catalogue#publishBundle
+#28026	New	Narayan Gaonkar	[BE] CatalogueService: analysePromotionConflicts, createProm	promotions#analysePromotionConflicts
+#28027	New	Deep Khanvilkar	[BE] CatalogueService: listPromotions, publishPromotion, upd	promotions#publishPromotion
+#28032	New	Pallavi Sawant	[FE] BO-015 Performance Calendar (setup: 4 of its 11 operati	catalogue#createPerformances
+#28037	New	Pallavi Sawant	[FE] BO-1146 Refund-to-Wallet Policy Configuration	orders#getRefundPolicy, orders#setRefundPolicy
+#28043	New	Surendra Loke	[FE] BO-010 Promotions & Coupons (setup: 6 of its 28 operati	promotions#publishPromotion
+#28044	New	Surendra Loke	[FE] BO-013 Channel & Distribution (setup: 1 of its 10 opera	catalogue#publishBundle
+#28046	New	Narayan Gaonkar	[BE] CatalogueService: createBundle, getBundle, getLatestBun	catalogue#getLatestBundle
+#28047	New	Pranay Shinde	[BE] OrderService: cloneTicketTemplate, createResaleListing,	orders#createResaleListing
+#28051	New	Pallavi Sawant	[FE] BO-009 Pricing Rules (setup: 7 of its 12 operations)	catalogue#bulkChangePrices
+#28080	New	Pranay Shinde	[Test] Module test: Ticketing & Guest Commerce · Venue Manag	catalogue#createPerformances, catalogue#getLatestBundle, catalogue#publishBundle, promotions#analysePromotionConflicts, promotions#publishPromotion
+#28081	New	Narayan Gaonkar	Ticketing & Guest Commerce · Venue Management (setup, the re	catalogue#getLatestBundle, fnb#createCombo, fnb#listCombos, fnb#listMenus, fnb#setComboSlots, promotions#analysePromotionConflicts
+#28130	New	Surendra Loke	[BE] FnbService: createCombo, setComboSlots	fnb#createCombo, fnb#setComboSlots
+#28131	New	Chinmay Patkar	[BE] FnbService: listCombos	fnb#listCombos
+#28135	New	Deep Khanvilkar	[BE] CatalogueService: acquireInventoryHold, convertInventor	catalogue#acquireInventoryHold
+#28150	New	Narayan Gaonkar	[BE] VenueOpsService: bookVisitPlan, generateVisitPlan, getV	venue-map#generateVisitPlan, venue-map#getVisitPlan
+#28153	New	Chitrangi Mestry	Ticketing · Guest App	venue-map#generateVisitPlan
+#28160	New	Chinmay Patkar	[FE] GST-052 Suggested Itineraries	venue-map#generateVisitPlan
+#28164	New	Pradnya Yeram	Ticketing · POS	catalogue#acquireInventoryHold
+#28165	New	Pradnya Yeram	[FE] POS-003 Sell — Timed Entry	catalogue#acquireInventoryHold
+#28191	New	Narayan Gaonkar	Seating & Maps · Guest Web	queue#listQueues, venue-map#generateVisitPlan, venue-map#getVisitPlan, venue-map#updateVisitPlan
+#28198	New	Narayan Gaonkar	[BE] VenueOpsService: createQueue, listQueues, updateQueue	queue#createQueue, queue#listQueues, queue#updateQueue
+#28199	New	Sanket Keluskar	[BE] VenueOpsService: updateVisitPlan	venue-map#updateVisitPlan
+#28200	New	Chinmay Patkar	[FE] WEB-050 Plan Your Visit	venue-map#generateVisitPlan, venue-map#getVisitPlan, venue-map#updateVisitPlan
+#28201	New	Chinmay Patkar	Seating & Maps · Guest App	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#28218	New	Narayan Gaonkar	Orders & Reservations · Guest Web	orders#createResaleListing, orders#extendCart, retail#lookupMerchandise
+#28219	New	Sanket Keluskar	[BE] OrderService: cancelReservation, convertReservation, cr	orders#extendReservation
+#28220	New	Chinmay Patkar	[FE] WEB-010 Shopping Cart	orders#extendCart
+#28224	New	Chinmay Patkar	[FE] WEB-030 Ticket Transfer	orders#createResaleListing
+#28225	New	Chitrangi Mestry	[FE] WEB-033 Shop	retail#lookupMerchandise
+#28227	New	Narayan Gaonkar	[BE] FnbService: leaveRestaurantWaitlist, list86Events, list	fnb#list86Events
+#28230	New	Narayan Gaonkar	Orders & Reservations · Guest App	orders#createResaleListing, orders#extendCart
+#28238	New	Chitrangi Mestry	[FE] GST-041 Checkout Entry	orders#extendCart
+#28239	New	Chinmay Patkar	[FE] GST-067 Refunds & Resale	orders#createResaleListing
+#28244	New	Deep Khanvilkar	[BE] FnbService: listDeliveryLocations, listDiningOutlets, l	fnb#listFulfilmentSlots
+#28253	New	Pradnya Yeram	Orders & Reservations · POS	catalogue#getLatestBundle, finance#issueTaxInvoice, orders#exchangeOrderLines, orders#extendReservation, orders#rescheduleOrder, promotions#analysePromotionConflicts, retail#lookupMerchandise
+#28254	New	Narayan Gaonkar	[BE] LedgerService: createTaxCode, getTaxDocumentRendition, 	finance#createTaxCode, finance#getTaxInvoice
+#28255	New	Narayan Gaonkar	[BE] LedgerService: issueTaxInvoice, listCreditMemos, listTa	finance#issueTaxInvoice, finance#listTaxInvoices
+#28256	New	Pradnya Yeram	[FE] POS-006 Held Orders	orders#exchangeOrderLines, orders#rescheduleOrder
+#28257	New	Pradnya Yeram	[FE] POS-010 Add to Existing Ticket	orders#exchangeOrderLines
+#28260	New	Pradnya Yeram	[FE] POS-030 Sales Journal	finance#issueTaxInvoice
+#28263	New	Pranay Shinde	Orders & Reservations · Venue Management (Block A)	finance#listSettlements, orders#exchangeOrderLines, orders#getRefundPolicy, orders#rescheduleOrder, shift#closeDepositBoxes
+#28279	New	Deep Khanvilkar	[BE] OrderService: closeDepositBoxes, getShift	shift#closeDepositBoxes
+#28282	New	Narayan Gaonkar	[BE] LedgerService: getSettlement, ingestSettlementFile, lis	finance#getSettlement, finance#ingestSettlementFile, finance#listSettlements
+#28283	New	Sanket Keluskar	[FE] BO-101 Orders & Money	finance#listSettlements
+#28312	New	Chinmay Patkar	Wallet & Cashless · Guest App	white-label#getPublishedTenantConfig
+#28333	New	Chinmay Patkar	[FE] WEB-001 Home / Landing	white-label#getPublishedTenantConfig
+#28335	New	Chitrangi Mestry	[FE] GST-001 Home	white-label#getPublishedTenantConfig
+#28337	New	Chinmay Patkar	[FE] CMS-103 Booking Flows	white-label#publishTenantConfig
+#28338	New	Pallavi Sawant	[Test] Module test: White Label · CMS	white-label#claimCustomDomain, white-label#getBookingFlowConfig, white-label#getPlatformSubdomain, white-label#setAppIcons, white-label#setBookingFlowConfig, white-label#setBrandIdentity
+#28342	New	Pradnya Yeram	[FE] POS-002 Sell — Ticket Catalogue	catalogue#getLatestBundle, promotions#analysePromotionConflicts, retail#lookupMerchandise
+#28343	New	Pradnya Yeram	[FE] POS-031 Reservations & Group Arrivals	orders#extendReservation
+#28344	New	Chitrangi Mestry	[Test] Module test: Orders & Reservations · POS	finance#issueTaxInvoice
+#28345	New	Chinmay Patkar	[FE] GST-071 Payment Methods	white-label#getPublishedTenantConfig
+#28391	New	Sanket Keluskar	[BE] FnbService: getMenu, setMenuItemDailyCount	fnb#getMenu
+#28393	New	Chitrangi Mestry	Finance & Tax · Guest Web	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#28395	New	Chitrangi Mestry	[FE] WEB-019 Order History	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#28398	New	Pradnya Yeram	Finance & Tax · Guest App	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#28399	New	Pradnya Yeram	[FE] GST-019 Order History	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#28402	New	Pradnya Yeram	Finance & Tax · POS	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#28403	New	Pradnya Yeram	[FE] POS-026 Receipt & Reprint	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#28405	New	Deep Khanvilkar	Finance & Tax · Venue Management (Block A)	finance#getSettlement, finance#ingestSettlementFile, finance#listLedgerEntries, finance#listSettlements
+#28407	New	Deep Khanvilkar	[BE] LedgerService: abandonPeriodClose, beginPeriodClose, ge	finance#abandonPeriodClose, finance#beginPeriodClose, finance#listLedgerEntries
+#28408	New	Pranay Shinde	[BE] LedgerService: disputeObligation, recordWriteOff, resol	finance#recordWriteOff
+#28409	New	Surendra Loke	[BE] LedgerService: listInterEntityObligations, postOrderRev	finance#postOrderRevenue
+#28411	In progress	Sanket Keluskar	Finance & Tax · API only (Block A completion)	finance#getUnifiedReconciliation, finance#listFiscalPeriods
+#28412	New	Sanket Keluskar	[BE] LedgerService: closeFiscalPeriod, listFiscalPeriods	finance#listFiscalPeriods
+#28413	New	Narayan Gaonkar	[BE] LedgerService: getUnifiedReconciliation	finance#getUnifiedReconciliation
+#28414	New	Pranay Shinde	[Test] Module test: Finance & Tax · API only (Block A comple	finance#getUnifiedReconciliation, finance#listFiscalPeriods
+#28415	New	Narayan Gaonkar	Venue Operations · Venue Management (setup)	queue#createQueue, queue#updateQueue
+#28442	New	Pallavi Sawant	[FE] BO-001 Queue Directory (setup: 2 of its 13 operations)	queue#createQueue, queue#updateQueue
+#28447	New	Sanket Keluskar	Venue Operations · Venue Management (setup, the rest of the 	queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus
+#28479	New	Pranay Shinde	Finance & Insights · Venue Management (setup)	finance#createTaxCode, finance#updateTaxCode
+#28482	New	Sanket Keluskar	[BE] LedgerService: transmitEInvoices, updateTaxCode	finance#updateTaxCode
+#28487	New	Pallavi Sawant	[FE] BO-075 Account Mapping (setup: 2 of its 8 operations)	finance#createTaxCode, finance#updateTaxCode
+#28490	New	Surendra Loke	Finance & Insights · Venue Management (setup, the rest of th	finance#createTaxExemption, finance#listPriceVariances, finance#listTaxCodes, finance#listTaxExemptions, finance#verifyTaxExemption
+#28493	New	Deep Khanvilkar	[BE] LedgerService: listPriceVariances, reviewPriceVariance	finance#listPriceVariances
+#28494	New	Pradnya Yeram	[FE] BO-077 FX Rates & Variances (the rest of the screen: 3 	finance#listPriceVariances
+#28501	New	Surendra Loke	[BE] LedgerService: createTaxExemption, listEInvoiceTransmis	finance#createTaxExemption, finance#listTaxCodes
+#28503	New	Surendra Loke	[BE] LedgerService: listTaxExemptions, listTaxInvoiceTemplat	finance#listTaxExemptions, finance#verifyTaxExemption
+#28505	New	Sanket Keluskar	[FE] BO-075 Account Mapping (the rest of the screen: 6 of it	finance#createTaxExemption, finance#listTaxCodes, finance#listTaxExemptions, finance#verifyTaxExemption
+#28521	New	Narayan Gaonkar	Food & Beverage · Guest Web	fnb#listFulfilmentSlots
+#28522	New	Narayan Gaonkar	[BE] FnbService: attachModifierGroup, buildProductionPlan, c	fnb#buildProductionPlan
+#28524	New	Chinmay Patkar	Food & Beverage · Guest App	fnb#listBookableOutlets, fnb#listFulfilmentSlots
+#28526	New	Pradnya Yeram	Food & Beverage · POS	fnb#listTableReservations, shift#listDepositBoxes, shift#withdrawFromDepositBox
+#28528	New	Pranay Shinde	[BE] OrderService: giveShiftVarianceReason, listDenomination	shift#listDepositBoxes
+#28530	New	Deep Khanvilkar	[BE] OrderService: suspendShift, withdrawFromDepositBox	shift#withdrawFromDepositBox
+#28532	New	Pallavi Sawant	[FE] BO-043 Daily Reconciliation	finance#getSettlement, finance#ingestSettlementFile, finance#listLedgerEntries, finance#listSettlements
+#28533	New	Pradnya Yeram	[FE] POS-015 Cash Operations Dashboard	shift#listDepositBoxes
+#28535	New	Pradnya Yeram	[FE] POS-018 Safe Drop & Cash Transfer Management	shift#listDepositBoxes, shift#withdrawFromDepositBox
+#28540	New	Narayan Gaonkar	[BE] FnbService: createTableReservationForGuest, escalateCor	fnb#escalateCorrectiveAction
+#28541	New	Surendra Loke	[FE] BO-136 F&B Global Settings & Controls (the rest of the 	tenancy#setVenueSettings
+#28542	New	Narayan Gaonkar	[BE] FnbService: listTableReservations, logColdChain, logKit	fnb#listTableReservations
+#28544	New	Narayan Gaonkar	[BE] FnbService: requestBill, rollbackMenu, scheduleMenuPubl	fnb#rollbackMenu
+#28545	New	Narayan Gaonkar	[BE] FnbService: createMenu, setItemAvailability, setMenuSec	fnb#createMenu, fnb#setMenuSections, fnb#updateMenu
+#28546	New	Pallavi Sawant	[FE] BO-109 Menu Builder & POS Layout Designer (the rest of 	fnb#getMenu, fnb#setMenuSections
+#28549	New	Pradnya Yeram	[FE] POS-028 Table Service	fnb#listTableReservations
+#28551	New	Pradnya Yeram	Food & Beverage · Kitchen Display	fnb#list86Events
+#28552	New	Narayan Gaonkar	[BE] FnbService: rebalanceStationLoad, recallKitchenTicket, 	fnb#releaseProductionPlan
+#28553	New	Deep Khanvilkar	[BE] FnbService: getGuestBill, getGuestMenu, getGuestOrderSt	fnb#listBookableOutlets
+#28556	New	Chinmay Patkar	[FE] WEB-036 F&B – Browse & Order	fnb#listFulfilmentSlots
+#28560	New	Chitrangi Mestry	[FE] GST-024 F&B – Browse & Order	fnb#listFulfilmentSlots
+#28563	New	Chinmay Patkar	[FE] GST-070 Reserve a Table	fnb#listBookableOutlets
+#28574	New	Pradnya Yeram	[FE] KIT-008 Exceptions, Re-Fire & Unavailable Items	fnb#list86Events
+#28577	New	Chitrangi Mestry	Food & Beverage · Staff App (Block A)	fnb#compItem
+#28580	New	Narayan Gaonkar	[BE] FnbService: compItem, listCorrectiveActions, moveTableV	fnb#compItem
+#28582	New	Pallavi Sawant	[FE] BO-024 Payment Exceptions	shift#closeDepositBoxes
+#28585	New	Chitrangi Mestry	[FE] EMP-059 Table Order, Bill & Payment Management	fnb#compItem
+#28588	New	Deep Khanvilkar	[Test] Module test: Food & Beverage · Staff App (Block A)	fnb#compItem
+#28589	New	Pranay Shinde	Food & Beverage · Venue Management (Block A)	fnb#applyMenuActions, fnb#getMenu, fnb#listMenuVersions, fnb#listMenus
+#28593	New	Narayan Gaonkar	[BE] OrderService: adjustDepositBoxFloat, approveShiftClose	shift#adjustDepositBoxFloat
+#28594	New	Deep Khanvilkar	[BE] LedgerService: getForeignTenderReport	finance#getForeignTenderReport
+#28595	New	Pranay Shinde	[Test] Module test: Finance & Tax · Venue Management (Block 	finance#listLedgerEntries
+#28599	New	Narayan Gaonkar	[BE] FnbService: applyMenuActions, closeCorrectiveAction, cr	fnb#applyMenuActions
+#28608	New	Chinmay Patkar	Retail · Guest Web	retail#lookupShopAndDrop
+#28609	New	Chinmay Patkar	[FE] WEB-042 Retail & Shop and Drop	retail#lookupShopAndDrop
+#28611	New	Chinmay Patkar	Retail · Guest App	retail#lookupMerchandise, retail#lookupShopAndDrop
+#28612	New	Chinmay Patkar	[FE] GST-062 Shop & Drop Collection	retail#lookupShopAndDrop
+#28613	New	Chitrangi Mestry	[FE] GST-026 Retail / Merchandise	retail#lookupMerchandise
+#28615	New	Pradnya Yeram	Retail · POS	retail#createShopAndDrop, retail#lookupMerchandise, retail#lookupShopAndDrop
+#28616	New	Pradnya Yeram	[FE] POS-012 Omnichannel Order & Fulfilment Center	retail#lookupShopAndDrop
+#28617	New	Pradnya Yeram	[FE] POS-023 Sell — Merchandise	retail#lookupMerchandise
+#28620	New	Pradnya Yeram	[FE] POS-011 Returns, Refunds & Exchanges	orders#exchangeOrderLines
+#28621	New	Pradnya Yeram	[FE] POS-005 Payment	retail#createShopAndDrop
+#28679	New	Narayan Gaonkar	Virtual Queue · Guest Web	queue#getWaitingGuest, queue#listQueues
+#28680	New	Narayan Gaonkar	[BE] VenueOpsService: getWaitingGuest, joinQueue, leaveQueue	queue#getWaitingGuest
+#28690	New	Chinmay Patkar	[FE] WEB-039 Venue Map & Wait Times	queue#listQueues
+#28691	New	Deep Khanvilkar	[Test] Module test: Seating & Maps · Guest Web	queue#listQueues, venue-map#updateVisitPlan
+#28693	New	Chitrangi Mestry	[FE] GST-053 Your Plan	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#28694	New	Chinmay Patkar	[FE] GST-059 Plan in Progress	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#28696	New	Chitrangi Mestry	[FE] WEB-040 Virtual Queue	queue#getWaitingGuest, queue#listQueues
+#28697	New	Pranay Shinde	[Test] Module test: Virtual Queue · Guest Web	queue#getWaitingGuest
+#28698	New	Chinmay Patkar	Virtual Queue · Guest App	queue#getWaitingGuest, queue#listQueues
+#28700	New	Chinmay Patkar	[FE] GST-023 Virtual Queue	queue#getWaitingGuest, queue#listQueues
+#28701	New	Chitrangi Mestry	[FE] GST-051 Plan	venue-map#generateVisitPlan
+#28703	New	Narayan Gaonkar	Virtual Queue · Staff App (Block A)	queue#getQueue
+#28704	New	Narayan Gaonkar	[BE] VenueOpsService: getQueue, setQueueStatus	queue#getQueue, queue#setQueueStatus
+#28706	New	Chitrangi Mestry	[FE] EMP-032 Manual wait entry	queue#getQueue
+#28707	New	Deep Khanvilkar	[Test] Module test: Virtual Queue · Staff App (Block A)	queue#getQueue
+#28708	New	Surendra Loke	Virtual Queue · Venue Management (Block A)	queue#createQueue, queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus, queue#updateQueue
+#28711	New	Chinmay Patkar	[BE] VenueOpsService: callNextParties, listQueueEntries	queue#listQueueEntries
+#28712	New	Sanket Keluskar	[FE] BO-001 Queue Directory (the rest of the screen: 11 of i	queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus
+#28714	New	Surendra Loke	[BE] VenueOpsService: listMyWaitingGuests, overrideWaitingGu	queue#listMyWaitingGuests
+#28722	New	Pallavi Sawant	Food, Beverage & Retail · Venue Management (setup)	fnb#buildProductionPlan, fnb#createMenu, fnb#escalateCorrectiveAction, fnb#releaseProductionPlan, fnb#rollbackMenu, fnb#setMenuSections, fnb#updateMenu, orders#setRefundPolicy, tenancy#setVenueSettings
+#28724	New	Chinmay Patkar	[BE] OrderService: setRefundPolicy	orders#setRefundPolicy
+#28725	New	Chinmay Patkar	[BE] OrderService: getRefundPolicy	orders#getRefundPolicy
+#28727	New	Surendra Loke	[FE] BO-023 Refunds & Exchanges	orders#exchangeOrderLines, orders#getRefundPolicy, orders#rescheduleOrder
+#28728	New	Pallavi Sawant	[Test] Module test: Orders & Reservations · Venue Management	finance#listSettlements, orders#getRefundPolicy, shift#closeDepositBoxes
+#28739	New	Pranay Shinde	[Test] Module test: Finance & Insights · Venue Management (s	finance#updateTaxCode
+#28741	New	Narayan Gaonkar	[Test] Module test: Finance & Insights · Venue Management (s	finance#createTaxExemption, finance#listPriceVariances, finance#listTaxCodes, finance#listTaxExemptions, finance#verifyTaxExemption
+#28743	New	Sanket Keluskar	[FE] BO-010 Promotions & Coupons (the rest of the screen: 22	promotions#analysePromotionConflicts
+#28754	New	Pranay Shinde	[Test] Module test: Food & Beverage · POS	fnb#listTableReservations, shift#listDepositBoxes, shift#withdrawFromDepositBox
+#28756	New	Narayan Gaonkar	[BE] FnbService: listMenuSchedules, listMenuVersions, listMe	fnb#listMenuVersions, fnb#listMenus
+#28757	New	Sanket Keluskar	[FE] BO-007 Product Directory (the rest of the screen: 14 of	fnb#listMenus
+#28758	New	Pallavi Sawant	[FE] BO-011 Packages & Bundles (the rest of the screen: 13 o	catalogue#getLatestBundle, fnb#createCombo, fnb#listCombos, fnb#listMenus, fnb#setComboSlots
+#28759	New	Narayan Gaonkar	[Test] Module test: Ticketing & Guest Commerce · Venue Manag	fnb#createCombo, fnb#listCombos, fnb#setComboSlots
+#28760	New	Surendra Loke	[FE] BO-045 Menu Management (the rest of the screen: 10 of i	fnb#applyMenuActions, fnb#getMenu, fnb#listMenuVersions, fnb#listMenus
+#28761	New	Pranay Shinde	[Test] Module test: Food & Beverage · Venue Management (Bloc	fnb#applyMenuActions, fnb#listMenuVersions, fnb#listMenus
+#28762	New	Pallavi Sawant	[FE] BO-045 Menu Management (setup: 8 of its 18 operations)	fnb#createMenu, fnb#rollbackMenu, fnb#setMenuSections, fnb#updateMenu
+#28763	New	Surendra Loke	[FE] BO-065 Venue Configuration (setup: 4 of its 10 operatio	orders#setRefundPolicy, tenancy#setVenueSettings
+#28765	New	Pallavi Sawant	[FE] BO-112 Production Planning & Production Sheets (setup: 	fnb#buildProductionPlan, fnb#releaseProductionPlan
+#28766	New	Pallavi Sawant	[FE] BO-044 F&B Outlets (setup: 7 of its 17 operations)	fnb#escalateCorrectiveAction
+#28768	New	Chinmay Patkar	[Test] Module test: Food, Beverage & Retail · Venue Manageme	orders#setRefundPolicy
+#28769	New	Narayan Gaonkar	Food, Beverage & Retail · Venue Management (setup, the rest 	fnb#listProductionPlans, fnb#listProductionRuns, orders#getRefundPolicy
+#28778	New	Sanket Keluskar	[FE] BO-065 Venue Configuration (the rest of the screen: 6 o	orders#getRefundPolicy
+#28781	New	Narayan Gaonkar	[BE] FnbService: enterCountLine, getProductionRun, listProdu	fnb#listProductionRuns
+#28785	New	Narayan Gaonkar	[BE] FnbService: completeProductionRun, listProductionPlans,	fnb#listProductionPlans
+#28791	New	Sanket Keluskar	[FE] BO-005 Queue Monitor	queue#createQueue, queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus, queue#updateQueue
+#28792	New	Deep Khanvilkar	[Test] Module test: Virtual Queue · Venue Management (Block 	queue#listQueueEntries
+#28793	New	Sanket Keluskar	[FE] BO-112 Production Planning & Production Sheets (the res	fnb#listProductionPlans, fnb#listProductionRuns
+#28796	New	Narayan Gaonkar	[Test] Module test: Food, Beverage & Retail · Venue Manageme	fnb#listProductionPlans, fnb#listProductionRuns
+#28861	New	Chitrangi Mestry	AI · Guest App	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#28862	New	Chitrangi Mestry	[FE] GST-054 AI Planner	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#29025	New	Kalpita Mejari	AI engine · Block A2: the AI work moved out of A1 (planner, 	venue-map#updateVisitPlan
+#29026	New	Kalpita Mejari	[AI] The planner agent on top of the rules planner	venue-map#updateVisitPlan
+#29028	New	Kalpita Mejari	[Test] Module test: AI engine · Block A2: the AI work moved 	venue-map#updateVisitPlan
+#29036	New	Chitrangi Mestry	Identity & Security · Staff App	identity#getCurrentSession
+#29037	New	Chitrangi Mestry	[FE] EMP-042 Profile	identity#getCurrentSession
+#29072	New	Chitrangi Mestry	[FE] ADM-619 Reconciliation & Settlement Command Center	finance#listSettlements
+#29082	New	Pallavi Sawant	Identity & Security · TICVAI Console 3 of 5	finance#listSettlements
+#29105	New	Sanket Keluskar	Tenancy & Venues · Venue Management 1 of 3	tenancy#setVenueSettings
+#29122	New	Chitrangi Mestry	[FE] BO-1063 Venue-Specific Configuration	tenancy#setVenueSettings
+#29158	New	Chitrangi Mestry	Tenancy & Venues · Venue Management 3 of 3	tenancy#setVenueSettings
+#29172	New	Sanket Keluskar	[FE] BO-600 Venue, Calendar & Operational Setup	tenancy#setVenueSettings
+#29243	New	Surendra Loke	[BE] PlatformService: createPartnerAgreement, decommissionBu	subscription#exportPartnerInvoice
+#29247	New	Narayan Gaonkar	[BE] LedgerService: createRecognitionSchedule, getDeferredRe	finance#getDeferredRevenue
+#29642	New	Chitrangi Mestry	White Label · Kiosk	white-label#getPublishedTenantConfig
+#29643	New	Chitrangi Mestry	[FE] KSK-002 Language Select	white-label#getPublishedTenantConfig
+#29646	New	Sanket Keluskar	White Label · Venue Management	white-label#claimCustomDomain, white-label#getTenantConfig, white-label#publishTenantConfig, white-label#setBrandIdentity
+#29648	New	Pradnya Yeram	[FE] BO-835 Site, Brand & Domain Setup	white-label#claimCustomDomain
+#29649	New	Chinmay Patkar	[FE] BO-836 Design System & Components	white-label#setBrandIdentity
+#29652	New	Sanket Keluskar	[FE] BO-843 Publishing, Analytics & Audit	white-label#publishTenantConfig
+#29654	New	Chitrangi Mestry	[FE] BO-834 Digital Experience Center	white-label#getTenantConfig
+#29660	New	Chitrangi Mestry	Ticketing · Staff App	catalogue#getLatestBundle
+#29662	New	Chitrangi Mestry	[FE] EMP-018 Offline package	catalogue#getLatestBundle
+#29665	New	Pallavi Sawant	Ticketing · Venue Management 1 of 8	catalogue#createPerformances, catalogue#getLatestBundle, catalogue#publishBundle
+#29666	New	Pallavi Sawant	[FE] BO-037 Offline Package Status	catalogue#getLatestBundle, catalogue#publishBundle
+#29667	New	Pallavi Sawant	[FE] BO-014 Catalogue Publishing	catalogue#publishBundle
+#29676	New	Pallavi Sawant	[FE] BO-019 Closures & Blackouts	catalogue#createPerformances
+#29693	New		Ticketing · Venue Management 3 of 8	catalogue#setMarketPricingConfiguration
+#29695	New	Hrushikant Patkar	[BE] CatalogueService: setMarketPricingConfiguration, setPri	catalogue#setMarketPricingConfiguration
+#29945	New	Pranay Shinde	[Test] Module test: Ticketing · Venue Management 3 of 8	catalogue#setMarketPricingConfiguration
+#30024	New	Pradnya Yeram	Orders & Reservations · Staff App	orders#exchangeOrderLines, orders#rescheduleOrder
+#30025	New	Surendra Loke	Orders & Reservations · Venue Management 1 of 8	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices, orders#exchangeOrderLines, orders#getRefundPolicy, orders#rescheduleOrder, orders#setRefundPolicy
+#30028	New	Hrushikant Patkar	Orders & Reservations · Venue Management 4 of 8	orders#getRefundPolicy
+#30030	New	Pradnya Yeram	Orders & Reservations · Venue Management 6 of 8	orders#exchangeOrderLines, orders#getRefundPolicy, orders#rescheduleOrder, orders#setRefundCalculationPolicy, orders#setRefundPolicy
+#30032	New	Pradnya Yeram	Orders & Reservations · Venue Management 8 of 8	orders#rescheduleOrder
+#30034	New	Pallavi Sawant	Orders & Reservations · Partner Portal	orders#exchangeOrderLines, orders#rescheduleOrder
+#30037	New	Narayan Gaonkar	Payments · Venue Management 3 of 3	finance#getSettlement, finance#ingestSettlementFile
+#30044	New	Sanket Keluskar	Wallet & Cashless · Venue Management 7 of 7	finance#listFiscalPeriods
+#30050	New	Hrushikant Patkar	Admission & Access · Venue Management 4 of 8	queue#listQueues, queue#updateQueue
+#30055	New	Pallavi Sawant	Finance & Tax · Venue Management	finance#abandonPeriodClose, finance#approveJournalEntry, finance#beginPeriodClose, finance#createJournalEntry, finance#getDeferredRevenue, finance#getJournalEntry, finance#getSettlement, finance#getUnifiedReconciliation, finance#getVatReturn, finance#ingestSettlementFile, finance#listFiscalPeriods, finance#listJournalEntries, finance#listSettlements, finance#listTaxInvoices, finance#rejectJournal, finance#reverseJournalEntry
+#30056	New	Pradnya Yeram	Finance & Tax · Analytics	finance#getUnifiedReconciliation, finance#listTaxInvoices
+#30058	New	Chitrangi Mestry	Finance & Tax · Partner Portal	finance#getSettlement, finance#ingestSettlementFile, finance#listSettlements
+#30060	New	Chitrangi Mestry	Food & Beverage · Staff App	fnb#listTableReservations, fnb#resolveBookingConflict
+#30061	New	Sanket Keluskar	Food & Beverage · Venue Management	fnb#getMenu, fnb#list86Events, fnb#listProductionRuns, shift#listDepositBoxes, shift#withdrawFromDepositBox
+#30062	New	Chitrangi Mestry	Retail · Kiosk	retail#lookupMerchandise
+#30063	New	Chitrangi Mestry	Retail · Staff App	retail#lookupMerchandise
+#30064	New	Pranay Shinde	Retail · Venue Management	retail#lookupShopAndDrop
+#30073	New	Pranay Shinde	Inventory · Staff App	retail#lookupMerchandise
+#30074	New	Surendra Loke	Inventory · Venue Management 1 of 2	retail#lookupMerchandise
+#30096	New	Chitrangi Mestry	Virtual Queue · Staff App	queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus
+#30097	New	Pallavi Sawant	Virtual Queue · Venue Management	queue#createQueue, queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus, queue#updateQueue
+#30680	New	Narayan Gaonkar	[BE] rescheduleOrder: POST /orders/{orderId}/reschedule	orders#rescheduleOrder
+#30683	New	Pranay Shinde	[BE] extendCart: POST /carts/{cartId}/extend	orders#extendCart
+#30685	New	Pranay Shinde	[BE] exchangeOrderLines: POST /orders/{orderId}/exchanges	orders#exchangeOrderLines
+#30722	New	Deep Khanvilkar	[BE] getCurrentSession: GET /auth/session	identity#getCurrentSession
+#30726	New	Chitrangi Mestry	[FE] EMP-002 Select venue & role: build with all states	identity#getCurrentSession
+#30727	New	Chitrangi Mestry	[FE] EMP-002 Select venue & role: connect to API	identity#getCurrentSession
+#30728	New	Chitrangi Mestry	[FE] EMP-002 Select venue & role: tests	identity#getCurrentSession
+#30732	New	Chitrangi Mestry	[FE] EMP-001 Sign in: build with all states	identity#getCurrentSession
+#30733	New	Chitrangi Mestry	[FE] EMP-001 Sign in: connect to API	identity#getCurrentSession
+#30734	New	Chitrangi Mestry	[FE] EMP-001 Sign in: tests	identity#getCurrentSession
+#30735	New	Chitrangi Mestry	[FE] SCN-001 Sign in: build with all states	identity#getCurrentSession
+#30736	New	Chitrangi Mestry	[FE] SCN-001 Sign in: connect to API	identity#getCurrentSession
+#30737	New	Chitrangi Mestry	[FE] SCN-001 Sign in: tests	identity#getCurrentSession
+#30747	New	Pradnya Yeram	[FE] POS-000 Sign In: build with all states	identity#getCurrentSession
+#30748	New	Pradnya Yeram	[FE] POS-000 Sign In: connect to API	identity#getCurrentSession
+#30749	New	Pradnya Yeram	[FE] POS-000 Sign In: tests	identity#getCurrentSession
+#30753	New	Pallavi Sawant	[FE] SUP-001 Venue Management Sign In: build with all states	identity#getCurrentSession
+#30754	New	Pallavi Sawant	[FE] SUP-001 Venue Management Sign In: connect to API	identity#getCurrentSession
+#30755	New	Pallavi Sawant	[FE] SUP-001 Venue Management Sign In: tests	identity#getCurrentSession
+#30765	New	Deep Khanvilkar	[BE] setAnalyticsProvider: PUT /tenant-config/analytics-prov	white-label#setAnalyticsProvider
+#30766	New	Deep Khanvilkar	[BE] setMaintenanceMode: PUT /tenant-config/status	white-label#setMaintenanceMode
+#30767	New	Deep Khanvilkar	[BE] createPreview: POST /tenant-config/preview	white-label#createPreview
+#30773	New	Narayan Gaonkar	[BE] listConfigVersions: GET /tenant-config/versions	white-label#listConfigVersions
+#30774	New	Narayan Gaonkar	[BE] publishTenantConfig: POST /tenant-config/publish	white-label#publishTenantConfig
+#30775	New	Narayan Gaonkar	[BE] restoreConfigVersion: POST /tenant-config/versions/{ver	white-label#restoreConfigVersion
+#30787	New	Sanket Keluskar	[FE] ADM-001 Platform Login / MFA: build with all states	identity#getCurrentSession
+#30788	New	Sanket Keluskar	[FE] ADM-001 Platform Login / MFA: connect to API	identity#getCurrentSession
+#30789	New	Sanket Keluskar	[FE] ADM-001 Platform Login / MFA: tests	identity#getCurrentSession
+#30790	New	Surendra Loke	[FE] PTR-001 Partner Login / MFA: build with all states	identity#getCurrentSession
+#30791	New	Surendra Loke	[FE] PTR-001 Partner Login / MFA: connect to API	identity#getCurrentSession
+#30792	New	Surendra Loke	[FE] PTR-001 Partner Login / MFA: tests	identity#getCurrentSession
+#30804	New	Pranay Shinde	[BE] allocateDepositBox: POST /deposit-boxes	shift#allocateDepositBox
+#30807	New	Pradnya Yeram	[FE] POS-016 Till Configuration: build with all states	shift#allocateDepositBox
+#30808	New	Pradnya Yeram	[FE] POS-016 Till Configuration: connect to API	shift#allocateDepositBox
+#30809	New	Pradnya Yeram	[FE] POS-016 Till Configuration: tests	shift#allocateDepositBox
+#30870	New	Deep Khanvilkar	[BE] createShopAndDrop: POST /shop-and-drop	retail#createShopAndDrop
+#30871	New	Deep Khanvilkar	[BE] lookupMerchandise: GET /merchandise/lookup	retail#lookupMerchandise
+#30872	New	Deep Khanvilkar	[BE] lookupShopAndDrop: GET /shop-and-drop/lookup	retail#lookupShopAndDrop
+#30970	New	Narayan Gaonkar	[BE] bulkChangePrices: POST /products/bulk-price	catalogue#bulkChangePrices
+#31040	New	Deep Khanvilkar	[BE] setAppIcons: PUT /tenant-config/app-icons	white-label#setAppIcons
+#31041	New	Deep Khanvilkar	[BE] setBrandIdentity: PUT /tenant-config/brand	white-label#setBrandIdentity
+#31042	New	Hrushikant Patkar	[BE] getBookingFlowConfig: GET /tenant-config/booking-flow	white-label#getBookingFlowConfig
+#31043	New	Hrushikant Patkar	[BE] setBookingFlowConfig: PUT /tenant-config/booking-flow	white-label#setBookingFlowConfig
+#31052	New	Hrushikant Patkar	[BE] getPublishedTenantConfig: GET /storefront/tenant-config	white-label#getPublishedTenantConfig
+#31054	New	Hrushikant Patkar	[BE] getTenantConfig: GET /tenant-config	white-label#getTenantConfig
+#31056	New	Chitrangi Mestry	[FE] ADM-018 Interface Languages: build with all states	white-label#getTenantConfig
+#31057	New	Chitrangi Mestry	[FE] ADM-018 Interface Languages: connect to API	white-label#getTenantConfig
+#31058	New	Chitrangi Mestry	[FE] ADM-018 Interface Languages: tests	white-label#getTenantConfig
+#31062	New	Chitrangi Mestry	[FE] WEB-029 Error / Sold Out / Maintenance: build with all 	white-label#getPublishedTenantConfig
+#31063	New	Chitrangi Mestry	[FE] WEB-029 Error / Sold Out / Maintenance: connect to API	white-label#getPublishedTenantConfig
+#31064	New	Chitrangi Mestry	[FE] WEB-029 Error / Sold Out / Maintenance: tests	white-label#getPublishedTenantConfig
+#31071	New	Chitrangi Mestry	[FE] GST-043 Arabic / RTL Experience: build with all states	white-label#getPublishedTenantConfig
+#31072	New	Chitrangi Mestry	[FE] GST-043 Arabic / RTL Experience: connect to API	white-label#getPublishedTenantConfig
+#31073	New	Chitrangi Mestry	[FE] GST-043 Arabic / RTL Experience: tests	white-label#getPublishedTenantConfig
+#31074	New	Chitrangi Mestry	[FE] GST-047 Maintenance / Upgrade Page: build with all stat	white-label#getPublishedTenantConfig
+#31075	New	Chitrangi Mestry	[FE] GST-047 Maintenance / Upgrade Page: connect to API	white-label#getPublishedTenantConfig
+#31076	New	Chitrangi Mestry	[FE] GST-047 Maintenance / Upgrade Page: tests	white-label#getPublishedTenantConfig
+#31077	New	Deep Khanvilkar	[BE] claimCustomDomain: POST /tenant-domains	white-label#claimCustomDomain
+#31078	New	Deep Khanvilkar	[BE] getPlatformSubdomain: GET /platform-subdomain	white-label#getPlatformSubdomain
+#31095	New	Chinmay Patkar	[FE] CMS-012 RTL Preview: build with all states	white-label#createPreview
+#31096	New	Chinmay Patkar	[FE] CMS-012 RTL Preview: connect to API	white-label#createPreview
+#31097	New	Chinmay Patkar	[FE] CMS-012 RTL Preview: tests	white-label#createPreview
+#31098	New	Chinmay Patkar	[FE] CMS-015 Version History: build with all states	white-label#listConfigVersions, white-label#restoreConfigVersion
+#31099	New	Chinmay Patkar	[FE] CMS-015 Version History: connect to API	white-label#listConfigVersions, white-label#restoreConfigVersion
+#31100	New	Chinmay Patkar	[FE] CMS-015 Version History: tests	white-label#listConfigVersions, white-label#restoreConfigVersion
+#31101	New	Chitrangi Mestry	[FE] CMS-017 Domain & Certificate: build with all states	white-label#claimCustomDomain, white-label#getPlatformSubdomain
+#31102	New	Chitrangi Mestry	[FE] CMS-017 Domain & Certificate: connect to API	white-label#claimCustomDomain, white-label#getPlatformSubdomain
+#31103	New	Chitrangi Mestry	[FE] CMS-017 Domain & Certificate: tests	white-label#claimCustomDomain, white-label#getPlatformSubdomain
+#31104	New	Chitrangi Mestry	[FE] CMS-006 Component Preview: build with all states	white-label#createPreview, white-label#getBookingFlowConfig
+#31105	New	Chitrangi Mestry	[FE] CMS-006 Component Preview: connect to API	white-label#createPreview, white-label#getBookingFlowConfig
+#31106	New	Chitrangi Mestry	[FE] CMS-006 Component Preview: tests	white-label#createPreview, white-label#getBookingFlowConfig
+#31107	New	Chinmay Patkar	[FE] CMS-001 Tenant Workspace: build with all states	white-label#setMaintenanceMode
+#31108	New	Chinmay Patkar	[FE] CMS-001 Tenant Workspace: connect to API	white-label#setMaintenanceMode
+#31109	New	Chinmay Patkar	[FE] CMS-001 Tenant Workspace: tests	white-label#setMaintenanceMode
+#31110	New	Chitrangi Mestry	[FE] CMS-009 Navigation & Menus: build with all states	white-label#getTenantConfig
+#31111	New	Chitrangi Mestry	[FE] CMS-009 Navigation & Menus: connect to API	white-label#getTenantConfig
+#31112	New	Chitrangi Mestry	[FE] CMS-009 Navigation & Menus: tests	white-label#getTenantConfig
+#31113	New	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow: build with all states	white-label#createPreview, white-label#publishTenantConfig
+#31114	New	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow: connect to API	white-label#createPreview, white-label#publishTenantConfig
+#31115	New	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow: tests	white-label#createPreview, white-label#publishTenantConfig
+#31116	New	Chinmay Patkar	[FE] CMS-016 Site Settings: build with all states	white-label#getBookingFlowConfig, white-label#setAnalyticsProvider, white-label#setBookingFlowConfig
+#31117	New	Chinmay Patkar	[FE] CMS-016 Site Settings: connect to API	white-label#getBookingFlowConfig, white-label#setAnalyticsProvider, white-label#setBookingFlowConfig
+#31118	New	Chinmay Patkar	[FE] CMS-016 Site Settings: tests	white-label#getBookingFlowConfig, white-label#setAnalyticsProvider, white-label#setBookingFlowConfig
+#31130	New	Chinmay Patkar	[FE] CMS-002 Brand Kit: build with all states	white-label#setBrandIdentity
+#31131	New	Chinmay Patkar	[FE] CMS-002 Brand Kit: connect to API	white-label#setBrandIdentity
+#31132	New	Chinmay Patkar	[FE] CMS-002 Brand Kit: tests	white-label#setBrandIdentity
+#31133	New	Chitrangi Mestry	[FE] CMS-004 Logo & Assets: build with all states	white-label#setAppIcons, white-label#setBrandIdentity
+#31134	New	Chitrangi Mestry	[FE] CMS-004 Logo & Assets: connect to API	white-label#setAppIcons, white-label#setBrandIdentity
+#31135	New	Chitrangi Mestry	[FE] CMS-004 Logo & Assets: tests	white-label#setAppIcons, white-label#setBrandIdentity
+#31139	New	Chinmay Patkar	[FE] CMS-104 App Build & Store Publishing: build with all st	white-label#setBrandIdentity
+#31140	New	Chinmay Patkar	[FE] CMS-104 App Build & Store Publishing: connect to API	white-label#setBrandIdentity
+#31141	New	Chinmay Patkar	[FE] CMS-104 App Build & Store Publishing: tests	white-label#setBrandIdentity
+#31173	New	Chinmay Patkar	[FE] CMS-011 Translations: build with all states	white-label#getTenantConfig
+#31174	New	Chinmay Patkar	[FE] CMS-011 Translations: connect to API	white-label#getTenantConfig
+#31175	New	Chinmay Patkar	[FE] CMS-011 Translations: tests	white-label#getTenantConfig
+#31176	New	Chitrangi Mestry	[FE] ADM-016 White-Label Branding Management: build with all	white-label#createPreview, white-label#listConfigVersions, white-label#publishTenantConfig, white-label#restoreConfigVersion, white-label#setAppIcons, white-label#setBrandIdentity
+#31177	New	Chitrangi Mestry	[FE] ADM-016 White-Label Branding Management: connect to API	white-label#createPreview, white-label#listConfigVersions, white-label#publishTenantConfig, white-label#restoreConfigVersion, white-label#setAppIcons, white-label#setBrandIdentity
+#31178	New	Chitrangi Mestry	[FE] ADM-016 White-Label Branding Management: tests	white-label#createPreview, white-label#listConfigVersions, white-label#publishTenantConfig, white-label#restoreConfigVersion, white-label#setAppIcons, white-label#setBrandIdentity
+#31179	New	Chinmay Patkar	[FE] ADM-017 Domain & Certificate Management: build with all	white-label#claimCustomDomain, white-label#getPlatformSubdomain
+#31180	New	Chinmay Patkar	[FE] ADM-017 Domain & Certificate Management: connect to API	white-label#claimCustomDomain, white-label#getPlatformSubdomain
+#31181	New	Chinmay Patkar	[FE] ADM-017 Domain & Certificate Management: tests	white-label#claimCustomDomain, white-label#getPlatformSubdomain
+#31205	New	Deep Khanvilkar	[BE] setVenueSettings: PUT /venues/{venueId}/settings	tenancy#setVenueSettings
+#31312	New	Surendra Loke	[BE] resolveTenantHost: GET /tenant-domains/{hostname}	tenancy#resolveTenantHost
+#31405	New	Deep Khanvilkar	[BE] createPerformances: POST /events/{eventId}/performances	catalogue#createPerformances
+#31417	New	Deep Khanvilkar	[BE] publishBundle: POST /catalogue/bundles	catalogue#publishBundle
+#31423	New	Narayan Gaonkar	[BE] analysePromotionConflicts: GET /promotions/{promotionId	promotions#analysePromotionConflicts
+#31428	New	Deep Khanvilkar	[BE] publishPromotion: POST /promotions/{promotionId}/publis	promotions#publishPromotion
+#31437	New	Pallavi Sawant	[FE] BO-015 Performance Calendar (setup: 4 of its 11 operati	catalogue#createPerformances
+#31438	New	Pallavi Sawant	[FE] BO-015 Performance Calendar (setup: 4 of its 11 operati	catalogue#createPerformances
+#31439	New	Pallavi Sawant	[FE] BO-015 Performance Calendar (setup: 4 of its 11 operati	catalogue#createPerformances
+#31452	New	Pallavi Sawant	[FE] BO-1146 Refund-to-Wallet Policy Configuration: build wi	orders#getRefundPolicy, orders#setRefundPolicy
+#31453	New	Pallavi Sawant	[FE] BO-1146 Refund-to-Wallet Policy Configuration: connect 	orders#getRefundPolicy, orders#setRefundPolicy
+#31454	New	Pallavi Sawant	[FE] BO-1146 Refund-to-Wallet Policy Configuration: tests	orders#getRefundPolicy, orders#setRefundPolicy
+#31470	New	Surendra Loke	[FE] BO-010 Promotions & Coupons (setup: 6 of its 28 operati	promotions#publishPromotion
+#31471	New	Surendra Loke	[FE] BO-010 Promotions & Coupons (setup: 6 of its 28 operati	promotions#publishPromotion
+#31472	New	Surendra Loke	[FE] BO-010 Promotions & Coupons (setup: 6 of its 28 operati	promotions#publishPromotion
+#31473	New	Surendra Loke	[FE] BO-013 Channel & Distribution (setup: 1 of its 10 opera	catalogue#publishBundle
+#31474	New	Surendra Loke	[FE] BO-013 Channel & Distribution (setup: 1 of its 10 opera	catalogue#publishBundle
+#31475	New	Surendra Loke	[FE] BO-013 Channel & Distribution (setup: 1 of its 10 opera	catalogue#publishBundle
+#31482	New	Narayan Gaonkar	[BE] getLatestBundle: GET /catalogue/bundles/latest	catalogue#getLatestBundle
+#31485	New	Pranay Shinde	[BE] createResaleListing: POST /resale-listings	orders#createResaleListing
+#31496	New	Pallavi Sawant	[FE] BO-009 Pricing Rules (setup: 7 of its 12 operations): b	catalogue#bulkChangePrices
+#31497	New	Pallavi Sawant	[FE] BO-009 Pricing Rules (setup: 7 of its 12 operations): c	catalogue#bulkChangePrices
+#31498	New	Pallavi Sawant	[FE] BO-009 Pricing Rules (setup: 7 of its 12 operations): t	catalogue#bulkChangePrices
+#31704	New	Surendra Loke	[BE] createCombo: POST /combos	fnb#createCombo
+#31705	New	Surendra Loke	[BE] setComboSlots: PUT /combos/{comboId}/slots	fnb#setComboSlots
+#31706	New	Chinmay Patkar	[BE] listCombos: GET /combos	fnb#listCombos
+#31711	New	Deep Khanvilkar	[BE] acquireInventoryHold: POST /inventory-holds	catalogue#acquireInventoryHold
+#31753	New	Narayan Gaonkar	[BE] generateVisitPlan: POST /visit-plans	venue-map#generateVisitPlan
+#31754	New	Narayan Gaonkar	[BE] getVisitPlan: GET /visit-plans/{planId}	venue-map#getVisitPlan
+#31778	New	Chinmay Patkar	[FE] GST-052 Suggested Itineraries: build with all states	venue-map#generateVisitPlan
+#31779	New	Chinmay Patkar	[FE] GST-052 Suggested Itineraries: connect to API	venue-map#generateVisitPlan
+#31780	New	Chinmay Patkar	[FE] GST-052 Suggested Itineraries: tests	venue-map#generateVisitPlan
+#31790	New	Pradnya Yeram	[FE] POS-003 Sell — Timed Entry: build with all states	catalogue#acquireInventoryHold
+#31791	New	Pradnya Yeram	[FE] POS-003 Sell — Timed Entry: connect to API	catalogue#acquireInventoryHold
+#31792	New	Pradnya Yeram	[FE] POS-003 Sell — Timed Entry: tests	catalogue#acquireInventoryHold
+#31851	New	Narayan Gaonkar	[BE] createQueue: POST /queues	queue#createQueue
+#31852	New	Narayan Gaonkar	[BE] listQueues: GET /queues	queue#listQueues
+#31853	New	Narayan Gaonkar	[BE] updateQueue: PATCH /queues/{queueId}	queue#updateQueue
+#31854	New	Sanket Keluskar	[BE] updateVisitPlan: PUT /visit-plans/{planId}	venue-map#updateVisitPlan
+#31855	New	Chinmay Patkar	[FE] WEB-050 Plan Your Visit: build with all states	venue-map#generateVisitPlan, venue-map#getVisitPlan, venue-map#updateVisitPlan
+#31856	New	Chinmay Patkar	[FE] WEB-050 Plan Your Visit: connect to API	venue-map#generateVisitPlan, venue-map#getVisitPlan, venue-map#updateVisitPlan
+#31857	New	Chinmay Patkar	[FE] WEB-050 Plan Your Visit: tests	venue-map#generateVisitPlan, venue-map#getVisitPlan, venue-map#updateVisitPlan
+#31892	New	Sanket Keluskar	[BE] extendReservation: POST /reservations/{reservationId}/e	orders#extendReservation
+#31893	New	Chinmay Patkar	[FE] WEB-010 Shopping Cart: build with all states	orders#extendCart
+#31894	New	Chinmay Patkar	[FE] WEB-010 Shopping Cart: connect to API	orders#extendCart
+#31895	New	Chinmay Patkar	[FE] WEB-010 Shopping Cart: tests	orders#extendCart
+#31904	New	Chinmay Patkar	[FE] WEB-030 Ticket Transfer: build with all states	orders#createResaleListing
+#31905	New	Chinmay Patkar	[FE] WEB-030 Ticket Transfer: connect to API	orders#createResaleListing
+#31906	New	Chinmay Patkar	[FE] WEB-030 Ticket Transfer: tests	orders#createResaleListing
+#31907	New	Chitrangi Mestry	[FE] WEB-033 Shop: build with all states	retail#lookupMerchandise
+#31908	New	Chitrangi Mestry	[FE] WEB-033 Shop: connect to API	retail#lookupMerchandise
+#31909	New	Chitrangi Mestry	[FE] WEB-033 Shop: tests	retail#lookupMerchandise
+#31914	New	Narayan Gaonkar	[BE] list86Events: GET /outlets/{outletId}/86-events	fnb#list86Events
+#31941	New	Chitrangi Mestry	[FE] GST-041 Checkout Entry: build with all states	orders#extendCart
+#31942	New	Chitrangi Mestry	[FE] GST-041 Checkout Entry: connect to API	orders#extendCart
+#31943	New	Chitrangi Mestry	[FE] GST-041 Checkout Entry: tests	orders#extendCart
+#31944	New	Chinmay Patkar	[FE] GST-067 Refunds & Resale: build with all states	orders#createResaleListing
+#31945	New	Chinmay Patkar	[FE] GST-067 Refunds & Resale: connect to API	orders#createResaleListing
+#31946	New	Chinmay Patkar	[FE] GST-067 Refunds & Resale: tests	orders#createResaleListing
+#31962	New	Deep Khanvilkar	[BE] listFulfilmentSlots: GET /outlets/{outletId}/fulfilment	fnb#listFulfilmentSlots
+#31985	New	Narayan Gaonkar	[BE] createTaxCode: POST /tax-codes	finance#createTaxCode
+#31987	New	Narayan Gaonkar	[BE] getTaxInvoice: GET /tax-invoices/{invoiceId}	finance#getTaxInvoice
+#31989	New	Narayan Gaonkar	[BE] issueTaxInvoice: POST /tax-invoices	finance#issueTaxInvoice
+#31991	New	Narayan Gaonkar	[BE] listTaxInvoices: GET /tax-invoices	finance#listTaxInvoices
+#31993	New	Pradnya Yeram	[FE] POS-006 Held Orders: build with all states	orders#exchangeOrderLines, orders#rescheduleOrder
+#31994	New	Pradnya Yeram	[FE] POS-006 Held Orders: connect to API	orders#exchangeOrderLines, orders#rescheduleOrder
+#31995	New	Pradnya Yeram	[FE] POS-006 Held Orders: tests	orders#exchangeOrderLines, orders#rescheduleOrder
+#31996	New	Pradnya Yeram	[FE] POS-010 Add to Existing Ticket: build with all states	orders#exchangeOrderLines
+#31997	New	Pradnya Yeram	[FE] POS-010 Add to Existing Ticket: connect to API	orders#exchangeOrderLines
+#31998	New	Pradnya Yeram	[FE] POS-010 Add to Existing Ticket: tests	orders#exchangeOrderLines
+#32005	New	Pradnya Yeram	[FE] POS-030 Sales Journal: build with all states	finance#issueTaxInvoice
+#32006	New	Pradnya Yeram	[FE] POS-030 Sales Journal: connect to API	finance#issueTaxInvoice
+#32007	New	Pradnya Yeram	[FE] POS-030 Sales Journal: tests	finance#issueTaxInvoice
+#32062	New	Deep Khanvilkar	[BE] closeDepositBoxes: POST /deposit-boxes/close	shift#closeDepositBoxes
+#32070	New	Narayan Gaonkar	[BE] getSettlement: GET /settlements/{settlementId}	finance#getSettlement
+#32071	New	Narayan Gaonkar	[BE] ingestSettlementFile: POST /settlements	finance#ingestSettlementFile
+#32073	New	Narayan Gaonkar	[BE] listSettlements: GET /settlements	finance#listSettlements
+#32074	New	Sanket Keluskar	[FE] BO-101 Orders & Money: build with all states	finance#listSettlements
+#32075	New	Sanket Keluskar	[FE] BO-101 Orders & Money: connect to API	finance#listSettlements
+#32076	New	Sanket Keluskar	[FE] BO-101 Orders & Money: tests	finance#listSettlements
+#32172	New	Chinmay Patkar	[FE] WEB-001 Home / Landing: build with all states	white-label#getPublishedTenantConfig
+#32173	New	Chinmay Patkar	[FE] WEB-001 Home / Landing: connect to API	white-label#getPublishedTenantConfig
+#32174	New	Chinmay Patkar	[FE] WEB-001 Home / Landing: tests	white-label#getPublishedTenantConfig
+#32175	New	Chitrangi Mestry	[FE] GST-001 Home: build with all states	white-label#getPublishedTenantConfig
+#32176	New	Chitrangi Mestry	[FE] GST-001 Home: connect to API	white-label#getPublishedTenantConfig
+#32177	New	Chitrangi Mestry	[FE] GST-001 Home: tests	white-label#getPublishedTenantConfig
+#32182	New	Chinmay Patkar	[FE] CMS-103 Booking Flows: build with all states	white-label#publishTenantConfig
+#32183	New	Chinmay Patkar	[FE] CMS-103 Booking Flows: connect to API	white-label#publishTenantConfig
+#32184	New	Chinmay Patkar	[FE] CMS-103 Booking Flows: tests	white-label#publishTenantConfig
+#32192	New	Pradnya Yeram	[FE] POS-002 Sell — Ticket Catalogue: build with all states	catalogue#getLatestBundle, promotions#analysePromotionConflicts, retail#lookupMerchandise
+#32193	New	Pradnya Yeram	[FE] POS-002 Sell — Ticket Catalogue: connect to API	catalogue#getLatestBundle, promotions#analysePromotionConflicts, retail#lookupMerchandise
+#32194	New	Pradnya Yeram	[FE] POS-002 Sell — Ticket Catalogue: tests	catalogue#getLatestBundle, promotions#analysePromotionConflicts, retail#lookupMerchandise
+#32195	New	Pradnya Yeram	[FE] POS-031 Reservations & Group Arrivals: build with all s	orders#extendReservation
+#32196	New	Pradnya Yeram	[FE] POS-031 Reservations & Group Arrivals: connect to API	orders#extendReservation
+#32197	New	Pradnya Yeram	[FE] POS-031 Reservations & Group Arrivals: tests	orders#extendReservation
+#32198	New	Chinmay Patkar	[FE] GST-071 Payment Methods: build with all states	white-label#getPublishedTenantConfig
+#32199	New	Chinmay Patkar	[FE] GST-071 Payment Methods: connect to API	white-label#getPublishedTenantConfig
+#32200	New	Chinmay Patkar	[FE] GST-071 Payment Methods: tests	white-label#getPublishedTenantConfig
+#32301	New	Sanket Keluskar	[BE] getMenu: GET /menus/{menuId}	fnb#getMenu
+#32306	New	Chitrangi Mestry	[FE] WEB-019 Order History: build with all states	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#32307	New	Chitrangi Mestry	[FE] WEB-019 Order History: connect to API	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#32308	New	Chitrangi Mestry	[FE] WEB-019 Order History: tests	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#32312	New	Pradnya Yeram	[FE] GST-019 Order History: build with all states	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#32313	New	Pradnya Yeram	[FE] GST-019 Order History: connect to API	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#32314	New	Pradnya Yeram	[FE] GST-019 Order History: tests	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#32318	New	Pradnya Yeram	[FE] POS-026 Receipt & Reprint: build with all states	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#32319	New	Pradnya Yeram	[FE] POS-026 Receipt & Reprint: connect to API	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#32320	New	Pradnya Yeram	[FE] POS-026 Receipt & Reprint: tests	finance#getTaxInvoice, finance#issueTaxInvoice, finance#listTaxInvoices
+#32323	New	Deep Khanvilkar	[BE] abandonPeriodClose: POST /fiscal-periods/{periodId}/aba	finance#abandonPeriodClose
+#32324	New	Deep Khanvilkar	[BE] beginPeriodClose: POST /fiscal-periods/{periodId}/begin	finance#beginPeriodClose
+#32326	New	Deep Khanvilkar	[BE] listLedgerEntries: GET /ledger/entries	finance#listLedgerEntries
+#32328	New	Pranay Shinde	[BE] recordWriteOff: POST /write-offs	finance#recordWriteOff
+#32331	New	Surendra Loke	[BE] postOrderRevenue: POST /internal/order-postings	finance#postOrderRevenue
+#32336	Ready for QA	Sanket Keluskar	[BE] listFiscalPeriods: GET /fiscal-periods	finance#listFiscalPeriods
+#32337	New	Narayan Gaonkar	[BE] getUnifiedReconciliation: GET /reconciliation/unified	finance#getUnifiedReconciliation
+#32415	New	Pallavi Sawant	[FE] BO-001 Queue Directory (setup: 2 of its 13 operations):	queue#createQueue, queue#updateQueue
+#32416	New	Pallavi Sawant	[FE] BO-001 Queue Directory (setup: 2 of its 13 operations):	queue#createQueue, queue#updateQueue
+#32417	New	Pallavi Sawant	[FE] BO-001 Queue Directory (setup: 2 of its 13 operations):	queue#createQueue, queue#updateQueue
+#32530	New	Sanket Keluskar	[BE] updateTaxCode: PATCH /tax-codes/{taxCodeId}	finance#updateTaxCode
+#32543	New	Pallavi Sawant	[FE] BO-075 Account Mapping (setup: 2 of its 8 operations): 	finance#createTaxCode, finance#updateTaxCode
+#32544	New	Pallavi Sawant	[FE] BO-075 Account Mapping (setup: 2 of its 8 operations): 	finance#createTaxCode, finance#updateTaxCode
+#32545	New	Pallavi Sawant	[FE] BO-075 Account Mapping (setup: 2 of its 8 operations): 	finance#createTaxCode, finance#updateTaxCode
+#32569	New	Deep Khanvilkar	[BE] listPriceVariances: GET /price-variances	finance#listPriceVariances
+#32571	New	Pradnya Yeram	[FE] BO-077 FX Rates & Variances (the rest of the screen: 3 	finance#listPriceVariances
+#32572	New	Pradnya Yeram	[FE] BO-077 FX Rates & Variances (the rest of the screen: 3 	finance#listPriceVariances
+#32573	New	Pradnya Yeram	[FE] BO-077 FX Rates & Variances (the rest of the screen: 3 	finance#listPriceVariances
+#32589	New	Surendra Loke	[BE] createTaxExemption: POST /tax-exemptions	finance#createTaxExemption
+#32592	New	Surendra Loke	[BE] listTaxCodes: GET /tax-codes	finance#listTaxCodes
+#32596	New	Surendra Loke	[BE] listTaxExemptions: GET /tax-exemptions	finance#listTaxExemptions
+#32599	New	Surendra Loke	[BE] verifyTaxExemption: POST /tax-exemptions/{exemptionId}/	finance#verifyTaxExemption
+#32603	New	Sanket Keluskar	[FE] BO-075 Account Mapping (the rest of the screen: 6 of it	finance#createTaxExemption, finance#listTaxCodes, finance#listTaxExemptions, finance#verifyTaxExemption
+#32604	New	Sanket Keluskar	[FE] BO-075 Account Mapping (the rest of the screen: 6 of it	finance#createTaxExemption, finance#listTaxCodes, finance#listTaxExemptions, finance#verifyTaxExemption
+#32605	New	Sanket Keluskar	[FE] BO-075 Account Mapping (the rest of the screen: 6 of it	finance#createTaxExemption, finance#listTaxCodes, finance#listTaxExemptions, finance#verifyTaxExemption
+#32631	New	Narayan Gaonkar	[BE] buildProductionPlan: POST /production-plans	fnb#buildProductionPlan
+#32644	New	Pranay Shinde	[BE] listDepositBoxes: GET /deposit-boxes	shift#listDepositBoxes
+#32651	New	Deep Khanvilkar	[BE] withdrawFromDepositBox: POST /deposit-boxes/{boxId}/wit	shift#withdrawFromDepositBox
+#32656	New	Pallavi Sawant	[FE] BO-043 Daily Reconciliation: build with all states	finance#getSettlement, finance#ingestSettlementFile, finance#listLedgerEntries, finance#listSettlements
+#32657	New	Pallavi Sawant	[FE] BO-043 Daily Reconciliation: connect to API	finance#getSettlement, finance#ingestSettlementFile, finance#listLedgerEntries, finance#listSettlements
+#32658	New	Pallavi Sawant	[FE] BO-043 Daily Reconciliation: tests	finance#getSettlement, finance#ingestSettlementFile, finance#listLedgerEntries, finance#listSettlements
+#32659	New	Pradnya Yeram	[FE] POS-015 Cash Operations Dashboard: build with all state	shift#listDepositBoxes
+#32660	New	Pradnya Yeram	[FE] POS-015 Cash Operations Dashboard: connect to API	shift#listDepositBoxes
+#32661	New	Pradnya Yeram	[FE] POS-015 Cash Operations Dashboard: tests	shift#listDepositBoxes
+#32665	New	Pradnya Yeram	[FE] POS-018 Safe Drop & Cash Transfer Management: build wit	shift#listDepositBoxes, shift#withdrawFromDepositBox
+#32666	New	Pradnya Yeram	[FE] POS-018 Safe Drop & Cash Transfer Management: connect t	shift#listDepositBoxes, shift#withdrawFromDepositBox
+#32667	New	Pradnya Yeram	[FE] POS-018 Safe Drop & Cash Transfer Management: tests	shift#listDepositBoxes, shift#withdrawFromDepositBox
+#32681	New	Narayan Gaonkar	[BE] escalateCorrectiveAction: POST /food-safety/corrective-	fnb#escalateCorrectiveAction
+#32684	New	Surendra Loke	[FE] BO-136 F&B Global Settings & Controls (the rest of the 	tenancy#setVenueSettings
+#32685	New	Surendra Loke	[FE] BO-136 F&B Global Settings & Controls (the rest of the 	tenancy#setVenueSettings
+#32686	New	Surendra Loke	[FE] BO-136 F&B Global Settings & Controls (the rest of the 	tenancy#setVenueSettings
+#32687	New	Narayan Gaonkar	[BE] listTableReservations: GET /table-reservations	fnb#listTableReservations
+#32696	New	Narayan Gaonkar	[BE] rollbackMenu: POST /menus/{menuId}/rollback	fnb#rollbackMenu
+#32699	New	Narayan Gaonkar	[BE] createMenu: POST /menus	fnb#createMenu
+#32701	New	Narayan Gaonkar	[BE] setMenuSections: PUT /menus/{menuId}/sections	fnb#setMenuSections
+#32702	New	Narayan Gaonkar	[BE] updateMenu: PATCH /menus/{menuId}	fnb#updateMenu
+#32703	New	Pallavi Sawant	[FE] BO-109 Menu Builder & POS Layout Designer (the rest of 	fnb#getMenu, fnb#setMenuSections
+#32704	New	Pallavi Sawant	[FE] BO-109 Menu Builder & POS Layout Designer (the rest of 	fnb#getMenu, fnb#setMenuSections
+#32705	New	Pallavi Sawant	[FE] BO-109 Menu Builder & POS Layout Designer (the rest of 	fnb#getMenu, fnb#setMenuSections
+#32709	New	Pradnya Yeram	[FE] POS-028 Table Service: build with all states	fnb#listTableReservations
+#32710	New	Pradnya Yeram	[FE] POS-028 Table Service: connect to API	fnb#listTableReservations
+#32711	New	Pradnya Yeram	[FE] POS-028 Table Service: tests	fnb#listTableReservations
+#32718	New	Narayan Gaonkar	[BE] releaseProductionPlan: POST /production-plans/{planId}/	fnb#releaseProductionPlan
+#32722	New	Deep Khanvilkar	[BE] listBookableOutlets: GET /venues/{venueId}/bookable-out	fnb#listBookableOutlets
+#32726	New	Chinmay Patkar	[FE] WEB-036 F&B – Browse & Order: build with all states	fnb#listFulfilmentSlots
+#32727	New	Chinmay Patkar	[FE] WEB-036 F&B – Browse & Order: connect to API	fnb#listFulfilmentSlots
+#32728	New	Chinmay Patkar	[FE] WEB-036 F&B – Browse & Order: tests	fnb#listFulfilmentSlots
+#32735	New	Chitrangi Mestry	[FE] GST-024 F&B – Browse & Order: build with all states	fnb#listFulfilmentSlots
+#32736	New	Chitrangi Mestry	[FE] GST-024 F&B – Browse & Order: connect to API	fnb#listFulfilmentSlots
+#32737	New	Chitrangi Mestry	[FE] GST-024 F&B – Browse & Order: tests	fnb#listFulfilmentSlots
+#32744	New	Chinmay Patkar	[FE] GST-070 Reserve a Table: build with all states	fnb#listBookableOutlets
+#32745	New	Chinmay Patkar	[FE] GST-070 Reserve a Table: connect to API	fnb#listBookableOutlets
+#32746	New	Chinmay Patkar	[FE] GST-070 Reserve a Table: tests	fnb#listBookableOutlets
+#32774	New	Pradnya Yeram	[FE] KIT-008 Exceptions, Re-Fire & Unavailable Items: build 	fnb#list86Events
+#32775	New	Pradnya Yeram	[FE] KIT-008 Exceptions, Re-Fire & Unavailable Items: connec	fnb#list86Events
+#32776	New	Pradnya Yeram	[FE] KIT-008 Exceptions, Re-Fire & Unavailable Items: tests	fnb#list86Events
+#32786	New	Narayan Gaonkar	[BE] compItem: POST /table-visits/{visitId}/comp	fnb#compItem
+#32792	New	Pallavi Sawant	[FE] BO-024 Payment Exceptions: build with all states	shift#closeDepositBoxes
+#32793	New	Pallavi Sawant	[FE] BO-024 Payment Exceptions: connect to API	shift#closeDepositBoxes
+#32794	New	Pallavi Sawant	[FE] BO-024 Payment Exceptions: tests	shift#closeDepositBoxes
+#32801	New	Chitrangi Mestry	[FE] EMP-059 Table Order, Bill & Payment Management: build w	fnb#compItem
+#32802	New	Chitrangi Mestry	[FE] EMP-059 Table Order, Bill & Payment Management: connect	fnb#compItem
+#32803	New	Chitrangi Mestry	[FE] EMP-059 Table Order, Bill & Payment Management: tests	fnb#compItem
+#32816	New	Narayan Gaonkar	[BE] adjustDepositBoxFloat: POST /deposit-boxes/{boxId}/adju	shift#adjustDepositBoxFloat
+#32818	New	Deep Khanvilkar	[BE] getForeignTenderReport: GET /fx/foreign-tender	finance#getForeignTenderReport
+#32826	New	Narayan Gaonkar	[BE] applyMenuActions: POST /menus/{menuId}/actions	fnb#applyMenuActions
+#32849	New	Chinmay Patkar	[FE] WEB-042 Retail & Shop and Drop: build with all states	retail#lookupShopAndDrop
+#32850	New	Chinmay Patkar	[FE] WEB-042 Retail & Shop and Drop: connect to API	retail#lookupShopAndDrop
+#32851	New	Chinmay Patkar	[FE] WEB-042 Retail & Shop and Drop: tests	retail#lookupShopAndDrop
+#32852	New	Chinmay Patkar	[FE] GST-062 Shop & Drop Collection: build with all states	retail#lookupShopAndDrop
+#32853	New	Chinmay Patkar	[FE] GST-062 Shop & Drop Collection: connect to API	retail#lookupShopAndDrop
+#32854	New	Chinmay Patkar	[FE] GST-062 Shop & Drop Collection: tests	retail#lookupShopAndDrop
+#32855	New	Chitrangi Mestry	[FE] GST-026 Retail / Merchandise: build with all states	retail#lookupMerchandise
+#32856	New	Chitrangi Mestry	[FE] GST-026 Retail / Merchandise: connect to API	retail#lookupMerchandise
+#32857	New	Chitrangi Mestry	[FE] GST-026 Retail / Merchandise: tests	retail#lookupMerchandise
+#32858	New	Pradnya Yeram	[FE] POS-012 Omnichannel Order & Fulfilment Center: build wi	retail#lookupShopAndDrop
+#32859	New	Pradnya Yeram	[FE] POS-012 Omnichannel Order & Fulfilment Center: connect 	retail#lookupShopAndDrop
+#32860	New	Pradnya Yeram	[FE] POS-012 Omnichannel Order & Fulfilment Center: tests	retail#lookupShopAndDrop
+#32861	New	Pradnya Yeram	[FE] POS-023 Sell — Merchandise: build with all states	retail#lookupMerchandise
+#32862	New	Pradnya Yeram	[FE] POS-023 Sell — Merchandise: connect to API	retail#lookupMerchandise
+#32863	New	Pradnya Yeram	[FE] POS-023 Sell — Merchandise: tests	retail#lookupMerchandise
+#32868	New	Pradnya Yeram	[FE] POS-011 Returns, Refunds & Exchanges: build with all st	orders#exchangeOrderLines
+#32869	New	Pradnya Yeram	[FE] POS-011 Returns, Refunds & Exchanges: connect to API	orders#exchangeOrderLines
+#32870	New	Pradnya Yeram	[FE] POS-011 Returns, Refunds & Exchanges: tests	orders#exchangeOrderLines
+#32871	New	Pradnya Yeram	[FE] POS-005 Payment: build with all states	retail#createShopAndDrop
+#32872	New	Pradnya Yeram	[FE] POS-005 Payment: connect to API	retail#createShopAndDrop
+#32873	New	Pradnya Yeram	[FE] POS-005 Payment: tests	retail#createShopAndDrop
+#32998	New	Narayan Gaonkar	[BE] getWaitingGuest: GET /waiting-guests/{entryId}	queue#getWaitingGuest
+#33017	New	Chinmay Patkar	[FE] WEB-039 Venue Map & Wait Times: build with all states	queue#listQueues
+#33018	New	Chinmay Patkar	[FE] WEB-039 Venue Map & Wait Times: connect to API	queue#listQueues
+#33019	New	Chinmay Patkar	[FE] WEB-039 Venue Map & Wait Times: tests	queue#listQueues
+#33023	New	Chitrangi Mestry	[FE] GST-053 Your Plan: build with all states	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#33024	New	Chitrangi Mestry	[FE] GST-053 Your Plan: connect to API	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#33025	New	Chitrangi Mestry	[FE] GST-053 Your Plan: tests	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#33026	New	Chinmay Patkar	[FE] GST-059 Plan in Progress: build with all states	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#33027	New	Chinmay Patkar	[FE] GST-059 Plan in Progress: connect to API	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#33028	New	Chinmay Patkar	[FE] GST-059 Plan in Progress: tests	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#33029	New	Chitrangi Mestry	[FE] WEB-040 Virtual Queue: build with all states	queue#getWaitingGuest, queue#listQueues
+#33030	New	Chitrangi Mestry	[FE] WEB-040 Virtual Queue: connect to API	queue#getWaitingGuest, queue#listQueues
+#33031	New	Chitrangi Mestry	[FE] WEB-040 Virtual Queue: tests	queue#getWaitingGuest, queue#listQueues
+#33035	New	Chinmay Patkar	[FE] GST-023 Virtual Queue: build with all states	queue#getWaitingGuest, queue#listQueues
+#33036	New	Chinmay Patkar	[FE] GST-023 Virtual Queue: connect to API	queue#getWaitingGuest, queue#listQueues
+#33037	New	Chinmay Patkar	[FE] GST-023 Virtual Queue: tests	queue#getWaitingGuest, queue#listQueues
+#33038	New	Chitrangi Mestry	[FE] GST-051 Plan: build with all states	venue-map#generateVisitPlan
+#33039	New	Chitrangi Mestry	[FE] GST-051 Plan: connect to API	venue-map#generateVisitPlan
+#33040	New	Chitrangi Mestry	[FE] GST-051 Plan: tests	venue-map#generateVisitPlan
+#33041	New	Narayan Gaonkar	[BE] getQueue: GET /queues/{queueId}	queue#getQueue
+#33042	New	Narayan Gaonkar	[BE] setQueueStatus: PUT /queues/{queueId}/status	queue#setQueueStatus
+#33044	New	Chitrangi Mestry	[FE] EMP-032 Manual wait entry: build with all states	queue#getQueue
+#33045	New	Chitrangi Mestry	[FE] EMP-032 Manual wait entry: connect to API	queue#getQueue
+#33046	New	Chitrangi Mestry	[FE] EMP-032 Manual wait entry: tests	queue#getQueue
+#33053	New	Chinmay Patkar	[BE] listQueueEntries: GET /queues/{queueId}/entries	queue#listQueueEntries
+#33054	New	Sanket Keluskar	[FE] BO-001 Queue Directory (the rest of the screen: 11 of i	queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus
+#33055	New	Sanket Keluskar	[FE] BO-001 Queue Directory (the rest of the screen: 11 of i	queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus
+#33056	New	Sanket Keluskar	[FE] BO-001 Queue Directory (the rest of the screen: 11 of i	queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus
+#33057	New	Surendra Loke	[BE] listMyWaitingGuests: GET /waiting-guests	queue#listMyWaitingGuests
+#33073	New	Chinmay Patkar	[BE] setRefundPolicy: PUT /venues/{venueId}/refund-policy	orders#setRefundPolicy
+#33074	New	Chinmay Patkar	[BE] getRefundPolicy: GET /venues/{venueId}/refund-policy	orders#getRefundPolicy
+#33078	New	Surendra Loke	[FE] BO-023 Refunds & Exchanges: build with all states	orders#exchangeOrderLines, orders#getRefundPolicy, orders#rescheduleOrder
+#33079	New	Surendra Loke	[FE] BO-023 Refunds & Exchanges: connect to API	orders#exchangeOrderLines, orders#getRefundPolicy, orders#rescheduleOrder
+#33080	New	Surendra Loke	[FE] BO-023 Refunds & Exchanges: tests	orders#exchangeOrderLines, orders#getRefundPolicy, orders#rescheduleOrder
+#33111	New	Sanket Keluskar	[FE] BO-010 Promotions & Coupons (the rest of the screen: 22	promotions#analysePromotionConflicts
+#33112	New	Sanket Keluskar	[FE] BO-010 Promotions & Coupons (the rest of the screen: 22	promotions#analysePromotionConflicts
+#33113	New	Sanket Keluskar	[FE] BO-010 Promotions & Coupons (the rest of the screen: 22	promotions#analysePromotionConflicts
+#33138	New	Narayan Gaonkar	[BE] listMenuVersions: GET /menus/{menuId}/versions	fnb#listMenuVersions
+#33139	New	Narayan Gaonkar	[BE] listMenus: GET /menus	fnb#listMenus
+#33140	New	Sanket Keluskar	[FE] BO-007 Product Directory (the rest of the screen: 14 of	fnb#listMenus
+#33141	New	Sanket Keluskar	[FE] BO-007 Product Directory (the rest of the screen: 14 of	fnb#listMenus
+#33142	New	Sanket Keluskar	[FE] BO-007 Product Directory (the rest of the screen: 14 of	fnb#listMenus
+#33143	New	Pallavi Sawant	[FE] BO-011 Packages & Bundles (the rest of the screen: 13 o	catalogue#getLatestBundle, fnb#createCombo, fnb#listCombos, fnb#listMenus, fnb#setComboSlots
+#33144	New	Pallavi Sawant	[FE] BO-011 Packages & Bundles (the rest of the screen: 13 o	catalogue#getLatestBundle, fnb#createCombo, fnb#listCombos, fnb#listMenus, fnb#setComboSlots
+#33145	New	Pallavi Sawant	[FE] BO-011 Packages & Bundles (the rest of the screen: 13 o	catalogue#getLatestBundle, fnb#createCombo, fnb#listCombos, fnb#listMenus, fnb#setComboSlots
+#33146	New	Surendra Loke	[FE] BO-045 Menu Management (the rest of the screen: 10 of i	fnb#applyMenuActions, fnb#getMenu, fnb#listMenuVersions, fnb#listMenus
+#33147	New	Surendra Loke	[FE] BO-045 Menu Management (the rest of the screen: 10 of i	fnb#applyMenuActions, fnb#getMenu, fnb#listMenuVersions, fnb#listMenus
+#33148	New	Surendra Loke	[FE] BO-045 Menu Management (the rest of the screen: 10 of i	fnb#applyMenuActions, fnb#getMenu, fnb#listMenuVersions, fnb#listMenus
+#33149	New	Pallavi Sawant	[FE] BO-045 Menu Management (setup: 8 of its 18 operations):	fnb#createMenu, fnb#rollbackMenu, fnb#setMenuSections, fnb#updateMenu
+#33150	New	Pallavi Sawant	[FE] BO-045 Menu Management (setup: 8 of its 18 operations):	fnb#createMenu, fnb#rollbackMenu, fnb#setMenuSections, fnb#updateMenu
+#33151	New	Pallavi Sawant	[FE] BO-045 Menu Management (setup: 8 of its 18 operations):	fnb#createMenu, fnb#rollbackMenu, fnb#setMenuSections, fnb#updateMenu
+#33152	New	Surendra Loke	[FE] BO-065 Venue Configuration (setup: 4 of its 10 operatio	orders#setRefundPolicy, tenancy#setVenueSettings
+#33153	New	Surendra Loke	[FE] BO-065 Venue Configuration (setup: 4 of its 10 operatio	orders#setRefundPolicy, tenancy#setVenueSettings
+#33154	New	Surendra Loke	[FE] BO-065 Venue Configuration (setup: 4 of its 10 operatio	orders#setRefundPolicy, tenancy#setVenueSettings
+#33158	New	Pallavi Sawant	[FE] BO-112 Production Planning & Production Sheets (setup: 	fnb#buildProductionPlan, fnb#releaseProductionPlan
+#33159	New	Pallavi Sawant	[FE] BO-112 Production Planning & Production Sheets (setup: 	fnb#buildProductionPlan, fnb#releaseProductionPlan
+#33160	New	Pallavi Sawant	[FE] BO-112 Production Planning & Production Sheets (setup: 	fnb#buildProductionPlan, fnb#releaseProductionPlan
+#33161	New	Pallavi Sawant	[FE] BO-044 F&B Outlets (setup: 7 of its 17 operations): bui	fnb#escalateCorrectiveAction
+#33162	New	Pallavi Sawant	[FE] BO-044 F&B Outlets (setup: 7 of its 17 operations): con	fnb#escalateCorrectiveAction
+#33163	New	Pallavi Sawant	[FE] BO-044 F&B Outlets (setup: 7 of its 17 operations): tes	fnb#escalateCorrectiveAction
+#33193	New	Sanket Keluskar	[FE] BO-065 Venue Configuration (the rest of the screen: 6 o	orders#getRefundPolicy
+#33194	New	Sanket Keluskar	[FE] BO-065 Venue Configuration (the rest of the screen: 6 o	orders#getRefundPolicy
+#33195	New	Sanket Keluskar	[FE] BO-065 Venue Configuration (the rest of the screen: 6 o	orders#getRefundPolicy
+#33202	New	Narayan Gaonkar	[BE] listProductionRuns: GET /production-runs	fnb#listProductionRuns
+#33210	New	Narayan Gaonkar	[BE] listProductionPlans: GET /production-plans	fnb#listProductionPlans
+#33221	New	Sanket Keluskar	[FE] BO-005 Queue Monitor: build with all states	queue#createQueue, queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus, queue#updateQueue
+#33222	New	Sanket Keluskar	[FE] BO-005 Queue Monitor: connect to API	queue#createQueue, queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus, queue#updateQueue
+#33223	New	Sanket Keluskar	[FE] BO-005 Queue Monitor: tests	queue#createQueue, queue#getQueue, queue#listQueueEntries, queue#listQueues, queue#setQueueStatus, queue#updateQueue
+#33224	New	Sanket Keluskar	[FE] BO-112 Production Planning & Production Sheets (the res	fnb#listProductionPlans, fnb#listProductionRuns
+#33225	New	Sanket Keluskar	[FE] BO-112 Production Planning & Production Sheets (the res	fnb#listProductionPlans, fnb#listProductionRuns
+#33226	New	Sanket Keluskar	[FE] BO-112 Production Planning & Production Sheets (the res	fnb#listProductionPlans, fnb#listProductionRuns
+#33416	New	Chitrangi Mestry	[FE] GST-054 AI Planner: build with all states	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#33417	New	Chitrangi Mestry	[FE] GST-054 AI Planner: connect to API	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#33418	New	Chitrangi Mestry	[FE] GST-054 AI Planner: tests	venue-map#getVisitPlan, venue-map#updateVisitPlan
+#33740	New	Chitrangi Mestry	[FE] EMP-042 Profile: build with all states	identity#getCurrentSession
+#33741	New	Chitrangi Mestry	[FE] EMP-042 Profile: connect to API	identity#getCurrentSession
+#33742	New	Chitrangi Mestry	[FE] EMP-042 Profile: tests	identity#getCurrentSession
+#33807	New	Chitrangi Mestry	[FE] ADM-619 Reconciliation & Settlement Command Center: bui	finance#listSettlements
+#33808	New	Chitrangi Mestry	[FE] ADM-619 Reconciliation & Settlement Command Center: con	finance#listSettlements
+#33809	New	Chitrangi Mestry	[FE] ADM-619 Reconciliation & Settlement Command Center: tes	finance#listSettlements
+#33922	New	Chitrangi Mestry	[FE] BO-1063 Venue-Specific Configuration: build with all st	tenancy#setVenueSettings
+#33923	New	Chitrangi Mestry	[FE] BO-1063 Venue-Specific Configuration: connect to API	tenancy#setVenueSettings
+#33924	New	Chitrangi Mestry	[FE] BO-1063 Venue-Specific Configuration: tests	tenancy#setVenueSettings
+#34033	New	Sanket Keluskar	[FE] BO-600 Venue, Calendar & Operational Setup: build with 	tenancy#setVenueSettings
+#34034	New	Sanket Keluskar	[FE] BO-600 Venue, Calendar & Operational Setup: connect to 	tenancy#setVenueSettings
+#34035	New	Sanket Keluskar	[FE] BO-600 Venue, Calendar & Operational Setup: tests	tenancy#setVenueSettings
+#34202	New	Surendra Loke	[BE] exportPartnerInvoice: POST /partners/{partnerId}/invoic	subscription#exportPartnerInvoice
+#34216	New	Narayan Gaonkar	[BE] getDeferredRevenue: GET /deferred-revenue	finance#getDeferredRevenue
+#35048	New	Chitrangi Mestry	[FE] KSK-002 Language Select: build with all states	white-label#getPublishedTenantConfig
+#35049	New	Chitrangi Mestry	[FE] KSK-002 Language Select: connect to API	white-label#getPublishedTenantConfig
+#35050	New	Chitrangi Mestry	[FE] KSK-002 Language Select: tests	white-label#getPublishedTenantConfig
+#35055	New	Pradnya Yeram	[FE] BO-835 Site, Brand & Domain Setup: build with all state	white-label#claimCustomDomain
+#35056	New	Pradnya Yeram	[FE] BO-835 Site, Brand & Domain Setup: connect to API	white-label#claimCustomDomain
+#35057	New	Pradnya Yeram	[FE] BO-835 Site, Brand & Domain Setup: tests	white-label#claimCustomDomain
+#35058	New	Chinmay Patkar	[FE] BO-836 Design System & Components: build with all state	white-label#setBrandIdentity
+#35059	New	Chinmay Patkar	[FE] BO-836 Design System & Components: connect to API	white-label#setBrandIdentity
+#35060	New	Chinmay Patkar	[FE] BO-836 Design System & Components: tests	white-label#setBrandIdentity
+#35067	New	Sanket Keluskar	[FE] BO-843 Publishing, Analytics & Audit: build with all st	white-label#publishTenantConfig
+#35068	New	Sanket Keluskar	[FE] BO-843 Publishing, Analytics & Audit: connect to API	white-label#publishTenantConfig
+#35069	New	Sanket Keluskar	[FE] BO-843 Publishing, Analytics & Audit: tests	white-label#publishTenantConfig
+#35073	New	Chitrangi Mestry	[FE] BO-834 Digital Experience Center: build with all states	white-label#getTenantConfig
+#35074	New	Chitrangi Mestry	[FE] BO-834 Digital Experience Center: connect to API	white-label#getTenantConfig
+#35075	New	Chitrangi Mestry	[FE] BO-834 Digital Experience Center: tests	white-label#getTenantConfig
+#35083	New	Chitrangi Mestry	[FE] EMP-018 Offline package: build with all states	catalogue#getLatestBundle
+#35084	New	Chitrangi Mestry	[FE] EMP-018 Offline package: connect to API	catalogue#getLatestBundle
+#35085	New	Chitrangi Mestry	[FE] EMP-018 Offline package: tests	catalogue#getLatestBundle
+#35089	New	Pallavi Sawant	[FE] BO-037 Offline Package Status: build with all states	catalogue#getLatestBundle, catalogue#publishBundle
+#35090	New	Pallavi Sawant	[FE] BO-037 Offline Package Status: connect to API	catalogue#getLatestBundle, catalogue#publishBundle
+#35091	New	Pallavi Sawant	[FE] BO-037 Offline Package Status: tests	catalogue#getLatestBundle, catalogue#publishBundle
+#35092	New	Pallavi Sawant	[FE] BO-014 Catalogue Publishing: build with all states	catalogue#publishBundle
+#35093	New	Pallavi Sawant	[FE] BO-014 Catalogue Publishing: connect to API	catalogue#publishBundle
+#35094	New	Pallavi Sawant	[FE] BO-014 Catalogue Publishing: tests	catalogue#publishBundle
+#35117	New	Pallavi Sawant	[FE] BO-019 Closures & Blackouts: build with all states	catalogue#createPerformances
+#35118	New	Pallavi Sawant	[FE] BO-019 Closures & Blackouts: connect to API	catalogue#createPerformances
+#35119	New	Pallavi Sawant	[FE] BO-019 Closures & Blackouts: tests	catalogue#createPerformances
+#35150	New	Hrushikant Patkar	[BE] setMarketPricingConfiguration: PUT /pricing-markets/{ma	catalogue#setMarketPricingConfiguration
+#35772	New	Deep Khanvilkar	[BE] LedgerService: rejectJournal, reopenPeriod	finance#rejectJournal
+#36015	New	Deep Khanvilkar	[BE] rejectJournal: POST /journal-entries/{entryId}/reject	finance#rejectJournal
+715 ticket(s)

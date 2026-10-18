@@ -1222,6 +1222,10 @@ paths:
       operationId: bulkChangePrices
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Reprice a category or a whole catalogue
       description: '2.9.9. **`BulkUpdateSeatsRequest` is the only bulk operation in the package** and
         it takes a selection plus the attribute to set — a usable precedent, applied here.
@@ -3439,6 +3443,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the region''s time zone the series is read in: daysOfWeek, until, firstStart and lastStart (ADAM CR-096)'
       x-ticvai-audience:
       - staff
       summary: Create performances, singly or by schedule
@@ -3830,6 +3838,10 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-037 Offline Package Status"
+      x-ticvai-read-via:
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'the tax codes the bundle carries (ADAM CR-110)'
       x-ticvai-audience:
       - staff
       summary: Compute, sign and publish a catalogue bundle
@@ -3916,6 +3928,10 @@ paths:
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
+      x-ticvai-read-via:
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'what its text calls "tax codes": ledger.tax_code, Ledger''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4079,6 +4095,9 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       - service
@@ -18001,6 +18020,10 @@ paths:
       operationId: setMarketPricingConfiguration
       x-ticvai-consumed-by:
         - "P08 ADM-054 Market, Venue & Currency Pricing Structure"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "venue''s trading currency": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
       summary: Create or update a node of the market pricing structure
       description: '**Global, country, region, market or venue** (29 September, writers pass). Creates or updates a
         `catalogue.pricing_market`: which price list and rounding profile the node uses and whether it inherits from
