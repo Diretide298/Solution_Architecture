@@ -374,3 +374,18 @@ def test_the_check_passes_what_the_fixed_generator_writes():
         derived={"sale_board_tile_variant_id_when_chk": "platform.sale_board_tile",
                  "sale_board_tile_sale_board_page_id_position_uniq": "platform.sale_board_tile"})
     assert not any(guard.found.values()), guard.found
+
+
+def test_a_retired_columns_guarded_statement_names_its_table_for_the_migration_ticket():
+    """ticket_done.after_r1_changes reads the forward migration for the tables it changes, so the migration ticket that
+    creates the table cites the file (check-migration-wording MW-AFTER-R1)."""
+    import tempfile
+    import ticket_done as td
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        d = root / "backend" / "tenant"
+        d.mkdir(parents=True)
+        (d / "V0105__after_r1_20261018.sql").write_text(
+            fwd.retire_not_null("platform.workstation", "org_unit_id") + ";\n", encoding="utf-8")
+        got = td.after_r1_changes(root)
+    assert got == {("backend/tenant/V0105__after_r1_20261018.sql", "platform.workstation"): [("column", "org_unit_id")]}

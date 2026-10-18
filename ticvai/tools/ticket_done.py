@@ -280,6 +280,9 @@ _AR1 = [
     (re.compile(r"^CREATE (?:UNIQUE )?INDEX (?:IF NOT EXISTS )?(\w+) ON (?:ONLY )?(\w+\.\w+)"), "index"),
     (re.compile(r"^SELECT platform\.(apply_\w+)\('(\w+\.\w+)'"), "row-level security"),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) (.+?);?$"), "change"),
+    # a retired column's guarded DROP NOT NULL (ddl_forward.retire_not_null, CHG-MGN-001)
+    (re.compile(r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM information_schema\.columns WHERE .*? THEN ALTER TABLE "
+                r"(\w+\.\w+) ALTER COLUMN (\w+) DROP NOT NULL"), "column"),
 ]
 
 
