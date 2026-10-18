@@ -194,6 +194,30 @@ own(7201, { subject: 'Refund API contract tests', status: 12, done: 100, parent:
 own(7202, { subject: 'Refund receipt template', status: 9, done: 100, parent: 901, user: 9, updated: day(-1) });
 own(7203, { subject: 'Refund to gift card', status: 4, parent: 901, user: 9 });
 
+// ── the sub-task dataset (FAKE_SUBTASKS=1) ───────────────────────────
+//
+// For api/subtasks-check.mjs (CHG-ADM-006): one person (sub-key, user 14) whose first ticket has sub-tasks two
+// levels deep - one closed, one somebody else's - and a sub-task of theirs whose parent is somebody else's.
+// Opt-in, like FAKE_TEAM: every other check counts this project's tickets and was written without these.
+if (process.env.FAKE_SUBTASKS === '1') {
+  USERS['sub-key'] = 14;
+  NAMES[14] = 'Sub Tasker';
+  own(7400, { subject: 'OrderService: claimCart, createCart, extendCart, getCart', status: 1, user: 14, order: 1 });
+  own(7401, { subject: 'claimCart', status: 12, done: 100, parent: 7400, user: 14, updated: day(-1) });
+  own(7402, { subject: 'createCart', status: 1, parent: 7400, user: 9 });
+  own(7403, { subject: 'extendCart', status: 1, parent: 7400, user: 14 });
+  own(7404, { subject: 'getCart', status: 1, parent: 7400, user: 14 });
+  own(7405, { subject: 'getCart: expiry rule', status: 1, parent: 7404, user: 14 });
+  own(7410, { subject: 'A ticket with nothing under it', status: 1, user: 14, order: 2 });
+  own(7420, { subject: 'Parent held by someone else', status: 1, user: 9, order: 3 });
+  own(7421, { subject: 'Your part of it', status: 1, parent: 7420, user: 14 });
+  // OpenProject titles a parent link with the parent's subject; own() writes "Epic n".
+  for (const id of ['7401', '7402', '7403', '7404', '7405', '7421']) {
+    const link = packages.get(id)._links.parent;
+    link.title = packages.get(link.href.split('/').pop()).subject;
+  }
+}
+
 // ── the team dataset (FAKE_TEAM=1) ───────────────────────────────────
 //
 // Five blocks as epics, features under them, tasks under those and sub-tasks
@@ -470,6 +494,10 @@ const created = [];
 const comments = new Map();
 // How many of the next creates to make and then answer 502 (/_lose-create).
 let LOSE_CREATES = 0;
+// `/_break?project=503&children=400`: answer the whole-project read (a project filter with every status and no
+// parent filter) or the sub-task read (a parent filter) with that status, as a refusing or overloaded instance
+// would; 0 or `off=1` heals. 400 on the sub-task read is an instance that does not know the parent filter.
+const BREAK = { project: 0, children: 0 };
 
 const read = (req) => new Promise((resolve) => {
   const parts = [];
@@ -525,6 +553,12 @@ createServer(async (req, res) => {
     if (url.searchParams.has('call')) CALL_MS = Number(url.searchParams.get('call')) || 0;
     return json(res, 200, { pageMs: PAGE_MS, callMs: CALL_MS });
   }
+  if (path === '/_break') {
+    if (url.searchParams.has('off')) { BREAK.project = 0; BREAK.children = 0; }
+    if (url.searchParams.has('project')) BREAK.project = Number(url.searchParams.get('project')) || 0;
+    if (url.searchParams.has('children')) BREAK.children = Number(url.searchParams.get('children')) || 0;
+    return json(res, 200, BREAK);
+  }
 
   if (!(req.headers.authorization ?? '').startsWith('Basic ')) {
     return json(res, 401, { message: 'no credential' });
@@ -572,6 +606,13 @@ createServer(async (req, res) => {
   if (path === '/api/v3/work_packages' && req.method === 'GET') {
     let want = [];
     try { want = JSON.parse(url.searchParams.get('filters') ?? '[]'); } catch { want = []; }
+    const filterOf = (name) => want.find((f) => Object.keys(f)[0] === name)?.[name];
+    if (BREAK.children && filterOf('parent')) {
+      return json(res, BREAK.children, { message: 'The sub-task read was refused (harness).' });
+    }
+    if (BREAK.project && filterOf('project') && filterOf('status')?.operator === '*' && !filterOf('parent')) {
+      return json(res, BREAK.project, { message: 'The project read was refused (harness).' });
+    }
     const closedOf = (wp) => {
       const href = wp._links?.status?.href ?? '';
       return STATUSES.find((st) => href.endsWith(`/${st.id}`))?.isClosed ?? false;
@@ -593,6 +634,9 @@ createServer(async (req, res) => {
         rows = rows.filter((wp) => closedOf(wp));
       } else if (field === 'project') {
         rows = rows.filter((wp) => (wp._links?.project?.href ?? '').endsWith(`/${spec.values[0]}`));
+      } else if (field === 'parent') {
+        // The work packages directly under any of the numbers given, as OpenProject's parent filter answers.
+        rows = rows.filter((wp) => spec.values.some((v) => (wp._links?.parent?.href ?? '') === `/api/v3/work_packages/${v}`));
       }
     }
     rows.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
