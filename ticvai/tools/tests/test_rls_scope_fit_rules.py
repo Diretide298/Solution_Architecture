@@ -62,8 +62,8 @@ DEP = {"platform": "commerce", "orders": "commerce", "fnb": "operations"}
 R6 = {"apply_parent_rls": "CREATE OR REPLACE FUNCTION platform.apply_parent_rls(target regclass) ... "
                           "format('EXISTS (SELECT 1 FROM %s parent_row WHERE ...)')"}
 FIXED = {"apply_parent_rls": "CREATE OR REPLACE FUNCTION platform.apply_parent_rls(target regclass) ... "
-                             "format('platform.parent_visible(%L::regclass, %I)', parent::text, fk_column)",
-         "parent_visible": "CREATE OR REPLACE FUNCTION platform.parent_visible(parent regclass, key_value uuid, "
+                             "format('%I IN (SELECT platform.visible_parent_ids(%L::regclass))', fk_column, parent::text)",
+         "visible_parent_ids": "CREATE OR REPLACE FUNCTION platform.visible_parent_ids(parent regclass, "
                            "for_write boolean DEFAULT false) RETURNS boolean LANGUAGE plpgsql STABLE SECURITY "
                            "DEFINER ... IF parent = 'platform.outlet'::regclass THEN ... IF parent = "
                            "'fnb.menu'::regclass THEN ... IF parent = 'orders.sales_order'::regclass THEN ..."}
@@ -81,7 +81,7 @@ def test_the_definer_function_answering_each_parent_fits():
 
 
 def test_a_parent_the_function_does_not_answer_is_found():
-    missing = dict(FIXED, parent_visible=FIXED["parent_visible"].replace("'platform.outlet'::regclass",
+    missing = dict(FIXED, visible_parent_ids=FIXED["visible_parent_ids"].replace("'platform.outlet'::regclass",
                                                                         "'x.y'::regclass"))
     assert keys(rf.parent_across_findings(POL, DEP, missing)) == ["fnb.menu", "fnb.menu_section"]
 
@@ -90,7 +90,7 @@ def test_only_the_hop_across_deployables_needs_the_function():
     # decision D9: fnb.menu asks the function for platform.outlet; fnb.menu_section keeps r6's EXISTS on fnb.menu,
     # which its own host may read
     pol = dict(POL, **{"fnb.menu": ("apply_parent_across_rls", POL["fnb.menu"][1])})
-    bodies = dict(R6, apply_parent_across_rls=FIXED["apply_parent_rls"], parent_visible=FIXED["parent_visible"])
+    bodies = dict(R6, apply_parent_across_rls=FIXED["apply_parent_rls"], visible_parent_ids=FIXED["visible_parent_ids"])
     assert rf.parent_chain("fnb.menu_section", pol) == ["fnb.menu", "platform.outlet"]
     assert rf.parent_across_findings(pol, DEP, bodies) == []
     assert rf.classes(pol)["fnb.menu_section"] == ("scope", "scope")

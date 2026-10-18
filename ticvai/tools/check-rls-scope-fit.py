@@ -28,7 +28,7 @@ its parent's class; a split policy (CHG-GEN-005) reads one way and writes anothe
                      SCOPE_FOLLOWS): a venue-registered device's heartbeat failed the write check (ADAM CR-095).
     RF-PARENT-ACROSS a table checked through a parent chain that reaches another deployable's schema, where the
                      parent helper reads the parent with the caller's own grants (DB-ROLES grants a deployable
-                     only its own schemas), or platform.parent_visible is not SECURITY DEFINER or does not answer
+                     only its own schemas), or platform.visible_parent_ids is not SECURITY DEFINER or does not answer
                      for the parent: #27686's 21 tables (ADAM CR-108, CHG-RSF-001).
 
 Devices are judged like staff (CHG-RSF-001): a device's operation runs at the scope its device is bound to
@@ -59,7 +59,7 @@ RULES = {
     "RF-DEVICE-ABOVE": "a device's operation below tenant writes a row created above its level whose path does not "
                        "follow its workstation (ADAM CR-095, CHG-RSF-001)",
     "RF-PARENT-ACROSS": "a parent chain into another deployable's schema checked with the caller's own grants, or "
-                        "by a parent_visible that does not answer for the parent (ADAM CR-108, CHG-RSF-001)",
+                        "by a visible_parent_ids that does not answer for the parent (ADAM CR-108, CHG-RSF-001)",
 }
 BELOW_TENANT = {"region", "brand", "venue", "workstation"}
 JUDGED_AUDIENCE = {"staff", "partner", "device"}
@@ -105,7 +105,7 @@ def policies(backend: Path) -> dict:
 
 
 def helper_bodies(backend: Path) -> dict:
-    """platform function name -> its last definition in apply order (the policy helpers and parent_visible)."""
+    """platform function name -> its last definition in apply order (the policy helpers and visible_parent_ids)."""
     out = {}
     for st in statements(backend):
         m = FUNC.match(st)
@@ -221,11 +221,11 @@ def device_findings(lin: dict, cl: dict, has_path: set, creators: dict, follows:
 
 def parent_across_findings(pol: dict, dep_of_schema: dict, bodies: dict) -> list:
     """RF-PARENT-ACROSS. `dep_of_schema`: schema -> deployable; `bodies`: helper_bodies(). Judged hop by hop: a child
-    whose parent is in another deployable needs a helper that asks platform.parent_visible, SECURITY DEFINER and
+    whose parent is in another deployable needs a helper that asks platform.visible_parent_ids, SECURITY DEFINER and
     answering that parent; a hop within one deployable may read its parent with the caller's grants (decision D9).
     A table is found when any hop of its chain fails."""
     out = []
-    pv = (bodies.get("parent_visible") or "").replace('"', "")
+    pv = (bodies.get("visible_parent_ids") or "").replace('"', "")
 
     def dep(t):
         return dep_of_schema.get(t.split(".", 1)[0])
@@ -235,12 +235,12 @@ def parent_across_findings(pol: dict, dep_of_schema: dict, bodies: dict) -> list
         par = parent_of(args)
         if not par or dep(child) is None or dep(par) is None or dep(child) == dep(par):
             return None
-        if "parent_visible" not in (bodies.get(helper) or ""):
+        if "visible_parent_ids" not in (bodies.get(helper) or ""):
             return par, f"{helper} on {child} reads {par} with the caller's own grants"
         if "SECURITY DEFINER" not in pv.upper():
-            return par, "platform.parent_visible is not SECURITY DEFINER"
+            return par, "platform.visible_parent_ids is not SECURITY DEFINER"
         if f"'{par}'::regclass" not in pv:
-            return par, f"platform.parent_visible does not answer for {par}"
+            return par, f"platform.visible_parent_ids does not answer for {par}"
         return None
 
     for t, (helper, _args) in sorted(pol.items()):

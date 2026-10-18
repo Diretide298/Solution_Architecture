@@ -3,7 +3,7 @@
 #27658	Ready for QA	Hrushikant Patkar	[DB] Migration V0010__approvals.sql: approvals (6 tables)	approvals.matrix, approvals.rule
 #27662	Ready for QA	Hrushikant Patkar	[DB] Migration V0012__sync.sql: sync (1 tables)	sync.rejection
 #27664	Ready for QA	Hrushikant Patkar	[DB] Migration V0014__ai.sql: ai (49 tables)	ai.provider
-#27665	Ready for QA	Hrushikant Patkar	[DB] Migration V0017__platform.sql: platform (17 tables)	platform.device
+#27665	Ready for QA	Hrushikant Patkar	[DB] Migration V0017__platform.sql: platform (17 tables)	platform.device, sync.dsar_request
 #27671	Ready for QA	Hrushikant Patkar	[DB] Migration V0022__catalogue.sql: catalogue (22 tables)	catalogue.dynamic_pricing_control, catalogue.sales_channel
 #27678	Ready for QA	Hrushikant Patkar	[DB] Migration V0029__fnb.sql: fnb (41 tables)	fnb.allergen_verdict, fnb.bill_split, fnb.kitchen_sla, fnb.kitchen_ticket, fnb.kitchen_ticket_line, fnb.menu, fnb.menu_item, fnb.menu_item_modifier, fnb.menu_section, fnb.production_run, fnb.recipe, f
 #27679	Ready for QA	Hrushikant Patkar	[DB] Migration V0030__payments.sql: payments (12 tables)	payments.provider
@@ -155,6 +155,7 @@
 #29157	New	Sanket Keluskar	[Test] Module test: Tenancy & Venues · Venue Management 2 of	platform.device, tenancy#enrolDevice
 #29158	New	Chitrangi Mestry	Tenancy & Venues · Venue Management 3 of 3	tenancy#configureWorkstation
 #29168	New	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup	tenancy#configureWorkstation
+#29190	New	Surendra Loke	[BE] CrossRegionService: createDsarRequest, getDsarRequest	sync.dsar_request
 #29244	New	Narayan Gaonkar	[BE] PlatformService: getPlanTiers, listBurstEnvironments, l	sync.rejection
 #29417	New	Pranay Shinde	Approvals · Venue Management 1 of 5	approvals#setApprovalMatrix
 #29421	New	Sanket Keluskar	[FE] BO-086 Approval Matrix	approvals#setApprovalMatrix
@@ -196,6 +197,7 @@
 #30248	Ready for QA	Hrushikant Patkar	[DB] sync.rejection	sync.rejection
 #30319	Ready for QA	Hrushikant Patkar	[DB] ai.provider	ai.provider
 #30329	Ready for QA	Hrushikant Patkar	[DB] platform.device	platform.device
+#30331	Ready for QA	Hrushikant Patkar	[DB] platform.dsar_request	sync.dsar_request
 #30566	Ready for QA	Hrushikant Patkar	[DB] fnb.allergen_verdict	fnb.allergen_verdict
 #30567	Ready for QA	Hrushikant Patkar	[DB] fnb.bill_split	fnb.bill_split
 #30576	Ready for QA	Hrushikant Patkar	[DB] fnb.kitchen_sla	fnb.kitchen_sla
@@ -402,6 +404,8 @@
 #34021	New	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup: build with all stat	tenancy#configureWorkstation
 #34022	New	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup: connect to API	tenancy#configureWorkstation
 #34023	New	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup: tests	tenancy#configureWorkstation
+#34054	New	Surendra Loke	[BE] createDsarRequest: POST /dsar/requests	sync.dsar_request
+#34055	New	Surendra Loke	[BE] getDsarRequest: GET /dsar/requests/{requestId}	sync.dsar_request
 #34206	New	Narayan Gaonkar	[BE] reconcileBurstEnvironment: POST /burst-environments/{bu	sync.rejection
 #34650	New	Sanket Keluskar	[FE] BO-086 Approval Matrix: build with all states	approvals#setApprovalMatrix
 #34651	New	Sanket Keluskar	[FE] BO-086 Approval Matrix: connect to API	approvals#setApprovalMatrix
@@ -450,6 +454,7 @@
 #35701	New	Narayan Gaonkar	[Test] Module test: Platform Operations · API only (Block A 	sync.rejection
 #35772	New	Deep Khanvilkar	[BE] LedgerService: rejectJournal, reopenPeriod	approvals.rule
 #35774	New	Pallavi Sawant	[FE] ADM-530 AI Approval Requirement & Routing Configuration	approvals#setApprovalMatrix
+#35781	New	Hrushikant Patkar	[DB] sync.dsar_request	sync.dsar_request
 #35785	New	Hrushikant Patkar	[DB] catalogue.dynamic_pricing_control	catalogue.dynamic_pricing_control
 #35798	New	Hrushikant Patkar	[DB] catalogue.sales_channel	catalogue.sales_channel
 #35807	New	Deep Khanvilkar	[BE] recordSyncRejection: POST /sync-rejections	sync.rejection
@@ -458,4 +463,4 @@
 #36018	New	Pallavi Sawant	[FE] ADM-530 AI Approval Requirement & Routing Configuration	approvals#setApprovalMatrix
 #36019	New	Pallavi Sawant	[FE] ADM-530 AI Approval Requirement & Routing Configuration	approvals#setApprovalMatrix
 #36020	New	Pallavi Sawant	[FE] ADM-530 AI Approval Requirement & Routing Configuration	approvals#setApprovalMatrix
-460 ticket(s)
+465 ticket(s)

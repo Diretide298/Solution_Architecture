@@ -21,7 +21,7 @@ for a person; listed for one instead, CR-005's append-only audit policies stayed
 review row was read as done. The old call it replaces is not listed as dropped.
 
 **A changed generated helper is written too** (CHG-RSF-001, 18 October 2026): `platform.apply_*_rls`,
-`platform.parent_visible` and `platform.parent_visible_owner` are replaced with CREATE OR REPLACE, and every table
+`platform.visible_parent_ids` and `platform.visible_parent_ids_setup` are replaced with CREATE OR REPLACE, and every table
 whose policy an `apply_*_rls` helper built is applied again; any other changed function is still listed.
 
 **A NOT NULL column without a default is added nullable** and listed: added as NOT NULL it fails on
@@ -259,10 +259,13 @@ SCOPE_FOLLOWS = {
 
 # **A generated row-level-security helper is the generator's own** (ADAM CR-108, 18 October 2026; CHG-RSF-001). No
 # policy depends on an `apply_*_rls` helper: a policy stores the predicate the helper built when it ran, so a changed
-# helper is written with CREATE OR REPLACE and every table that uses it is applied again. `platform.parent_visible`,
-# which policies do call, keeps its OID through CREATE OR REPLACE and needs no re-apply; `parent_visible_owner` is
+# helper is written with CREATE OR REPLACE and every table that uses it is applied again. `platform.visible_parent_ids`,
+# which policies do call, keeps its OID through CREATE OR REPLACE and needs no re-apply; `visible_parent_ids_setup` is
 # called only by the helpers. Any other changed function is still listed for a person.
-REPLACEABLE = re.compile(r"^platform\.(apply_\w+_rls|parent_visible|parent_visible_owner)\s*\(", re.I)
+REPLACEABLE = re.compile(r"^platform\.(apply_\w+_rls|visible_parent_ids|visible_parent_ids_setup)\s*\(", re.I)
+# The helpers that ask platform.visible_parent_ids: a renamed table's policy under one of them is written under the
+# table's current name (CHG-RSF-001, fix round 1); a policy belongs to the table and moves with its rename.
+ACROSS_HELPERS = ("apply_parent_across_rls", "apply_parent_split_across_rls")
 
 
 
@@ -790,10 +793,28 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             continue
         refs = tables_named(s, known)
         if refs & set(rt):
+            rc_ = rls_call(s)
             for t in refs & set(rt):
                 # **Whole, never cut** (CHG-MGN-001, ADAM CR-148): `s[:70]` cut 19 of the 26 policy calls in these rows
                 # before their key or parent, so the person could not tell which parent the table follows.
                 follows[t].append(s)
+            fk = re.match(r"^SELECT platform\.\w+\('[^']+'::regclass,\s*'([^']+)'", s)
+            if rc_ and rc_[0] in ACROSS_HELPERS and rc_[1] in rt and fk \
+                    and fk.group(1) in old.tables[rt[rc_[1]]].cols:
+                # **A renamed table whose parent is now across deployables gets its policy now** (CHG-RSF-001, fix
+                # round 1): sync.dsar_request is still platform.dsar_request in the databases; its policy is applied
+                # under that name, and the person's SET SCHEMA moves it with the table.
+                was_name = rt[rc_[1]]
+                now = stmt.replace(f"'{rc_[2]}'::regclass", f"'{was_name}'::regclass", 1)
+                was = [old.stmts[k2] for k2 in old.stmts if k2[0] == "stmt"
+                       and (rls_call(old.stmts[k2]) or ("", "", ""))[1] == was_name
+                       and rls_call(old.stmts[k2])[0] != "drop_rls_policies"]
+                if norm(now) not in was:
+                    p.statements.append(f"SELECT platform.drop_rls_policies('{was_name}'::regclass)")
+                    p.statements.append(now)
+                    p.rollback.append(f"SELECT platform.drop_rls_policies('{was_name}'::regclass); "
+                                      + " ".join(w.rstrip(";") + ";" for w in was))
+                    p.counts["policies"] = p.counts.get("policies", 0) + 1
             continue
         if refs and refs <= new_tables:
             p.statements.append(stmt)

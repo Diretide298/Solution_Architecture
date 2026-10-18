@@ -3,25 +3,29 @@ date: '2026-10-18'
 source: cr
 kind: contract
 summary: 'Row security lets in the callers the contracts name: a child whose parent is in another deployable asks one
-  SECURITY DEFINER function, platform.parent_visible, so its host is answered under the parent''s own policy without a
-  grant on the parent (CR-108); a venue reads the approval matrices it inherits and their rules, and the six tables
-  with the same shape likewise (CR-095 A); a device bound to a workstation carries the workstation''s path, so its
-  heartbeat passes the write check (CR-095 B).'
+  SECURITY DEFINER function, platform.visible_parent_ids, for the parent rows the caller may see, so its host is
+  answered under the parent''s own policy without a grant on the parent (CR-108); a venue reads the approval matrices
+  it inherits and their rules, and the six tables with the same shape likewise (CR-095 A); a device bound to a
+  workstation carries the workstation''s path, so its heartbeat passes the write check (CR-095 B).'
 decision:
-  what: 'Published answers of 15 October: CR-108 option 1 (one security-definer function; signature
-    parent_visible(parent regclass, key_value uuid, for_write boolean), one static branch per parent a cross-deployable
-    policy names, any other parent raises); CR-095 A1 (ApprovalMatrix read-beneath, approvals.rule following its
-    matrix for reading and writing only under its own) and B1''s remainder (a bound device takes its workstation''s
-    path, set on binding, moved on rebinding). Lead''s rulings of 18 October: the six sibling tables with a scope_level
-    column are read-beneath too (access.policy_scope_assignment, ai.provider, catalogue.dynamic_pricing_control,
-    catalogue.sales_channel, marketing.service_copilot_config, payments.provider); the function does not refuse to
-    answer at run time when its owner bypasses row security, instead platform.parent_visible_owner gives it a dedicated
-    owner, ticvai_parent_visible (no login, no superuser, no BYPASSRLS), wherever its owner bypasses row security and
-    the migration may create roles, and warns where it may not; and, because the per-row call measured far more than
-    twice the r6 check, only a child whose parent is in another deployable asks the function
-    (apply_parent_across_rls), every other parent policy keeps r6''s helper. Generated: derive-ddl writes the function,
-    its owner function and the two across helpers; ddl_forward writes a changed generated helper with its tables
-    applied again, and SCOPE_FOLLOWS for platform.device.'
+  what: 'Published answers of 15 October: CR-108 option 1 (one security-definer function, owned by the migration role;
+    the parent tables force row security, so the check runs under the caller''s scope); CR-095 A1 (ApprovalMatrix
+    read-beneath, approvals.rule following its matrix for reading and writing only under its own) and B1''s remainder
+    (a bound device takes its workstation''s path, set on binding, moved on rebinding). Lead''s rulings of 18 October:
+    the six sibling tables with a scope_level column are read-beneath too (access.policy_scope_assignment, ai.provider,
+    catalogue.dynamic_pricing_control, catalogue.sales_channel, marketing.service_copilot_config, payments.provider);
+    the function never refuses to answer at run time (D5); only a child whose parent is in another deployable asks it,
+    every other parent policy keeps r6''s helper (D9). Controller''s ruling in fix round 1 (18 October): the function is
+    set-based, platform.visible_parent_ids(parent regclass, for_write boolean) returning the visible parent ids, asked
+    once per query (`<fk> IN (SELECT platform.visible_parent_ids(parent))`); its signature is internal to the policies,
+    developers never call it. It keeps the allow-list (one static branch per parent, any other raises), the fixed search
+    path with public, and no dynamic SQL from its arguments. platform.visible_parent_ids_setup gives it a dedicated
+    owner, ticvai_parent_visible (no login, no superuser, no BYPASSRLS), with SELECT on every table up each parent''s
+    chain, wherever its owner bypasses row security and the migration may create roles; where it may not, the migration
+    refuses. EXECUTE is revoked from PUBLIC and granted to the DB-ROLES deployable roles that exist (commerce, access,
+    operations, workers, ticvai_ai). Generated: derive-ddl writes the function, its setup and the two across helpers;
+    ddl_forward writes a changed generated helper with its tables applied again, a renamed table''s across policy under
+    its current name, and SCOPE_FOLLOWS for platform.device.'
   by: Chinmay
   date: '2026-10-18'
 why: 'ADAM CR-095 (#27934) and CR-108 (#27686), accepted 15 October. Finding: check-rls-scope-fit judged inherited rows
@@ -34,10 +38,10 @@ keys_touched:
     catalogue.dynamic_pricing_control, catalogue.sales_channel, marketing.service_copilot_config, payments.provider,
     fnb.kitchen_sla, fnb.kitchen_ticket, fnb.menu, fnb.service_order, fnb.table_reservation, fnb.table_session,
     fnb.table_visit, fnb.waitlist_entry, pii.subject_biometric, resources.performance_participant, retail.merchandise,
-    retail.reservation, retail.return_policy, retail.sale, sync.rejection, fnb.allergen_verdict, fnb.bill_split,
-    fnb.kitchen_ticket_line, fnb.menu_item, fnb.menu_item_modifier, fnb.menu_section, fnb.production_run, fnb.recipe,
-    fnb.service_order_line, fnb.sold_out_item, fnb.sub_bill, fnb.substitution_rule, retail.exchange,
-    retail.reservation_line, retail.return, retail.return_line, retail.sale_line]
+    retail.reservation, retail.return_policy, retail.sale, sync.rejection, sync.dsar_request, fnb.allergen_verdict,
+    fnb.bill_split, fnb.kitchen_ticket_line, fnb.menu_item, fnb.menu_item_modifier, fnb.menu_section,
+    fnb.production_run, fnb.recipe, fnb.service_order_line, fnb.sold_out_item, fnb.sub_bill, fnb.substitution_rule,
+    retail.exchange, retail.reservation_line, retail.return, retail.return_line, retail.sale_line]
   schemas: [ApprovalMatrix, RegisteredDevice, DeviceBinding, AccessPolicyScopeAssignment, AiProvider,
     SalesChannelProfile, DynamicPricingControl, PaymentProvider, AiCustomerServiceCopilotKnowledgeWorkspaceInput]
   operations: [registerDevice, configureWorkstation, recordDeviceHeartbeat, setApprovalMatrix,
@@ -49,18 +53,23 @@ keys_touched:
   - tools/check-storage-promises.py
   - contracts/spine/approvals.yaml
   - contracts/spine/tenancy.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/marketing-crm.yaml
   other:
-  - 'the next forward migration (V0105, tenant database; derived at the release): platform.parent_visible,
-    platform.parent_visible_owner, apply_parent_across_rls and apply_parent_split_across_rls added; 23 policies
-    applied again (15 children across deployables, the matrix and its rules, the six sibling tables); nothing in the
-    control database'
+  - 'the next forward migration (V0105, tenant database; derived at the release): platform.visible_parent_ids,
+    platform.visible_parent_ids_setup, apply_parent_across_rls and apply_parent_split_across_rls added; 24 policies
+    applied again (16 children across deployables, sync.dsar_request among them under its current name
+    platform.dsar_request; the matrix and its rules; the six sibling tables); nothing in the control database'
 root_class: A23 AUTH-SCOPE
 tickets:
   started: [27650, 27658, 27662, 27664, 27665, 27671, 27678, 27679, 27682, 27683, 27686, 30172, 30216, 30218, 30248,
-    30319, 30329, 30566, 30567, 30576, 30578, 30579, 30581, 30582, 30583, 30585, 30592, 30593, 30596, 30597, 30598,
-    30599, 30600, 30602, 30603, 30604, 30606, 30614, 30631, 30632, 30633, 30634, 30635, 30636, 30637, 30638, 30794,
-    32557, 35134]
-  unstarted: [27934, 27812, 27833, 27803, 30831, 27794, 27655, 30846, 30903, 31185, 32815]
+    30319, 30329, 30331, 30566, 30567, 30576, 30578, 30579, 30581, 30582, 30583, 30585, 30592, 30593, 30596, 30597,
+    30598, 30599, 30600, 30602, 30603, 30604, 30606, 30614, 30631, 30632, 30633, 30634, 30635, 30636, 30637, 30638,
+    30794, 32557, 35134]
+  unstarted: [27934, 27812, 27833, 27803, 30831, 27794, 27655, 30846, 30903, 31185, 32815, 29190, 34054, 34055, 35781]
 release_tag: r7
 decision_owner: Chinmay
 adam_cr: CR-095, CR-108
@@ -69,23 +78,36 @@ prevention:
   type: check
   ref: tools/check-rls-scope-fit.py
 status: open
-notes: 'Measured on PostgreSQL 16 (as the migration role, 100,000 child rows, medians of five runs): a full scan of a
-  child that asks parent_visible took 10,200 to 19,400 ms against 23 to 58 ms for the r6 check (340 to 440 times);
-  a child one level below the crossing, which keeps r6''s EXISTS, took 180 to 192 ms against 132 to 145 ms (1.3
-  times). Hence the ruling''s narrower form: only the 15 children whose parent is in another deployable ask the
-  function. A point read by id costs about 4 ms either way. A set-based variant (the visible parent ids asked once
-  per query) scanned the same 100,000 rows in 12 ms; it is a different signature from the published answer, so it is
-  left to the lead. Verified: tools/tests/test_parent_visible_pg.py (8 tests, run, not skipped): the r6 check is
-  refused to a role without the parent grant; the function shows the caller''s venue only; a venue reads inherited
-  matrices and writes only its own; other parents are refused; the owner is the migration role in a production-like
-  migration and ticvai_parent_visible when migrated as postgres, and a bypassing owner is replaced when a parent
-  policy is applied again. The real tenant DDL with V0105 applied on PostgreSQL 16 as postgres and as a migration role
-  without superuser, BYPASSRLS or CREATEROLE: V0105 applies in one transaction, and a host role with grants on fnb only
-  reads fnb.menu and fnb.menu_item where before it got "permission denied for table outlet". Risk the lead keeps:
-  DB-ROLES (#27655) must give the migration role neither superuser nor BYPASSRLS, or must let it create roles; where
-  neither holds the migration warns and the function would show every child row. Started tickets: #27686 (On hold)
-  takes the forward migration and un-holds; the [DB] tickets in Ready for QA get a comment that the policies change in
-  V0105; #30794 (configureWorkstation, In progress, Pranay Shinde) gets a comment that binding moves the device''s
-  scopePath; #32557 and #35134 (On hold) a comment (14 October rule). check-rls-scope-fit, check-migrations,
-  check-migration-freeze, check-ddl-conventions, check-storage-promises, check-contract-shapes and
-  check-contract-compat pass; derived files restored before the commit; the release derive writes V0105.'
+notes: 'Sixteen children have a parent in another deployable: 8 fnb and 4 retail tables under platform.outlet,
+  resources.performance_participant under catalogue.performance, sync.rejection under platform.workstation,
+  pii.subject_biometric under access.entitlement, and sync.dsar_request under approvals.request. sync.dsar_request is
+  still platform.dsar_request in the databases (its move to sync waits on the by-hand rename row); V0105 applies its
+  across policy under that name by a generated statement, and the SET SCHEMA moves the policy with the table.
+  Timings on PostgreSQL 16, 100,000 child rows, full count(*) scan, medians of five runs. Before (the per-row function
+  of the first round): 10,200 to 19,400 ms against 23 to 58 ms for r6''s EXISTS (340 to 440 times). After (fix round
+  1, set-based), on the real tenant DDL with V0105: retail.sale 14.6 ms as the migration role and 14.1 ms as the
+  operations host role, against 28.9 ms for r6''s EXISTS as the migration role (as operations r6 is refused,
+  "permission denied for table outlet"); fnb.kitchen_ticket 14.1 ms and 14.7 ms against 29.4 ms. One row by id about
+  7 ms in a fresh session (the function''s first call). The set-based read reads every parent row the caller may see
+  once per query, so a child of a large parent (pii.subject_biometric under access.entitlement) pays for that parent''s
+  visible rows on each query. Verified: tools/tests/test_parent_visible_pg.py (13 tests, run, not skipped): the r6
+  check is refused to a role without the parent grant; the function shows the caller''s venue only; a write under
+  another venue is refused; a venue reads inherited matrices and writes only its own; a parent with a parent of its
+  own (catalogue.performance -> catalogue.event) answers through its chain, also migrated as postgres; other parents
+  are refused; a role outside DB-ROLES may not execute it; the owner is the migration role in a production-like
+  migration and ticvai_parent_visible when migrated as postgres; a bypassing owner is replaced when a policy is
+  applied again; a migration role with BYPASSRLS that may not create roles is refused. The real tenant DDL with V0105
+  applies on PostgreSQL 16 as postgres and as a migration role without superuser, BYPASSRLS or CREATEROLE. Risk the
+  lead keeps: DB-ROLES (#27655) must give the migration role neither superuser nor BYPASSRLS, or let it create roles;
+  otherwise V0105 refuses to apply. DB-ROLES creates the five host roles in the baseline; a host role created after
+  V0105 needs EXECUTE on platform.visible_parent_ids (or the next across policy applied grants it). Release steps:
+  (1) apply V0105; (2) **move existing devices to their workstation''s path**, the by-hand step in
+  handoff/migration-review.md: UPDATE platform.device x SET scope_path = p.scope_path FROM platform.workstation p
+  WHERE p.id = x.workstation_id AND x.scope_path IS DISTINCT FROM p.scope_path (a bound device''s heartbeat fails the
+  write check until it runs; the server sets the path on every binding from this release); (3) un-hold #27686.
+  Started tickets: #27686 (On hold) takes the forward migration and un-holds; the [DB] tickets in Ready for QA get a
+  comment that the policies change in V0105; #30794 (configureWorkstation, In progress, Pranay Shinde) gets a comment
+  that binding moves the device''s scopePath; #32557 and #35134 (On hold) a comment (14 October rule).
+  check-rls-scope-fit, check-migrations, check-migration-freeze, check-ddl-conventions, check-storage-promises,
+  check-contract-shapes and check-contract-compat pass; derived files restored before the commit; the release derive
+  writes V0105.'
