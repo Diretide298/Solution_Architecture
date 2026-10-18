@@ -2049,7 +2049,12 @@ def read_work_package(
     account: dict = Depends(require_account),
 ):
     """One work package, read live as the caller, with whatever it is linked to.
-    Only from the OpenProject project the ADAM project reads."""
+    Only from the OpenProject project the ADAM project reads.
+
+    With what hangs under it (`subtasks`: every depth, in the order the board finishes work) and what it hangs under
+    (`partOf`), both read from OpenProject for this ticket and never from the held project read, so a project read
+    that failed cannot hide them (CHG-ADM-006). `subtasks` is None when they could not be read, and the pull says so
+    rather than showing none."""
     # The number is checked before the credential is looked up, and the order
     # matters: the other way round, asking for `/api/work-packages/banana`
     # without a stored token answers "connect your OpenProject account", which
@@ -2064,13 +2069,33 @@ def read_work_package(
     except openproject.Refused as exc:
         raise HTTPException(404 if exc.status == 404 else 502, str(exc))
     _same_pms_project(found, scope, number)
-    # Read after the project check, so a ticket from another plan never has its
-    # thread fetched. A thread that cannot be read does not cost the ticket:
-    # `comments` is None and the reader is told, rather than shown "no comments".
+    # Read after the project check, so a ticket from another plan never has its thread, its sub-tasks or its parent
+    # fetched. Three independent reads, asked side by side. One that fails does not cost the ticket: `comments` and
+    # `subtasks` are None and the reader is told, rather than shown "none".
+    parent = str(found["parent"]) if found.get("parent") else ""
+    with ThreadPoolExecutor(max_workers=3) as reads:
+        thread = reads.submit(openproject.comments, endpoint, token, number)
+        under = reads.submit(openproject.descendants, endpoint, token, number, scope["pmsId"])
+        above = reads.submit(openproject.summary, endpoint, token, parent) if parent else None
     try:
-        found["comments"] = openproject.comments(endpoint, token, number)
+        found["comments"] = thread.result()
     except (openproject.Blocked, openproject.Refused):
         found["comments"] = None
+    try:
+        below = under.result()
+        subtasks = _ordered_subtasks(below, {found["key"]: found, **{row["key"]: row for row in below}})
+    except (openproject.Blocked, openproject.Refused):
+        subtasks = None
+    part_of = None
+    if above is not None:
+        try:
+            up = above.result()
+            part_of = {"key": up["key"], "subject": up["subject"], "status": up["status"],
+                       "assignee": up["assignee"], "url": up["url"], "read": True}
+        except (openproject.Blocked, openproject.Refused):
+            # Still named: the number and the title OpenProject put on the link are already in hand.
+            part_of = {"key": parent, "subject": found.get("parentSubject") or "", "status": "", "assignee": "",
+                       "url": f"{endpoint.rstrip('/')}/work_packages/{parent}", "read": False}
 
     rows = db.all_rows(
         "SELECT * FROM artefact_link WHERE external_key = ? "
@@ -2080,7 +2105,9 @@ def read_work_package(
     touches = [_link_row(r)["target"] for r in rows]
     return {"workPackage": found, "touches": touches,
             # The open blocking CRs that affect this ticket (CHG-ADM-004): the pull's "Blocked by".
-            "blockedBy": blockers.Board(scope["project"]).of(number, touches)}
+            "blockedBy": blockers.Board(scope["project"]).of(number, touches),
+            # The pull's "Sub-tasks" and "Part of" (CHG-ADM-006).
+            "subtasks": subtasks, "partOf": part_of}
 
 
 # ── which release a ticket is being built against ────────────────────
@@ -2247,6 +2274,37 @@ def _completion_order(items: list, by_key: dict) -> list:
     return sorted(items, key=key)
 
 
+def _ordered_subtasks(rows: list, by_key: dict) -> list:
+    """Sub-tasks in the order the board finishes work (`_completion_order`: what is started first, then the build
+    order, which a sub-task takes from its nearest ancestor that has one, a parent before its own sub-tasks), in the
+    one shape the board and the pull share. Each row carries its `depth`; `by_key` holds the ancestors to walk."""
+    return [{
+        "key": row["key"], "subject": row["subject"], "status": row["status"], "assignee": row["assignee"],
+        "percentDone": row.get("percentDone"), "dueDate": row.get("dueDate"), "depth": row["depth"],
+        "parent": str(row.get("parent") or ""), "url": row["url"],
+    } for row in _completion_order(rows, by_key)]
+
+
+def _start_here(every: list, closed: set, me: Optional[str], blocked_of) -> Optional[dict]:
+    """Where work starts when nobody names a ticket (`/ticket` with no number, CHG-ADM-006): the first ticket in board
+    order that no open blocking CR affects or, when it has sub-tasks, its first open one that is yours or nobody's
+    and is not blocked itself. Without the project tree its sub-tasks are unknown, and your own open board rows
+    directly under it stand in for them. None when every ticket is blocked."""
+    first = next((item for item in every if not item["blockedBy"]), None)
+    if not first:
+        return None
+    under = first.get("subtasks") or [item for item in every if str(item.get("parent") or "") == first["key"]]
+    for sub in under:
+        if sub.get("status") in closed or (sub.get("assignee") and sub.get("assignee") != me):
+            continue
+        if blocked_of(sub["key"]):
+            continue
+        return {"key": sub["key"], "subject": sub["subject"], "status": sub["status"],
+                "partOf": first["key"], "partOfSubject": first["subject"]}
+    return {"key": first["key"], "subject": first["subject"], "status": first["status"],
+            "partOf": None, "partOfSubject": None}
+
+
 @app.get("/api/board/mine")
 def my_board(
     project_id: str = Query(default=""),
@@ -2341,7 +2399,7 @@ def my_board(
             },
             # Pulled whether or not anybody asked, because the round trip to
             # fetch them later costs more than carrying them now.
-            "subtasks": _subtasks_of(item["key"], kids) if tree_read else [],
+            "subtasks": _subtasks_of(item["key"], kids, by_key) if tree_read else [],
             # The open blocking CRs that affect it, and how (CHG-ADM-004): what lets an agent
             # that hit a blocker pick the next ticket it can finish by lookup, not by guess.
             "blockedBy": blocked.of(item["key"], touching.get(item["key"], [])),
@@ -2360,6 +2418,9 @@ def my_board(
     # hold nothing and closed nothing this week, and then there is no sprint of
     # yours to count either.
     me = next((i.get("assignee") for i in items + finished if i.get("assignee")), None)
+    # Where `/ticket` with no number starts (CHG-ADM-006): over the whole board, whatever `only` shows.
+    closed_names = {s["name"] for s in project_read.get("statuses", []) if s.get("isClosed")}
+    start_here = _start_here(every, closed_names, me, lambda k: blocked.of(k, touching.get(k, [])))
     recent = [item for item in finished
               if (item.get("updatedAt") or "") >= security.stamp(security.now() - timedelta(days=7))]
     live = {i["key"] for i in items} | {i["key"] for i in recent}
@@ -2393,6 +2454,9 @@ def my_board(
         # Said out loud when the tree could not be read, so a board where every
         # module reads "none" is not mistaken for a project with no epics.
         "modulesKnown": tree_read,
+        # The same for the sub-tasks (CHG-ADM-006): False is "could not be read", which a board must never show as 0.
+        "subtasksKnown": tree_read,
+        "startHere": start_here,
         # The release tag ADAM is serving, or None for the working tree.
         "release": served,
         "openproject": {
@@ -3371,31 +3435,23 @@ def _module_of(key: str, by_key: dict) -> Optional[dict]:
     return None if at["key"] == key else at
 
 
-def _subtasks_of(key: str, kids: dict) -> list:
-    """Everything underneath a ticket, flattened, nearest first.
+def _subtasks_of(key: str, kids: dict, by_key: dict) -> list:
+    """Everything underneath a ticket, at every depth, in the order the board finishes work.
 
     All descendants rather than only the immediate children: a subtask of a
     subtask is still work under this ticket, and it has no other way of being
-    reached from a board that only lists what is assigned to you.
+    reached from a board that only lists what is assigned to you. Ordered as the
+    pull orders them (`_ordered_subtasks`), so the board and README.md agree.
     """
-    out, queue, seen = [], [(child, 1) for child in kids.get(key, [])], {key}
+    found, queue, seen = [], [(child, 1) for child in kids.get(key, [])], {key}
     while queue:
         child, depth = queue.pop(0)
         if child["key"] in seen:
             continue
         seen.add(child["key"])
-        out.append({
-            "key": child["key"],
-            "subject": child["subject"],
-            "status": child["status"],
-            "assignee": child["assignee"],
-            "percentDone": child["percentDone"],
-            "dueDate": child["dueDate"],
-            "depth": depth,
-            "url": child["url"],
-        })
+        found.append({**child, "depth": depth})
         queue.extend((grand, depth + 1) for grand in kids.get(child["key"], []))
-    return out
+    return _ordered_subtasks(found, by_key)
 
 
 @app.get("/api/board/overview")

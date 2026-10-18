@@ -514,6 +514,81 @@ def children(endpoint: str, token: str, key: str) -> list:
             for wp in page.get("_embedded", {}).get("elements", [])]
 
 
+def summary(endpoint: str, token: str, key: str) -> dict:
+    """One work package, summarised, without its description: what a line naming it needs (a pull's "Part of")."""
+    return summarise(call(endpoint, token, f"work_packages/{key}"), endpoint, token)
+
+
+# How far down a pull looks, and how many it lists. A ticket's sub-tasks are a handful; the bounds are for a parent
+# chain that is another system's data.
+DESCENDANT_DEPTH = 10
+DESCENDANT_LIMIT = 200
+
+
+def descendants(endpoint: str, token: str, key: str, project_id: Optional[int] = None,
+                limit: int = DESCENDANT_LIMIT) -> list:
+    """Every work package under `key`, at every depth, summarised, each with its `depth` (1 is a direct child).
+
+    For a pull's "Sub-tasks" (CHG-ADM-006), read for this one ticket and never taken from the held project read: on
+    18 October pulling #27735 listed none of #30681-#30684, and a project read that failed or has not finished must
+    not be able to hide them again. One collection call per level, with a parent filter and **every status** (the
+    collection's default is open work only, and a closed sub-task is part of the answer). An instance that does not
+    know the parent filter (it answers 400 or 422) is walked through each ticket's own `children` links instead, one
+    read per sub-task. Only tickets in `project_id`, when given. Visit-guarded. Raises `Refused` or `Blocked` like
+    `call`, which the caller turns into "could not be read".
+    """
+    try:
+        return _descendants_by_filter(endpoint, token, str(key), project_id, limit)
+    except Refused as exc:
+        if exc.status not in (400, 422):
+            raise
+    return _descendants_by_links(endpoint, token, str(key), project_id, limit)
+
+
+def _descendants_by_filter(endpoint: str, token: str, key: str, project_id: Optional[int], limit: int) -> list:
+    found, seen, level, depth = [], {key}, [key], 1
+    while level and depth <= DESCENDANT_DEPTH and len(found) < limit:
+        page = call(endpoint, token, "work_packages", {
+            "filters": json.dumps([
+                {"parent": {"operator": "=", "values": level}},
+                {"status": {"operator": "*", "values": []}},
+            ]),
+            "pageSize": limit,
+            "sortBy": json.dumps([["id", "asc"]]),
+        })
+        below = []
+        for raw in page.get("_embedded", {}).get("elements", []):
+            row = summarise(raw, endpoint, token)
+            if row["key"] in seen or (project_id is not None and row["projectId"] != project_id):
+                continue
+            seen.add(row["key"])
+            found.append({**row, "depth": depth})
+            below.append(row["key"])
+        level, depth = below, depth + 1
+    return found[:limit]
+
+
+def _descendants_by_links(endpoint: str, token: str, key: str, project_id: Optional[int], limit: int) -> list:
+    found, seen, depth = [], {key}, 1
+    level = [call(endpoint, token, f"work_packages/{key}")]
+    while level and depth <= DESCENDANT_DEPTH and len(found) < limit:
+        below = []
+        for raw in level:
+            for link in (raw.get("_links") or {}).get("children") or []:
+                child = _id_from_href(link.get("href"))
+                if child is None or str(child) in seen:
+                    continue
+                seen.add(str(child))
+                got = call(endpoint, token, f"work_packages/{child}")
+                row = summarise(got, endpoint, token)
+                if project_id is not None and row["projectId"] != project_id:
+                    continue
+                found.append({**row, "depth": depth})
+                below.append(got)
+        level, depth = below, depth + 1
+    return found[:limit]
+
+
 def is_closed(endpoint: str, token: str, key: str) -> bool:
     """Whether the work package's status is a closing one, by OpenProject's own `isClosed`.
 
