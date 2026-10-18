@@ -920,7 +920,7 @@ changes:
       for revenue. A value added to a response enum cannot be additive; a client switching on `source` shows an unknown
       value as other. The lead decided the value; check-contract-compat labels it breaking, so the lead confirms the
       label at merge.'
-    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json, CR-168: "JournalSource gains payment")'
+    approved-by: 'pending (lead to confirm the breaking label; the published answer to CR-168 decided the value, "JournalSource gains payment", not that it is breaking)'
     tag: r7
     producer-tickets: [SVC-LEDGER-FINANCE-3, SVC-LEDGER-LEDGER-3, VM-LEDGER-LEDGER-1, VM-LEDGER-LEDGER-2]
     consumer-tickets: [VM-BO-043, AM-FINANCE-TAX-P08, AM-FINANCE-TAX-P08-BLOCK-A, TEST-AM-FINANCE-TAX-P08-BLOCK-A]
@@ -933,7 +933,7 @@ changes:
       status, set when convertInventoryHold sells the order''s units (after `converted`, when the order was created). A
       value added to a response enum cannot be additive. The lead decided the status; check-contract-compat labels it
       breaking, so the lead confirms the label at merge.'
-    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json, CR-169: "seating.seat_reservation gains inventory_reservation_id and a sold status")'
+    approved-by: 'pending (lead to confirm the breaking label; the published answer to CR-169 decided the value, "seating.seat_reservation gains inventory_reservation_id and a sold status", not that it is breaking)'
     tag: r7
     producer-tickets: [SVC-CATALOGUE-HOLD-1]
     consumer-tickets: [AM-SEATING-MAPS-P01, AM-SEATING-MAPS-P02, AM-SEATING-MAPS-P04, APP-MOB-GST-049, APP-POS-POS-004, APP-WEB-WEB-007]

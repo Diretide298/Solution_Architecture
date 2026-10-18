@@ -94,3 +94,25 @@ def test_release_flags_reads_the_screens_operations(tmp_path):
 def test_release_flags_map_of_the_package_has_screen_operations():
     ops = rf.screen_ops_of(TOOLS.parent / "screens")
     assert "storePaymentToken" in ops.get("WEB-021", [])
+
+
+# - check-contract-compat (fix round 1 I-2; CHG-CRA-007): an approval still pending approves nothing.
+_spec_cc = importlib.util.spec_from_file_location("contract_compat", TOOLS / "check-contract-compat.py")
+cc = importlib.util.module_from_spec(_spec_cc)
+_spec_cc.loader.exec_module(cc)
+
+
+def test_pending_approval_approves_nothing(tmp_path, monkeypatch):
+    f = tmp_path / "breaking-changes.yaml"
+    f.write_text(
+        "changes:\n"
+        "  - id: BC-901\n    contract: finance\n    operation: getThing\n    reason: r\n"
+        "    approved-by: 'pending (lead to confirm the breaking label)'\n    tag: r7\n"
+        "    producer-tickets: [A]\n    consumer-tickets: [B]\n"
+        "  - id: BC-902\n    contract: finance\n    operation: getOther\n    reason: r\n"
+        "    approved-by: 'Chinmay Parab, 18 October 2026'\n    tag: r7\n"
+        "    producer-tickets: [A]\n    consumer-tickets: [B]\n", encoding="utf-8")
+    monkeypatch.setattr(cc, "BREAKING", f)
+    entries, errors = cc.load_breaking()
+    assert [e["id"] for e in entries] == ["BC-902"]
+    assert any("BC-901" in e and "pending" in e for e in errors)
