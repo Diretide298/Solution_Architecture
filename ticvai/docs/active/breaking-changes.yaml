@@ -906,3 +906,31 @@ changes:
     tag: r7
     producer-tickets: [SVC-IDENTITY-ADMINISTRATION-8]
     consumer-tickets: [APP-PARTNER-PTR-020, TEST-AM-IDENTITY-SECURITY-P10, SETUP-SEED]
+  - id: BC-371
+    contract: finance
+    operation: postOrderRevenue
+    operations: [postOrderRevenue, recordWriteOff, listJournalEntries, createJournalEntry, getJournalEntry,
+      approveJournalEntry, rejectJournal, reverseJournalEntry, listLedgerEntries]
+    change: "gained enum value(s) ['payment']"
+    reason: 'ADAM CR-168, option A (published answer of 18 October 2026; CHG-CRA-007): JournalSource gains `payment`, the
+      cash receipt createPayment posts (sourceId the payment, reference the order), so postOrderRevenue never mistakes it
+      for revenue. A value added to a response enum cannot be additive; a client switching on `source` shows an unknown
+      value as other. The lead decided the value; check-contract-compat labels it breaking, so the lead confirms the
+      label at merge.'
+    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json, CR-168: "JournalSource gains payment")'
+    tag: r7
+    producer-tickets: [SVC-LEDGER-FINANCE-3, SVC-LEDGER-LEDGER-3, VM-LEDGER-LEDGER-1, VM-LEDGER-LEDGER-2]
+    consumer-tickets: [VM-BO-043, AM-FINANCE-TAX-P08, AM-FINANCE-TAX-P08-BLOCK-A, TEST-AM-FINANCE-TAX-P08-BLOCK-A]
+  - id: BC-372
+    contract: seating
+    operation: createSeatHold
+    operations: [createSeatHold, getSeatHold, extendSeatHold, allocateBlockedSeats]
+    change: "gained enum value(s) ['sold']"
+    reason: 'ADAM CR-169, option A (published answer of 18 October 2026; CHG-CRA-007): a seat reservation gains a `sold`
+      status, set when convertInventoryHold sells the order''s units (after `converted`, when the order was created). A
+      value added to a response enum cannot be additive. The lead decided the status; check-contract-compat labels it
+      breaking, so the lead confirms the label at merge.'
+    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json, CR-169: "seating.seat_reservation gains inventory_reservation_id and a sold status")'
+    tag: r7
+    producer-tickets: [SVC-CATALOGUE-HOLD-1]
+    consumer-tickets: [AM-SEATING-MAPS-P01, AM-SEATING-MAPS-P02, AM-SEATING-MAPS-P04, APP-MOB-GST-049, APP-POS-POS-004, APP-WEB-WEB-007]

@@ -49,6 +49,18 @@ And one rule per decision:
   BR-NEW-OPS       (CHG-RUL-013) `listMyTableReservations` (self-scoped, paged), `listBookableOutlets` (public,
                    published, paged), `uploadIncidentMedia` and `addIncidentPerson` exist.
 
+And one rule per decision for the CRs of 18 October 2026 (class 9, "rules nobody has decided yet"; CHG-CRA-007):
+
+  BR-GUEST-PII     (ADAM CR-141) every GuestProfile property is marked personal or behavioural
+                   (`x-ticvai-data-class`), the six personal fields among them; `searchGuests` states the consent rule,
+                   the id order without GUEST_VIEW_PII and leaves out lifetimeValue until it has a currency.
+  BR-HOST-ROUTING  (CR-162) `resolveTenantHost` states 308, terminated is 404, which databases are opened, a
+                   platform subdomain verified at provisioning, and `database_name` informational.
+  BR-CASH-RECEIPT  (CR-168) a `payment` journal source, a region's account mapping by scope path, entry numbers unique
+                   per legal entity, the next open period, and createPayment's two settings reads.
+  BR-HOLD-LAPSE    (CR-169) a seat reservation names its hold and can be `sold`; `convertInventoryHold` moves the
+                   envelope's units and states the lapsed-hold rule (unitsGone, nothing refunded automatically).
+
 The step-up rule of `rejectShiftVariance` (CHG-RUL-014), and of `closeShift`, `acceptShiftVariance`,
 `withdrawFromDepositBox` and the 20 MFA step-ups (CHG-RUL-019, CHG-RUL-020), is held by `check-step-up.py`
 (SU-CARRIER), which asks every step-up operation where it carries the step-up.
@@ -330,11 +342,73 @@ def main() -> int:
         need("BR-NEW-OPS", "consent" in text(ops["addIncidentPerson"][3]).lower(),
              "addIncidentPerson does not apply the consent rules")
 
+    # ============================================== the rules decided for the CRs of 18 October 2026 (CHG-CRA-007)
+    # Class 9 of the 18 October triage, "rules nobody has decided yet": each operation depended on a rule the package
+    # never stated, so a developer could not build it. The lead decided each; the contract now states it, with any
+    # proposed default marked for the client to correct. One rule per decision, as above.
+
+    # -------------------------------------------------------------- BR-GUEST-PII (ADAM CR-141)
+    f, _, _, sg, doc = op("searchGuests")
+    gp = ((doc.get("components") or {}).get("schemas") or {}).get("GuestProfile") or {}
+    personal = {"displayName", "email", "phone", "preferredLanguage", "preferredChannel", "guestLinkId"}
+    for p, ps in (gp.get("properties") or {}).items():
+        cls = (ps or {}).get("x-ticvai-data-class")
+        need("BR-GUEST-PII", cls in ("personal", "behavioural"),
+             f"GuestProfile.{p} is not marked personal or behavioural (x-ticvai-data-class)")
+        if p in personal:
+            need("BR-GUEST-PII", cls == "personal", f"GuestProfile.{p} is personal data (CR-141) and not marked so")
+    st = text(sg)
+    need("BR-GUEST-PII", "superseded_at" in st and "granted" in st,
+         "searchGuests does not state hasConsentFor's rule (the current consent record, decision granted)")
+    need("BR-GUEST-PII", "ordered by `id`" in st or "ordered by id" in st,
+         "searchGuests does not order by id for a caller without GUEST_VIEW_PII")
+    need("BR-GUEST-PII", "lifetimeValue" in st and "currency" in st,
+         "searchGuests does not say lifetimeValue is left out until it has a currency (CR-094's rule)")
+
+    # -------------------------------------------------------------- BR-HOST-ROUTING (ADAM CR-162)
+    rt = text(op("resolveTenantHost")[3])
+    for frag, why in (("308", "the redirect status"), ("terminated", "a terminated tenant answers 404"),
+                      ("draining", "which cell_tenant databases are opened"),
+                      ("verifiedAt", "a platform subdomain is written verified at provisioning"),
+                      ("informational", "tenant_domain.database_name is informational")):
+        need("BR-HOST-ROUTING", frag in rt, f"resolveTenantHost does not state {why} ({frag!r})")
+
+    # -------------------------------------------------------------- BR-CASH-RECEIPT (ADAM CR-168)
+    fin = load("contracts/spine/finance.yaml")
+    fs = (fin.get("components") or {}).get("schemas") or {}
+    need("BR-CASH-RECEIPT", "payment" in ((fs.get("JournalSource") or {}).get("enum") or []),
+         "JournalSource has no `payment`: a cash receipt would read as revenue")
+    need("BR-CASH-RECEIPT", "scopePath" in ((fs.get("AccountMapping") or {}).get("properties") or {}),
+         "AccountMapping has no scopePath: a region's mapping cannot be found")
+    je = fs.get("JournalEntry") or {}
+    need("BR-CASH-RECEIPT", ["legalEntityId", "entryNumber"] in (je.get("x-ticvai-unique-together") or [])
+         and not (((je.get("properties") or {}).get("entryNumber") or {}).get("x-ticvai-unique")),
+         "JournalEntry.entryNumber is not unique per legal entity (x-ticvai-unique-together legalEntityId, entryNumber)")
+    cp = op("createPayment")[3]
+    need("BR-CASH-RECEIPT", "next open period" in text(cp),
+         "createPayment does not post a capture to the legal entity's next open period")
+    vias = {str(v.get("query")) for v in cp.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+    need("BR-CASH-RECEIPT", {"tenancy#venueSettingsRecords", "tenancy#regionSettingsRecords"} <= vias,
+         "createPayment does not declare its reads of venue and region settings")
+
+    # -------------------------------------------------------------- BR-HOLD-LAPSE (ADAM CR-169)
+    seat = load("contracts/satellite/seating.yaml")
+    sh = ((seat.get("components") or {}).get("schemas") or {}).get("SeatHold") or {}
+    shp = sh.get("properties") or {}
+    need("BR-HOLD-LAPSE", "sold" in ((shp.get("status") or {}).get("enum") or []),
+         "SeatHold.status has no `sold`")
+    need("BR-HOLD-LAPSE", "inventoryReservationId" in shp, "SeatHold names no inventory reservation")
+    ct = text(op("convertInventoryHold")[3])
+    need("BR-HOLD-LAPSE", "unitsGone" in ct and "refunded automatically" in ct,
+         "convertInventoryHold does not state the lapsed-hold rule (units retaken, else unitsGone; no automatic refund)")
+    need("BR-HOLD-LAPSE", "channel_envelope" in ct, "convertInventoryHold does not move the envelope's leased units")
+
     errors["BR-PARSE"].extend(PARSE_ERRORS)
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
-             "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS"]
+             "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
+             "BR-HOLD-LAPSE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

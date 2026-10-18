@@ -1,0 +1,83 @@
+id: CHG-CRA-007
+date: '2026-10-18'
+source: cr
+kind: contract
+summary: 'Four rules nobody had decided are now in the contracts: which guest fields are personal and how searchGuests
+  hides and orders them (CR-141); the host routing outcomes (CR-162); how a payment''s cash receipt finds its account
+  mapping, names its source, finds an open period and numbers its entry (CR-168); and what convertInventoryHold does
+  with seats, envelopes and a hold that lapsed after the capture (CR-169). Each has a business-rule check.'
+decision:
+  what: 'Published answers of 18 October 2026 (decisions-final.json): CR-141 option 1 now (option 3 as the lasting
+    fix: GuestProfile''s properties marked x-ticvai-data-class personal or behavioural), CR-162 option A, CR-168 option
+    A, CR-169 option A. marketing-crm.yaml: GuestProfile data classes (six personal), lifetimeValue left out until it
+    has a currency (CR-094''s rule), searchGuests'' consent rule, null personal fields and id order without
+    GUEST_VIEW_PII. tenancy.yaml: resolveTenantHost''s outcomes (308; terminated 404; live, suspended and draining
+    databases opened; a platform subdomain verified at provisioning; the cell_tenant address; database_name
+    informational). finance.yaml: JournalSource payment; AccountMapping.scopePath (read-beneath, a venue reads its
+    region''s row; venue row, else region row, else refused); JournalEntry.legalEntityId and entry numbers unique per
+    (legal entity, lower(number)) replacing the tenant-wide index; the fiscal-year label is the year the fiscal year
+    starts in, a proposed default for the client''s finance team. orders.yaml: createPayment (and capturePayment, which
+    posts the same receipt) declare tenancy#venueSettingsRecords and regionSettingsRecords in-process; the cash
+    receipt''s source, next open period and "one posting" stated. catalogue.yaml convertInventoryHold: seats by
+    inventoryReservationId to sold, envelope units leased to sold, the lapsed-hold rule (units retaken if free,
+    else unitsGone for the reconciler, nothing refunded automatically). seating.yaml SeatHold:
+    inventoryReservationId, status sold; states/seat-hold.yaml converted -> sold. Breaking: BC-371 (JournalSource),
+    BC-372 (SeatHold.status), the response enum values the decisions add.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'ADAM CR-141 (Sanket Keluskar, #30711), CR-162 (Hrushikant Patkar, PLATFORM-KERNEL #27692), CR-168 and CR-169
+  (Hrushikant Patkar, PLATFORM-SAGA-PAID #27701), accepted 18 October 2026; class 9 of the 18 October triage ("rules
+  nobody has decided yet"). Finding: each operation depended on a rule the package never stated.'
+keys_touched:
+  operations: [searchGuests, resolveTenantHost, createPayment, capturePayment, setAccountMappings, postOrderRevenue,
+    convertInventoryHold]
+  tables: [marketing.guest_profile, ledger.account_mapping, ledger.journal_entry, seating.seat_reservation,
+    catalogue.channel_envelope]
+  schemas: [GuestProfile, JournalSource, AccountMapping, JournalEntry, SeatHold]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/seating.yaml
+  - states/seat-hold.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  - docs/active/audit-runs/cr-answers-1018/impact-class9-decided-rules.tsv
+  other:
+  - 'BC-371, BC-372'
+  - 'x-ticvai-data-class (new contract mark: personal | behavioural)'
+root_class: 'A-UNDECIDED: rules nobody has decided yet (class 9 of the 18 October triage)'
+tickets:
+  started:
+  - 'MIG-SEATING#seating.seat_hold (30356, On hold) and MIG-CATALOGUE#catalogue.channel_allocation (30386, On hold):
+    the renamed tables gain a column and a status value'
+  - 'TEST-AM-FOUNDATION-DATABASE (27686, On hold)'
+  unstarted:
+  - 'Finished migrations (a child task each): MIG-SEATING, MIG-CATALOGUE, MIG-LEDGER, MIG-MARKETING and their
+    sub-tasks for seat_reservation, channel_envelope, journal_entry, guest_profile. searchGuests (#30711),
+    PLATFORM-KERNEL (#27692) and PLATFORM-SAGA-PAID (#27701), where the CRs were raised, get the answers as comments.
+    202 New in all (impact file).'
+release_tag: r7
+decision_owner: Chinmay
+adam_cr: CR-141, CR-162, CR-168, CR-169
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Prevention: check-business-rules, one rule per decision (BR-GUEST-PII, BR-HOST-ROUTING, BR-CASH-RECEIPT,
+  BR-HOLD-LAPSE), shown failing on r6 (40 findings) and passing after. Sibling query: other guest reads of GuestProfile
+  take the same marks from the schema (getGuestProfile and the list reads; their text is unchanged); capturePayment
+  posts the same cash receipt and got the same two reads; no other operation posts to ledger.account_mapping''s
+  lookup. Database (derived at the release; this branch''s derive in D:\wt\fix-cr-answers-1018-derived\class9): tenant
+  V0105 adds account_mapping.scope_path (backfill each row''s path, then NOT NULL) with its read-beneath policy,
+  journal_entry.legal_entity_id with its key, index and journal_entry_legal_entity_id_entry_number_uniq; the review
+  drops journal_entry_entry_number_uniq and widens the source and seat_reservation status CHECKs; the seat reservation''s
+  new column waits on the rename row of CR-011. Breaking: BC-371 and BC-372 record response enum values the decisions
+  add; the lead confirms the label at merge. Not modelled: where the order''s unitsGone flag is stored for the
+  reconciler (the answer names the reason, not the field); stated in convertInventoryHold''s text. Lane F (CR-161) may
+  add the same createPayment reads; the merge keeps one copy. For the lead''s baseline: check-ddl-conventions
+  D-SCOPE-NOTNULL on ledger.account_mapping.scope_path (added nullable; no backfill can be derived, because a
+  region row records no region: a person writes it, venue rows from the venue''s path; no production rows exist).'

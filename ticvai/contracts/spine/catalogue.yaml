@@ -4465,6 +4465,16 @@ paths:
         the outbox once per seat. Seating belongs to this service, so the seat event is published here and not
         by the order service that called it.
 
+
+        **Decided 18 October 2026** (ADAM CR-169, option A; CHG-CRA-007). **Seats**: the order''s seat
+        reservations are the ones whose `inventoryReservationId` is this hold; they move to `sold` and `seat.sold`
+        is written once per seat. **Envelopes**: where the capacity has channel allocations, the same units move
+        from `leased` to `sold` on the hold''s `catalogue.channel_envelope`. **A hold that lapsed after the
+        capture**: the capture stands and the order is paid. The units are taken again if they are still free;
+        otherwise the order is flagged for the reconciler with `refusedReason` `unitsGone`. **Nothing is ever
+        refunded automatically**, PLATFORM-SAGA-PAID''s own rule for a dead-lettered issuance. Until the seat
+        reservation''s key lands, a seated line is refused with `409 hold-not-active` naming this request.
+
         '
       x-ticvai-emits:
       - seat.sold

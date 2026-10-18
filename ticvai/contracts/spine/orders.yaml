@@ -5873,6 +5873,12 @@ paths:
       - query: finance#fxRateRecords
         route: in-process
         for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s settings for the cash receipt: its region and trading currency (ADAM CR-168)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the region''s settings for the cash receipt: the region''s account mappings and fiscal setup (ADAM CR-168)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Order, payment, ticket: the saga** (system-design review SD-026, 29 September). When this payment
@@ -5933,6 +5939,14 @@ paths:
         `walletReceived`, each to the accounts `finance.setAccountMappings` holds for the venue, and to
         the fiscal period that is open for the payment date. An offline cash payment replayed through
         `syncOrders` posts the same event, dated by its `recordedAt`.
+
+        **The cash receipt, decided 18 October 2026** (ADAM CR-168, option A; CHG-CRA-007). The mapping is the
+        venue''s own row for the event, else the row for the venue''s region, else the posting is refused. The entry''s
+        `source` is `payment`, its `sourceId` the payment id and its `reference` the order id, so
+        `postOrderRevenue` never mistakes a cash receipt for revenue. Where the payment date''s period is closed or
+        missing, the entry posts to the legal entity''s **next open period**: a capture the provider has taken is
+        never refused. "One ledger posting" (PLATFORM-SAGA-PAID) means one cash-receipt entry per payment, never one
+        more from a replay; revenue is `postOrderRevenue`''s own.
 
         **Writes one `payments.payment_attempt` row per provider call**, including a declined, errored
         or abandoned attempt that never becomes a payment: `orders.payment` records what was taken, the
@@ -6200,6 +6214,12 @@ paths:
       - query: finance#fxRateRecords
         route: in-process
         for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s settings for the cash receipt: its region and trading currency (ADAM CR-168)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the region''s settings for the cash receipt: the region''s account mappings and fiscal setup (ADAM CR-168)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Order, payment, ticket: the saga** (system-design review SD-026, 29 September). When this payment

@@ -4207,7 +4207,17 @@ paths:
 
         
 
-        **Order.** Sorted by `displayName` ascending, then by `id`.'
+        **Order.** Sorted by `displayName` ascending, then by `id`.
+
+
+        **Decided 18 October 2026** (ADAM CR-141; CHG-CRA-007). **Without `GUEST_VIEW_PII`** the six personal fields
+        (`displayName`, `email`, `phone`, `preferredLanguage`, `preferredChannel`, `guestLinkId`; marked
+        `x-ticvai-data-class: personal` on `GuestProfile`, and `pii.subject` already treats preferred language as
+        personal) are null, and the results are ordered by `id`, not by name, so the order discloses nothing.
+        **`hasConsentFor`**: a guest has consent for a purpose when their `marketing.consent_record` for that purpose
+        with `superseded_at` null has decision `granted`; it is Marketing''s own table, so no read route is needed.
+        **`lifetimeValue` is left out** until a guest''s lifetime value has a currency (CR-094''s rule, waiting on the
+        client).'
       tags:
       - guest
       x-ticvai-permission: GUEST_VIEW
@@ -24077,12 +24087,15 @@ components:
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     GuestProfile:
       x-ticvai-persistence: marketing.guest_profile
+      # Each property is personal or behavioural (x-ticvai-data-class; ADAM CR-141, 18 October 2026; CHG-CRA-007):
+      # a personal one is null to a caller without GUEST_VIEW_PII, in every guest read.
       type: object
       required:
       - subjectId
       - isActive
       properties:
         id:
+          x-ticvai-data-class: behavioural
           type: string
           format: uuid
           readOnly: true
@@ -24093,6 +24106,7 @@ components:
 
             '
         subjectId:
+          x-ticvai-data-class: behavioural
           type: string
           format: uuid
           description: 'Opaque reference. Personal data lives in the separately erasable store, which
@@ -24100,28 +24114,36 @@ components:
 
             '
         displayName:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         email:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         phone:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         preferredLanguage:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         preferredChannel:
+          x-ticvai-data-class: personal
           $ref: '#/components/schemas/MessageChannel'
         guestLinkId:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: Present where the guest is linked across cells. Marketing acts locally.
         tags:
+          x-ticvai-data-class: behavioural
           type: array
           items:
             type: string
         engagementScore:
+          x-ticvai-data-class: behavioural
           type: integer
           nullable: true
           minimum: 0
@@ -24135,6 +24157,7 @@ components:
 
             '
         engagementTier:
+          x-ticvai-data-class: behavioural
           type: string
           nullable: true
           enum:
@@ -24150,16 +24173,24 @@ components:
 
             '
         lifetimeValue:
+          x-ticvai-data-class: behavioural
           $ref: ../shared/common.yaml#/components/schemas/Money
+          description: '**Left out of guest reads until a guest''s lifetime value has a currency** (ADAM CR-141,
+            18 October 2026; CHG-CRA-007): an amount above a venue is in the currency recorded on its own row
+            (CR-094''s rule, which waits on the client), and this row records none yet.'
         visitCount:
+          x-ticvai-data-class: behavioural
           type: integer
         lastVisitAt:
+          x-ticvai-data-class: behavioural
           type: string
           format: date-time
           nullable: true
         isActive:
+          x-ticvai-data-class: behavioural
           type: boolean
         mergedIntoSubjectId:
+          x-ticvai-data-class: behavioural
           type: string
           format: uuid
           nullable: true
@@ -24170,6 +24201,7 @@ components:
 
             '
         mergedAt:
+          x-ticvai-data-class: behavioural
           type: string
           format: date-time
           nullable: true

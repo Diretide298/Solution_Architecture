@@ -355,6 +355,17 @@ paths:
         `detached` here when that times out, so a released hostname cannot be served for somebody else
         (the takeover warning on CMS-017).
 
+
+        **The routing outcomes, decided 18 October 2026** (ADAM CR-162, option A: what the resolver does today
+        becomes the rule; CHG-CRA-007). A request on a host that is not the tenant''s primary is answered **308
+        Permanent Redirect** to `redirectToHostname`. A **`terminated`** tenant answers 404; every other tenant
+        status is routed, and its operations apply the suspension mode. The address is the tenant''s
+        `control.cell_tenant` row: its cell, instance and database name, of a database that is `live`,
+        `suspended` or `draining` (`provisioning` and `dropped` are not opened), and none or more than one such
+        row answers 404. `tenant_domain.cell_id` narrows the cell; `tenant_domain.database_name` is
+        informational. A platform subdomain is written with `verifiedAt` set at provisioning, so one rule
+        serves both kinds of host.
+
         '
       tags:
       - tenancy

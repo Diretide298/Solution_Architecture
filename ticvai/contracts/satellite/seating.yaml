@@ -5015,6 +5015,16 @@ components:
           - converted
           - released
           - expired
+          - sold
+          description: '`converted` when the order is created; `sold` when the order is paid and
+            `catalogue.convertInventoryHold` sells the units (ADAM CR-169, 18 October 2026; CHG-CRA-007).'
+        inventoryReservationId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.inventory_reservation
+          description: '**The inventory hold these seats sit under** (ADAM CR-169; CHG-CRA-007), so
+            `convertInventoryHold` finds the order''s seat reservations from the hold it converts.'
         totalPrice:
           x-ticvai-column: gross_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
