@@ -109,13 +109,13 @@ Once everything is green, the rehearsal pull included (section 4):
 5. Rebuild the setup zip from a clean HEAD.
 
 ## 5a. Light CR release: one class fix, out in minutes
-When the fix for a class of change requests has merged into `main`, it can go out on its own, between the Tuesday
+When the fix for a class of change requests has merged into `main` (and `main` is what both remotes have), it can go out on its own, between the Tuesday
 and Friday releases, without the OpenProject server apply over every ticket and without the full rehearsal pull
 (council of 14 October; the lead's list of 18 October, item 8; CHG-LCR-001). It creates no plan tickets, changes no
 build-order links and retires nothing: a fix that does any of those waits for the full release (section 6's server
 path). `tools/cr-release.py` runs the steps in this order. Each prints what it would do; only `--apply` does it.
-1. **Check:** `python3 tools/cr-release.py check`, then `--apply`. It refuses unless the branch is `main`, nothing is
-   left uncommitted, `main` here is `main` on both remotes, the last tag is on both remotes (a tag made here and never
+1. **Check:** `python3 tools/cr-release.py check`, then `--apply`. It refuses unless HEAD is on a named branch (any; a detached HEAD is refused), nothing is
+   left uncommitted, HEAD here is `main` on both remotes, the last tag is on both remotes (a tag made here and never
    pushed is never the starting point), and the change log passes since the last tag. Then it runs
    the gate: only the checks the changed files reach when `run-checks.py --changed` is there, otherwise the full
    refresh (`refresh-safe.sh --head-only --no-merge --parallel 4`, about half an hour). It says which.

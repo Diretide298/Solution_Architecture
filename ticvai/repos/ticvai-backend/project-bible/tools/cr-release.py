@@ -9,8 +9,8 @@ them once it is tagged, ADAM has fetched the tag, ADAM's ticket links are loaded
 does those steps for one fix, in order, each printing exactly what it would do; nothing outward happens without
 --apply, and tagging, pushing and the server commands stay the lead's (docs/active/release-runbook.md, section 5a).
 
-  check         on main after the fix merged: the branch is main, nothing uncommitted (untracked files in the package
-                count), HEAD is main on origin and github, the last tag is behind HEAD, check-changelog --since it;
+  check         after the fix merged: HEAD is on a named branch (any; a detached HEAD is refused) and equals main on
+                origin and github, nothing uncommitted (untracked files in the package count), the last tag is behind HEAD, check-changelog --since it;
                 then the gate: lane C's change-scoped checks (`run-checks.py --changed-from`) when this checkout has
                 them, else `refresh-safe.sh --head-only --no-merge --parallel 4` (it says which and how long).
                 --apply runs the gate; the result (check.json) is what `tag` requires.
@@ -543,6 +543,12 @@ def self_test() -> list:
         if got != want:
             fails.append(f"{name}: got {got!r}, expected {want!r}")
 
+    # -- the branch rule ------------------------------------------------------------------------------------------
+    case("branch: main passes", branch_refusal("main"), None)
+    case("branch: another named branch passes", branch_refusal("r6-integrate"), None)
+    case("branch: detached HEAD refuses", bool(branch_refusal("HEAD")), True)
+    case("branch: empty refuses", bool(branch_refusal("")), True)
+
     # -- tag numbering --------------------------------------------------------------------------------------------
     try:
         case("only r<N> tags count, numerically", release_numbers(["r1", "r10", "r6-rc", "rx", "r2", "v3", "r06", "r6"]),
@@ -959,6 +965,13 @@ def gate_command(changed_file, json_out):
             ["bash", "tools/refresh-safe.sh", "--head-only", "--no-merge", "--parallel", "4"], None)
 
 
+def branch_refusal(branch):
+    """A detached HEAD is refused; any named branch is fine, because HEAD must equal main on every remote anyway."""
+    if branch in ("", "HEAD"):
+        return "HEAD is detached: check out a branch at the commit to release"
+    return None
+
+
 def cmd_check(args):
     base, release, _ = resolve_release(args.release, after_tag=False)
     out = out_dir(args, release)
@@ -966,8 +979,10 @@ def cmd_check(args):
           f"{'APPLY: the gate runs' if args.apply else 'dry run (--apply runs the gate)'}")
     refuse = []
     branch = git("rev-parse", "--abbrev-ref", "HEAD").strip()
-    if branch != "main":
-        refuse.append(f"the branch is {branch}, not main")
+    if branch_refusal(branch):
+        refuse.append(branch_refusal(branch))
+    else:
+        print(f"  note: on branch {branch} (allowed: HEAD must equal main on every remote)")
     status = git("status", "--porcelain", "--untracked-files=all").splitlines()
     tracked = [l for l in status if not l.startswith("??")]
     untracked_pkg = [l[3:] for l in status if l.startswith("?? ticvai/")]

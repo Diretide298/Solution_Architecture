@@ -80,6 +80,24 @@ def build(reg: dict) -> dict:
     return out
 
 
+def write_register(out: dict, path: Path = OUT) -> bool:
+    """Write the register; when the committed one equals it apart from `updated`, keep the old `updated` so the
+    file stays byte-identical (it was restamped on every run, which made every refresh touch it: CHG-LCR-002).
+    Returns True when the file changed."""
+    if path.is_file():
+        try:
+            old = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except yaml.YAMLError:
+            old = None
+        if isinstance(old, dict) and old.get("updated") and                 {k: v for k, v in old.items() if k != "updated"} == {k: v for k, v in out.items() if k != "updated"}:
+            out = dict(out, updated=old["updated"])
+    text = yaml.safe_dump(out, sort_keys=False, allow_unicode=True, width=100)
+    if path.is_file() and path.read_text(encoding="utf-8") == text:
+        return False
+    path.write_text(text, encoding="utf-8")
+    return True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
@@ -100,9 +118,8 @@ def main() -> int:
     if not a.apply:
         print("\n  nothing written - pass --apply")
         return 0
-    OUT.write_text(yaml.safe_dump(out, sort_keys=False, allow_unicode=True, width=100),
-                   encoding="utf-8")
-    print("  -> screens/%s" % OUT.name)
+    changed = write_register(out)
+    print("  -> screens/%s%s" % (OUT.name, "" if changed else " (unchanged)"))
     return 0
 
 
