@@ -1,0 +1,106 @@
+id: CHG-CRA-004
+date: '2026-10-18'
+source: cr
+kind: contract
+summary: 'Four operations now have the storage, keys and refusals their text promised: replayEvents queues a stored
+  control.webhook_replay row for a workers-host dispatcher and refuses a bad window, an unheld event type and a
+  tenant outside the client (CR-140); publishTenantConfig names versions itself, keeps one label and one current
+  version per tenant and routes review through createApprovalRequest with white-label consumers of the decision
+  (CR-154); configureWorkstation links registered devices by deviceId and never creates or deletes one (CR-155); the
+  payment webhook verifies Network International by its secret header, keys connections to their provider and events
+  to their connection, indexes provider references and names itself on the payment transitions it takes (CR-165).
+  Two siblings get the one-current index (asset and product versions).'
+decision:
+  what: 'Published answers of 18 October 2026 (decisions-final.json): CR-140 option 1 simplified, CR-154 1a, 2a, 2b
+    and 2c, CR-155 option A, CR-165 option A with the provider as a key. Contracts: public-api.yaml WebhookReplayJob
+    persisted to control.webhook_replay (window_from, window_to, event_types, status queued|running|completed|failed,
+    queued_at, completed_at, requested_by_principal_id), WebhookDelivery.replayId, replayEvents without its outbox
+    read route, with 400 replay-window-invalid | replay-window-beyond-retention | replay-event-type-not-subscribed and
+    404; white-label.yaml publishTenantConfig (server-minted integer label, review path through createApprovalRequest,
+    x-ticvai-write-via), setPublishReviewPolicy (creates the tenant default matrix for whiteLabelPublication through
+    setApprovalMatrix), ConfigVersion and KioskConfigVersion unique label and one current (x-ticvai-unique-together,
+    x-ticvai-unique-when); events approval-granted and approval-rejected gain white-label consumers, and
+    whitelabel.contentPublished is emitted when a version becomes current; tenancy.yaml DeviceBinding.deviceId and
+    configureWorkstation link and unlink (422 unknown-device, 422 device-not-bindable, 409 device-bound-elsewhere);
+    payments.yaml webhook text (secret header behind credentialRef, constant time; scheduled inquirePaymentStatus poll
+    for Network International), its 404, PaymentProviderConnection.providerId -> payments.provider,
+    PaymentProviderEvent.providerConnectionId; orders.yaml Payment x-ticvai-index [[providerReference]] and
+    inquirePaymentStatus text; states/payment.yaml pendingConfirmation -> authorised and the other transitions the
+    webhook takes, each naming it. Siblings: MediaAssetVersion and ProductVersion one current per asset and product.
+    Generator: derive-ddl reads x-ticvai-index and x-ticvai-unique-when.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'ADAM CR-140 (Sanket Keluskar, #31358), CR-154 (Narayan Gaonkar, #27779), CR-155 (Hrushikant Patkar, #30794) and
+  CR-165 (Hrushikant Patkar, #27699), accepted 18 October 2026; class 8 of the 18 October triage ("the contract
+  promises more than its responses and storage carry"). Finding: no rule asked whether an isCurrent flag had an index
+  keeping one row current, or whether a full-replace list could name the rows other operations create.'
+keys_touched:
+  operations: [replayEvents, publishTenantConfig, setPublishReviewPolicy, configureWorkstation,
+    receivePaymentProviderWebhook, inquirePaymentStatus]
+  tables: [control.webhook_replay, control.webhook_delivery, whitelabel.config_version,
+    whitelabel.kiosk_config_version, platform.device, payments.provider_connection, payments.provider_event,
+    orders.payment, assets.asset_version, catalogue.product_version]
+  schemas: [WebhookReplayJob, WebhookDelivery, ConfigVersion, KioskConfigVersion, DeviceBinding,
+    PaymentProviderConnection, PaymentProviderEvent, Payment, MediaAssetVersion, ProductVersion]
+  files:
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/spine/catalogue.yaml
+  - events/approval-granted.yaml
+  - events/approval-rejected.yaml
+  - events/whitelabel-contentPublished.yaml
+  - states/payment.yaml
+  - states/webhook-replay.yaml
+  - tools/derive-ddl.py
+  - tools/check-storage-promises.py
+  - tools/tests/test_cr_answers_generator.py
+  - tools/applied/promises-kept-18-october.py
+  - handoff/api-data-lineage.json
+  - handoff/cross-deployable-writes.md
+  - docs/active/audit-runs/cr-answers-1018/impact-class8-promises-kept.tsv
+  other:
+  - 'x-ticvai-index, x-ticvai-unique-when (new generator marks)'
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started:
+  - 'SVC-TENANCY-WORKSTATION-1#configureWorkstation (30794, In progress): devices are linked by deviceId; CR-155 was
+    raised from it, so its agent gets the answer as a comment'
+  - 'TEST-AM-FOUNDATION-DATABASE (27686, On hold): new indexes, columns and control.webhook_replay'
+  unstarted:
+  - 'Finished migrations (a child task each, for the migration owner): MIG-ASSETS, MIG-WHITELABEL, MIG-PLATFORM,
+    MIG-CATALOGUE, MIG-ORDERS, MIG-PAYMENTS, VM-MIG-CONTROL and their sub-tasks for asset_version, config_version,
+    platform.device, product_version, orders.payment, provider_connection (impact file). 303 New tickets, including
+    replayEvents (#31358), publishTenantConfig (#27779) and PLATFORM-PAYMENTS (#27699).'
+release_tag: r7
+decision_owner: Chinmay
+adam_cr: CR-140, CR-154, CR-155, CR-165
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Prevention: check-storage-promises SP-ONE-CURRENT (a persisted isCurrent with no x-ticvai-unique-when) and
+  SP-REPLACE-NO-KEY (a PUT replacing a list of rows another operation creates one by one, whose items name none of
+  them). Shown failing on r6 (4 + 2 new) and, after, 1 left for the lead: setTableLayout''s tables[] (fnb.dining_table,
+  created by createTable) carry no writable id, the CR-155 shape, with no decision yet: baseline it or decide the key.
+  Generator rules: derive-ddl x-ticvai-index and x-ticvai-unique-when (pytest, failing on r6, passing after). Database
+  (derived at the release; this branch''s derive kept in D:\wt\fix-cr-answers-1018-derived\class8): tenant V0105 adds
+  provider_connection.provider_id, provider_event.provider_connection_id (with keys and indexes),
+  payment_provider_reference_idx, config_version_scope_path_version_uniq and config_version_scope_path_uniq (where
+  is_current), the kiosk pair, asset_version_asset_id_uniq and product_version_product_id_uniq (where is_current);
+  control V0105 adds control.webhook_replay and webhook_delivery.replay_id. Not in the package, for the lead: the
+  replay dispatcher''s ticket (CR-140 "its own ticket"), the Network International poll job''s ticket if
+  PLATFORM-PAYMENTS does not take it. Client action: enable the custom header in the N-Genius portal (CR-165).
+  Lineage: tools/applied/promises-kept-18-october.py takes replayEvents'' outbox read and delivery write away (it
+  now writes control.webhook_replay), and records the routed writes of publishTenantConfig (approvals.request) and
+  setPublishReviewPolicy (approvals.matrix) and the webhook''s read of payments.provider; the edited lineage and the
+  rewritten handoff/cross-deployable-writes.md (check-cross-deployable-writes --write, which the refresh does not run)
+  are committed. Verified after the derive (then restored): check-cross-module-reads 0 new (the outbox read gone),
+  check-cross-deployable-writes ok (68 writes routed), check-lineage, check-read-columns, check-write-lineage,
+  check-contract-compat, check-problem-types (117), check-states (no error; the new states/webhook-replay.yaml models the replay row, and five warnings come from class 4: the subscription model''s heuristic no longer sees `subscription` in control.contract); build-service-docs then
+  check-migration-tickets (control.webhook_replay gets MIG-CONTROL-21, V1245), check-key-stability, check-plan-closure,
+  check-ticket-builds, and adam-links.py then check-ticket-links, all 0 new.'

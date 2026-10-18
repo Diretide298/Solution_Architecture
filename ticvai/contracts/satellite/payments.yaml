@@ -695,9 +695,15 @@ paths:
         fallback, not the path.
 
 
-        **Signature first.** The body is verified against the connection''s webhook secret (Stripe
-        `Stripe-Signature`, Network International''s HMAC header) before anything is parsed; a bad or missing
-        signature is refused `401` and nothing is written. **De-duplicated on the provider''s event id**: the event
+        **Signature first.** The body is verified against the connection''s webhook secret before anything is
+        parsed: Stripe''s `Stripe-Signature`; for **Network International, the connection''s secret header**, the
+        header name and value set in the client''s N-Genius portal, kept behind the connection''s `credentialRef`
+        (a vault reference, ADR-0063) and compared in constant time (ADAM CR-165, 18 October 2026; CHG-CRA-004:
+        the provider signs nothing, so this replaces the HMAC wording). A bad or missing signature or header is
+        refused `401` and nothing is written. **Network International never redelivers**, so its payments are also
+        confirmed by a scheduled poll of `orders.inquirePaymentStatus` for every payment still `pendingConfirmation`
+        (a job on the workers host); the webhook is the fast path and the poll the safety net. The client enables
+        the custom header in their portal. **De-duplicated on the provider''s event id**: the event
         is recorded in `payments.provider_event` (unique on provider and provider event id) and a redelivery
         answers `200` without acting again. **Matched on `providerReference`** to the `orders.payment` it is about;
         an event for an unknown reference is kept (`unmatched`) for the reconciler, never dropped.
@@ -732,7 +738,9 @@ paths:
           `payments.provider_connection` id, which `createPaymentProviderConnection` puts into the webhook URL it registers
           with the provider. The tenant is the cell the request reached (the tenant''s API host, `resolveTenantHost`); the
           connection is this id within it; its signing secret then verifies the body. Unknown, absent or of another
-          provider: 404 with no detail, and nothing is read from the body.'
+          provider: 404 with no detail, and nothing is read from the body. "Another provider" is the connection''s
+          `providerId` naming a `payments.provider` whose kind is not the `{provider}` in the path (ADAM CR-165).
+          The event is recorded with this connection (`PaymentProviderEvent.providerConnectionId`).'
         schema:
           type: string
           format: uuid
@@ -762,6 +770,14 @@ paths:
             written.
           x-ticvai-problem-types:
           - webhook-signature-invalid
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          description: 'The `connectionId` is unknown, absent, or a connection to another provider than the path names
+            (ADAM CR-165, CHG-CRA-004). No detail is given and nothing is read from the body.'
+          x-ticvai-problem-types: [not-found]
           content:
             application/problem+json:
               schema:
@@ -3241,6 +3257,14 @@ components:
         id:
           type: string
           format: uuid
+        providerId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: payments.provider
+          description: '**Which provider this connection is to** (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to
+            `payments.provider`, whose `kind` already says `stripe` or `networkInternational`. The payment webhook
+            checks it against the `{provider}` in its path, so an event for another provider is a 404.'
         code:
           x-ticvai-unique: tenant
           type: string
@@ -3646,6 +3670,14 @@ components:
           enum:
           - stripe
           - networkInternational
+        providerConnectionId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: payments.provider_connection
+          description: '**The connection the webhook arrived on** (its `connectionId`; ADAM CR-165, CHG-CRA-004), so an
+            event is traced to the credentials that verified it.'
         providerEventId:
           type: string
           maxLength: 255

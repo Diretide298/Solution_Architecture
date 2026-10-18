@@ -1368,6 +1368,30 @@ def exactly_one_sql(short: str, group: list) -> str:
             f"num_nonnulls({', '.join(q(k) for k in group)}) = 1)")
 
 
+def index_sql(schema: str, short: str, table: str, group: list) -> str:
+    """`x-ticvai-index` (ADAM CR-165, CR-166; CHG-CRA-004): a plain index over the columns the contract names."""
+    return (f"-- declared index (x-ticvai-index): {table} ({', '.join(group)})\n"
+            f"CREATE INDEX IF NOT EXISTS {obj_name(short, *group, suffix='idx')} ON {q(schema)}.{q(short)} "
+            f"({', '.join(q(k) for k in group)});")
+
+
+def unique_when_sql(schema: str, short: str, table: str, keycols: list, cond: dict, keys: list) -> str:
+    """`x-ticvai-unique-when` (ADAM CR-154; CHG-CRA-004): a partial unique index. `keys` are the index's
+    expressions (a text key as `lower(...)`); `cond` maps a column to the value that selects the rows."""
+    preds = []
+    for k, v in sorted(cond.items()):
+        if v is True:
+            preds.append(q(k))
+        elif v is False:
+            preds.append(f"NOT {q(k)}")
+        else:
+            preds.append(f"{q(k)} = {sql_literal(v)}")
+    where = " AND ".join(preds)
+    return (f"-- unique when (x-ticvai-unique-when): {table} ({', '.join(keycols)}) where {where}\n"
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {obj_name(short, *keycols, suffix='uniq')} "
+            f"ON {q(schema)}.{q(short)} ({', '.join(keys)}) WHERE {where};")
+
+
 def load_contract_props(docs: dict | None = None) -> dict:
     """`module.Schema.property` -> the contract property, with `$ref` and `allOf` followed.
 
@@ -1618,6 +1642,24 @@ def table_marks(cols: dict, tables) -> dict:
             entry["exactly_one_of"] = [
                 [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group]
                 for group in eo if isinstance(group, list) and len(group) > 1]
+        # **A plain index over several columns the contract asks for** (ADAM CR-165, CR-166; CHG-CRA-004):
+        # `x-ticvai-index: [[aggregateId, sequence]]` on the schema, for a lookup no key or unique index serves
+        # (a provider's reference, an aggregate's next sequence). Named `<table>_<columns>_idx`.
+        ix = marks.get("x-ticvai-index")
+        if isinstance(ix, list) and ix:
+            entry["index"] = [
+                [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group]
+                for group in ix if isinstance(group, list) and group]
+        # **Unique among the rows of one kind only** (ADAM CR-154; CHG-CRA-004): `x-ticvai-unique-when:
+        # [{columns: [scopePath], when: {isCurrent: true}}]` is a partial unique index, so one tenant has one
+        # current version however many it keeps. Named `<table>_<columns>_<when column>_uniq`.
+        uw = marks.get("x-ticvai-unique-when")
+        if isinstance(uw, list) and uw:
+            entry["unique_when"] = [
+                ([column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in (u.get("columns") or [])],
+                 {(column_of(str(k)) or (str(k) if str(k) in names else f"?{k}")): v
+                  for k, v in (u.get("when") or {}).items()})
+                for u in uw if isinstance(u, dict) and u.get("columns") and u.get("when")]
         if len(entry) > 1:
             out[t] = entry
     return out
@@ -2350,6 +2392,30 @@ def main() -> int:
                     f"CREATE UNIQUE INDEX IF NOT EXISTS {uname} ON {q(schema)}.{q(short)} "
                     f"({', '.join(unique_key(k, col_type, src_of) for k in keycols)}){nnd};"))
                 n_uniq += 1
+
+            # `x-ticvai-unique-when` (ADAM CR-154, CHG-CRA-004): unique among the rows the condition selects only,
+            # a partial unique index named like any other, `<table>_<columns>_uniq` (the name the published answer
+            # gave developers for their own migration).
+            for group, cond in (marks.get(t) or {}).get("unique_when") or []:
+                bad = [k[1:] for k in [*group, *cond] if k.startswith("?")]
+                if bad:
+                    no_unique.append(f"{t} (x-ticvai-unique-when {group}): {', '.join(bad)} is not a column")
+                    continue
+                keycols = list(group)
+                if part_col and part_col not in keycols:
+                    keycols.append(part_col)
+                idx_lines.append((schema, unique_when_sql(schema, short, t, keycols, cond,
+                                                          [unique_key(k, col_type, src_of) for k in keycols])))
+                n_uniq += 1
+
+            # `x-ticvai-index` (ADAM CR-165, CR-166; CHG-CRA-004): a plain index over the columns the contract names.
+            for group in (marks.get(t) or {}).get("index") or []:
+                missing = [k for k in group if k.startswith("?")]
+                if missing:
+                    no_unique.append(f"{t} (x-ticvai-index {group}): {', '.join(k[1:] for k in missing)} is not a column")
+                    continue
+                idx_lines.append((schema, index_sql(schema, short, t, group)))
+                n_idx += 1
 
             if not inline_pk and pk_cols:
                 body.append(f"    CONSTRAINT {obj_name(short, suffix='pkey')} PRIMARY KEY "

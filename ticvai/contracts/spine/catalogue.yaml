@@ -20671,6 +20671,11 @@ components:
     ProductVersion:
       type: object
       x-ticvai-persistence: catalogue.product_version
+      # One current version per product (class 8 of the 18 October triage, the sibling of ADAM CR-154; CHG-CRA-004):
+      # `isCurrent` promised it and nothing kept it.
+      x-ticvai-unique-when:
+      - columns: [productId]
+        when: {isCurrent: true}
       description: '1.1.47, 1.4.9 to 1.4.11. **Follows `white-label.ConfigVersion`** — the same pattern
         for the same reason, and the fourth place this mechanism was asked for.
 

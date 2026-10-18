@@ -1761,6 +1761,17 @@ paths:
         till alone. A workstation with neither an outlet board nor its own is refused `422
         sale-board-required`, because a till must open on something. `cashDrawerLimit` overrides the
         venue's drawer limit for this till (DEC-179; CHG-CSP-016).
+
+        **`devices` links and unlinks registered devices; it never creates or deletes one** (ADAM CR-155,
+        option A, 18 October 2026; CHG-CRA-004). Each item names a registered device by `deviceId`. A device in
+        the list is linked to this workstation (`platform.device.workstation_id`, with the item's `isRequired`); a
+        device linked here and left out of the list is unlinked (`workstation_id` null). No `platform.device` row
+        is ever inserted or deleted by this PUT. An unknown `deviceId` (or an item with none) is `422
+        unknown-device`; a device that cannot be bound to a till (retired, or not approved) is `422
+        device-not-bindable`; a device already linked to another workstation is `409 device-bound-elsewhere`
+        (unlink it there first). The approved screens already pick from the registered devices, so nothing changes
+        on screen. "Binding" (CR-095) is `platform.device.workstation_id`, set by `registerDevice` or this PUT;
+        `tenancy.device_assignment` (CR-103) records custody and location, a different fact.
       tags: [workstation]
       x-ticvai-permission: WORKSTATION_CONFIGURE
       x-ticvai-scope-level: venue
@@ -1793,16 +1804,20 @@ paths:
             **A shift is open on this workstation** (`shift-open`: Orders' `openShiftForWorkstation`
             found one in `pendingApproval`, `open`, `suspended`, `pendingClosure` or `pendingVariance`;
             ADAM CR-083, CHG-TEN-004). The change is not applied; it can be made once the shift has
-            closed. Names the open shift (`shiftId`, `shiftStatus`).
-          x-ticvai-problem-types: [shift-open]
+            closed. Names the open shift (`shiftId`, `shiftStatus`). Or a device in `devices` is linked to
+            another workstation (`device-bound-elsewhere`, naming it; ADAM CR-155, CHG-CRA-004): unlink it there
+            first.
+          x-ticvai-problem-types: [shift-open, device-bound-elsewhere]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/WorkstationShiftOpenProblem' }
         '422':
           description: >
             No board would apply: the request sends no `saleBoardId` and the workstation's outlet has
-            none (`sale-board-required`; CHG-CSP-006).
-          x-ticvai-problem-types: [sale-board-required]
+            none (`sale-board-required`; CHG-CSP-006). Or an item of `devices` names no registered device
+            (`unknown-device`) or one that cannot be bound to a till, retired or not approved
+            (`device-not-bindable`; ADAM CR-155, CHG-CRA-004).
+          x-ticvai-problem-types: [sale-board-required, unknown-device, device-not-bindable]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -6283,8 +6298,19 @@ components:
         workstation's scope**: `platform.device.scope_path` becomes the workstation's path, so the device's own
         session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).
       type: object
+      description: '**A registered device linked to the workstation** (ADAM CR-155, option A, 18 October 2026;
+        CHG-CRA-004). `deviceId` names an existing `platform.device` (registered by `registerDevice`); in
+        `configureWorkstation` it is what links the device (`platform.device.workstation_id`, `isRequired`). `kind`,
+        `driver` and `identifier` are the device''s own record, returned on `Workstation.devices`; a request''s values
+        for them are not written.'
       required: [kind, driver]
       properties:
+        deviceId:
+          type: string
+          format: uuid
+          x-ticvai-column: id
+          description: '**The registered device** (CR-155): the `platform.device` row''s own id. Every item `configureWorkstation` is sent names one; an
+            item without one, or naming no registered device of this tenant, is `422 unknown-device`.'
         kind: { $ref: '#/components/schemas/DeviceKind' }
         driver:
           type: string

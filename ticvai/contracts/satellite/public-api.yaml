@@ -821,10 +821,6 @@ paths:
         - "P08 BO-1173 Wallet Integration Command Center"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P14 DEV-005 Webhooks"
-      x-ticvai-read-via:
-      - query: tenancy#outboxRecords
-        route: service
-        for: 'its read of platform.outbox, Tenancy''s data (CHG-MOD-001)'
       summary: Re-deliver events from a point in time
       description: >
         13.3.19. **Recovery, synchronisation and troubleshooting** — an integrator whose server was
@@ -835,6 +831,19 @@ paths:
 
         **Marked as a replay in the payload.** A consumer that cannot tell a replay from a live
         event will double-count.
+
+        **This validates and queues; it reads no outbox** (ADAM CR-140, option 1, 18 October 2026;
+        CHG-CRA-004). It inserts one `control.webhook_replay` row (`WebhookReplayJob`, status `queued`) and
+        answers 202. **A dispatcher on the workers host drains it** (its own ticket): it reads each tenant's
+        `platform.outbox` directly, as the relay on the same host does, re-delivers the events in the window and
+        of the types asked, and writes each delivery as a `control.webhook_delivery` with `isReplay` true and the
+        replay's `replayId`; the row goes `running`, then `completed` or `failed`.
+
+        **The window** (CR-140): `to` before `from` is 400 `replay-window-invalid`. The retention bound is the
+        outbox itself: published rows leave with their monthly partition (ADR-0058), so a `from` older than the
+        oldest attached partition is 400 `replay-window-beyond-retention`. An event type the subscription does not
+        hold is 400 `replay-event-type-not-subscribed`. **The caller's tenant** must be one of the subscription's
+        API client's `allowedTenantIds`, else 404, as for an unknown subscription.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -864,6 +873,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WebhookReplayJob'
+        '400':
+          description: 'The window or the event types cannot be replayed (ADAM CR-140; CHG-CRA-004): `to` before `from`
+            (`replay-window-invalid`); `from` older than the oldest outbox partition still attached
+            (`replay-window-beyond-retention`); an event type the subscription does not hold
+            (`replay-event-type-not-subscribed`). Nothing is queued.'
+          x-ticvai-problem-types: [replay-window-invalid, replay-window-beyond-retention, replay-event-type-not-subscribed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '404':
+          description: 'No such subscription, or the caller''s tenant is not one of its API client''s `allowedTenantIds`
+            (ADAM CR-140); the two are not told apart. Nothing is queued.'
+          x-ticvai-problem-types: [not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '409':
           description: 'The subscription is `pendingVerification` (`webhook-subscription-not-verified`) or `disabled` (`webhook-subscription-disabled`); events are replayed only to a verified, enabled endpoint. Nothing is queued.'
           x-ticvai-problem-types: [webhook-subscription-not-verified, webhook-subscription-disabled]
@@ -2355,6 +2382,12 @@ components:
             **Truncated, and it is what makes the log useful** — a 500 with the receiver's own error
             message in it answers the question without a conversation.
         isReplay: { type: boolean, default: false }
+        replayId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: control.webhook_replay
+          description: The replay that re-delivered it (`replayEvents`; ADAM CR-140, CHG-CRA-004); null for a live delivery.
         isTest:
           type: boolean
           default: false
@@ -2553,13 +2586,31 @@ components:
         effectiveTo: { type: string, format: date, nullable: true }
     WebhookReplayJob:
       type: object
-      x-ticvai-persistence: none — response only; the replayed deliveries are written as webhook deliveries marked as replays
-      description: '**A queued replay** (`replayEvents`): the window and event types it re-delivers. Each delivery it makes is marked as a replay in its payload.'
-      required: [replayId, subscriptionId, from, queuedAt]
+      x-ticvai-persistence: control.webhook_replay
+      description: '**A queued replay** (`replayEvents`): the window and event types it re-delivers. Each delivery it
+        makes is marked as a replay in its payload. **Stored** (ADAM CR-140, option 1, 18 October 2026; CHG-CRA-004):
+        one `control.webhook_replay` row per request, which the workers host''s replay dispatcher drains; each
+        delivery it writes is a `control.webhook_delivery` with `isReplay` true and this `replayId`.'
+      required: [replayId, subscriptionId, from, status, queuedAt]
       properties:
-        replayId: { type: string, format: uuid }
-        subscriptionId: { type: string, format: uuid }
-        from: { type: string, format: date-time }
-        to: { type: string, format: date-time, nullable: true }
+        replayId: { type: string, format: uuid, x-ticvai-column: id }
+        subscriptionId: { type: string, format: uuid, x-ticvai-references: control.webhook_subscription }
+        from: { type: string, format: date-time, x-ticvai-column: window_from }
+        to: { type: string, format: date-time, nullable: true, x-ticvai-column: window_to }
         eventTypes: { type: array, items: { $ref: '#/components/schemas/WebhookEventType' } }
+        status:
+          type: string
+          readOnly: true
+          enum: [queued, running, completed, failed]
+          default: queued
+          description: '`queued` until the dispatcher takes it; `running` while it re-delivers; `completed` or
+            `failed` when it stops (CR-140).'
         queuedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: none
+          description: Who asked for the replay, a staff or partner principal; set by the server.

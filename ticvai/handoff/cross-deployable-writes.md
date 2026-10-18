@@ -14,9 +14,9 @@
 
 | | writes |
 |---|---:|
-| Cross-deployable writes in the lineage (59 operations) | 68 |
+| Cross-deployable writes in the lineage (61 operations) | 70 |
 | by event | 29 |
-| by the owner's operation | 39 |
+| by the owner's operation | 41 |
 | on the exception list | 0 |
 
 ## The kernel tables every deployable is granted directly
@@ -49,12 +49,14 @@ Sorted by the owning deployable, then the table.
 | `suspendEntitlement` | commerce / CatalogueService | `access.entitlement` | access / AccessService | event `entitlement.statusChanged` |
 | `transferOrderTickets` | commerce / OrderService | `access.entitlement` | access / AccessService | event `entitlement.transferred` |
 | `voidEntitlement` | commerce / OrderService | `access.entitlement` | access / AccessService | event `entitlement.voided` |
+| `setPublishReviewPolicy` | operations / WhiteLabelService | `approvals.matrix` | commerce / TenancyService | operation `setApprovalMatrix` |
 | `actOnPartnerApplicationReview` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `approveBookingLimitCommercial` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `approveMembershipProductValidation` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `approvePartnerStatuLifecycle` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `createPartnerAgreement` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `createPartnerChangeRequest` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
+| `publishTenantConfig` | operations / WhiteLabelService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `registerPartner` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setAgreementContractTerm` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setPartnerAllocations` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |

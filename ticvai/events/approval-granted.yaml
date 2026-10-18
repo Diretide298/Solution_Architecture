@@ -84,6 +84,15 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: white-label
+  purpose: Make the approved white-label version current (`reviewStatus` approved, `isCurrent` true, the previous
+    current version no longer current) and emit whitelabel.contentPublished, when `subjectType` is
+    `whiteLabelPublication` (ADAM CR-154, 18 October 2026; CHG-CRA-004)
+  writes:
+  - whitelabel.config_version
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: Retained with the request. This is an audit record, not an operational message
 notes: '**The event that replaces four bespoke callbacks.** Each owning contract consumed its own approval
   signal before this existed; now there is one, and adding a fifth approval kind means adding a consumer

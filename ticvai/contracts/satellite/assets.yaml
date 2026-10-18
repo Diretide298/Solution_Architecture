@@ -1591,6 +1591,11 @@ components:
     MediaAssetVersion:
       type: object
       x-ticvai-persistence: assets.asset_version
+      # One current version per asset (class 8 of the 18 October triage, the sibling of ADAM CR-154; CHG-CRA-004):
+      # `isCurrent` promised it and nothing kept it.
+      x-ticvai-unique-when:
+      - columns: [assetId]
+        when: {isCurrent: true}
       description: 'Boards 2.6 and 2.7. **Usage impact belongs to the version read**, because replacing a
         logo is routine or an incident depending on where it appears.
 

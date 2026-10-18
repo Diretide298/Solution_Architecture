@@ -1,0 +1,319 @@
+group	ticket	plan_key	status	type	assignee	subject	links
+started	27686	TEST-AM-FOUNDATION-DATABASE	On hold	Task	Pranay Shinde	[Test] Module test: Foundation · Database migrations	table:assets.asset_version, table:catalogue.product_version, table:orders.payment, table:payments.provider_connection, table:platform.device, table:whitelabel.config_version
+started	30794	SVC-TENANCY-WORKSTATION-1#configureWorkstation	In progress	Sub Task	Pranay Shinde	[BE] configureWorkstation: PUT /workstations/{workstationId}	operation:tenancy#configureWorkstation, raised the CR, table:platform.device
+finished	27659	MIG-ASSETS	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0013__assets.sql: assets (7 tables)	table:assets.asset_version
+finished	27663	MIG-WHITELABEL	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0016__whitelabel.sql: whitelabel (29 tables)	table:whitelabel.config_version
+finished	27665	MIG-PLATFORM	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0017__platform.sql: platform (17 tables)	table:platform.device
+finished	27671	MIG-CATALOGUE	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0022__catalogue.sql: catalogue (22 tables)	table:catalogue.product_version
+finished	27675	MIG-ORDERS	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0026__orders.sql: orders (39 tables)	table:orders.payment
+finished	27679	MIG-PAYMENTS	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0030__payments.sql: payments (12 tables)	table:payments.provider_connection
+finished	27988	VM-MIG-CONTROL	Ready for QA	Task	Hrushikant Patkar	[DB] Forward migration V1003__control.sql: control for Venue Management (2 tables)	table:control.webhook_delivery, table:control.webhook_subscription
+finished	30219	MIG-ASSETS#assets.asset_version	Ready for QA	Sub Task	Hrushikant Patkar	[DB] assets.asset_version	table:assets.asset_version
+finished	30254	MIG-WHITELABEL#whitelabel.config_version	Ready for QA	Sub Task	Hrushikant Patkar	[DB] whitelabel.config_version	table:whitelabel.config_version
+finished	30329	MIG-PLATFORM#platform.device	Ready for QA	Sub Task	Hrushikant Patkar	[DB] platform.device	table:platform.device
+finished	30404	MIG-CATALOGUE#catalogue.product_version	Ready for QA	Sub Task	Hrushikant Patkar	[DB] catalogue.product_version	table:catalogue.product_version
+finished	30473	MIG-ORDERS#orders.payment	Ready for QA	Sub Task	Hrushikant Patkar	[DB] orders.payment	table:orders.payment
+finished	30615	MIG-PAYMENTS#payments.provider_connection	Ready for QA	Sub Task	Hrushikant Patkar	[DB] payments.provider_connection	table:payments.provider_connection
+new	27645	AM-FOUNDATION-DATABASE	New	Feature	Hrushikant Patkar	Foundation · Database migrations	table:assets.asset_version, table:catalogue.product_version, table:orders.payment, table:payments.provider_connection, table:platform.device, table:whitelabel.config_version
+new	27687	AM-FOUNDATION-PLATFORM	New	Feature	Pranay Shinde	Foundation · Platform kernel	operation:payments#receivePaymentProviderWebhook
+new	27691	PLATFORM-OBSERVE	New	Task	Pranay Shinde	[BE] Observability with tenant and venue on every trace, and the first dashboards	table:orders.payment, table:payments.provider_connection
+new	27699	PLATFORM-PAYMENTS	New	Task	Hrushikant Patkar	[BE] Payment adapter and signed webhook against the provider's test mode	operation:payments#receivePaymentProviderWebhook, raised the CR, table:orders.payment, table:payments.provider_connection, table:payments.provider_event
+new	27701	PLATFORM-SAGA-PAID	New	Task	Hrushikant Patkar	[BE] Order paid to tickets issued: the saga proven end to end	table:orders.payment, table:payments.provider_connection
+new	27703	TEST-AM-FOUNDATION-PLATFORM	New	Task	Chinmay Patkar	[Test] Module test: Foundation · Platform kernel	operation:payments#receivePaymentProviderWebhook, table:orders.payment, table:payments.provider_connection, table:payments.provider_event
+new	27705	OFFLINE-JOURNAL	New	Task	Pradnya Yeram	[BE] Offline journal in packages/offline-core: record, replay and the conflict policies	table:orders.payment, table:payments.provider_connection
+new	27707	OFFLINE-SYNC	New	Task	Hrushikant Patkar	[BE] syncOrders: a result per entry, and a bad entry quarantined instead of blocking the t	table:orders.payment
+new	27709	TEST-AM-FOUNDATION-OFFLINE	New	Task	Deep Khanvilkar	[Test] Module test: Foundation · Offline: POS, Kitchen Display and scanner	table:orders.payment, table:payments.provider_connection
+new	27734	SVC-ORDER-ORDER-4	New	Task	Narayan Gaonkar	[BE] OrderService: listTicketTransfers, modifyOrder, reprintOrder, rescheduleOrder	table:orders.payment
+new	27736	SVC-ORDER-ORDER-2	New	Task	Pranay Shinde	[BE] OrderService: exchangeOrderLines, getMediaEntitlements, getOrder, getOrderCalendarEve	table:orders.payment
+new	27740	TEST-AM-IDENTITY-SECURITY-P01	New	Task	Sanket Keluskar	[Test] Module test: Identity & Security · Guest Web	table:orders.payment
+new	27779	SVC-WHITELABEL-PUBLISHING-2	New	Task	Narayan Gaonkar	[BE] WhiteLabelService: getSitePackage, getSiteSetupProgress, listConfigVersions, publishT	operation:white-label#publishTenantConfig, raised the CR, table:whitelabel.config_version
+new	27780	SVC-WHITELABEL-PUBLISHING-3	New	Task	Narayan Gaonkar	[BE] WhiteLabelService: restoreConfigVersion, setPublishReviewPolicy, setSiteSetupProgress	operation:white-label#setPublishReviewPolicy, table:whitelabel.config_version
+new	27787	AM-TENANCY-VENUES-P04	New	Feature	Pranay Shinde	Tenancy & Venues · POS	operation:tenancy#configureWorkstation
+new	27789	SVC-TENANCY-WORKSTATION-1	New	Task	Pranay Shinde	[BE] TenancyService: configureWorkstation, createOutlet, createSaleBoard, getOutlet	operation:tenancy#configureWorkstation, table:platform.device
+new	27790	SVC-TENANCY-WORKSTATION-2	New	Task	Sanket Keluskar	[BE] TenancyService: listDevices, listSaleBoards, updateOutlet, updateSaleBoard	table:platform.device
+new	27792	SVC-ORDER-SHIFT-1	New	Task	Pranay Shinde	[BE] OrderService: acceptShiftVariance, allocateDepositBox, approveShiftOpen, closeShift	table:orders.payment
+new	27793	APP-POS-POS-016	New	Task	Pradnya Yeram	[FE] POS-016 Till Configuration	operation:tenancy#configureWorkstation
+new	27794	TEST-AM-TENANCY-VENUES-P04	New	Task	Deep Khanvilkar	[Test] Module test: Tenancy & Venues · POS	operation:tenancy#configureWorkstation, table:platform.device
+new	27802	SVC-TENANCY-DEVICES-3	New	Task	Pranay Shinde	[BE] TenancyService: listDeviceAuditRecords, listDeviceTamperEvents, recordDeviceTamperEve	table:platform.device
+new	27803	SVC-TENANCY-WORKSTATION-3	New	Task	Deep Khanvilkar	[BE] TenancyService: recordDeviceHeartbeat	table:platform.device
+new	27819	SVC-WALLET-RETAIL-1	New	Task	Pranay Shinde	[BE] WalletService: getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadS	table:orders.payment
+new	27836	SVC-VENUEOPS-ASSET-1	New	Task	Narayan Gaonkar	[BE] VenueOpsService: deleteMediaAsset, getMediaAsset, replaceMediaAsset, searchMedia	table:assets.asset_version
+new	27843	TEST-AM-DIGITAL-ASSETS-P13	New	Task	Deep Khanvilkar	[Test] Module test: Digital Assets · CMS 1 of 4	table:assets.asset_version
+new	27859	SVC-CATALOGUE-CATALOGUE-1	New	Task	Narayan Gaonkar	[BE] CatalogueService: bulkChangePrices, cloneProduct, commitCatalogueImport, getMyMembers	table:catalogue.product_version
+new	27860	SVC-ORDER-ORDER-1	New	Task	Pranay Shinde	[BE] OrderService: appendEntitlementToMedia, applyManualDiscount, claimTicketTransfer, cre	table:orders.payment
+new	27861	SVC-ORDER-ORDER-5	New	Task	Pranay Shinde	[BE] OrderService: resumeOrder, setVisitReminder, transferOrderTickets, voidOrder	table:orders.payment
+new	27863	SVC-ORDER-ORDERS-3	New	Task	Deep Khanvilkar	[BE] OrderService: listBillingStatements, listMyOrders, listPaymentTokens, payByLink	table:orders.payment
+new	27874	AM-WHITE-LABEL-P13	New	Feature	Chinmay Patkar	White Label · CMS	operation:white-label#publishTenantConfig, operation:white-label#setPublishReviewPolicy
+new	27876	SVC-WHITELABEL-APPPUBLISHING-1	New	Task	Deep Khanvilkar	[BE] WhiteLabelService: getAppBuild, getStoreAccounts, listAppBuilds, requestAppBuild	table:whitelabel.config_version
+new	27878	SVC-WHITELABEL-BOOKINGFLOWS-1	New	Task	Hrushikant Patkar	[BE] WhiteLabelService: createBookingFlowDefinition, deleteBookingFlow, getBookingFlow, ge	table:whitelabel.config_version
+new	27885	SVC-WHITELABEL-OVERVIEW-1	New	Task	Hrushikant Patkar	[BE] WhiteLabelService: getPublishedTenantConfig, getTenantAppStatus, getTenantConfig, lis	table:whitelabel.config_version
+new	27906	APP-WL-CMS-014	New	Task	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow	operation:white-label#publishTenantConfig, operation:white-label#setPublishReviewPolicy
+new	27910	SVC-ORDER-CART-1	New	Task	Pranay Shinde	[BE] OrderService: abandonCart, addCartLine, applyCartPromoCode, checkoutCart	table:orders.payment
+new	27927	AM-WHITE-LABEL-P09	New	Feature	Chitrangi Mestry	White Label · TICVAI Console	operation:white-label#publishTenantConfig
+new	27928	APP-WL-ADM-016	New	Task	Chitrangi Mestry	[FE] ADM-016 White-Label Branding Management	operation:white-label#publishTenantConfig
+new	27941	SVC-TENANCY-TENANCY-1	New	Task	Deep Khanvilkar	[BE] TenancyService: getWorkstationHealth, setVenueSettings, setVenueSettingsDefaults	table:platform.device
+new	27996	AM-PUBLIC-API-API-BLOCK-A-COMPLETION	New	Feature	Sanket Keluskar	Public API · API only (Block A completion)	operation:public-api#replayEvents
+new	27997	SVC-PLATFORM-PUBLICAPI-9	New	Task	Sanket Keluskar	[BE] PlatformService: replayEvents	operation:public-api#replayEvents, table:control.webhook_delivery, table:control.webhook_subscription
+new	27998	TEST-AM-PUBLIC-API-API-BLOCK-A-COMPLETION	New	Task	Surendra Loke	[Test] Module test: Public API · API only (Block A completion)	operation:public-api#replayEvents, table:control.webhook_delivery, table:control.webhook_subscription
+new	28007	VM-PLATFORM-PUBLICAPI-1	New	Task	Sanket Keluskar	[BE] PlatformService: createWebhookSubscription, listApiClients, listWebhookDeliveries, li	operation:public-api#listWebhookDeliveries, table:control.webhook_delivery, table:control.webhook_subscription
+new	28014	TEST-AM-SETUP-PLATFORM-FOUNDATION-P14-REST	New	Task	Narayan Gaonkar	[Test] Module test: Platform Foundation · Developer Portal (setup, the rest of the screens	table:control.webhook_delivery, table:control.webhook_subscription
+new	28015	AM-SETUP-TICKETING-GUEST-COMMERCE-P08	New	Feature	Narayan Gaonkar	Ticketing & Guest Commerce · Venue Management (setup)	operation:payments#createPaymentProviderConnection
+new	28047	SVC-ORDER-ORDERS-1	New	Task	Pranay Shinde	[BE] OrderService: cloneTicketTemplate, createResaleListing, createTicketTemplate, getBill	table:orders.payment
+new	28048	SVC-ORDER-PAYMENTS-1	New	Task	Pranay Shinde	[BE] OrderService: createInstalmentPlan, createPaymentProviderConnection, listInstalmentPl	operation:payments#createPaymentProviderConnection, table:orders.payment, table:payments.provider_connection
+new	28053	APP-SETUP-ADM-570	New	Task	Surendra Loke	[FE] ADM-570 Gateway, PSP & Acquirer Directory (setup: 1 of its 2 operations)	operation:payments#createPaymentProviderConnection
+new	28101	SVC-CATALOGUE-CATALOGUE-5	New	Task	Narayan Gaonkar	[BE] CatalogueService: importProductCatalogue, listDynamicPriceRules, listProductVersions,	table:catalogue.product_version
+new	28138	SVC-ORDER-SYNC-1	New	Task	Pranay Shinde	[BE] OrderService: listSyncRejections, syncOrders	table:orders.payment
+new	28144	SVC-ORDER-PAYMENT-1	New	Task	Pranay Shinde	[BE] OrderService: addTip, capturePayment, createPayment, inquirePaymentStatus	operation:orders#inquirePaymentStatus, table:orders.payment, table:payments.provider_connection
+new	28218	AM-ORDERS-RESERVATIONS-P01	New	Feature	Narayan Gaonkar	Orders & Reservations · Guest Web	operation:orders#inquirePaymentStatus
+new	28219	SVC-ORDER-RESERVATION-1	New	Task	Sanket Keluskar	[BE] OrderService: cancelReservation, convertReservation, createReservation, extendReserva	table:orders.payment
+new	28222	APP-WEB-WEB-012	New	Task	Chinmay Patkar	[FE] WEB-012 Checkout — Payment	operation:orders#inquirePaymentStatus
+new	28229	TEST-AM-ORDERS-RESERVATIONS-P01	New	Task	Narayan Gaonkar	[Test] Module test: Orders & Reservations · Guest Web	table:orders.payment
+new	28230	AM-ORDERS-RESERVATIONS-P02	New	Feature	Narayan Gaonkar	Orders & Reservations · Guest App	operation:orders#inquirePaymentStatus
+new	28231	SVC-ORDER-ORDER-3	New	Task	Pranay Shinde	[BE] OrderService: getOrderStatement, getVisitReminder, holdOrder, listOrders	table:orders.payment
+new	28232	SVC-ORDER-REFUND-1	New	Task	Pranay Shinde	[BE] OrderService: createRefund, createRefundRequest, listOrderRefunds	table:orders.payment
+new	28233	SVC-ORDER-DUNNING-1	New	Task	Sanket Keluskar	[BE] OrderService: listMyPaymentIssues, retryMyDunningPayment	table:orders.payment
+new	28236	APP-MOB-GST-009	New	Task	Chitrangi Mestry	[FE] GST-009 Review & Payment	operation:orders#inquirePaymentStatus
+new	28255	SVC-LEDGER-TAX-2	New	Task	Narayan Gaonkar	[BE] LedgerService: issueTaxInvoice, listCreditMemos, listTaxInvoices, setEInvoicingProvid	table:orders.payment
+new	28263	AM-ORDERS-RESERVATIONS-P08-BLOCK-A	New	Feature	Pranay Shinde	Orders & Reservations · Venue Management (Block A)	operation:orders#inquirePaymentStatus
+new	28280	VM-ORDER-ORDERS-2	New	Task	Pranay Shinde	[BE] OrderService: getChargebackAnalytics, listDeposits, recordChargeback, recordChargebac	table:orders.payment
+new	28282	VM-LEDGER-SETTLEMENT-1	New	Task	Narayan Gaonkar	[BE] LedgerService: getSettlement, ingestSettlementFile, listSettlementExceptions, listSet	table:payments.provider_connection
+new	28291	SVC-ORDER-DRAFTED-2	New	Task	Pranay Shinde	[BE] OrderService: setOrderAmendment, setOrderDetailTransaction	table:orders.payment
+new	28292	SVC-ORDER-ORDERS-12	New	Task	Pranay Shinde	[BE] OrderService: convertToTermProduct, issueInvitation, listInvitationAllowances, listMe	table:orders.payment
+new	28300	AM-PAYMENTS-API-BLOCK-A	New	Feature	Hrushikant Patkar	Payments · API only (Block A)	table:payments.provider_event
+new	28302	MIG-PAYMENTS-7	New	Task	Hrushikant Patkar	[DB] Forward migration V1030__payments.sql: payments for Payments · Venue Management 1 of 	table:payments.provider_event
+new	28304	SVC-ORDER-PAYMENTS-17	New	Task	Deep Khanvilkar	[BE] OrderService: listPaymentMethods, listPaymentProviderConnections, setPaymentRules, si	table:payments.provider_connection
+new	28306	SVC-ORDER-PAYMENTS-18	New	Task	Narayan Gaonkar	[BE] OrderService: testPaymentProviderConnection	table:payments.provider_connection
+new	28307	TEST-AM-PAYMENTS-API-BLOCK-A	New	Task	Narayan Gaonkar	[Test] Module test: Payments · API only (Block A)	table:payments.provider_connection, table:payments.provider_event
+new	28337	APP-WL-CMS-103	New	Task	Chinmay Patkar	[FE] CMS-103 Booking Flows	operation:white-label#publishTenantConfig
+new	28338	TEST-AM-WHITE-LABEL-P13	New	Task	Pallavi Sawant	[Test] Module test: White Label · CMS	table:whitelabel.config_version
+new	28344	TEST-AM-ORDERS-RESERVATIONS-P04	New	Task	Chitrangi Mestry	[Test] Module test: Orders & Reservations · POS	table:orders.payment
+new	28413	SVC-LEDGER-FINANCE-5	New	Task	Narayan Gaonkar	[BE] LedgerService: getUnifiedReconciliation	table:orders.payment
+new	28414	TEST-AM-FINANCE-TAX-API-BLOCK-A-COMPLETION	New	Task	Pranay Shinde	[Test] Module test: Finance & Tax · API only (Block A completion)	table:orders.payment
+new	28529	SVC-ORDER-SHIFT-5	New	Task	Pranay Shinde	[BE] OrderService: resumeShift, setDenominations, setTillShiftPolicy, submitShiftCount	table:orders.payment
+new	28539	SVC-FNB-BILL-1	New	Task	Narayan Gaonkar	[BE] FnbService: closeTableVisit, getBill, splitBill	table:orders.payment
+new	28553	SVC-FNB-GUESTORDERING-2	New	Task	Deep Khanvilkar	[BE] FnbService: getGuestBill, getGuestMenu, getGuestOrderStatus, listBookableOutlets	table:orders.payment
+new	28581	VM-ORDER-DRAFTED-1	New	Task	Chinmay Patkar	[BE] OrderService: listPaymentReconciliationException, listTicketReissueFulfillment	table:orders.payment
+new	28582	VM-BO-024	New	Task	Pallavi Sawant	[FE] BO-024 Payment Exceptions	operation:orders#inquirePaymentStatus
+new	28592	VM-TENANCY-WORKSTATION-1	New	Task	Pranay Shinde	[BE] TenancyService: getWorkstation, listOutlets, listWorkstations, registerDevice	operation:tenancy#getWorkstation, table:platform.device
+new	28594	SVC-LEDGER-REPORTING-2	New	Task	Deep Khanvilkar	[BE] LedgerService: getForeignTenderReport	table:orders.payment
+new	28615	AM-RETAIL-P04	New	Feature	Pradnya Yeram	Retail · POS	operation:orders#inquirePaymentStatus
+new	28621	APP-POS-POS-005	New	Task	Pradnya Yeram	[FE] POS-005 Payment	operation:orders#inquirePaymentStatus
+new	28728	TEST-AM-ORDERS-RESERVATIONS-P08-BLOCK-A	New	Task	Pallavi Sawant	[Test] Module test: Orders & Reservations · Venue Management (Block A)	table:orders.payment
+new	28754	TEST-AM-FOOD-BEVERAGE-P04	New	Task	Pranay Shinde	[Test] Module test: Food & Beverage · POS	table:orders.payment
+new	28759	TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST	New	Task	Narayan Gaonkar	[Test] Module test: Ticketing & Guest Commerce · Venue Management (setup, the rest of the 	operation:payments#createPaymentProviderConnection, table:catalogue.product_version, table:payments.provider_connection
+new	28911	SVC-MARKETING-MARKETING-21	New	Task	Sanket Keluskar	[BE] MarketingService: setCallDisposition, startKioskAssist	table:platform.device
+new	28916	TEST-AM-SETUP-CUSTOMER-MARKETING-P08-REST	New	Task	Chinmay Patkar	[Test] Module test: Customer & Marketing · Venue Management (setup, the rest of the screen	table:platform.device
+new	29105	AM-TENANCY-VENUES-P08	New	Feature	Sanket Keluskar	Tenancy & Venues · Venue Management 1 of 3	operation:tenancy#configureWorkstation, operation:tenancy#getWorkstation
+new	29108	VM-TENANCY-DEVICES-1	New	Task	Deep Khanvilkar	[BE] TenancyService: createDeviceFirmware, getDeviceFirmware, issueDeviceCredential, listD	table:platform.device
+new	29109	VM-TENANCY-DEVICES-2	New	Task	Pranay Shinde	[BE] TenancyService: revokeDeviceCredential, rollbackDeviceFirmware, setDeviceFirmwareStat	table:platform.device
+new	29119	VM-BO-036	New	Task	Sanket Keluskar	[FE] BO-036 Device Registry	operation:tenancy#configureWorkstation, operation:tenancy#getWorkstation
+new	29126	TEST-AM-TENANCY-VENUES-P08	New	Task	Chinmay Patkar	[Test] Module test: Tenancy & Venues · Venue Management 1 of 3	table:platform.device
+new	29147	SVC-TENANCY-DEVICES-4	New	Task	Sanket Keluskar	[BE] TenancyService: enrolDevice, getDeviceTelemetry	table:platform.device
+new	29157	TEST-AM-TENANCY-VENUES-P08-2	New	Task	Sanket Keluskar	[Test] Module test: Tenancy & Venues · Venue Management 2 of 3	table:platform.device
+new	29158	AM-TENANCY-VENUES-P08-3	New	Feature	Chitrangi Mestry	Tenancy & Venues · Venue Management 3 of 3	operation:tenancy#configureWorkstation
+new	29168	VM-BO-602	New	Task	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup	operation:tenancy#configureWorkstation
+new	29244	SVC-PLATFORM-SUBSCRIPTION-6	New	Task	Narayan Gaonkar	[BE] PlatformService: getPlanTiers, listBurstEnvironments, listPartnerUsers, reconcileBurs	table:orders.payment
+new	29404	SVC-PLATFORM-DRAFTED-12	New	Task	Narayan Gaonkar	[BE] PlatformService: listPartnerProfileReadiness, setPartnerBrandVenue, setPartnerProfile	table:orders.payment
+new	29405	SVC-PLATFORM-DRAFTED-13	New	Task	Deep Khanvilkar	[BE] PlatformService: setPaymentTermBilling	table:orders.payment
+new	29518	SVC-PLATFORM-DRAFTED-14	New	Task	Surendra Loke	[BE] PlatformService: listPartnerCancellationRefund, listPartnerDisputeCase, listPartnerPe	table:orders.payment
+new	29550	AM-PUBLIC-API-P08	New	Feature	Chitrangi Mestry	Public API · Venue Management	operation:public-api#listWebhookDeliveries, operation:public-api#replayEvents
+new	29551	VM-BO-067	New	Task	Pallavi Sawant	[FE] BO-067 Integrations	operation:public-api#listWebhookDeliveries
+new	29552	SVC-PLATFORM-PUBLICAPI-5	New	Task	Sanket Keluskar	[BE] PlatformService: getApiUsage, issueApiToken, testWebhookSubscription	table:control.webhook_delivery
+new	29553	SVC-PLATFORM-DRAFTED-10	New	Task	Pranay Shinde	[BE] PlatformService: listCommercialAgreement, listCommercialAgreementHealth, listPartner,	table:control.webhook_delivery, table:orders.payment
+new	29563	VM-BO-1078	New	Task	Chitrangi Mestry	[FE] BO-1078 Monitoring, Retry & Reconciliation	operation:public-api#listWebhookDeliveries
+new	29564	VM-BO-1173	New	Task	Pradnya Yeram	[FE] BO-1173 Wallet Integration Command Center	operation:public-api#replayEvents
+new	29566	VM-BO-692	New	Task	Pradnya Yeram	[FE] BO-692 Accreditation Webhook Management	operation:public-api#listWebhookDeliveries
+new	29573	TEST-AM-PUBLIC-API-P08	New	Task		[Test] Module test: Public API · Venue Management	table:control.webhook_delivery
+new	29582	AM-PUBLIC-API-P14	New	Feature	Chitrangi Mestry	Public API · Developer Portal	operation:public-api#listWebhookDeliveries, operation:public-api#replayEvents
+new	29584	APP-DEVPORTAL-DEV-005	New	Task	Chitrangi Mestry	[FE] DEV-005 Webhooks	operation:public-api#listWebhookDeliveries, operation:public-api#replayEvents
+new	29592	SVC-VENUEOPS-ASSETS-1	New	Task		[BE] VenueOpsService: analyseMediaAsset, bulkUpdateMediaAssets, findSimilarMediaAssets, ge	table:assets.asset_version
+new	29606	SVC-VENUEOPS-ASSETS-2	New	Task		[BE] VenueOpsService: getMediaTaxonomy, getMediaUsageAnalytics, listMediaAssetVersions, li	table:assets.asset_version
+new	29616	TEST-AM-DIGITAL-ASSETS-P13-2	New	Task		[Test] Module test: Digital Assets · CMS 2 of 4	table:assets.asset_version
+new	29646	AM-WHITE-LABEL-P08	New	Feature	Sanket Keluskar	White Label · Venue Management	operation:white-label#publishTenantConfig
+new	29652	VM-BO-843	New	Task	Sanket Keluskar	[FE] BO-843 Publishing, Analytics & Audit	operation:white-label#publishTenantConfig
+new	29683	SVC-CATALOGUE-DRAFTED-7	New	Task	Surendra Loke	[BE] CatalogueService: approveReviewDecision, listChangeImpactAnalysis, listChangePropagat	table:catalogue.product_version
+new	29726	SVC-PLATFORM-DRAFTED-11	New	Task		[BE] PlatformService: listPartnerContactUser, listPartnerDocumentationCompliance, listPart	table:orders.payment
+new	29731	TEST-AM-SUBSCRIPTION-LICENSING-P10	New	Task	Chinmay Patkar	[Test] Module test: Subscription & Licensing · Partner Portal 1 of 2	table:control.webhook_delivery, table:orders.payment
+new	29732	SVC-PLATFORM-DRAFTED-15	New	Task	Pranay Shinde	[BE] PlatformService: listPartnerStatementAccount, listReservationHoldRelease	table:orders.payment
+new	29735	TEST-AM-SUBSCRIPTION-LICENSING-P10-2	New	Task	Pranay Shinde	[Test] Module test: Subscription & Licensing · Partner Portal 2 of 2	table:orders.payment
+new	29736	SVC-CATALOGUE-DRAFTED-8	New	Task	Hrushikant Patkar	[BE] CatalogueService: listProductDuplicationTemplate, listProductGovernance, listProductI	table:catalogue.product_version
+new	29787	SVC-PLATFORM-DRAFTED-4	New	Task		[BE] PlatformService: listMembershipUsageVisit, listPartnerAccessRole, listPartnerReconcil	table:orders.payment
+new	29808	SVC-CATALOGUE-DRAFTED-9	New	Task	Pranay Shinde	[BE] CatalogueService: listProductRetirementSuspension, listProductTrailChange, listRollba	table:catalogue.product_version
+new	29813	TEST-AM-TICKETING-P08-2	New	Task	Pranay Shinde	[Test] Module test: Ticketing · Venue Management 2 of 8	table:catalogue.product_version
+new	29856	SVC-PLATFORM-DRAFTED-3	New	Task		[BE] PlatformService: listCreditLimitExposure, listDepositGuaranteeFinancial, listMemberEx	table:orders.payment
+new	29861	TEST-AM-SUBSCRIPTION-LICENSING-P08	New	Task	Narayan Gaonkar	[Test] Module test: Subscription & Licensing · Venue Management 1 of 3	table:orders.payment
+new	29862	SVC-PLATFORM-DRAFTED-6	New	Task	Narayan Gaonkar	[BE] PlatformService: getMembershipProductValidation, listMember, listMemberLifecycleCase,	table:orders.payment
+new	29863	SVC-PLATFORM-DRAFTED-7	New	Task	Surendra Loke	[BE] PlatformService: listMembershipRenewalRetention, listMembershipUpgradeDowngrade, list	table:orders.payment
+new	29872	TEST-AM-SUBSCRIPTION-LICENSING-P08-2	New	Task	Chinmay Patkar	[Test] Module test: Subscription & Licensing · Venue Management 2 of 3	table:orders.payment
+new	30023	AM-ORDERS-RESERVATIONS-P05	New	Feature	Pradnya Yeram	Orders & Reservations · Kiosk	operation:orders#inquirePaymentStatus
+new	30024	AM-ORDERS-RESERVATIONS-P06	New	Feature	Pradnya Yeram	Orders & Reservations · Staff App	operation:orders#inquirePaymentStatus
+new	30028	AM-ORDERS-RESERVATIONS-P08-4	New	Feature	Hrushikant Patkar	Orders & Reservations · Venue Management 4 of 8	operation:orders#inquirePaymentStatus
+new	30034	AM-ORDERS-RESERVATIONS-P10	New	Feature	Pallavi Sawant	Orders & Reservations · Partner Portal	operation:orders#inquirePaymentStatus
+new	30035	AM-PAYMENTS-P08	New	Feature	Surendra Loke	Payments · Venue Management 1 of 3	operation:payments#createPaymentProviderConnection
+new	30036	AM-PAYMENTS-P08-2	New	Feature	Hrushikant Patkar	Payments · Venue Management 2 of 3	operation:orders#inquirePaymentStatus
+new	30678	SVC-ORDER-ORDER-4#modifyOrder	New	Sub Task	Narayan Gaonkar	[BE] modifyOrder: POST /orders/{orderId}/modify	table:orders.payment
+new	30687	SVC-ORDER-ORDER-2#getOrder	New	Sub Task	Pranay Shinde	[BE] getOrder: GET /orders/{orderId}	table:orders.payment
+new	30772	SVC-WHITELABEL-PUBLISHING-2#getSiteSetupProgress	New	Sub Task	Narayan Gaonkar	[BE] getSiteSetupProgress: GET /tenant-config/site-setup	table:whitelabel.config_version
+new	30773	SVC-WHITELABEL-PUBLISHING-2#listConfigVersions	New	Sub Task	Narayan Gaonkar	[BE] listConfigVersions: GET /tenant-config/versions	table:whitelabel.config_version
+new	30774	SVC-WHITELABEL-PUBLISHING-2#publishTenantConfig	New	Sub Task	Narayan Gaonkar	[BE] publishTenantConfig: POST /tenant-config/publish	operation:white-label#publishTenantConfig, table:whitelabel.config_version
+new	30776	SVC-WHITELABEL-PUBLISHING-3#setPublishReviewPolicy	New	Sub Task	Narayan Gaonkar	[BE] setPublishReviewPolicy: PUT /publish-review-policy	operation:white-label#setPublishReviewPolicy
+new	30777	SVC-WHITELABEL-PUBLISHING-3#setSiteSetupProgress	New	Sub Task	Narayan Gaonkar	[BE] setSiteSetupProgress: PUT /tenant-config/site-setup	table:whitelabel.config_version
+new	30798	SVC-TENANCY-WORKSTATION-2#listDevices	New	Sub Task	Sanket Keluskar	[BE] listDevices: GET /devices	table:platform.device
+new	30806	SVC-ORDER-SHIFT-1#closeShift	New	Sub Task	Pranay Shinde	[BE] closeShift: POST /shifts/{shiftId}/close	table:orders.payment
+new	30807	APP-POS-POS-016#build	New	Sub Task	Pradnya Yeram	[FE] POS-016 Till Configuration: build with all states	operation:tenancy#configureWorkstation
+new	30808	APP-POS-POS-016#wire	New	Sub Task	Pradnya Yeram	[FE] POS-016 Till Configuration: connect to API	operation:tenancy#configureWorkstation
+new	30809	APP-POS-POS-016#test	New	Sub Task	Pradnya Yeram	[FE] POS-016 Till Configuration: tests	operation:tenancy#configureWorkstation
+new	30830	SVC-TENANCY-DEVICES-3#recordDeviceTamperEvent	New	Sub Task	Pranay Shinde	[BE] recordDeviceTamperEvent: POST /device-tamper-events	table:platform.device
+new	30831	SVC-TENANCY-WORKSTATION-3#recordDeviceHeartbeat	New	Sub Task	Deep Khanvilkar	[BE] recordDeviceHeartbeat: POST /devices/{deviceId}/heartbeat	table:platform.device
+new	30868	SVC-WALLET-RETAIL-1#settleWalletAtExit	New	Sub Task	Pranay Shinde	[BE] settleWalletAtExit: POST /wallets/{walletId}/exit-settlement	table:orders.payment
+new	30907	SVC-VENUEOPS-ASSET-1#replaceMediaAsset	New	Sub Task	Narayan Gaonkar	[BE] replaceMediaAsset: POST /media/{mediaId}/replace	table:assets.asset_version
+new	30970	SVC-CATALOGUE-CATALOGUE-1#bulkChangePrices	New	Sub Task	Narayan Gaonkar	[BE] bulkChangePrices: POST /products/bulk-price	table:catalogue.product_version
+new	30974	SVC-ORDER-ORDER-1#appendEntitlementToMedia	New	Sub Task	Pranay Shinde	[BE] appendEntitlementToMedia: POST /media/{mediaCode}/entitlements	table:orders.payment
+new	30975	SVC-ORDER-ORDER-1#applyManualDiscount	New	Sub Task	Pranay Shinde	[BE] applyManualDiscount: POST /orders/{orderId}/discounts	table:orders.payment
+new	30977	SVC-ORDER-ORDER-1#createOrder	New	Sub Task	Pranay Shinde	[BE] createOrder: POST /orders	table:orders.payment
+new	30978	SVC-ORDER-ORDER-5#resumeOrder	New	Sub Task	Pranay Shinde	[BE] resumeOrder: POST /orders/{orderId}/resume	table:orders.payment
+new	30981	SVC-ORDER-ORDER-5#voidOrder	New	Sub Task	Pranay Shinde	[BE] voidOrder: POST /orders/{orderId}/voids	table:orders.payment
+new	30986	SVC-ORDER-ORDERS-3#listBillingStatements	New	Sub Task	Deep Khanvilkar	[BE] listBillingStatements: GET /billing-statements	table:orders.payment
+new	30987	SVC-ORDER-ORDERS-3#listMyOrders	New	Sub Task	Deep Khanvilkar	[BE] listMyOrders: GET /my/orders	table:orders.payment
+new	30989	SVC-ORDER-ORDERS-3#payByLink	New	Sub Task	Deep Khanvilkar	[BE] payByLink: POST /payment-links/{token}/pay	table:orders.payment
+new	31026	SVC-WHITELABEL-APPPUBLISHING-1#getStoreAccounts	New	Sub Task	Deep Khanvilkar	[BE] getStoreAccounts: GET /tenant-config/store-accounts	table:whitelabel.config_version
+new	31028	SVC-WHITELABEL-APPPUBLISHING-1#requestAppBuild	New	Sub Task	Deep Khanvilkar	[BE] requestAppBuild: POST /tenant-config/app-builds	table:whitelabel.config_version
+new	31033	SVC-WHITELABEL-BOOKINGFLOWS-1#getPublishedBookingFlow	New	Sub Task	Hrushikant Patkar	[BE] getPublishedBookingFlow: GET /venues/{venueId}/booking-flow	table:whitelabel.config_version
+new	31053	SVC-WHITELABEL-OVERVIEW-1#getTenantAppStatus	New	Sub Task	Hrushikant Patkar	[BE] getTenantAppStatus: GET /tenant-config/status	table:whitelabel.config_version
+new	31113	APP-WL-CMS-014#build	New	Sub Task	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow: build with all states	operation:white-label#publishTenantConfig, operation:white-label#setPublishReviewPolicy
+new	31114	APP-WL-CMS-014#wire	New	Sub Task	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow: connect to API	operation:white-label#publishTenantConfig, operation:white-label#setPublishReviewPolicy
+new	31115	APP-WL-CMS-014#test	New	Sub Task	Chitrangi Mestry	[FE] CMS-014 Publishing Workflow: tests	operation:white-label#publishTenantConfig, operation:white-label#setPublishReviewPolicy
+new	31129	SVC-ORDER-CART-1#checkoutCart	New	Sub Task	Pranay Shinde	[BE] checkoutCart: POST /carts/{cartId}/checkout	table:orders.payment
+new	31176	APP-WL-ADM-016#build	New	Sub Task	Chitrangi Mestry	[FE] ADM-016 White-Label Branding Management: build with all states	operation:white-label#publishTenantConfig
+new	31177	APP-WL-ADM-016#wire	New	Sub Task	Chitrangi Mestry	[FE] ADM-016 White-Label Branding Management: connect to API	operation:white-label#publishTenantConfig
+new	31178	APP-WL-ADM-016#test	New	Sub Task	Chitrangi Mestry	[FE] ADM-016 White-Label Branding Management: tests	operation:white-label#publishTenantConfig
+new	31204	SVC-TENANCY-TENANCY-1#getWorkstationHealth	New	Sub Task	Deep Khanvilkar	[BE] getWorkstationHealth: GET /workstations/{workstationId}/health	table:platform.device
+new	31309	VM-MIG-CONTROL#control.webhook_delivery	New	Sub Task	Hrushikant Patkar	[DB] control.webhook_delivery	table:control.webhook_delivery
+new	31310	VM-MIG-CONTROL#control.webhook_subscription	New	Sub Task	Hrushikant Patkar	[DB] control.webhook_subscription	table:control.webhook_subscription
+new	31358	SVC-PLATFORM-PUBLICAPI-9#replayEvents	New	Sub Task	Sanket Keluskar	[BE] replayEvents: POST /webhook-subscriptions/{subscriptionId}/replay	operation:public-api#replayEvents, raised the CR, table:control.webhook_delivery, table:control.webhook_subscription
+new	31375	VM-PLATFORM-PUBLICAPI-1#createWebhookSubscription	New	Sub Task	Sanket Keluskar	[BE] createWebhookSubscription: POST /webhook-subscriptions	table:control.webhook_subscription
+new	31377	VM-PLATFORM-PUBLICAPI-1#listWebhookDeliveries	New	Sub Task	Sanket Keluskar	[BE] listWebhookDeliveries: GET /webhook-subscriptions/{subscriptionId}/deliveries	operation:public-api#listWebhookDeliveries, table:control.webhook_delivery
+new	31378	VM-PLATFORM-PUBLICAPI-1#listWebhookSubscriptions	New	Sub Task	Sanket Keluskar	[BE] listWebhookSubscriptions: GET /webhook-subscriptions	table:control.webhook_subscription
+new	31487	SVC-ORDER-ORDERS-1#getBillingStatement	New	Sub Task	Pranay Shinde	[BE] getBillingStatement: GET /billing-statements/{statementId}	table:orders.payment
+new	31488	SVC-ORDER-PAYMENTS-1#createInstalmentPlan	New	Sub Task	Pranay Shinde	[BE] createInstalmentPlan: POST /instalment-plans	table:orders.payment
+new	31489	SVC-ORDER-PAYMENTS-1#createPaymentProviderConnection	New	Sub Task	Pranay Shinde	[BE] createPaymentProviderConnection: POST /payment-providers	operation:payments#createPaymentProviderConnection, table:payments.provider_connection
+new	31502	APP-SETUP-ADM-570#build	New	Sub Task	Surendra Loke	[FE] ADM-570 Gateway, PSP & Acquirer Directory (setup: 1 of its 2 operations): build with 	operation:payments#createPaymentProviderConnection
+new	31503	APP-SETUP-ADM-570#wire	New	Sub Task	Surendra Loke	[FE] ADM-570 Gateway, PSP & Acquirer Directory (setup: 1 of its 2 operations): connect to 	operation:payments#createPaymentProviderConnection
+new	31504	APP-SETUP-ADM-570#test	New	Sub Task	Surendra Loke	[FE] ADM-570 Gateway, PSP & Acquirer Directory (setup: 1 of its 2 operations): tests	operation:payments#createPaymentProviderConnection
+new	31636	SVC-CATALOGUE-CATALOGUE-5#listProductVersions	New	Sub Task	Narayan Gaonkar	[BE] listProductVersions: GET /products/{productId}/versions	table:catalogue.product_version
+new	31637	SVC-CATALOGUE-CATALOGUE-5#restoreProductVersion	New	Sub Task	Narayan Gaonkar	[BE] restoreProductVersion: POST /products/{productId}/versions/{version}/restore	table:catalogue.product_version
+new	31719	SVC-ORDER-SYNC-1#syncOrders	New	Sub Task	Pranay Shinde	[BE] syncOrders: POST /sync/orders	table:orders.payment
+new	31732	SVC-ORDER-PAYMENT-1#addTip	New	Sub Task	Pranay Shinde	[BE] addTip: POST /payments/{paymentId}/tip	table:orders.payment
+new	31733	SVC-ORDER-PAYMENT-1#capturePayment	New	Sub Task	Pranay Shinde	[BE] capturePayment: POST /payments/{paymentId}/capture	table:orders.payment, table:payments.provider_connection
+new	31734	SVC-ORDER-PAYMENT-1#createPayment	New	Sub Task	Pranay Shinde	[BE] createPayment: POST /payments	table:orders.payment, table:payments.provider_connection
+new	31735	SVC-ORDER-PAYMENT-1#inquirePaymentStatus	New	Sub Task	Pranay Shinde	[BE] inquirePaymentStatus: POST /payments/{paymentId}/inquiry	operation:orders#inquirePaymentStatus, table:orders.payment
+new	31890	SVC-ORDER-RESERVATION-1#convertReservation	New	Sub Task	Sanket Keluskar	[BE] convertReservation: POST /reservations/{reservationId}/convert	table:orders.payment
+new	31898	APP-WEB-WEB-012#build	New	Sub Task	Chinmay Patkar	[FE] WEB-012 Checkout — Payment: build with all states	operation:orders#inquirePaymentStatus
+new	31899	APP-WEB-WEB-012#wire	New	Sub Task	Chinmay Patkar	[FE] WEB-012 Checkout — Payment: connect to API	operation:orders#inquirePaymentStatus
+new	31900	APP-WEB-WEB-012#test	New	Sub Task	Chinmay Patkar	[FE] WEB-012 Checkout — Payment: tests	operation:orders#inquirePaymentStatus
+new	31920	SVC-ORDER-ORDER-3#getOrderStatement	New	Sub Task	Pranay Shinde	[BE] getOrderStatement: GET /orders/{orderId}/statement	table:orders.payment
+new	31922	SVC-ORDER-ORDER-3#holdOrder	New	Sub Task	Pranay Shinde	[BE] holdOrder: POST /orders/{orderId}/hold	table:orders.payment
+new	31924	SVC-ORDER-REFUND-1#createRefund	New	Sub Task	Pranay Shinde	[BE] createRefund: POST /orders/{orderId}/refunds	table:orders.payment
+new	31928	SVC-ORDER-DUNNING-1#retryMyDunningPayment	New	Sub Task	Sanket Keluskar	[BE] retryMyDunningPayment: POST /dunning-cases/{caseId}/retry	table:orders.payment
+new	31935	APP-MOB-GST-009#build	New	Sub Task	Chitrangi Mestry	[FE] GST-009 Review & Payment: build with all states	operation:orders#inquirePaymentStatus
+new	31936	APP-MOB-GST-009#wire	New	Sub Task	Chitrangi Mestry	[FE] GST-009 Review & Payment: connect to API	operation:orders#inquirePaymentStatus
+new	31937	APP-MOB-GST-009#test	New	Sub Task	Chitrangi Mestry	[FE] GST-009 Review & Payment: tests	operation:orders#inquirePaymentStatus
+new	31989	SVC-LEDGER-TAX-2#issueTaxInvoice	New	Sub Task	Narayan Gaonkar	[BE] issueTaxInvoice: POST /tax-invoices	table:orders.payment
+new	32064	VM-ORDER-ORDERS-2#getChargebackAnalytics	New	Sub Task	Pranay Shinde	[BE] getChargebackAnalytics: GET /chargebacks/analytics	table:orders.payment
+new	32066	VM-ORDER-ORDERS-2#recordChargeback	New	Sub Task	Pranay Shinde	[BE] recordChargeback: POST /chargebacks/intake	table:orders.payment
+new	32071	VM-LEDGER-SETTLEMENT-1#ingestSettlementFile	New	Sub Task	Narayan Gaonkar	[BE] ingestSettlementFile: POST /settlements	table:payments.provider_connection
+new	32090	SVC-ORDER-DRAFTED-2#setOrderAmendment	New	Sub Task	Pranay Shinde	[BE] setOrderAmendment: PUT /order-amendment	table:orders.payment
+new	32091	SVC-ORDER-DRAFTED-2#setOrderDetailTransaction	New	Sub Task	Pranay Shinde	[BE] setOrderDetailTransaction: PUT /order-detail-transaction	table:orders.payment
+new	32092	SVC-ORDER-ORDERS-12#convertToTermProduct	New	Sub Task	Pranay Shinde	[BE] convertToTermProduct: POST /orders/{orderId}/convert-to-term	table:orders.payment
+new	32111	MIG-PAYMENTS-7#payments.provider_event	New	Sub Task	Hrushikant Patkar	[DB] payments.provider_event	table:payments.provider_event
+new	32117	SVC-ORDER-PAYMENTS-17#listPaymentProviderConnections	New	Sub Task	Deep Khanvilkar	[BE] listPaymentProviderConnections: GET /payment-providers	table:payments.provider_connection
+new	32119	SVC-ORDER-PAYMENTS-17#simulatePaymentConfiguration	New	Sub Task	Deep Khanvilkar	[BE] simulatePaymentConfiguration: POST /payment-configuration/simulate	table:payments.provider_connection
+new	32123	SVC-ORDER-PAYMENTS-18#testPaymentProviderConnection	New	Sub Task	Narayan Gaonkar	[BE] testPaymentProviderConnection: POST /payment-providers/{connectionId}/test	table:payments.provider_connection
+new	32182	APP-WL-CMS-103#build	New	Sub Task	Chinmay Patkar	[FE] CMS-103 Booking Flows: build with all states	operation:white-label#publishTenantConfig
+new	32183	APP-WL-CMS-103#wire	New	Sub Task	Chinmay Patkar	[FE] CMS-103 Booking Flows: connect to API	operation:white-label#publishTenantConfig
+new	32184	APP-WL-CMS-103#test	New	Sub Task	Chinmay Patkar	[FE] CMS-103 Booking Flows: tests	operation:white-label#publishTenantConfig
+new	32337	SVC-LEDGER-FINANCE-5#getUnifiedReconciliation	New	Sub Task	Narayan Gaonkar	[BE] getUnifiedReconciliation: GET /reconciliation/unified	table:orders.payment
+new	32649	SVC-ORDER-SHIFT-5#submitShiftCount	New	Sub Task	Pranay Shinde	[BE] submitShiftCount: POST /shifts/{shiftId}/count	table:orders.payment
+new	32678	SVC-FNB-BILL-1#getBill	New	Sub Task	Narayan Gaonkar	[BE] getBill: GET /table-visits/{visitId}/bill	table:orders.payment
+new	32719	SVC-FNB-GUESTORDERING-2#getGuestBill	New	Sub Task	Deep Khanvilkar	[BE] getGuestBill: GET /table-sessions/{sessionId}/bill	table:orders.payment
+new	32790	VM-ORDER-DRAFTED-1#listPaymentReconciliationException	New	Sub Task	Chinmay Patkar	[BE] listPaymentReconciliationException: GET /payment-reconciliation-exception	table:orders.payment
+new	32792	VM-BO-024#build	New	Sub Task	Pallavi Sawant	[FE] BO-024 Payment Exceptions: build with all states	operation:orders#inquirePaymentStatus
+new	32793	VM-BO-024#wire	New	Sub Task	Pallavi Sawant	[FE] BO-024 Payment Exceptions: connect to API	operation:orders#inquirePaymentStatus
+new	32794	VM-BO-024#test	New	Sub Task	Pallavi Sawant	[FE] BO-024 Payment Exceptions: tests	operation:orders#inquirePaymentStatus
+new	32812	VM-TENANCY-WORKSTATION-1#getWorkstation	New	Sub Task	Pranay Shinde	[BE] getWorkstation: GET /workstations/{workstationId}	operation:tenancy#getWorkstation, table:platform.device
+new	32814	VM-TENANCY-WORKSTATION-1#listWorkstations	New	Sub Task	Pranay Shinde	[BE] listWorkstations: GET /workstations	table:platform.device
+new	32815	VM-TENANCY-WORKSTATION-1#registerDevice	New	Sub Task	Pranay Shinde	[BE] registerDevice: POST /devices	table:platform.device
+new	32818	SVC-LEDGER-REPORTING-2#getForeignTenderReport	New	Sub Task	Deep Khanvilkar	[BE] getForeignTenderReport: GET /fx/foreign-tender	table:orders.payment
+new	32871	APP-POS-POS-005#build	New	Sub Task	Pradnya Yeram	[FE] POS-005 Payment: build with all states	operation:orders#inquirePaymentStatus
+new	32872	APP-POS-POS-005#wire	New	Sub Task	Pradnya Yeram	[FE] POS-005 Payment: connect to API	operation:orders#inquirePaymentStatus
+new	32873	APP-POS-POS-005#test	New	Sub Task	Pradnya Yeram	[FE] POS-005 Payment: tests	operation:orders#inquirePaymentStatus
+new	33523	SVC-MARKETING-MARKETING-21#startKioskAssist	New	Sub Task	Sanket Keluskar	[BE] startKioskAssist: POST /kiosk-assists	table:platform.device
+new	33879	VM-TENANCY-DEVICES-1#getDeviceFirmware	New	Sub Task	Deep Khanvilkar	[BE] getDeviceFirmware: GET /device-firmware/{firmwareId}	table:platform.device
+new	33881	VM-TENANCY-DEVICES-1#listDeviceFirmware	New	Sub Task	Deep Khanvilkar	[BE] listDeviceFirmware: GET /device-firmware	table:platform.device
+new	33885	VM-TENANCY-DEVICES-2#startDeviceFirmwareRollout	New	Sub Task	Pranay Shinde	[BE] startDeviceFirmwareRollout: POST /device-firmware/rollouts	table:platform.device
+new	33913	VM-BO-036#build	New	Sub Task	Sanket Keluskar	[FE] BO-036 Device Registry: build with all states	operation:tenancy#configureWorkstation, operation:tenancy#getWorkstation
+new	33914	VM-BO-036#wire	New	Sub Task	Sanket Keluskar	[FE] BO-036 Device Registry: connect to API	operation:tenancy#configureWorkstation, operation:tenancy#getWorkstation
+new	33915	VM-BO-036#test	New	Sub Task	Sanket Keluskar	[FE] BO-036 Device Registry: tests	operation:tenancy#configureWorkstation, operation:tenancy#getWorkstation
+new	33989	SVC-TENANCY-DEVICES-4#enrolDevice	New	Sub Task	Sanket Keluskar	[BE] enrolDevice: POST /devices/{deviceId}/enrolment	table:platform.device
+new	34021	VM-BO-602#build	New	Sub Task	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup: build with all states	operation:tenancy#configureWorkstation
+new	34022	VM-BO-602#wire	New	Sub Task	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup: connect to API	operation:tenancy#configureWorkstation
+new	34023	VM-BO-602#test	New	Sub Task	Chitrangi Mestry	[FE] BO-602 POS, Payment & Access Setup: tests	operation:tenancy#configureWorkstation
+new	34206	SVC-PLATFORM-SUBSCRIPTION-6#reconcileBurstEnvironment	New	Sub Task	Narayan Gaonkar	[BE] reconcileBurstEnvironment: POST /burst-environments/{burstEnvironmentId}/reconcile	table:orders.payment
+new	34606	SVC-PLATFORM-DRAFTED-12#listPartnerProfileReadiness	New	Sub Task	Narayan Gaonkar	[BE] listPartnerProfileReadiness: GET /partner-profile-readiness	table:orders.payment
+new	34610	SVC-PLATFORM-DRAFTED-13#setPaymentTermBilling	New	Sub Task	Deep Khanvilkar	[BE] setPaymentTermBilling: PUT /payment-term-billing	table:orders.payment
+new	34760	SVC-PLATFORM-DRAFTED-14#listPartnerPerformanceScorecard	New	Sub Task	Surendra Loke	[BE] listPartnerPerformanceScorecard: GET /partner-performance-scorecard	table:orders.payment
+new	34824	VM-BO-067#build	New	Sub Task	Pallavi Sawant	[FE] BO-067 Integrations: build with all states	operation:public-api#listWebhookDeliveries
+new	34825	VM-BO-067#wire	New	Sub Task	Pallavi Sawant	[FE] BO-067 Integrations: connect to API	operation:public-api#listWebhookDeliveries
+new	34826	VM-BO-067#test	New	Sub Task	Pallavi Sawant	[FE] BO-067 Integrations: tests	operation:public-api#listWebhookDeliveries
+new	34829	SVC-PLATFORM-PUBLICAPI-5#testWebhookSubscription	New	Sub Task	Sanket Keluskar	[BE] testWebhookSubscription: POST /webhook-subscriptions/{subscriptionId}/test	table:control.webhook_delivery
+new	34830	SVC-PLATFORM-DRAFTED-10#listCommercialAgreement	New	Sub Task	Pranay Shinde	[BE] listCommercialAgreement: GET /commercial-agreement	table:orders.payment
+new	34831	SVC-PLATFORM-DRAFTED-10#listCommercialAgreementHealth	New	Sub Task	Pranay Shinde	[BE] listCommercialAgreementHealth: GET /commercial-agreement-health	table:orders.payment
+new	34832	SVC-PLATFORM-DRAFTED-10#listPartner	New	Sub Task	Pranay Shinde	[BE] listPartner: GET /partner	table:control.webhook_delivery, table:orders.payment
+new	34833	SVC-PLATFORM-DRAFTED-10#listPartner2	New	Sub Task	Pranay Shinde	[BE] listPartner2: GET /partner-2	table:orders.payment
+new	34861	VM-BO-1078#build	New	Sub Task	Chitrangi Mestry	[FE] BO-1078 Monitoring, Retry & Reconciliation: build with all states	operation:public-api#listWebhookDeliveries
+new	34862	VM-BO-1078#wire	New	Sub Task	Chitrangi Mestry	[FE] BO-1078 Monitoring, Retry & Reconciliation: connect to API	operation:public-api#listWebhookDeliveries
+new	34863	VM-BO-1078#test	New	Sub Task	Chitrangi Mestry	[FE] BO-1078 Monitoring, Retry & Reconciliation: tests	operation:public-api#listWebhookDeliveries
+new	34864	VM-BO-1173#build	New	Sub Task	Pradnya Yeram	[FE] BO-1173 Wallet Integration Command Center: build with all states	operation:public-api#replayEvents
+new	34865	VM-BO-1173#wire	New	Sub Task	Pradnya Yeram	[FE] BO-1173 Wallet Integration Command Center: connect to API	operation:public-api#replayEvents
+new	34866	VM-BO-1173#test	New	Sub Task	Pradnya Yeram	[FE] BO-1173 Wallet Integration Command Center: tests	operation:public-api#replayEvents
+new	34870	VM-BO-692#build	New	Sub Task	Pradnya Yeram	[FE] BO-692 Accreditation Webhook Management: build with all states	operation:public-api#listWebhookDeliveries
+new	34871	VM-BO-692#wire	New	Sub Task	Pradnya Yeram	[FE] BO-692 Accreditation Webhook Management: connect to API	operation:public-api#listWebhookDeliveries
+new	34872	VM-BO-692#test	New	Sub Task	Pradnya Yeram	[FE] BO-692 Accreditation Webhook Management: tests	operation:public-api#listWebhookDeliveries
+new	34892	APP-DEVPORTAL-DEV-005#build	New	Sub Task	Chitrangi Mestry	[FE] DEV-005 Webhooks: build with all states	operation:public-api#listWebhookDeliveries, operation:public-api#replayEvents
+new	34893	APP-DEVPORTAL-DEV-005#wire	New	Sub Task	Chitrangi Mestry	[FE] DEV-005 Webhooks: connect to API	operation:public-api#listWebhookDeliveries, operation:public-api#replayEvents
+new	34894	APP-DEVPORTAL-DEV-005#test	New	Sub Task	Chitrangi Mestry	[FE] DEV-005 Webhooks: tests	operation:public-api#listWebhookDeliveries, operation:public-api#replayEvents
+new	34916	SVC-VENUEOPS-ASSETS-1#findSimilarMediaAssets	New	Sub Task		[BE] findSimilarMediaAssets: GET /media-assets/similar	table:assets.asset_version
+new	34955	SVC-VENUEOPS-ASSETS-2#listMediaAssetVersions	New	Sub Task		[BE] listMediaAssetVersions: GET /media-assets/{assetId}/versions	table:assets.asset_version
+new	35067	VM-BO-843#build	New	Sub Task	Sanket Keluskar	[FE] BO-843 Publishing, Analytics & Audit: build with all states	operation:white-label#publishTenantConfig
+new	35068	VM-BO-843#wire	New	Sub Task	Sanket Keluskar	[FE] BO-843 Publishing, Analytics & Audit: connect to API	operation:white-label#publishTenantConfig
+new	35069	VM-BO-843#test	New	Sub Task	Sanket Keluskar	[FE] BO-843 Publishing, Analytics & Audit: tests	operation:white-label#publishTenantConfig
+new	35144	SVC-CATALOGUE-DRAFTED-7#approveReviewDecision	New	Sub Task	Surendra Loke	[BE] approveReviewDecision: PUT /review-decision	table:catalogue.product_version
+new	35196	SVC-PLATFORM-DRAFTED-11#listPartnerOrderBooking	New	Sub Task		[BE] listPartnerOrderBooking: GET /partner-order-booking	table:orders.payment
+new	35209	SVC-PLATFORM-DRAFTED-15#listPartnerStatementAccount	New	Sub Task	Pranay Shinde	[BE] listPartnerStatementAccount: GET /partner-statement-account	table:orders.payment
+new	35218	SVC-CATALOGUE-DRAFTED-8#listProductGovernance	New	Sub Task	Hrushikant Patkar	[BE] listProductGovernance: GET /product-governance	table:catalogue.product_version
+new	35220	SVC-CATALOGUE-DRAFTED-8#listProductLifecycle	New	Sub Task	Hrushikant Patkar	[BE] listProductLifecycle: GET /product-lifecycle	table:catalogue.product_version
+new	35259	SVC-PLATFORM-DRAFTED-4#listPartnerReconciliationException	New	Sub Task		[BE] listPartnerReconciliationException: GET /partner-reconciliation-exception	table:orders.payment
+new	35311	SVC-CATALOGUE-DRAFTED-9#listProductTrailChange	New	Sub Task	Pranay Shinde	[BE] listProductTrailChange: GET /product-trail-change	table:catalogue.product_version
+new	35312	SVC-CATALOGUE-DRAFTED-9#listRollbackRecovery	New	Sub Task	Pranay Shinde	[BE] listRollbackRecovery: GET /rollback-recovery	table:catalogue.product_version
+new	35343	SVC-PLATFORM-DRAFTED-3#listCreditLimitExposure	New	Sub Task		[BE] listCreditLimitExposure: GET /credit-limit-exposure	table:orders.payment
+new	35344	SVC-PLATFORM-DRAFTED-3#listDepositGuaranteeFinancial	New	Sub Task		[BE] listDepositGuaranteeFinancial: GET /deposit-guarantee-financial	table:orders.payment
+new	35355	SVC-PLATFORM-DRAFTED-6#listMemberLifecycleCase	New	Sub Task	Narayan Gaonkar	[BE] listMemberLifecycleCase: GET /member-lifecycle-case	table:orders.payment
+new	35358	SVC-PLATFORM-DRAFTED-7#listMembershipUpgradeDowngrade	New	Sub Task	Surendra Loke	[BE] listMembershipUpgradeDowngrade: GET /membership-upgrade-downgrade	table:orders.payment
+new	35359	SVC-PLATFORM-DRAFTED-7#listRenewalAuto	New	Sub Task	Surendra Loke	[BE] listRenewalAuto: GET /renewal-auto	table:orders.payment
+new	35594	AM-WHITE-LABEL-KIOSK	New	Feature	Hrushikant Patkar	White Label · Kiosk customisation	operation:white-label#publishKioskConfigs
+new	35595	MIG-WHITELABEL-2	New	Task	Hrushikant Patkar	[DB] Forward migration V1199__whitelabel.sql: whitelabel for White Label · Kiosk customisa	table:whitelabel.kiosk_config_version
+new	35597	SVC-WHITELABEL-KIOSK-3	New	Task	Hrushikant Patkar	[BE] WhiteLabelService: listKioskConfigs, publishKioskConfigs, restoreKioskConfigVersion, 	operation:white-label#publishKioskConfigs, table:whitelabel.kiosk_config_version
+new	35599	SVC-WHITELABEL-KIOSK-2	New	Task	Hrushikant Patkar	[BE] WhiteLabelService: getKioskConfigValidation, getPublishedKioskConfig, listKioskAssign	table:whitelabel.config_version, table:whitelabel.kiosk_config_version
+new	35600	APP-CMS-CMS-105	New	Task	Pradnya Yeram	[FE] CMS-105 Kiosk Builder	operation:white-label#publishKioskConfigs
+new	35601	APP-KIOSK-CONFIG	New	Task	Chitrangi Mestry	[FE] Kiosk shell: the published kiosk configuration on KSK-001, KSK-002, KSK-008, KSK-010,	table:whitelabel.kiosk_config_version
+new	35604	TEST-AM-WHITE-LABEL-KIOSK	New	Task	Deep Khanvilkar	[Test] Module test: White Label · Kiosk customisation	operation:white-label#publishKioskConfigs, table:whitelabel.config_version, table:whitelabel.kiosk_config_version
+new	35613	MIG-WHITELABEL-2#whitelabel.kiosk_config_version	New	Sub Task	Hrushikant Patkar	[DB] whitelabel.kiosk_config_version	table:whitelabel.kiosk_config_version
+new	35619	SVC-WHITELABEL-KIOSK-3#publishKioskConfigs	New	Sub Task	Hrushikant Patkar	[BE] publishKioskConfigs: POST /venues/{venueId}/kiosk-configs/publish	operation:white-label#publishKioskConfigs, table:whitelabel.kiosk_config_version
+new	35620	SVC-WHITELABEL-KIOSK-3#restoreKioskConfigVersion	New	Sub Task	Hrushikant Patkar	[BE] restoreKioskConfigVersion: POST /kiosk-configs/{kioskConfigId}/versions/{versionNumbe	table:whitelabel.kiosk_config_version
+new	35623	SVC-WHITELABEL-KIOSK-2#getKioskConfigValidation	New	Sub Task	Hrushikant Patkar	[BE] getKioskConfigValidation: GET /kiosk-configs/{kioskConfigId}/validation	table:whitelabel.config_version
+new	35624	SVC-WHITELABEL-KIOSK-2#getPublishedKioskConfig	New	Sub Task	Hrushikant Patkar	[BE] getPublishedKioskConfig: GET /venues/{venueId}/kiosk-config	table:whitelabel.kiosk_config_version
+new	35626	SVC-WHITELABEL-KIOSK-2#listKioskConfigVersions	New	Sub Task	Hrushikant Patkar	[BE] listKioskConfigVersions: GET /kiosk-configs/{kioskConfigId}/versions	table:whitelabel.kiosk_config_version
+new	35627	APP-CMS-CMS-105#build	New	Sub Task	Pradnya Yeram	[FE] CMS-105 Kiosk Builder: build with all states	operation:white-label#publishKioskConfigs
+new	35628	APP-CMS-CMS-105#wire	New	Sub Task	Pradnya Yeram	[FE] CMS-105 Kiosk Builder: connect to API	operation:white-label#publishKioskConfigs
+new	35629	APP-CMS-CMS-105#test	New	Sub Task	Pradnya Yeram	[FE] CMS-105 Kiosk Builder: tests	operation:white-label#publishKioskConfigs
+new	35719	TEST-AM-WALLET-CASHLESS-API-BLOCK-A	New	Task	Chinmay Patkar	[Test] Module test: Wallet & Cashless · API only (Block A)	table:orders.payment

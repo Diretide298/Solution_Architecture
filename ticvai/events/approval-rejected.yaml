@@ -65,6 +65,14 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: white-label
+  purpose: Mark the white-label version rejected (`reviewStatus` rejected); it never becomes current, when
+    `subjectType` is `whiteLabelPublication` (ADAM CR-154, 18 October 2026; CHG-CRA-004)
+  writes:
+  - whitelabel.config_version
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: Retained with the request. This is an audit record, not an operational message
 notes: Critical on the owning contract because **a rejected refund left in `pendingApproval` is a refund
   that neither happens nor fails**, and the guest is told nothing.

@@ -7,6 +7,8 @@ package is checked by running `tools/derive-ddl.py` and reading the forward migr
 it held).
 
 - `x-ticvai-exactly-one-of` (ADAM CR-158; CHG-CRA-002): a grant names exactly one of a permission or a role.
+- `x-ticvai-index` (ADAM CR-165, CR-166; CHG-CRA-004): a plain index over the columns the contract names.
+- `x-ticvai-unique-when` (ADAM CR-154; CHG-CRA-004): a partial unique index, one current version per tenant.
 """
 import importlib.util
 from pathlib import Path
@@ -47,3 +49,29 @@ def test_exactly_one_of_check_sql():
     line = ddl.exactly_one_sql("delegated_access", ["permission", "role_id"])
     assert line.strip() == ("CONSTRAINT delegated_access_permission_role_id_one_chk CHECK "
                             "(num_nonnulls(permission, role_id) = 1)")
+
+
+# - `x-ticvai-index` (ADAM CR-165, CR-166; CHG-CRA-004): a plain index the contract names.
+# - `x-ticvai-unique-when` (ADAM CR-154; CHG-CRA-004): one current version per tenant, a partial unique index.
+
+def test_index_names_columns_and_sql():
+    cols = _cols("platform.outbox", "platform-ops.OutboxEntry",
+                 {"id": "id", "aggregateId": "aggregate_id", "sequence": "sequence"})
+    entry = _marks("platform-ops.OutboxEntry", {"x-ticvai-index": [["aggregateId", "sequence"]]}, cols, "platform.outbox")
+    assert entry.get("index") == [["aggregate_id", "sequence"]]
+    sql = ddl.index_sql("platform", "outbox", "platform.outbox", ["aggregate_id", "sequence"])
+    assert sql.splitlines()[-1] == ("CREATE INDEX IF NOT EXISTS outbox_aggregate_id_sequence_idx "
+                                    "ON platform.outbox (aggregate_id, sequence);")
+
+
+def test_unique_when_names_columns_and_sql():
+    cols = _cols("whitelabel.config_version", "white-label.ConfigVersion",
+                 {"version": "version", "isCurrent": "is_current", "scopePath": "scope_path"})
+    entry = _marks("white-label.ConfigVersion",
+                   {"x-ticvai-unique-when": [{"columns": ["scopePath"], "when": {"isCurrent": True}}]},
+                   cols, "whitelabel.config_version")
+    assert entry.get("unique_when") == [(["scope_path"], {"is_current": True})]
+    sql = ddl.unique_when_sql("whitelabel", "config_version", "whitelabel.config_version", ["scope_path"],
+                              {"is_current": True}, ["scope_path"])
+    assert sql.splitlines()[-1] == ("CREATE UNIQUE INDEX IF NOT EXISTS config_version_scope_path_uniq "
+                                    "ON whitelabel.config_version (scope_path) WHERE is_current;")

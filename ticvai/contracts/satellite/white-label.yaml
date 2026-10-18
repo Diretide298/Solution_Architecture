@@ -1031,7 +1031,15 @@ paths:
         publishing, and the version or block goes live when approved; `requiresReviewerOtherThanAuthor` keeps the
         products'' rule. When off, a permission holder simulates (`createPreview`) and publishes in one step.
 
+        **Switching it on creates the tenant''s default approval matrix for `whiteLabelPublication`** (ADAM CR-154,
+        18 October 2026; CHG-CRA-004) through approvals'' `setApprovalMatrix` (`x-ticvai-write-via`), where the
+        tenant has none, so the policy and the matrix never disagree: a policy that is on always has a matrix to
+        route the approval request by.
+
         '
+      x-ticvai-write-via:
+      - table: approvals.matrix
+        operation: setApprovalMatrix
       tags:
       - publishing
       x-ticvai-permission: TENANT_PUBLISH
@@ -3728,6 +3736,9 @@ paths:
       - query: tenancy#activeVenues
         route: service
         for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -3755,6 +3766,21 @@ paths:
         **Platform staff publish a hosted tenant''s site** (Chinmay, 2 October, workbook Q144; R098; CHG-CSA-038)
         only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant exports a site
         package (`exportSitePackage`) instead.
+
+        **The server names the version** (ADAM CR-154, 18 October 2026; CHG-CRA-004). In the publish transaction it
+        takes the next integer for the tenant (`1`, `2`, ...), as kiosk versions are numbered; that is the
+        version''s `version`, and the draft''s `tenant_config.version` becomes the next label. `config_version` is
+        unique on (`scope_path`, `version`) and has one current row per tenant (a partial unique index on
+        `scope_path` where `is_current`), so a racing publish fails on the index and is retried with the next label.
+
+        **The review path** (CR-154; CHG-CRA-004). The tenant''s publish-review policy decides: off, the version is
+        current at once (201) and `whitelabel.contentPublished` goes out in the same transaction; on, this calls
+        approvals'' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, subject
+        `whiteLabelPublication`, `subjectId` the `config_version` id), records its `approvalRequestId` and answers
+        202 with `reviewStatus` `pending`. White-label''s consumer of `approval.granted` makes the version current
+        (`reviewStatus` `approved`) and then emits `contentPublished`; its consumer of `approval.rejected` sets
+        `reviewStatus` `rejected` and the version never becomes current. A scheduled publish emits it when the job
+        makes the version current. **The event goes out when a version becomes current, never before.**
 
         '
       tags:
@@ -10421,6 +10447,12 @@ components:
             **Operations write it at `tenant` scope.**'
     KioskConfigVersion:
       x-ticvai-persistence: whitelabel.kiosk_config_version
+      # The same pair as ConfigVersion (ADAM CR-154, 18 October 2026; CHG-CRA-004): one number per kiosk
+      # configuration, and one current version of each.
+      x-ticvai-unique-together: [[kioskConfigId, versionNumber]]
+      x-ticvai-unique-when:
+      - columns: [kioskConfigId]
+        when: {isCurrent: true}
       type: object
       description: '**A published kiosk configuration: immutable**, like a `ConfigVersion` (decided 5 October 2026 by
         Chinmay, CHG-R4-001). Written once by `publishKioskConfigs` and never changed; the newest published one is
@@ -10926,6 +10958,12 @@ components:
     ConfigVersion:
       x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getKioskConfigValidation
       x-ticvai-persistence: whitelabel.config_version
+      # One label per tenant and one current version per tenant (ADAM CR-154, 18 October 2026; CHG-CRA-004):
+      # config_version_scope_path_version_uniq and the partial config_version_scope_path_uniq where is_current.
+      x-ticvai-unique-together: [[scopePath, version]]
+      x-ticvai-unique-when:
+      - columns: [scopePath]
+        when: {isCurrent: true}
       type: object
       required:
       - version
@@ -10936,6 +10974,9 @@ components:
       properties:
         version:
           type: string
+          readOnly: true
+          description: '**Named by the server** (ADAM CR-154; CHG-CRA-004): the next integer for the tenant, `1`, `2`,
+            ..., taken in the publish transaction. Unique per tenant; a racing publish fails on the index and retries.'
         publishedAt:
           type: string
           format: date-time
