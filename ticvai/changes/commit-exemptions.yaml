@@ -1,0 +1,8 @@
+# Commits already pushed whose message can no longer be changed, and that the commit rule of
+# tools/check-changelog.py would otherwise fail. Treated exactly like a `CHG-exempt:` line in the message, and
+# printed on every run. Each entry: the full 40-character sha (in history), the reason, who ruled, the date.
+- sha: 4edc4e39be44e72572881f5660f7d8354cc5e75f
+  reason: "r7 derived commit: the only authored change is screens/_id-register.yaml's updated: date, which
+    derive-id-register restamped every run (fixed by CHG-LCR-002)"
+  by: Chinmay Parab
+  date: '2026-10-19'

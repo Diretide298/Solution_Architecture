@@ -26,7 +26,9 @@ them with an example. This enforces them, so nobody has to remember to read them
 commit in REF..HEAD that touches an authored package input (`changes/schema.yaml` `authored_roots` and
 `authored_files`, less anything `tools/refresh-manifest.py` classifies as derived) names an existing entry
 id in its message. Commits dated before `commit_rule_from` (5 October) are grandfathered; a release refresh
-commit may carry `CHG-exempt: <reason>`, and every exemption is printed. Without `--since` (the normal
+commit may carry `CHG-exempt: <reason>`, and so may a commit already pushed, whose message can no longer be
+changed: `changes/commit-exemptions.yaml` lists `{sha, reason, by, date}` (full sha, in history); it is treated
+the same way. Every exemption is printed. Without `--since` (the normal
 `run-checks.py` run, where no range is given) only the files are validated.
 
 Self-tests run every time: entries and commits built in memory that must pass, and ones that must fail.
@@ -57,6 +59,9 @@ MANIFEST = ROOT / "handoff" / "refresh-manifest.json"
 ID_IN_TEXT = re.compile(r"\bCHG-[A-Z][A-Z0-9]{1,5}-\d{3}\b")
 EXEMPT = re.compile(r"(?mi)^CHG-exempt:\s*\S")
 SHA = re.compile(r"^[0-9a-f]{7,40}$")
+FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
+EXEMPTIONS = CHANGES / "commit-exemptions.yaml"
+EXEMPTION_KEYS = {"sha", "reason", "by", "date"}
 
 
 def _utf8():
@@ -324,8 +329,39 @@ def authored(paths: list[str], schema: dict, classify=None) -> list[str]:
     return hit
 
 
+def validate_exemptions(doc, known_sha) -> tuple[list[str], dict]:
+    """changes/commit-exemptions.yaml: a list of {sha, reason, by, date}. known_sha(sha) says whether git has the
+    commit. -> (errors, {sha: reason})."""
+    if doc is None:
+        return [], {}
+    if not isinstance(doc, list):
+        return ["commit-exemptions.yaml: must be a list of {sha, reason, by, date}"], {}
+    errs, out = [], {}
+    for i, x in enumerate(doc, 1):
+        at = f"commit-exemptions.yaml entry {i}"
+        if not isinstance(x, dict):
+            errs.append(f"{at}: must be a mapping")
+            continue
+        extra = set(x) - EXEMPTION_KEYS
+        if extra:
+            errs.append(f"{at}: unknown key(s) {', '.join(sorted(map(str, extra)))}")
+        for k in ("reason", "by", "date"):
+            if not str(x.get(k) or "").strip():
+                errs.append(f"{at}: missing {k}")
+        if x.get("date") and not isinstance(x.get("date"), datetime.date) and _date(x.get("date")) is None:
+            errs.append(f"{at}: date is not YYYY-MM-DD")
+        sha = str(x.get("sha") or "")
+        if not FULL_SHA.match(sha):
+            errs.append(f"{at}: sha must be the full 40 hex characters, got {sha[:12]!r}")
+        elif not known_sha(sha):
+            errs.append(f"{at}: sha {sha[:9]} is not in this repository's history")
+        else:
+            out[sha] = str(x.get("reason") or "")
+    return errs, out
+
+
 def commit_rule(commits: list[dict], ids: set, schema: dict, classify=None,
-                kinds: dict | None = None) -> tuple[list[str], list[str], int]:
+                kinds: dict | None = None, exempt_shas=()) -> tuple[list[str], list[str], int]:
     """commits: [{sha, date (datetime.date), message, paths (package-relative)}] -> (errors, exemptions,
     grandfathered)."""
     errs, exempt, old = [], [], 0
@@ -349,13 +385,20 @@ def commit_rule(commits: list[dict], ids: set, schema: dict, classify=None,
             if unknown:
                 errs.append(f"{c['sha'][:9]} cites {', '.join(sorted(unknown))}, not in changes/entries/  ({subject})")
             continue
-        if EXEMPT.search(c["message"]):
-            exempt.append(f"{c['sha'][:9]} {subject}")
+        if EXEMPT.search(c["message"]) or c["sha"] in exempt_shas:
+            why = (f"  [commit-exemptions.yaml: {exempt_shas[c['sha']][:140]}]"
+                   if isinstance(exempt_shas, dict) and c["sha"] in exempt_shas else "")
+            exempt.append(f"{c['sha'][:9]} {subject}{why}")
             continue
         what = ", ".join(hit[:3]) + (f" and {len(hit) - 3} more" if len(hit) > 3 else "")
         errs.append(f"{c['sha'][:9]} touches {what} and names no change id"
                     + (f" (cites unknown {', '.join(sorted(cited))})" if cited else "") + f"  ({subject})")
     return errs, exempt, old
+
+
+def git_knows(sha: str) -> bool:
+    rc, _ = _git("cat-file", "-e", f"{sha}^{{commit}}")
+    return rc == 0
 
 
 def latest_tag() -> str | None:
@@ -525,6 +568,29 @@ def self_test(schema: dict) -> list[tuple[str, bool, str]]:
     out.append(("commit rule: a file the manifest calls derived is not asked", "888888888" not in flagged, ""))
     out.append(("commit rule: a plan file cited with a non-plan change fails", "777777777" in flagged, ""))
     out.append(("commit rule: a plan file cited with a plan change passes", "666666666" not in flagged, ""))
+    # a commit already pushed, exempted by sha (CHG-LCR-002)
+    sha_a = "4" * 40
+    pushed = [{"sha": sha_a, "date": d(2026, 10, 19), "message": "TICVAI r7 derived", "paths": ["screens/P02.yaml"]}]
+    e1, x1, _ = commit_rule(pushed, set(), schema, cls)
+    out.append(("exemption: the same commit unlisted fails", len(e1) == 1 and not x1, ""))
+    e2, x2, _ = commit_rule(pushed, set(), schema, cls, exempt_shas={sha_a})
+    out.append(("exemption: a listed sha is exempt and printed, not failed", not e2 and len(x2) == 1, ""))
+    e3, x3, _ = commit_rule(pushed, set(), schema, cls, exempt_shas={"5" * 40})
+    out.append(("exemption: another sha does not help", len(e3) == 1, ""))
+    ok = {"sha": sha_a, "reason": "r", "by": "B", "date": "2026-10-19"}
+    known = lambda sh: sh == sha_a
+    out.append(("exemption file: a good entry passes", validate_exemptions([ok], known) == ([], {sha_a: "r"}), ""))
+    out.append(("exemption file: an empty file passes", validate_exemptions(None, known) == ([], {}), ""))
+    for name, bad, word in [("an unknown key", dict(ok, extra=1), "unknown key"),
+                            ("a short sha", dict(ok, sha=sha_a[:7]), "40 hex"),
+                            ("a sha not in history", dict(ok, sha="6" * 40), "not in this repository"),
+                            ("no reason", {k: v for k, v in ok.items() if k != "reason"}, "missing reason"),
+                            ("no by", dict(ok, by=" "), "missing by"),
+                            ("no date", {k: v for k, v in ok.items() if k != "date"}, "missing date"),
+                            ("a bad date", dict(ok, date="19 Oct"), "YYYY-MM-DD")]:
+        ee, _m = validate_exemptions([bad], known)
+        out.append((f"exemption file: {name} fails", any(word in e for e in ee), str(ee)))
+    out.append(("exemption file: a mapping instead of a list fails", bool(validate_exemptions({"a": 1}, known)[0]), ""))
     return out
 
 
@@ -574,7 +640,9 @@ def main() -> int:
         else:
             commits = git_commits(ref)
             kinds = {e.get("id"): e.get("kind") for _f, e in entries if isinstance(e, dict)}
-            c_errs, exempt, old = commit_rule(commits, ids, schema, manifest_classifier(), kinds)
+            x_errs, by_sha = validate_exemptions(_load(EXEMPTIONS) if EXEMPTIONS.exists() else None, git_knows)
+            errs += x_errs
+            c_errs, exempt, old = commit_rule(commits, ids, schema, manifest_classifier(), kinds, by_sha)
             print(f"commit rule since {ref}: {len(commits)} commit(s); {old} grandfathered "
                   f"(before {schema.get('commit_rule_from')}); {len(exempt)} exempt")
             for x in exempt:

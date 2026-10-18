@@ -1,0 +1,44 @@
+id: CHG-LCR-002
+date: '2026-10-19'
+source: developer
+kind: process
+proposed: '2026-10-19'
+summary: 'The light change-request release check can release r7: any named branch is accepted when HEAD is main on every
+  remote, the screen id register keeps its date when nothing else changed, and a commit already pushed can be exempted
+  by its sha.'
+decision:
+  what: 'cr-release check accepts any named branch (a detached HEAD is refused) because HEAD must equal main on origin
+    and github anyway. derive-id-register keeps the committed updated date when the register is otherwise identical, so
+    a refresh leaves the file untouched. check-changelog reads changes/commit-exemptions.yaml (sha, reason, by, date;
+    validated: no unknown keys, full sha, in history, reason, by and date present) and treats a listed commit like one
+    carrying CHG-exempt, printed on every run. The one entry is r7''s derived commit 4edc4e39, ruled by the lead on
+    19 October ("Fix the tool, tag tomorrow"). The runbook section 5a says "HEAD is main on both remotes".'
+  by: Chinmay Parab
+  date: '2026-10-19'
+why: 'cr-release check r7, 19 October 2026, refused for two tool reasons. First, "the branch is r6-integrate, not main":
+  the integration worktree is on its own branch because main is checked out in another session, and the ls-remote check
+  just below already enforces that what is released is what both remotes have on main. Second, "check-changelog --since
+  r6 fails: 4edc4e39 touches screens/_id-register.yaml and names no change id": the only change to that file was its
+  updated date, which derive-id-register stamped with today''s date on every run, so every full refresh''s derived
+  commit would fail the rule; 4edc4e39 is pushed and its message cannot be changed.'
+keys_touched:
+  files:
+  - tools/cr-release.py
+  - tools/derive-id-register.py
+  - tools/check-changelog.py
+  - changes/commit-exemptions.yaml
+  - docs/active/release-runbook.md
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: pending (raised by the lead with the r7 release; the request is the lead's 19 October ruling)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-id-register.py::write_register
+status: open
+notes: 'Self-tests: cr-release (branch rule), check-changelog (exemption file and sha exemption), and
+  tools/tests/test_derive_id_register.py.'
