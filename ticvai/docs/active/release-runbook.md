@@ -108,6 +108,42 @@ Once everything is green, the rehearsal pull included (section 4):
    `origin` or `github`.
 5. Rebuild the setup zip from a clean HEAD.
 
+## 5a. Light CR release: one class fix, out in minutes
+When the fix for a class of change requests has merged into `main`, it can go out on its own, between the Tuesday
+and Friday releases, without the OpenProject server apply over every ticket and without the full rehearsal pull
+(council of 14 October; the lead's list of 18 October, item 8; CHG-LCR-001). It creates no plan tickets, changes no
+build-order links and retires nothing: a fix that does any of those waits for the full release (section 6's server
+path). `tools/cr-release.py` runs the steps in this order. Each prints what it would do; only `--apply` does it.
+1. **Check:** `python3 tools/cr-release.py check`, then `--apply`. It refuses unless the branch is `main`, nothing is
+   left uncommitted, `main` here is `main` on both remotes, and the change log passes since the last tag. Then it runs
+   the gate: only the checks the changed files reach when `run-checks.py --changed` is there, otherwise the full
+   refresh (`refresh-safe.sh --head-only --no-merge --parallel 4`, about half an hour). It says which.
+2. **Impact:** `python3 tools/cr-release.py impact --live-status`. Every operation, screen, table, file and ADR whose
+   definition changed since the last tag, and every ticket that links one, split into not started, started and
+   finished. The list is taken from the release diff, never from the request's text. Service links are left out:
+   every back-end task links its service.
+3. **Tag (the lead):** `python3 tools/cr-release.py tag --note "<the class>"`, then `--apply`. The next `r<N>`,
+   annotated, pushed by name to `origin` and `github`, then `check-adam-latest-release.py --remotes`. It refuses
+   unless the gate passed at this commit. The six mirror repositories are not tagged here; the next full release
+   tags them. If the fix changed ADAM's connector (`viewer/mcp`), rebuild the setup zip from a clean HEAD as well.
+4. **Deploy (the lead, on ADAM's box):** `git fetch --tags`, then `sudo ./deploy/deploy.sh`.
+5. **Links and the pull:** `python3 tools/cr-release.py after-deploy --apply` rebuilds `adam-links.json` and prints
+   the commit and the box's `load_links.py` commands (dry run, then `--apply`, as the ticvai user). Once they are
+   loaded, `after-deploy --stage pull --apply` pulls every ticket on the impact list with the shipped connector, the
+   same pull a developer runs. Each must say release `r<N>`, link something and have no link ADAM cannot find. Any
+   miss is fixed before the next step.
+6. **Rework:** `python3 tools/cr-release.py rework --note "<the requests>"`, then `--apply`. Each finished task or
+   sub-task the release changed gets one rework sub-task: over the API under a small parent, mail off; under a large
+   one (a migration task) through `tools/op-create.rb` on the OpenProject server, from the file it writes. Started
+   and not-started tickets need nothing: their next pull shows what changed since the previous one.
+7. **Settle:** `python3 tools/cr-release.py settle --crs <the requests> --resolution "<what changed>"`, then
+   `--apply`. The class's requests are marked done with `ref r<N>` through `viewer/api/settle_changes.py`, which tells
+   each request's ticket.
+
+Developers and agents are always on the latest release: nobody is asked anything, and their next `/ticket` is at
+`r<N>`. The nightly full gate is the backstop for anything the scoped checks did not reach. Measure each one: the
+minutes from the merge to the last settled request.
+
 ## 6. Distribute
 - **OpenProject:** on the server, run `op-release-server.sh dry-run r<N>`, then `op-release-server.sh apply r<N>`.
   That one script:

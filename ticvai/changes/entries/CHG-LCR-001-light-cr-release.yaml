@@ -1,0 +1,43 @@
+id: CHG-LCR-001
+date: '2026-10-18'
+source: developer
+kind: process
+proposed: '2026-10-18'
+summary: 'A light change-request release: a merged class fix is checked, tagged, loaded into ADAM, pulled, reworked
+  and settled in minutes by tools/cr-release.py, without the OpenProject server apply or the full rehearsal pull.'
+decision:
+  what: 'New tool tools/cr-release.py with six steps, each a dry run unless --apply: check (main, clean, pushed, change
+    log, then the gate: change-scoped checks when run-checks.py has --changed, else the full refresh), impact (the
+    release diff to the tickets that link a changed operation, screen, table, file or ADR, split new, started and
+    finished, as a pull list), tag (the lead''s tag and push by name to both remotes), after-deploy (ADAM''s links
+    rebuilt and loaded, every impact ticket pulled at r<N> with every link found), rework (a sub-task under each
+    finished ticket, over the API or op-create.rb on the server for a large parent) and settle (the class''s requests
+    done with ref r<N> through settle_changes.py). Runbook section 5a says when and how; service links are not used
+    to pick tickets, and the mirror repositories are tagged at the next full release.'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'The council of 14 October (Gate and ingestion after the audit) planned a light release for change-request class
+  fixes, and the lead''s 18 October list, item 8, asked for it ("make sure todays CR goes in without the release"):
+  a full release needs the OpenProject server apply over every ticket and a 1,488-ticket rehearsal, which held the
+  CR-137 to CR-169 fixes for days.'
+keys_touched:
+  files:
+  - tools/cr-release.py
+  - tools/refresh.sh
+  - docs/active/release-runbook.md
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: pending (the lead raises the ADAM CR; the request is the lead's 18 October list, item 8)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/cr-release.py::impact_tickets
+status: open
+notes: 'Built before lane C merged: check runs the full refresh until run-checks.py has --changed-from. settle --class
+  reads the watcher''s class list once lane D2 has merged; until then the requests are named with --crs.
+  The self-tests (tag numbering, the changed artefacts, the impact split, the pull judgement, rework and settle) run
+  first on every call.'

@@ -2,9 +2,49 @@
 # -*- coding: utf-8 -*-
 """The light change-request release: a merged class fix reaches developers in minutes (CHG-LCR-001).
 
-Self-tests run first, every time; `self-test` runs only them.
+**Council of 14 October 2026** (Gate and ingestion after the audit) and the lead's 18 October list, item 8: a fix to a
+class of change requests should not wait for the full release (the OpenProject server apply over every ticket, the
+1,488-ticket rehearsal pull). Developers' agents read the package at the release tag ADAM serves, so a fix reaches
+them once it is tagged, ADAM has fetched the tag, ADAM's ticket links are loaded, and the requests are settled. This
+does those steps for one fix, in order, each printing exactly what it would do; nothing outward happens without
+--apply, and tagging, pushing and the server commands stay the lead's (docs/active/release-runbook.md, section 5a).
+
+  check         on main after the fix merged: the branch is main, nothing uncommitted (untracked files in the package
+                count), HEAD is main on origin and github, the last tag is behind HEAD, check-changelog --since it;
+                then the gate: lane C's change-scoped checks (`run-checks.py --changed-from`) when this checkout has
+                them, else `refresh-safe.sh --head-only --no-merge --parallel 4` (it says which and how long).
+                --apply runs the gate; the result (check.json) is what `tag` requires.
+  impact        the release diff (`git diff r<N-1>..HEAD`) to artefacts whose definition changed (operations by
+                operationId, through any `$ref`; screens by id; tables by their schema-reference entry; files and
+                ADRs), then to the tickets that link them in adam-links.json, split new / started / finished, as a
+                pull list in audit/kit/pull-direct.mjs's format. Service links are not used (every back-end task
+                links its service). --live-status reads the statuses from OpenProject (GET only).
+  tag           the next r<N> (from this checkout's tags and both remotes'), annotated, pushed by name to origin and
+                github, then check-adam-latest-release --remotes. Refuses unless the gate passed at HEAD.
+  after-deploy  once the lead has deployed (on ADAM's box: git fetch --tags, sudo ./deploy/deploy.sh): rebuild
+                adam-links.json (TICVAI_OP_TOKEN), print the commit and the box's load_links.py commands, then (--stage
+                pull) pull every impact ticket with the shipped connector and require release r<N>, something linked
+                and no link ADAM cannot find on each. --log judges a pull log again.
+  rework        a sub-task for each finished task or sub-task (Ready for QA, Closed) the release changed: over the
+                API under a small parent (mail off), in op-create.rb's file for the server under a large one (API
+                creates under a big ticket outlast Cloudflare's 100 s).
+  settle        the class's requests (--crs, or --class from handoff/cr-classes.yaml) done with ref r<N>, through
+                ADAM's viewer/api/settle_changes.py (its dry run, then --apply).
+
+Release numbers: before the tag (check, impact, tag) the release is the next r<N> after the newest tag; after it
+(after-deploy, rework, settle) it is the newest tag. --release r<N> names it. Files go to
+audit/ticvai/releases/r<N>/ (gitignored). Secrets come from audit/audit.env (--env-file) and are never printed.
+
+Self-tests run first, every time; `self-test` runs only them. No test reads the network or writes anything outside
+memory.
 
     python3 tools/cr-release.py self-test
+    python3 tools/cr-release.py check [--apply]
+    python3 tools/cr-release.py impact [--live-status]
+    python3 tools/cr-release.py tag [--note "read routes"] [--apply]
+    python3 tools/cr-release.py after-deploy [--stage links|pull|all] [--lead-email E] [--log FILE] [--apply]
+    python3 tools/cr-release.py rework [--note CR-161] [--large-at 20] [--apply]
+    python3 tools/cr-release.py settle --crs CR-161,CR-167 --resolution "..." [--apply]
 """
 from __future__ import annotations
 
