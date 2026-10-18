@@ -39,3 +39,25 @@ def test_stand_in_self_tests():
     r = subprocess.run(["node", str(KIT / "stand-in-openproject.mjs"), "--self-test"], capture_output=True, text=True,
                        timeout=120)
     assert r.returncode == 0, r.stdout + r.stderr
+
+
+def _bash():
+    exe = os.environ.get("BASH_EXE") or shutil.which("bash")
+    return None if not exe or "system32" in exe.lower() else exe   # WSL's bash cannot read this path
+
+
+@pytest.mark.skipif(_bash() is None, reason="no Git Bash or Linux bash")
+@pytest.mark.parametrize("args,env,said", [
+    (["r7"], {}, "the first argument is r<N>-rc"),
+    (["r7-rc", "--base", "nowhere", "--ports", "8787,8986,4374"], {}, "port 8787 belongs to another session"),
+    (["r7-rc", "--ports", "8996,8986,4374"], {}, "--base is the last live pull"),
+    (["live-repull", "r7", "--rehearsal", "nowhere", "--created", "nowhere"],
+     {"ADAM_URL": "", "ADAM_EMAIL": "", "ADAM_PASSWORD": ""}, "set ADAM_URL, ADAM_EMAIL and ADAM_PASSWORD"),
+    (["live-repull", "r7", "--rehearsal", "nowhere", "--created", "nowhere"],
+     {"ADAM_URL": "http://127.0.0.1:4173", "ADAM_EMAIL": "a@b.c", "ADAM_PASSWORD": "x"}, "port 4173"),
+])
+def test_rehearse_refuses(args, env, said):
+    r = subprocess.run([_bash(), str(KIT / "rehearse.sh"), *args], capture_output=True, text=True,
+                       env={**os.environ, **env}, timeout=120)
+    assert r.returncode == 2, r.stdout + r.stderr
+    assert said in r.stderr, r.stderr
