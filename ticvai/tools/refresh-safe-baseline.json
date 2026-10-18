@@ -21,9 +21,9 @@
    ]
   },
   "check-screen-patterns": {
-   "why": "known on main at e875d996 and named by the lead's brief of 5 October 2026 as not to be chased in r2 (CHG-R4-004): the NP ceiling (ADM-340 fixed at r4, CHG-R6-042, 12 October 2026) (284 later-sprint findings above 191), and the P8/READ findings the bundle (handoff/service-docs/op-release.json) gives BO-087, BO-344, BO-1018, BO-1034, BO-1179, BO-1187 and ADM-606, plus BO-954 Venue Canvas, whose setup task the r4 bundle created in Block A (APP-SETUP-BO-954, live since the r4 apply) while the screen still says wave 3; the r4 gate ran before the bundle was committed and never saw it (13 October 2026). NP is 285 with it. The count is pinned: one more finding is a new failure",
+   "why": "known on main at e875d996 and named by the lead's brief of 5 October 2026 as not to be chased in r2 (CHG-R4-004): the NP ceiling (ADM-340 fixed at r4, CHG-R6-042, 12 October 2026) (284 later-sprint findings above 191), and the P8/READ findings the bundle (handoff/service-docs/op-release.json) gives BO-087, BO-344, BO-1018, BO-1034, BO-1179, BO-1187 and ADM-606, plus BO-954 Venue Canvas, whose setup task the r4 bundle created in Block A (APP-SETUP-BO-954, live since the r4 apply) while the screen still says wave 3; the r4 gate ran before the bundle was committed and never saw it (13 October 2026). NP is 285 with it. Re-pinned 18 October 2026 (r7 integration gate) at 39: the r6 bundle (785d8013, committed after the r6 gate ran on ee22b123 and saw 11) builds 21 more screens in Block A by the r6 plan's deliberate changes (CHG-TKT-008: the command centres ADM-088, ADM-108, ADM-268; the Block A setup app-module AM-SETUP-TICKETING-GUEST-COMMERCE-P08: ADM-071, -089, -090, -091, -094, -095, -106, -109, -115, -259, -260, -261, -263, -266, -267, -269, BO-291, BO-441), while their screen files still say wave 2 or 3 (P8 +21), and seven of them show data with no read (READ +7: ADM-109, -115, -259, -260, -261, -266, -267), counted outside Block A before. CHG-TKT-008's notes leave ADM-106, ADM-259..267 and BO-291 to the lead. Identical at origin/main 34a12fe0 and at a3db4cb5: no class fix changed them. The count is pinned: one more finding is a new failure",
    "known": [
-    "^11 finding\\(s\\): NP 1, P8 8, READ 2$"
+    "^39 finding\\(s\\): NP 1, P8 29, READ 9$"
    ]
   }
  },
