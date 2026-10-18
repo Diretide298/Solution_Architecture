@@ -71,7 +71,19 @@ def apply(lin: dict) -> int:
         if changed:
             note(e, why)
             n += 1
+    # The contract's `x-ticvai-write-via`, as derive-lineage copies it into `writeVia`, so the lineage this commits
+    # agrees with the contract before the next derive (check-cross-deployable-writes X-LINEAGE).
+    for o, via in WRITE_VIA.items():
+        if o in lin and lin[o].get("writeVia") != via:
+            lin[o]["writeVia"] = via
+            n += 1
     return n
+
+
+WRITE_VIA = {
+    "publishTenantConfig": [{"table": "approvals.request", "operation": "createApprovalRequest"}],
+    "setPublishReviewPolicy": [{"table": "approvals.matrix", "operation": "setApprovalMatrix"}],
+}
 
 
 def main() -> int:
