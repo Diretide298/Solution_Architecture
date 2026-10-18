@@ -514,6 +514,64 @@ def retired_of(body) -> list[str]:
     return out
 
 
+def path_supplied_keys(contracts: dict) -> set:
+    """`(schema, property)`: a declared key the request path always supplies, so its column is NOT NULL.
+
+    **A key filled from the path is not in `required`, and that made it nullable** (CHG-MGN-001, ADAM CR-139, 18
+    October 2026). `ChannelAllocation.channelCapacityId` is readOnly, "from the path of setChannelAllocations"
+    (`/channel-capacities/{channelCapacityId}/channel-allocations`), and a declared reference; the contract never
+    listed it as required because the caller never sends it. So `catalogue.channel_envelope.channel_capacity_id` came
+    out nullable, a nullable key owns no row (derive-ddl), and the table fell to the tenant root.
+
+    The rule: a readOnly property with `x-ticvai-references` naming a table, not nullable, whose name is a `{param}` of
+    a path in the same contract with an operation whose request or response carries the schema (through `$ref`s, three
+    levels deep). A nullable one is an association and stays nullable; one the caller sends is not the path's."""
+    def refs(node, out):
+        if isinstance(node, dict):
+            r = node.get("$ref")
+            if isinstance(r, str) and r.startswith("#/components/schemas/"):
+                out.add(r.rsplit("/", 1)[-1])
+            for v in node.values():
+                refs(v, out)
+        elif isinstance(node, list):
+            for v in node:
+                refs(v, out)
+        return out
+
+    out: set = set()
+    for _name, (_tier, doc) in contracts.items():
+        if not isinstance(doc, dict):
+            continue
+        schemas = (doc.get("components") or {}).get("schemas") or {}
+        carried: set = set()
+        for path, item in (doc.get("paths") or {}).items():
+            params = set(re.findall(r"\{(\w+)\}", str(path)))
+            if not params or not isinstance(item, dict):
+                continue
+            for verb, op in item.items():
+                if verb not in ("get", "put", "post", "patch", "delete") or not isinstance(op, dict):
+                    continue
+                seen = refs({"q": op.get("requestBody"), "r": op.get("responses")}, set())
+                frontier = set(seen)
+                for _ in range(3):
+                    nxt = set()
+                    for n in frontier:
+                        nxt |= refs(schemas.get(n) or {}, set())
+                    frontier = nxt - seen
+                    seen |= frontier
+                carried |= {(s, p) for s in seen for p in params}
+        for sname, body in schemas.items():
+            if not isinstance(body, dict):
+                continue
+            for branch in [body] + [b for b in (body.get("allOf") or []) if isinstance(b, dict)]:
+                for prop, spec in (branch.get("properties") or {}).items():
+                    ref = spec.get("x-ticvai-references") if isinstance(spec, dict) else None
+                    if (isinstance(ref, str) and "." in ref and spec.get("readOnly") is True
+                            and not is_nullable(spec) and (sname, prop) in carried):
+                        out.add((sname, prop))
+    return out
+
+
 def persistence_of(body) -> str | None:
     """The persistence tag, wherever it sits.
 
@@ -957,11 +1015,14 @@ def main() -> int:
         return any(o != sname and not o.endswith(("Request", "Summary"))
                    for o in by_table.get(table, []))
 
+    # A key the request path supplies is required on its row (CHG-MGN-001, ADAM CR-139): see path_supplied_keys.
+    _path_keys = path_supplied_keys(contracts)
     for sname, table in sorted(persisted.items()):
         if sname in projection_only:
             continue
         body = all_schemas.get(sname) or {}
-        required = set() if _later_writer(sname, table) else required_of(body, all_schemas)
+        required = set() if _later_writer(sname, table) else (
+            required_of(body, all_schemas) | {p for s, p in _path_keys if s == sname})
         cols = []
         for prop, spec in properties_of(body, all_schemas).items():
             if isinstance(spec, dict) and spec.get("type") == "array" \

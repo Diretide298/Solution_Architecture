@@ -23155,9 +23155,11 @@ components:
       x-ticvai-retired-columns: [envelope_id]
       x-ticvai-persistence: catalogue.channel_envelope
       type: object
+      # channelCapacityId: an allocation always draws on one channel capacity, from the path (ADAM CR-139, CHG-MGN-001).
       required:
       - channel
       - allocatedUnits
+      - channelCapacityId
       properties:
         id:
           type: string

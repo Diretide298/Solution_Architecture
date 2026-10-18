@@ -238,3 +238,48 @@ def test_a_key_into_a_partitioned_table_stays_an_index_not_a_constraint():
     dd.apply_unenforced_keys(cols)
     c = cols["marketing.message_dispatch_attempt"][0]
     assert (c["references"], c["enforced"], c["referenceHow"]) == ("marketing.message_dispatch", "no", "convention")
+
+
+# ---- 2. a key the request path supplies is NOT NULL (CR-139) ------------------------------------------------------
+
+def _catalogue(**over):
+    alloc = {"x-ticvai-persistence": "catalogue.channel_envelope", "type": "object", "required": ["channel"],
+             "properties": {
+                 "channel": {"type": "string"},
+                 "channelCapacityId": {"type": "string", "format": "uuid", "readOnly": True,
+                                       "x-ticvai-references": "catalogue.channel_capacity"},
+                 "salesChannelId": {"type": "string", "format": "uuid", "readOnly": True, "nullable": True,
+                                    "x-ticvai-references": "catalogue.sales_channel"},
+                 "venueId": {"type": "string", "format": "uuid", "x-ticvai-references": "platform.venue"}}}
+    alloc["properties"].update(over)
+    return {"catalogue": ("spine", {
+        "paths": {"/channel-capacities/{channelCapacityId}/channel-allocations": {
+                      "put": {"operationId": "setChannelAllocations",
+                              "responses": {"200": {"content": {"application/json": {"schema": {
+                                  "$ref": "#/components/schemas/ChannelAllocationSet"}}}}}}},
+                  "/venues/{venueId}/sales-channels/{salesChannelId}": {
+                      "get": {"operationId": "x", "responses": {"200": {"content": {"application/json": {
+                          "schema": {"$ref": "#/components/schemas/ChannelAllocation"}}}}}}}},
+        "components": {"schemas": {
+            "ChannelAllocationSet": {"type": "object", "properties": {"allocations": {
+                "type": "array", "items": {"$ref": "#/components/schemas/ChannelAllocation"}}}},
+            "ChannelAllocation": alloc}}})}
+
+
+def test_a_read_only_declared_key_the_path_supplies_is_required():
+    ds = _load("derive_schema_t2", "derive-schema.py")
+    keys = ds.path_supplied_keys(_catalogue())
+    assert ("ChannelAllocation", "channelCapacityId") in keys
+    # nullable (an association, not an owner) and writable (the caller sends it) keys are not
+    assert ("ChannelAllocation", "salesChannelId") not in keys
+    assert ("ChannelAllocation", "venueId") not in keys
+
+
+def test_a_key_named_none_or_on_no_carrying_path_is_not_required():
+    ds = _load("derive_schema_t2b", "derive-schema.py")
+    keys = ds.path_supplied_keys(_catalogue(channelCapacityId={"type": "string", "readOnly": True,
+                                                               "x-ticvai-references": "none"}))
+    assert ("ChannelAllocation", "channelCapacityId") not in keys
+    cat = _catalogue()
+    cat["catalogue"][1]["paths"].pop("/channel-capacities/{channelCapacityId}/channel-allocations")
+    assert ("ChannelAllocation", "channelCapacityId") not in ds.path_supplied_keys(cat)
