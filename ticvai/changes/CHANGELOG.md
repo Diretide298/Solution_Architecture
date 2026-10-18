@@ -2,7 +2,7 @@
 
 > **Generated** by `tools/build-changelog-index.py` from `changes/entries/*.yaml`; do not edit, and do not commit it from a branch. The rules: `changes/README.md`; the checker: `tools/check-changelog.py`.
 
-797 change(s): 181 open, 616 closed. Newest first.
+798 change(s): 181 open, 617 closed. Newest first.
 
 ## Open (181)
 
@@ -190,10 +190,11 @@
 | CHG-CSA-044 | 2026-10-02 | audit · contract | The six promotion builder screens with no read (ADM-148, ADM-169, ADM-172, ADM-173, ADM-174, ADM-199) get no new reads here: the console commercial screens move to Venue Management and merge with BO-010, which reads get… | No contract change; logged open until the screen merge decides the binding. (Chinmay, 2026-10-02) | Contract gaps CHG-WIR-027 (each correction offers "or the screen moves to getPromotion"); Chinmay, 2 October, ADM-049 ("they are venue screens": move and merge) and the pre-apply round ("duplicate sc… | check: `tools/audit-screenless-operations.py` | pending |
 | CHG-CSA-032 | 2026-10-02 | cr · contract | Retention periods for accreditation documents and the CRM data-retention policy wait for the UAE/GCC research and counsel; nothing is changed. | No contract change until research proposes defaults marked pending counsel. (Chinmay, 2026-10-02) | Chinmay, 2 October, Critical set 1: workbook Q240 (BO-192; DEC-240) and Q459 (BO-629; DEC-459), status needs-research. ADR-0047, ADR-0063. | check: `tools/check-contract-compat.py` | pending |
 
-## Closed (616)
+## Closed (617)
 
 | Id | Date | Source · kind | Summary | Decision (by, date) | Why | Prevention | Release |
 |---|---|---|---|---|---|---|---|
+| CHG-ADM-006 | 2026-10-18 | audit · process | A pull lists the ticket's sub-tasks at every depth with status and holder and names a sub-task's parent; the board says when sub-tasks could not be read; /ticket with no number starts the first ticket the developer can … | viewer/api/openproject.py descendants (a parent filter per level with every status, each ticket's children links when the filter is refused); /api/work-package… (Chinmay, 2026-10-18) | Finding of the 18 October live pull on ADAM (items 1 and 17 of the 18 October list): pulling #27735 gave no list of its sub-tasks #30681-#30684, pulling #30681 did not name #27735, the board filled s… | check: `check-adam-subtasks::ST-PULL` | r7 |
 | CHG-PPL-002 | 2026-10-15 | plan · plan | LedgerService keeps Hrushikant Patkar as its reviewing owner (accountable for its back end and migrations), pinned in team.json serviceOwners, so the load balancer no longer moves it when service sizes change. | docs/active/team.json gains serviceOwners {"LedgerService": "Hrushikant Patkar"} with its note. tools/build-service-docs.py gives a pinned service to its owner… (Chinmay, 2026-10-15) | Lead decision, Chinmay, 15 October 2026, 00:40: "keep hrushikant", on the r6 audit's tickets-and-plan finding (the CHG-TKT batch: LedgerService's reviewing owner moves between Hrushikant and Tanmay a… | check: `tools/check-plan-owners.py` | r6 |
 | CHG-PPL-001 | 2026-10-15 | plan · plan | Tanmay Dukhande has left the team, and Narayan Gaonkar takes his place at the same role (Back end), pools, pace (1.17) and position. Every task Tanmay owned, was accountable for, tested or reviewed moves to Narayan, and… | docs/active/team.json: Narayan Gaonkar (OpenProject user 79) replaces Tanmay Dukhande (OpenProject user 108) in areas.backend, onboard, pace and people, in the… (Chinmay, 2026-10-15) | Lead decision, Chinmay, 15 October 2026, 00:40: "tanmay is leaving so shift all tasks to narayan. Check in pms his exact name". The OpenProject (PMS) name is Narayan Gaonkar, user 79. Tanmay held a t… | check: `tools/check-plan-owners.py` | r6 |
 | CHG-GT3-003 | 2026-10-15 | audit · plan | The pushed rest-of-screen tickets of ADM-603 and BO-1146 close into the whole-screen tickets r6 kept, with a reason, instead of staying New with nothing linked. | tools/op-retire.py OTHER: APP-SETUP-ADM-603-REST (#28272) merges into APP-SETUP-ADM-603 (#28054) and APP-SETUP-BO-1146-REST (#28726) into APP-SETUP-BO-1146 (#2… (Chinmay, 2026-10-14) | The r6 rehearsal pull of r6-candidate c56b9dc4 (the r6 rehearsal summary (lead workspace), lead workspace): both left Block A with status New -> New and links 4 -> 0, because the plan had dropped the… | check: `tools/check-ticket-links.py` | r6 |

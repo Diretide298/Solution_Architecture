@@ -201,6 +201,10 @@ CHECKS = [
     # 15 October (the r6 release, tracker F43, CHG-REL-008): the scripts run in OpenProject's container use nothing
     # newer than its Ruby 2.6 (a fix script stopped on Array#tally on the server). Strict: never baselined.
     "check-ruby-compat",
+    # 18 October (developers' feedback, CHG-ADM-006): a pull lists a ticket's sub-tasks and a sub-task's parent, the board
+    # never shows 0 for sub-tasks it could not read, /ticket with no number starts the next workable ticket instead of
+    # asking, and /update-adam refreshes only ADAM's own command files in a workspace. Reads ../viewer. Strict.
+    "check-adam-subtasks",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
