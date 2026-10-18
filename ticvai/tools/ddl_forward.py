@@ -44,6 +44,14 @@ table it points at was renamed is not listed: Postgres follows a renamed table. 
 and a hand-written `ALTER TABLE ... SET SCHEMA` is recognised like `RENAME TO`. Postgres moves the table's
 indexes and constraints with it.
 
+**What the generator derived reaches the migration owner whole** (CHG-MGN-001, ADAM CR-138, CR-139, CR-148, CR-156,
+CR-157, 18 October 2026). A review row carries every statement in full, never a prefix. A column the contract retires
+(`x-ticvai-retired-columns`, passed as `retired=`) is a drop, not "a rename or a drop: decide": its row names the
+four-step drop with its key and indexes, and the forward migration drops its NOT NULL at once (guarded, so a database
+where the column is already gone applies it). A table CHECK added to an existing table is written (NOT VALID, then
+VALIDATE, after dropping one of the same name a person may have added), and a new index on a renamed column is
+listed whole to create after the rename.
+
 This is not a SQL parser. It understands the statements `derive-ddl.py` emits and the handful a
 person writes in a forward migration; anything else it cannot place is listed for review rather than
 guessed at.
@@ -261,6 +269,24 @@ def scope_path_backfill(t: str, cols, was_tenant_root: bool = False) -> str | No
             f"scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
 
 
+# **A column the contract retires loses its NOT NULL at once** (CHG-MGN-001, ADAM CR-157, 18 October 2026). The
+# contract withdraws it (`x-ticvai-retired-columns`), so no code writes it any more, and an insert that leaves it out
+# must not fail. Dropping NOT NULL touches no row. **Guarded**, because the migration owner may already have dropped
+# the column by hand (the four-step drop): the statement then does nothing rather than failing the migration.
+RETIRE_GUARD = re.compile(
+    r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM information_schema\.columns WHERE table_schema = '(\w+)' AND "
+    r"table_name = '(\w+)' AND column_name = '(\w+)' AND is_nullable = 'NO'\) THEN ALTER TABLE \S+ ALTER COLUMN "
+    r"\S+ DROP NOT NULL; END IF; END \$\$$", re.I)
+
+
+def retire_not_null(t: str, c: str) -> str:
+    """The guarded `ALTER COLUMN ... DROP NOT NULL` for a retired column (recognised again by RETIRE_GUARD)."""
+    sch, name = t.split(".", 1)
+    return (f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = '{unq(sch)}' AND "
+            f"table_name = '{unq(name)}' AND column_name = '{unq(c)}' AND is_nullable = 'NO') THEN ALTER TABLE {t} "
+            f"ALTER COLUMN {c} DROP NOT NULL; END IF; END $$")
+
+
 class Model:
     """Every statement of one database's DDL, keyed so that the same object in two versions pairs up."""
 
@@ -308,6 +334,14 @@ class Model:
         for stmt in split_statements(sql):
             s = norm(stmt)
             if re.match(r"INSERT INTO platform\.schema_version\b", s, re.I):
+                continue
+            m = RETIRE_GUARD.match(s)
+            if m and f"{m.group(1)}.{m.group(2)}" in self.tables:
+                t, c = f"{m.group(1)}.{m.group(2)}", m.group(3)
+                tab = self.tables[t]
+                if c in tab.cols:
+                    tab.cols[c] = norm(re.sub(r"\s+NOT NULL\b", "", tab.cols[c], flags=re.I))
+                self.handled.add((t, c))
                 continue
             m = re.match(rf"ALTER TABLE (?:ONLY )?(?:IF EXISTS )?({QNAME}) RENAME TO ({NAME})$", s, re.I)
             if m and unq(m.group(1)) in self.tables:
@@ -429,12 +463,14 @@ def move_sql(old: str, new: str) -> str:
     return sql + (f"; ALTER TABLE {ns}.{on} RENAME TO {nn}" if on != nn else "")
 
 
-def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan:
+def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired: dict | None = None) -> Plan:
     """`renames`: {"tables": {old: new}, "columns": {(table as named now, old column): new column}}, the
     declared renames (CHG-R6-010). Only a table that exists on the old side under its old name and on the new
-    side under its new one is treated as renamed; likewise a column."""
+    side under its new one is treated as renamed; likewise a column. `retired`: {table: {column}}, the columns the
+    contracts withdraw (`x-ticvai-retired-columns`, CHG-MGN-001)."""
     p = Plan(area)
     renames = renames or {}
+    retired = retired or {}
     known = set(old.tables) | set(new.tables)
     # new name -> old name, for the tables renamed since the old side
     rt = {n: o for o, n in (renames.get("tables") or {}).items()
@@ -449,6 +485,7 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
     new_tables = set(new.tables) - set(old.tables) - set(rt)
     new_cols: dict[str, set] = {}
     follows: dict[str, list] = {t: [] for t in rt}   # renamed table -> generated objects named for it
+    retired_objs: set = set()                        # (table, index or constraint) named in a retired column's row
     qual = [(re.compile(r"(?<![\w.])" + re.escape(o) + r"(?![\w])"), n) for n, o in rt.items()]
 
     def subst(st: str) -> str:
@@ -458,6 +495,32 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
 
     def review(kind, obj, change, todo):
         p.review.append((kind, obj, change, todo))
+
+    def on_col(st: str, t: str, c: str) -> bool:
+        """An old index or constraint statement on `t` whose columns include `c`."""
+        cols = constraint_columns(st) if re.match(r"ALTER TABLE", st, re.I) else _cols_in_parens(st)
+        return bool(cols) and c in cols and t in tables_named(st, known)
+
+    def retired_row(t: str, c: str, was_table: str, write: bool) -> None:
+        """A column the contract retires: a drop, worded with what goes with it (CR-157). `write`: the table exists
+        under this name on the old side, so its NOT NULL is dropped in this forward migration."""
+        objs = sorted((k[2] if k[0] == "constraint" else k[1].split(".", 1)[1]) for k, st in old.stmts.items()
+                      if k[0] in ("constraint", "index") and on_col(st, was_table, c))
+        retired_objs.update((was_table, o) for o in objs)
+        coldef = (old.tables.get(was_table) or Table()).cols.get(c, "")
+        has_nn = bool(re.search(r"\bNOT NULL\b", coldef, re.I) and not re.search(r"PRIMARY KEY", coldef, re.I))
+        drop_nn = write and has_nn
+        if drop_nn:
+            p.statements.append(retire_not_null(t, c))
+            p.rollback.append(f"ALTER TABLE {t} ALTER COLUMN {c} SET NOT NULL;")
+            p.counts["other"] += 1
+        review("column retired", f"{t}.{c}", "retired by the contract (x-ticvai-retired-columns): no code writes or "
+               "reads it", "drop it, the four-step drop: "
+               + ("this forward migration already drops its NOT NULL; " if drop_nn else
+                  "after the rename, drop its NOT NULL; " if has_nn else "")
+               + "stop every read, "
+               + (f"drop {', '.join(objs)}, " if objs else "")
+               + f"then ALTER TABLE {t} DROP COLUMN {c} in a later forward migration")
 
     def on_renamed_col(t, cols) -> bool:
         return bool(cols) and any((t, c) in rc for c in cols)
@@ -501,6 +564,9 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                                        if n not in re.findall(r"CONSTRAINT (\S+) ", a.cols[oc])]
                 for c in a.cols:
                     if c not in b.cols and (t, c) not in old_renamed:
+                        if c in retired.get(t, ()) or c in retired.get(rt[t], ()):
+                            retired_row(t, c, rt[t], write=False)
+                            continue
                         review("column dropped", f"{t}.{c}", "no longer in the schema reference",
                                "a rename or a drop: decide, then RENAME COLUMN or the four-step drop by hand")
                 continue
@@ -561,6 +627,9 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                                "data rewrite) by hand")
             for c in a.cols:
                 if c not in b.cols and (t, c) not in old_renamed:
+                    if c in retired.get(t, ()):
+                        retired_row(t, c, t, write=True)
+                        continue
                     review("column dropped", f"{t}.{c}", "no longer in the schema reference",
                            "a rename or a drop: decide, then RENAME COLUMN or the four-step drop by hand")
             for c in sorted(b.constraints - a.constraints):
@@ -712,6 +781,10 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
         if kind == "index" and any((t, c) in old_renamed for t in tables_named(old.stmts[k], known)
                                    for c in _cols_in_parens(old.stmts[k])):
             continue
+        if kind in ("index", "constraint") and any(
+                (k[2] if kind == "constraint" else k[1].split(".", 1)[1]) == o and rt_t in tables_named(old.stmts[k], known)
+                for rt_t, o in retired_objs):
+            continue   # named in its retired column's row (CHG-MGN-001)
         if kind == "table":
             review("table dropped", k[1], "no longer in the schema reference",
                    "a rename or a drop: decide, then ALTER TABLE ... RENAME or DROP TABLE by hand")

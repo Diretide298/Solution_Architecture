@@ -1186,6 +1186,7 @@ def load_contract_props() -> dict:
             if isinstance(schema, dict):
                 SCHEMA_MARKS[f"{mod}.{name}"] = {k: v for k, v in schema.items()
                                                  if str(k).startswith("x-ticvai-")}
+                retired_columns(schema)
                 for prop, spec in props_of(doc, schema).items():
                     if isinstance(spec, dict) and spec.get("type") == "array":
                         ref = str((spec.get("items") or {}).get("$ref") or "")
@@ -1194,10 +1195,31 @@ def load_contract_props() -> dict:
     return found
 
 
+def retired_columns(schema: dict) -> None:
+    """**The columns a contract withdraws** (`x-ticvai-retired-columns`), into RETIRED, read as derive-schema's
+    `retired_of` reads them: on the schema or an `allOf` branch, beside the persistence tag; a bare name is the
+    tagged table's column, `schema.table.column` a child table's (CHG-FXC-003). Frozen mode hands them to ddl_forward,
+    so a retired column's row says drop it rather than "a rename or a drop: decide" (CHG-MGN-001, ADAM CR-157)."""
+    branches = [schema] + [b for b in (schema.get("allOf") or []) if isinstance(b, dict)]
+    tag = next((b.get("x-ticvai-persistence") for b in branches if isinstance(b.get("x-ticvai-persistence"), str)),
+               None)
+    table = tag.split("+")[0].strip() if tag and "." in tag and "\u2014" not in tag else None
+    for b in branches:
+        for rc in (b.get("x-ticvai-retired-columns") or []) if isinstance(b.get("x-ticvai-retired-columns"),
+                                                                          list) else []:
+            rc = str(rc)
+            if rc.count(".") == 2:
+                t, c = rc.rsplit(".", 1)
+                RETIRED.setdefault(t, set()).add(c)
+            elif table:
+                RETIRED.setdefault(table, set()).add(rc)
+
+
 # `module.Schema` -> its `x-ticvai-*` keys, and `module.Schema.arrayProp` -> `module.ItemSchema`.
-# Filled by `load_contract_props`, read by `table_marks`.
+# Filled by `load_contract_props`, read by `table_marks`. RETIRED: table -> the columns its contract withdraws.
 SCHEMA_MARKS: dict = {}
 ITEM_SCHEMA: dict = {}
+RETIRED: dict = {}
 
 
 def table_marks(cols: dict, tables) -> dict:
@@ -1469,7 +1491,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
                 old.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", text, maxsplit=1, flags=re.M)[0])
         for name in sorted(n for n in files if n.startswith(area_dir + "/") and n.endswith(".sql")):
             new.add_file(files[name])
-        plans.append(ddl_forward.diff(area_dir, old, new, renames))
+        plans.append(ddl_forward.diff(area_dir, old, new, renames, retired=RETIRED))
     # **Root-level files are documentation of references that are not constraints** (990): nothing
     # applies them, so a change is listed rather than migrated.
     for name in sorted(n for n in files if "/" not in n and n.endswith(".sql")):
