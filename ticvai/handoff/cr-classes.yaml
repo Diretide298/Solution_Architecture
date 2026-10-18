@@ -11,8 +11,10 @@
 #                   blocking one of them blocks a new request of the class
 #   checks          check -> rules whose baselined findings (handoff/audit-baseline.json) are the class's known members
 #   branch          the class fix's branch (default fix/<id>)
-#   default_ruling  a ruling the lead wrote for the class: the request is listed first in REVIEW.md under "approve all
-#                   default-ruled", and is still settled only when the lead marks it (never alone)
+#   default_ruling  {status: proposed|active, text: ...}: a ruling for the class. Only `active` (the lead sets it) puts
+#                   its requests first in REVIEW.md under "approve all default-ruled"; a `proposed` ruling (one an
+#                   implementer drafted) is shown in the facts and changes nothing. Either way a request is settled
+#                   only when the lead marks it, and the mark covers only the draft the lead saw.
 #   needs           who decides by default: lead or client
 classes:
 - id: read-routes
@@ -37,8 +39,10 @@ classes:
   name: The Foundation module test
   words: [module test, table records, record in adam, database migrations module, dead_letter]
   crs: [CR-092, CR-093]
-  default_ruling: ADAM builds a table's record from the generated DDL plus the forward migrations (CR-092's fix); the
-    module test lists only its own tickets' tables. Nothing for the developer to change in the package.
+  default_ruling:
+    status: proposed
+    text: ADAM builds a table's record from the generated DDL plus the forward migrations (CR-092's fix); the module
+      test lists only its own tickets' tables. Nothing for the developer to change in the package.
   needs: lead
 - id: control-data
   name: Control data in the tenant database

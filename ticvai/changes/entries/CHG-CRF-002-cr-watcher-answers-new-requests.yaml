@@ -10,7 +10,7 @@ decision:
     members of its checks, a duplicate on the same artefact, the open blocking requests it waits for, the class''s
     siblings and the tickets they touch from adam-links.json), drafts one answer per request in a read-only Claude Code
     turn at the latest release, and writes REVIEW.md, in a folder on the lead''s machine outside git,
-    with a decision line per request; requests in a class with a written default ruling come first under one "approve all default-ruled" line. `settle` turns the
+    with a decision line per request; requests in a class with an active default ruling come first under one "approve all default-ruled" line. `settle` turns the
     requests marked approve or change into a decisions file for viewer/api/settle_changes.py, dry run first. A reject
     mark redrafts with the lead''s note; rejecting the request itself is a change mark with status rejected.'
   by: Chinmay
@@ -34,5 +34,5 @@ prevention:
   type: generator-rule
   ref: tools/cr-watch.py::sort_request
 status: open
-notes: The scheduled task and the first `--seed` run are the lead's steps. Default rulings are shown in the draft and never
+notes: The scheduled task and the first `--seed` run are the lead's steps. Default rulings start as proposed, are shown in the draft and never
   settled without the lead's mark.

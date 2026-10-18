@@ -37,6 +37,7 @@ import argparse
 import contextlib
 import csv
 import datetime
+import hashlib
 import http.cookiejar
 import io
 import json
@@ -74,6 +75,11 @@ NEEDS = ("lead", "client", "none")
 STATUSES = ("open", "accepted", "rejected", "done")   # settle_changes.py
 LOCK_HOURS = 2
 DRAFT_MINUTES = 15
+MAX_TRIES = 2                        # a draft that fails this often is answered by hand (fix round 1, I-4)
+MAX_TURNS = "12"                     # the drafting turn's limits (fix round 1, I-4)
+MAX_BUDGET_USD = "1.00"
+# What the drafting turn must never read: the lead's credentials (fix round 1, I-3).
+NO_READ = ("Read(//d/Chinmay/adam/audit/**)", "Read(**/*.env)", "Read(**/.env*)")
 
 
 def _now() -> str:
@@ -152,6 +158,15 @@ def read_env_file(path) -> dict:
 
 
 # ------------------------------------------------------------------------------------------------- 2. sort
+def _ruling(raw) -> tuple:
+    """(text, status) of a class's default ruling: `{status: proposed|active, text: ...}`. Only `active` lets the
+    approve-all line reach the class; a bare text, or any other status, is proposed (fix round 1, R-1)."""
+    if isinstance(raw, dict):
+        status = str(raw.get("status") or "proposed").strip().lower()
+        return str(raw.get("text") or ""), status if status == "active" else "proposed"
+    return str(raw or ""), "proposed"
+
+
 def load_classes(path=None) -> list:
     path = Path(path or CLASSES)
     doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
@@ -165,7 +180,8 @@ def load_classes(path=None) -> list:
                     "crs": [str(x) for x in c.get("crs") or []],
                     "checks": {str(k): [str(r) for r in v or []] for k, v in (c.get("checks") or {}).items()},
                     "branch": str(c.get("branch") or f"fix/{c['id']}"),
-                    "default_ruling": str(c.get("default_ruling") or ""),
+                    "default_ruling": _ruling(c.get("default_ruling"))[0],
+                    "default_status": _ruling(c.get("default_ruling"))[1],
                     "needs": str(c.get("needs") or "lead")})
     return out
 
@@ -296,7 +312,8 @@ def sort_request(cr: dict, rows: list, classes: list, baseline: dict, idx: dict,
              "unsure": len(ranked) > 1 and ranked[1][0] == ranked[0][0],
              "siblings": siblings(main, baseline, idx),
              "branch": main["branch"] if main else "", "branch_exists": bool(main) and main["branch"] in branches,
-             "default_ruling": main["default_ruling"] if main else "", "needs": main["needs"] if main else "lead",
+             "default_ruling": main["default_ruling"] if main else "",
+             "default_status": main["default_status"] if main else "", "needs": main["needs"] if main else "lead",
              "ticket_status": "", "status_cached": bool(idx.get("cached"))}
     facts.update(related(cr, rows, main))
     try:
@@ -337,7 +354,8 @@ def facts_lines(cr: dict, f: dict) -> list:
     if f["branch"]:
         lines.append(f"Fix branch: {f['branch']} ({'exists' if f['branch_exists'] else 'not made yet'})")
     if f["default_ruling"]:
-        lines.append(f"The class's default ruling: {f['default_ruling']}")
+        state = "in force" if f.get("default_status") == "active" else "proposed, not in force"
+        lines.append(f"The class's default ruling ({state}): {f['default_ruling']}")
     return lines
 
 
@@ -425,13 +443,39 @@ def settle_as(verdict: str, release: str, nxt: str) -> tuple:
     return "accepted", nxt
 
 
+def child_env(environ=None) -> dict:
+    """The environment the drafting turn gets: everything but ADAM_*, TICVAI_* and any variable named like a token,
+    password or secret (the turn reads developer-written text and must hold no credential). Claude's own login
+    variables (ANTHROPIC_*, CLAUDE_*) stay, or it could not run."""
+    out = {}
+    for k, v in (os.environ if environ is None else environ).items():
+        u = k.upper()
+        if u.startswith(("ANTHROPIC_", "CLAUDE_")):
+            out[k] = v
+        elif u.startswith(("ADAM_", "TICVAI_")) or any(w in u for w in ("TOKEN", "PASSWORD", "SECRET")):
+            continue
+        else:
+            out[k] = v
+    return out
+
+
+def claude_argv(claude: str) -> list:
+    """The drafting turn's command line: three read tools, no settings but the worktree's own, no outside MCP servers,
+    a turn and a money limit, and the credentials folder and any .env file refused (fix round 1, I-3, I-4). The
+    deny list is last: it takes a list."""
+    mine = "//" + REPO.resolve().as_posix().replace(":", "", 1)[0].lower() + REPO.resolve().as_posix()[2:] + "/audit/**"
+    deny = ["Bash", "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch", *NO_READ, f"Read({mine})"]
+    return [claude, "-p", "--output-format", "json", "--tools", "Read,Grep,Glob", "--allowedTools", "Read,Grep,Glob",
+            "--strict-mcp-config", "--setting-sources", "project", "--max-turns", MAX_TURNS,
+            "--max-budget-usd", MAX_BUDGET_USD, "--no-session-persistence",
+            "--disallowedTools", *dict.fromkeys(deny)]
+
+
 def run_claude(prompt: str, cwd: Path, claude: str, timeout: int = DRAFT_MINUTES * 60) -> str:
-    """One headless Claude Code turn with read-only tools, in `cwd`. Returns its final text."""
-    p = subprocess.run([claude, "-p", "--output-format", "json", "--allowedTools", "Read,Grep,Glob",
-                        "--disallowedTools", "Bash,Edit,Write,NotebookEdit,WebFetch,WebSearch",
-                        "--no-session-persistence"],
-                       input=prompt, capture_output=True, text=True, encoding="utf-8", errors="replace",
-                       cwd=str(cwd), timeout=timeout)
+    """One headless Claude Code turn with read-only tools, in `cwd` (the package worktree), with no credential in its
+    environment. Returns its final text."""
+    p = subprocess.run(claude_argv(claude), input=prompt, capture_output=True, text=True, encoding="utf-8",
+                       errors="replace", cwd=str(cwd), timeout=timeout, env=child_env())
     if p.returncode != 0:
         raise RuntimeError(f"claude exited {p.returncode}: {(p.stderr or p.stdout).strip()[:300]}")
     try:
@@ -450,15 +494,27 @@ BLOCK = re.compile(r"^## (CR-\d+)\b.*$", re.M)
 ALL_DEFAULT = re.compile(r"^approve all default-ruled \(\d+\):[ \t]*(.*)$", re.M)
 
 
+def draft_hash(d) -> str:
+    """A short hash of a draft as stored: a mark settles only the draft it was made against (fix round 1, C-1)."""
+    if not d:
+        return ""
+    return hashlib.sha256(json.dumps(d, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()[:12]
+
+
+def _fold(text) -> str:
+    return " ".join(str(text).split())
+
+
 def _item(r: dict) -> dict:
     return {"id": r["id"], "ref": r["ref"], "raised": r["raised"], "title": r["title"], "ticket": r["ticket"],
             "blocking": r["blocking"], "cr": dict(r), "facts": {}, "facts_lines": [], "draft": None,
             "draft_error": "", "drafted_at": "", "decision": "", "note": "", "status": "", "ref_to": "",
-            "resolution": "", "redraft_note": ""}
+            "resolution": "", "redraft_note": "", "draft_tries": 0}
 
 
 def _default_ruled(p: dict) -> bool:
-    return bool((p.get("facts") or {}).get("default_ruling"))
+    f = p.get("facts") or {}
+    return bool(f.get("default_ruling")) and f.get("default_status") == "active"
 
 
 def render_review(pending: dict, status_line: str) -> str:
@@ -471,7 +527,7 @@ def render_review(pending: dict, status_line: str) -> str:
              "drafts it again with your note). Then:", "",
              "    python ticvai/tools/cr-watch.py settle            # what would be settled (dry run)",
              "    python ticvai/tools/cr-watch.py settle --apply    # settle in ADAM and tell the tickets", ""]
-    open_default = [p for p in order if _default_ruled(p) and not p.get("decision")]
+    open_default = [p for p in order if _default_ruled(p) and not p.get("decision") and p.get("draft")]
     if open_default:
         lines += ["These requests are in a class with a written default ruling, shown in each block. Write `approve` "
                   "after the colon to approve every one of them that has no mark of its own; nothing is settled "
@@ -486,7 +542,7 @@ def render_review(pending: dict, status_line: str) -> str:
     for p in order:
         d = p.get("draft") or {}
         note = f": {p['note']}" if p.get("decision") == "reject" and p.get("note") else ""
-        err = f" (not written: {p['draft_error']})" if p.get("draft_error") else ""
+        err = f" (not written: {_fold(p['draft_error'])})" if p.get("draft_error") else ""
         lead = [f"your last note: {p['redraft_note']}"] if p.get("redraft_note") and not d else []
         default = ["default ruled: yes"] if _default_ruled(p) else []
         lines += ["", f"## {p['ref']} · {d.get('verdict', 'no draft yet')} · "
@@ -495,7 +551,8 @@ def render_review(pending: dict, status_line: str) -> str:
                   "> " + " ".join(p["title"].split()), f"decision: {p.get('decision', '')}{note}",
                   f"status: {p.get('status', '')}",
                   f"ref: {p.get('ref_to', '')}", f"resolution: {p.get('resolution', '')}",
-                  "facts: " + " ".join(" · ".join(p["facts_lines"]).split()), *default, *lead,
+                  "facts: " + " ".join(" · ".join(p["facts_lines"]).split()),
+                  f"draft hash: {draft_hash(d)}", *default, *lead,
                   f"draft: drafts/{p['ref']}.md{err}"]
     return "\n".join(lines) + "\n"
 
@@ -511,15 +568,16 @@ def parse_review(text: str) -> dict:
     for ref, body in zip(parts[1::2], parts[2::2]):
         got = {}
         for line in body.splitlines():
-            m = re.match(r"^(decision|status|ref|resolution|default ruled):[ \t]?(.*)$", line)
+            m = re.match(r"^(decision|status|ref|resolution|default ruled|draft hash):[ \t]?(.*)$", line)
             if m and m.group(1) not in got:
                 got[m.group(1)] = m.group(2).strip()
         dm = re.match(r"^(approve|change|reject)\b\s*:?\s*(.*)$", got.get("decision", ""), re.I)
         default = got.get("default ruled", "").lower() == "yes"
         out[ref] = {"decision": dm.group(1).lower() if dm else "", "note": dm.group(2).strip() if dm else "",
                     "status": got.get("status", ""), "ref_to": got.get("ref", ""),
-                    "resolution": got.get("resolution", ""), "default": default}
-        if approve_all and default and not out[ref]["decision"]:
+                    "resolution": got.get("resolution", ""), "default": default,
+                    "draft_hash": got.get("draft hash", "")}
+        if approve_all and default and not out[ref]["decision"] and out[ref]["draft_hash"]:
             out[ref]["decision"] = "approve"
     return out
 
@@ -532,7 +590,13 @@ def decisions_for(pending: dict, marks: dict, project: str, nxt: str) -> tuple:
         if ref not in pending or m["decision"] not in ("approve", "change"):
             continue
         status = m["status"].lower()
-        if status not in STATUSES:
+        shown = draft_hash(pending[ref].get("draft"))
+        if m.get("draft_hash", "") != shown:
+            problems.append(f"{ref}: the draft changed since you marked it; read it again and mark it again")
+        elif m["decision"] == "approve" and not shown:
+            problems.append(f"{ref}: nothing was drafted to approve; mark it change with your own status and "
+                            f"resolution")
+        elif status not in STATUSES:
             problems.append(f"{ref}: status {m['status']!r} is not one of {', '.join(STATUSES)}")
         elif not m["resolution"]:
             problems.append(f"{ref}: no resolution to settle with")
@@ -638,6 +702,20 @@ def _draft_file(out: Path, p: dict, text: str):
     _write(out / "drafts" / f"{p['ref']}.md", "\n".join(body))
 
 
+def absorb_marks(pending: dict, marks: dict):
+    """The lead's marks in REVIEW.md into the state, for `run` and `settle` alike."""
+    for ref, m in marks.items():
+        p = pending.get(ref)
+        if not p:
+            continue
+        if m["decision"] == "reject":
+            p.update(draft=None, draft_error="", draft_tries=0, decision="", note="", status="", ref_to="",
+                     resolution="", redraft_note=m["note"] or "no reason given")
+        else:
+            p.update(decision=m["decision"], note=m["note"], status=m["status"], ref_to=m["ref_to"],
+                     resolution=m["resolution"])
+
+
 def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
     """Steps 1-4. `fetch`, `drafter` (prompt, cwd) -> text, `tree`, `rel` and `branches` stand in for ADAM, Claude
     Code and git in the self-tests."""
@@ -652,16 +730,7 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
     state = state or {"project": a.project, "last_id": a.start_id or 0, "pending": {}}
     pending = state["pending"]
     review = out / "REVIEW.md"
-    for ref, m in (parse_review(review.read_text(encoding="utf-8")) if review.exists() else {}).items():
-        p = pending.get(ref)
-        if not p:
-            continue
-        if m["decision"] == "reject":
-            p.update(draft=None, draft_error="", decision="", note="", status="", ref_to="", resolution="",
-                     redraft_note=m["note"] or "no reason given")
-        else:
-            p.update(decision=m["decision"], note=m["note"], status=m["status"], ref_to=m["ref_to"],
-                     resolution=m["resolution"])
+    absorb_marks(pending, parse_review(review.read_text(encoding="utf-8")) if review.exists() else {})
     try:
         text = Path(a.csv).read_text(encoding="utf-8-sig") if a.csv else (fetch or _fetch_live)(a)
         rows = parse_export(text)
@@ -698,7 +767,10 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
         p["cr"] = by_ref.get(p["ref"], p["cr"])          # the request as ADAM has it now
         p["facts"] = sort_request(p["cr"], rows, classes, baseline, idx, branches)
         p["facts_lines"] = facts_lines(p["cr"], p["facts"])
-    todo = [p for p in pending.values() if not p.get("draft")]
+    # Never draft over the lead: a request they marked keeps their words (fix round 1, C-1); one that failed
+    # MAX_TRIES times waits for them (I-4).
+    todo = [p for p in pending.values()
+            if not p.get("draft") and not p.get("decision") and p.get("draft_tries", 0) < MAX_TRIES]
     if todo and not a.no_draft:
         claude = a.claude or shutil.which("claude") or ""
         if drafter is None and not claude:
@@ -722,7 +794,10 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
                     p.update(draft=d, draft_error="", drafted_at=_now(), status=status, ref_to=ref_to,
                              resolution=d["resolution"], redraft_note="")
                 except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as e:
-                    p["draft_error"] = str(e)[:200]
+                    p["draft_tries"] = p.get("draft_tries", 0) + 1
+                    p["draft_error"] = _fold(e)[:200]
+                    if p["draft_tries"] >= MAX_TRIES:
+                        p["draft_error"] = f"draft failed twice: answer by hand ({p['draft_error']})"
                 _draft_file(out, p, answer)
     for p in pending.values():
         if not (out / "drafts" / f"{p['ref']}.md").exists():
@@ -746,8 +821,9 @@ def settle(a, runner=None, env=None, rel=None) -> int:
         print("cr-watch settle: nothing to settle (no REVIEW.md yet)")
         return 2
     _, nxt = rel or releases_live()
-    spec, problems = decisions_for(state["pending"], parse_review(review.read_text(encoding="utf-8")),
-                                   state["project"], nxt)
+    marks = parse_review(review.read_text(encoding="utf-8"))
+    spec, problems = decisions_for(state["pending"], marks, state["project"], nxt)
+    absorb_marks(state["pending"], marks)       # what REVIEW.md is written from after an apply (fix round 1, I-2)
     for pr in problems:
         print(f"  not settled: {pr}")
     if not spec["items"]:
@@ -979,7 +1055,8 @@ def _t_default(fails):
     pend = {}
     for i, ruled in ((1, False), (2, True), (3, True), (4, True)):
         p = _item(dict(_row(i), id=i, blocking="yes" if i == 1 else ""))
-        p.update(facts={"class_name": "Money currency", "default_ruling": "Rule X" if ruled else ""},
+        p.update(facts={"class_name": "Money currency", "default_ruling": "Rule X" if ruled else "",
+                        "default_status": "active"},
                  facts_lines=["Ticket #1"], draft={"verdict": "NOT FIXED", "needs": "client"}, status="accepted",
                  ref_to="r7", resolution=f"Accepted {i}. Build now: x.")
         pend[p["ref"]] = p
@@ -1006,7 +1083,7 @@ def _t_default(fails):
     pend["CR-004"].update(status="", resolution="", draft=None)
     marks = parse_review(marked.replace("resolution: Accepted 4. Build now: x.", "resolution: "))
     _expect(fails, "no draft, no settle", decisions_for(pend, marks, "ticvai", "r7")[1],
-            ["CR-004: no resolution to settle with"])
+            ["CR-004: the draft changed since you marked it; read it again and mark it again"])
 
 
 def _t_pipeline(fails):
@@ -1095,7 +1172,189 @@ def _t_pipeline(fails):
                                                          load_state(d / "out")["pending"]), (3, {}))
 
 
-TESTS = [_t_export, _t_sort, _t_draft, _t_review, _t_default, _t_pipeline]
+def _pipe_args(d, **kw):
+    a = argparse.Namespace(out=str(d / "out"), csv=None, project="ticvai", seed=False, start_id=0, no_draft=False,
+                           classes=d / "c.yaml", baseline=d / "b.json", links=_links_file(d, []), claude="",
+                           release_dir="", adam="https://adam.example", apply=False)
+    for k, v in kw.items():
+        setattr(a, k, v)
+    return a
+
+
+def _t_marks(fails):
+    """Fix round 1, C-1 and I-2: a mark applies only to the draft the lead saw; nothing is drafted over a mark; settle
+    keeps the marks it does not settle."""
+    base = dict(facts={"class_name": "X", "default_ruling": "R", "default_status": "active"}, facts_lines=["t"],
+                status="accepted", ref_to="r7")
+    drafted = _item(dict(_row(1), id=1))
+    drafted.update(base, draft={"verdict": "NOT FIXED", "needs": "lead"}, resolution="Accepted 1. Build now: x.")
+    bare = _item(dict(_row(2), id=2))
+    bare.update(base, resolution="the lead's own words")
+    pend = {"CR-001": drafted, "CR-002": bare}
+    text = render_review(pend, "s")
+    _expect(fails, "the block carries the hash of the draft shown", re.findall(r"^draft hash: (\w*)$", text, re.M),
+            [draft_hash(drafted["draft"]), ""])
+    one = text.replace("decision: \n", "decision: approve\n", 1)
+    spec, problems = decisions_for(pend, parse_review(one), "ticvai", "r7")
+    _expect(fails, "an approve of the draft shown is settled", ([i["cr"] for i in spec["items"]], problems),
+            (["CR-001"], []))
+    drafted["draft"] = dict(drafted["draft"], verdict="PARTLY FIXED")
+    spec, problems = decisions_for(pend, parse_review(one), "ticvai", "r7")
+    _expect(fails, "a draft that changed after the mark is refused", (spec["items"], problems),
+            ([], ["CR-001: the draft changed since you marked it; read it again and mark it again"]))
+    drafted["draft"]["verdict"] = "NOT FIXED"
+    blocks = text.split("\n## ")
+    blocks[2] = blocks[2].replace("decision: \n", "decision: approve\n")
+    spec, problems = decisions_for(pend, parse_review("\n## ".join(blocks)), "ticvai", "r7")
+    _expect(fails, "an approve of a block that never had a draft is refused", (spec["items"], problems),
+            ([], ["CR-002: nothing was drafted to approve; mark it change with your own status and resolution"]))
+    blocks[2] = blocks[2].replace("decision: approve\n", "decision: change\n")
+    spec, problems = decisions_for(pend, parse_review("\n## ".join(blocks)), "ticvai", "r7")
+    _expect(fails, "a change with the lead's own words is settled", ([i["cr"] for i in spec["items"]], problems),
+            (["CR-002"], []))
+    both = text.replace("approve all default-ruled (1): ", "approve all default-ruled (1): approve", 1)
+    _expect(fails, "approve-all reaches only the request that had a draft",
+            {k: v["decision"] for k, v in parse_review(both).items()}, {"CR-001": "approve", "CR-002": ""})
+
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        (d / "c.yaml").write_text(TEST_CLASSES, encoding="utf-8")
+        (d / "b.json").write_text(json.dumps(TEST_BASELINE), encoding="utf-8")
+        csv_text = _csv([_row(1), _row(2)])
+        calls = []
+        kw = dict(fetch=lambda _a: csv_text, drafter=lambda prompt, cwd: calls.append(prompt) or ANSWER, tree=d,
+                  rel=("r6", "r7"), branches=set())
+        a = _pipe_args(d, no_draft=True)
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **kw)
+            review = d / "out" / "REVIEW.md"
+            text = review.read_text(encoding="utf-8")
+            marked = text.replace("decision: \nstatus: \nref: \nresolution: \n", "decision: change\nstatus: done\n"
+                                  "ref: r6\nresolution: Mine alone.\n", 1)
+            review.write_text(marked, encoding="utf-8")
+            a.no_draft = False
+            run(a, **kw)
+        _expect(fails, "a request the lead marked is not drafted over", len(calls), 1)
+        mine = load_state(d / "out")["pending"]["CR-001"]
+        _expect(fails, "the lead's words survive the next run", (mine["status"], mine["resolution"], mine["draft"]),
+                ("done", "Mine alone.", None))
+
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        (d / "c.yaml").write_text(TEST_CLASSES, encoding="utf-8")
+        (d / "b.json").write_text(json.dumps(TEST_BASELINE), encoding="utf-8")
+        csv_text = _csv([_row(1), _row(2)])
+        calls = []
+        kw = dict(fetch=lambda _a: csv_text, drafter=lambda prompt, cwd: calls.append(prompt) or ANSWER, tree=d,
+                  rel=("r6", "r7"), branches=set())
+        a = _pipe_args(d)
+        secrets = {"ADAM_EMAIL": "lead@x", "ADAM_PASSWORD": "s3cret-pw", "TICVAI_OP_TOKEN": "tok-123"}
+        ran = []
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **kw)
+            review = d / "out" / "REVIEW.md"
+            text = review.read_text(encoding="utf-8")
+            blocks = text.split("\n## ")
+            blocks[1] = blocks[1].replace("decision: \n", "decision: approve\n")
+            blocks[2] = blocks[2].replace("decision: \n", "decision: reject: keep this note\n")
+            review.write_text("\n## ".join(blocks), encoding="utf-8")
+            a.apply = True
+            settle(a, runner=lambda argv, e: ran.append(argv) or 0, env=secrets, rel=("r6", "r7"))
+        after = review.read_text(encoding="utf-8")
+        _expect(fails, "settle applied the approve", [i["cr"] for i in json.loads(
+            Path(ran[0][2]).read_text(encoding="utf-8"))["items"]], ["CR-001"])
+        _expect(fails, "an unrelated reject note survives a settle", "your last note: keep this note" in after, True)
+        _expect(fails, "the settled request left the list", [r for r in BLOCK.findall(after)], ["CR-002"])
+
+
+def _t_budget(fails):
+    """Fix round 1, I-3 and I-4: the drafting turn is boxed in, and a failing draft stops after two tries."""
+    env = {"PATH": "/bin", "HOME": "/h", "ADAM_PASSWORD": "a", "ADAM_EMAIL": "b", "TICVAI_OP_TOKEN": "c",
+           "GITHUB_TOKEN": "d", "MY_SECRET": "e", "DB_PASSWORD": "f", "ANTHROPIC_API_KEY": "kept"}
+    _expect(fails, "the child environment carries no credential", sorted(child_env(env)),
+            ["ANTHROPIC_API_KEY", "HOME", "PATH"])
+    argv = claude_argv("claude")
+
+    def after(flag):
+        return argv[argv.index(flag) + 1]
+
+    _expect(fails, "tools are limited", after("--tools"), "Read,Grep,Glob")
+    _expect(fails, "settings only from the project", after("--setting-sources"), "project")
+    _expect(fails, "no outside MCP servers", "--strict-mcp-config" in argv, True)
+    _expect(fails, "turn and money limits", (after("--max-turns"), after("--max-budget-usd")), ("12", "1.00"))
+    deny = argv[argv.index("--disallowedTools") + 1:]
+    for want in ("Read(//d/Chinmay/adam/audit/**)", "Read(**/*.env)", "Bash"):
+        if want not in deny:
+            fails.append(f"the deny list lacks {want!r}: {deny}")
+    seen = {}
+
+    class Done:
+        returncode, stderr, stdout = 0, "", json.dumps({"result": "ok"})
+
+    real = subprocess.run
+    saved = {k: os.environ.get(k) for k in env}
+    os.environ.update(env)
+    try:
+        subprocess.run = lambda *a_, **k_: seen.update(k_, argv=a_[0]) or Done()
+        run_claude("prompt", Path("somewhere"), "claude")
+    finally:
+        subprocess.run = real
+        for k, v in saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+    _expect(fails, "run_claude passes the cleaned environment and the package worktree",
+            (sorted(k for k in seen["env"] if k in env), seen["cwd"]),
+            (["ANTHROPIC_API_KEY", "HOME", "PATH"], str(Path("somewhere"))))
+
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        (d / "c.yaml").write_text(TEST_CLASSES, encoding="utf-8")
+        (d / "b.json").write_text(json.dumps(TEST_BASELINE), encoding="utf-8")
+        csv_text = _csv([_row(1)])
+        calls = []
+        kw = dict(fetch=lambda _a: csv_text, drafter=lambda prompt, cwd: calls.append(prompt) or "no json", tree=d,
+                  rel=("r6", "r7"), branches=set())
+        a = _pipe_args(d)
+        with contextlib.redirect_stdout(io.StringIO()):
+            for _ in range(4):
+                run(a, **kw)
+        _expect(fails, "a failing draft is tried twice, no more", len(calls), 2)
+        text = (d / "out" / "REVIEW.md").read_text(encoding="utf-8")
+        if "draft failed twice: answer by hand" not in text:
+            fails.append("REVIEW.md does not say the draft failed twice")
+        marked = text.replace("decision: \n", "decision: reject: try again\n", 1)
+        (d / "out" / "REVIEW.md").write_text(marked, encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **kw)
+        _expect(fails, "the lead's reject starts the tries again", len(calls), 3)
+
+
+def _t_proposed(fails):
+    """Fix round 1, R-1: a proposed default ruling is shown but never enables the approve-all line."""
+    with tempfile.TemporaryDirectory() as d:
+        f = Path(d) / "c.yaml"
+        f.write_text("classes:\n- id: a\n  name: A\n  default_ruling: {status: proposed, text: Rule A}\n"
+                     "- id: b\n  name: B\n  default_ruling: {status: active, text: Rule B}\n"
+                     "- id: c\n  name: C\n  default_ruling: Rule C\n", encoding="utf-8")
+        got = {c["id"]: (c["default_ruling"], c["default_status"]) for c in load_classes(f)}
+    _expect(fails, "rulings load with their status; a bare text counts as proposed", got,
+            {"a": ("Rule A", "proposed"), "b": ("Rule B", "active"), "c": ("Rule C", "proposed")})
+    for status, want in (("proposed", []), ("active", ["1"])):
+        p = _item(dict(_row(1), id=1))
+        p.update(facts={"class_name": "A", "default_ruling": "Rule A", "default_status": status}, facts_lines=["t"],
+                 draft={"verdict": "NOT FIXED", "needs": "lead"}, status="accepted", ref_to="r7",
+                 resolution="Accepted. Build now: x.")
+        text = render_review({"CR-001": p}, "s")
+        _expect(fails, f"a {status} ruling and the approve-all line",
+                re.findall(r"^approve all default-ruled \((\d+)\):", text, re.M), want)
+        marked = text.replace("approve all default-ruled (1): ", "approve all default-ruled (1): approve")
+        _expect(fails, f"a {status} ruling and the approve-all mark",
+                parse_review(marked)["CR-001"]["decision"], "approve" if want else "")
+
+
+TESTS = [_t_export, _t_sort, _t_draft, _t_review, _t_default, _t_pipeline, _t_marks, _t_budget, _t_proposed]
 
 
 def self_test() -> list:
