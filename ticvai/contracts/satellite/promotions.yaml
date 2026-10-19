@@ -1424,11 +1424,16 @@ paths:
       description: 'Called at point of sale before applying. Returns whether the code is valid, why not
         when it is not, and what it would give.
 
-        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
-        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets whether a code of a
-        live, published promotion is valid and what it gives, and nothing in draft, unpublished or withdrawn;
-        asked for by id, such a record answers as not found. `PRICE_VIEW` is what a staff caller must hold,
-        and staff also see drafts (ADR-0025).
+        **A guest calls this without a permission** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001;
+        `x-ticvai-guest-callable`). **The guest rule, on what is stored** (R8 blocker ORDERS-MONEY-C32, the
+        lead''s answer A of 20 October 2026; a coupon campaign has `is_active`, `valid_from` and `valid_to` and no
+        link to a promotion): an unknown code is 404; a known code is 200 with `GuestCouponCode` (code, status,
+        whether it can be applied and why not, the discount and the validity window) and nothing about its
+        allocation, owner, assignee or counts. `invalidReason` for a guest is `expired`, `notYetValid`, `voided`
+        (also when the campaign is not active), `alreadyRedeemed` (the guest''s own redemption) or
+        `notAssignedToGuest` (assigned to someone else, without saying to whom); `wrongVenue` only when the guest
+        sends `venueId` and the code is not valid there. `PRICE_VIEW` is what a staff caller must hold; staff get
+        `CouponCode` and see drafts (ADR-0025).
 
         '
       tags:
@@ -1438,13 +1443,24 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: The venue the guest is buying at, so `wrongVenue` can be answered; a guest session carries no
+          venue. Staff callers are answered for their session's venue.
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
-          description: Code state
+          description: Code state. **A guest caller receives `GuestCouponCode`**; staff callers receive `CouponCode`.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CouponCode'
+                oneOf:
+                - $ref: '#/components/schemas/CouponCode'
+                - $ref: '#/components/schemas/GuestCouponCode'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
@@ -1849,7 +1865,10 @@ paths:
         **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a published bundle, and
         nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
-        `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+        `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025). **A guest or
+        visitor receives `GuestBundle`** (R8 blocker ORDERS-MONEY-C32, the lead's answer A of 20 October 2026):
+        name, description, price and savings, components and choice groups, and validity, never the allocation,
+        owner, campaign or whether it has been sold.
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
@@ -1865,11 +1884,13 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Bundle
+          description: Bundle. **A guest or visitor receives `GuestBundle`**; staff callers receive `Bundle`.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Bundle'
+                oneOf:
+                - $ref: '#/components/schemas/Bundle'
+                - $ref: '#/components/schemas/GuestBundle'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
@@ -10197,6 +10218,89 @@ components:
           type: string
           nullable: true
           description: The channel's last rejection, while status is `publicationFailed` or `outOfSync`.
+    GuestCouponCode:
+      x-ticvai-persistence: none — guest projection of promotions.coupon_code and its campaign
+      type: object
+      description: '**What a guest may see of a coupon code** (R8 blocker ORDERS-MONEY-C32), as `GuestPromotion` is
+        for a promotion: never the campaign, batch, assignee, assignment, redemption counts or the order it was
+        redeemed on. `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - code
+      - status
+      properties:
+        code:
+          type: string
+        status:
+          $ref: '#/components/schemas/CouponStatus'
+        isValid:
+          type: boolean
+          description: True when the code can be applied now; else `invalidReason` says why.
+        invalidReason:
+          type: string
+          nullable: true
+          enum:
+          - expired
+          - notYetValid
+          - voided
+          - alreadyRedeemed
+          - notAssignedToGuest
+          - wrongVenue
+        discount:
+          $ref: '#/components/schemas/Discount'
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+    GuestBundle:
+      x-ticvai-persistence: none — guest projection of promotions.bundle and its components
+      type: object
+      description: '**What a guest may see of a bundle** (R8 blocker ORDERS-MONEY-C32), as `GuestPromotion` is for a
+        promotion: never the allocation, owner, campaign, code or whether it has been sold.
+        `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - id
+      - name
+      - price
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        kind:
+          $ref: '#/components/schemas/BundleKind'
+        price:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        savingsAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        savingsPercentage:
+          type: number
+          nullable: true
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleComponent'
+        choiceGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleChoiceGroup'
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
     GuestPromotion:
       x-ticvai-persistence: none — guest projection of promotions.promotion
       type: object

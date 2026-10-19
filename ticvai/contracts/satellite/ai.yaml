@@ -4050,7 +4050,9 @@ paths:
       description: '**The kill switch** (AIC-189, ADM-519, ADM-536, ADM-556). The capability answers from its declared
         degradation mode until resumed: recommendations leave the slot empty, fraud scoring falls back to the owners''
         rules, the concierge offers a person (design 3.7). In-flight plans of the capability pause at their next
-        checkpoint. Emits `ai.capabilityPaused`.
+        checkpoint. Emits `ai.capabilityPaused`, written to `ai.outbox` in the same transaction as the capability,
+        intervention and plan writes; the decision record in the log database follows after commit, retried (R8
+        blocker FOUNDATION-AI-C41).
 
         '
       tags:
@@ -4698,6 +4700,9 @@ paths:
       description: '**Human override is always possible** (AIC-187, ADM-536): the original decision and the human
         one are kept side by side as an intervention and an annotation on the decision record. It changes what AI
         does next; it does not reach into an owning module (a correction there is that module''s own operation).
+        It writes the `ai.intervention` row and appends one annotation of `kind` `override` with its
+        `interventionId` to the decision record; `humanDecision` stays as it was written when the record was
+        created (R8 blocker FOUNDATION-AI-C33).
 
         '
       tags:
@@ -10644,6 +10649,178 @@ components:
       description: Cell-to-cell, as `../shared/common.yaml` `serviceAuth`. Used by `evaluateAiGovernance`,
         `scoreTransactionRisk` and `simulateRecommendationDecision`.
   schemas:
+    AiOutboxEntry:
+      x-ticvai-append-only: createdAt
+      type: object
+      x-ticvai-persistence: ai.outbox
+      # One aggregate's events in order, as platform.outbox (R8 blocker FOUNDATION-AI-C41, CHG-R8STO-005).
+      x-ticvai-index: [[aggregateId, sequence]]
+      description: '**The AI service''s outbox** (R8 blocker FOUNDATION-AI-C41, the lead''s answer A of 20 October 2026;
+        ADR-0058 amended). The columns and rules of `platform.outbox` (platform-ops `OutboxEntry`), in the tenant
+        database, written only by AI (ADR-0020: only AI writes AI tables) and drained by the regional relay like the
+        other outboxes and the control outbox. An AI operation that emits an event (`ai.capabilityPaused`,
+        `ai.planExecuted` and the rest) inserts it here **in the same transaction as its tenant-database writes**
+        (ADR-0033). A decision record in the AI log database is not in that transaction: it is written after the
+        tenant transaction commits, and retried until it is.'
+      required:
+      - id
+      - eventId
+      - eventName
+      - tenantId
+      - aggregateType
+      - aggregateId
+      - sequence
+      - payload
+      - occurredAt
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The envelope's event id, which is this row's `id` (ADR-0058; UUIDv7, ADR-0056).
+        eventName:
+          type: string
+          description: The `name` of an event in `events/` published by `ai`.
+        eventVersion:
+          type: integer
+          minimum: 1
+        tenantId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The tenant the change belongs to (envelope field, SD-030).
+        aggregateType:
+          type: string
+          description: The AI table the change happened in.
+        aggregateId:
+          type: string
+          format: uuid
+          description: Which row changed; also the broker ordering key (ADR-0058).
+        payload:
+          type: object
+          description: The event as it happened.
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005).
+        sequence:
+          type: integer
+          description: '**Monotonic per aggregate**, allocated in the writing transaction from `ai.outbox_sequence`
+            (`INSERT ... ON CONFLICT (aggregate_id) DO UPDATE SET last_sequence = last_sequence + 1 RETURNING
+            last_sequence`), never `max(sequence) + 1`, as `platform.outbox_sequence` does for the other hosts.'
+        occurredAt:
+          type: string
+          format: date-time
+          description: When the change happened, set in the writing transaction; a consumer reads this.
+        traceId:
+          type: string
+          maxLength: 64
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null until the relay publishes it; unpublished rows in sequence order are the work.
+        attempts:
+          type: integer
+          default: 0
+          description: Five, exponential from one second, jittered; then the relay's dead letter, as for
+            `platform.outbox`.
+        lastError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    AiVectorStore:
+      type: object
+      x-ticvai-persistence: ai.vector_store
+      # One row per embedding model's collection of the tenant (R8 blocker FOUNDATION-AI-C43, CHG-R8STO-005).
+      x-ticvai-unique-together:
+      - [collectionName]
+      description: '**The tenant''s physical Qdrant collections, as AI provisioned them** (R8 blocker FOUNDATION-AI-C43).
+        In the tenant database beside `ai.knowledge_collection`, because it is per tenant. Never returned by an
+        operation. **Written by AI''s consumer of `tenant.provisioned`** (Subscription emits it from the control
+        outbox when a tenant''s database is provisioned): it creates the collection `t_<tenantId>_<model>`, points
+        the alias `tenant_<tenantId>` at it, issues the collection-scoped token and records the row `active`. **AI''s
+        consumer of `tenant.terminated`** (emitted once `terminateTenant`''s retention window has passed) deletes
+        the collections and the alias, revokes the token and marks the row `deleted`. A rebuild for a new model adds
+        a row and moves the alias at the swap (`reindexSource`).'
+      required: [id, collectionName, alias, model, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        collectionName:
+          type: string
+          maxLength: 200
+          description: The physical collection, `t_<tenantId>_<model>`.
+        alias:
+          type: string
+          maxLength: 200
+          description: The alias searches use, `tenant_<tenantId>`.
+        model:
+          type: string
+          maxLength: 200
+          description: The embedding model the collection's vectors come from.
+        isAliasTarget:
+          type: boolean
+          default: false
+          description: Whether the alias points at this collection now (one row per tenant at a time).
+        tokenIssuedAt:
+          type: string
+          format: date-time
+          nullable: true
+        tokenExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the collection-scoped token expires; it is renewed before then.
+        status:
+          type: string
+          enum:
+          - provisioning
+          - active
+          - offboarding
+          - deleted
+          - failed
+        failureReason:
+          type: string
+          maxLength: 500
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+    AiOutboxSequence:
+      type: object
+      x-ticvai-persistence: ai.outbox_sequence
+      x-ticvai-primary-key: [aggregateId]
+      description: '**The last outbox sequence given to each AI aggregate** (R8 blocker FOUNDATION-AI-C41), as
+        `platform.outbox_sequence` for the other hosts; AI keeps its own so that only AI writes the tables it uses
+        (ADR-0020).'
+      required:
+      - aggregateId
+      - lastSequence
+      - scopePath
+      properties:
+        aggregateId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+        lastSequence:
+          type: integer
+          format: int64
+        scopePath:
+          type: string
+          readOnly: true
+          description: The aggregate's own scope path, the one its outbox rows carry, set on the first insert.
     AiInboxEntry:
       type: object
       x-ticvai-persistence: ai.inbox
@@ -10850,7 +11027,14 @@ components:
         startingPatternKey:
           type: string
           readOnly: true
-          description: The pattern and version in use, e.g. `waterPark@3`.
+          description: '**The starting pattern and version in use**, e.g. `waterPark@3` (R8 blocker FOUNDATION-AI-C54,
+            the lead''s answer B of 20 October 2026). The packs are read-only files shipped in the ticvai-ai image,
+            versioned with it, one per venue type as `<venueType>@<n>` (a month curve and staff productivity per role,
+            with their source); no table holds them. `setAiVenueSettings` sets the key from the venue''s type to the
+            newest pack the image carries; a venue type with no pack gets `other@<n>`, a flat curve with wide
+            intervals. Block A ships packs for the venue types of the first client''s tenants plus `other`, for the
+            Block A kinds (queue balancing, prep plan, upsell); their figures are written by TICVAI from published
+            sources and are proposed, client to correct.'
         updatedAt:
           type: string
           format: date-time
@@ -14901,7 +15085,24 @@ components:
         a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained
         per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only,
         partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays
-        `ai.<table>`; which server holds it is a deployment matter, not a contract one.'
+        `ai.<table>`; which server holds it is a deployment matter, not a contract one.
+
+
+        **Which answers are governed** (R8 blocker FOUNDATION-AI-C33, the lead''s answer A of 20 October 2026): an
+        answer of a capability whose `riskClass` is `medium`, `high` or `critical` writes a decision record; a `low` one writes
+        `ai.activity` only. No column holds the depth: the capability registry''s risk class decides.
+
+
+        **The hash chain** (R8 blocker FOUNDATION-AI-C33). `recordHash` = SHA-256, as lowercase hex, of the
+        canonical JSON (RFC 8785) of this list of fields and nothing else: `id`, `capabilityKey`, `task`,
+        `inputsRef`, `evidence`, `producer`, `modelVersion`, `promptTemplateVersion`, `featureSetVersion`,
+        `knowledgeVersion`, `ruleVersions`, `governanceOutcome`, `policyVersion`, `approvals`, `outcome`,
+        `createdAt` and `previousHash`. `previousHash` is the `recordHash` of the tenant''s previous record in
+        (`createdAt`, `id`) order, an empty string for the first. The writer reads that head and inserts the new
+        row under `pg_advisory_xact_lock(hashtext(<tenant id>))`, so several pods cannot fork the chain.
+        `annotations` and `humanDecision` are not hashed: the hashed fields are never edited, and a correction is an
+        annotation. `hashVersion` names this field list, so a later change to it is a new version, never a rewrite.
+        A verifier replays the chain and recomputes every hash.'
       required:
       - traceId
       - capabilityKey
@@ -15003,14 +15204,33 @@ components:
                 format: uuid
               note:
                 type: string
+              kind:
+                type: string
+                enum:
+                - correction
+                - override
+                description: '`override` is the one `overrideAiDecision` appends (R8 blocker FOUNDATION-AI-C33).'
+              interventionId:
+                type: string
+                format: uuid
+                nullable: true
+                description: For `override`, the `ai.intervention` row it records.
           readOnly: true
-          description: Corrections, appended; the original fields are never edited.
+          description: Corrections, appended; the original fields are never edited and annotations are not part of
+            the hash.
         previousHash:
           type: string
           readOnly: true
         recordHash:
           type: string
           readOnly: true
+        hashVersion:
+          type: integer
+          minimum: 1
+          default: 1
+          readOnly: true
+          description: Which list of hashed fields `recordHash` covers; 1 is the list in this schema's description (R8
+            blocker FOUNDATION-AI-C33).
         createdAt:
           type: string
           format: date-time

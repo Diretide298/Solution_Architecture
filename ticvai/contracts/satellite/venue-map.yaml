@@ -2237,6 +2237,77 @@ components:
           description: When the party arrives. Null means opening time.
         locale: { type: string, nullable: true }
 
+    VisitPlanPreset:
+      type: object
+      x-ticvai-persistence: venuemap.visit_plan_preset
+      # One preset per key at a venue (R8 blocker GPS-C21, the lead's answer B of 20 October 2026; CHG-R8STO-005).
+      x-ticvai-unique-together:
+      - [scopePath, presetKey]
+      description: '**A ready-made day plan a venue offers** (GST-052 Suggested Itineraries; R8 blocker GPS-C21, the
+        lead''s answer of 20 October 2026: venue-defined presets in a table, the six built-in ones as seed). Each venue
+        starts with six rows seeded from the built-in `preset` keys (`highlights`, `family`, `thrillSeeker`,
+        `waterDay`, `relaxed`, `showsAndDining`, `isBuiltIn` true, with TICVAI''s wording); the venue may change
+        their wording and contents, switch any off, and add its own. `generateVisitPlan` resolves `presetKey`
+        against the active rows of the plan''s venues (422 `unknown-preset` otherwise) and takes the interests,
+        pace and must-include points from the row. The guest read of the planner options and the venue''s write
+        are operations of this contract (requested of the surface lane with this cause).'
+      required: [id, presetKey, name, pace, isBuiltIn, isActive, sortOrder, scopePath]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        presetKey:
+          type: string
+          maxLength: 64
+          pattern: '^[a-z][a-zA-Z0-9]*$'
+          description: The key `generateVisitPlan.presetKey` names. A built-in row keeps its built-in key.
+        name:
+          type: string
+          maxLength: 120
+        nameLocalised:
+          type: object
+          nullable: true
+          additionalProperties: { type: string }
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        descriptionLocalised:
+          type: object
+          nullable: true
+          additionalProperties: { type: string }
+        pace:
+          type: string
+          enum: [packed, balanced, relaxed]
+        interestTags:
+          type: array
+          maxItems: 12
+          description: The same closed list as `VenuePoint.interestTags`.
+          items: { type: string }
+        mustIncludePointIds:
+          type: array
+          maxItems: 10
+          items: { type: string, format: uuid }
+        isBuiltIn:
+          type: boolean
+          readOnly: true
+          description: True for the six seeded rows; a built-in row can be changed or switched off, never deleted.
+        isActive:
+          type: boolean
+          default: true
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: The order GST-052 lists the presets in.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005): the venue the preset belongs to.'
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     VisitPlan:
       type: object
       x-ticvai-persistence: venuemap.visit_plan

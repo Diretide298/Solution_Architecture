@@ -930,6 +930,11 @@ paths:
         hosting instructions. A job: answers 202, followed with `getSitePackage`. Only from a published version; the
         working draft never leaves.
 
+        **The job** (R8 blocker IDENTITY-C63): it runs in the workers host, reads the version''s
+        `whitelabel.config_version` snapshot, builds the package and stores it in the assets store; the package moves
+        `building` -> `ready` (with its download link, which expires 24 hours after it is issued) or `failed` (with
+        the reason). Nothing else is stored.
+
         '
       tags:
       - publishing
@@ -3695,6 +3700,11 @@ paths:
         needs, DI-444) or a sample ticket otherwise. **Simulate, then publish** (workbook Q156, CHG-CSA-042): this is
         the simulate step.
 
+        **Where the preview is kept** (R8 blocker IDENTITY-C63): nothing is stored in a table. The rendered draft''s
+        reference is held in Redis under `cache:preview:{tenantId}:{previewId}` until `expiresAt` (its time to live),
+        and `url` is served from that entry; after it expires the link answers 404. The read that serves the link is
+        requested of the surface lane (`GET /tenant-config/preview/{previewId}`).
+
         '
       tags:
       - publishing
@@ -3885,7 +3895,12 @@ paths:
                     activates it (decided 28 September, audit R163)**: the version is validated and
                     snapshotted now, recorded with `isCurrent` false, and the job makes it current at
                     `scheduledFor`. It is validated again then; a failure leaves the current version
-                    live and is reported on the version.
+                    live and is reported on the version (`activationFailedAt`, `activationFailure`).
+                    **The job** (R8 blocker IDENTITY-C63) runs in the workers host every minute: it takes the
+                    versions whose `scheduledFor` has passed and that are not current and not failed,
+                    validates each again and makes it current, which is when `contentPublished` is emitted
+                    (CR-154); a version that fails validation keeps `isCurrent` false and records the
+                    failure.
       responses:
         '201':
           headers:
@@ -10166,6 +10181,16 @@ components:
         (GST-026), Services opens GST-029, Shows is `listPerformances` of the venue for today, and Map and Waits
         show in place.
 
+
+        **Where the Home overview, its quick actions and "Book a trip" come from in r8** (R8 blocker WHITE-C07, the
+        lead''s answer of 20 October 2026: option 3, nothing new stored). The `venueOverview` description is the
+        published content page its section names (`contentPageId`, read with `listPublishedContentPages`); none
+        named, the line is left out. The `quickActions` tiles are a fixed list the app shows, one per enabled
+        module (`enabledModules` of the published configuration), in the order of the approved frame; a venue does
+        not configure them in r8. "Book a trip" shows when the venue has a published booking flow of type
+        `transport` (`getPublishedBookingFlow`). Configurable tiles (a section''s own actions) come later, when the
+        client asks for them.
+
         '
       enum:
       - heroBanner
@@ -11371,6 +11396,19 @@ components:
           type: string
           format: date-time
           nullable: true
+        activationFailedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the scheduled activation of this version failed its validation again; null when it has
+            not failed (R8 blocker IDENTITY-C63). A failed version is not tried again; publish a new one.
+        activationFailure:
+          type: string
+          maxLength: 2000
+          nullable: true
+          readOnly: true
+          description: Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63).
         contentHash:
           type: string
         pendingBuildTimeChanges:

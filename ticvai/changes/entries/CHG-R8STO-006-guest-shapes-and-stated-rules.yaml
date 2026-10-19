@@ -1,0 +1,39 @@
+id: CHG-R8STO-006
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A guest reading a coupon code or a bundle gets its own narrow shape (GuestCouponCode, GuestBundle) and a
+  coupon rule built on what is stored; the Home overview, quick actions and "Book a trip" are stated from data that
+  exists (a content page, the enabled modules, a transport booking flow); and ADM-603 is built with the labels its
+  fields carry, the rest proposed to the client.'
+decision:
+  what: 'R8 blocker causes ORDERS-MONEY-C32 (answer A), WHITE-C07 (answer: option 3 for r8, nothing new stored) and
+    ORDERS-MONEY-C28 (answer C, ownership tenant). getCouponCode and getBundle answer a guest with the new shapes
+    (oneOf, as getPromotion does) and getCouponCode takes an optional venueId. No storage change.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (walk of the Sprint 1 and 2 tickets): ORDERS-MONEY-C32 (28190), WHITE-C07
+  (28335), ORDERS-MONEY-C28 (28054); the lead''s answers of 20 October 2026.'
+keys_touched:
+  operations: [getCouponCode, getBundle]
+  schemas: [GuestCouponCode, GuestBundle, HomepageSectionKind, B2bPaymentTerms]
+  files:
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/payments.yaml
+root_class: 'contract does not carry what the screen or ticket needs (r8 ticket walk)'
+tickets:
+  started: []
+  unstarted:
+  - '28190, 28335, 28054 (the walk that found the gaps)'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Screen parts requested of the surface lane: GST-037 binds GuestCouponCode and drops redemptionCount; ADM-603
+  binds listB2bCreditAccounts to the account picker and takes ADM-602 in entryFrom; GST-001 quick-action tiles and
+  Home exits. ADM-603''s unmapped labels go on the client note.'
