@@ -1,0 +1,28 @@
+id: CHG-R8GEN-003
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'One permission vocabulary: tools/check-permission-vocabulary.py holds every place that names a permission to the Permission enum of contracts/shared/permissions.yaml: each operation''s x-ticvai-permission, -escalated and -by-module, the module checklist x-ticvai-permission-modules (every value in exactly one module), roles.yaml''s presets, the lineage''s perm (equal to the contract''s) and roles-by-app.yaml. roles-by-app.yaml no longer says the two vocabularies share no key: roles.yaml''s action keys are counted by the enum values they map to, and its daily date stamp is gone so a refresh does not change it every day.'
+decision:
+  what: 'Generators lane, second r8 fix round, extra item 4. The enum stays the one source; the lineage''s perm is now derived (CHG-R8GEN-001), roles-by-app.yaml is derived (derive-app-roles), and the rest is checked. Six enum values nothing names are reported, not failed: DEPOSIT_BOX_MODIFY_OWN, DISCOUNT_APPLY, KIOSK_ATTEND, LOYALTY_ADJUST, PRICE_OVERRIDE, REPORT_VIEW_REGION.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (second round brief, generators lane extra item 4). On 20 October 178 lineage entries named a permission the contract no longer required, and roles-by-app.yaml still said roles.yaml shared no key with the contracts although its grants had been mapped to the enum since audit R278.'
+keys_touched:
+  files:
+  - tools/check-permission-vocabulary.py
+  - tools/derive-app-roles.py
+  - tools/run-checks.py
+  - roles-by-app.yaml
+root_class: 'two copies of one vocabulary: a value named in several files that only one of them defines'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-permission-vocabulary.py
+status: open
