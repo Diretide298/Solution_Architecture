@@ -433,6 +433,13 @@ def main() -> int:
                     guard.add("XR-VIEW-ACROSS", f"{o}:{t}", f"{o} ({rdep}) reads the view {t} of {owner} "
                               f"({dep_of.get(owner)}): across deployables use the owner's service or a projection",
                               strict=strict)
+                # **A view named for Identity is still a read above it** (20 October 2026, r8 cause FOUNDATION-AI-C48,
+                # CHG-R8GEN-005). This branch skipped the tier rule, so an `orders.sales_order_for_identity` view
+                # would have passed although ADR-0028 lets Identity read nothing above it but a projection.
+                if reader in FOUNDATION_STRICT and tier_of.get(owner) != "foundation":
+                    guard.add("XR-FOUNDATION", f"{o}:{t}", f"{o} ({reader}, foundation) reads the view {t} of {owner} "
+                              f"({tier_of.get(owner)}): Identity reads nothing above it but a projection, and a view "
+                              "is not one", strict=strict)
                 continue
             if is_covered(t, owner, cov_t, cov_o):
                 continue
