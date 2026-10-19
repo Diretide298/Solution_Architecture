@@ -15,8 +15,9 @@ namespace TICVAI.Infrastructure.Persistence.Migrations;
 ///     await new SqlMigrationRunner(connectionString).ApplyAsync("db/tenant", ct);
 /// A [DB] ticket's migration is a new numbered file here, checked on its own by
 /// `node .claude/scripts/db-ticket.mjs &lt;ticket&gt;`, which applies it the way this class does to a
-/// copy of the database at the previous state. The whole folder, applied to an empty database
-/// twice (the second run must apply nothing), runs once a day and in the pipeline.
+/// copy of the database at the previous state, applies it again, and compares the result with the
+/// package's statements. Before a merge request, `--full &lt;database&gt;` applies the whole folder to
+/// an empty database. No pipeline runs that yet.
 /// </summary>
 public sealed class SqlMigrationRunner(string connectionString)
 {

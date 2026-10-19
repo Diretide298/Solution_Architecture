@@ -101,8 +101,11 @@ public sealed class RefundAuthoriser(
   copy from, never run as they are**. Copying functions or tables out of them, such as the
   helpers at the top of 920 and 930, is expected; their "Do not hand-edit" is about the package's
   own files. `SqlMigrationRunner` applies our files in order and records each with its checksum in
-  `platform.schema_version`. A [DB] ticket is done when its file applies to an empty database and
-  a second run applies nothing. Never edit an applied file: add a new one.
+  `platform.schema_version`. A [DB] ticket is done when `node .claude/scripts/db-ticket.mjs <ticket>`
+  says MATCH: its file, applied to a copy of the previous state and then applied again, leaves exactly
+  what the package's statements leave and changes nothing else. Before the merge request,
+  `--full <database>` applies every file to an empty database, each twice. Never edit an applied
+  file: add a new one.
 - A retried mutating request with the same `Idempotency-Key` gets the first answer, from
   `IIdempotencyStore` (in memory in development; Redis in production).
 - Parameterised always. String-concatenated SQL is a build-blocking review finding.

@@ -38,10 +38,10 @@ Work the ticket, following "Working a ticket (ADAM)" in CLAUDE.md:
    affects. Propose the first one and say which CR holds back each ticket you skipped.
 4. Build what the ticket and its contract describe, in the layers CLAUDE.md lists.
 5. Add tests for the success case and each listed error. Run `dotnet test TICVAI-Backend.slnx` until it passes.
-   **A [DB] ticket** (its subject starts [DB]): write the one SQL file it names, then run
-   `node .claude/scripts/db-ticket.mjs $ARGUMENTS` until it says MATCH, as "A [DB] ticket" in CLAUDE.md
-   says. That replaces this step: no `dotnet build` or `dotnet test` unless the ticket changes C#.
-   Put its result lines in the comment.
+   **A [DB] ticket** (its subject starts [DB]): write the one SQL file it names, every statement safe to
+   run twice, then run `node .claude/scripts/db-ticket.mjs $ARGUMENTS` until it says MATCH, as "A [DB]
+   ticket" in CLAUDE.md says. That replaces this step and any older "empty database" rule: no
+   `dotnet build` or `dotnet test` unless the ticket changes C#. Put its result lines in the comment.
 6. `adam_propose` the QA status (**Ready for QA** - `adam_propose` with only the ticket number lists the live statuses; use the one named for QA, and if there is none, stop and ask), 100%, and a 2-4 line comment that says what QA should check. Never **Closed**. If the build or the tests are not
    finished, propose **In progress** with an honest % done instead; if something outside this
    repository blocks it (an open change request, say), propose **On hold** and say what. Show me the proposal and stop.
