@@ -2755,6 +2755,14 @@ paths:
         **Not paged, deliberately.** A map carries tens of resources, not thousands, and a paged answer
         would make the client stitch pages before it could grey a single cabana.
 
+
+        **The next free date** (r8 walk of ticket 28204). When no resource on the map is `available` for the
+        window, `nextAvailableDate` is the first date after `from` on which at least one placed resource is
+        free, looked for up to 30 days ahead (the horizon is fixed, not a parameter); null when the window has a
+        free resource or nothing is free within 30 days. GST-058 offers it as "next free date" and does not
+        call the operation day by day. The date is worked out the same way as `status`, with setup and teardown
+        subtracted, and for the same `kind` when `kind` is sent.
+
         '
       tags:
       - resources
@@ -3822,6 +3830,16 @@ components:
               type: integer
             unavailable:
               type: integer
+        nextAvailableDate:
+          type: string
+          format: date
+          nullable: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The first date after `from`, within 30 days, with at least one free resource; null when this
+            window already has one or nothing is free within the horizon. Computed on read; stored nowhere.
+
+            '
         resources:
           type: array
           items:

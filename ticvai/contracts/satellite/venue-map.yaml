@@ -1473,6 +1473,12 @@ paths:
         A venue with one bookable map returns one entry and the screen skips the choice.
 
         A venue with no published bookable map is an empty `maps` list, not a 404.
+
+        **`onlyBookable`** (r8 walk of ticket 28690). The default `true` is the behaviour above, for the booking
+        screens (WEB-047, GST-058, GST-074). The map-viewing screens (WEB-039, GST-021) send `false`: they list
+        every **published** map of the venue whether or not it carries a placed resource, so a guest can open a
+        map of walkways and attractions that has no cabana on it. Published only, still; with `false`,
+        `placedResourceCount` may be 0, and `productId` and `kind` still narrow the list when sent.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_VIEW
       x-ticvai-guest-callable: true
@@ -1501,6 +1507,13 @@ paths:
           required: false
           schema: { type: string, enum: [cabana, lounger, table, pitch, other] }
           description: Only maps carrying at least one placed resource of this kind (`PlacedResource.kind`).
+        - name: onlyBookable
+          in: query
+          required: false
+          schema: { type: boolean, default: true }
+          description: >
+            `true` (default): only maps whose published version carries at least one placed resource. `false`: every
+            published map of the venue, with or without placed resources (WEB-039, GST-021).
       responses:
         '200':
           description: The venue's published bookable maps, park maps first, then by `name`.
@@ -1510,6 +1523,61 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /visit-plans:
+    get:
+      operationId: listMyVisitPlans
+      x-ticvai-consumed-by:
+        - "P02 GST-059 Plan in Progress"
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: 'r8 walk of ticket 28694: GST-059 opened cold, from the home screen or a notification, had no planId; shape follows listVisitPlanAlternatives (paged) and getVisitPlan (owner rule)'
+      summary: The caller's own visit plans, by date or status
+      description: >
+        **How a screen finds today's plan without being handed a `planId`** (r8 walk of ticket 28694).
+        GST-059 (Plan in Progress), opened cold, calls this with `date` set to today and `status=draft`
+        or `booked`; it shows the plan it finds, or offers to make one when the list is empty.
+
+        **Only the caller's own plans**, by the same owner rule as `getVisitPlan`: a signed-in guest's
+        plans (`subjectId`), or the plans of the device session the anonymous guest holds (`sessionRef`).
+        Another guest's plan is never listed. Ordered by `updatedAt`, newest first, then by `id`; paged.
+
+        `date` keeps the plans whose current version has a day on that date (`VisitPlan.days[].date`).
+        `status` keeps one status. With neither, every plan of the caller. An empty page is a 200, not a 404.
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema: { type: string, format: date }
+          description: Only plans with a day on this date.
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [draft, booked, archived] }
+          description: Only plans in this status.
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The caller's plans, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/VisitPlan' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: generateVisitPlan
       x-ticvai-consumed-by:
@@ -1626,13 +1694,18 @@ paths:
             to lay out; or a date is outside its venue's opening calendar (`venue-closed-on-date`);
             or `presetKey` names no ready-made plan of the venue (`unknown-preset`); or a
             `dayVenues` entry names a venue that is not an active venue of the caller's tenant, or
-            a date that is not in `dates` (`venue-not-in-tenant`; 30 September, MoM 4.7). The
-            problem names which, and for which date.
+            a date that is not in `dates` (`venue-not-in-tenant`; 30 September, MoM 4.7); or every
+            candidate was excluded by the party's answers (`no-suitable-plan`; r8 walk of ticket 28200). The
+            problem names which, and for which date. For `no-suitable-plan` it carries `excludingAnswer`
+            (`height`, `age`, `interests`, `cuisines` or `pace`) and `excludedBy`, the answer that removed the
+            most candidates (for example the smallest child's height against every ride's minimum), so
+            WEB-050 and GST-052 can say which answer to change; the same plan is never shown empty.
           x-ticvai-problem-types:
             - venue-not-plannable
             - venue-closed-on-date
             - unknown-preset
             - venue-not-in-tenant
+            - no-suitable-plan
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -2498,8 +2571,8 @@ components:
           description: The `VenueMap.publishedVersion` a guest is served; send it to `getVenueMap` as `version`.
         placedResourceCount:
           type: integer
-          minimum: 1
-          description: Placed resources on the published version.
+          minimum: 0
+          description: Placed resources on the published version. 0 only when the caller sent `onlyBookable=false`.
         kinds:
           type: array
           description: The kinds of spot on this map, e.g. `[cabana, lounger]`, for the picker's chips.

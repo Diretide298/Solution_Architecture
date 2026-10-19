@@ -4861,6 +4861,27 @@ components:
             `graphical` means every seat carries `position`.
 
             '
+        viewBox:
+          type: object
+          nullable: true
+          description: 'The coordinate space the seat positions are in, as `SeatMap.viewBox`, so the section view
+            is drawn from this response alone (WEB-007, GST-049; r8 walk of ticket 28197). Null when `renderMode`
+            is `list`.
+
+            '
+          properties:
+            width:
+              type: number
+            height:
+              type: number
+        stagePosition:
+          allOf:
+          - $ref: '#/components/schemas/Point'
+          nullable: true
+          description: 'Where the stage sits in the same space, as `SeatMap.stagePosition`; the section view orients
+            the seats towards it. Null when `renderMode` is `list`.
+
+            '
         totals:
           type: object
           properties:
