@@ -1813,6 +1813,13 @@ paths:
         is computed on read (`VisitPlan.estimate`), and the add-on is priced when the plan is booked (`bookVisitPlan`,
         by `addCartLine`). Allowed in an
         anonymous session, like every change here.
+
+        **The waits-changed re-order on GST-059** (r8 walk of ticket 28694; lead decision of 20 October 2026,
+        option A). The server proposes nothing. A stop is **late** when its planned start has passed by more than 15
+        minutes (a proposal, owner to confirm) because the live wait (`getWaitTimes`) exceeds the item's
+        `expectedWaitMinutes`. The app works out the proposed new order from the live waits, shows it, and when the
+        guest taps "Re-order my day" sends the moves as `updateVisitPlan` operations (`move`), which the server lays
+        out and checks like any other change and saves as a new version, so undo works.
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true

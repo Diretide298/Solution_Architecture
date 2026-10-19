@@ -11604,6 +11604,18 @@ components:
           format: date-time
         brand:
           $ref: '#/components/schemas/BrandIdentity'
+        assetsBaseUrl:
+          type: string
+          format: uri
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**How any guest screen turns an asset id into a picture** (r8 walk of ticket 28156; lead
+            decision of 20 October 2026, option A). The address of a published asset is `assetsBaseUrl` + `/` +
+            the asset id + `/` + a rendition name, for example `{assetsBaseUrl}/{assetId}/card.webp`. The renditions are
+            `thumb`, `card`, `hero` and `original`. Every media object in every guest response carries an asset id and
+            nothing else, so no screen makes a media call per tile. Only public assets referenced by a published
+            version are served at it. `brandUrls` and the banner addresses below are this rule worked out for you.'
         brandUrls:
           type: object
           nullable: true
