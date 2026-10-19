@@ -3,8 +3,10 @@ date: '2026-10-18'
 source: cr
 kind: contract
 summary: 'What the kernel tickets build now has its storage in the package: a control-database outbox for
-  tenant.suspended, approval before suspendTenant and reactivateTenant, a timer for a future suspension and the full
-  set of reactivate refusals (CR-152); control.cell_tenant.root_scope_path written at provisioning (CR-163);
+  tenant.suspended; suspendTenant and reactivateTenant raise their own approval request, answer 202 with it and write
+  nothing else, and Subscription''s approval.granted consumer re-checks the tenant and applies the change (CR-152,
+  CR-172 option (a)); a timer for a future suspension and the full set of reactivate refusals (CR-152);
+  control.cell_tenant.root_scope_path written at provisioning (CR-163);
   TenantAppStatus.darkAppModules and a generated app-module map, handoff/release-flags.json (CR-164); the outbox''s
   occurred_at, its (aggregate_id, sequence) index and a per-aggregate counter every host may use, with ADR-0057 and
   ADR-0058 amended (CR-166). A check now names each kernel ticket''s storage and fails when one goes missing.'
@@ -16,7 +18,7 @@ decision:
     reactivateTenant raise their own approval request and answer 202 (CR-172, fix round 2), a future effectiveAt is pending and a
     workers job applies it, reactivate refuses tenant-not-suspended and cancels a pending suspension, terminating ->
     active described; CellTenant.rootScopePath. states/tenant.yaml: the timer transition. events/tenant-suspended.yaml:
-    written to control.outbox, by the call or the job. white-label.yaml: TenantAppStatus.darkAppModules. New
+    written to control.outbox, by Subscription''s approval.granted consumer or the job (CR-172). white-label.yaml: TenantAppStatus.darkAppModules. New
     tools/derive-release-flags.py writes handoff/release-flags.json (306 app-modules, 2,550 operations, 1,388 bound by
     more than one, each screen''s operations included; corrected in fix round 1 from 2,544 and 1,099, when the
     generator read no screen). tools/derive-ddl.py: provision-tenant.sh creates the tenant''s root scope node and records its
@@ -32,11 +34,13 @@ why: 'ADAM CR-152 (Narayan Gaonkar, #27775), CR-163 (#27692), CR-164 (#27695) an
 keys_touched:
   operations: [suspendTenant, reactivateTenant, getTenantAppStatus]
   tables: [control.outbox, control.cell_tenant, control.tenant, platform.outbox, platform.outbox_sequence]
-  schemas: [OutboxEntry, OutboxSequence, ControlOutboxEntry, CellTenant, TenantAppStatus]
+  schemas: [OutboxEntry, OutboxSequence, ControlOutboxEntry, CellTenant, TenantAppStatus, TenantChangeRequested,
+    TenantChangeConflictProblem, ApprovalRequest]
   files:
   - contracts/satellite/platform-ops.yaml
   - contracts/satellite/subscription.yaml
   - contracts/satellite/white-label.yaml
+  - contracts/spine/approvals.yaml
   - states/tenant.yaml
   - events/tenant-suspended.yaml
   - events/approval-granted.yaml
@@ -49,6 +53,10 @@ keys_touched:
   - tools/derive-release-flags.py
   - handoff/release-flags.json
   - tools/check-ticket-builds.py
+  - tools/check-states.py
+  - tools/applied/tenant-approval-19-october.py
+  - handoff/api-data-lineage.json
+  - docs/active/breaking-changes.yaml
   - docs/active/audit-runs/cr-answers-1018/impact-class15-kernel-plumbing.tsv
   tickets: [PLATFORM-OUTBOX, PLATFORM-KERNEL, PLATFORM-FLAGS, DB-ROLES, PLATFORM-MIGRATE]
 root_class: 'new: kernel-plumbing-missing (class 15 of the 18 October triage)'
@@ -74,9 +82,11 @@ notes: 'Prevention: check-ticket-builds B-KERNEL-STORAGE (KERNEL_NEEDS: each ker
   release derive. Shown failing on r6 (8 new) and passing after. Also held: check-cross-deployable-writes X-KERNEL
   now requires the counter grant. Sibling query: the KERNEL_NEEDS list is the class; PLATFORM-MIGRATE''s resume is
   class 12 (CHG-CRA-006). Database (derived at the release; this branch''s derive in
-  D:\wt\fix-cr-answers-1018-derived\class15): control V0105 adds control.outbox and cell_tenant.root_scope_path
-  (added nullable; the review row says backfill then SET NOT NULL); tenant V0105 adds platform.outbox_sequence (scope
-  policy), platform.outbox.occurred_at (added nullable; backfill from created_at, then NOT NULL) and
+  D:\wt\fix-cr-answers-1018-derived\class15, written then as V0105; r7 has since taken V0105, so the release derive
+  numbers this branch''s forward migrations, V0106 at the round-2 derive and contested at merge): the control
+  migration adds control.outbox and cell_tenant.root_scope_path (added nullable; the review row says backfill then SET
+  NOT NULL); the tenant migration adds platform.outbox_sequence (scope policy), platform.outbox.occurred_at (added
+  nullable; backfill from created_at, then NOT NULL) and
   outbox_aggregate_id_sequence_idx. provision-tenant.sh (derived) creates the root node. For the lead: register
   `python3 tools/derive-release-flags.py` in tools/refresh.sh after build-service-docs (lane C''s file; until then run
   it by hand after a plan change; --check says when it is stale), and the mirror copy to ticvai-backend
@@ -90,4 +100,30 @@ notes: 'Prevention: check-ticket-builds B-KERNEL-STORAGE (KERNEL_NEEDS: each ker
   (x-ticvai-write-via; kind configurationChange, subjectContract subscription, subjectType tenant, subjectId the
   tenant, attributes.action suspend or reactivate) and answers 202 with the request id (TenantChangeRequested);
   Subscription''s approval.granted consumer applies the change (and writes tenant.suspended to control.outbox), and
-  approval.rejected leaves the tenant unchanged. ADM-005 is not changed. r7 never carried the round-1 check.'
+  approval.rejected leaves the tenant unchanged. ADM-005 is not changed. r7 never carried the round-1 check.
+
+  **Fix round 3 (lane-H review 2; the lead''s rulings of 19 October 2026).** I-1, the grant made buildable the way
+  publishTenantConfig''s review is: white-label''s consumer learns what to apply from the record the call wrote, named
+  by the event, and re-checks it on arrival. Here the one record the call writes is the approval request (I-2), so
+  approvals keeps the attributes it is sent (ApprovalRequest.attributes, stored as given; the rules match on them,
+  also when a draft is submitted later) and Subscription''s consumer reads them by the event''s requestId through
+  approvals#requestRecords (route service, the declared query Subscription already uses for approvals.request). On
+  arrival it re-checks the tenant: already in the target state is a recorded no-op; a state that no longer allows the
+  change closes the request as not applied with the refusal''s reason (tenant-not-active, tenant-terminated,
+  tenant-not-suspended); both are reported on the request''s approved-action execution. A second suspend or reactivate
+  while one is open answers 409 open-request-exists with the fields createApprovalRequest''s own 409 declares
+  (refusedReason openRequestExists, requestId, currentStatus; TenantChangeConflictProblem), documented on both
+  operations. The approver is the tenant''s approval rules for configurationChange narrowed to subject type tenant, as
+  publishTenantConfig''s request is routed by the rules for its subject; no role is named. I-2: the two calls''
+  lineage writes are approvals.request and cache:idempotency only, and tools/applied/tenant-approval-19-october.py
+  removes control.tenant, control.outbox and platform.outbox after a derive; states/tenant.yaml credits active ->
+  suspended, suspended -> active and terminating -> active to the consumer (trigger externalEvent, no operation);
+  events/tenant-suspended.yaml has no emittedBy (it names operations only, and no operation writes the event). I-3:
+  ADM-005 does not change visibly; after the 202 the row keeps its current status until the grant applies, and no
+  contract text promises a pending state. M-1: BC-373 records the 200 -> 202 (Chinmay Parab, 19 October 2026, CR-172
+  option a). M-2: check-states rule 16 (no approvalRequestId, no approval-required, the createApprovalRequest route, a
+  202 with the request id) with self-tests, and rule 15 forbids the two operations on any tenant edge; rule 16 finds 6
+  on r7 and rule 15 finds 5 on 1c1af276, 0 after. Database: approvals.request gains attributes (jsonb, nullable) at
+  the release derive (check-contract-storage ST-FIELD-NO-COLUMN until then). Not changed: states/cell.yaml''s two
+  cascades still name suspendTenant and reactivateTenant (a check-states warning; outside the entries the review
+  named, and another r8 lane edits the state models).'
