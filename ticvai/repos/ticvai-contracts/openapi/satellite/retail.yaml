@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Retail
   version: 0.1.0
-  x-ticvai-screen-count: 4
+  x-ticvai-screen-count: 22
   x-ticvai-tier: satellite
   x-ticvai-module: "6 — Retail POS"
   x-ticvai-requirements: 78
@@ -32,7 +32,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -101,39 +101,256 @@ tags:
   - name: giftCard
   - name: floor
 
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  merchandiseRecords:
+    module: retail
+    table: retail.merchandise
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The retail.merchandise rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Retail stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MerchandiseItem'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Retail answers with its retail.merchandise rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Retail's service route (serviceAuth).
+    served: [service]
 paths:
   # ---------------------------------------------------------------- merchandise
-  /merchandise:
-    get:
-      operationId: listMerchandise
-      x-ticvai-read-routing: replica
-      summary: List merchandise
+
+
+
+
+
+
+  /merchandise-reservations/{reservationId}/collect:
+    parameters:
+      - name: reservationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: collectMerchandiseReservation
+      x-ticvai-consumed-by:
+        - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
+      x-ticvai-audience: [staff]
+      summary: The guest picked it up
       description: >
-        Back-office use. A terminal reads its merchandise catalogue from the local bundle,
-        but checks live stock before completing a sale.
-      tags: [merchandise]
-      x-ticvai-permission: PRODUCT_VIEW
+        Stock leaves the outlet. **Distinct from the sale**, which may have happened days
+        earlier.
+      tags: [retail]
+      x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Done
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchandiseReservation'
+        '409':
+          description: 'The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be collected. Stock does not move.'
+          x-ticvai-problem-types: [merchandise-reservation-not-reserved]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /merchandise-reservations/{reservationId}/cancel:
+    parameters:
+      - name: reservationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: cancelMerchandiseReservation
+      x-ticvai-consumed-by:
+        - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
+      x-ticvai-audience: [staff]
+      summary: Release a reservation
+      description: >
+        **Stock returns to sale immediately.** A reservation nobody cancels is stock nobody
+        can buy.
+      tags: [retail]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Done
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchandiseReservation'
+        '409':
+          description: 'The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be cancelled. Stock does not move.'
+          x-ticvai-problem-types: [merchandise-reservation-not-reserved]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /shop-and-drop/{dropId}/dispose:
+    parameters:
+      - name: dropId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: disposeShopAndDrop
+      x-ticvai-consumed-by:
+        - "P08 BO-143 Retail Global Settings & Controls"
+      x-ticvai-audience: [staff]
+      summary: Dispose of an uncollected item
+      description: >
+        Held for the stated period, then disposed of. **The period must be told to the guest at
+        drop-off** — an item disposed of on a policy nobody stated is a paid item destroyed.
+
+        Recorded with who authorised it, because this destroys something a guest owns.
+      tags: [retail]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method]
+              properties:
+                method: { type: string, enum: [donated, destroyed, returnedToStock, heldLonger] }
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Done
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopAndDrop'
+        '409':
+          description: 'The item is still within its hold (`awaitingCollection` or `partiallyCollected`; `shop-and-drop-still-held`) or is already `collected` or `disposed` (`shop-and-drop-already-closed`); only an `uncollected` item is disposed of. Nothing changes.'
+          x-ticvai-problem-types: [shop-and-drop-still-held, shop-and-drop-already-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /merchandise:
+    get:
+      operationId: listMerchandise
+      x-ticvai-consumed-by:
+        - "P01 WEB-033 Shop"
+        - "P01 WEB-042 Retail & Shop and Drop"
+        - "P02 GST-026 Retail / Merchandise"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P05 KSK-017 Shop"
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-048 Retail Products"
+        - "P08 BO-116 Merchandising & Product Presentation"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-read-routing: replica
+      summary: List merchandise
+      description: >
+        Two callers. **The back office** lists and manages the range. **The guest shop
+        screens** (web, guest app, kiosk) browse it. A terminal does not call this: it reads
+        its merchandise catalogue from the local bundle and checks live stock with
+        `lookupMerchandise` before completing a sale.
+
+
+        **A guest gets the guest projection, not the stock record.** A staff caller receives
+        `MerchandiseItem`. A guest caller receives `GuestMerchandiseItem`, which leaves out the
+        inventory link, the catalogue variant, the stock count and the serial-number flag, and
+        says only whether the item can be bought. The server chooses by the caller's
+        audience; the client does not ask for one.
+
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that
+        is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
+        not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `name` ascending, then by `id`.
+      tags: [merchandise]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: >
+        24 August: **servable from a local cache.** The device holds enough to answer without the 
+        network and the answer may be stale — which is correct for a catalogue and wrong for conte
+        nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately 
+        excluded - **a stale seat is a seat sold twice.**
+      x-ticvai-conflict-policy: serverWins
+      parameters:
         - name: outletId
           in: query
+          description: Exact match. Items of this outlet only. Omit for every outlet in the venue.
           schema: { type: string, format: uuid }
         - name: categoryId
           in: query
+          description: Exact match on `categoryId`. Items with no category never match.
           schema: { type: string, format: uuid }
         - name: inStockOnly
           in: query
+          description: >
+            True returns only items with `onHand` greater than zero at their own outlet. Items
+            with no `inventoryItemId` never run out, so they always pass. False (the default)
+            applies no stock filter.
           schema: { type: boolean, default: false }
         - name: search
           in: query
-          schema: { type: string }
+          description: >
+            Case-insensitive "contains" match over `name`, `sku`, `barcode` and `description`.
+            An item matches when any one of them contains the text. Combined with the other
+            filters by AND.
+          schema: { type: string, minLength: 1, maxLength: 100 }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
         '200':
-          description: Merchandise
+          description: >
+            Merchandise, one page. Items are `MerchandiseItem` for a staff caller and
+            `GuestMerchandiseItem` for a guest caller.
           content:
             application/json:
               schema:
@@ -143,11 +360,20 @@ paths:
                     properties:
                       items:
                         type: array
-                        items: { $ref: '#/components/schemas/MerchandiseItem' }
+                        items:
+                          oneOf:
+                            - $ref: '#/components/schemas/MerchandiseItem'
+                            - $ref: '#/components/schemas/GuestMerchandiseItem'
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createMerchandise
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-048 Retail Products"
+      x-ticvai-audience: [staff]
       summary: Create a merchandise item
       description: >
         Links a sellable catalogue variant to an inventory item. That link is what makes a
@@ -167,16 +393,21 @@ paths:
             schema: { $ref: '#/components/schemas/CreateMerchandiseRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MerchandiseItem' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
-          description: Barcode already in use in this venue
+          description: Barcode already in use in this venue. `refusedReason` is `barcodeInUse`.
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /merchandise/{merchandiseId}:
     parameters:
@@ -186,12 +417,18 @@ paths:
         schema: { type: string, format: uuid }
     patch:
       operationId: updateMerchandise
+      x-ticvai-consumed-by:
+        - "P08 BO-048 Retail Products"
+        - "P08 BO-116 Merchandising & Product Presentation"
+      x-ticvai-audience: [staff]
       summary: Amend a merchandise item
       tags: [merchandise]
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -201,42 +438,121 @@ paths:
               minProperties: 1
               properties:
                 name: { type: string, maxLength: 200 }
+                description:
+                  type: string
+                  nullable: true
+                  description: What the item is, in the guest's words. Null clears it.
+                barcode:
+                  type: string
+                  maxLength: 128
+                  nullable: true
+                  description: Must stay unique in the venue. Null clears it.
                 categoryId: { type: string, format: uuid }
+                inventoryItemId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: >
+                    Re-points the stock item a sale depletes. Sales already made keep the
+                    movements they wrote. Null unlinks it, and the item then sells without
+                    running out, which is almost always a configuration error.
+                imageAssetRef: { type: string, nullable: true }
                 isReturnable: { type: boolean }
                 returnWindowDays: { type: integer, minimum: 0 }
                 requiresSerialNumber: { type: boolean }
                 isActive: { type: boolean }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MerchandiseItem' }
+        '409':
+          description: The new barcode is already in use in this venue. `refusedReason` is `barcodeInUse`.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /merchandise/lookup:
     get:
       operationId: lookupMerchandise
+      x-ticvai-consumed-by:
+        - "P01 WEB-033 Shop"
+        - "P02 GST-026 Retail / Merchandise"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-023 Sell — Merchandise"
+        - "P05 KSK-017 Shop"
+        - "P06 EMP-062 Store Stock & SKU Availability"
+        - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
+        - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'the caller''s workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003)'
+      - query: promotions#liveEffectivePrice
+        route: service
+        for: 'the price after any live promotion (ADAM CR-096)'
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary
       summary: Price and stock check by barcode
       description: >
         The most-used operation on a shop floor. Returns price after any live promotion,
         stock at this outlet, and stock at sibling outlets — so a colleague can be sent to
         fetch a size rather than losing the sale.
+
+
+        **"This outlet" is the outlet of the workstation asking** (decided 28 September, audit
+        R215): price and `onHand` are that outlet's row. A caller with no workstation (a guest
+        on the web shop or app) names the outlet with `outletId`; a workstation caller's own
+        outlet always wins. **An inactive item is not found**: it answers `404`, exactly as
+        an unknown barcode does.
+
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that
+        is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
+        not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **A guest gets a narrower answer** (r8 walk of ticket 27820): `sku` and `siblingOutlets` are staff-only
+        (`x-ticvai-staff-only`) and are left out of a guest response, which shows `isAvailable`. `onHand` stays in it,
+        because `PriceCheck` requires it and leaving it out would break the tills built against it. "Published" is the
+        merchandise record's `isPublished` flag, set by `PRODUCT_CONFIGURE` holders.
       tags: [floor]
       x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
         - name: barcode
           in: query
+          description: Exact match on `barcode`, within the venue. Send `barcode` or `sku`.
           schema: { type: string }
         - name: sku
           in: query
+          description: Exact match on `sku`, within the venue. Send `barcode` or `sku`.
           schema: { type: string }
         - name: includeSiblingOutlets
           in: query
+          description: False leaves `siblingOutlets` empty.
           schema: { type: boolean, default: true }
+        - name: outletId
+          in: query
+          description: >
+            The outlet to price and count at, for a caller with no workstation (audit R215).
+            Ignored for a workstation caller, whose own outlet is used. Required when the
+            caller has no workstation; absent then, the request is a `400`.
+          schema: { type: string, format: uuid }
       responses:
         '200':
           description: Price and stock
@@ -244,16 +560,28 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PriceCheck' }
         '400':
-          description: Neither barcode nor SKU supplied
+          x-ticvai-problem-types: [lookup-key-missing, outlet-required]
+          description: Neither barcode nor SKU supplied, or a caller with no workstation sent no `outletId` (audit R215)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '404':
+          description: No active item with that barcode or SKU at the outlet. An inactive item is not found (audit R215).
+          x-ticvai-problem-types: [not-found]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- sales
   /retail-sales:
     get:
       operationId: listRetailSales
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List retail sales
       tags: [sale]
@@ -264,15 +592,19 @@ paths:
       parameters:
         - name: outletId
           in: query
+          description: Exact match. Sales at this outlet only. Omit for every outlet in the venue.
           schema: { type: string, format: uuid }
         - name: shiftId
           in: query
+          description: Exact match. Sales rung up in this shift only.
           schema: { type: string }
         - name: createdFrom
           in: query
+          description: Sales with `createdAt` at or after this instant.
           schema: { type: string, format: date-time }
         - name: createdTo
           in: query
+          description: Sales with `createdAt` before this instant. With `createdFrom`, the range is half-open.
           schema: { type: string, format: date-time }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
@@ -289,9 +621,19 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/RetailSale' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createRetailSale
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-005 Payment"
+      x-ticvai-read-via:
+      - query: inventory#kitComponentRecords
+        route: in-process
+        for: 'its read of inventory.kit_component, Inventory''s data (CHG-MOD-001)'
+      x-ticvai-audience: [staff]
       summary: Sell merchandise
       description: >
         **Not offline-capable.** Stock depletes in real time and a specific unit cannot be
@@ -301,6 +643,12 @@ paths:
         Creates an order in the Order & Payment context and a `saleDepletion` movement in the
         inventory ledger, in one transaction. There is no second stock counter maintained by
         the till.
+
+        **A kit sells as one line and leaves stock as its components** (4.4.20, 29 September
+        build). Where the line's item has an `inventory.kit_component` bill of materials
+        (inventory `setInventoryKitDefinition`), one `saleDepletion` is posted per component,
+        quantity times the line quantity, and none for the kit; `insufficientStock` is judged on
+        the components.
       tags: [sale]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
@@ -315,6 +663,9 @@ paths:
             schema: { $ref: '#/components/schemas/CreateRetailSaleRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sold; stock depleted
           content:
             application/json:
@@ -322,20 +673,26 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
           description: >
-            Insufficient stock, a serialised item has no serial number, or the terminal is
-            offline.
+            Insufficient stock (`insufficientStock`), a serialised item has no serial number
+            (`serialNumberRequired`), or the terminal is offline (`terminalOffline`).
+            `refusedReason` says which, and `lines` names the lines at fault.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/StockConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /retail-sales/{saleId}:
     parameters:
       - name: saleId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getRetailSale
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a retail sale
       description: >
@@ -353,15 +710,28 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/RetailSale' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /retail-sales/lookup:
     get:
       operationId: lookupRetailSale
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
+        - "P04 POS-011 Returns, Refunds & Exchanges"
+        - "P08 BO-021 Order Search"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Find a sale from a receipt
       description: >
         By receipt number, order number or the barcode printed on the receipt. A guest at a
         returns desk has a piece of paper, not an order ID.
+
+
+        **Where several identifiers are sent, the receipt barcode wins, then the receipt
+        number, then the order number** (decided 28 September, audit R215); the others are
+        ignored and `matchedBy` says which was used. **Several matching sales return a list**,
+        newest first, for the cashier to choose from; one match is a list of one.
       tags: [return]
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
@@ -370,34 +740,63 @@ paths:
       parameters:
         - name: receiptNumber
           in: query
+          description: Exact match on `receiptNumber`. Send one of the three identifiers.
           schema: { type: string }
         - name: orderNumber
           in: query
+          description: Exact match on the order number of the order in the Order & Payment context.
           schema: { type: string }
         - name: receiptBarcode
           in: query
+          description: Exact match on the barcode printed on the receipt. Wins over the other two (audit R215).
           schema: { type: string }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
         '200':
-          description: Sale
+          description: The matching sales, newest first. Several matches return several (audit R215).
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/RetailSale' }
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    required: [matchedBy]
+                    properties:
+                      matchedBy:
+                        type: string
+                        enum: [receiptBarcode, receiptNumber, orderNumber]
+                        description: The identifier used, by the precedence above (audit R215).
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/RetailSale' }
+        '400':
+          x-ticvai-problem-types: [lookup-identifier-missing]
+          description: None of the three identifiers was sent
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /retail-sales/{saleId}/reprint:
     parameters:
       - name: saleId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: reprintReceipt
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
+        - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
+      x-ticvai-audience: [staff]
       summary: Reprint or resend a receipt
       tags: [sale]
       x-ticvai-permission: ORDER_REPRINT
+      x-ticvai-permission-escalated: ORDER_VIEW_OTHER   # where the order is not the caller's own
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -419,6 +818,9 @@ paths:
                   description: Required for anything but print.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sent
           content:
             application/json:
@@ -427,11 +829,15 @@ paths:
                 properties:
                   reprintCount: { type: integer }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- returns
   /retail-returns:
     get:
       operationId: listRetailReturns
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List returns
       tags: [return]
@@ -442,10 +848,18 @@ paths:
       parameters:
         - name: outletId
           in: query
+          description: Exact match. Returns taken at this outlet only. Omit for every outlet in the venue.
           schema: { type: string, format: uuid }
         - name: condition
           in: query
+          description: Returns with at least one line in this condition.
           schema: { $ref: '#/components/schemas/ReturnCondition' }
+        - name: status
+          in: query
+          description: >
+            `accepted` or `refused`. Omit for both. A refused return is recorded (see
+            `createRetailReturn`), so it can be found when the guest comes back to complain.
+          schema: { $ref: '#/components/schemas/RetailReturnStatus' }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
@@ -461,9 +875,18 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/RetailReturn' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createRetailReturn
+      x-ticvai-consumed-by:
+        - "P04 POS-011 Returns, Refunds & Exchanges"
+      x-ticvai-read-via:
+      - query: inventory#kitComponentRecords
+        route: in-process
+        for: 'its read of inventory.kit_component, Inventory''s data (CHG-MOD-001)'
+      x-ticvai-audience: [staff]
       summary: Accept a return
       description: >
         **A return is not a negative sale.** It records the condition of the goods, restores
@@ -471,9 +894,42 @@ paths:
         policy — which is separate from the ticket refund policy.
 
         Goods returned damaged or opened are written off rather than restocked, and that
-        write-off is a movement with a reason rather than a silent absence.
+        write-off is a movement with a reason rather than a silent absence. **A returned kit
+        reverses its components** (4.4.20): each component is restocked or written off, never
+        the kit itself.
+
+        **The money goes back as a refund raised in the Order & Payment context** (`refundId`),
+        so the orders `FraudRule` refund rules (`refundCount`, `refundValue`, `refundRatio` per
+        guest or card, 5.3.33) are evaluated on retail returns as on every other refund; a held
+        refund goes to approval rather than being refused at the till.
+
+
+        **A refused return is recorded** (F34 `refusedReturn`: a refused return is a guest
+        who may complain). The 409 writes a `RetailReturn` with `status: refused`, the
+        `refusedReason`, nothing refunded, restocked or written off, and a new id that the
+        server assigns and returns as `refusalId`. The request's own `id` stays unused, so the
+        same return can be sent again, under a new `Idempotency-Key`, once the second
+        authoriser is in hand.
+
+
+        **Above the outlet's self-authorise limit, a supervisor's step-up on the same device**
+        (decided 28 September, audit R144), never an approval request. `secondaryAuthorisation`
+        carries the supervisor's principal and staff PIN (a PIN, never a password, audit R123
+        (7)). The rule is `SupervisorStepUp` in `common.yaml`: the PIN is verified against the
+        principal, who must hold `ORDER_REFUND_APPROVE` at this venue and must not be the caller;
+        a failure is a `403` (`supervisor-step-up-refused`) and nothing is written. Missing when
+        the amount needs it, the return is refused with the `409` below.
+
+        **Thresholds: two, both step-up** (r8 walk of tickets 27820 and 27823; lead decision of 20 October 2026,
+        option A, following R144 and POS-011 "no approval-request path"). `ReturnPolicy.selfAuthoriseLimit` (up to
+        it, one cashier alone) and `requiresSecondUserAbove` (above it, a second user) both mean the supervisor
+        step-up above; neither raises an approval request. **`requiresApprovalAbove` is retired** and `requiresApproval`
+        is no longer a refused reason. **A cash refund on a card sale is refused** with `refusedReason`
+        `cashRefundOnCardSale` unless the outlet's `allowCashRefundOnCardSale` is true; flow F34's "cannot configure
+        its way out" is corrected to that.
       tags: [return]
       x-ticvai-permission: ORDER_REFUND
+      x-ticvai-permission-escalated: ORDER_REFUND_APPROVE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -486,21 +942,40 @@ paths:
             schema: { $ref: '#/components/schemas/CreateRetailReturnRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted
           content:
             application/json:
               schema: { $ref: '#/components/schemas/RetailReturn' }
         '409':
           description: >
-            Outside the return window, item is non-returnable, already returned, or a second
-            authoriser is required. The response names the policy that refused it.
+            Refused by the return policy: outside the return window, item is non-returnable,
+            already returned, a supervisor step-up is required, no receipt, or a serial number
+            that does not match. `refusedReason` says which, and `refusalId` names the recorded
+            refusal.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/ReturnPolicyProblem' }
+        '403':
+          description: >
+            The caller lacks `ORDER_REFUND`, or the supervisor step-up failed: the PIN did not
+            verify, the principal does not hold `ORDER_REFUND_APPROVE` at this venue, or is the
+            caller (`supervisor-step-up-refused`, audit R144).
+          x-ticvai-problem-types:
+            - forbidden
+            - supervisor-step-up-refused
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /retail-exchanges:
     post:
       operationId: createRetailExchange
+      x-ticvai-audience: [staff]
       summary: Exchange one item for another
       description: >
         A return and a sale in one transaction, settling only the difference. Modelling it as
@@ -520,15 +995,22 @@ paths:
             schema: { $ref: '#/components/schemas/CreateExchangeRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Exchanged
           content:
             application/json:
               schema: { $ref: '#/components/schemas/RetailExchange' }
         '409':
-          description: Replacement out of stock, or the original is not exchangeable
+          description: >
+            Replacement out of stock (`insufficientStock`), or the original is not
+            exchangeable (`originalNotExchangeable`). `refusedReason` says which.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/StockConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /outlets/{outletId}/return-policy:
     parameters:
@@ -538,6 +1020,11 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getReturnPolicy
+      x-ticvai-consumed-by:
+        - "P04 POS-011 Returns, Refunds & Exchanges"
+        - "P08 BO-044 F&B Outlets"
+        - "P08 BO-143 Retail Global Settings & Controls"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read the retail return policy
       description: >
@@ -555,10 +1042,16 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ReturnPolicy' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     put:
       operationId: setReturnPolicy
-      x-ticvai-config-scope: venue
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
+        - "P08 BO-143 Retail Global Settings & Controls"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: outlet   # CF-138: F&B and retail configure at outlet, decided 18 August
       summary: Set the retail return policy
       tags: [return]
       x-ticvai-permission: REGION_CONFIGURE
@@ -574,257 +1067,24 @@ paths:
             schema: { $ref: '#/components/schemas/ReturnPolicy' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ReturnPolicy' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- wallet
-  /wallets/{subjectId}:
-    parameters:
-      - name: subjectId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
-    get:
-      operationId: getWallet
-      x-ticvai-consumed-by:
-        - "P01 WEB-021 Wallet & Gift Cards"
-      x-ticvai-read-routing: primary
-      summary: Read a guest wallet
-      description: >
-        Stored value belonging to a guest, distinct from a bearer gift card. Where the guest
-        is linked across cells, the authoritative balance lives in their home cell.
-      tags: [wallet]
-      x-ticvai-permission: ORDER_VIEW
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      responses:
-        '200':
-          description: Wallet
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Wallet' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
-  /wallets/{subjectId}/top-ups:
-    parameters:
-      - name: subjectId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
-    post:
-      operationId: topUpWallet
-      summary: Add value to a wallet
-      description: >
-        Creates a liability, not revenue. Recognition happens when the value is spent, or as
-        breakage if the wallet expires.
-      tags: [wallet]
-      x-ticvai-permission: ORDER_CREATE
-      x-ticvai-scope-level: workstation
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [id, amount, tender, recordedAt]
-              properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
-                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-                tender: { type: string }
-                bonusAmount:
-                  allOf:
-                    - $ref: '../shared/common.yaml#/components/schemas/Money'
-                  description: >
-                    Promotional bonus on top of the paid amount. Tracked separately because
-                    bonus value is typically non-refundable.
-                recordedAt: { type: string, format: date-time }
-      responses:
-        '201':
-          description: Topped up
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Wallet' }
-        '402':
-          description: Payment declined
-          content:
-            application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /wallets/{subjectId}/transactions:
-    parameters:
-      - name: subjectId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
-    get:
-      operationId: listWalletTransactions
-      x-ticvai-read-routing: primary   # reconciling a disputed balance needs the current one
-      summary: Wallet transaction history
-      tags: [wallet]
-      x-ticvai-permission: ORDER_VIEW
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
-        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
-      responses:
-        '200':
-          description: Transactions
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '../shared/common.yaml#/components/schemas/Page'
-                  - type: object
-                    properties:
-                      items:
-                        type: array
-                        items: { $ref: '#/components/schemas/WalletTransaction' }
 
-  /wallets/{subjectId}/adjust:
-    parameters:
-      - name: subjectId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
-    post:
-      operationId: adjustWallet
-      summary: Manually adjust a wallet balance
-      description: >
-        Goodwill credit, correction of a failed top-up, or reversal of a disputed spend.
-        Requires a reason and is reported separately — manual adjustments to stored value are
-        the first place an auditor looks.
-      tags: [wallet]
-      x-ticvai-permission: LEDGER_POST
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [amount, reason]
-              properties:
-                amount:
-                  allOf:
-                    - $ref: '../shared/common.yaml#/components/schemas/Money'
-                  description: Positive credits, negative debits.
-                reason: { type: string, minLength: 3, maxLength: 500 }
-      responses:
-        '200':
-          description: Adjusted
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Wallet' }
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
 
   # ---------------------------------------------------------------- gift cards
-  /gift-cards:
-    post:
-      operationId: issueGiftCard
-      summary: Issue or activate a gift card
-      description: >
-        A bearer instrument — whoever holds the card holds the value. Distinct from a wallet,
-        which belongs to a named guest.
 
-        Physical cards are pre-printed and activated at sale; digital cards are issued with a
-        generated code.
-      tags: [giftCard]
-      x-ticvai-permission: ORDER_CREATE
-      x-ticvai-scope-level: workstation
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/IssueGiftCardRequest' }
-      responses:
-        '201':
-          description: Issued
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/GiftCard' }
-        '409':
-          description: Card already activated, or the code is unknown
-          content:
-            application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /gift-cards/{cardCode}:
-    parameters:
-      - name: cardCode
-        in: path
-        required: true
-        schema: { type: string }
-    get:
-      operationId: getGiftCard
-      x-ticvai-consumed-by:
-        - "P01 WEB-021 Wallet & Gift Cards"
-      x-ticvai-read-routing: primary   # bearer instrument. Stale balance is double-spend
-      summary: Check a gift card balance
-      tags: [giftCard]
-      x-ticvai-permission: ORDER_VIEW
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      responses:
-        '200':
-          description: Card
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/GiftCard' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
-
-  /gift-cards/{cardCode}/block:
-    parameters:
-      - name: cardCode
-        in: path
-        required: true
-        schema: { type: string }
-    post:
-      operationId: blockGiftCard
-      summary: Block a gift card
-      description: Reported lost, stolen, or issued in error. Blocking preserves the balance.
-      tags: [giftCard]
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [reason]
-              properties:
-                reason:
-                  type: string
-                  enum: [lost, stolen, fraud, issuedInError, guestRequest]
-                note: { type: string, maxLength: 500 }
-      responses:
-        '200':
-          description: Blocked
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/GiftCard' }
 
   # ---------------------------------------------------------------- floor
   /outlets/{outletId}/stock-check:
@@ -835,11 +1095,20 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getOutletStock
+      x-ticvai-consumed-by:
+        - "P06 EMP-062 Store Stock & SKU Availability"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Stock across an outlet
       description: >
         Shaped for a handheld on a shop floor — low stock first, with sibling outlet
         availability so a colleague can be sent rather than the sale lost.
+
+        **Order.** Low stock first, by `available` ascending, then by `name`.
       tags: [floor]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-scope-level: venue
@@ -848,9 +1117,11 @@ paths:
       parameters:
         - name: categoryId
           in: query
+          description: Exact match on the item's category. Items with no category never match.
           schema: { type: string, format: uuid }
         - name: lowStockFirst
           in: query
+          description: True puts items below their reorder point (`isBelowReorderPoint`) first.
           schema: { type: boolean, default: true }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
@@ -867,10 +1138,25 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/OutletStockLine' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shop-and-drop:
     post:
       operationId: createShopAndDrop
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: service
+        for: 'the retail lines lineIds names on the orderId path (ADAM CR-096)'
+      - query: fnb#deliveryLocationRecords
+        route: in-process
+        for: 'collectionPointClosed: the collection point and its serving outlets (ADAM CR-096; the hours rule is CR-104)'
+      x-ticvai-audience: [staff, service]
+      security:
+        - bearerAuth: []
+        - serviceAuth: []
       summary: Buy now, collect on the way out
       description: >
         4.4.7 — a guest buys in store and leaves the goods behind rather than carrying them
@@ -884,6 +1170,18 @@ paths:
         Not a reservation. `reserveMerchandise` holds unsold stock for someone who has not
         paid; this is paid goods awaiting handover, and conflating the two produces a stock
         figure nobody can explain.
+
+
+        **Also called by the order service when an online order is paid** (decided 28
+        September, audit R236): a guest on the web buys merchandise to collect on the way
+        out, pays at checkout, and on payment the order service calls this with `orderId`
+        (and no `saleId`), once per order, naming the retail lines marked for collection in
+        `lineIds`. A staff caller at a till sends `saleId`. Exactly one of the two is sent.
+
+        **Collection point hours** (r8 walk of ticket 27820): the collection point (`fnb.DeliveryLocation`) has
+        `opensAt` and `closesAt` (time of day, local to the venue). The drop is refused 409 `collectionPointClosed`
+        when it would be collected while the point is closed, and `collectBy` defaults to the close of the point's
+        day when the request sends none.
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
@@ -897,10 +1195,19 @@ paths:
           application/json:
             schema:
               type: object
-              required: [id, saleId, collectionPointId, recordedAt]
+              required: [id, collectionPointId, recordedAt]
               properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
-                saleId: { type: string }
+                id: { type: string, format: uuid }
+                saleId:
+                  type: string
+                  nullable: true
+                  description: The retail sale, from a till. Send this or `orderId`, not both.
+                orderId:
+                  type: string
+                  nullable: true
+                  description: >
+                    The paid online order, when the order service calls on payment (audit R236).
+                    `lineIds` then names the order's retail lines marked for collection.
                 entitlementId:
                   type: string
                   nullable: true
@@ -918,32 +1225,55 @@ paths:
                   description: >
                     Usually venue close. Uncollected goods after it become an exception, not
                     a permanent shelf occupant.
-                recordedAt: { type: string, format: date-time }
+                recordedAt: { type: string, format: date-time, x-ticvai-stored-as: retail.shop_and_drop.dropped_at }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Dropped
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ShopAndDrop' }
         '409':
           description: >
-            Sale already dropped, an item is non-droppable — chilled, fragile, oversized — or
-            the collection point is closed before `collectBy`.
+            Sale already dropped (`alreadyDropped`), an item is non-droppable — chilled,
+            fragile, oversized — (`itemNotDroppable`), or the collection point is closed before
+            `collectBy` (`collectionPointClosed`). `refusedReason` says which.
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/ShopAndDropProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shop-and-drop/lookup:
     get:
       operationId: lookupShopAndDrop
       x-ticvai-consumed-by:
+        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-062 Shop & Drop Collection"
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P08 BO-143 Retail Global Settings & Controls"
+      x-ticvai-read-via:
+      - query: fnb#deliveryLocationRecords
+        route: in-process
+        for: 'what its text calls "collection point": fnb.delivery_location, F&B''s data (CHG-RTE-001)'
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-audience: [staff, guest]
       summary: Find a guest's dropped goods
       description: >
         Scanned at the collection point. Accepts the entitlement, the drop reference, or the
         original receipt — a guest arrives with whichever they still have.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for goods they
+        dropped themselves; another guest's goods is refused exactly as one that does not exist, never
+        returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
       tags: [floor]
       x-ticvai-permission: ORDER_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -951,12 +1281,15 @@ paths:
       parameters:
         - name: entitlementId
           in: query
+          description: Exact match on the ticket scanned at the collection point.
           schema: { type: string }
         - name: dropReference
           in: query
+          description: Exact match on `dropReference`, as printed on the slip.
           schema: { type: string }
         - name: receiptNumber
           in: query
+          description: Exact match on the receipt number of the sale the goods came from.
           schema: { type: string }
       responses:
         '200':
@@ -967,23 +1300,34 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/ShopAndDrop' }
         '400':
+          x-ticvai-problem-types: [lookup-identifier-missing]
           description: No identifier supplied
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shop-and-drop/{dropId}/collect:
     parameters:
       - name: dropId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: collectShopAndDrop
+      x-ticvai-consumed-by:
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+      x-ticvai-audience: [staff]
       summary: Hand the goods over
       description: >
         Records who handed over and against what. Partial collection is permitted — a guest
         may take some and leave the rest for a later trip on the same ticket.
+
+        **The collection deadline** (r8 walk of ticket 27820): `pastCollectBy` applies to a drop in
+        `awaitingCollection` or `partiallyCollected` only. A drop that was never collected (the uncollected reversal
+        has run) collects without it. The default `collectBy` is the close of the collection point's day (its
+        `closesAt`, see `createShopAndDrop`).
       tags: [floor]
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-scope-level: venue
@@ -1009,15 +1353,22 @@ paths:
                 recordedAt: { type: string, format: date-time }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Collected
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ShopAndDrop' }
         '409':
-          description: Already collected, or past the collection deadline
+          description: >
+            Already collected (`alreadyCollected`), or past the collection deadline
+            (`pastCollectBy`). `refusedReason` says which.
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/ShopAndDropProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /outlets/{outletId}/reserve:
     parameters:
@@ -1027,12 +1378,49 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: reserveMerchandise
+      x-ticvai-consumed-by:
+        - "P02 GST-026 Retail / Merchandise"
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P05 KSK-017 Shop"
+        - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
+      - query: inventory#stockEarmarkRecords
+        route: in-process
+        for: 'its read of inventory.stock_earmark, Inventory''s data (CHG-MOD-001)'
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-audience: [staff, guest]
       summary: Reserve an item for collection
       description: >
         A guest who cannot carry a purchase around a venue collects it on the way out. The
         item is allocated but not sold, and the reservation expires.
+
+
+        **`expiresAt` is at least 15 minutes ahead and no later than the end of the visit
+        day** (decided 28 September, audit R215): the close of the venue's operating day on
+        which the reservation is made. Outside that window the request is a `400`. **Left
+        out, the reservation holds until the end of the visit day** (decided 28 September,
+        audit R169).
+
+
+        **Not the guest path for buying to collect, on the web or in the app** (decided
+        28 September, audit R236). A guest buying to collect pays online at checkout
+        (`addCartLine`, `checkoutCart`, `createPayment`), and the order service creates the
+        collection with `createShopAndDrop`. This holds unpaid stock only: in the guest app
+        (GST-026) it is offered as a hold the guest pays for at the shop, and staff use it
+        at a till or an outlet. A held item is never collected unpaid.
+
+        **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003;
+        `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
+        cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
+        do it for a guest at a till or in the back office (ADR-0025).
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1044,9 +1432,9 @@ paths:
           application/json:
             schema:
               type: object
-              required: [id, lines, expiresAt]
+              required: [id, lines]
               properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                id: { type: string, format: uuid }
                 subjectId: { type: string, format: uuid }
                 lines:
                   type: array
@@ -1057,30 +1445,325 @@ paths:
                     properties:
                       merchandiseId: { type: string, format: uuid }
                       quantity: { type: integer, minimum: 1 }
-                expiresAt: { type: string, format: date-time }
+                expiresAt:
+                  type: string
+                  format: date-time
+                  description: >
+                    At least 15 minutes from now and no later than the close of the venue's
+                    operating day (audit R215). Defaults to the close of the venue's operating
+                    day, the end of the visit day (audit R169).
                 collectionNote: { type: string, maxLength: 200 }
       responses:
+        '400':
+          description: >
+            `expiresAt` is less than 15 minutes ahead, or later than the end of the visit day
+            (audit R215).
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reserved
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MerchandiseReservation' }
         '409':
-          description: Insufficient stock
+          description: Insufficient stock. `refusedReason` is `insufficientStock`, and `lines` names the lines short.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/StockConflictProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /store-rules:
+    get:
+      operationId: listStoreRules
+      x-ticvai-consumed-by:
+        - "P08 BO-142 Store Rules, Controls & Permissions"
+      x-ticvai-audience:
+      - staff
+      summary: Rules and controls in force in the store
+      description: '**Drafted 4 September as a stub.** BO-142 *Store Rules, Controls & Permissions* had nothing of its own, so wiring `listRoles` onto BO-106 on 4 September made the two screens identical. **The collision was a symptom** - BO-142 needs store rules and there were none to give it. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
+      tags:
+      - retail
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+      - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Rules and controls in force in the store
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/StoreRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /store-rules/{storeRuleId}:
+    put:
+      operationId: setStoreRules
+      x-ticvai-consumed-by:
+        - "P08 BO-142 Store Rules, Controls & Permissions"
+      x-ticvai-audience:
+      - staff
+      summary: Change a store rule
+      description: '**Drafted 4 September as a stub.** **A control that stops a discount is also a control that stops a sale**, so the write is separately permissioned from the read. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - retail
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreRule'
+      parameters:
+        - name: storeRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Change a store rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-recommendations:
+    get:
+      operationId: listRetailRecommendations
+      summary: Upsell and pairing suggestions for retail
+      description: >
+        **A channel adapter of the one recommendation engine** (ADR-0052, accepted 1 October). This operation stays as the retail basket surface, with its path, id and response shape. **Block A**: the promotions module answers it from the relationship map (rules; strategy, relationships, business priority and suppression are configured in promotions). **Block B**: it forwards to the engine in `ticvai-ai` (ai `decideRecommendations`, placement `retailBasket`) with no contract change, under a hard 200 ms budget and failing open to the rules answer, so checkout never waits on it. New screens may bind either; the deprecation of 29 September is withdrawn.
+
+        The retail half of the same table F&B keeps. **Separate because the merchandising is
+        separate** — a coffee pairs with a pastry and a jacket pairs with a hat, and one list
+        serving both would be filtered on every read.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+      tags:
+      - retail
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Upsell and pairing suggestions for retail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RetailProductRecommendation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
+    RetailProductRecommendation:
+      type: object
+      x-ticvai-persistence: retail.product_recommendation
+      description: '**Taken from the backend workbook, 20 September.** Defines Retail upsell, cross-sell and add-on recommendations, including optional cross-service targets.'
+      required:
+      - sourceProductId
+      - type
+      - targetService
+      - targetProductId
+      - defaultQuantity
+      - priority
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        sourceProductId:
+          x-ticvai-references: catalogue.product
+          type: string
+          format: uuid
+        sourceVariantId:
+          type: string
+          format: uuid
+          nullable: true
+        type:
+          type: string
+          maxLength: 30
+        targetService:
+          type: string
+          maxLength: 30
+        targetProductId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+        targetVariantId:
+          type: string
+          format: uuid
+          nullable: true
+        displayMessage:
+          type: string
+          maxLength: 300
+          nullable: true
+        defaultQuantity:
+          type: number
+        maxQuantity:
+          type: number
+          nullable: true
+        priority:
+          type: integer
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    StoreRule:
+      type: object
+      x-ticvai-persistence: retail.store_rule
+      # 26 September: `thresholdMinor` (an integer of minor units that also stood for an age)
+      # split into `thresholdAmount` (Money) and `minimumAgeYears`. naming-and-style 5.1: money
+      # is Money, never an integer and never a float.
+      x-ticvai-retired-columns:
+      - threshold_minor
+      description: '**Drafted 4 September.** One rule or control in force in a store - a discount
+        limit, a refund threshold, an age check, a manager override. **A row rather than a config
+        value** because somebody has to be able to say who changed a limit and when, which is
+        what `updatedAt` and `updatedByPrincipalId` record.
+
+
+        **Which limit field a kind uses.** `refundThreshold` uses `thresholdAmount`. `ageCheck`
+        uses `minimumAgeYears`. **A `discountLimit` or a `priceOverride` limit is a percentage or an
+        amount, the venue choosing per limit** (Chinmay, 2 October, workbook Q195; CHG-CSA-019):
+        `limitKind` says which, and the limit is `thresholdAmount` or `thresholdPercent`. Whether a
+        `managerOverride` has a limit at all is still undecided; it carries none.'
+      required:
+      - id
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+        outletId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - discountLimit
+          - refundThreshold
+          - ageCheck
+          - managerOverride
+          - priceOverride
+        thresholdAmount:
+          allOf:
+          - $ref: '../shared/common.yaml#/components/schemas/Money'
+          nullable: true
+          description: The amount above which `requiresPermission` is needed. For `refundThreshold`, and for a
+            `discountLimit` or `priceOverride` whose `limitKind` is `amount`.
+        limitKind:
+          type: string
+          nullable: true
+          enum:
+          - percent
+          - amount
+          description: For `discountLimit` and `priceOverride` (workbook Q195; CHG-CSA-019). `percent` uses
+            `thresholdPercent`; `amount` uses `thresholdAmount`. The venue chooses per limit.
+        thresholdPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: The percentage of the line or basket above which `requiresPermission` is needed, where
+            `limitKind` is `percent`.
+        minimumAgeYears:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: The age a guest must have reached. For `ageCheck`.
+        requiresPermission:
+          type: string
+          description: The permission a person needs to act past this rule.
+        enabled:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Who last changed this rule. Set by the server from the caller of `setStoreRules`.
     MerchandiseItem:
       x-ticvai-persistence: "retail.merchandise"
       type: object
       required: [id, sku, name, outletId, variantId, price, onHand, isActive]
       properties:
+        description:
+          type: string
+          description: 'What the item is, in the guest''s words. Indexed for guest-app search.
+
+            '
         id: { type: string, format: uuid }
         sku: { type: string }
-        barcode: { type: string, nullable: true }
+        barcode: { type: string, nullable: true, x-ticvai-unique: venue }
         name: { type: string }
         outletId: { type: string, format: uuid }
         categoryId: { type: string, format: uuid, nullable: true }
@@ -1095,13 +1778,65 @@ components:
           description: >
             The stock item depleted on sale. Null means the item sells but never runs out,
             which is almost always a configuration error.
-        price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        price: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: list_price }
         onHand: { type: number }
         isReturnable: { type: boolean, default: true }
         returnWindowDays: { type: integer, nullable: true }
         requiresSerialNumber: { type: boolean, default: false }
         imageAssetRef: { type: string, nullable: true }
         isActive: { type: boolean }
+
+    GuestMerchandiseItem:
+      x-ticvai-persistence: "none — guest projection of MerchandiseItem"
+      type: object
+      description: >
+        **What a guest caller of `listMerchandise` receives.** The fields a shop screen shows
+        and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no
+        catalogue variant, no stock count, no serial-number flag. `additionalProperties: false`
+        is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by
+        default.
+      additionalProperties: false
+      required: [id, name, outletId, price, isAvailable]
+      properties:
+        id: { type: string, format: uuid }
+        sku: { type: string }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        outletId: { type: string, format: uuid }
+        categoryId: { type: string, format: uuid, nullable: true }
+        price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        isAvailable:
+          type: boolean
+          description: >
+            True when the item is active and in stock at its outlet. An item with no
+            `inventoryItemId` never runs out, so it is available while active.
+        isReturnable: { type: boolean }
+        returnWindowDays: { type: integer, nullable: true }
+        imageAssetRef: { type: string, nullable: true }
+        productVariantId:
+          type: string
+          format: uuid
+          description: >
+            The catalogue Product variant the item sells, which `addCartLine` takes as its `variantId`
+            (added 3 October 2026, CHG-R1S-004: the r1 gate found WEB-033 could not add to the cart
+            from the guest projection; qualified from `variantId` by CHG-GTRB-001, since the glossary
+            bans a bare Variant). An id, not the variant record: price and tax still come from the server.
+          x-ticvai-references: catalogue.ProductVariant
+
+    MerchandiseConflictProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason]
+          properties:
+            refusedReason:
+              type: string
+              enum: [barcodeInUse]
+            conflictingMerchandiseId:
+              type: string
+              format: uuid
+              description: The item that already carries the barcode.
 
     CreateMerchandiseRequest:
       x-ticvai-persistence: "none — request only"
@@ -1111,6 +1846,9 @@ components:
         sku: { type: string, maxLength: 64 }
         barcode: { type: string, maxLength: 128 }
         name: { type: string, maxLength: 200 }
+        description:
+          type: string
+          description: What the item is, in the guest's words. Indexed for guest-app search.
         outletId: { type: string, format: uuid }
         categoryId: { type: string, format: uuid }
         variantId: { type: string, format: uuid }
@@ -1126,7 +1864,15 @@ components:
       required: [merchandiseId, name, listPrice, effectivePrice, onHand]
       properties:
         merchandiseId: { type: string, format: uuid }
-        sku: { type: string }
+        outletId:
+          type: string
+          format: uuid
+          description: >
+            The outlet whose price and stock this is: the asking workstation's outlet, or
+            `outletId` for a caller with none (decided 28 September, audit R215).
+        sku:
+          type: string
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest or a visitor (r8 walk of ticket 27820).
         name: { type: string }
         listPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         effectivePrice:
@@ -1138,6 +1884,7 @@ components:
         isAvailable: { type: boolean }
         siblingOutlets:
           type: array
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest or a visitor (r8 walk of ticket 27820).
           description: Stock elsewhere in the venue, so a colleague can be sent.
           items:
             type: object
@@ -1151,7 +1898,7 @@ components:
       type: object
       required: [id, merchandiseId, quantity]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         merchandiseId: { type: string, format: uuid }
         quantity: { type: integer, minimum: 1 }
         serialNumbers:
@@ -1169,7 +1916,7 @@ components:
       type: object
       required: [id, outletId, lines, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         outletId: { type: string, format: uuid }
         shiftId: { type: string }
         subjectId: { type: string, format: uuid }
@@ -1188,7 +1935,15 @@ components:
       required: [id, receiptNumber, orderId, outletId, lines, grossAmount, createdAt]
       properties:
         id: { type: string }
-        receiptNumber: { type: string }
+        receiptNumber:
+          type: string
+          readOnly: true
+          description: >
+            **Server-assigned: the venue prefix plus a sequence per venue** (decided 28
+            September, audit R152). Each till holds a reserved range of the venue's sequence,
+            so a sale made offline prints its number at once and the server accepts it on
+            sync. **Not gapless**: an unused reserved number is skipped, not reissued. Only
+            tax invoices are gapless, per legal entity.
         orderId:
           type: string
           description: The order in the Order & Payment context. Retail does not keep its own ledger.
@@ -1204,9 +1959,9 @@ components:
               merchandiseId: { type: string, format: uuid }
               name: { type: string }
               quantity: { type: integer }
-              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-              discount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-              lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: unit_amount }
+              discount: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: discount_amount }
+              lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: gross_amount }
               serialNumbers:
                 type: array
                 items: { type: string }
@@ -1215,7 +1970,7 @@ components:
                 type: boolean
                 description: False once the window has passed or the line is fully returned.
               notReturnableReason: { type: string, nullable: true }
-        subtotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        subtotal: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: net_amount }
         discountAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         taxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         grossAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
@@ -1225,10 +1980,21 @@ components:
 
     StockConflictProblem:
       x-ticvai-persistence: "none — error shape"
+      description: >
+        The 409 of `createRetailSale`, `createRetailExchange` and `reserveMerchandise`.
+        `refusedReason` tells the causes apart; each operation lists the values it can return.
       allOf:
         - $ref: '../shared/common.yaml#/components/schemas/Problem'
         - type: object
+          required: [refusedReason]
           properties:
+            refusedReason:
+              type: string
+              enum:
+                - insufficientStock
+                - serialNumberRequired
+                - terminalOffline
+                - originalNotExchangeable
             lines:
               type: array
               items:
@@ -1261,7 +2027,7 @@ components:
       type: object
       required: [id, saleId, lines, reason, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         saleId: { type: string }
         lines:
           type: array
@@ -1284,17 +2050,20 @@ components:
             Defaults to the original tender. Cash refunds against a card sale usually need
             approval, per the outlet's return policy.
         secondaryAuthorisation:
-          type: object
-          description: Required above the outlet's self-authorise limit.
-          properties:
-            principalId: { type: string, format: uuid }
-            credential: { type: string }
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+          description: >
+            Required above the outlet's self-authorise limit. **A supervisor's step-up on the
+            same device** (decided 28 September, audit R144): `credential` is the supervisor's
+            staff PIN, never a password (audit R123 (7)), as on orders `CreateRefundRequest`.
+            The principal must hold `ORDER_REFUND_APPROVE` at this venue and must not be the
+            caller.
         recordedAt: { type: string, format: date-time }
 
     RetailReturn:
       x-ticvai-persistence: "retail.return + retail.return_line"
       type: object
-      required: [id, saleId, lines, refundAmount, restockedQuantity, writtenOffQuantity, createdAt]
+      required: [id, saleId, lines, status, refundAmount, restockedQuantity, writtenOffQuantity, createdAt]
       properties:
         id: { type: string }
         returnNumber: { type: string }
@@ -1324,26 +2093,57 @@ components:
         refundTender: { type: string }
         restockedQuantity: { type: integer }
         writtenOffQuantity: { type: integer }
-        acceptedByPrincipalId: { type: string, format: uuid }
+        status:
+          allOf:
+            - $ref: '#/components/schemas/RetailReturnStatus'
+          readOnly: true
+        refusedReason:
+          allOf:
+            - $ref: '#/components/schemas/ReturnRefusedReason'
+          nullable: true
+          readOnly: true
+          description: Set when `status` is `refused`, null otherwise.
+        acceptedByPrincipalId:
+          type: string
+          format: uuid
+          description: Who took the return at the desk. On a refused return, who attempted it.
         secondaryPrincipalId: { type: string, format: uuid, nullable: true }
         createdAt: { type: string, format: date-time }
+
+    RetailReturnStatus:
+      type: string
+      description: >
+        `accepted`: goods came back and the refund was raised. `refused`: the return policy
+        refused it; nothing was refunded, restocked or written off, and the row exists so the
+        refusal can be found later.
+      enum: [accepted, refused]
+
+    ReturnRefusedReason:
+      type: string
+      description: Why the return policy refused a return. One value per cause.
+      enum:
+        - outsideReturnWindow
+        - itemNotReturnable
+        - alreadyReturned
+        - requiresSecondUser
+        - receiptRequired
+        - cashRefundOnCardSale
+        - serialNumberMismatch
 
     ReturnPolicyProblem:
       x-ticvai-persistence: "none — error shape"
       allOf:
         - $ref: '../shared/common.yaml#/components/schemas/Problem'
         - type: object
+          required: [refusedReason, refusalId]
           properties:
-            refusedReason:
+            refusedReason: { $ref: '#/components/schemas/ReturnRefusedReason' }
+            refusalId:
               type: string
-              enum:
-                - outsideReturnWindow
-                - itemNotReturnable
-                - alreadyReturned
-                - requiresSecondUser
-                - requiresApproval
-                - receiptRequired
-                - serialNumberMismatch
+              format: uuid
+              description: >
+                The id of the `RetailReturn` recorded with `status: refused`. Assigned by the
+                server; not the request's `id`.
             windowDays: { type: integer }
             daysSincePurchase: { type: integer }
             threshold: { $ref: '../shared/common.yaml#/components/schemas/Money' }
@@ -1353,20 +2153,41 @@ components:
       type: object
       required: [outletId, defaultWindowDays, requiresReceipt]
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
         outletId: { type: string, format: uuid }
         defaultWindowDays: { type: integer, minimum: 0 }
         requiresReceipt: { type: boolean, default: true }
         allowCashRefundOnCardSale: { type: boolean, default: false }
         selfAuthoriseLimit:
+          x-ticvai-column: self_authorise_limit_amount
           allOf:
             - $ref: '../shared/common.yaml#/components/schemas/Money'
           description: Up to this, one cashier may accept a return alone.
-        requiresSecondUserAbove: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        requiresApprovalAbove: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        requiresSecondUserAbove: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: second_user_above_amount }
+        requiresApprovalAbove:
+          deprecated: true
+          x-ticvai-retired: true
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Retired (r8, decision R144), so no return raises an approval request. Ignored, and no longer read or returned.
+          x-ticvai-column: approval_above_amount
         restockableConditions:
           type: array
-          description: Conditions that return stock to sale. Everything else is written off.
-          items: { $ref: '#/components/schemas/ReturnCondition' }
+          description: >
+            Conditions that return stock to sale. Everything else is written off.
+
+
+            Stored as a `text[]` column on `retail.return_policy`, like
+            `nonReturnableCategoryIds`. The items wrap the enum in `allOf` so the schema
+            derivation reads a list of values rather than a child table.
+          items:
+            allOf:
+              - $ref: '#/components/schemas/ReturnCondition'
         nonReturnableCategoryIds:
           type: array
           items: { type: string, format: uuid }
@@ -1376,7 +2197,7 @@ components:
       type: object
       required: [id, saleId, returnLines, replacementLines, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         saleId: { type: string }
         returnLines:
           type: array
@@ -1403,9 +2224,10 @@ components:
         saleId: { type: string }
         returnId: { type: string }
         newSaleId: { type: string }
-        returnedValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        replacementValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        returnedValue: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: returned_amount }
+        replacementValue: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: replacement_amount }
         difference:
+          x-ticvai-column: difference_amount
           allOf:
             - $ref: '../shared/common.yaml#/components/schemas/Money'
           description: >
@@ -1413,83 +2235,10 @@ components:
             difference settles.
         createdAt: { type: string, format: date-time }
 
-    Wallet:
-      x-ticvai-persistence: "retail.wallet"
-      type: object
-      required: [subjectId, balance, currency, status]
-      properties:
-        subjectId: { type: string, format: uuid }
-        balance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        bonusBalance:
-          allOf:
-            - $ref: '../shared/common.yaml#/components/schemas/Money'
-          description: Promotional value. Typically non-refundable and spent first.
-        currency: { type: string, pattern: '^[A-Z]{3}$' }
-        status:
-          type: string
-          enum: [active, suspended, closed]
-        homeCellName:
-          type: string
-          nullable: true
-          description: >
-            Where the authoritative balance lives. Present when the guest is linked across
-            cells.
-        expiresAt: { type: string, format: date-time, nullable: true }
-        lastActivityAt: { type: string, format: date-time, nullable: true }
 
-    WalletTransactionKind:
-      type: string
-      enum: [topUp, spend, refund, adjustment, bonus, expiry, transfer]
 
-    WalletTransaction:
-      x-ticvai-persistence: "retail.wallet_transaction"
-      type: object
-      required: [id, kind, amount, balanceAfter, recordedAt]
-      properties:
-        id: { type: string }
-        kind: { $ref: '#/components/schemas/WalletTransactionKind' }
-        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        balanceAfter: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        orderId: { type: string, nullable: true }
-        venueId: { type: string, format: uuid, nullable: true }
-        reason: { type: string, nullable: true }
-        principalId: { type: string, format: uuid, nullable: true }
-        recordedAt: { type: string, format: date-time }
 
-    IssueGiftCardRequest:
-      x-ticvai-persistence: "none — request only"
-      type: object
-      required: [id, faceValue, kind]
-      properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
-        kind:
-          type: string
-          enum: [physical, digital]
-        cardCode:
-          type: string
-          description: Required for physical cards, which are pre-printed. Generated for digital.
-        faceValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        recipientEmail: { type: string, nullable: true }
-        recipientPhone: { type: string, nullable: true }
-        message: { type: string, maxLength: 500 }
-        validMonths: { type: integer, minimum: 1 }
 
-    GiftCard:
-      x-ticvai-persistence: "retail.gift_card"
-      type: object
-      required: [cardCode, faceValue, balance, status, issuedAt]
-      properties:
-        cardCode: { type: string }
-        kind: { type: string }
-        faceValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        balance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        status:
-          type: string
-          enum: [issued, active, partiallyRedeemed, redeemed, expired, blocked]
-        blockedReason: { type: string, nullable: true }
-        issuedAt: { type: string, format: date-time }
-        activatedAt: { type: string, format: date-time, nullable: true }
-        expiresAt: { type: string, format: date-time, nullable: true }
 
     OutletStockLine:
       x-ticvai-persistence: "none — projection over inventory"
@@ -1509,15 +2258,24 @@ components:
         lastSoldAt: { type: string, format: date-time, nullable: true }
 
     ShopAndDrop:
+      x-ticvai-retired-columns: [collection_point_id]
       type: object
       x-ticvai-persistence: "retail.shop_and_drop + retail.shop_and_drop_line"
-      required: [id, dropReference, saleId, collectionPointId, status, collectBy]
+      required: [id, dropReference, collectionPointId, status, collectBy]
       properties:
         id: { type: string }
         dropReference:
           type: string
           description: Short and readable. Printed on the slip a guest may or may not keep.
-        saleId: { type: string }
+        saleId:
+          type: string
+          nullable: true
+          description: The till sale. Null for an online order, which sets `orderId` (audit R236).
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The paid online order that created this collection (audit R236).
         entitlementId:
           type: string
           nullable: true
@@ -1525,7 +2283,7 @@ components:
             The ticket that claims these goods. The point of 4.4.7 — a guest does not have to
             keep a receipt safe for eight hours in a water park.
         subjectId: { type: string, format: uuid, nullable: true }
-        collectionPointId: { type: string, format: uuid }
+        collectionPointId: { type: string, format: uuid, x-ticvai-column: collection_location_id, x-ticvai-references: fnb.delivery_location}
         collectionPointName: { type: string }
         status:
           type: string
@@ -1545,6 +2303,29 @@ components:
         collectedAt: { type: string, format: date-time, nullable: true }
         collectedByPrincipalId: { type: string, format: uuid, nullable: true }
         verifiedBy: { type: string, nullable: true }
+
+    ShopAndDropProblem:
+      x-ticvai-persistence: "none — error shape"
+      description: >
+        The 409 of `createShopAndDrop` and `collectShopAndDrop`. `refusedReason` tells the
+        causes apart; each operation lists the values it can return.
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason]
+          properties:
+            refusedReason:
+              type: string
+              enum:
+                - alreadyDropped
+                - itemNotDroppable
+                - collectionPointClosed
+                - alreadyCollected
+                - pastCollectBy
+            lineIds:
+              type: array
+              description: For `itemNotDroppable`, the sale lines that cannot be dropped.
+              items: { type: string }
 
     MerchandiseReservation:
       x-ticvai-persistence: "retail.reservation + retail.reservation_line"
@@ -1575,3 +2356,9 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell, as `common.yaml` `serviceAuth`. Used by the order service calling
+        `createShopAndDrop` when an online order is paid (audit R236).

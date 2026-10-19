@@ -1,0 +1,2633 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — Public API and developer access
+  version: 1.0.0
+  x-ticvai-screen-count: 35
+  x-ticvai-tier: satellite
+  x-ticvai-module: "13 — Developer & API Management"
+  x-ticvai-platforms:
+    - P14 Developer
+  # Derived from screens/*.yaml on 18 August — every platform with a screen that calls an
+  # operation in this contract. **Six contracts declared none**, which the viewer reports as
+  # missing taxonomy and no package checker tested for.
+  description: >
+    **The developer-facing surface: who may call TICVAI, with what credential, against which
+    environment, and what happens when the contract changes.**
+
+    This contract does not expose business capability. **Domain 13.3 asks for ticketing, membership,
+    loyalty, wallet, access, F&B, retail and reporting APIs — and all of them already exist** across
+    the other twenty-six contracts. What was missing is the layer in front: registration,
+    credentials, a sandbox, webhooks, quotas and a deprecation lifecycle.
+
+    ## The decisions this is built on
+
+    **D1 — Extensible platform with third-party listings.** Developers register, obtain credentials
+    and test in a sandbox. Certification (13.1.49) and marketplace publishing (13.1.50) are in.
+    **This supersedes the earlier reading of the 10 August decision**, which settled integration
+    direction and said nothing about onboarding or tooling.
+
+    **D2 — Synthetic sandbox data only.** No cloning, no masking of production into developer
+    environments. 13.2.13 is in; 13.2.12 is retained as a guard. **This removes the PDPL and DESC
+    exposure entirely** and decouples the sandbox from the unresolved tenant-isolation question —
+    **there is no production data to isolate.**
+
+    **D3 — One shared TICVAI sandbox.** 13.2.2, tenant-specific sandboxes, is **declined and
+    recorded rather than dropped.** Tenant-specific validation runs on the per-customer staging
+    environment agreed 30 July: **development and certification are generic, acceptance is
+    tenant-specific.**
+
+    **D4 — This contract is `public-api`, not `platform`.** "Platform" already denotes TICVAI
+    throughout the MoMs and ADRs, and a contract by that name would read as the whole product.
+
+    **D5 — The commercial model is tenant-configurable by TICVAI.** Module licensing (13.3.24),
+    listing fees and revenue share are configuration rather than code, **so rates and terms change
+    without a release.** The mechanism is decided here; the rates are not (CF-135c).
+
+    **D6 — Sandbox, certification, then production (17 September minutes, M17-05 to M17-07).**
+    Sandbox keys and production keys are separate; a production key is issued by TICVAI only for a
+    certified integration (`requestProductionAccess`, `decideProductionAccess`), carries an expiry
+    and an IP allow-list, and is scoped by module (`listApiScopes`). Abnormal traffic is flagged by
+    anomaly rules (`setApiAnomalyRule`, `listApiAnomalies`). **This supersedes "certification is a
+    gate on listing, not on API access"** in the first version of this contract.
+
+    ## What is deliberately not here
+
+    **Third-party code does not run inside TICVAI.** A listing points at an integration running on
+    the developer's own infrastructure. Recommended and stated rather than assumed — **executing
+    submitted code inside a multi-tenant platform is a different product with a different threat
+    model.**
+
+    **Documentation is not generated here.** ADR-0024 makes the contract the deliverable and the 27
+    OpenAPI files *are* the schema documentation. 13.1.1 to 13.1.5 ask for a portal that renders
+    them, which is a frontend over artefacts that already exist.
+
+servers:
+  - url: https://api.ticvai.com/v1
+
+security:
+- bearerAuth: []
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  apiClientRecords:
+    module: public-api
+    table: control.api_client
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.api_client rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ApiClient'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.api_client rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Platform's service route (serviceAuth).
+    served: [service]
+paths:
+  /developers:
+    post:
+      operationId: registerDeveloper
+      x-ticvai-consumed-by:
+        - "P14 DEV-002 Register & Organisation"
+      security: []
+      summary: Register a developer or organisation
+      description: >
+        13.1.6 to 13.1.9. **An organisation, not a person** — an integration outlives the engineer
+        who built it, and a credential tied to somebody's personal account dies when they leave.
+
+        A developer account is **not a tenant and not a partner.** A partner resells tickets; a
+        developer writes software. Conflating them was the confusion CF-135 opened on.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [public]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DeveloperAccount' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Registered, pending verification
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeveloperAccount' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /developers/{developerId}:
+    get:
+      operationId: getDeveloperAccount
+      x-ticvai-consumed-by:
+        - "P14 DEV-002 Register & Organisation"
+      x-ticvai-audience: [partner, staff]
+      x-ticvai-read-routing: replica
+      summary: A registered developer organisation
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        DEV-002 registers an organisation (`registerDeveloper`) and sets its members; it had no read of the
+        organisation it then shows. A partner reads only its own (`x-ticvai-self-scoped`). Returns what the
+        write stores, in the write's own shape.
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-self-scoped: principal
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: developerId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: A registered developer organisation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeveloperAccount'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /developers/{developerId}/members:
+    get:
+      operationId: listDeveloperMembers
+      x-ticvai-consumed-by:
+        - "P14 DEV-002 Register & Organisation"
+      summary: Who is in a developer organisation
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; DEV-002: setDeveloperMembers wrote members nothing read).** The organisation's `control.developer_member` rows (DeveloperMember), owner first, then by email; removed members are left out.
+      tags:
+      - publicApi
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: developerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Who is in a developer organisation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeveloperMember'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    parameters:
+      - name: developerId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setDeveloperMembers
+      x-ticvai-consumed-by:
+        - "P14 DEV-002 Register & Organisation"
+      summary: Who at this organisation may do what
+      description: |-
+        13.1.10. **The organisation administers its own people**, because TICVAI maintaining every integrator's staff list is TICVAI doing their HR — the same reasoning as `PartnerUser`.
+
+        **What the PUT does** (4 October 2026, CHG-FXC-005). Replaces the organisation's member list in
+        `control.developer_member` (DeveloperMember): an email not on the list is invited, a listed email's role is
+        updated, a member left off is `removed`. Exactly one `owner` must remain, or 409. Nothing is written to the tenant's
+        identity tables; the portal signs a member in by the email.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [members]
+              properties:
+                members:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      email: { type: string, format: email }
+                      role: { type: string, enum: [owner, admin, developer, readOnly] }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeveloperMember'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-clients:
+    get:
+      operationId: listApiClients
+      x-ticvai-consumed-by:
+        - "P08 ADM-351 Approval API Management"
+        - "P08 ADM-356 Integration Security & Access Control"
+        - "P08 BO-067 Integrations"
+        - "P08 BO-1071 Integration Command Center"
+        - "P08 BO-1073 API Access & OAuth"
+        - "P08 BO-1076 Concurrency, Idempotency & Limits"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+        - "P08 BO-691 Accreditation API Management"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P10 PTR-019 API Credentials & Integration"
+        - "P14 DEV-003 Clients & Credentials"
+      summary: Registered clients for this developer
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ApiClient' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: createApiClient
+      x-ticvai-consumed-by:
+        - "P08 BO-1177 API Security, Access & Integration Permissions"
+        - "P10 PTR-019 API Credentials & Integration"
+        - "P14 DEV-003 Clients & Credentials"
+      summary: Create a client with scopes and an environment
+      description: >
+        13.1.11 to 13.1.13, and **CF-135a: the credential model was owned by nobody.** 2.7.52,
+        7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration
+        credential and a webstore credential were three unrelated things. **This is the one that
+        exists.**
+
+        **A client is bound to one environment.** A sandbox client cannot reach production, which is
+        stated on the object rather than enforced by a naming convention — **a key that works in
+        both is a key somebody will use in the wrong one.**
+
+        **Production keys only after certification** (17 September minutes, M17-06; decided again 29
+        September). A developer creates `sandbox` clients here freely. A `production` client is
+        refused 409 `certification-required` unless it names a certified integration
+        (`certificationListingId`, an `IntegrationListing` in `certified` within `certifiedUntil`) and
+        the caller is TICVAI staff (`issuedBy: ticvai`). The developer's route is
+        `requestProductionAccess`, which TICVAI decides with `decideProductionAccess`; approving it
+        creates the production client. **A production client needs an IP allow-list** (M17-07): an
+        empty `ipAllowList` on a production client is refused 422 `ip-allow-list-required`.
+
+        **Scopes are module scopes** (M17-05): each is `{module}.read` or `{module}.write` from
+        `listApiScopes`, so a CRM integration partner is granted CRM scopes and nothing else. An unknown
+        scope is refused 422 `unknown-scope`. **No scope grants a catalogue write** (M17-04): partners
+        read assigned products and partner prices; the product, price and capacity writes are open
+        only through a platform-staff `ApiLicence.catalogueWriteException`. Keys expire: `credentialTtlDays` (default 365 for
+        production, 90 for sandbox) sets `expiresAt`, and rotation renews it.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApiClient' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: >
+            Created. **The secret is returned once and never again** — a system that can show you a
+            secret later is a system that stores one.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  client: { $ref: '#/components/schemas/ApiClient' }
+                  clientSecret: { type: string, format: password }
+        '409':
+          description: >
+            A `production` client without a current certification, or asked for by a developer rather
+            than issued by TICVAI (`certification-required`, M17-06). Use `requestProductionAccess`.
+          x-ticvai-problem-types:
+            - certification-required
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            A `production` client with an empty `ipAllowList` (`ip-allow-list-required`, M17-07), or a
+            scope that is not in the scope catalogue (`unknown-scope`, M17-05).
+          x-ticvai-problem-types:
+            - ip-allow-list-required
+            - unknown-scope
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-clients/{clientId}/credentials:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: rotateApiCredential
+      x-ticvai-consumed-by:
+        - "P10 PTR-019 API Credentials & Integration"
+        - "P14 DEV-003 Clients & Credentials"
+      summary: Issue a new secret, with an overlap window
+      description: >
+        13.1.15. **Rotation without an overlap is an outage.** Both secrets are valid until
+        `oldSecretExpiresAt`, which gives the integrator time to deploy — and **a rotation with no
+        overlap is one nobody performs until they are breached.**
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                overlapHours: { type: integer, default: 72 }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Rotated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientSecret: { type: string, format: password }
+                  oldSecretExpiresAt: { type: string, format: date-time }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    delete:
+      operationId: revokeApiCredential
+      x-ticvai-consumed-by:
+        - "P10 PTR-019 API Credentials & Integration"
+        - "P14 DEV-003 Clients & Credentials"
+      summary: Revoke immediately
+      description: >
+        13.1.15. **No overlap, by definition** — revocation is what you reach for when a secret has
+        leaked, and a grace period defeats it.
+
+        **Active tokens are invalidated too.** Revoking the credential while leaving issued tokens
+        alive is a revocation that takes an hour to mean anything.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Revoked
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /oauth/token:
+    post:
+      operationId: issueApiToken
+      security:
+      - apiKeyAuth: []
+      - serviceAuth: []
+      summary: Exchange a credential for an access token
+      description: >
+        13.1.13 and 13.1.14. **Client credentials grant** — machine to machine, no user present.
+
+        **Scopes are the intersection of what the client was granted and what its tenant licenses**
+        (13.3.24, D5). A client with a ticketing scope calling a venue that has not licensed the
+        ticketing API gets nothing, and the token says so at issue rather than the call failing
+        later.
+
+        **The IP allow-list is checked here and on every call** (17 September minutes, M17-07): a
+        request from an address outside `ApiClient.ipAllowList` is refused 403 `ip-not-allowed`, and a
+        client past `expiresAt` gets no token (403 `client-expired`). Every refusal counts towards
+        the anomaly rules (`setApiAnomalyRule`).
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [partner, service]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [grantType, clientId, clientSecret]
+              properties:
+                grantType: { type: string, enum: [client_credentials] }
+                clientId: { type: string }
+                clientSecret: { type: string, format: password }
+                scope: { type: string }
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken: { type: string, format: password }
+                  tokenType: { type: string }
+                  expiresIn: { type: integer }
+                  scope: { type: string }
+        '403':
+          description: >
+            The request came from an address outside the client's `ipAllowList` (`ip-not-allowed`),
+            or the client is past `expiresAt` (`client-expired`), suspended or revoked.
+          x-ticvai-problem-types:
+            - ip-not-allowed
+            - client-expired
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /sandboxes:
+    get:
+      operationId: listSandboxes
+      x-ticvai-consumed-by:
+        - "P14 DEV-004 Sandbox"
+      summary: Sandbox environments
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Sandboxes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Sandbox' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: createSandbox
+      x-ticvai-consumed-by:
+        - "P14 DEV-004 Sandbox"
+      summary: Provision a sandbox with synthetic data
+      description: >
+        13.2.1 and 13.2.13, decisions D2 and D3. **One shared TICVAI sandbox, synthetic data only.**
+
+        **No production data is cloned or masked into it** — which removes the PDPL and DESC
+        exposure entirely, and means the sandbox does not depend on the unresolved tenant-isolation
+        question, because **there is no production data to isolate.**
+
+        **13.2.2 (tenant-specific sandboxes) is declined**, recorded rather than dropped. Per-customer
+        staging from 30 July does tenant-specific validation: **development and certification are
+        generic, acceptance is tenant-specific.**
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, dataProfile]
+              properties:
+                name: { type: string }
+                dataProfile: { $ref: '#/components/schemas/SyntheticDataProfile' }
+                expiresAfterDays: { type: integer, default: 90 }
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Provisioning
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sandbox' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /sandboxes/{sandboxId}/reset:
+    parameters:
+      - name: sandboxId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: resetSandbox
+      x-ticvai-consumed-by:
+        - "P14 DEV-004 Sandbox"
+      summary: Back to a clean synthetic dataset
+      description: >
+        13.2.3. **Regression testing needs a known starting state**, and a sandbox that accumulates
+        a year of a developer's experiments is one where a failing test proves nothing.
+
+        Regenerates from the data profile. **Credentials survive a reset** — an integrator
+        re-onboarding after every reset would stop resetting.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Resetting
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sandbox' }
+        '409':
+          description: 'The sandbox is already `resetting` (`sandbox-already-resetting`), or is not `active` (`provisioning`, `expired` or `deleted`; `sandbox-not-active`). Nothing changes.'
+          x-ticvai-problem-types: [sandbox-already-resetting, sandbox-not-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /webhook-subscriptions:
+    get:
+      operationId: listWebhookSubscriptions
+      x-ticvai-consumed-by:
+        - "P08 BO-067 Integrations"
+        - "P08 BO-1074 Webhook Configuration"
+        - "P08 BO-1077 Mapping & Transformation"
+        - "P08 BO-1173 Wallet Integration Command Center"
+        - "P08 BO-1176 Wallet Events, Webhooks & Notification Orchestration"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+        - "P08 BO-692 Accreditation Webhook Management"
+        - "P14 DEV-005 Webhooks"
+      summary: The tenant's webhook subscriptions, filterable by API client
+      description: >
+        **Per tenant, filterable by API client** (decided 28 September, audit R214 (4)). Returns every
+        webhook subscription in the tenant; `clientId` narrows it to what one API client is subscribed
+        to. A partner caller sees only its own client's subscriptions whatever it sends.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          description: Only this API client's subscriptions (audit R214 (4)).
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/WebhookSubscription' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: createWebhookSubscription
+      x-ticvai-consumed-by:
+        - "P08 BO-067 Integrations"
+        - "P08 BO-1074 Webhook Configuration"
+        - "P08 BO-1176 Wallet Events, Webhooks & Notification Orchestration"
+        - "P08 BO-692 Accreditation Webhook Management"
+        - "P14 DEV-005 Webhooks"
+      x-ticvai-names-for-context: [platform.outbox]
+      summary: Subscribe to business events
+      description: >
+        13.1.26, 13.3.17, 13.3.18 and 13.3.22. **The events exist**, published through
+        `platform.outbox`. What was missing is a way for anything outside TICVAI to receive one.
+
+        **`eventTypes` come from the webhook event catalogue** (`WebhookEventType`, read with
+        `listWebhookEventTypes`). A name not in it is `422`: a subscription to an event nobody
+        publishes is a receiver waiting for nothing. Device, accreditation, approval-workflow and
+        seat events joined the catalogue on 29 September (16.9.56, 12.1.53, 11.1.64, 11.1.66,
+        21.13.4).
+
+        **Filtered at subscription, not at delivery.** A subscriber taking every event and
+        discarding 99% is a subscriber the platform pays to talk to.
+
+        **The endpoint is verified before the first delivery.** An unverified endpoint is somebody
+        else's server being sent a venue's ticket sales.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WebhookSubscription' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created, pending endpoint verification
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WebhookSubscription' }
+        '422':
+          x-ticvai-problem-types: [unknown-event-type]
+          description: An entry in `eventTypes` is not in the webhook event catalogue.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /webhook-event-types:
+    get:
+      operationId: listWebhookEventTypes
+      x-ticvai-consumed-by:
+        - "P08 ADM-352 Workflow Event Framework"
+        - "P08 BO-1074 Webhook Configuration"
+        - "P08 BO-1075 Seat Event Catalog"
+        - "P08 BO-692 Accreditation Webhook Management"
+      x-ticvai-agreed: >-
+        29 September: re-trace 16.9.56, 12.1.53, 11.1.64, 11.1.66 and 21.13.4 (events existed or were
+        named with nothing to subscribe to them from); our build plan; shape follows
+        listWebhookSubscriptions, paged as tenancy listDevices
+      summary: The events a webhook may subscribe to
+      description: >
+        **The webhook event catalogue.** One entry per `WebhookEventType`: the name, its version, the
+        context that publishes it, what it is about, when it is emitted and the payload fields a
+        receiver gets. Read from the event catalogue shipped with the release (`events/*.yaml`), so it
+        never lists an event the platform does not publish, and a new event becomes subscribable in
+        the release that publishes it.
+
+        `publisher` narrows it to one context — `tenancy` for device events, `accreditation`,
+        `approvals`, `seating`. The same list for every tenant and every partner; what a subscription
+        then receives is still filtered to the caller's tenant and the subscription's `filters`.
+
+        **Order.** Sorted by `name` ascending.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: publisher
+          in: query
+          required: false
+          description: Only events this context publishes.
+          schema: { type: string }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The catalogue
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/WebhookEventCatalogueEntry' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /webhook-subscriptions/{subscriptionId}/deliveries:
+    parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listWebhookDeliveries
+      x-ticvai-consumed-by:
+        - "P08 BO-067 Integrations"
+        - "P08 BO-1078 Monitoring, Retry & Reconciliation"
+        - "P08 BO-692 Accreditation Webhook Management"
+        - "P14 DEV-005 Webhooks"
+      summary: What was sent, what failed, and why
+      description: >
+        13.1.30 and 13.3.23. **A developer debugging an integration needs the delivery log more than
+        anything else in this contract**, and without it every question becomes a support ticket.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Deliveries
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/WebhookDelivery' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /webhook-subscriptions/{subscriptionId}/replay:
+    parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: replayEvents
+      x-ticvai-consumed-by:
+        - "P08 BO-1173 Wallet Integration Command Center"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+        - "P14 DEV-005 Webhooks"
+      summary: Re-deliver events from a point in time
+      description: >
+        13.3.19. **Recovery, synchronisation and troubleshooting** — an integrator whose server was
+        down for four hours needs those four hours, not a support conversation.
+
+        **Bounded by the retention policy** (13.3.20). Replay is not a second source of truth, and
+        an integration that relies on replaying six months is an integration that should be polling.
+
+        **Marked as a replay in the payload.** A consumer that cannot tell a replay from a live
+        event will double-count.
+
+        **This validates and queues; it reads no outbox** (ADAM CR-140, option 1, 18 October 2026;
+        CHG-CRA-004). It inserts one `control.webhook_replay` row (`WebhookReplayJob`, status `queued`) and
+        answers 202. **A dispatcher on the workers host drains it** (its own ticket): it reads each tenant
+        database's outbox directly, as the relay on the same host does, re-delivers the events in the window and
+        of the types asked, and writes each delivery as a `control.webhook_delivery` with `isReplay` true and the
+        replay's `replayId`; the row goes `running`, then `completed` or `failed`.
+
+        **The window** (CR-140): `to` before `from` is 400 `replay-window-invalid`. The retention bound is the
+        outbox itself: published rows leave with their monthly partition (ADR-0058), so a `from` older than the
+        oldest attached partition is 400 `replay-window-beyond-retention`. An event type the subscription does not
+        hold is 400 `replay-event-type-not-subscribed`. **The caller's tenant** must be one of the subscription's
+        API client's `allowedTenantIds`, else 404, as for an unknown subscription.
+
+        **What the window measures, what it filters, how large it may be** (r8 walk of ticket 27997). The window
+        is on the outbox row's `created_at`, the moment the event was written, not the moment it was first
+        delivered. The subscription's own filters (event types, venues) are applied by the dispatcher to every
+        replayed event exactly as for a live delivery, so an event of another venue is never sent. One replay
+        covers at most 7 days (`to` minus `from`, `to` defaulting to now) and at most 10,000 events; a larger
+        ask is 400 `replay-window-too-large` and nothing is queued, so the integrator replays in steps.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [from]
+              properties:
+                from: { type: string, format: date-time }
+                to: { type: string, format: date-time, nullable: true }
+                eventTypes: { type: array, items: { $ref: '#/components/schemas/WebhookEventType' } }
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Replay queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookReplayJob'
+        '400':
+          description: 'The window or the event types cannot be replayed (ADAM CR-140; CHG-CRA-004): `to` before `from`
+            (`replay-window-invalid`); `from` older than the oldest outbox partition still attached
+            (`replay-window-beyond-retention`); an event type the subscription does not hold
+            (`replay-event-type-not-subscribed`); a window longer than 7 days or holding more than 10,000 events
+            (`replay-window-too-large`). Nothing is queued.'
+          x-ticvai-problem-types: [replay-window-invalid, replay-window-beyond-retention, replay-event-type-not-subscribed, replay-window-too-large]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '404':
+          description: 'No such subscription, or the caller''s tenant is not one of its API client''s `allowedTenantIds`
+            (ADAM CR-140); the two are not told apart. Nothing is queued.'
+          x-ticvai-problem-types: [not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '409':
+          description: 'The subscription is `pendingVerification` (`webhook-subscription-not-verified`) or `disabled` (`webhook-subscription-disabled`); events are replayed only to a verified, enabled endpoint. Nothing is queued.'
+          x-ticvai-problem-types: [webhook-subscription-not-verified, webhook-subscription-disabled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-quotas:
+    get:
+      operationId: listApiQuotas
+      x-ticvai-consumed-by:
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The rate limits and quotas set per client
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        DEV-008 and ADM-015 set quotas with `setApiQuota` and nothing read them. `DEVELOPER_ADMIN`, as the
+        write: `DEVELOPER_VIEW` is held by developers themselves, who must not read other clients' limits.
+        Returns what the write stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The rate limits and quotas set per client
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApiQuota'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-quotas/{quotaId}:
+    put:
+      operationId: setApiQuota
+      x-ticvai-consumed-by:
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P14 DEV-008 Programme Administration"
+      summary: Rate limits and throttling per client
+      description: >
+        13.1.36 and 13.1.37. **A quota protects the venue, not the developer.** An integration
+        polling availability every second at an onsale is a denial of service written by somebody
+        with good intentions.
+
+        **Burst is separate from sustained rate**, because a nightly sync is a legitimate spike and
+        a flat per-second limit either blocks it or permits the flood it was meant to stop.
+
+        **429 carries `Retry-After`.** A limit with no guidance produces a client that retries
+        immediately and makes it worse.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: quotaId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApiQuota' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiQuota' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-usage:
+    get:
+      operationId: getApiUsage
+      x-ticvai-consumed-by:
+        - "P08 ADM-351 Approval API Management"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P14 DEV-006 Usage & Limits"
+      summary: Calls, errors, latency and success rate
+      description: >
+        13.1.16 to 13.1.20 and 13.1.41 to 13.1.45. **One endpoint, because they are one question
+        asked five ways** — a developer wants to know whether their integration is healthy.
+
+        **Errors are attributed.** A 4xx is the integrator's problem and a 5xx is TICVAI's, and a
+        dashboard that shows a single error rate lets both sides blame the other.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: analytical
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Usage
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiUsageSummary' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-versions:
+    get:
+      operationId: listApiVersions
+      x-ticvai-consumed-by:
+        - "P14 DEV-001 API Reference"
+      security:
+      - bearerAuth: []
+      - {}
+      summary: Versions, their status and their sunset dates
+      description: >
+        13.1.31 to 13.1.35, and **CF-141 is sharper under D1 than it was**: a single supported
+        production version was tenable when only Softlabs called the API. **With third parties, a
+        breaking change with no deprecation window breaks somebody else's business.**
+
+        ADR-0026 records the versioning rule. This exposes it.
+
+        **Open to an anonymous caller, so it holds no permission** (r8 walk of ticket 27983; lead decision of 20
+        October 2026, option A): the reference is public, a developer arrives with no account (F27). The permission
+        a staff caller must hold (`DEVELOPER_VIEW`, ADR-0025) is not enforced here, and a signed-in staff caller
+        without it is not refused. Nobody is refused on this read, so the screen's no-access state cannot be reached
+        through it.
+      tags: [publicApi]
+      x-ticvai-permission: null
+      x-ticvai-audience: [public, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Versions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ApiVersion' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-versions/{version}/deprecate:
+    parameters:
+      - name: version
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: deprecateApiVersion
+      x-ticvai-consumed-by:
+        - "P09 ADM-026 End-of-Support Notice Management"
+        - "P14 DEV-008 Programme Administration"
+      summary: Announce a sunset date and notify subscribers
+      description: >
+        13.1.32 and 13.1.34. **Deprecation is an announcement with a date, not a switch.**
+
+        Notifies every client using the version, and **the notification names which operations they
+        actually call** — a generic *"v1 is retiring"* to somebody using three of two hundred
+        endpoints is a message they will ignore.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sunsetAt, reason]
+              properties:
+                sunsetAt: { type: string, format: date-time }
+                reason: { type: string }
+                migrationGuideUrl: { type: string, nullable: true }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Deprecated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiVersion' }
+        '409':
+          description: 'The version is not `current` (still `preview`, or already `deprecated` or `sunset`); only the current version is deprecated. Nothing changes and nobody is notified.'
+          x-ticvai-problem-types: [api-version-not-current]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /listings:
+    get:
+      operationId: listIntegrationListings
+      x-ticvai-consumed-by:
+        - "P14 DEV-007 Marketplace Listing"
+        - "P14 DEV-008 Programme Administration"
+      security:
+      - bearerAuth: []
+      - {}
+      summary: Published third-party integrations
+      description: >
+        13.1.50. **A listing, not an installation.** The integration runs on the developer's own
+        infrastructure and this is the entry that describes it, points at it, and says it has been
+        certified.
+
+        **Third-party code does not execute inside TICVAI** — stated rather than assumed, because
+        executing submitted code in a multi-tenant platform is a different product with a different
+        threat model.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [public, staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/IntegrationListing' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: submitIntegrationListing
+      x-ticvai-consumed-by:
+        - "P14 DEV-007 Marketplace Listing"
+      summary: Submit an integration for certification (and, if public, listing)
+      description: >
+        13.1.49 and 13.1.50. **Certification gates production access and listing** (17 September
+        minutes, M17-06, which reverses the earlier "a gate on listing, not on API access"). A
+        developer builds and tests in the sandbox with sandbox keys; production keys are issued only
+        for a certified integration (`requestProductionAccess`). A `private` listing is certified and
+        never shown in the marketplace, for a partner integrating for one venue; a `public` one also
+        appears in the marketplace once certified.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/IntegrationListing' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Submitted for review
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IntegrationListing' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /listings/{listingId}/certify:
+    parameters:
+      - name: listingId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: certifyIntegration
+      x-ticvai-consumed-by:
+        - "P14 DEV-008 Programme Administration"
+      summary: Approve, reject or revoke a certification
+      description: >
+        13.1.49. **Certification expires**, because an integration certified against v1 and still
+        listed after v3 is TICVAI vouching for something it has not looked at in two years.
+
+        **It is also what production access rests on** (17 September minutes, M17-06). Revoking a
+        certification, or letting it lapse, suspends the production clients issued against it
+        (`setApiClientStatus` `suspended`, reason `certificationLapsed`); sandbox clients are untouched.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [certify, reject, revoke] }
+                certifiedUntil: { type: string, format: date, nullable: true }
+                notes: { type: string, nullable: true }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Decided
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IntegrationListing' }
+        '409':
+          description: '`certify` or `reject` on a listing that is not `submitted` or `inReview` (`integration-listing-not-in-review`), or `revoke` on one that is not `certified` (`integration-listing-not-certified`). Nothing changes.'
+          x-ticvai-problem-types: [integration-listing-not-in-review, integration-listing-not-certified]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-licensing:
+    get:
+      operationId: listApiLicences
+      x-ticvai-consumed-by:
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The API licences granted, per client
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        DEV-008 sets licences with `setApiLicensing`; `listApiScopes` lists the scopes a licence may grant,
+        not the licences. Returns what the write stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The API licences granted, per client
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApiLicence'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-licensing/{licenceId}:
+    put:
+      operationId: setApiLicensing
+      x-ticvai-consumed-by:
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-agreed: '29 September: 17 September minutes M17-04 (partners never create products, prices or performances through the API); the exception is platform-staff only'
+      summary: Which API modules a tenant has licensed, and on what terms
+      description: >
+        13.3.24, decision D5. **Configuration, not code** — rates and terms change without a
+        release, which is the whole point of the decision.
+
+        **The example in the requirement is the shape**: a venue licensing the ticketing API and not
+        the F&B one. A scope the tenant has not licensed produces no token, and the refusal happens
+        at issue rather than at call time.
+
+        **The rates themselves are CF-135c and remain open.** This is the surface they will be set
+        through.
+
+        **Catalogue writes are not grantable to partner or developer clients** (17 September
+        minutes M17-04, decided 29 September): partners never create products, prices or
+        performances through the API. The product, price list, channel capacity, lifecycle and
+        alternative-code writes (`createProduct`, `updateProduct`, `setProductAttributes`,
+        `createPriceList`, `updatePriceList`, `copyPriceList`, `setPrices`, `createChannelCapacity`,
+        `updateChannelCapacity`, `setChannelAllocations`, `transitionProductLifecycle`,
+        `setAlternativeCodes`) are in no scope a client can be granted, whatever modules are
+        licensed. **The only exception is `catalogueWriteException`**, which TICVAI platform staff
+        alone may set here (a tenant principal sending it is refused 403 `platform-staff-only`), for a
+        named client and named operations, with a reason and an end date; it is audited and lapses
+        on its own.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: licenceId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApiLicence' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiLicence' }
+        '403':
+          description: >
+            `catalogueWriteException` was sent by a principal that is not TICVAI platform staff
+            (`platform-staff-only`, M17-04).
+          x-ticvai-problem-types:
+            - platform-staff-only
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-clients/{clientId}/status:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setApiClientStatus
+      x-ticvai-consumed-by:
+        - "P08 ADM-356 Integration Security & Access Control"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+      x-ticvai-agreed: >-
+        29 September: VM close-out; pack 'Wallet_Configuration_Backend_Structure_v1.0.pdf' board 10
+        pp.115 and 122 (Suspend Integration); shape follows revokeApiCredential and states/api-client.yaml
+      summary: Suspend or reactivate an integration, reversibly
+      description: >
+        Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paused a client
+        reversibly.** An integration flooding the wallet with bad messages is suspended here: token
+        issue is refused and issued tokens stop working while `suspended`, but the credentials, the
+        webhook subscriptions and the mappings are kept, so `active` resumes it without re-onboarding.
+
+        `reason` is required for `suspended` and is audited. A `revoked` client cannot be reactivated
+        (409): revocation stays terminal (states/api-client.yaml). Decided 29 September, readiness
+        close-out.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [active, suspended] }
+                reason:
+                  x-ticvai-stored-as: control.api_client.status_reason
+                  type: string
+                  maxLength: 500
+                  description: Required with `suspended`.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Status set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiClient' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          x-ticvai-problem-types: [api-client-revoked]
+          description: The client is `revoked`, which is terminal.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          x-ticvai-problem-types: [reason-required]
+          description: '`suspended` without a `reason`.'
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /webhook-subscriptions/{subscriptionId}/test:
+    parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: testWebhookSubscription
+      x-ticvai-consumed-by:
+        - "P08 BO-1173 Wallet Integration Command Center"
+        - "P08 BO-692 Accreditation Webhook Management"
+      x-ticvai-agreed: >-
+        29 September: VM close-out; pack 'Wallet_Configuration_Backend_Structure_v1.0.pdf' board 10
+        p.115 (Test Connection); shape follows replayEvents
+      summary: Send a signed test event to the endpoint, now
+      description: >
+        Board 10, p.115. **Test Connection.** Sends one synthetic event of `eventType` (default: the
+        first of the subscription's `eventTypes`) to the endpoint, signed with the subscription's
+        secret, and waits for the answer. The payload is marked `isTest`, as a replay is marked
+        `isReplay`, so a receiver never books it.
+
+        Returns the delivery attempt with the response code and body excerpt. A test does not count
+        towards `consecutiveFailures` and does not change the subscription's status. An `eventType`
+        the subscription does not take is refused (422).
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventType: { $ref: '#/components/schemas/WebhookEventType' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The test delivery and what the endpoint answered
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WebhookDelivery' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '422':
+          x-ticvai-problem-types: [event-type-not-subscribed]
+          description: '`eventType` is not one this subscription takes.'
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-scopes:
+    get:
+      operationId: listApiScopes
+      x-ticvai-consumed-by:
+        - "P08 ADM-351 Approval API Management"
+        - "P08 BO-1073 API Access & OAuth"
+        - "P08 BO-1177 API Security, Access & Integration Permissions"
+        - "P10 PTR-019 API Credentials & Integration"
+        - "P14 DEV-001 API Reference"
+        - "P14 DEV-003 Clients & Credentials"
+      security:
+      - bearerAuth: []
+      - {}
+      x-ticvai-agreed: '29 September: 17 September minutes M17-05 (API access scoped and bundled by module); shape follows listApiVersions, paged'
+      summary: The scope catalogue, one read and one write scope per module
+      description: >
+        **API access is granted by module** (17 September minutes, M17-05): `ticketing.read`,
+        `ticketing.write`, `membership.read` and so on, one pair per licensable module
+        (`ModuleKey`). Each scope lists the operations it opens, so a CRM integration partner granted
+        `marketing.read` and `marketing.write` reaches the CRM operations and nothing else. The
+        catalogue is generated at release from `x-ticvai-api-scope` on every partner-callable
+        operation; it is not edited by hand. `licensed` says whether the caller's tenant licenses the
+        module (`setApiLicensing`), since an unlicensed scope yields no token.
+
+        **How the operations carry it** (30 September): every operation whose `x-ticvai-audience`
+        includes `partner` names its scope, `x-ticvai-api-scope: '{module}.read'` for a GET and
+        `'{module}.write'` otherwise, the module being the operation's `x-ticvai-requires-module` or,
+        failing that, its contract's (orders, catalogue and promotions `ticketing`; seating
+        `seating`; marketing-crm `marketing`; reporting `analytics`; subscription and finance
+        `partner`; approvals `core`). Sign-in and session operations (identity) and the developer
+        portal's own client management (this contract) are not module data and carry no scope: a
+        client reaches them by its credential, not by a grant.
+
+        **Order.** Sorted by `operationId` descending (a UUIDv7, so newest first).
+
+        **Open to an anonymous caller, so it holds no permission**, as `listApiVersions` (r8 walk of ticket 27983;
+        lead decision of 20 October 2026, option A); `DEVELOPER_VIEW` is not enforced here.
+      tags: [publicApi]
+      x-ticvai-permission: null
+      x-ticvai-audience: [public, staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: module
+          in: query
+          schema: { $ref: '../shared/common.yaml#/components/schemas/ModuleKey' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Scopes, grouped by module
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ApiScope' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-clients/{clientId}/production-access:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: requestProductionAccess
+      x-ticvai-consumed-by:
+        - "P10 PTR-019 API Credentials & Integration"
+        - "P14 DEV-003 Clients & Credentials"
+        - "P14 DEV-004 Sandbox"
+      x-ticvai-agreed: '29 September: 17 September minutes M17-06 (production only after sandbox testing and certification); shape follows submitIntegrationListing'
+      summary: Ask for production keys for a sandbox client that passed certification
+      description: >
+        **Sandbox, then certification, then production** (17 September minutes, M17-06). The
+        developer names the sandbox client they built with, the certified integration
+        (`listingId`), the tenants it will act for, the scopes it needs and the addresses it calls
+        from. TICVAI decides it with `decideProductionAccess`; approval issues a new production
+        client, **never promotes the sandbox key**, so a key that was used in testing never reaches a
+        live venue. The developer then takes the production secret once with `rotateApiCredential`.
+
+        Refused 409 `certification-required` when the listing is not certified or its certification
+        has lapsed, and 422 `ip-allow-list-required` without an allow-list (M17-07).
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [listingId, scopes, allowedTenantIds, ipAllowList]
+              properties:
+                listingId: { type: string, format: uuid }
+                scopes:
+                  type: array
+                  minItems: 1
+                  items: { type: string }
+                allowedTenantIds:
+                  type: array
+                  minItems: 1
+                  items: { type: string, format: uuid }
+                ipAllowList:
+                  type: array
+                  minItems: 1
+                  items: { type: string }
+                note: { type: string, nullable: true, maxLength: 1000 }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Requested, `pending`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductionAccessRequest' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: >
+            The listing is not certified, or its certification has lapsed (`certification-required`);
+            or the client is not a sandbox client, or a request for it is already pending
+            (`production-access-pending`).
+          x-ticvai-problem-types:
+            - certification-required
+            - production-access-pending
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: An empty `ipAllowList` (`ip-allow-list-required`) or an unknown scope (`unknown-scope`).
+          x-ticvai-problem-types:
+            - ip-allow-list-required
+            - unknown-scope
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /production-access-requests:
+    get:
+      operationId: listProductionAccessRequests
+      x-ticvai-consumed-by:
+        - "P08 BO-1073 API Access & OAuth"
+        - "P08 BO-1177 API Security, Access & Integration Permissions"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P10 PTR-019 API Credentials & Integration"
+        - "P14 DEV-004 Sandbox"
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-agreed: '29 September: 17 September minutes M17-06; shape follows listIntegrationListings, paged'
+      summary: Production access requests, pending first
+      description: >
+        The approval queue for production keys (M17-06). A developer sees their own organisation's
+        requests; TICVAI staff see every request.
+
+        **Order.** Pending first (by `status`), then newest first, by `requestedAt` descending, then by `id`.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [pending, approved, rejected, withdrawn] }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Requests
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ProductionAccessRequest' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /production-access-requests/{requestId}/decide:
+    parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: decideProductionAccess
+      x-ticvai-consumed-by:
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-agreed: '29 September: 17 September minutes M17-06 (TICVAI-generated production keys, configurable expiry); shape follows certifyIntegration'
+      summary: Approve or reject production access
+      description: >
+        **TICVAI issues production keys** (M17-06). Approving creates the production `ApiClient`
+        (`environment: production`, `issuedBy: ticvai`, the certified listing, the scopes, tenants
+        and allow-list as approved or narrowed, `credentialTtlDays` as set) with no secret yet; the
+        developer takes the secret once with `rotateApiCredential`. Rejecting needs a reason the
+        developer can act on. A request whose certification lapsed since it was made is refused 409
+        `certification-required`.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [approve, reject] }
+                reason: { type: string, nullable: true, maxLength: 1000 }
+                scopes:
+                  type: array
+                  description: Narrow the requested scopes. Never widens them.
+                  items: { type: string }
+                credentialTtlDays: { type: integer, minimum: 1, maximum: 730, default: 365 }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Decided. On approval, `productionClientId` names the new client.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductionAccessRequest' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: >
+            Already decided (`already-decided`), or the listing's certification lapsed since the
+            request (`certification-required`).
+          x-ticvai-problem-types:
+            - already-decided
+            - certification-required
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          x-ticvai-problem-types: [reason-required]
+          description: '`reject` without a `reason`.'
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-anomaly-rules:
+    get:
+      operationId: listApiAnomalyRules
+      x-ticvai-consumed-by:
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The rules that flag abnormal API traffic
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        DEV-008 and ADM-015 set anomaly rules with `setApiAnomalyRule` and nothing read them. Returns what
+        the write stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The rules that flag abnormal API traffic
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApiAnomalyRule'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /api-anomaly-rules/{anomalyRuleId}:
+    put:
+      operationId: setApiAnomalyRule
+      x-ticvai-consumed-by:
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P14 DEV-008 Programme Administration"
+      x-ticvai-agreed: '29 September: 17 September minutes M17-07 (API security monitoring flags excessive or abnormal volume); shape follows setApiQuota'
+      summary: When API traffic is flagged as abnormal
+      description: >
+        **Monitoring that flags abnormal request volume** (17 September minutes, M17-07). A rule
+        compares a client's traffic with its own baseline (the same hour over the last four weeks)
+        or with a fixed ceiling: calls per minute, the 4xx share, refusals from outside the
+        allow-list, or calls to operations outside the client's usual set. A breach records an
+        `ApiAnomaly` and publishes `apiClient.anomalyDetected`; `action` may also throttle or
+        suspend the client (`setApiClientStatus`), and suspension is audited. Matched on `ruleKey`:
+        replaces or creates. Quotas stay on `setApiQuota`; this watches what quotas do not catch.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: anomalyRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApiAnomalyRule' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiAnomalyRule' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /api-anomalies:
+    get:
+      operationId: listApiAnomalies
+      x-ticvai-consumed-by:
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P14 DEV-006 Usage & Limits"
+      x-ticvai-agreed: '29 September: 17 September minutes M17-07; shape follows listWebhookDeliveries, paged'
+      summary: Flagged API traffic
+      description: >
+        Anomalies flagged by the rules (M17-07), newest first. A developer sees their own clients'
+        anomalies on DEV-006, so they learn about a runaway integration from TICVAI's panel before a
+        venue calls them; TICVAI staff see every client's on ADM-015.
+
+        **Order.** Newest first, by `detectedAt` descending, then by `id`.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: analytical
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: clientId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: from
+          in: query
+          schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Anomalies
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ApiAnomaly' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Staff session token (common.yaml bearerAuth). Added 29 September (system-design review SD-054).
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
+  # **Server-owned fields are `readOnly`, secrets are `writeOnly`.** The create operations here
+  # take the resource schema as their body, so without the marks a client had to invent the id
+  # and the status. OpenAPI 3.1: a `readOnly` property listed in `required` is required in
+  # responses only, and a client that sends one has it ignored. Status moves through the
+  # operations that own it (verification, revocation, certification, endpoint verification).
+  schemas:
+    ApiScope:
+      type: object
+      x-ticvai-persistence: none — generated at release from x-ticvai-api-scope on each partner-callable operation
+      description: >
+        **One module scope** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, and the
+        operations it opens.
+
+        **A write scope never opens a catalogue write** (M17-04): `ticketing.write` opens carts,
+        orders and holds for a partner or developer client, and no product, price list, price,
+        channel capacity, lifecycle or alternative-code write, since those operations are not
+        partner-callable and carry no `x-ticvai-api-scope`. Only a platform-staff
+        `ApiLicence.catalogueWriteException` opens one, for one named client.
+      required: [scope, module, access]
+      properties:
+        scope: { type: string, description: 'e.g. `ticketing.read`.' }
+        module: { $ref: '../shared/common.yaml#/components/schemas/ModuleKey' }
+        access: { type: string, enum: [read, write] }
+        description: { type: string }
+        operations:
+          type: array
+          items:
+            type: object
+            properties:
+              contract: { type: string }
+              operationId: { type: string }
+        licensed:
+          type: boolean
+          description: Whether the caller's tenant licenses the module (`ApiLicence.licensedModules`).
+
+    ProductionAccessRequest:
+      type: object
+      x-ticvai-persistence: "control.production_access_request"
+      description: >
+        **A developer's request for production keys** (17 September minutes, M17-06): sandbox, then
+        certification, then production.
+      required: [id, developerId, sandboxClientId, listingId, status]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        developerId: { type: string, format: uuid, readOnly: true, x-ticvai-references: control.developer_account }
+        sandboxClientId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: control.api_client
+        listingId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.integration_listing
+        scopes: { type: array, items: { type: string } }
+        allowedTenantIds: { type: array, items: { type: string, format: uuid } }
+        ipAllowList: { type: array, items: { type: string } }
+        note: { type: string, nullable: true }
+        status: { type: string, enum: [pending, approved, rejected, withdrawn], readOnly: true }
+        decidedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+        decidedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+        reason: { type: string, nullable: true, readOnly: true }
+        productionClientId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: control.api_client
+        requestedAt: { type: string, format: date-time, readOnly: true }
+
+    ApiAnomalyRule:
+      type: object
+      x-ticvai-persistence: "control.api_anomaly_rule"
+      description: >
+        **When API traffic is abnormal** (17 September minutes, M17-07). Platform defaults ship for
+        every tenant; TICVAI tightens them per tenant or per client.
+      required: [ruleKey, measure, comparison, threshold, action]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        ruleKey: { type: string }
+        clientId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: control.api_client
+          description: Null applies to every client of the tenant.
+        measure:
+          type: string
+          enum: [callsPerMinute, clientErrorShare, allowListRefusals, unusualOperations, authFailures]
+        comparison:
+          type: string
+          enum: [aboveBaselineMultiple, aboveFixed]
+          description: '`aboveBaselineMultiple`: above `threshold` x the same hour over the last four weeks.'
+        threshold: { type: number }
+        windowMinutes: { type: integer, minimum: 1, default: 5 }
+        action: { type: string, enum: [flag, throttle, suspend], default: flag }
+        isActive: { type: boolean, default: true }
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The tenant a rule belongs to** (4 October 2026, CHG-FXC-003). Null for a platform default, which
+            every tenant reads; `listApiAnomalyRules` returns the platform defaults and the caller tenant''s own rules.'
+        scopePath:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The tenant's root scope path for a tenant rule (scope row-level security); null for a platform default.
+
+    DeveloperMember:
+      type: object
+      x-ticvai-persistence: control.developer_member
+      description: '**One person at a developer organisation** (`setDeveloperMembers`, 4 October 2026, CHG-FXC-005).
+        Developer-portal people are not tenant staff: they are kept here in the control database beside
+        `control.developer_account`, keyed by email, and never become `identity.principal` or `identity.delegated_access`
+        rows (the Sprint 1-2 judging found no email column on a principal and no permission a portal role could map to).
+        A new email is invited (`status` `invited`) and becomes `active` when the person signs in to the portal with it.
+        What each role may do in the portal: `owner` everything and the member list, `admin` everything but removing the
+        owner, `developer` its own clients and credentials, `readOnly` view.'
+      required: [email, role, status]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        developerAccountId: { type: string, format: uuid, readOnly: true }
+        email: { type: string, format: email }
+        role: { type: string, enum: [owner, admin, developer, readOnly] }
+        status: { type: string, enum: [invited, active, removed], readOnly: true }
+        invitedAt: { type: string, format: date-time, readOnly: true }
+        activatedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+    ApiAnomaly:
+      type: object
+      x-ticvai-persistence: "control.api_anomaly"
+      description: One flagged breach of an anomaly rule (M17-07).
+      required: [id, ruleKey, clientId, detectedAt]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        ruleKey: { type: string }
+        clientId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.api_client
+        measure: { type: string }
+        observed: { type: number }
+        baseline: { type: number, nullable: true }
+        actionTaken: { type: string, enum: [flag, throttle, suspend] }
+        detectedAt: { type: string, format: date-time }
+        resolvedAt: { type: string, format: date-time, nullable: true }
+    DeveloperAccount:
+      type: object
+      x-ticvai-persistence: "control.developer_account"
+      description: >
+        13.1.6 to 13.1.9. **An organisation, because an integration outlives the engineer who built
+        it.** A credential tied to somebody's personal account dies when they leave.
+
+        **Not a tenant and not a partner.** A partner resells tickets; a developer writes software,
+        and one organisation may be both.
+      required: [id, organisationName, contactEmail, status]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        organisationName: { type: string }
+        contactEmail: { type: string, format: email }
+        websiteUrl: { type: string, nullable: true }
+        countryCode: { type: string }
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where this developer is also a commercial partner. **The link exists and the two are not
+            the same record**, which is what CF-135a was about.
+        status: { type: string, enum: [pending, verified, suspended, closed], readOnly: true }
+        verifiedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+
+    ApiClient:
+      type: object
+      x-ticvai-persistence: "control.api_client"
+      description: >
+        CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own,
+        so a partner API key, a POS integration credential and a webstore credential were three
+        unrelated things with three lifecycles.
+      required: [id, developerId, name, environment, scopes, status]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        developerId: { type: string, format: uuid, x-ticvai-references: control.developer_account }
+        name: { type: string }
+        clientId: { type: string, readOnly: true }
+        environment:
+          type: string
+          enum: [sandbox, production]
+          description: >
+            **Bound to one, stated on the object rather than by naming convention.** A key that
+            works in both is a key somebody will use in the wrong one.
+        scopes:
+          type: array
+          description: >
+            **Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here
+            and not licensed there produces no token — and the refusal is at issue rather than at
+            call time, so an integrator finds out in testing. **Module scopes** (17 September minutes,
+            M17-05): `{module}.read` or `{module}.write`, one of `listApiScopes`.
+          items:
+            type: string
+            pattern: '^[a-zA-Z]+\.(read|write)$'
+        issuedBy:
+          type: string
+          enum: [partner, ticvai]
+          readOnly: true
+          description: >
+            Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production
+            key issued on an approved `requestProductionAccess`.
+        certificationListingId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: control.integration_listing
+          description: For a production client, the certified integration it was issued against.
+        credentialTtlDays:
+          type: integer
+          minimum: 1
+          maximum: 730
+          nullable: true
+          description: Key lifetime. Default 365 for production, 90 for sandbox (M17-06, configurable expiry).
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the key stops working unless rotated. No token is issued after it.
+        allowedTenantIds:
+          type: array
+          description: >
+            13.1.46. **Which tenants this client may act for.** A developer integrating for one
+            venue must not reach another, and a client with an empty list reaches none.
+          items: { type: string, format: uuid }
+        ipAllowList:
+          type: array
+          description: >
+            13.1.38. **Required on a production client** (17 September minutes, M17-07: endpoints are
+            protected by IP allow-listing, not left open to the internet); optional in the sandbox.
+            CIDR ranges. Checked at token issue and on every call.
+          items: { type: string }
+        status: { type: string, enum: [active, suspended, revoked], readOnly: true }
+        lastUsedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: >
+            **A credential unused for a year is a credential nobody will notice being stolen.**
+        statusReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: Why the client was suspended (`setApiClientStatus`).
+
+    Sandbox:
+      type: object
+      x-ticvai-persistence: "control.sandbox"
+      description: >
+        D2 and D3. **One shared TICVAI sandbox, synthetic data only.**
+      required: [id, name, status, dataProfile]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        name: { type: string }
+        developerId: { type: string, format: uuid }
+        status: { type: string, enum: [provisioning, active, resetting, expired, deleted], readOnly: true }
+        dataProfile: { $ref: '#/components/schemas/SyntheticDataProfile' }
+        containsProductionData:
+          type: boolean
+          default: false
+          readOnly: true
+          description: >
+            **Always false, and stated rather than assumed** (D2). No cloning, no masking. It is a
+            field so that a future reversal is a visible change rather than a silent one — and
+            because **the whole PDPL and DESC argument for this contract rests on it.**
+        expiresAt: { type: string, format: date-time, readOnly: true }
+        lastResetAt: { type: string, format: date-time, nullable: true, readOnly: true }
+
+    SyntheticDataProfile:
+      type: object
+      description: >
+        13.2.5 and 13.2.13. **What the synthetic dataset contains**, so a developer can test against
+        a shape that resembles a real venue without any of it being real.
+
+        **Generated, not sampled.** Sampling production and calling it synthetic is masking with
+        extra steps.
+      properties:
+        venueKind: { type: string, enum: [themePark, waterPark, museum, theatre, stadium, arena, mixed] }
+        productCount: { type: integer, default: 200 }
+        guestCount: { type: integer, default: 5000 }
+        seatMapIncluded: { type: boolean, default: true }
+        historicalMonths:
+          type: integer
+          default: 12
+          description: >
+            **Backdated synthetic orders**, because an integration reading a reporting API against an
+            empty venue tests nothing.
+        locale: { type: string, default: en-AE }
+
+    WebhookEventType:
+      type: string
+      description: >
+        **The webhook event catalogue: every event a subscription may name** (29 September, build
+        pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`,
+        published through the outbox of the tenant database by exactly one context. A name is added here in the same
+        change that adds its event file, and never before.
+
+        **Added 29 September**, each closing a requirement that had the webhook mechanism and nothing
+        to subscribe to:
+
+        | Events | Publisher | Requirement |
+        |---|---|---|
+        | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 |
+        | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 |
+        | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 |
+        | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 |
+        | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 |
+        | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) |
+        | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) |
+        | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |
+
+        **Deprecated** (1 October, ADR-0067 amendment): `device.enrolmentChanged` is still offered but nothing
+        inside the platform consumes it any more; it is removed at the next major version of this API.
+        Subscribers are told in the release note.
+
+        **Published and deliberately not offered** (29 September, build pass, group G2):
+        `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of
+        them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is
+        high-volume fraud telemetry, not a business fact a receiver acts on.
+      x-ticvai-deprecated-values: [device.enrolmentChanged]   # ADR-0067 amendment, 1 October
+      enum:
+        - access.validated
+        - accreditation.applicationDecided
+        - accreditation.credentialIssued
+        - accreditation.holderStatusChanged
+        - accreditation.renewalDue
+        - ai.ceilingApproaching
+        - apiClient.anomalyDetected
+        - approval.escalated
+        - approval.expired
+        - approval.granted
+        - approval.rejected
+        - approval.requested
+        - approval.stepCompleted
+        - assets.documentIndexed
+        - cart.abandoned
+        - catalogue.productPublished
+        - consent.deviceConsentClaimed
+        - consent.deviceConsentRecorded
+        - conversation.handedOver
+        - device.enrolmentChanged
+        - device.firmwareReleased
+        - device.firmwareRolloutCompleted
+        - device.statusChanged
+        - device.tamperDetected
+        - entitlement.expiringSoon
+        - entitlement.issued
+        - entitlement.statusChanged
+        - fnb.menuPublished
+        - fnb.orderReady
+        - inventory.purchaseOrderReceived
+        - ledger.journalPosted
+        - ledger.periodClosed
+        - maintenance.assetReturnedToService
+        - maintenance.templatePublished
+        - maintenance.workOrderCompleted
+        - marketing.caseClosed
+        - order.chargebackRecorded
+        - order.completed
+        - order.paid
+        - order.refunded
+        - performance.cancelled
+        - reporting.definitionPublished
+        - retail.merchandisePublished
+        - seat.blocked
+        - seat.held
+        - seat.released
+        - seat.sold
+        - seatMap.published
+        - shift.closed
+        - stock.depleted
+        - tenant.suspended
+        - whitelabel.contentPublished
+
+    WebhookEventCatalogueEntry:
+      type: object
+      x-ticvai-persistence: none — read from the event catalogue (events/*.yaml) shipped with the release
+      description: >
+        One event a webhook may subscribe to, as the event catalogue declares it. What a receiver
+        needs to write a handler: the name, the version in the payload, who publishes it, what it is
+        about and when, and the payload fields.
+      required: [name, version, publisher]
+      properties:
+        name: { $ref: '#/components/schemas/WebhookEventType' }
+        version: { type: integer, minimum: 1 }
+        publisher:
+          type: string
+          description: The one context that publishes it.
+        aggregate:
+          type: string
+          description: What the event is about. Delivery is ordered within one instance of it.
+        description: { type: string }
+        emittedWhen: { type: string, nullable: true }
+        payload:
+          type: array
+          items:
+            type: object
+            required: [field, type]
+            properties:
+              field: { type: string }
+              type: { type: string }
+              required: { type: boolean, default: true }
+              notes: { type: string, nullable: true }
+
+    WebhookSubscription:
+      type: object
+      x-ticvai-persistence: "control.webhook_subscription"
+      description: >
+        13.1.26, 13.3.18 and 13.3.22. **The 29 events already exist and nothing outside could
+        receive one.**
+      required: [id, clientId, endpointUrl, eventTypes, status]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        clientId: { type: string, format: uuid, x-ticvai-references: control.api_client }
+        endpointUrl: { type: string }
+        eventTypes:
+          type: array
+          description: >
+            **Filtered at subscription, not at delivery.** A subscriber taking every event and
+            discarding 99% is a subscriber the platform pays to talk to. Each entry is a name from
+            the webhook event catalogue (`WebhookEventType`).
+          items: { $ref: '#/components/schemas/WebhookEventType' }
+        filters:
+          type: object
+          nullable: true
+          description: 13.3.22. Tenant, venue, or a business condition on the payload.
+          additionalProperties: true
+        signingSecret:
+          x-ticvai-secret: vault-reference
+          type: string
+          format: password
+          writeOnly: true
+          description: >
+            **How the receiver knows it was TICVAI.** Without a signature an endpoint accepts a
+            ticket-sale event from anybody who learns the URL.
+
+            **Write-only: accepted on create, never returned.** The same rule as `clientSecret` — a
+            system that can show you a secret later is a system that hands it to whoever reads
+            the subscription.
+        status: { type: string, enum: [pendingVerification, active, paused, failing, disabled], readOnly: true }
+        consecutiveFailures: { type: integer, readOnly: true }
+        disabledReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: >
+            13.1.29. **An endpoint failing for days is disabled rather than retried forever**, and
+            the developer is told — a queue growing against a dead endpoint is a cost the platform
+            carries silently.
+
+    WebhookDelivery:
+      type: object
+      x-ticvai-persistence: "control.webhook_delivery"
+      description: >
+        13.1.30. **The log a developer needs most**, and without it every question becomes a support
+        ticket.
+      required: [id, subscriptionId, eventType, status]
+      properties:
+        id: { type: string, format: uuid }
+        subscriptionId: { type: string, format: uuid, x-ticvai-references: control.webhook_subscription }
+        eventId: { type: string, format: uuid }
+        eventType: { type: string }
+        status: { type: string, enum: [pending, delivered, failed, retrying, abandoned] }
+        attemptCount: { type: integer }
+        responseCode: { type: integer, nullable: true }
+        responseBodyExcerpt:
+          type: string
+          nullable: true
+          description: >
+            **Truncated, and it is what makes the log useful** — a 500 with the receiver's own error
+            message in it answers the question without a conversation.
+        isReplay: { type: boolean, default: false }
+        replayId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: control.webhook_replay
+          description: The replay that re-delivered it (`replayEvents`; ADAM CR-140, CHG-CRA-004); null for a live delivery.
+        isTest:
+          type: boolean
+          default: false
+          description: >
+            Sent by `testWebhookSubscription` (VM close-out, 29 September). Marked in the payload so a
+            receiver never books it, and never counted towards `consecutiveFailures`.
+        deliveredAt: { type: string, format: date-time, nullable: true }
+
+    ApiQuota:
+      type: object
+      x-ticvai-persistence: "control.api_limit"
+      description: >
+        13.1.36 and 13.1.37. **A quota protects the venue, not the developer.**
+      required: [clientId, sustainedPerMinute]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        clientId: { type: string, format: uuid, x-ticvai-references: control.api_client }
+        sustainedPerMinute: { type: integer }
+        burstPerSecond:
+          type: integer
+          description: >
+            **Separate from the sustained rate**, because a nightly sync is a legitimate spike and a
+            flat per-second limit either blocks it or permits the flood it was meant to stop.
+        dailyCap: { type: integer, nullable: true }
+        perOperationOverrides:
+          type: object
+          additionalProperties: { type: integer }
+          description: >
+            **Availability checks and order creation deserve different limits** — one is cheap and
+            polled, the other is expensive and rare.
+        onBreach: { type: string, enum: [throttle, reject, queue], default: throttle }
+
+    ApiUsageSummary:
+      type: object
+      description: >
+        13.1.16 to 13.1.20, 13.1.41 to 13.1.45. **One endpoint because they are one question asked
+        five ways.**
+      properties:
+        totalCalls: { type: integer }
+        successRate: { type: number }
+        clientErrorRate:
+          type: number
+          description: >
+            **4xx — the integrator's problem.** Separated because a single error rate lets both
+            sides blame the other.
+        serverErrorRate:
+          type: number
+          description: 5xx — TICVAI's problem.
+        p50LatencyMs: { type: number }
+        p95LatencyMs: { type: number }
+        p99LatencyMs: { type: number }
+        quotaBreaches: { type: integer }
+        byOperation:
+          type: array
+          items:
+            type: object
+            properties:
+              operationId: { type: string }
+              calls: { type: integer }
+              errorRate: { type: number }
+
+    ApiVersion:
+      type: object
+      x-ticvai-persistence: "control.api_version"
+      description: >
+        13.1.31 to 13.1.35, ADR-0026. **CF-141 is sharper under D1**: a single supported production
+        version was tenable when only Softlabs called the API, and **with third parties a breaking
+        change with no window breaks somebody else's business.**
+      required: [version, status]
+      properties:
+        version: { type: string }
+        status: { type: string, enum: [preview, current, deprecated, sunset] }
+        releasedAt: { type: string, format: date-time }
+        deprecatedAt: { type: string, format: date-time, nullable: true }
+        sunsetAt: { type: string, format: date-time, nullable: true }
+        minimumNoticeMonths:
+          type: integer
+          default: 12
+          description: >
+            **The commitment, not the intention.** A deprecation policy without a stated minimum is
+            a policy that shortens under pressure.
+        migrationGuideUrl: { type: string, nullable: true }
+        activeClientCount: { type: integer, readOnly: true }
+        changes:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          type: array
+          description: >
+            **The developer changelog for this version** (17 September minutes, M17-14): every operation
+            added, changed, deprecated or removed, and whether the change is breaking under ADR-0026.
+            Generated at release from the contract diff; shown on DEV-001.
+          items:
+            type: object
+            required: [operationId, kind]
+            properties:
+              operationId: { type: string }
+              contract: { type: string }
+              kind: { type: string, enum: [added, changed, deprecated, removed] }
+              breaking: { type: boolean, default: false }
+              summary: { type: string }
+
+    IntegrationListing:
+      type: object
+      x-ticvai-persistence: "control.integration_listing"
+      description: >
+        13.1.50, decision D1. **A listing, not an installation.** The integration runs on the
+        developer's own infrastructure.
+
+        **Third-party code does not execute inside TICVAI** — stated rather than assumed, because
+        that is a different product with a different threat model.
+      required: [id, developerId, name, category, status]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        developerId: { type: string, format: uuid, x-ticvai-references: control.developer_account }
+        name: { type: string }
+        category: { type: string, enum: [crm, marketing, accounting, hotel, transport, analytics, accessibility, other] }
+        description: { type: string }
+        integrationUrl: { type: string }
+        requiredScopes: { type: array, items: { type: string } }
+        status: { type: string, enum: [draft, submitted, inReview, certified, rejected, revoked, delisted], readOnly: true }
+        certifiedUntil:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: >
+            **Certification expires.** An integration certified against v1 and still listed after v3
+            is TICVAI vouching for something it has not looked at in two years.
+        certifiedAgainstVersion: { type: string, nullable: true, readOnly: true }
+        listingFeeModel: { type: string, enum: [none, flat, revenueShare], nullable: true }
+        visibility:
+          type: string
+          enum: [public, private]
+          default: public
+          description: >
+            `private`: certified for production access and never shown in the marketplace (17 September
+            minutes, M17-06). `public`: also listed once certified.
+
+    ApiLicence:
+      type: object
+      x-ticvai-persistence: "control.api_licence"
+      description: >
+        13.3.24, decision D5. **Configuration, not code** — rates and terms change without a
+        release.
+
+        **The rates themselves are CF-135c and remain open.** This is the surface they will be set
+        through.
+      required: [tenantId, licensedModules]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        tenantId: { type: string, format: uuid, readOnly: true }
+        licensedModules:
+          type: array
+          description: >
+            **The example in the requirement is the shape**: a venue licensing the ticketing API and
+            not the F&B one. **The platform module list** (17 September minutes, M17-05), so the licence,
+            the scope catalogue and the modules a tenant buys are one vocabulary.
+          items: { $ref: '../shared/common.yaml#/components/schemas/ModuleKey' }
+        callAllowancePerMonth: { type: integer, nullable: true }
+        catalogueWriteException:
+          type: object
+          nullable: true
+          description: >
+            **M17-04: the one way a client reaches a catalogue write**, set by TICVAI platform staff
+            only (`setApiLicensing` refuses anyone else 403 `platform-staff-only`). Null, the default,
+            means no partner or developer client of this tenant can create or change products, price
+            lists, prices, channel capacity, lifecycle or alternative codes.
+          required: [clientId, operationIds, reason, grantedUntil]
+          properties:
+            clientId:
+              type: string
+              format: uuid
+              x-ticvai-references: control.api_client
+            operationIds:
+              type: array
+              minItems: 1
+              items:
+                type: string
+                enum: [createProduct, updateProduct, setProductAttributes, createPriceList, updatePriceList, copyPriceList, setPrices, createChannelCapacity, updateChannelCapacity, setChannelAllocations, transitionProductLifecycle, setAlternativeCodes]
+            reason: { type: string, maxLength: 500 }
+            grantedByPrincipalId: { type: string, format: uuid, readOnly: true }
+            grantedUntil: { type: string, format: date }
+        overageRatePerThousand: { type: number, nullable: true }
+        revenueSharePercent: { type: number, nullable: true }
+        effectiveFrom: { type: string, format: date }
+        effectiveTo: { type: string, format: date, nullable: true }
+    WebhookReplayJob:
+      type: object
+      x-ticvai-persistence: control.webhook_replay
+      description: '**A queued replay** (`replayEvents`): the window and event types it re-delivers. Each delivery it
+        makes is marked as a replay in its payload. **Stored** (ADAM CR-140, option 1, 18 October 2026; CHG-CRA-004):
+        one `control.webhook_replay` row per request, which the workers host''s replay dispatcher drains; each
+        delivery it writes is a `control.webhook_delivery` with `isReplay` true and this `replayId`.'
+      required: [replayId, subscriptionId, from, status, queuedAt]
+      properties:
+        replayId: { type: string, format: uuid, x-ticvai-column: id }
+        subscriptionId: { type: string, format: uuid, x-ticvai-references: control.webhook_subscription }
+        from: { type: string, format: date-time, x-ticvai-column: window_from }
+        to: { type: string, format: date-time, nullable: true, x-ticvai-column: window_to }
+        eventTypes: { type: array, items: { $ref: '#/components/schemas/WebhookEventType' } }
+        status:
+          type: string
+          readOnly: true
+          enum: [queued, running, completed, failed]
+          default: queued
+          description: '`queued` until the dispatcher takes it; `running` while it re-delivers; `completed` or
+            `failed` when it stops (CR-140).'
+        queuedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: none
+          description: Who asked for the replay, a staff or partner principal; set by the server.

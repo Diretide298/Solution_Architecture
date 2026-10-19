@@ -1,0 +1,27 @@
+id: CHG-R8GEN-011
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'repos/ticvai-contracts/openapi/ is a copy of contracts/ again: tools/derive-mirrors.py syncs spine, satellite and shared (and the contracts README) into it at every refresh, removing what the package no longer has (spine/cross-cell.yaml). The repository''s Makefile lints and bundles the satellite contracts as well as the spine.'
+decision:
+  what: 'r8 cause FOUNDATION-AI-C51. The npm publish step stays an echo until the registry is chosen (the previous cause); generate-clients.sh is unchanged.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, cause FOUNDATION-AI-C51 (ticket 27640 SETUP-CLIENTS; ADAM gap 27640/1).'
+keys_touched:
+  files:
+  - tools/derive-mirrors.py
+  - repos/ticvai-contracts/Makefile
+  - repos/ticvai-contracts/openapi
+root_class: 'a copy nothing refreshes'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-mirrors.py
+status: open

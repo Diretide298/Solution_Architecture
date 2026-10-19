@@ -1,0 +1,4143 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — Workforce
+  version: 1.0.0
+  x-ticvai-screen-count: 46
+  x-ticvai-module: "18 — Employee Mobile App & AI Assistant (workforce)"
+  x-ticvai-platforms:
+    - P06 Venue Staff App
+    - P08 Venue Management
+  # Derived from screens/*.yaml on 18 August — every platform with a screen that calls an
+  # operation in this contract. **Six contracts declared none**, which the viewer reports as
+  # missing taxonomy and no package checker tested for.
+  x-ticvai-tier: satellite
+  description: >
+    **Rota, attendance and announcements.** The three things the employee app needs that no
+    contract owned.
+
+    CF-71 called this "a task has no contract", and reading the fifty requirements showed the
+    premise was half wrong: **18.2.x is Work Order Inbox, Accept, Reject, Start, Pause,
+    Complete and Close** — a task in the employee app *is* a work order, and the fix there was
+    seven lifecycle operations on `maintenance`, not a new Task object. Building one would have
+    given a venue two inboxes for one job.
+
+    What genuinely had no home is here.
+
+    ## Rota is not a shift
+
+    `orders.pos_shift` is a cash-handling session — a drawer opened, counted and closed, tied to a
+    workstation. **A rota assignment is a person expected somewhere at a time**, and most of
+    the people on a rota never touch a till.
+
+    Conflating them is how a lifeguard becomes uncountable. The two link where they overlap: a
+    cashier's assignment names the workstation their shift will open on.
+
+    ## Attendance is not the rota either
+
+    The rota says who *should* be there. Attendance says who *was*. **The gap between them is
+    the entire operational value** — a venue with only the rota believes it is fully staffed
+    every day.
+
+    ## Dates are local
+
+    **Every `format: date` parameter here is a calendar day in the Region's time zone**
+    (`RegionSettings.timeZone`, which every venue inherits and cannot override), running from
+    local midnight to local midnight. Not UTC: in the Gulf a UTC day starts at four in the
+    morning, and a rota read by UTC days moves the night shift onto the wrong date. Instants
+    (`startsAt`, `occurredAt`) stay `date-time` in UTC, as everywhere else.
+
+    ## Deliberately not here
+
+    **Payroll.** Attendance produces hours; what they are worth is a finance system's problem
+    and almost certainly an existing one. This contract records the hours; it does not calculate
+    pay, and it has **no export operation** — neither of hours nor of the rota.
+
+    **Leave and absence approval.** Requests route through `approvals`, which already has
+    delegation, escalation and segregation of duties. A second approval mechanism here would be
+    the fifth one this platform has already collapsed.
+  contact:
+    name: TICVAI Platform
+servers:
+  - url: https://api.{region}.ticvai.com/workforce/v1
+    variables:
+      region:
+        default: ae
+security:
+  - bearerAuth: []
+tags:
+  - name: rota
+    description: Who is expected where, and when
+  - name: attendance
+    description: Who actually turned up
+  - name: announcements
+    description: Telling staff something
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  employeeRecords:
+    module: workforce
+    table: workforce.employee
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The workforce.employee rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/WorkforceEmployee'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its workforce.employee rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Tenancy implements.
+    served: [in-process]
+  shiftRecords:
+    module: workforce
+    table: workforce.shift
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The workforce.shift rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/WorkforceShift'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its workforce.shift rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  workAssignmentRecords:
+    module: workforce
+    table: workforce.work_assignment
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The workforce.work_assignment rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/WorkforceWorkAssignment'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its workforce.work_assignment rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Tenancy implements.
+    served: [in-process]
+paths:
+  /rota-assignments:
+    get:
+      operationId: listRotaAssignments
+      x-ticvai-consumed-by:
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-021 Roster"
+        - "P06 EMP-022 My rota"
+        - "P06 EMP-023 Swap request"
+        - "P08 BO-055 Rota & Scheduling"
+        - "P08 BO-712 Staff & Role Assignment Configuration"
+        - "P08 BO-714 Event Shift & Roster Configuration"
+        - "P08 BO-883 Workforce Roster Command Center"
+        - "P08 BO-884 Attraction & Operational Staffing Roster"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-audience: [staff]
+      summary: The rota
+      description: >
+        18.9.2. A supervisor sees the venue; a steward sees themselves. **The same operation,
+        scoped by permission** — a steward without `WORKFORCE_VIEW` gets their own assignments
+        and no one else's, which is what `EMP-022 My rota` renders.
+
+        **Order.** Soonest first, by `startsAt` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
+      tags: [rota]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: from
+          in: query
+          description: First calendar day, in the Region's time zone, not UTC.
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          description: Last calendar day, in the Region's time zone, not UTC.
+          schema: { type: string, format: date }
+        - name: principalId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: departmentId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Assignments
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/RotaAssignment' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+    post:
+      operationId: createRotaAssignment
+      x-ticvai-consumed-by:
+        - "P08 BO-055 Rota & Scheduling"
+        - "P08 BO-712 Staff & Role Assignment Configuration"
+        - "P08 BO-714 Event Shift & Roster Configuration"
+        - "P08 BO-884 Attraction & Operational Staffing Roster"
+        - "P08 BO-917 Event Staff & Personnel Allocation"
+      x-ticvai-read-via:
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-audience: [staff]
+      summary: Put someone on the rota
+      description: >
+        Refused where the person already has an overlapping assignment, or lacks the role the
+        position requires. **A rota that lets one person be in two places is a rota that gets
+        ignored.**
+
+        Where the position needs a till, the assignment names the workstation their shift will
+        open on — the link between a rota and a cash session, without merging the two.
+      tags: [rota]
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RotaAssignment' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Assigned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RotaAssignment' }
+        '409':
+          x-ticvai-problem-types: [rota-assignment-overlap, person-lacks-required-role]
+          description: Overlaps an existing assignment, or the person lacks the required role
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /guest-broadcast:
+    post:
+      operationId: broadcastToGuests
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: venue-map#pointRecords
+        route: service
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
+      x-ticvai-write-via:
+      - table: marketing.message_dispatch
+        operation: sendTransactionalMessage
+      summary: Venue-wide notice to every guest on site
+      description: >
+        BL-020. **`publishAnnouncement` carries an emergency kind and is staff-facing.** A venue-wide
+        evacuation notice is not a marketing message and must not ride the marketing path — **consent
+        and suppression do not apply to a fire.**
+
+        Reaches every guest with a live entitlement at this venue, by every channel they have.
+        **Bypasses quiet hours, journey throttling and channel preference**, which is the entire
+        reason it is a separate operation rather than a campaign with a flag.
+
+        **Requires two principals for `evacuation`.** A venue-wide alarm sent in error empties a
+        park and it is not recallable.
+
+        **`evacuation` requires `ANNOUNCEMENT_EMERGENCY`** (decided 28 September, audit R091 (1) and
+        R197): any other kind needs `ANNOUNCEMENT_PUBLISH`, and an evacuation sent by a caller
+        without `ANNOUNCEMENT_EMERGENCY` at this venue is a `403`. The escalation is by kind, not by
+        a value threshold.
+      tags: [workforce]
+      x-ticvai-permission: ANNOUNCEMENT_PUBLISH
+      x-ticvai-permission-escalated: ANNOUNCEMENT_EMERGENCY
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, message]
+              properties:
+                kind: { type: string, enum: [evacuation, weather, rideClosure, lostChild, operational, allClear] }
+                message: { type: string, maxLength: 300 }
+                messageLocalised:
+                  type: object
+                  additionalProperties: { type: string }
+                  description: >
+                    **Every enabled language, and a missing one is sent in the default rather than
+                    withheld.** A guest who cannot read the notice is better served than a guest who
+                    never receives it.
+                assemblyPointIds:
+                  type: array
+                  description: >
+                    For an evacuation. **The map resolves them to the nearest one per guest** where
+                    the venue is georeferenced — a single assembly point named in text sends
+                    everybody the same direction regardless of where they are standing.
+                  items: { type: string, format: uuid }
+                secondPrincipalId: { type: string, format: uuid, nullable: true }
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Broadcasting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestBroadcastAccepted'
+        '403':
+          description: >
+            The caller lacks `ANNOUNCEMENT_PUBLISH` at this venue, or sent `kind` `evacuation`
+            without `ANNOUNCEMENT_EMERGENCY` (problem type `emergency-permission-required`, audit
+            R091 (1)).
+          x-ticvai-problem-types:
+            - forbidden
+            - emergency-permission-required
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /rota-assignments/{assignmentId}:
+    parameters:
+      - name: assignmentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateRotaAssignment
+      x-ticvai-consumed-by:
+        - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-audience: [staff]
+      summary: Move or cancel an assignment
+      tags: [rota]
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateRotaAssignmentRequest' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RotaAssignment' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /rota-assignments/{assignmentId}/swap:
+    parameters:
+      - name: assignmentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: requestShiftSwap
+      x-ticvai-consumed-by:
+        - "P06 EMP-021 Roster"
+        - "P06 EMP-022 My rota"
+        - "P06 EMP-023 Swap request"
+        - "P08 BO-055 Rota & Scheduling"
+        - "P08 BO-939 Shift Change, Swap, Pickup & Release"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-audience: [staff]
+      summary: Ask someone to take your shift
+      description: |-
+        `EMP-023`. **Routes through `approvals`** rather than implementing its own — the supervisor approving a swap is the same mechanism as the one approving a refund, with the same audit trail and the same rule that a requester cannot approve themselves.
+        Both parties must accept before the supervisor sees it. A swap approved against someone who never agreed is a gap in the rota nobody notices until the shift starts.
+        **Who may swap with whom** (decided 28 September, audit R129 (6)): only two people holding the same role at the same venue. `toPrincipalId` must hold the assignment's `requiredRoleId` (or, where that is null, the requester's role for the assignment) at the assignment's venue; otherwise a `409` names which condition failed. **Every swap needs a supervisor's approval before it takes effect**: the request moves the rota assignment to `swapPending`, and the assignment changes hands only when the approval request is granted.
+
+        **The approval request it raises** (4 October 2026, CHG-FXC-008): `approvals.createApprovalRequest` with kind
+        `configurationChange`, `subjectType` `shiftSwap`, `subjectContract` `workforce` and `subjectId` the ShiftSwap's id,
+        once both parties have accepted. A venue's matrix routes it with a rule whose `subjectTypes` holds `shiftSwap`; with no
+        such rule the tenant default asks a supervisor at the assignment's venue.
+      tags: [rota]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [toPrincipalId]
+              properties:
+                toPrincipalId: { type: string, format: uuid }
+                reason: { type: string, maxLength: 300 }
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Awaiting the other party, then approval. The assignment is now `swapPending`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShiftSwap' }
+        '409':
+          description: >
+            The swap is not like for like (audit R129 (6)): the other person does not hold the
+            assignment's role (`swap-role-mismatch`), or is not staff at the assignment's venue
+            (`swap-venue-mismatch`). `detail` names which. Also refused when the assignment is not
+            `published` or `confirmed` (`assignment-not-swappable`).
+          x-ticvai-problem-types:
+            - swap-role-mismatch
+            - swap-venue-mismatch
+            - assignment-not-swappable
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /attendance:
+    get:
+      operationId: listAttendance
+      x-ticvai-consumed-by:
+        - "P06 EMP-024 Clock in / out"
+        - "P06 EMP-025 Break management"
+        - "P08 BO-056 Time & Attendance"
+        - "P08 BO-884 Attraction & Operational Staffing Roster"
+        - "P08 BO-888 Attendance & Live Workforce Command Center"
+      x-ticvai-audience: [staff]
+      summary: Who was here
+      description: >
+        18.9.1. **Against the rota, not on its own.** A list of clock-ins says nothing; a list
+        of clock-ins beside the assignments that expected them shows the no-shows, the late
+        starts and the people who covered.
+      tags: [attendance]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: date
+          in: query
+          description: A calendar day, in the Region's time zone, not UTC.
+          schema: { type: string, format: date }
+        - name: principalId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: exceptionsOnly
+          in: query
+          description: Late, absent, no clock-out. **The list a duty manager actually opens.**
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Attendance
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AttendanceRecord' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /attendance/clock:
+    post:
+      operationId: recordAttendance
+      x-ticvai-consumed-by:
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-024 Clock in / out"
+        - "P06 EMP-025 Break management"
+        - "P08 BO-889 Staff Check-In, Check-Out & Attendance Exceptions"
+        - "P08 BO-935 Assignment Detail & Operational Brief"
+        - "P08 BO-936 Mobile Staff Check-In & Check-Out"
+      x-ticvai-read-via:
+      - query: access#accessPointRecords
+        route: service
+        for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
+      x-ticvai-audience: [staff]
+      summary: Clock in, clock out, or take a break
+      description: >
+        18.9.1 and `EMP-024`, `EMP-025`. **Offline-capable and timestamped on the device**, then
+        reconciled. A steward clocking in at a gate with no signal must not be marked absent.
+
+        Where the venue requires it, the record carries the access point or geofence the clock
+        happened at — **a clock-in from a car park is a different fact from one at the staff
+        entrance**, and the difference is what makes attendance evidence rather than
+        self-report.
+
+        A missing clock-out is not corrected automatically. It is flagged, because guessing when
+        someone left is how a payroll dispute starts.
+
+        **Self clock-in only** (Chinmay, 3 October 2026, Block A business rules: "self clock-in
+        only"; CHG-RUL-016). The record is always the caller's own: the principal comes from the
+        session and the body names nobody, so a supervisor cannot clock a member of staff in or out
+        here, from a till, the staff app or the back office. A supervisor corrects a record
+        afterwards with `amendAttendance` (`WORKFORCE_MANAGE`), which keeps the original. BO-056's
+        "Record attendance" becomes "Amend attendance".
+      tags: [attendance]
+      x-ticvai-self-scoped: principal
+      x-ticvai-permission: ATTENDANCE_RECORD
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, occurredAt]
+              properties:
+                kind: { type: string, enum: [clockIn, clockOut, breakStart, breakEnd] }
+                occurredAt:
+                  type: string
+                  format: date-time
+                  description: Device time. The server records both this and when it arrived.
+                assignmentId: { type: string, format: uuid, nullable: true }
+                accessPointId: { type: string, format: uuid, nullable: true }
+                latitude: { type: number, nullable: true }
+                longitude: { type: number, nullable: true }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AttendanceRecord' }
+        '409':
+          x-ticvai-problem-types: [clock-out-without-clock-in, already-clocked-in]
+          description: >
+            Out of sequence — a clock-out with no clock-in, or a second clock-in. **Reported
+            rather than silently corrected.**
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /attendance/{recordId}/amend:
+    parameters:
+      - name: recordId
+        x-ticvai-column: workforce.attendance.id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: amendAttendance
+      x-ticvai-consumed-by:
+        - "P08 BO-056 Time & Attendance"
+        - "P08 BO-889 Staff Check-In, Check-Out & Attendance Exceptions"
+      x-ticvai-audience: [staff]
+      summary: A supervisor corrects a record
+      description: >
+        Forgotten clock-outs and phones that died. **The original is kept and the amendment is
+        recorded against it** — attendance feeds pay, and a record that can be quietly rewritten
+        is not evidence of anything.
+
+        **The supervisor's tool for attendance** (Chinmay, 3 October 2026; CHG-RUL-016): staff clock
+        themselves in and out with `recordAttendance`; a supervisor never records for them and
+        corrects here instead.
+
+        **Every correction is kept as its own row** (decided 28 September, audit R129 (7)): each
+        call appends one `AttendanceAmendment` (who, when, the time before, the time after, the
+        reason) to `workforce.attendance_amendment`. A record corrected twice has two rows; none is
+        overwritten. The record's `amendedByPrincipalId` and `amendmentReason` summarise the latest
+        one and are not where the history is kept.
+      tags: [attendance]
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [correctedAt, reason]
+              properties:
+                correctedAt: { type: string, format: date-time }
+                reason: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Amended, with the original retained
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AttendanceRecord' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /announcements:
+    get:
+      operationId: listAnnouncements
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+        - "P06 EMP-038 Broadcast to team"
+        - "P06 EMP-039 Announcements"
+        - "P06 EMP-047 Emergency mode"
+        - "P08 BO-066 Notification Settings"
+        - "P08 BO-941 Operational Notifications & Live Alerts"
+      x-ticvai-audience: [staff]
+      summary: What staff have been told
+      description: >
+        18.9.3 and 18.9.5. `EMP-039`.
+
+        **A staff member sees the announcements for their own venue and for every scope level
+        above it** (region, tenant), and never those targeted at a sibling venue (decided 28
+        September, audit R129 (8)). An announcement is in the list when one of its `venueIds` is the
+        caller's venue, or it targets a region or the tenant that contains that venue; department
+        and role targeting then narrow it within the venue.
+      tags: [announcements]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: unacknowledgedOnly
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Announcements
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Announcement' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+    post:
+      operationId: publishAnnouncement
+      x-ticvai-consumed-by:
+        - "P06 EMP-038 Broadcast to team"
+        - "P08 BO-066 Notification Settings"
+      x-ticvai-read-via:
+      - query: identity#roleRecords
+        route: in-process
+        for: 'its read of identity.role, Identity''s data (CHG-MOD-001)'
+      x-ticvai-audience: [staff]
+      summary: Tell staff something
+      description: >
+        18.9.3, 18.9.4, `EMP-038`. Targeted by venue, department or role.
+
+        **`emergency` is not a louder `operational`.** It overrides the home screen (`EMP-047`),
+        bypasses quiet hours, requires acknowledgement, and reports who has not acknowledged —
+        because during an evacuation the useful list is the people who have not confirmed they
+        know.
+
+        A separate permission, so the ability to post a staff notice does not carry the ability
+        to declare an emergency: **`kind` `emergency` requires `ANNOUNCEMENT_EMERGENCY`** (decided
+        28 September, audit R091 (1)), and an emergency published without it is a `403`. Every
+        other kind needs `ANNOUNCEMENT_PUBLISH` only.
+
+        **Delivered in the staff app and by push** (29 September, build, 18.1.5). `deliveryChannels`
+        names them: `inApp` is the announcement list and the home-screen banner; `push` goes to every
+        targeted person's staff phones, the tenancy `RegisteredDevice` rows of kind `mobileHandset` with a
+        push token (`registerDevice`), through the platform's push provider. A person with no registered
+        handset still gets it in the app. `emergency` always goes by both, whatever is sent, and bypasses
+        quiet hours; a push that fails is retried and counted on the handset (`pushFailureCount`), and
+        `AnnouncementReach` counts delivery per person, not per device.
+      tags: [announcements]
+      x-ticvai-permission: ANNOUNCEMENT_PUBLISH
+      x-ticvai-permission-escalated: ANNOUNCEMENT_EMERGENCY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Announcement' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Announcement' }
+        '403':
+          description: >
+            The caller lacks `ANNOUNCEMENT_PUBLISH` at the target scope, or sent `kind` `emergency`
+            without `ANNOUNCEMENT_EMERGENCY` (problem type `emergency-permission-required`, audit
+            R091 (1)).
+          x-ticvai-problem-types:
+            - forbidden
+            - emergency-permission-required
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /announcements/{announcementId}/acknowledge:
+    parameters:
+      - name: announcementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: acknowledgeAnnouncement
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+        - "P06 EMP-039 Announcements"
+        - "P06 EMP-047 Emergency mode"
+      x-ticvai-audience: [staff]
+      summary: Confirm you have read it
+      description: >
+        Queued offline. **An emergency acknowledgement that needs a network is one that does not
+        arrive when it matters most.**
+      tags: [announcements]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Acknowledged
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /announcements/{announcementId}/reach:
+    parameters:
+      - name: announcementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getAnnouncementReach
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+        - "P06 EMP-038 Broadcast to team"
+        - "P08 BO-066 Notification Settings"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-audience: [staff]
+      summary: Who has acknowledged, and who has not
+      description: >
+        **The second list is the one that matters.** For an operational notice it measures
+        whether anyone read it; during an emergency it is the roll call.
+      tags: [announcements]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: Reach
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnnouncementReach' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /training-records:
+    get:
+      operationId: listTrainingRecords
+      x-ticvai-consumed-by:
+        - "P06 EMP-041 Training"
+        - "P08 BO-057 Training & Certification"
+      x-ticvai-audience:
+      - staff
+      summary: Training completed and what is expiring
+      description: '**Drafted 4 September as a stub.** EMP-041 *Training* sat on `semanticSearch` alone, which made it identical to the knowledge base. **The F&B `fireCourse` / `holdCourse` / `setCourseRules` operations are meal courses, not training** - the name collision is why this gap survived a search. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Training completed and what is expiring
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrainingRecord'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /shift-swaps:
+    get:
+      operationId: listShiftSwapRequests
+      x-ticvai-consumed-by:
+        - "P06 EMP-023 Swap request"
+        - "P08 BO-887 Shift Marketplace & Workforce Requests"
+        - "P08 BO-939 Shift Change, Swap, Pickup & Release"
+      x-ticvai-audience:
+      - staff
+      summary: Swap requests and their state
+      description: '**Drafted 4 September as a stub.** `requestShiftSwap` existed and nothing could read the requests back, so EMP-023 shared the roster''s operations. **A request nobody can list is a request nobody can approve.** Returns the existing `ShiftSwap` schema: a first draft of this added a `ShiftSwapRequest` of its own and derived a second table for the same rows, which is the modelling mistake this package exists to make visible. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Swap requests and their state
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShiftSwap'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /shift-templates:
+    get:
+      operationId: listShiftTemplates
+      x-ticvai-consumed-by:
+        - "P08 BO-879 Shift Template & Assignment Configuration"
+      summary: Named shift patterns a rota is built from
+      description: 'Resource board 3.7. **`createRotaAssignment` placed one person in one slot and
+        nothing described the slot.** A rota built assignment by assignment is a rota typed out every
+        week; a template — early, late, split, double, on-call — is the unit a manager actually thinks
+        in.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShiftTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /shift-templates/{shiftTemplateId}:
+    put:
+      operationId: setShiftTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-714 Event Shift & Roster Configuration"
+        - "P08 BO-879 Shift Template & Assignment Configuration"
+      summary: Define a shift pattern, its breaks and its qualifications
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: shiftTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShiftTemplate'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShiftTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /staffing-rules:
+    put:
+      operationId: setStaffingRules
+      x-ticvai-consumed-by:
+        - "P08 BO-881 Overtime & Working-Hour Rules"
+        - "P08 BO-885 Minimum Staffing & Coverage Rule Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      summary: Minimum cover, working-hour limits and overtime
+      description: 'Resource boards 4.3 and 3.9. **Minimum staffing is a safety rule before it is a
+        cost rule.** A ride that requires two operators cannot run with one, and a rota that allows it
+        has produced a closure or an incident.
+
+        **Working-hour limits are law in most markets**, and a system that lets a manager roster
+        somebody for fourteen hours has made the venue liable rather than the manager.
+
+        **Writes `workforce.staffing_rules` and the rows of `workforce.position_requirement`** (decided 29 September,
+        writers pass): each `minimumCover` entry is one position requirement, and the set sent replaces the
+        venue''s set, so a position left out no longer has a minimum.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffingRules'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffingRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /staffing-coverage:
+    get:
+      operationId: getStaffingCoverage
+      x-ticvai-consumed-by:
+        - "P08 BO-714 Event Shift & Roster Configuration"
+        - "P08 BO-883 Workforce Roster Command Center"
+        - "P08 BO-884 Attraction & Operational Staffing Roster"
+        - "P08 BO-886 Staffing Gap & Coverage Control Center"
+        - "P08 BO-892 AI Workforce Planner & Roster Optimization"
+        - "P08 BO-927 AI Staffing Requirement Forecast"
+        - "P09 ADM-513 Workforce Demand & Staffing Forecast"
+      summary: Where the rota is short, and by how much
+      description: 'Resource board 4.4. **The gap is the product.** A rota screen showing who is on
+        shows nothing a manager cannot see; a screen showing that the north gate is one short at
+        fourteen hundred on Saturday is the reason the system exists.
+
+        Computed against minimum staffing and the qualifications each position requires — a position
+        filled by somebody not qualified for it is still a gap.
+
+        **Against the forecast as well as the minimum** (29 September, build pass, group G2; 8.2.49).
+        `basis` `forecastRequirement` measures the rota against the staff requirement the AI forecast
+        handed over (`ai.operationalRequirementIssued`, kind `staff`, kept in `workforce.forecast_requirement`
+        per position and period), and `higherOfBoth` against whichever is larger, so a Saturday the forecast
+        says will be busy shows as short even where the fixed minimum is met. Each row then carries the
+        forecast figure, its busy-case (p90) figure and the forecast version it came from. A period with no
+        handed-over requirement falls back to the minimum and says so (`basisApplied`).
+
+        **The shortage alert goes through reporting**: an `AlertRule` on metric `staffingShortfall` (the
+        largest `gap` in the window against the forecast requirement) raises an `Alert` to the dashboard panel
+        and the roles named, like any other operational alert. Workforce computes; it does not notify.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        required: true
+        description: First calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        description: Last calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: basis
+        in: query
+        description: What `required` is measured from. `minimum` is the configured minimum staffing (the
+          behaviour before 29 September, and the default); `forecastRequirement` the handed-over forecast
+          staff requirement; `higherOfBoth` the larger of the two.
+        schema:
+          type: string
+          enum:
+          - minimum
+          - forecastRequirement
+          - higherOfBoth
+          default: minimum
+      responses:
+        '200':
+          description: Coverage and its gaps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StaffingCoverage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /leave-requests:
+    get:
+      operationId: listLeaveRequests
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
+      summary: Leave, absence and their effect on cover
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Leave requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: requestLeave
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
+      summary: Ask for time off, against the cover it would cost
+      description: 'Resource board 3.8. **Approving leave without seeing the resulting gap is how a
+        venue discovers in July that four supervisors booked the same week.**
+
+        The response carries the coverage impact, so the approver sees it before deciding rather than
+        after.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Requested, with the coverage impact
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /labour-cost:
+    get:
+      operationId: getLabourCost
+      x-ticvai-consumed-by:
+        - "P08 BO-891 Labor Cost & Staffing Budget Control"
+      summary: Rostered and actual labour cost against budget
+      description: 'Resource board 4.9. **Rostered cost and actual cost diverge every single day**, and
+        the difference is overtime, no-shows and cover. A venue that only sees one of them cannot
+        explain its payroll.
+
+        Compared against budget per venue, department and period, because that is the granularity a
+        general manager is held to. The budgets are set with `setLabourBudget` (decided 29 September, writers
+        pass).
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        required: true
+        description: First calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        description: Last calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - venue
+          - department
+          - role
+          - day
+          - person
+      responses:
+        '200':
+          description: Cost against budget
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LabourCostRow'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /workforce-compliance:
+    get:
+      operationId: validateWorkforceCompliance
+      x-ticvai-consumed-by:
+        - "P08 BO-876 Certification & Expiry Management"
+        - "P08 BO-890 Workforce Compliance Validation Center"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      summary: Where the rota breaks a rule
+      description: 'Resource board 4.8. **Expired qualifications, exceeded hours, missed breaks,
+        under-age rostering and minimum-rest breaches** — checked against the rota before it is
+        published rather than discovered in an inspection.
+
+        **A lapsed lifeguard certificate is a safety failure, not a data-quality one**, which is the
+        line `resources` already takes on qualifications; this is where it reaches the rota.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        description: First calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: Last calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Breaches and warnings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceComplianceFinding'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /shift-marketplace:
+    get:
+      operationId: listOpenShifts
+      x-ticvai-consumed-by:
+        - "P08 BO-887 Shift Marketplace & Workforce Requests"
+      summary: Shifts offered back, and who may take them
+      description: 'Resource board 4.6. **`requestShiftSwap` needed a counterparty and there was
+        nowhere to find one.** An open-shift marketplace lets somebody release a shift and somebody
+        qualified pick it up, which is how a gap gets filled at nine on a Friday night without a
+        manager ringing round.
+
+        **Eligibility is enforced, not advisory.** A shift requiring a lifeguard qualification is not
+        offered to somebody without one.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      responses:
+        '200':
+          description: Open shifts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OpenShift'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: claimOpenShift
+      summary: Pick up a released shift
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - openShiftId
+              properties:
+                openShiftId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Claimed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenShift'
+        '409':
+          x-ticvai-problem-types: [open-shift-already-taken, shift-claimant-not-eligible, working-hour-rule-breach]
+          description: Already taken, not eligible, or it would breach a working-hour rule
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /employees:
+    get:
+      operationId: listEmployees
+      summary: People, as the HR system of record has them
+      description: 'Resource board 3 page 45, decision 6 of the schema merge. **The employee record
+        is a projection of an external system and this endpoint reads it, never writes it.** The write
+        path is a synchronisation run; `field_ownership` says which fields we may hold an opinion about
+        at all.
+
+        **`workforce.employee` had no operation of any kind until 20 September** — the rota, attendance
+        and leave were all wired and the people they are about were not.
+
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      parameters:
+      - name: employmentStatus
+        in: query
+        schema:
+          type: string
+      - name: jobTitleId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Employees
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceEmployee'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /employees/{employeeId}:
+    get:
+      operationId: getEmployee
+      x-ticvai-consumed-by:
+        - "P08 BO-874 Staff Resource Profile"
+      summary: One person, with their employment, postings and leave balances
+      description: 'Four tables and one question. **A profile screen that fans out across four list
+        endpoints is four round trips and four chances to show a half-loaded person**, so the
+        employment record, the postings and the leave balances come back composed.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      parameters:
+      - name: employeeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceEmployeeProfile'
+        '404':
+          x-ticvai-problem-types: [not-found]
+          description: No such employee
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /job-titles:
+    get:
+      operationId: listJobTitles
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+        - "P08 BO-873 Staff Resource Directory"
+      summary: The job titles a posting can name
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Job titles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceJobTitle'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /job-titles/{jobTitleId}:
+    put:
+      operationId: setJobTitle
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+      summary: Define a job title
+      description: '**Ours to configure even where the HRMS masters the people.** A venue names the
+        role a posting fills; the external system names the person who fills it.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: jobTitleId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceJobTitle'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceJobTitle'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /leave-types:
+    get:
+      operationId: listLeaveTypes
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
+      summary: Leave types and how each accrues
+      description: '**`requestLeave` existed and nothing described what could be requested.** A leave
+        request carries a type; the types were a vocabulary nobody could read.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Leave types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceLeaveType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /leave-types/{leaveTypeId}:
+    put:
+      operationId: setLeaveType
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
+      summary: Define a leave type
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: leaveTypeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceLeaveType'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceLeaveType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /leave-balances:
+    get:
+      operationId: listLeaveBalances
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
+      summary: What each person has left, by leave type
+      description: '**A leave request that cannot be checked against a balance is a form, not a
+        workflow.** `requestLeave` has existed since the contract was written and the balance it
+        should refuse against had no operation.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: employeeId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: leaveTypeId
+        x-ticvai-column: workforce.leave_balance.type_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceLeaveBalance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /shift-patterns:
+    get:
+      operationId: listShiftPatterns
+      x-ticvai-consumed-by:
+        - "P08 BO-879 Shift Template & Assignment Configuration"
+      summary: Named shift patterns
+      description: '**Distinct from `/shift-templates`, and the distinguishing column is
+        `crossesMidnight`.** A pattern says that 22:00 to 06:00 is one shift; a template carries two
+        timestamps and already knows. This is the definition, that is the instance.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Shifts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceShift'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /shift-patterns/{shiftPatternId}:
+    put:
+      operationId: setShiftPattern
+      x-ticvai-consumed-by:
+        - "P08 BO-879 Shift Template & Assignment Configuration"
+      summary: Define a shift pattern and its break
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: shiftPatternId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceShift'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceShift'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /work-assignments:
+    get:
+      operationId: listWorkAssignments
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+        - "P08 BO-873 Staff Resource Directory"
+      summary: Where each person is posted, and from when
+      description: '**A posting is not a rota slot.** `rota_assignment` says a principal works
+        Saturday 14:00 to 22:00; this says they are a Ride Operator at Venue 3, Attractions
+        department, from 1 March and primary. **A roster could not be checked against a posting
+        because only one of the two was wired.**
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: employeeId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: activeOn
+        in: query
+        description: Postings in force on this calendar day, in the Region's time zone. Omit for current.
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Postings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceWorkAssignment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /work-assignments/{workAssignmentId}:
+    put:
+      operationId: setWorkAssignment
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+      summary: Post a person to a job title at a venue
+      description: '**A posting ends by `effectiveTo`, never by deletion.** An attendance record from
+        March has to resolve against the posting that was in force in March.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - name: workAssignmentId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceWorkAssignment'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceWorkAssignment'
+        '409':
+          description: Overlaps an existing primary posting, or the employee is terminated externally
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /integration-sources:
+    get:
+      operationId: listIntegrationSources
+      x-ticvai-consumed-by:
+        - "P08 BO-874 Staff Resource Profile"
+        - "P08 BO-878 Staff Availability & Working Pattern"
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
+      summary: External systems that master workforce data, and their health
+      description: 'Resource board 10. **The six-state display the board asks for lives on this row** —
+        what is connected, when it last synchronised, and whether its credentials still work.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceIntegrationSource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /integration-sources/{sourceId}:
+    put:
+      operationId: setIntegrationSource
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
+      summary: Connect or reconfigure an external workforce system
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - name: sourceId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceIntegrationSource'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceIntegrationSource'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /integration-sources/{sourceId}/field-ownership:
+    get:
+      operationId: getFieldOwnership
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
+      summary: Which fields this source masters
+      description: 'Resource board 3, Ownership Rules: *"For every field, administrators shall determine
+        ... External System Master. This prevents conflicting updates."*
+
+        **Absent means ours**, so nothing has to be enumerated before it is decided and the set returned
+        here is only what somebody has actually said.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - name: sourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Ownership rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceFieldOwnership'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setFieldOwnership
+      x-ticvai-consumed-by:
+        - "P08 BO-878 Staff Availability & Working Pattern"
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
+      summary: Declare who masters each field
+      description: '**Set as a whole, not row by row.** Ownership is only meaningful read together —
+        a screen showing nine fields owned externally and one owned here is the artefact an
+        administrator is reasoning about, and applying it one row at a time leaves it inconsistent in
+        the middle.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - name: sourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/WorkforceFieldOwnership'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceFieldOwnership'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /sync-runs:
+    get:
+      operationId: listSyncRuns
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
+      summary: Synchronisation history, with counts
+      description: 'Resource board 10 asks the page to show successful records, failed records,
+        warnings and mapping errors rather than *"integration failed"*.
+
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: analytical
+      parameters:
+      - name: sourceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Runs
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceSyncRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: startSync
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
+      summary: Run a synchronisation now
+      description: '**This is the write path for `workforce.employee`.** The projection is not edited
+        through an API; it is replaced by what the system of record says, field by field, subject to
+        `field_ownership`.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One run per source at a time. Two concurrent runs against one HRMS
+        produce conflicts that are artefacts of the runs rather than of the data.
+
+        '
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - sourceId
+              properties:
+                sourceId:
+                  type: string
+                  format: uuid
+                dryRun:
+                  type: boolean
+                  default: false
+                  description: Report what would change without applying it.
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceSyncRun'
+        '409':
+          x-ticvai-problem-types: [sync-run-in-progress]
+          description: A run is already in progress for this source
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /sync-conflicts:
+    get:
+      operationId: listSyncConflicts
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
+      summary: Disagreements a person has to settle
+      description: 'Resource board 3 names the cases: an employee in HR and not here, a venue changed
+        externally, a certification expired, and *"employee terminated externally but has future TICVAI
+        assignments"*.
+
+        **`affectedAssignmentIds` is a snapshot, not a live join** — what was at risk when the conflict
+        was raised, which must not change when a roster does.
+
+        
+
+        **Order.** Newest first, by `raisedAt` descending, then by `id`.'
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - name: sourceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: kind
+        in: query
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Conflicts
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceSyncConflict'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: resolveSyncConflict
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
+      summary: Settle a disagreement
+      description: '**Board 3 requires the downstream consequence to be visible, not just the
+        conflict.** Resolving a terminated-externally conflict has to say what happens to the future
+        assignments it flagged, which is why the resolution names them rather than leaving a rota to
+        discover it.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveSyncConflictRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceSyncConflict'
+        '409':
+          x-ticvai-problem-types: [sync-conflict-already-resolved, resolution-not-for-kind]
+          description: Already resolved, or the resolution is not available for this kind
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /labour-budgets:
+    get:
+      operationId: listLabourBudgets
+      x-ticvai-consumed-by:
+        - "P08 BO-891 Labor Cost & Staffing Budget Control"
+      x-ticvai-agreed: '29 September: writers pass; resource board 4.9 (BO-891 Labor Cost & Staffing Budget
+        Control, "budget per venue, department and period"); shape follows listJobTitles with the Page envelope'
+      summary: Labour budgets, per venue, department and period
+      description: 'The budgets `getLabourCost` compares rostered and actual cost against (decided 29 September,
+        writers pass). Filtered by venue and department, and by a date range that returns every budget whose
+        period overlaps it.
+
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: departmentId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        description: First calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: Last calendar day, in the Region's time zone, not UTC.
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Budgets
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/LabourBudget'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /labour-budgets/{labourBudgetId}:
+    put:
+      operationId: setLabourBudget
+      x-ticvai-consumed-by:
+        - "P08 BO-891 Labor Cost & Staffing Budget Control"
+      x-ticvai-agreed: '29 September: writers pass; resource board 4.9 (BO-891 Labor Cost & Staffing Budget
+        Control); closes DM2 open item (workforce.labour_budget had no writer); shape follows setJobTitle'
+      summary: Set the labour budget for a venue, department and period
+      description: '**Writes `workforce.labour_budget`** (decided 29 September, writers pass), keyed by venue,
+        department and `periodStart`: a PUT for a key that exists replaces its `periodEnd` and amount, any
+        other creates a budget. A null `departmentId` is the whole venue''s budget.
+        **Periods for one venue and department never overlap** (`409`), so `getLabourCost` has exactly one
+        budget to compare each day against; `periodEnd` before `periodStart` is `422`. Changing a budget does
+        not rewrite past cost, only the comparison.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - name: labourBudgetId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabourBudget'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabourBudget'
+        '409':
+          x-ticvai-problem-types: [labour-budget-period-overlap]
+          description: The period overlaps another budget for the same venue and department
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          x-ticvai-problem-types: [period-ends-before-start]
+          description: periodEnd is before periodStart
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /staff-conversations:
+    get:
+      operationId: listStaffConversations
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+      x-ticvai-agreed: '29 September: our build plan (BL-163 asked for a decision on internal messaging; 18.9.5
+        Internal Messaging); shape follows listLabourBudgets with the Page envelope'
+      summary: The caller's staff conversations, newest activity first
+      description: '18.9.5, Internal Messaging (decided 29 September, build pass). **Announcements are one way;
+        this is the other half**: a direct or small-group conversation between staff, so a supervisor can
+        tell one attendant something without broadcasting it to the venue.
+
+
+        **Only the caller''s own conversations.** A manager does not read other people''s messages through
+        this list, whatever their permissions; a conversation is visible to its participants and no one
+        else. Each row carries the caller''s unread count.
+
+        
+
+        **Order.** Newest activity first, by `lastMessageAt` descending, then by `id`.'
+      tags:
+      - announcements
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: unreadOnly
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceStaffConversationSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /staff-conversations/{conversationId}/messages:
+    parameters:
+    - name: conversationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listStaffMessages
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+      x-ticvai-agreed: '29 September: our build plan (18.9.5 Internal Messaging, BL-163); shape follows
+        listLabourBudgets with the Page envelope'
+      summary: Messages in one staff conversation, newest first
+      description: 'Newest first, paged backwards with the cursor. **A caller who is not a participant gets a
+        `404`, not a `403`**: whether a conversation exists between two other people is itself not the
+        caller''s business.
+
+        
+
+        **Order.** Newest first, by `sentAt` descending, then by `id`.'
+      tags:
+      - announcements
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Messages
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceStaffMessage'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /staff-conversations/{conversationId}/read:
+    parameters:
+    - name: conversationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: markStaffConversationRead
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+      x-ticvai-agreed: '29 September: our build plan (18.9.5 Internal Messaging); shape follows
+        acknowledgeAnnouncement'
+      summary: Mark a staff conversation read up to a message
+      description: 'Moves the caller''s read marker forward to `upToMessageId` (never back), which is what the
+        unread count in `listStaffConversations` is computed from. Queued offline, like
+        `acknowledgeAnnouncement`. A caller who is not a participant gets a `404`.
+
+        '
+      tags:
+      - announcements
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - upToMessageId
+              properties:
+                upToMessageId:
+                  type: string
+                  format: uuid
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Marked read
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /staff-messages:
+    post:
+      operationId: sendStaffMessage
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+      x-ticvai-agreed: '29 September: our build plan (18.9.5 Internal Messaging; BL-163 "a decision on
+        internal messaging": decided, staff-to-staff conversations in workforce); shape follows
+        publishAnnouncement'
+      summary: Send a message to a colleague or a small group
+      description: '18.9.5 (decided 29 September, build pass). **Either into an existing conversation or to
+        named colleagues.** With `conversationId` the message joins that conversation; with
+        `recipientPrincipalIds` and no `conversationId` it reuses the caller''s direct conversation with a
+        single recipient, or starts a group conversation with several. One of the two is required (`422`).
+
+
+        **Recipients are staff of the caller''s venue** (a principal with an employment at it); anyone else is
+        a `422` naming them. A group is capped at 50 participants: past that it is an announcement, and
+        `publishAnnouncement` is the tool, with its targeting and acknowledgement.
+
+
+        **Queued offline and delivered once.** The client generates `id` (a UUIDv7); a replay of the same `id`
+        returns the stored message rather than sending twice. New messages push to the recipients'' staff
+        devices. Messages are workforce records under the tenant''s retention policy (ADR-0047); nothing here
+        is guest data.
+
+        '
+      tags:
+      - announcements
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceSendStaffMessageRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceStaffMessage'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          x-ticvai-problem-types: [conversation-or-recipients-required, recipient-not-venue-staff, group-too-large]
+          description: Neither conversationId nor recipientPrincipalIds, a recipient who is not staff of the
+            caller's venue, or a group over 50 participants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    WorkforceStaffConversation:
+      type: object
+      x-ticvai-persistence: workforce.staff_conversation
+      description: '**One direct or group conversation between staff of a venue** (18.9.5 Internal Messaging;
+        decided 29 September, build pass). Created by `sendStaffMessage` the first time colleagues are
+        messaged; its participants are `workforce.staff_conversation_participant` rows. Announcements stay the
+        one-to-many channel; this is the one-to-one and small-group one.'
+      required:
+      - id
+      - venueId
+      - kind
+      - createdByPrincipalId
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          x-ticvai-references: platform.scope
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+        kind:
+          type: string
+          enum:
+          - direct
+          - group
+          description: A direct conversation has exactly two participants and at most one exists per pair.
+        title:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: Group conversations only; null on a direct one.
+        createdByPrincipalId:
+          x-ticvai-references: identity.principal
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        lastMessageAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    WorkforceStaffConversationParticipant:
+      type: object
+      x-ticvai-persistence: workforce.staff_conversation_participant
+      description: One staff member in one conversation, with their read marker (decided 29 September, build
+        pass). The unread count is the messages after `lastReadMessageId`.
+      required:
+      - staffConversationId
+      - principalId
+      - joinedAt
+      properties:
+        staffConversationId:
+          x-ticvai-references: workforce.staff_conversation
+          type: string
+          format: uuid
+        principalId:
+          x-ticvai-references: identity.principal
+          type: string
+          format: uuid
+        joinedAt:
+          type: string
+          format: date-time
+        lastReadMessageId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Moved forward only, by `markStaffConversationRead`.
+        mutedUntil:
+          type: string
+          format: date-time
+          nullable: true
+    WorkforceStaffMessage:
+      type: object
+      x-ticvai-persistence: workforce.staff_message
+      description: One message in a staff conversation (decided 29 September, build pass). Never edited
+        through the API, so a conversation reads the same to everyone in it afterwards.
+      required:
+      - id
+      - staffConversationId
+      - senderPrincipalId
+      - body
+      - sentAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The client-generated UUIDv7 from the send, the key an offline replay deduplicates on.
+        staffConversationId:
+          x-ticvai-references: workforce.staff_conversation
+          type: string
+          format: uuid
+        senderPrincipalId:
+          x-ticvai-references: identity.principal
+          type: string
+          format: uuid
+        body:
+          type: string
+          maxLength: 2000
+        attachmentAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A photo or file, held as a media asset.
+        sentAt:
+          type: string
+          format: date-time
+          description: When the sender sent it, which for a message queued offline is before it arrived.
+        receivedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+    WorkforceStaffConversationSummary:
+      type: object
+      x-ticvai-persistence: none — projection over workforce.staff_conversation, its participants and its latest
+        message, for the caller
+      description: One row of `listStaffConversations`, as the caller sees it.
+      required:
+      - conversation
+      - unreadCount
+      properties:
+        conversation:
+          $ref: '#/components/schemas/WorkforceStaffConversation'
+        participants:
+          type: array
+          items:
+            type: object
+            properties:
+              principalId:
+                type: string
+                format: uuid
+              displayName:
+                type: string
+              onShift:
+                type: boolean
+        lastMessage:
+          allOf:
+          - $ref: '#/components/schemas/WorkforceStaffMessage'
+          nullable: true
+        unreadCount:
+          type: integer
+          minimum: 0
+    WorkforceSendStaffMessageRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      required:
+      - id
+      - body
+      - sentAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Client-generated UUIDv7; a replay of the same id returns the stored message.
+        conversationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: An existing conversation the caller is in. Absent means `recipientPrincipalIds`.
+        recipientPrincipalIds:
+          type: array
+          maxItems: 49
+          items:
+            type: string
+            format: uuid
+          description: Colleagues to message when there is no `conversationId`. One reuses the direct
+            conversation; several start a group.
+        title:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: A new group's title; ignored otherwise.
+        body:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        attachmentAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        sentAt:
+          type: string
+          format: date-time
+
+    WorkforceEmployeeProfile:
+      type: object
+      x-ticvai-persistence: none — composed from employee and four related tables
+      description: >
+        **One person and everything a profile screen asks about them.** The employment record, the
+        postings and the leave balances are separate tables and one question, so fanning out across
+        four endpoints is four round trips and four chances to render a half-loaded person.
+      required:
+      - employee
+      properties:
+        employee:
+          $ref: '#/components/schemas/WorkforceEmployee'
+        employments:
+          type: array
+          description: >
+            Most recent first. **More than one is normal** — a seasonal worker rehired each summer
+            has several, and collapsing them to the current one loses the service history that
+            leave accrual is calculated from.
+          items:
+            $ref: '#/components/schemas/WorkforceEmployment'
+        assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkforceWorkAssignment'
+        leaveBalances:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkforceLeaveBalance'
+        jobTitles:
+          type: array
+          description: >
+            The titles the postings name, so a client does not have to resolve them one by one.
+          items:
+            $ref: '#/components/schemas/WorkforceJobTitle'
+        externallyMasteredFields:
+          type: array
+          description: >
+            **Which fields on this record the venue may not edit**, resolved from
+            `field_ownership` for whichever source masters this employee. A screen that shows an
+            editable input over a field the HRMS owns has promised something it cannot keep.
+          items:
+            type: string
+    ResolveSyncConflictRequest:
+      type: object
+      x-ticvai-persistence: none — writes sync_conflict
+      required:
+      - conflictId
+      - resolution
+      properties:
+        conflictId:
+          type: string
+          format: uuid
+        resolution:
+          type: string
+          enum:
+          - acceptExternal
+          - keepTicvai
+          - retry
+          - ignore
+          - escalate
+        note:
+          type: string
+          maxLength: 1000
+          nullable: true
+        releaseAffectedAssignments:
+          type: boolean
+          default: false
+          description: >
+            **For a termination conflict, what happens to the shifts already rostered.** Board 3
+            requires the downstream consequence to be acted on rather than reported: releasing them
+            puts the shifts back on the marketplace, and leaving them means a manager has decided
+            to cover them another way.
+    WorkforceIntegrationSource:
+      type: object
+      x-ticvai-persistence: workforce.integration_source
+      description: >
+        **An external system that masters some of our workforce data.** Board 3 names HRMS,
+        Workforce Management, Payroll, Time & Attendance, Identity Management and external
+        staffing agencies. The six-state display Board 10 asks for lives on this row: what is
+        connected, when it last synchronised, and whether its credentials still work.
+      required:
+      - code
+      - name
+      - kind
+      - transport
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 60
+        name:
+          type: string
+          maxLength: 150
+        kind:
+          type: string
+          enum: [hrms, workforceManagement, payroll, timeAndAttendance, identity, staffingAgency]
+        transport:
+          type: string
+          enum: [api, webhook, scheduled, manual, fileImport]
+          description: >
+            Board 3, Support. **`manual` and `fileImport` are in the list on purpose** — a
+            staffing agency that sends a spreadsheet is still a system of record, and modelling
+            only the API cases would leave the messiest source unmanaged.
+        authenticationStatus:
+          type: string
+          enum: [healthy, expiring, expired, failed, notConfigured]
+        lastSynchronisedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          readOnly: true
+          type: string
+          enum: [active, degraded, suspended]
+        scopePath:
+          type: string
+          nullable: true
+    WorkforceFieldOwnership:
+      type: object
+      x-ticvai-persistence: workforce.field_ownership
+      description: >
+        **Which system owns a field, which is what prevents conflicting updates.** Board 3:
+        *"For every field, administrators shall determine ... External System Master."* Without
+        this, an employee record mastered in HRMS and edited here disagrees with its source and
+        nothing can say which answer is right.
+
+        One row per table and column. Absent means ours, so nothing has to be enumerated before
+        it is decided.
+      required:
+      - tableName
+      - columnName
+      - master
+      properties:
+        id:
+          type: string
+          format: uuid
+        tableName:
+          type: string
+          maxLength: 120
+        columnName:
+          type: string
+          maxLength: 120
+        master:
+          type: string
+          enum: [ticvai, external]
+        sourceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The integration source that masters it, when `master` is `external`.
+        onConflict:
+          type: string
+          enum: [externalWins, ticvaiWins, flagForReview]
+        scopePath:
+          type: string
+          nullable: true
+    WorkforceSyncRun:
+      type: object
+      x-ticvai-persistence: workforce.sync_run
+      description: >
+        **One synchronisation, and what it did.** Board 10 asks the page to show successful
+        records, failed records, warnings and mapping errors rather than *"integration failed"* —
+        and to say the operational consequence: *"12 employee availability updates could not be
+        synchronised. Four employees have assignments within the next 24 hours."* That sentence
+        needs counts on a row, not a log line.
+      required:
+      - sourceId
+      - startedAt
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceId:
+          x-ticvai-references: workforce.integration_source
+          type: string
+          format: uuid
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum: [running, succeeded, partial, failed]
+        recordsRead:
+          type: integer
+        recordsApplied:
+          type: integer
+        recordsFailed:
+          type: integer
+        warningCount:
+          type: integer
+        mappingErrorCount:
+          type: integer
+        trigger:
+          type: string
+          enum: [scheduled, manual, webhook, fileImport]
+        scopePath:
+          type: string
+          nullable: true
+    WorkforceSyncConflict:
+      type: object
+      x-ticvai-persistence: workforce.sync_conflict
+      description: >
+        **A disagreement a person has to settle, and the assignments it puts at risk.** Board 3
+        lists the cases by name: an employee in HR and not here, a venue changed externally, a
+        certification expired, and *"employee terminated externally but has future TICVAI
+        assignments"* — where *"the system shall flag affected downstream assignments"*.
+
+        `affectedAssignmentIds` is deliberately an array and deliberately an exception: it is a
+        snapshot of what was at risk when the conflict was raised, not a live relationship, and
+        it must not change when a roster does.
+      required:
+      - sourceId
+      - kind
+      - status
+      - raisedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceId:
+          x-ticvai-references: workforce.integration_source
+          type: string
+          format: uuid
+        syncRunId:
+          type: string
+          format: uuid
+          nullable: true
+        kind:
+          type: string
+          enum:
+          - missingInTicvai
+          - missingExternally
+          - venueChangedExternally
+          - certificationExpired
+          - terminatedExternally
+          - fieldDisagreement
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+        externalReference:
+          type: string
+          maxLength: 200
+          nullable: true
+        detail:
+          type: string
+          maxLength: 1000
+          nullable: true
+        affectedAssignmentIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        status:
+          type: string
+          enum: [open, retried, reprocessed, escalated, resolved, ignored]
+        raisedAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resolvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+          nullable: true
+    WorkforceEmployee:
+      type: object
+      x-ticvai-persistence: workforce.employee
+      description: '**Taken from the backend workbook, 20 September.** Stores the main employee/staff master record.'
+      required:
+      - tenantId
+      - code
+      - firstName
+      - lastName
+      - dateOfJoining
+      - employmentType
+      - employmentStatus
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+        code:
+          type: string
+          maxLength: 50
+        firstName:
+          type: string
+          maxLength: 100
+        lastName:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          maxLength: 254
+          nullable: true
+        mobile:
+          type: string
+          maxLength: 30
+          nullable: true
+        dateOfJoining:
+          type: string
+          format: date
+        dateOfBirth:
+          type: string
+          format: date
+          nullable: true
+          description: '**What the under-age check needs** (data model for the agreed operations, 29 September): `validateWorkforceCompliance` reports
+            `underAgeNightShift` against `StaffingRules.minimumAgeForNightShift`, and that rule has nothing to
+            compare with unless the employee''s age is on file. **An employee with no date of birth is reported
+            as a warning**, not assumed to be of age.'
+        employmentType:
+          type: string
+          maxLength: 30
+        employmentStatus:
+          type: string
+          maxLength: 30
+        managerEmployeeId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    WorkforceEmployment:
+      type: object
+      x-ticvai-persistence: workforce.employment
+      description: '**Taken from the backend workbook, 20 September.** Stores employment terms and contract validity.'
+      required:
+      - employeeId
+      - contractType
+      - startDate
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeId:
+          x-ticvai-references: workforce.employee
+          type: string
+          format: uuid
+        contractType:
+          type: string
+          maxLength: 30
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        standardHoursPerWeek:
+          type: number
+          nullable: true
+        probationEndDate:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        createdAt:
+          type: string
+          format: date-time
+    WorkforceJobTitle:
+      type: object
+      x-ticvai-persistence: workforce.job_title
+      description: '**Taken from the backend workbook, 20 September.** Stores job/designation definitions such as Cashier, Manager, Chef or Technician.'
+      required:
+      - tenantId
+      - code
+      - name
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          readOnly: true
+          x-ticvai-references: none
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          readOnly: true
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    WorkforceLeaveBalance:
+      type: object
+      x-ticvai-persistence: workforce.leave_balance
+      description: '**Taken from the backend workbook, 20 September.** Stores leave entitlement, used amount and remaining balance per employee/period.'
+      required:
+      - employeeId
+      - typeId
+      - periodYear
+      - entitledDays
+      - usedDays
+      - pendingDays
+      - availableDays
+      - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeId:
+          x-ticvai-references: workforce.employee
+          type: string
+          format: uuid
+        typeId:
+          x-ticvai-references: workforce.leave_type
+          type: string
+          format: uuid
+        periodYear:
+          type: integer
+        entitledDays:
+          type: number
+        usedDays:
+          type: number
+        pendingDays:
+          type: number
+        availableDays:
+          type: number
+        updatedAt:
+          type: string
+          format: date-time
+    WorkforceLeaveType:
+      type: object
+      x-ticvai-persistence: workforce.leave_type
+      description: '**Taken from the backend workbook, 20 September.** Defines leave categories and basic leave behavior.'
+      required:
+      - tenantId
+      - code
+      - name
+      - isPaid
+      - requiresApproval
+      - isActive
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          readOnly: true
+          x-ticvai-references: none
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 100
+        isPaid:
+          type: boolean
+        requiresApproval:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          readOnly: true
+          type: string
+          format: date-time
+    WorkforceShift:
+      type: object
+      x-ticvai-persistence: workforce.shift
+      description: '**Taken from the backend workbook, 20 September.** Defines reusable shifts such as Morning, Evening or Night.'
+      required:
+      - tenantId
+      - code
+      - name
+      - startTime
+      - endTime
+      - breakMinutes
+      - crossesMidnight
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          readOnly: true
+          x-ticvai-references: none
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 100
+        startTime:
+          type: string
+          maxLength: 0
+        endTime:
+          type: string
+          maxLength: 0
+        breakMinutes:
+          type: integer
+        crossesMidnight:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    WorkforceWorkAssignment:
+      type: object
+      x-ticvai-persistence: workforce.work_assignment
+      description: '**Taken from the backend workbook, 20 September.** Assigns an employee to a job and operational location/scope for an effective period.'
+      required:
+      - employeeId
+      - jobTitleId
+      - effectiveFrom
+      - isPrimary
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeId:
+          x-ticvai-references: workforce.employee
+          type: string
+          format: uuid
+        jobTitleId:
+          x-ticvai-references: workforce.job_title
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        departmentId:
+          type: string
+          format: uuid
+          nullable: true
+        outletId:
+          type: string
+          format: uuid
+          nullable: true
+        effectiveFrom:
+          type: string
+          format: date
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+        isPrimary:
+          type: boolean
+        status:
+          readOnly: true
+          type: string
+          maxLength: 30
+        createdAt:
+          readOnly: true
+          type: string
+          format: date-time
+    ShiftTemplate:
+      type: object
+      x-ticvai-persistence: workforce.shift_template
+      description: 'Resource board 3.7. **The unit a manager actually thinks in.**'
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+          enum:
+          - early
+          - late
+          - middle
+          - split
+          - double
+          - night
+          - onCall
+          - overtime
+        startsAt:
+          type: string
+        endsAt:
+          type: string
+        breaks:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          type: array
+          items:
+            type: object
+            properties:
+              afterMinutes:
+                type: integer
+              minutes:
+                type: integer
+              paid:
+                type: boolean
+                default: false
+        requiredQualifications:
+          type: array
+          items:
+            type: string
+        roleCode:
+          type: string
+          nullable: true
+        costCentre:
+          type: string
+          nullable: true
+        hourlyRate:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        scopePath:
+          type: string
+    StaffingRules:
+      type: object
+      x-ticvai-persistence: workforce.staffing_rules + workforce.position_requirement
+      description: 'Resource board 4.3. **A safety rule before it is a cost rule.**'
+      properties:
+        minimumCover:
+          type: array
+          description: '**Minimum staffing per position, venue and time window, with the qualifications it
+            requires**: the rows of `workforce.position_requirement` (data model for the agreed operations, 29 September). `getStaffingCoverage` measures the
+            rota against them; before this they were an array with no table, so no minimum was stored.'
+          items:
+            type: object
+            required:
+            - id
+            - positionCode
+            - minimumHeadcount
+            properties:
+              id:
+                type: string
+                format: uuid
+              positionCode:
+                type: string
+              label:
+                type: string
+              venueId:
+                type: string
+                format: uuid
+                nullable: true
+              attractionId:
+                type: string
+                format: uuid
+                nullable: true
+              minimumHeadcount:
+                type: integer
+                minimum: 0
+              daysOfWeek:
+                type: array
+                nullable: true
+                description: Days the minimum applies; absent means every day the venue is open
+                items:
+                  type: string
+                  enum:
+                  - monday
+                  - tuesday
+                  - wednesday
+                  - thursday
+                  - friday
+                  - saturday
+                  - sunday
+              startsAt:
+                type: string
+                nullable: true
+                description: Start of the time window, local time (HH:MM) as `ShiftTemplate.startsAt`; absent means opening
+              endsAt:
+                type: string
+                nullable: true
+                description: End of the time window, local time (HH:MM); absent means closing
+              requiredQualifications:
+                type: array
+                items:
+                  type: string
+              appliesWhenOpen:
+                type: boolean
+                default: true
+              blocksOperation:
+                type: boolean
+                default: true
+                description: '**A ride requiring two operators cannot run with one.** Where this is
+                  true the attraction closes rather than running short.
+
+                  '
+        maximumHoursPerDay:
+          type: integer
+          nullable: true
+        maximumHoursPerWeek:
+          type: integer
+          nullable: true
+        minimumRestHours:
+          type: integer
+          nullable: true
+        maximumConsecutiveDays:
+          type: integer
+          nullable: true
+        overtime:
+          type: object
+          properties:
+            allowed:
+              type: boolean
+              default: true
+            afterHoursPerWeek:
+              type: integer
+              nullable: true
+            rateMultiplier:
+              type: number
+              nullable: true
+            requiresApproval:
+              type: boolean
+              default: true
+        minimumAgeForNightShift:
+          type: integer
+          nullable: true
+        defaultIncentiveRateMultiplier:
+          type: number
+          nullable: true
+          minimum: 1
+          description: '**What an open shift pays above base when it is released.** Added 22 September:
+            `workforce.open_shift.incentive_rate_multiplier` was set per shift with nothing behind it,
+            so two identical shifts could price differently and record no reason. The shift still
+            carries its own value — **as the snapshot**, the rule-and-record split `payments.fee_rule`
+            and `orders.order_fee` use — and this is where it comes from.
+
+            **Top-level rather than beside `overtime`** so the value is its own column. Nested in an
+            object it would be a key inside a JSON blob, which nothing can index, constrain or pair to
+            the shift that uses it.
+
+            '
+        maximumIncentiveRateMultiplier:
+          type: number
+          nullable: true
+          minimum: 1
+          description: '**The ceiling on an incentive.** A shift nobody claims is the moment somebody
+            raises the multiplier in a hurry — the same reason `maximumDailyCharge` bounds a late fee.'
+        incentiveApprovalAbove:
+          type: number
+          nullable: true
+          minimum: 1
+          description: '**Above this multiplier a second person approves the release.** Routed as an
+            approval, not a boolean — `overtime.requiresApproval` beside it is one of 26 approval flags
+            across the contracts that no approval kind, matrix row or SLA reaches.'
+        scopePath:
+          type: string
+    StaffingCoverage:
+      type: object
+      description: 'Resource board 4.4. **The gap is the product.**'
+      properties:
+        date:
+          type: string
+          format: date
+        venueId:
+          type: string
+          format: uuid
+        positionCode:
+          type: string
+        label:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        required:
+          type: integer
+        rostered:
+          type: integer
+        qualified:
+          type: integer
+          description: '**A position filled by somebody not qualified for it is still a gap.**'
+        gap:
+          type: integer
+        severity:
+          type: string
+          enum:
+          - covered
+          - tight
+          - short
+          - blocking
+        openShiftIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        basisApplied:
+          type: string
+          enum:
+          - minimum
+          - forecastRequirement
+          description: Which figure `required` is for this row. With `higherOfBoth`, the larger; with
+            `forecastRequirement` and no handed-over requirement for the period, `minimum`.
+        minimumRequired:
+          type: integer
+          nullable: true
+          description: The configured minimum for the position and window.
+        forecastRequired:
+          type: number
+          nullable: true
+          description: The forecast staff requirement (p50) for the position and window, from
+            `workforce.forecast_requirement`. Null where none was handed over.
+        forecastRequiredP90:
+          type: number
+          nullable: true
+          description: The busy-case requirement, for planning to the busy case.
+        forecastVersionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The AI forecast version the requirement is bound to (AIP-067), so a manager can open the
+            forecast behind it.
+    WorkforceForecastRequirement:
+      type: object
+      x-ticvai-persistence: workforce.forecast_requirement
+      description: '**The staff requirement a forecast handed over** (29 September, build pass, group G2; 8.2.49).
+        Written by workforce''s consumer of `ai.operationalRequirementIssued` (kind `staff`, target `workforce`), one
+        row per requirement, never through the API: workforce keeps its own copy so `getStaffingCoverage` compares the
+        rota with it without reading the AI service. **A recommendation, never a rota change** (AI design 1.3
+        constraint 1): the manager still rosters people; this only moves what counts as short. A later requirement for
+        the same position and period supersedes the earlier one (`supersededAt`).'
+      required:
+      - requirementId
+      - versionId
+      - periodStart
+      - periodEnd
+      - quantity
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        requirementId:
+          type: string
+          format: uuid
+          description: '`AiOperationalRequirement.id` from the event; the idempotency key of the consumer. Not a foreign
+            key: the requirement lives in the AI service.'
+        versionId:
+          type: string
+          format: uuid
+          description: The forecast version it is bound to.
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        positionCode:
+          type: string
+          nullable: true
+          description: The event's `subjectRef` (a role or position); matched to `StaffingRules` positions. Null is the
+            venue total.
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        quantity:
+          type: number
+          description: Staff required at the forecast's median.
+        quantityP90:
+          type: number
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+        receivedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        supersededAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005), the requirement''s scope.'
+    LeaveRequest:
+      type: object
+      x-ticvai-persistence: workforce.leave_request
+      description: 'Resource board 3.8. **Approving leave without seeing the gap is how four
+        supervisors book the same week.**
+
+        '
+      required:
+      - principalId
+      - from
+      - to
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+        principalId:
+          x-ticvai-references: identity.principal
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - annual
+          - sick
+          - unpaid
+          - parental
+          - compassionate
+          - training
+          - timeOffInLieu
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        halfDay:
+          type: boolean
+          default: false
+        reason:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+          - requested
+          - approved
+          - rejected
+          - cancelled
+          - taken
+        coverageImpact:
+          x-ticvai-persisted: false
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/StaffingCoverage'
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+    LabourCostRow:
+      type: object
+      description: 'Resource board 4.9. **Rostered and actual diverge every day.**'
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        rosteredHours:
+          type: number
+        actualHours:
+          type: number
+        overtimeHours:
+          type: number
+        rosteredCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        actualCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        budget:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        variance:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        variancePercent:
+          type: number
+        headcount:
+          type: integer
+    LabourBudget:
+      type: object
+      x-ticvai-persistence: workforce.labour_budget
+      description: '**The labour budget a general manager is held to, per venue, department and period**
+        (resource board 4.9; data model for the agreed operations, 29 September). `getLabourCost` compares rostered and actual cost against it
+        (`LabourCostRow.budget`). A null `departmentId` is the whole venue''s budget. Periods for one venue
+        and department do not overlap. Written by `setLabourBudget`, listed by `listLabourBudgets` (decided
+        29 September, writers pass).'
+      required:
+      - id
+      - venueId
+      - periodStart
+      - periodEnd
+      - budgetAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          x-ticvai-references: platform.scope
+          type: string
+          format: uuid
+        departmentId:
+          type: string
+          format: uuid
+          nullable: true
+        periodStart:
+          type: string
+          format: date
+          description: First day of the period, in the Region's time zone
+        periodEnd:
+          type: string
+          format: date
+          description: Last day of the period, in the Region's time zone
+        budgetAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        scopePath:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    WorkforceComplianceFinding:
+      type: object
+      description: 'Resource board 4.8. **Checked before the rota is published, not in an inspection.**'
+      properties:
+        code:
+          type: string
+          enum:
+          - expiredQualification
+          - missingQualification
+          - exceededDailyHours
+          - exceededWeeklyHours
+          - insufficientRest
+          - missedBreak
+          - consecutiveDaysExceeded
+          - underAgeNightShift
+          - belowMinimumCover
+        severity:
+          type: string
+          enum:
+          - breach
+          - warning
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+        principalName:
+          type: string
+          nullable: true
+        date:
+          type: string
+          format: date
+          nullable: true
+        detail:
+          type: string
+        rotaAssignmentIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    OpenShift:
+      type: object
+      x-ticvai-persistence: workforce.open_shift
+      description: 'Resource board 4.6. **How a gap gets filled at nine on a Friday without a manager
+        ringing round.**
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        rotaAssignmentId:
+          type: string
+          format: uuid
+          nullable: true
+        shiftTemplateId:
+          type: string
+          format: uuid
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+        positionCode:
+          type: string
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        releasedBy:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        requiredQualifications:
+          type: array
+          items:
+            type: string
+        eligiblePrincipalCount:
+          type: integer
+          readOnly: true
+        incentiveRateMultiplier:
+          type: number
+          nullable: true
+        status:
+          type: string
+          enum:
+          - open
+          - claimed
+          - pendingApproval
+          - filled
+          - expired
+          - withdrawn
+        claimedBy:
+          type: string
+          format: uuid
+          nullable: true
+        claimedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+    TrainingRecord:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getStaffingCoverage, listTrainingRecords, validateWorkforceCompliance
+      type: object
+      x-ticvai-persistence: workforce.training_record
+      description: '**Drafted 4 September.** One person, one course, one outcome. **The field that
+        matters is the expiry** - a lapsed food-safety or first-aid certificate is a person who
+        may not work a station, and a list without it is a list nobody can roster from.'
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        principalId:
+          type: string
+          format: uuid
+        courseName:
+          type: string
+        required:
+          type: boolean
+        completedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum:
+          - notStarted
+          - inProgress
+          - passed
+          - failed
+          - expired
+        evidenceRef:
+          type: string
+    RotaStatus:
+      type: string
+      enum: [planned, published, confirmed, swapPending, cancelled, completed, noShow]
+
+    RotaAssignment:
+      type: object
+      x-ticvai-persistence: "workforce.rota_assignment"
+      required: [principalId, venueId, startsAt, endsAt, position]
+      properties:
+        overtimeMinutes:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: >
+            BL-044, 1.2.83. **UAE labour law limits working hours and mandates rest periods**, and
+            nothing in the package counted either. Derived from attendance against the shift.
+        restPeriodBefore:
+          type: integer
+          nullable: true
+          description: >
+            Minutes since the previous shift ended. **The check that stops a closing shift followed
+            by an opening one**, which is legal in most places and unsafe in all of them.
+        breachesWorkingHourLimit:
+          type: boolean
+          default: false
+          readOnly: true
+          description: >
+            **Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory
+            limit is a rota somebody has to redo, and finding out a month later means it was worked.
+        labourCost:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            **Cost at the point of scheduling.** A manager building a rota without seeing its cost is
+            a manager who finds out from finance.
+        id: { type: string, format: uuid, readOnly: true }
+        principalId: { type: string, format: uuid }
+        displayName: { type: string, readOnly: true }
+        venueId: { type: string, format: uuid }
+        departmentId: { type: string, format: uuid, nullable: true }
+        position:
+          type: string
+          description: >
+            What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most
+            positions never touch a till**, which is why a rota assignment is not a shift.
+
+            **A position code, not a label.** It is the same value as
+            `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and
+            `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an
+            assignment spelled differently from the rule it fills is counted against nothing and
+            the gap stays open. Tenant-defined, which is why it is not an enum here.
+        requiredRoleId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Checked on assignment. A rota naming someone unqualified is a rota that gets overridden.
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where the position needs a till. **The link between a rota and a cash session**,
+            without merging the two.
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        status: { $ref: '#/components/schemas/RotaStatus' }
+        breakMinutes: { type: integer, nullable: true }
+        note: { type: string, nullable: true }
+    UpdateRotaAssignmentRequest:
+      type: object
+      x-ticvai-persistence: none — request only; a partial update of workforce.rota_assignment
+      description: '**A partial update of RotaAssignment** (the CR-089 pattern; CHG-SHP-008): `updateRotaAssignment` sends only what changes, and a field left out keeps its stored value. Nothing is required and nothing has a default, so a generated client never resends a value it did not mean to change. The server''s own fields (breachesWorkingHourLimit, displayName, id, overtimeMinutes) are not sendable.'
+      minProperties: 1
+      properties:
+        restPeriodBefore:
+          type: integer
+          nullable: true
+          description: >
+            Minutes since the previous shift ended. **The check that stops a closing shift followed
+            by an opening one**, which is legal in most places and unsafe in all of them.
+        labourCost:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            **Cost at the point of scheduling.** A manager building a rota without seeing its cost is
+            a manager who finds out from finance.
+        principalId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid }
+        departmentId: { type: string, format: uuid, nullable: true }
+        position:
+          type: string
+          description: >
+            What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most
+            positions never touch a till**, which is why a rota assignment is not a shift.
+
+            **A position code, not a label.** It is the same value as
+            `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and
+            `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an
+            assignment spelled differently from the rule it fills is counted against nothing and
+            the gap stays open. Tenant-defined, which is why it is not an enum here.
+        requiredRoleId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Checked on assignment. A rota naming someone unqualified is a rota that gets overridden.
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where the position needs a till. **The link between a rota and a cash session**,
+            without merging the two.
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        status: { $ref: '#/components/schemas/RotaStatus' }
+        breakMinutes: { type: integer, nullable: true }
+        note: { type: string, nullable: true }
+
+    ShiftSwap:
+      type: object
+      x-ticvai-persistence: "workforce.shift_swap"
+      required: [id, assignmentId, fromPrincipalId, toPrincipalId, status]
+      properties:
+        id: { type: string, format: uuid }
+        assignmentId: { type: string, format: uuid }
+        fromPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
+        toPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
+        status:
+          type: string
+          enum: [awaitingPeer, awaitingApproval, approved, rejected, withdrawn]
+          description: >
+            **Both parties before the supervisor.** A swap approved against someone who never
+            agreed is a gap in the rota nobody notices until the shift starts.
+        approvalRequestId:
+          type: string
+          nullable: true
+          description: Routed through `approvals` rather than a second mechanism here.
+        reason: { type: string, nullable: true }
+        requestedAt: { type: string, format: date-time }
+
+    AttendanceRecord:
+      type: object
+      x-ticvai-persistence: "workforce.attendance"
+      required: [id, principalId, kind, occurredAt]
+      properties:
+        id: { type: string, format: uuid }
+        principalId: { type: string, format: uuid }
+        assignmentId: { type: string, format: uuid, nullable: true }
+        venueId: { type: string, format: uuid }
+        kind: { type: string, enum: [clockIn, clockOut, breakStart, breakEnd] }
+        occurredAt:
+          type: string
+          format: date-time
+          description: Device time — when it happened.
+        recordedAt:
+          type: string
+          format: date-time
+          description: >
+            When the server received it. **Both are kept**: a steward clocking in offline at a
+            gate is not late because the sync was.
+        accessPointId: { type: string, format: uuid, nullable: true }
+        latitude: { type: number, nullable: true }
+        longitude: { type: number, nullable: true }
+        isAmended: { type: boolean, readOnly: true }
+        amendedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Who made the latest amendment. The full history is `amendments` (audit R129 (7)).
+        amendmentReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The latest amendment's reason. The full history is `amendments` (audit R129 (7)).
+        originalOccurredAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **The original is never overwritten.** Attendance feeds pay, and a record that can be
+            quietly rewritten is not evidence.
+        amendments:
+          type: array
+          readOnly: true
+          description: >
+            **Every correction, oldest first, one row each** (decided 28 September, audit R129 (7)).
+            A single set of amendment columns holds only the last one, and the second correction to
+            a record would erase the evidence of the first.
+          items: { $ref: '#/components/schemas/AttendanceAmendment' }
+        exception:
+          type: string
+          nullable: true
+          enum: [late, earlyLeave, missingClockOut, noShow, outOfGeofence, unscheduled]
+          description: Computed against the rota. Null where the record matches what was expected.
+
+    AttendanceAmendment:
+      type: object
+      x-ticvai-persistence: "workforce.attendance_amendment"
+      description: >
+        One correction to an attendance record, appended by `amendAttendance` and never updated
+        (decided 28 September, audit R129 (7)).
+      required: [id, attendanceRecordId, amendedByPrincipalId, amendedAt, occurredAtBefore, occurredAtAfter, reason]
+      properties:
+        id: { type: string, format: uuid }
+        attendanceRecordId: { type: string, format: uuid, x-ticvai-references: workforce.attendance }
+        amendedByPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
+        amendedAt: { type: string, format: date-time }
+        occurredAtBefore:
+          type: string
+          format: date-time
+          description: The record's time before this correction.
+        occurredAtAfter:
+          type: string
+          format: date-time
+          description: The time this correction set (`correctedAt` on the request).
+        reason: { type: string, maxLength: 300 }
+
+    AnnouncementKind:
+      type: string
+      description: >
+        `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet
+        hours, requires acknowledgement, and carries a separate permission.
+      enum: [operational, safety, emergency, hr, celebration]
+
+    Announcement:
+      type: object
+      x-ticvai-persistence: "workforce.announcement"
+      required: [title, body, kind, publishedAt]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        title: { type: string, maxLength: 140 }
+        body: { type: string, maxLength: 4000 }
+        kind: { $ref: '#/components/schemas/AnnouncementKind' }
+        venueIds:
+          type: array
+          items: { type: string, format: uuid }
+        departmentIds:
+          type: array
+          items: { type: string, format: uuid }
+        roleIds:
+          type: array
+          items: { type: string, format: uuid }
+        requiresAcknowledgement: { type: boolean }
+        deliveryChannels:
+          type: array
+          description: >
+            How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted
+            people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`).
+            `emergency` is sent by both whatever is set here.
+          items: { type: string, enum: [inApp, push] }
+          default: [inApp, push]
+        expiresAt: { type: string, format: date-time, nullable: true }
+        publishedByPrincipalId: { type: string, format: uuid, readOnly: true }
+        publishedAt: { type: string, format: date-time }
+        locale: { type: string, nullable: true }
+
+    AnnouncementReach:
+      type: object
+      x-ticvai-persistence: "none — computed from workforce.announcement_receipt"
+      properties:
+        announcementId: { type: string, format: uuid }
+        targeted: { type: integer }
+        delivered: { type: integer }
+        acknowledged: { type: integer }
+        outstanding:
+          type: array
+          description: >
+            **The list that matters.** For an operational notice it measures whether anyone read
+            it; during an emergency it is the roll call.
+          items:
+            type: object
+            properties:
+              principalId: { type: string, format: uuid }
+              displayName: { type: string }
+              onShift: { type: boolean }
+    GuestBroadcastAccepted:
+      type: object
+      x-ticvai-persistence: none — response only; the dispatch rows are marketing.message_dispatch
+      description: '**The broadcast was accepted for sending** (`broadcastToGuests`). Sending runs on; the count is the guests with a live entitlement at the venue when it was accepted.'
+      required: [broadcastId, kind, acceptedAt, recipientCount]
+      properties:
+        broadcastId: { type: string, format: uuid }
+        kind: { type: string, enum: [evacuation, weather, rideClosure, lostChild, operational, allClear] }
+        acceptedAt: { type: string, format: date-time }
+        recipientCount: { type: integer, minimum: 0 }

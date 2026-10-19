@@ -119,10 +119,49 @@ def sync(src: Path, dst: Path, skip: frozenset = frozenset()) -> tuple[int, int,
     return added, updated, removed
 
 
+# **The contracts repository's `openapi/` is a copy of `contracts/`** (20 October 2026, r8 cause FOUNDATION-AI-C51,
+# ticket 27640 SETUP-CLIENTS, CHG-R8GEN-011). It was copied once on 14 August and never again: it still held
+# `spine/cross-cell.yaml` (renamed cross-region since) and lacked the satellite contracts added after, so the clients
+# SETUP-CLIENTS generates from it were two months behind the package. Synced like a bible: added, updated, removed.
+OPENAPI = (("contracts/spine", "spine"), ("contracts/satellite", "satellite"), ("contracts/shared", "shared"))
+
+
+def sync_openapi() -> tuple[int, int, int]:
+    dst = REPOS / "ticvai-contracts" / "openapi"
+    if not dst.parent.is_dir():
+        return 0, 0, 0
+    added = updated = removed = 0
+    wanted = {}
+    for src, sub in OPENAPI:
+        for f in sorted((ROOT / src).glob("*.yaml")):
+            wanted[Path(sub) / f.name] = f
+    if (ROOT / "contracts" / "README.md").is_file():
+        wanted[Path("README.md")] = ROOT / "contracts" / "README.md"
+    for rel, f in wanted.items():
+        target = dst / rel
+        if not target.exists():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(f, target)
+            added += 1
+        elif not filecmp.cmp(f, target, shallow=False):
+            shutil.copy2(f, target)
+            updated += 1
+    for f in sorted(dst.rglob("*"), reverse=True) if dst.is_dir() else []:
+        if f.is_file() and f.relative_to(dst) not in wanted:
+            f.unlink()
+            removed += 1
+        elif f.is_dir() and not any(f.iterdir()):
+            f.rmdir()
+    return added, updated, removed
+
+
 def main() -> int:
     if not REPOS.is_dir():
         print("  no repos/ — nothing to mirror")
         return 0
+    a, u, r = sync_openapi()
+    if a or u or r:
+        print(f"  repos/ticvai-contracts/openapi: +{a} ~{u} -{r} (a copy of contracts/)")
 
     targets = []
     docs = REPOS / "ticvai-docs"
