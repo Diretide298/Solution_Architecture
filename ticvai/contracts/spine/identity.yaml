@@ -1575,6 +1575,15 @@ paths:
         CHG-CSP-002, breaking change BC-001 to BC-005): a session opened from a browser or a handheld
         has no workstation and no board, and the field is absent rather than invented.
 
+
+        **The venue is chosen with the role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C45,
+        option A; CHG-R8SPN-032). A role is held through a grant, and the grant carries the scope: a steward at
+        AquaCove Abu Dhabi and at AquaCove Dubai holds two grants of one role, and `availableRoles` lists one
+        `RoleSummary` per grant, each naming its venue (`scope`). The client sends the chosen card''s `grantId`;
+        the session''s venue (`identity.session.venue_id`) and scope are set from that grant''s scope. `roleId`
+        alone still works for a role held at one venue; for a role held at several, a body with no `grantId` is
+        refused `422 grant-required`, and a `grantId` that is not the caller''s, or not of `roleId`, is `403`.
+
         '
       requestBody:
         required: true
@@ -1588,6 +1597,11 @@ paths:
                 roleId:
                   type: string
                   format: uuid
+                grantId:
+                  type: string
+                  format: uuid
+                  description: '`RoleSummary.grantId` of the card chosen: which grant of the role, and so which venue
+                    (IDENTITY-C45, CHG-R8SPN-032). Required when the role is held at more than one venue.'
       responses:
         '200':
           headers:
@@ -1600,6 +1614,14 @@ paths:
                 $ref: '#/components/schemas/Session'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '422':
+          description: 'The role is held at more than one venue and the body names no `grantId` (`grant-required`;
+            IDENTITY-C45, CHG-R8SPN-032). Nothing changes; the client shows the cards and sends the chosen grant.'
+          x-ticvai-problem-types: [grant-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/refresh:
@@ -10828,6 +10850,16 @@ components:
           type: boolean
           description: True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`);
             false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002).
+        grantId:
+          type: string
+          format: uuid
+          description: '**The grant this card stands for** (`identity.delegated_access.id`; IDENTITY-C45, CHG-R8SPN-032).
+            A role held at two venues is two grants and two cards; `selectRole` takes the chosen one.'
+        scope:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ScopeRef
+          description: The scope node the grant is held at (`platform.scope`), with its name, so the card can say which
+            venue (IDENTITY-C45).
     Session:
       type: object
       required:
@@ -10890,6 +10922,15 @@ components:
             '
         workstation:
           $ref: '#/components/schemas/WorkstationContext'
+        availableRoles:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**The roles the principal may choose, one per grant** (IDENTITY-C45, CHG-R8SPN-032), resolved on
+            read as `LoginResponse.availableRoles` is, so EMP-002 can list them on a cold open or after a relaunch
+            (`getCurrentSession`) without signing in again.'
+          items:
+            $ref: '#/components/schemas/RoleSummary'
         openedAt:
           type: string
           format: date-time
