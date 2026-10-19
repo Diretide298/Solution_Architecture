@@ -1,4 +1,4 @@
--- V01035 -- tenant database, after r1 (9cec72d) (20261019): the names the contracts use.
+-- V0103a -- tenant database, after r1 (9cec72d) (20261020): the names the contracts use.
 -- **Written by tools/derive-ddl.py in frozen mode. Do not edit after merge; a mistake is a new migration.**
 --
 -- The baseline under backend/tenant/ is frozen at r1 (9cec72d), but the schema reference has renamed columns,
@@ -10,6 +10,11 @@
 -- makes to your tables'). A foreign key is added NOT VALID: it checks every new write, and the owner runs
 -- ALTER TABLE ... VALIDATE CONSTRAINT when the rows already there are known to be clean.
 -- 4 column rename(s), 0 key(s) added or renamed, 0 index(es) renamed or dropped.
+--
+-- **This file runs before V0104__after_r1_20261015.sql**, which applies row-level security on these columns by their new
+-- names: without it a database built from the files in name order stops at V0104__after_r1_20261015.sql. The other renames,
+-- with the keys and indexes that follow them, are in V0107; its blocks for these columns find them renamed
+-- and do nothing.
 
 -- access.access_change | rename column | old_access_id to old_entitlement_id
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'access_change' AND column_name = 'old_access_id') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'access_change' AND column_name = 'old_entitlement_id') THEN ALTER TABLE access.access_change RENAME COLUMN old_access_id TO old_entitlement_id; END IF; END $$;
@@ -24,7 +29,7 @@ DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_sche
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'platform' AND table_name = 'sale_board_tile' AND column_name = 'page_id') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'platform' AND table_name = 'sale_board_tile' AND column_name = 'sale_board_page_id') THEN ALTER TABLE platform.sale_board_tile RENAME COLUMN page_id TO sale_board_page_id; END IF; END $$;
 
 INSERT INTO platform.schema_version (version, description, checksum)
-VALUES ('V01035', 'after r1 (9cec72d), names the contracts use: 4 column rename(s), 0 key(s) added or renamed, 0 index(es) renamed or dropped', 'e5695659c216e8db02741241516bb58dc28f65a65bba60f655f2824786da0001')
+VALUES ('V0103a', 'after r1 (9cec72d), names the contracts use: 4 column rename(s), 0 key(s) added or renamed, 0 index(es) renamed or dropped', 'e5695659c216e8db02741241516bb58dc28f65a65bba60f655f2824786da0001')
 ON CONFLICT (version) DO NOTHING;
 
 -- ============================================================================
@@ -36,4 +41,4 @@ ON CONFLICT (version) DO NOTHING;
 -- ALTER TABLE marketing.waiver_signature RENAME COLUMN form_definition_id TO template_id;
 -- ALTER TABLE access.entry_rule_point RENAME COLUMN admission_rules_id TO admission_profile_id;
 -- ALTER TABLE access.access_change RENAME COLUMN old_entitlement_id TO old_access_id;
--- DELETE FROM platform.schema_version WHERE version = 'V01035';
+-- DELETE FROM platform.schema_version WHERE version = 'V0103a';
