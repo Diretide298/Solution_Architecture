@@ -7122,6 +7122,11 @@ paths:
         `setSessionVenue`, or at none until one is chosen; `availableVenues` lists the venues it may choose,
         those of `Session.scope` at venue level and every active venue under a wider scope node, in name order.
 
+        **How a service knows it.** It is part of the session the bearer token's `sid` names, so every service reads it
+        where it already reads the session's scope (the session registry `bearerAuth` checks); a write that sends no
+        `venueId` acts at it, and a venue-scoped call made while it is null and the session reaches several venues is
+        the service's to refuse as it refuses any call outside the caller's scope.
+
         A session that is not yet usable answers `409 session-pending`, as `getCurrentSession` does.
       responses:
         '200':

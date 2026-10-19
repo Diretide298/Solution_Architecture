@@ -1,0 +1,50 @@
+id: CHG-R8PRD-007
+date: '2026-10-20'
+source: developer
+kind: contract
+summary: 'Fixes from walking each wave 1 task as the developer who pulls it: a product configurer can list what a sale
+  permission rule may name (listSalePermissionTargets) and reads each rule''s target by name; a rule set PUT keeps
+  the ids of rules it does not change; field sets store each field''s position and say what value each field type
+  stores; tag and field-set codes are unique in the venue; a product''s classification changes in any state but
+  archived without approval; the needs-attention reasons share the lifecycle list''s issue codes and define an
+  active price list; the session venue says how services read it. Additive to CHG-R8PRD-002..006.'
+decision:
+  what: 'contracts/spine/catalogue.yaml (only text added by CHG-R8PRD-002..006 changed, and appended): GET
+    /sale-permission-targets listSalePermissionTargets (PRODUCT_CONFIGURE; paged; order name, id) and schema
+    SalePermissionTarget; ProductSalePermissionRule.targetName (read-only); ProductSalePermissionRuleSet says a PUT
+    keeps rule ids matched on level and target, and that a site rule naming another venue waits for the wave 2 product
+    form; FieldSetField.position (read-only) and the stored value per type; ProductTag.code and FieldSet.code unique
+    per venue; setProductClassification 409 product-archived and no approval; ProductAttentionReason codes
+    missingVariants, missingChannels, missingPricing, missingEntitlements (shared with
+    ProductLifecycleCommandCenterView.validationIssues). contracts/spine/identity.yaml: getSessionVenue says services
+    read the venue with the session.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The developer walk of the wave 1 tasks on 20 October 2026 (products module), done before the tasks go out:
+  listRoles needs ROLE_MANAGE and listPrincipals USER_MANAGE, which a product configurer does not hold, so the "who can
+  sell" pickers could not be filled (CHG-R8PRD-005); a field set''s field order had no column to live in and the
+  sale path could not know what a check box stores (CHG-R8PRD-004); two venues could not both have a "summer" tag
+  (CHG-R8PRD-002); the attention reasons used a second vocabulary beside listProductLifecycle''s validationIssues
+  (CHG-R8PRD-006).'
+keys_touched:
+  operations: [listSalePermissionTargets, setProductSalePermissionRules, getProductSalePermissionRules,
+    setFieldSetDefinition, setProductTagDefinition, setProductClassification, listProductAttentionItems, getSessionVenue]
+  schemas: [SalePermissionTarget, ProductSalePermissionRule, ProductSalePermissionRuleSet, FieldSetField, FieldSet,
+    ProductTag, ProductAttentionReason]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/identity.yaml
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. The walk and what it leaves are in the wave 1 task drafts (outside git, for the lead). Two choices
+  in it are proposals for the lead: classification changes need no approval, and codes are unique per venue.'

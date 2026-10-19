@@ -18897,7 +18897,8 @@ paths:
 
         **The code is fixed once products carry it.** `Product.segmentTags` stores the code, so changing the code
         of a tag that products carry is refused (`409 tag-code-in-use`); make a new tag instead. The code is unique
-        in the tenant (`409 duplicate-code`), compared ignoring case, as category codes are (audit R108).
+        in the venue (`409 duplicate-code`), compared ignoring case: the tag list is the venue's, as the product
+        list it filters is.
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -18943,7 +18944,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          description: The code is already used by another tag of the tenant (`duplicate-code`), or the write changes
+          description: The code is already used by another tag of the venue (`duplicate-code`), or the write changes
             the code of a tag that products carry (`tag-code-in-use`).
           x-ticvai-problem-types:
           - duplicate-code
@@ -18973,6 +18974,10 @@ paths:
         **Only master data is accepted.** A `categoryId` that is not a category of the product's venue with `kind`
         `category` is `422 unknown-category`, an inactive one `422 inactive-category`; a tag id that is not a tag
         of the venue is `422 unknown-tag`, a deactivated one `422 inactive-tag`.
+
+        **In which states.** Any lifecycle state but `archived` (`409 product-archived`), and at once: a category and
+        tags change no price, entitlement, capacity or availability, so the change is not a governed one and needs
+        no approval or new version (proposed by Chinmay, 20 October 2026, with the developer walk of wave 1).
       tags:
       - product
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -19017,6 +19022,14 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The product is archived (`product-archived`).
+          x-ticvai-problem-types:
+          - product-archived
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: A category or tag that is not master data of the product's venue, or is no longer active.
           x-ticvai-problem-types:
@@ -19374,7 +19387,7 @@ paths:
         form, and the order of `fields` is the order the sale asks them in.
 
         **What the server refuses.** A drop-down or radio field with fewer than two options, two options with one
-        `value`, or two fields with one `key` (`400 validation`); a `code` another set of the tenant uses (`409
+        `value`, or two fields with one `key` (`400 validation`); a `code` another set of the venue uses (`409
         duplicate-code`); a field `key` kept with a different `type` while products link the set
         (`409 field-key-retyped`: the values already captured under that key would change meaning, so add a field
         with a new key instead); deactivating a set that products link (`409 field-set-in-use`: link those
@@ -19421,7 +19434,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          description: The code is taken in the tenant (`duplicate-code`), a linked set's field changes type
+          description: The code is taken in the venue (`duplicate-code`), a linked set's field changes type
             (`field-key-retyped`), or a linked set is deactivated (`field-set-in-use`).
           x-ticvai-problem-types:
           - duplicate-code
@@ -19800,6 +19813,79 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ProductAttentionItem'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /sale-permission-targets:
+    get:
+      operationId: listSalePermissionTargets
+      x-ticvai-consumed-by: []
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'the venues a `site` rule can name: platform.scope, Tenancy''s data'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the workstations a `workstation` rule can name: platform.workstation, Tenancy''s data'
+      - query: identity#roleRecords
+        route: in-process
+        for: 'the roles a `role` rule can name: identity.role, Identity''s data'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'the staff a `user` rule can name: identity.principal, Identity''s data'
+      summary: What a sale permission rule can name at one level, with names
+      description: >-
+        **The pickers of the "who can sell" rules** (CHG-R8PRD-007, from the developer walk of wave 1). A person who
+        configures products holds `PRODUCT_CONFIGURE`, not `ROLE_MANAGE` or `USER_MANAGE`, so `listRoles` and
+        `listPrincipals` refuse them; this read gives, for one `level`, the ids and names a rule may name and nothing
+        else: the tenant's active venues (`site`), the venue's sales channels (`salesChannel`,
+        `catalogue.sales_channel`), the venue's workstations, the tenant's roles, and the staff principals with a grant
+        at the venue (`user`; name and username only, no contact details). `global` has no targets.
+
+        **Which rows.** Active ones only (a retired role, a deactivated principal or workstation is left out). `search`
+        matches the start of any word of the name, ignoring case.
+
+        **Order.** Sorted by `name` ascending, then by `id`.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: level
+        in: query
+        required: true
+        description: The level whose targets to list; `global` answers an empty page.
+        schema:
+          $ref: '#/components/schemas/SalePermissionLevel'
+      - name: search
+        in: query
+        required: false
+        description: Matches the start of any word of the target's name, ignoring case.
+        schema:
+          type: string
+          maxLength: 80
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The targets
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SalePermissionTarget'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
@@ -44404,10 +44490,10 @@ components:
           type: string
           maxLength: 64
           pattern: ^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)*$
-          x-ticvai-unique: tenant
+          x-ticvai-unique: venue
           description: >-
             Lower case, digits and hyphens, with `/` between levels (`level/beginner` sits under `level`), as
-            `Product.segmentTags` has always been read. Unique in the tenant, compared ignoring case. Fixed once
+            `Product.segmentTags` has always been read. Unique in the venue, compared ignoring case. Fixed once
             products carry it (`409 tag-code-in-use`).
         name:
           type: string
@@ -44721,8 +44807,8 @@ components:
           type: string
           maxLength: 64
           pattern: ^[A-Z0-9][A-Z0-9_-]*$
-          x-ticvai-unique: tenant
-          description: Unique in the tenant, compared ignoring case (`409 duplicate-code`), so an import can name the set.
+          x-ticvai-unique: venue
+          description: Unique in the venue, compared ignoring case (`409 duplicate-code`), so an import can name the set.
         name:
           type: string
           maxLength: 120
@@ -44764,6 +44850,10 @@ components:
         **One field of a field set** (CHG-R8PRD-004). The four types the minutes name: `text`; `dropDown` and `radio`
         pick one of `options`; `checkBox` with `options` picks any number of them, and with none is a single tick
         (yes or no), as a consent box is.
+
+        **What a sale stores under `key`** in `dataMaskValues`: a string for `text`; the chosen option's `value` for
+        `dropDown` and `radio`; an array of the chosen options' values for a `checkBox` with options; `true` or
+        `false` for a single `checkBox`. A field left empty is absent, not null.
       required:
       - key
       - label
@@ -44774,6 +44864,11 @@ components:
           format: uuid
           readOnly: true
           description: The set it belongs to; from the path.
+        position:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: The field's place in `fields`, from 1; the server stores it from the order the set was sent in.
         key:
           type: string
           pattern: ^[a-z][a-zA-Z0-9]{0,39}$
@@ -44906,6 +45001,13 @@ components:
           description: >-
             What the rule names at its level: a venue (`site`), a `catalogue.sales_channel` (`salesChannel`), a
             workstation, a role or a principal (`user`). Null for `global` and only for it.
+        targetName:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The target's name as `listSalePermissionTargets` gives it, so the rule reads in words; null for `global`, and for a target that no longer exists.
         effect:
           type: string
           enum:
@@ -44935,6 +45037,13 @@ components:
         `salesChannel`, then `site`, then `global`), **and within that level `DENY` wins over `ALLOW`**. A context
         no rule matches is denied, so a product that is to sell everywhere except one place carries a `global`
         `ALLOW` and that one `DENY`. A guest channel has no seller, so only the first four levels can match it.
+
+        **A PUT keeps what it does not change**: a rule sent with the `level` and `targetId` of a saved one keeps
+        that rule's `id`; any other is new, and a saved rule not sent is removed.
+
+        **The product's own venue.** Today a product sells only at its own venue (`Product.venueId`, the
+        `variantsSellableAt` query), so a `site` rule naming another venue changes nothing until a product can be sold
+        at several (the wave 2 product form, decision 4 of the minutes); it is accepted so the rules can be prepared.
 
         **The precedence is proposed, the client to confirm**: the minutes give the six levels and allow or deny at
         each, not which wins when two disagree (Chinmay, 20 October 2026; open item for the products review call).
@@ -45095,7 +45204,9 @@ components:
       type: string
       description: >-
         **Why a product is on the "needs attention" list** (CHG-R8PRD-006). Each is read from what the product
-        already stores; `blocking` ones stop it being approved or sold, the others are warnings.
+        already stores; `blocking` ones stop it being approved or sold, the others are warnings. **The codes it
+        shares with `ProductLifecycleCommandCenterView.validationIssues` (`missingEntitlements`, `missingPricing`,
+        `missingChannels`, `awaitingApproval`) mean the same there, by the rules below** (CHG-R8PRD-007).
 
         - `awaitingApproval` (warning): `lifecycleState` is `inReview`.
 
@@ -45103,13 +45214,15 @@ components:
 
         - `missingCategory` (blocking): no `categoryId`.
 
-        - `noVariants` (blocking): no active variant (`ProductVariant.isActive`).
+        - `missingVariants` (blocking): no active variant (`ProductVariant.isActive`).
 
-        - `noSalesChannel` (blocking): `channels` empty.
+        - `missingChannels` (blocking): `channels` empty.
 
-        - `noPrice` (blocking): an active variant with no price in any active price list of the venue.
+        - `missingPricing` (blocking): an active variant with no price in any active price list of the venue, that is
+        a price list of the product's venue whose `status` is `active` and whose `validFrom` to `validTo` contains now
+        (an open end counts as open).
 
-        - `noEntitlement` (blocking): a product of a ticket kind (`admission`, `timedAdmission`,
+        - `missingEntitlements` (blocking): a product of a ticket kind (`admission`, `timedAdmission`,
         `datedAdmission`, `openDated`, `seated`, `membership`) with no `entitlementTemplateId`.
 
         - `endingSoon` (warning): `onSaleTo` within the next 30 days; `since` is `onSaleTo`.
@@ -45117,10 +45230,10 @@ components:
       - awaitingApproval
       - approvedNotLive
       - missingCategory
-      - noVariants
-      - noSalesChannel
-      - noPrice
-      - noEntitlement
+      - missingVariants
+      - missingChannels
+      - missingPricing
+      - missingEntitlements
       - endingSoon
     ProductAttentionItem:
       type: object
@@ -45162,6 +45275,28 @@ components:
           format: date-time
           nullable: true
           description: For `endingSoon`, the product's `onSaleTo`; null for every other reason, because the product records no time for them.
+    SalePermissionTarget:
+      type: object
+      x-ticvai-persistence: none — projection over platform.scope, catalogue.sales_channel, platform.workstation, identity.role and identity.principal
+      description: One thing a sale permission rule can name (CHG-R8PRD-007).
+      required:
+      - id
+      - level
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: What the rule's `targetId` takes.
+        level:
+          $ref: '#/components/schemas/SalePermissionLevel'
+        name:
+          type: string
+          description: The venue's, channel's, workstation's or role's name, or the person's display name.
+        detail:
+          type: string
+          nullable: true
+          description: A second line to tell two alike apart, e.g. a workstation's code or a person's username.
   securitySchemes:
     serviceAuth:
       type: http
