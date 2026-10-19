@@ -1022,8 +1022,9 @@ paths:
         forty rows is forty.
 
         **The client names the version, the target and the strategy; the server owns the rest.**
-        `profileId` comes from the path, and `id`, `status`, the counts, `failureReasons`,
-        `startedAt` and `completedAt` are `readOnly` and ignored on input. **Only a published
+        The body is `DeployConfigurationProfileRequest` (since 20 October 2026, APPROVALS-TENANCY-C07,
+        CHG-R8SPN-017); `profileId` comes from the path, and the answer's `id`, `status`, the counts,
+        `failureReasons`, `startedAt` and `completedAt` are the server's. **Only a published
         version deploys** — a draft is still editable, and a version edited underneath its
         deployments is what publishing exists to prevent.
       tags: [tenancy]
@@ -1038,7 +1039,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ProfileDeployment' }
+            schema: { $ref: '#/components/schemas/DeployConfigurationProfileRequest' }
       responses:
         '202':
           description: Queued
@@ -4547,12 +4548,10 @@ components:
           readOnly: true
           description: Taken from the path of `deployConfigurationProfile`.
         version:
+          readOnly: true
           type: integer
-          minimum: 1
-          description: 'The published version to deploy, named by the client (`deployConfigurationProfile`''s
-            body). It was `readOnly` until 20 October 2026, which left nothing to name the version and made the
-            409 `profile-version-draft` and `profile-version-not-found` unreachable (R8 blocker cause
-            APPROVALS-TENANCY-C07, CHG-R8SPN-017).'
+          description: 'The published version deployed, as `DeployConfigurationProfileRequest.version` named it (R8
+            blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017).'
         targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
         targetFilter:
           type: object
@@ -4579,6 +4578,35 @@ components:
             40 rows is forty.
         startedAt: { type: string, format: date-time, readOnly: true }
         completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+
+    DeployConfigurationProfileRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      description: '**What `deployConfigurationProfile` is asked to do** (20 October 2026, R8 blocker cause
+        APPROVALS-TENANCY-C07, CHG-R8SPN-017). Until then the body was `ProfileDeployment`, whose `version` is
+        `readOnly`, so nothing named the version to deploy and the 409 `profile-version-draft` and
+        `profile-version-not-found` could never happen. The client names the version, the target and the strategy;
+        the answer is the `ProfileDeployment` the server records.'
+      required: [version]
+      properties:
+        version:
+          type: integer
+          minimum: 1
+          description: The published version of the path's profile to deploy.
+        targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
+        targetFilter:
+          type: object
+          nullable: true
+          description: >
+            By department, type or venue, where the target is a set rather than a list.
+          properties:
+            venueIds: { type: array, items: { type: string, format: uuid } }
+            departmentIds: { type: array, items: { type: string, format: uuid } }
+            workstationTypes:
+              type: array
+              description: The same workstation-type values `ConfigurationProfile.venueKindScope` holds.
+              items: { type: string }
+        strategy: { type: string, enum: [immediate, staged, onNextIdle], default: onNextIdle }
 
     OfflinePolicy:
       type: object

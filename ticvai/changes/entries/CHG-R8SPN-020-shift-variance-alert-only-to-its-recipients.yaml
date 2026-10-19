@@ -1,0 +1,35 @@
+id: CHG-R8SPN-020
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A shift-variance alert, with its observed value and threshold, is read only by the alert rule''s recipient roles
+  and OVERSHORT_ACCEPT holders at the venue; any other caller, the shift''s own cashier among them, gets no such alert
+  (blind close, CHG-FIN-003). Written in shift.yaml submitShiftCount; listAlerts'' filter is the surface lane''s
+  part.'
+decision:
+  what: 'R8 blocker cause APPROVALS-TENANCY-C36 (lead answer: take the recommendation, option A). Core part:
+    contracts/spine/shift.yaml submitShiftCount. contracts/satellite/reporting.yaml listAlerts (the filter and the
+    omitted figures) is requested from the surface lane in the core lane report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 ticket 28733 (ADAM gap 28733/2): listAlerts showed shift-variance alerts, including the
+  observed variance, to the cashier. Finding: R8 blocker cause list, group approvals-tenancy.'
+keys_touched:
+  operations: [submitShiftCount, listAlerts]
+  files:
+  - contracts/spine/shift.yaml
+root_class: 'audience leak: a read returns a figure the decided rule hides from the caller'
+tickets:
+  started: []
+  unstarted:
+  - '28733 (the walk that found the gap).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28733/2'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Requested from the generators lane: a check-business-rules assertion that reporting listAlerts states the
+  recipient-role or OVERSHORT_ACCEPT rule for shift-variance alerts.'

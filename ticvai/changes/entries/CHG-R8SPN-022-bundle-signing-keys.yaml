@@ -1,0 +1,36 @@
+id: CHG-R8SPN-022
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A catalogue bundle''s signature is Ed25519 over contentHash with the cell''s bundle-signing key (private half in
+  the cell''s Key Vault); getBundleSigningKeys (new, PRODUCT_VIEW, workstation scope, paged, newest first, valid keys
+  only) returns the public halves, which the till caches; a retired key stays valid 7 days. Additive.'
+decision:
+  what: 'R8 blocker cause FOUNDATION-AI-C14 (lead answer: take the recommendation, option A). catalogue.yaml:
+    getBundleSigningKeys, BundleSigningKey (persistence none: read from Key Vault), CatalogueBundle.signature.
+    ADR-0013 C102 and ADR-0063 are the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 ticket 27706 OFFLINE-BUNDLE (ADAM gap 27706/6): the bundle signature''s algorithm, key
+  distribution and rotation grace were undefined. Finding: R8 blocker cause list, group foundation-ai.'
+keys_touched:
+  operations: [getBundleSigningKeys, getLatestBundle, reportBundleApplied]
+  schemas: [BundleSigningKey, CatalogueBundle]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'undecided value: a security parameter the build needs is set nowhere'
+tickets:
+  started: []
+  unstarted:
+  - '27706 (the walk that found the gap).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27706/6'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'New operation gates: permission PRODUCT_VIEW (as getLatestBundle), no config noun, PageSize and PageCursor with
+  order and statuses stated. It is bound by no screen (a till reads it in the background); the generators lane''s
+  lineage derive adds its entry (reads nothing from the database).'

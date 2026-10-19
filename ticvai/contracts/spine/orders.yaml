@@ -24369,6 +24369,11 @@ components:
           - refund
           - void
           - scan
+          - cashMovement
+          description: 'What was refused. `cashMovement` (20 October 2026, R8 blocker cause FOUNDATION-AI-C13;
+            CHG-R8SPN-021) is an offline lift or float replayed through `shift.createCashMovement` and refused
+            `409 shift-not-open` or `lift-exceeds-float`; its `payload` is the `CreateCashMovementRequest` the till
+            sent.'
         recordedAt:
           type: string
           format: date-time

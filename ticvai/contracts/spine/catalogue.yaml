@@ -4045,6 +4045,54 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /catalogue/bundle-signing-keys:
+    get:
+      operationId: getBundleSigningKeys
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: The public keys a till verifies catalogue bundles with
+      description: '**How a till verifies a bundle''s signature** (decided 20 October 2026, Chinmay, R8 blocker cause
+        FOUNDATION-AI-C14, option A; CHG-R8SPN-022; ADR-0013 C102). A bundle''s `signature` is an **Ed25519**
+        detached signature over its `contentHash`, made with the cell''s bundle-signing key, whose private half stays
+        in the cell''s Key Vault; `signatureKeyId` names the key. This read returns the public halves: the key in use
+        and any key retired within the last 7 days. The till caches them with the bundle and verifies offline; a
+        bundle signed by a key it does not hold makes it read this again before applying, and a signature that does
+        not verify is never applied (the till keeps the bundle it has and reports `signatureInvalid` through
+        `reportBundleApplied`). **Rotation grace**: after a rotation the previous key stays valid for 7 days
+        (`validTo`), so a till offline across a rotation can still verify the next bundle it pulls; after that
+        it must come online to fetch the new key.
+
+
+        **Order.** Newest first, by `validFrom` descending, then by `keyId`. **Statuses.** Only keys still valid
+        (`validTo` null or in the future) are returned; there are at most two, so one page always holds them.'
+      tags:
+      - bundle
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The valid bundle-signing public keys, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/BundleSigningKey'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /catalogue/bundles/{version}/applied:
     parameters:
     - name: version
@@ -23477,6 +23525,36 @@ components:
           type: string
         appliedByWorkstations:
           type: integer
+    BundleSigningKey:
+      x-ticvai-persistence: none — read from the cell's Key Vault (public halves only)
+      type: object
+      description: 'One public key a till verifies catalogue bundle signatures with (`getBundleSigningKeys`; R8 blocker
+        cause FOUNDATION-AI-C14, CHG-R8SPN-022). Nothing is stored in the database: the key pair lives in the cell''s
+        Key Vault and this is its public half.'
+      required:
+      - keyId
+      - algorithm
+      - publicKey
+      - validFrom
+      properties:
+        keyId:
+          type: string
+          description: The value a bundle carries in `signatureKeyId`.
+        algorithm:
+          type: string
+          enum:
+          - Ed25519
+        publicKey:
+          type: string
+          description: The raw 32-byte Ed25519 public key, base64url-encoded.
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null for the key in use; for a retired key, 7 days after the rotation that retired it.
     CatalogueBundle:
       x-ticvai-persistence: catalogue.published_bundle
       type: object
@@ -23505,6 +23583,10 @@ components:
           type: string
           description: 'Detached signature over `contentHash`. The terminal verifies before applying and
             rolls back on failure — a half-applied catalogue is never traded against.
+
+
+            **Ed25519**, with the key `signatureKeyId` names, whose public half `getBundleSigningKeys` returns
+            (FOUNDATION-AI-C14, CHG-R8SPN-022).
 
             '
         signatureKeyId:

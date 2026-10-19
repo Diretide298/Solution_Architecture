@@ -5,13 +5,14 @@ kind: contract
 summary: 'Every write names its target where the client can send it. setConfigurationProfile is keyed on the path''s
   profileId (201 when no profile has it; a body id must equal it, else 400). setOfflinePolicy and
   setConnectivityThresholds act on the caller''s venue scope node, and scopePath stays server-owned.
-  ProfileDeployment.version is no longer readOnly, so deployConfigurationProfile''s body names the version and its 409
-  profile-version-draft and profile-version-not-found can happen.'
+  deployConfigurationProfile takes DeployConfigurationProfileRequest (version required, target, strategy) instead of
+  ProfileDeployment, whose version is readOnly, so the body names the version and its 409 profile-version-draft and
+  profile-version-not-found can happen.'
 decision:
   what: 'R8 blocker cause APPROVALS-TENANCY-C07 (lead answer: take the recommendation, option A, the venue of the
     caller''s session, as the tenancy singleton PUTs do). contracts/spine/tenancy.yaml prose and
-    ProfileDeployment.version. setAlertRule (contracts/satellite/reporting.yaml) follows the same rule and is the
-    surface lane''s part, requested in the core lane report; the approved screens are unchanged.'
+    DeployConfigurationProfileRequest. setAlertRule (contracts/satellite/reporting.yaml) follows the same rule and is
+    the surface lane''s part, requested in the core lane report; the approved screens are unchanged.'
   by: Chinmay
   date: '2026-10-20'
 why: 'Walk of the Sprint 1 and 2 tickets 27800, 27801 and 28733 (ADAM gaps 27800/0, 27801/0, 27801/2, 28733/0): a field
@@ -19,7 +20,7 @@ why: 'Walk of the Sprint 1 and 2 tickets 27800, 27801 and 28733 (ADAM gaps 27800
   approvals-tenancy.'
 keys_touched:
   operations: [setConfigurationProfile, setOfflinePolicy, setConnectivityThresholds, deployConfigurationProfile]
-  schemas: [ProfileDeployment, OfflinePolicy, ConnectivityThresholds]
+  schemas: [DeployConfigurationProfileRequest, ProfileDeployment, OfflinePolicy, ConnectivityThresholds]
   files:
   - contracts/spine/tenancy.yaml
 root_class: 'contract gap: a readOnly field is the only thing naming a write''s target'
@@ -35,6 +36,6 @@ prevention:
   type: check
   ref: tools/check-contract-compat.py
 status: open
-notes: 'If check-contract-compat calls ProfileDeployment.version newly required on deployConfigurationProfile''s request
-  breaking, the core lane report carries the breaking-change entry for the lead: before this no client could name a
-  version, so no working client exists to break.'
+notes: 'If check-contract-compat calls version newly required on deployConfigurationProfile''s request breaking, the core
+  lane report carries the breaking-change entry for the lead: before this no client could name a version, so no
+  working client exists to break.'

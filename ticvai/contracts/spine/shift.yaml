@@ -1796,7 +1796,12 @@ paths:
         raised to the supervisors holding OVERSHORT_ACCEPT at the venue, on the venue's alerting
         channel (`tenancy.VenueSettings.alerting`); the shift appears on BO-040 and on the till's
         exceptions list (POS-020) for a supervisor, and the supervisor sees counted, expected and
-        variance there (`getShift`, `closeShift`, `acceptShiftVariance`). The cashier may give a
+        variance there (`getShift`, `closeShift`, `acceptShiftVariance`). **The alert itself is read only by
+        those it is for** (decided 20 October 2026, Chinmay, R8 blocker cause APPROVALS-TENANCY-C36, option A;
+        CHG-R8SPN-020): reporting's `listAlerts` returns a shift-variance alert, with its observed value and
+        threshold, only to a caller holding one of the alert rule's recipient roles or OVERSHORT_ACCEPT at the
+        venue; any other caller, the shift's own cashier among them, gets no such alert at all (POS-025's
+        banner simply shows fewer). The cashier may give a
         reason and a note with the count (`cashierReason`, `notes`; DI-803) without being told the
         amount. **A recount the supervisor asks for** (DI-804) is submitted the same way from
         `pendingVariance`; every count is kept (`CashCountLine`, `countKind` close) and the latest
@@ -2151,6 +2156,14 @@ paths:
         warning never blocks a sale, and the cashier is told only that the drawer is over its limit, not
         what it holds (CHG-FIN-003). A supervisor recording the lift counts what they take, which makes it
         counted cash.
+
+        **Offline, the till journals the movement and replays this same call** (decided 20 October 2026,
+        Chinmay, R8 blocker cause FOUNDATION-AI-C13, option A; CHG-R8SPN-021). On reconnect the journal calls
+        `createCashMovement` itself, with the `Idempotency-Key` the movement was taken with and its
+        `recordedAt` (when it happened at the till), so a replay sent twice records it once. It is not part
+        of `syncOrders`. A replay refused `409 shift-not-open` or `lift-exceeds-float` is not retried: the till
+        quarantines it through `recordSyncRejection` with `kind` `cashMovement` and the request body as the
+        `payload`, and a supervisor resolves it on the sync rejections list like any other.
       tags: [cash]
       x-ticvai-permission: CASH_LIFT
       x-ticvai-scope-level: venue
