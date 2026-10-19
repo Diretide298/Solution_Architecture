@@ -5494,6 +5494,13 @@ paths:
 
         Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA (audit R135).
 
+        **How the cell admits the operator here and in `listOwnPlatformStaffGrants`** (R8 blocker IDENTITY-C20,
+        CHG-R8MIG-006; the lead''s answer, option A). The operator is not a principal of this tenant: the cell
+        validates the Control Plane token, takes its subject as `operatorPrincipalId` (a plain uuid, no foreign
+        key) and reads the MFA step-up from the token''s `amr` claim, never from a tenant session. The transaction
+        runs with `ticvai.scope_paths` set to the tenant root and the operator as the audited actor
+        (`AuditRecord.platformStaffGrantId` once the grant exists).
+
         '
       tags:
       - administration
@@ -5504,7 +5511,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-step-up: mfa
-      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
+      x-ticvai-step-up-carrier: session   # the MFA step-up on the caller's Control Plane token, its amr claim (CHG-R8MIG-006)
       x-ticvai-step-up-reason: Opens a platform operator's access into a tenant's data.
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/TenantId
@@ -9035,11 +9042,14 @@ components:
           type: string
           format: uuid
         operatorPrincipalId:
-          x-ticvai-references: identity.principal
+          x-ticvai-references: none
           type: string
           format: uuid
           readOnly: true
-          description: The platform operator, from the Control Plane token. Set by the server.
+          description: 'The platform operator, from the Control Plane token (its subject). Set by the server. **Not a
+            row in this tenant''s `identity.principal`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead''s answer,
+            option A): an operator is the Control Plane''s, so this is a plain uuid with no foreign key, and the key
+            V0107 adds is dropped by the next forward migration.'
         operatorDisplayName:
           type: string
           readOnly: true
@@ -10530,8 +10540,9 @@ components:
           maxLength: 256
         credential:
           type: string
-          description: 'Password, PIN, card token or RFID token depending on `method`. Compared with the
-            principal''s `PrincipalCredential.credentialHash` and never stored (ADR-0071, CHG-CRD-003).
+          description: 'The password for `password`; the PIN for `pin`, `card` and `rfid`. Compared with the
+            principal''s `PrincipalCredential.credentialHash` (method `password` or `pin`) and never stored (ADR-0071,
+            CHG-CRD-003). A badge carries no secret: see `method`.
 
             '
           maxLength: 512
@@ -10555,6 +10566,15 @@ components:
 
 
             Added 10 September 2026 for `POS-000 Sign In`.
+
+
+            **`card` and `rfid` say how the username was entered, not a credential of their own** (R8 blocker
+            IDENTITY-C36, CHG-R8MIG-006; the lead''s answer, option C). A badge tap at POS-000 or SCN-001 fills
+            `username` with the employee number the badge carries, and the operator still types the PIN in
+            `credential`, which is checked against the principal''s `pin` credential exactly as for `pin`. No badge
+            token is stored and `PrincipalCredential.method` stays `password` or `pin`. **`sso` is not a login
+            method**: an SSO sign-in goes through `startSsoAuthorization` and `completeSsoAuthorization`, and a
+            `login` with `method` `sso` is refused 400.
 
             '
           enum:

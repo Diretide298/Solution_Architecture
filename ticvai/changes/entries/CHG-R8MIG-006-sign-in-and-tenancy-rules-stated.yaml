@@ -1,0 +1,52 @@
+id: CHG-R8MIG-006
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Three sign-in and tenancy rules the tickets needed are written where the developer reads them: an installed
+  staff app names its tenant by host (a staffApp channel on control.tenant_domain, no tenant header); a platform
+  operator is not a tenant principal (PlatformStaffGrant.operatorPrincipalId has no foreign key, the cell runs the
+  grant operations at the tenant root with the operator as audited actor, MFA from the Control Plane token''s amr
+  claim); a badge tap fills the username only and the PIN is the credential, and sso is refused by login.'
+decision:
+  what: 'R8 blocker causes FOUNDATION-AI-C26 (option A), IDENTITY-C20 (option A) and IDENTITY-C36 (option C), as the lead
+    answered on 20 October 2026 ("take the recommendation"). contracts/spine/tenancy.yaml TenantDomain.channel gains
+    staffApp, and resolveTenantHost says devices resolve by host; contracts/spine/identity.yaml
+    PlatformStaffGrant.operatorPrincipalId x-ticvai-references none (the next forward migration drops the key V0107
+    added), openPlatformStaffGrant states the cell context; LoginRequest.method and credential say what card and rfid
+    mean. sso stays in the enum (removing a request value is breaking) and is refused 400.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), groups foundation-ai and identity; tickets 27666 (SETUP-AUTH),
+  27765, 27732, 27761 and 27762: a device had no declared way to name its tenant, every openPlatformStaffGrant would
+  fail the foreign key to identity.principal, and login accepted card, rfid and sso with nothing to check them against.'
+keys_touched:
+  operations: [resolveTenantHost, openPlatformStaffGrant, listOwnPlatformStaffGrants, login]
+  schemas: [TenantDomain, PlatformStaffGrant, LoginRequest]
+  tables:
+  - control.tenant_domain
+  - identity.platform_staff_grant
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/identity.yaml
+  - tools/ddl_forward.py
+  - tools/ticket_done.py
+  - tools/tests/test_migration_generator.py
+root_class: 'undefined rule: an operation''s storage or identity depends on a rule the contract never stated'
+tickets:
+  started: []
+  unstarted:
+  - '27666, 27765, 27732, 27761, 27762.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::widened_check
+status: open
+notes: 'Generator (tools/ddl_forward.py, three tests): a column CHECK that only gains values is written in the forward
+  migration (dropped, added NOT VALID, validated), and a foreign key the contract withdraws is dropped, guarded, in the
+  names file (ticket_done reads its tag); both were review rows a person had to write. Breaking by check-contract-compat: resolveTenantHost and setTenantDomainMapping responses gain the channel value
+  staffApp (the lead adds the breaking-changes entry; the lane report has it). Requested of the backend repository:
+  TenantResolutionMiddleware stops reading X-Ticvai-Tenant. Requested of the screens owner: SCN-001 credential notes
+  say the badge fills the username and the PIN is the credential.'

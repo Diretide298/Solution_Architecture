@@ -315,6 +315,46 @@ def retire_not_null(t: str, c: str) -> str:
             f"ALTER COLUMN {c} DROP NOT NULL; END IF; END $$")
 
 
+def _inline_check(coldef: str):
+    """(name, the whole `CONSTRAINT <name> CHECK (...)` text, the expression inside) of a column's inline CHECK."""
+    m = re.search(r"CONSTRAINT (\S+) CHECK \(", coldef, re.I)
+    if not m:
+        return None
+    depth, i = 0, m.end() - 1
+    for j in range(i, len(coldef)):
+        depth += {"(": 1, ")": -1}.get(coldef[j], 0)
+        if depth == 0:
+            return m.group(1), coldef[m.start():j + 1], coldef[i + 1:j]
+    return None
+
+
+IN_LIST = re.compile(r"^(\w+) IN \((.*)\)$", re.S)
+
+
+def widened_check(old_def: str, new_def: str):
+    """**A column CHECK that only gained values** (CHG-R8MIG-006): the same column but for an inline
+    `CHECK (col IN (...))` whose new list holds every old value and more. Returns (constraint name, the new
+    `CONSTRAINT ... CHECK (...)` clause), else None. Widening refuses no row that was valid, so it is additive."""
+    o, n = _inline_check(old_def), _inline_check(new_def)
+    if not o or not n or o[0] != n[0]:
+        return None
+    if norm(old_def.replace(o[1], "")) != norm(new_def.replace(n[1], "")):
+        return None
+    mo, mn = IN_LIST.match(o[2].strip()), IN_LIST.match(n[2].strip())
+    if not mo or not mn or mo.group(1) != mn.group(1):
+        return None
+    vals = lambda s: {v.strip() for v in re.findall(r"'(?:[^']|'')*'", s)}
+    old_v, new_v = vals(mo.group(2)), vals(mn.group(2))
+    if not old_v or not old_v < new_v:
+        return None
+    return n[0], n[1]
+
+
+def guard_drop_constraint(t: str, name: str) -> str:
+    return (f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
+            f"to_regclass('{t}')) THEN ALTER TABLE {t} DROP CONSTRAINT {name}; END IF; END $$")
+
+
 def only_not_null_dropped(old_def: str, new_def: str) -> bool:
     """`new_def` is `old_def` with its NOT NULL taken off and nothing else changed (not a key column)."""
     if "PRIMARY KEY" in old_def.upper() or not re.search(r"\bNOT NULL\b", old_def, re.I):
@@ -496,7 +536,16 @@ class Model:
                     # constraint, as it is in the generated CREATE TABLE, so the next diff does not write it again.
                     a = re.match(rf"ADD (CONSTRAINT {NAME} CHECK .*?)(?: NOT VALID)?$", action, re.I)
                     if a:
-                        tab.constraints.add(norm(a.group(1)))
+                        # a column CHECK widened in place (CHG-R8MIG-006) replaces the column's inline CHECK
+                        added = norm(a.group(1))
+                        nm = _inline_check(added)
+                        inline = [c_ for c_, d_ in tab.cols.items()
+                                  if nm and (_inline_check(d_) or ("",))[0] == nm[0]]
+                        if inline:
+                            d_ = tab.cols[inline[0]]
+                            tab.cols[inline[0]] = norm(d_.replace(_inline_check(d_)[1], added))
+                        else:
+                            tab.constraints.add(added)
                         handled = True
                         continue
                     if re.match(rf"VALIDATE CONSTRAINT {NAME}$", action, re.I):
@@ -890,6 +939,18 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     elif a.cols[c] == relaxed(d):
                         review("not null", f"{t}.{c}", "still nullable in the databases; the schema reference "
                                "says NOT NULL", "backfill, then ALTER COLUMN ... SET NOT NULL")
+                    elif widened_check(a.cols[c], d):
+                        # **A column CHECK that only gained values is written** (CHG-R8MIG-006: an enum value the
+                        # contract adds, TenantDomain.channel staffApp): dropped and added again NOT VALID, then
+                        # VALIDATE, as a new table CHECK is; apply_forward folds it into the column, so once.
+                        name, clause = widened_check(a.cols[c], d)
+                        p.statements += [f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}",
+                                         f"ALTER TABLE {t} ADD {clause} NOT VALID",
+                                         f"ALTER TABLE {t} VALIDATE CONSTRAINT {name}"]
+                        old_clause = _inline_check(a.cols[c])[1]
+                        p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}; "
+                                          f"ALTER TABLE {t} ADD {old_clause} NOT VALID;")
+                        p.counts["other"] += 1
                     elif only_not_null_dropped(a.cols[c], d):
                         # **A column the contract makes optional loses its NOT NULL here** (CHG-R8MIG-004, R8 blockers
                         # APPROVALS-TENANCY-C09, ORDERS-MONEY-C35, IDENTITY-C12): relaxing NOT NULL touches no row and
@@ -1188,6 +1249,17 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     continue
                 review("index dropped", k[1], "no longer generated", "DROP INDEX by hand if intended")
         elif kind == "constraint":
+            fk_ = parse_fk(old.stmts[k])
+            nt_ = new.tables.get(k[1])
+            if (fk_ and k[1] not in removed_tables and k[1] not in renamed_away and nt_ is not None
+                    and all(c_ in nt_.cols for c_ in fk_[2])):
+                # **A foreign key the contract withdraws is dropped** (CHG-R8MIG-006, R8 blocker IDENTITY-C20:
+                # `x-ticvai-references: none` on PlatformStaffGrant.operatorPrincipalId). Its column stays; dropping a
+                # key refuses no write. Guarded, and the rollback adds it again.
+                recon_drop.append((tag(k[1], "drop foreign key", k[2], guard_drop_constraint(k[1], k[2]), fk_[3]),
+                                   old.stmts[k].rstrip().rstrip(";") + " NOT VALID;"))
+                p.recon_counts["keys"] += 1
+                continue
             if k[1] not in removed_tables:
                 review("constraint dropped", f"{k[1]} {k[2]}", "no longer generated",
                        "ALTER TABLE ... DROP CONSTRAINT by hand if intended")
@@ -1280,7 +1352,7 @@ def render_recon(p: Plan, version: str, baseline: str, stamp: str, before: str =
     body = "\n\n".join(x.rstrip().rstrip(";") + ";" for x in p.recon)
     checksum = _h.sha256(body.encode("utf-8")).hexdigest()
     c = p.recon_counts
-    what = (f"{c['renames']} column rename(s), {c['keys']} key(s) added or renamed, {c['indexes']} index(es) "
+    what = (f"{c['renames']} column rename(s), {c['keys']} key(s) added, renamed or dropped, {c['indexes']} index(es) "
             "renamed or dropped")
     desc = f"after {baseline}, names the contracts use: {what}"
     lines = [

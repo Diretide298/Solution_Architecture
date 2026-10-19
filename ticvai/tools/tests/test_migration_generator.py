@@ -634,3 +634,44 @@ def test_a_type_change_with_the_not_null_dropped_is_still_a_decision():
     p = fwd.diff("tenant", model(AR_OLD), model(new))
     assert not [s for s in p.statements if "DROP NOT NULL" in s]
     assert [r for r in p.review if r[0] == "column changed"]
+
+
+CH_OLD = ("CREATE TABLE IF NOT EXISTS control.tenant_domain (id uuid PRIMARY KEY NOT NULL, channel text CONSTRAINT "
+          "tenant_domain_channel_chk CHECK (channel IN ('guestWeb', 'backOffice')));\n")
+CH_NEW = CH_OLD.replace("'backOffice')", "'backOffice', 'staffApp')")
+
+
+def test_a_column_check_that_only_gains_values_is_written_not_valid_then_validated_once():
+    p = fwd.diff("control", model(CH_OLD), model(CH_NEW))
+    assert any("DROP CONSTRAINT IF EXISTS tenant_domain_channel_chk" in s for s in p.statements), p.statements
+    add = [s for s in p.statements if " ADD CONSTRAINT tenant_domain_channel_chk" in s]
+    assert add and "'staffApp'" in add[0] and add[0].endswith("NOT VALID")
+    assert any("VALIDATE CONSTRAINT tenant_domain_channel_chk" in s for s in p.statements)
+    assert not [r for r in p.review if r[0] == "column changed"], p.review
+    again = fwd.diff("control", fold(CH_OLD, p), model(CH_NEW))
+    assert not again.statements and not again.review, (again.statements, again.review)
+
+
+def test_a_column_check_that_loses_a_value_is_still_a_decision():
+    p = fwd.diff("control", model(CH_NEW), model(CH_OLD))
+    assert not [s for s in p.statements if "tenant_domain_channel_chk" in s]
+    assert [r for r in p.review if r[0] == "column changed"]
+
+
+PSG = ("CREATE TABLE IF NOT EXISTS identity.principal (id uuid PRIMARY KEY NOT NULL);\n"
+       "CREATE TABLE IF NOT EXISTS identity.platform_staff_grant (id uuid PRIMARY KEY NOT NULL, "
+       "operator_principal_id uuid NOT NULL);\n")
+PSG_FK = ("ALTER TABLE identity.platform_staff_grant ADD CONSTRAINT platform_staff_grant_operator_principal_id_fkey "
+          "FOREIGN KEY (operator_principal_id) REFERENCES identity.principal(id);\n")
+
+
+def test_a_foreign_key_the_contract_withdraws_is_dropped_guarded_in_the_names_file():
+    p = fwd.diff("tenant", model(PSG + PSG_FK), model(PSG))
+    drop = [s for s in p.recon if "DROP CONSTRAINT platform_staff_grant_operator_principal_id_fkey" in s]
+    assert drop and "pg_constraint" in drop[0] and "| drop foreign key |" in drop[0]
+    assert any("ADD CONSTRAINT platform_staff_grant_operator_principal_id_fkey" in r for r in p.recon_rollback)
+    assert not [r for r in p.review if r[0] == "constraint dropped"], p.review
+    folded = model(PSG + PSG_FK)
+    folded.apply_forward(";\n".join(s.split("\n", 1)[1] for s in p.recon) + ";\n")
+    again = fwd.diff("tenant", folded, model(PSG))
+    assert not again.recon and not again.review, (again.recon, again.review)

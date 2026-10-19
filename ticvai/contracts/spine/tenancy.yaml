@@ -366,6 +366,11 @@ paths:
         informational. A platform subdomain is written with `verifiedAt` set at provisioning, so one rule
         serves both kinds of host.
 
+
+        **Installed staff apps resolve the same way** (R8 blocker FOUNDATION-AI-C26, CHG-R8MIG-004): a handheld,
+        POS, scanner or kiosk is provisioned with its tenant''s platform subdomain as its API host (a `staffApp`
+        channel row), so its login and token refresh name the tenant by host; there is no tenant header.
+
         '
       tags:
       - tenancy
@@ -3960,6 +3965,12 @@ components:
           - backOffice
           - partnerPortal
           - developerPortal
+          - staffApp
+          description: '`staffApp` (R8 blocker FOUNDATION-AI-C26, CHG-R8MIG-004; the lead''s answer, option A): **an
+            installed staff app (handheld, POS, scanner, kiosk) names its tenant by host**, like every other caller.
+            The device is provisioned with the tenant''s platform subdomain as its API host, and login, refresh and
+            every later call resolve the tenant from that host through `resolveTenantHost`; no tenant header or
+            body field is read.'
         status:
           type: string
           enum:
