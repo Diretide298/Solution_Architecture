@@ -208,7 +208,18 @@ CHECKS = [
     # never shows 0 for sub-tasks it could not read, /ticket with no number starts the next workable ticket instead of
     # asking, and /update-adam refreshes only ADAM's own command files in a workspace. Reads ../viewer. Strict.
     "check-adam-subtasks",
+    # 20 October (r8 second fix round, generators lane, CHG-R8GEN-001..003): one permission vocabulary -- every place
+    # that names a permission names a value of the Permission enum, and the derived copies agree with it.
+    "check-permission-vocabulary",
+    # 20 October (same round, CHG-R8GEN-002): a refresh step that writes into an authored input (the lineage, the
+    # screens, the flows, the contracts' consumed-by, roles-by-app.yaml ...) is a fixed point: run once more after the
+    # refresh it changes nothing. Runs alone (SERIAL: it writes while it runs, then puts every file back) and with the
+    # arguments in ARGS; about fifteen minutes, link-screens-contracts left to the full form (--skip-slow).
+    "check-regenerate-twice",
 ]
+
+# Arguments a checker is run with here, when its bare form is not the one a gate run needs (CHG-R8GEN-002).
+ARGS = {"check-regenerate-twice": ["--once", "--skip-slow"]}
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
 REPORT_ONLY = {
@@ -258,7 +269,7 @@ REPORT_ONLY = {
 # without waiting and skips when another holds it. check-parameter-columns, the 69th (CHG-FXC-003, merged into
 # r1-fix-merge on 4 October), only reads. So the set is empty, and a checker that starts
 # writing a shared file must be added here in the same change.
-SERIAL = set()
+SERIAL = {"check-regenerate-twice"}   # writes the package while it runs (20 October 2026, CHG-R8GEN-002)
 
 
 def _run_one(t):
@@ -267,7 +278,7 @@ def _run_one(t):
     if not os.path.exists(path):
         return t, 127, None, 0.0
     t0 = time.time()
-    p = subprocess.run([sys.executable, path], capture_output=True, text=True,
+    p = subprocess.run([sys.executable, path] + ARGS.get(t, []), capture_output=True, text=True,
                        encoding="utf-8", errors="replace", cwd=ROOT,
                        env=dict(os.environ, PYTHONIOENCODING="utf8"))
     return t, p.returncode, (p.stdout or "") + (p.stderr or ""), time.time() - t0
