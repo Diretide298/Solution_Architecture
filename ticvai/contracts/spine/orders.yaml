@@ -7729,7 +7729,12 @@ paths:
         reservations; another guest''s reservation is refused exactly as one that does not exist, never
         returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
-        
+        **Upcoming and Past, as GST-016 splits them** (decided 20 October 2026, Chinmay, R8 blocker cause
+        ORDERS-MONEY-C13, option A; CHG-R8SPN-026): by status and hold expiry, from fields every row carries.
+        **Upcoming** is `status` `held` with `expiresAt` in the future; **Past** is every other row (`converted`,
+        `expired` or `cancelled`, and a `held` row whose `expiresAt` has passed but the sweeper has not yet
+        expired). The screen asks once with no `status` and splits the page itself; the card already shows when
+        the hold expires.
 
         **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
@@ -14050,6 +14055,15 @@ paths:
         every read, like `appliedPromotionIds`.
 
         Applying a code the cart already holds returns the cart unchanged.
+
+        **A promotion''s own code is accepted as well as a coupon campaign''s** (decided 20 October 2026, Chinmay,
+        R8 blocker cause ORDERS-MONEY-C11: option A for automatic promotions, B for code promotions; CHG-R8SPN-026).
+        The code is looked up first among the venue''s live promotions that need a code (`promotions.Promotion`
+        with a code), then among coupon campaign codes; either way it is kept on `Cart.couponCodes` and
+        evaluated as above. This is what WEB-032''s "Use this offer" does for a promotion that needs a code: it
+        carries the code to the cart through this call, so the offer shows on the price before the guest pays.
+        An automatic promotion needs no call: `evaluatePromotions` already applies it at the basket, and the
+        button only returns to the list. No new cart field.
 
         '
       tags:
