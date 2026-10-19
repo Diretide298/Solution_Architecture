@@ -4845,9 +4845,18 @@ paths:
       x-ticvai-api-scope: ticketing.read
       parameters:
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
+      - name: X-Order-Access-Token
+        in: header
+        required: false
+        description: '`Order.orderAccessToken` from `checkoutCart`''s answer, in place of a session (IDENTITY-C52,
+          CHG-R8SPN-025). Valid 24 hours for this order only; a token for another order, expired or forged, is
+          `404`, as an order that does not exist.'
+        schema:
+          type: string
       security:
       - guestAuth: []
       - bearerAuth: []
+      - {}
       x-ticvai-audience:
       - staff
       - guest
@@ -4859,6 +4868,13 @@ paths:
         `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they
         placed; another guest's order is refused exactly as one that does not exist, never returned.
         `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
+        **Or with the order's access token and no session** (decided 20 October 2026, Chinmay, R8 blocker
+        cause IDENTITY-C52, option A; CHG-R8SPN-025): the device that checked out, or a payer with no
+        session, sends `X-Order-Access-Token` (`Order.orderAccessToken`, from `checkoutCart`) and reads this
+        one order for 24 hours. With neither a session nor a valid token for this order the answer is `404`.
+        For a signed-in guest a `404` is also what WEB-013 and WEB-012 show as their no-access state: the
+        guest's own order lookup found nothing they may see (IDENTITY-C28); no permission is involved.
       tags:
       - order
       x-ticvai-permission: ORDER_VIEW
@@ -7292,6 +7308,10 @@ paths:
         permission; it reprints only an order the guest at it has identified (KSK-012 booking found, KSK-009
         ticket issued, KSK-010 print failure), and each reprint is recorded against the device.
 
+        **`delivery` `wallet` is "Add to wallet"** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C29,
+        option A; CHG-R8SPN-025): one call adds every ticket of the order (or the lines named) to the guest''s
+        phone wallet, which is what WEB-013''s approved button does; no other operation is needed.
+
         '
       tags:
       - order
@@ -7576,7 +7596,9 @@ paths:
         appears where the caller is its sender (`fromSubjectId`) or, once claimed, its recipient
         (`toSubjectId`).
 
-        
+        **`claimUrl` is null on a transfer the caller sent** (decided 20 October 2026, Chinmay, R8 blocker cause
+        IDENTITY-C26, option A; CHG-R8SPN-025): it carries the claim token, and the sender must not be able to
+        claim on the recipient''s behalf. It is returned only on the recipient''s own rows.
 
         **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
@@ -7615,7 +7637,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Transfers, newest offer first — `offeredAt` descending, `id` as the tiebreak.
+          description: Transfers, soonest to lapse first — `expiresAt` ascending, `id` as the tiebreak (the order the
+            description and the cursor use; IDENTITY-C26).
           content:
             application/json:
               schema:
@@ -21964,7 +21987,8 @@ components:
             deep-link table (`white-label.DeepLinkScheme`), pattern `transferClaim`: the tenant''s `baseUrl` plus
             `/t/{transferId}?token={claimToken}`. It opens the app on `/general/ticket-transfer` (GST-014) where the
             app is installed, and the storefront claim page otherwise. Once released the pattern never changes, so
-            a link already sent keeps working.'
+            a link already sent keeps working. **Never returned to the sender** in `listTicketTransfers` (null on
+            the rows the caller sent; IDENTITY-C26, CHG-R8SPN-025).'
         claimToken:
           x-ticvai-secret: blind-index
           type: string
@@ -23437,6 +23461,18 @@ components:
           type: string
           format: uuid
           description: The client UUIDv7 from `CreateOrderRequest.id`.
+        orderAccessToken:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**What lets the device that just checked out read the order it paid for** (decided 20 October
+            2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in
+            `checkoutCart`''s answer, null everywhere else: a signed token bound to this order and to the cart''s
+            device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a
+            session, so a guest who checked out with no account, or whose session ended, still sees the
+            confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing
+            else.'
         orderNumber:
           x-ticvai-unique: tenant
           type: string

@@ -675,8 +675,9 @@ paths:
         '
       tags:
       - identity
-      x-ticvai-permission: GUEST_VIEW
-      x-ticvai-guest-callable: true
+      # No staff permission: a guest or a visitor proves their own address (ADR-0025; R8 blocker cause IDENTITY-C28,
+      # CHG-R8SPN-025). GUEST_VIEW was a staff permission no guest holds, so nothing could be refused for lacking it.
+      x-ticvai-permission: null
       x-ticvai-audience:
       - guest
       - anonymous
@@ -3133,7 +3134,15 @@ paths:
       x-ticvai-audience:
       - anonymous
       summary: Sign in with Apple or Google
-      description: 'Where the provider''s verified email matches an existing account, the identities are
+      description: '**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay,
+        R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label''s published tenant config, which the
+        app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple
+        and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
+        provider rows. The client secret and the audience checks stay here, server-side, in the provider row
+        (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
+        against the one registered (`DomainReadiness.uaePassRedirect`).
+
+        Where the provider''s verified email matches an existing account, the identities are
         linked rather than a duplicate created. Where it does not, a new account is created — an unverified
         email from a provider is not proof of ownership.
 
@@ -3206,7 +3215,15 @@ paths:
       x-ticvai-audience:
       - anonymous
       summary: Sign in with a national identity provider
-      description: 'OAuth authorisation-code exchange. Returns a verified identity, so an account created
+      description: '**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay,
+        R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label''s published tenant config, which the
+        app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple
+        and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
+        provider rows. The client secret and the audience checks stay here, server-side, in the provider row
+        (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
+        against the one registered (`DomainReadiness.uaePassRedirect`).
+
+        OAuth authorisation-code exchange. Returns a verified identity, so an account created
         this way needs no further verification.
 
         Government onboarding has lead time and should be started before it becomes the critical path.
@@ -3695,6 +3712,18 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          x-ticvai-problem-types: [session-active-elsewhere, workstation-in-use]
+          description: '**Refused exactly as `login` refuses** (decided 20 October 2026, Chinmay, R8 blocker cause
+            IDENTITY-C24, option A; CHG-R8SPN-025; ADR-0004, audit R184): the principal the provider proved already
+            holds an active session on another device (`session-active-elsewhere`), or the handheld or till is in
+            use by somebody else (`workstation-in-use`). Signing in through a provider never ends the other session;
+            a supervisor ends it with `forceLogout`. The answer says since when and on what (`SessionHeldProblem`:
+            `openedAt` and `deviceLabel`; ADAM CR-170).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SessionHeldProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/sso-config:
