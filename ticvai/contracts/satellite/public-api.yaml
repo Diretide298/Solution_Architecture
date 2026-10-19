@@ -1046,8 +1046,14 @@ paths:
         breaking change with no deprecation window breaks somebody else's business.**
 
         ADR-0026 records the versioning rule. This exposes it.
+
+        **Open to an anonymous caller, so it holds no permission** (r8 walk of ticket 27983; lead decision of 20
+        October 2026, option A): the reference is public, a developer arrives with no account (F27). The permission
+        a staff caller must hold (`DEVELOPER_VIEW`, ADR-0025) is not enforced here, and a signed-in staff caller
+        without it is not refused. Nobody is refused on this read, so the screen's no-access state cannot be reached
+        through it.
       tags: [publicApi]
-      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-permission: null
       x-ticvai-audience: [public, partner]
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
@@ -1517,8 +1523,11 @@ paths:
         client reaches them by its credential, not by a grant.
 
         **Order.** Sorted by `operationId` descending (a UUIDv7, so newest first).
+
+        **Open to an anonymous caller, so it holds no permission**, as `listApiVersions` (r8 walk of ticket 27983;
+        lead decision of 20 October 2026, option A); `DEVELOPER_VIEW` is not enforced here.
       tags: [publicApi]
-      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-permission: null
       x-ticvai-audience: [public, staff, partner]
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica

@@ -10584,7 +10584,27 @@ components:
       x-ticvai-persistence: none — embedded as jsonb on ai.suggestion and ai.forecast_version
       description: '**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn).
         The customer sees a stage badge and a "Based on" chip, never a bare percentage (design 5.6), and "Limited
-        historical data" while the starting pattern carries more than half the weight.'
+        historical data" while the starting pattern carries more than half the weight.
+
+
+        **The stage rule per kind** (r8 walk of ticket 27723; lead decision of 20 October 2026, option A). The
+        stage of an answer is decided by the days of the tenant''s own data behind its kind, against that kind''s
+        `Minimum` in `SuggestionKind`: `starting` below the minimum, `learning` from the minimum, `established` from
+        three times the minimum, `learned` only by promotion (AI-D16). For the Block A kinds that is:
+
+        | kind | minimum | learning from | established from |
+
+        |---|---|---|---|
+
+        | queueBalancing | 14 days | day 14 | day 42 |
+
+        | prepPlan | 28 days (4 weeks) | day 28 | day 84 |
+
+        | upsell | 90 days | day 90 | day 270 |
+
+        The 28-day seeded run of AI-ENGINE-BASELINE therefore proves `learning` for `queueBalancing` and `prepPlan`.
+        `upsell` cannot read `learning` at day 28 and is checked at day 90 with a seeded fixture of 90 days of orders.
+        Other kinds follow the same rule with their own minimum.'
       required:
       - stage
       - basedOn
