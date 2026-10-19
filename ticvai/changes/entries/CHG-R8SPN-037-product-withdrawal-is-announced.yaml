@@ -1,0 +1,34 @@
+id: CHG-R8SPN-037
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Withdrawing a product writes catalogue.productWithdrawn to the outbox (productId, venueIds, variantIds,
+  withdrawnAt) in the same transaction, as publishing writes catalogue.productPublished, so AI''s Help me choose job
+  can raise a new suggestion when a mapped product is withdrawn.'
+decision:
+  what: 'R8 blocker cause FOUNDATION-AI-C39 (no decision needed). Core part: catalogue.yaml transitionProductLifecycle
+    (catalogue''s events are declared in the event files'' emittedBy, so no x-ticvai-emits change). The event file
+    events/catalogue-productWithdrawn.yaml, the AI job''s internal operation and trigger values (ai.yaml),
+    white-label''s guidedChoiceRecords query, the consumer purpose on catalogue-productPublished.yaml and
+    docs/architecture/ai-system-design.md 3.2 are the surface lane''s part (exact request in the core lane report).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 ticket 27712 AI-ENGINE-GUIDED (ADAM gap 27712/0): the Help me choose job had no trigger
+  events and no query for the published choice. Finding: R8 blocker cause list, group foundation-ai.'
+keys_touched:
+  operations: [transitionProductLifecycle]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'contract gap: a consumer''s trigger is an event nobody publishes'
+tickets:
+  started: []
+  unstarted:
+  - '27712 (the walk that found the gap).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27712/0'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open

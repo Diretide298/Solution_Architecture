@@ -4876,6 +4876,11 @@ paths:
         Withdrawal stops new sales and leaves existing entitlements intact. Archiving is refused while
         entitlements remain unexpired.
 
+        **Withdrawal is announced** (R8 blocker cause FOUNDATION-AI-C39; CHG-R8SPN-037): `withdraw` (live to
+        withdrawn) writes `catalogue.productWithdrawn` to the outbox in the same transaction (productId, venueIds,
+        variantIds, withdrawnAt), as `publish` writes `catalogue.productPublished`. AI''s Help me choose job consumes it
+        (a mapped product withdrawn raises a new suggestion) and white-label''s published bundle drops the product.
+
         '
       tags:
       - product
