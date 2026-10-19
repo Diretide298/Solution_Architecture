@@ -8424,6 +8424,10 @@ components:
       # One current credential per principal and method; the replaced ones are the history rows (CHG-CRD-001).
       x-ticvai-unique-together:
       - [principalId, method]
+      # The principal's own rows, a grant over the principal's home scope, and the tenant root (R8 blocker IDENTITY-C37,
+      # CHG-R8MIG-007): changeOwnCredential and the failed-attempt count run as the principal, at any venue;
+      # createPrincipal and resetPrincipalCredential run at the venue the principal is homed in.
+      x-ticvai-rls: own-or-home-scope
       type: object
       description: '**A staff or partner principal''s password or PIN, as stored** (14 October 2026, CHG-CRD-001, ADAM
         CR-078). `identity.principal_credential` held only `id` and a nullable `principal_id`, so `createPrincipal`,
@@ -8502,13 +8506,27 @@ components:
         `action`); `verifyMfaChallenge` reads it, counts wrong codes in `failedAttempts`, voids it at the fifth (audit
         R126 (6)), and on success sets `verifiedAt`; the operation that consumes the step-up sets `consumedAt`, so it is
         single-use (CHG-RUL-020). **Step-up is locked** for `PasswordPolicy.lockoutMinutes` after `voidedAt` of a
-        challenge voided by the fifth wrong code; no column more is needed. A guest''s challenge (rev 3 GAP-B1) has no
-        principal and is not stored here yet: guest second factors are not modelled in storage (`identity.mfa_method`
-        has no subject either).'
-      required: [principalId, action, status, expiresAt, failedAttempts]
+        challenge voided by the fifth wrong code; no column more is needed. **A guest''s challenge is stored here too**
+        (rev 3 GAP-B1; R8 blocker IDENTITY-C12, CHG-R8MIG-007): exactly one of `principalId` and `subjectId` is set,
+        and the row is its owner''s alone (`x-ticvai-rls: own-row`). **An enrolment''s code** (`smsOtp`, `emailOtp`) is a
+        challenge with `action` `enrol` and the pending `methodId`, so `identity.mfa_method` holds no code (IDENTITY-C34).'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
+      required: [action, status, expiresAt, failedAttempts]
       properties:
         id: { type: string, format: uuid, readOnly: true, description: 'The `challengeId` the client verifies.' }
-        principalId: { type: string, format: uuid }
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: The staff or partner principal challenged; null for a guest.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: pii.subject
+          description: The guest challenged (`pii.subject`); null for a principal.
         methodId:
           type: string
           format: uuid
@@ -8527,8 +8545,9 @@ components:
           type: string
           writeOnly: true
           nullable: true
-          description: The PHC hash (ADR-0071) of a code the server sent (`emailOtp`); null for an authenticator
-            (`totp`), whose code is computed, never sent.
+          description: The PHC hash (ADR-0071) of a code the server sent (`smsOtp`, `emailOtp`, and the code of an
+            `enrol` challenge); null for an authenticator (`totp`), whose code is computed from the method's stored
+            `MfaMethod.secret`, never sent.
         status:
           type: string
           enum: [pending, verified, consumed, voided, expired]
@@ -8551,10 +8570,24 @@ components:
       description: '**One single-use recovery code, as stored** (14 October 2026, CHG-CRD-005, ADAM CR-078). Never
         returned after enrolment: `enrolMfaMethod` returns the codes once (`MfaEnrolment.recoveryCodes`) and writes
         their hashes here, replacing any earlier set; `verifyMfaChallenge` accepts one in place of a code, and sets its
-        `usedAt`. A code that can be re-read is a second password (`handoff/schema-storage-only.md`).'
-      required: [principalId, codeHash, issuedAt]
+        `usedAt`. A code that can be re-read is a second password (`handoff/schema-storage-only.md`). A guest''s codes
+        are stored the same way, against `subjectId` (R8 blocker IDENTITY-C12, CHG-R8MIG-007).'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
+      required: [codeHash, issuedAt]
       properties:
-        principalId: { type: string, format: uuid }
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: The principal whose code this is; null for a guest.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: pii.subject
+          description: The guest whose code this is; null for a principal.
         codeHash:
           type: string
           writeOnly: true
@@ -9911,6 +9944,16 @@ components:
     MfaMethod:
       x-ticvai-persistence: identity.mfa_method
       type: object
+      description: '**A second factor a principal or a guest has enrolled** (R8 blockers IDENTITY-C12 and IDENTITY-C34,
+        CHG-R8MIG-007). Exactly one of `principalId` and `subjectId` is set, so a guest''s method is stored like a
+        staff member''s and `GuestSession.requiresMfa` and `mfaMethods` are answered from here; the row is its owner''s
+        alone (`x-ticvai-rls: own-row`). Three fields are storage only and never returned
+        (`handoff/schema-storage-only.md`): `secret` (a `totp` shared secret, which `verifyMfaChallenge` computes the
+        code from), `destination` (the full phone number or email an `smsOtp` or `emailOtp` code is sent to;
+        `maskedTarget` is the only form returned) and `pendingExpiresAt` (set while an enrolment awaits
+        `verifyMfaEnrolment`; an expired pending row is deleted by the next `enrolMfaMethod` of its owner).'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
       required:
       - id
       - kind
@@ -9920,6 +9963,40 @@ components:
         id:
           type: string
           format: uuid
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: The principal who enrolled it; null for a guest.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The guest who enrolled it; null for a principal.
+        secret:
+          type: string
+          nullable: true
+          writeOnly: true
+          x-ticvai-secret: field-encrypted
+          description: The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other
+            kinds. Never returned after `MfaEnrolment.secret`.
+        destination:
+          type: string
+          nullable: true
+          writeOnly: true
+          x-ticvai-secret: field-encrypted
+          description: The full phone number (`smsOtp`) or email (`emailOtp`) the code goes to, encrypted with the
+            tenant's field key (ADR-0063); null for other kinds. Only `maskedTarget` is ever returned.
+        pendingExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          writeOnly: true
+          description: While `isActive` is false, when the unconfirmed enrolment lapses; null once verified.
         kind:
           $ref: '#/components/schemas/MfaKind'
         label:
@@ -10082,8 +10159,10 @@ components:
           format: date-time
     Principal:
       x-ticvai-persistence: identity.principal
-      # CHG-GEN-005: any staff grant reads principals; writes stay at the tenant root (CR-076).
-      x-ticvai-rls: grant-holder-read
+      # CHG-GEN-005: any staff grant reads principals. Writes: the tenant root (CR-076) or a grant over the principal's
+      # home scope, so a venue manager creates and updates the principals homed in their venue (R8 blocker IDENTITY-C37,
+      # the lead's option A; CHG-R8MIG-007).
+      x-ticvai-rls: home-scope-write
       type: object
       required:
       - id

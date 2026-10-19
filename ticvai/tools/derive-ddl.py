@@ -699,7 +699,20 @@ $$;
 # a parent's SELECT would open its children's writes, since the parent rule's WITH CHECK is "the parent is
 # visible"). A tenant-root table is not a parent of anything, so marking one does not make tables that reference
 # it follow it, except where SPLIT_CHILDREN says so.
-RLS_MARKS = ("read-beneath", "grant-holder-read")
+#   * `x-ticvai-rls: own-row` (CHG-R8MIG-007; R8 blocker causes IDENTITY-C12, IDENTITY-C37, IDENTITY-C48): a row is read
+#     and written by the principal or the guest it belongs to (`principal_id` = the session's `ticvai.principal_id`,
+#     `subject_id` = its `ticvai.subject_id`), and by the tenant root, for a credential or second factor that is its
+#     owner's alone: changeOwnCredential, the MFA tables a guest enrols in too. Not split: one check for both.
+#   * `x-ticvai-rls: home-scope-write` (CHG-R8MIG-007; R8 blocker IDENTITY-C37, the lead's option A): any staff grant
+#     reads, as grant-holder-read; a row is written by the tenant root or by a grant over the row's `home_scope_id`, so
+#     a venue manager creates and updates the principals homed in their venue and nobody else's (CR-076's tenant-root
+#     writers keep their reach).
+#   * `x-ticvai-rls: subject-self` (CHG-R8MIG-007; IDENTITY-C48 option A): the guest record itself (`pii.subject`, whose
+#     `id` is the subject): any staff grant reads, the guest reads and writes its own row, and the tenant root writes.
+#   * `x-ticvai-rls: own-or-home-scope` (CHG-R8MIG-007; IDENTITY-C37): a principal's credential rows, read and written
+#     by that principal (`ticvai.principal_id`), by a grant over the principal's home scope (createPrincipal and
+#     resetPrincipalCredential at a venue) and by the tenant root.
+RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope")
 
 # **A child that follows a split parent which the parent rule would not otherwise pick** (the parent sits at the tenant
 # root, so it is no owner). `identity.role_permission` is the rows of a role's permission set (CR-076 decision:
@@ -707,6 +720,8 @@ RLS_MARKS = ("read-beneath", "grant-holder-read")
 # only where the role may be written.
 SPLIT_CHILDREN = {
     "identity.role_permission": "role_id",   # CHG-GEN-005 (CR-076)
+    # a replaced hash is moved by the call that replaces the credential, at the principal's own or home scope
+    "identity.principal_credential_history": "principal_credential_id",   # CHG-R8MIG-007 (IDENTITY-C37)
 }
 
 # **The same marks for a table no contract schema describes** (MOD audit, 14 October 2026, CHG-MOD-007). `pii.subject`
@@ -714,7 +729,8 @@ SPLIT_CHILDREN = {
 # relationship rather than a schema of their own, so `x-ticvai-rls` has nowhere to be written. Every one is read by
 # staff operations below the tenant (check-rls-scope-fit RF-TENANT-ROOT): a venue's guest lookup read no guest at all.
 TABLE_RLS = {
-    "pii.subject": "grant-holder-read",
+    # a guest reads and updates its own record (CHG-R8MIG-007, IDENTITY-C48): grant-holder-read alone shut it out
+    "pii.subject": "subject-self",
     "pii.subject_contact": "grant-holder-read",
     "fnb.delivery_location_outlet": "grant-holder-read",
     "whitelabel.homepage_section": "grant-holder-read",
@@ -801,6 +817,34 @@ BEGIN
     PERFORM platform.apply_split_rls(target,
         'platform.grant_holder() OR platform.subject_in_scope(subject_id)',
         'platform.subject_in_scope(subject_id)');
+END
+$$;
+
+-- `x-ticvai-rls: own-row` (CHG-R8MIG-007): the row's own principal (`ticvai.principal_id`, set with the session at
+-- sign-in) or guest (`ticvai.subject_id`), or the tenant root. A credential or a second factor is its owner's alone.
+CREATE OR REPLACE FUNCTION platform.own_row(row_principal_id uuid, row_subject_id uuid)
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT (row_principal_id IS NOT NULL
+            AND row_principal_id::text = NULLIF(current_setting('ticvai.principal_id', true), ''))
+        OR (row_subject_id IS NOT NULL
+            AND row_subject_id::text = NULLIF(current_setting('ticvai.subject_id', true), ''))
+        OR platform.tenant_root_in_scope();
+$$;
+
+CREATE OR REPLACE FUNCTION platform.apply_own_row_rls(target regclass, principal_column text, subject_column text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    chk text := format('platform.own_row(%s, %s)',
+                       CASE WHEN principal_column IS NULL THEN 'NULL::uuid' ELSE quote_ident(principal_column) END,
+                       CASE WHEN subject_column IS NULL THEN 'NULL::uuid' ELSE quote_ident(subject_column) END);
+BEGIN
+    PERFORM platform.apply_split_rls(target, chk, chk);
 END
 $$;
 
@@ -2689,7 +2733,50 @@ def main() -> int:
             base, write = "subject", "platform.subject_in_scope({a}subject_id)"
         else:
             base, write = "tenant root", "platform.tenant_root_in_scope()"
-        if mark == "read-beneath":
+        if mark == "home-scope-write":
+            if "home_scope_id" not in has or base in ("scope_path", "venue_id"):
+                print(f"  ! {t}: x-ticvai-rls home-scope-write needs home_scope_id and no scope_path or venue_id; "
+                      "the base rule stands")
+                continue
+            write = ("(platform.tenant_root_in_scope() OR EXISTS (SELECT 1 FROM platform.scope hs WHERE hs.id = "
+                     "{a}home_scope_id AND platform.in_scope(hs.path)))")
+            call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
+                    f"{sql_literal(write.format(a=''))});")
+            base = "the tenant root or a grant over its home scope"
+        elif mark == "own-or-home-scope":
+            if "principal_id" not in has or base in ("scope_path", "venue_id"):
+                print(f"  ! {t}: x-ticvai-rls own-or-home-scope needs principal_id and no scope_path or venue_id; "
+                      "the base rule stands")
+                continue
+            write = ("(platform.own_row({a}principal_id, NULL::uuid) OR EXISTS (SELECT 1 FROM identity.principal hp "
+                     "JOIN platform.scope hs ON hs.id = hp.home_scope_id WHERE hp.id = {a}principal_id "
+                     "AND platform.in_scope(hs.path)))")
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(write.format(a=''))}, "
+                    f"{sql_literal(write.format(a=''))});")
+            base = "its principal, a grant over the principal's home scope, or the tenant root"
+        elif mark == "subject-self":
+            if "subject_id" in has or base in ("scope_path", "venue_id"):
+                print(f"  ! {t}: x-ticvai-rls subject-self is for the subject record itself (its id is the subject); "
+                      "the base rule stands")
+                continue
+            write = "platform.own_row(NULL::uuid, {a}id)"
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, "
+                    f"{sql_literal('platform.grant_holder() OR platform.own_row(NULL::uuid, id)')}, "
+                    f"{sql_literal(write.format(a=''))});")
+            base = "the guest itself or the tenant root"
+        elif mark == "own-row":
+            pc = "principal_id" if "principal_id" in has else None
+            sc = "subject_id" if "subject_id" in has else None
+            if not (pc or sc) or base in ("scope_path", "venue_id"):
+                print(f"  ! {t}: x-ticvai-rls own-row needs principal_id or subject_id and no scope_path or venue_id; "
+                      "the base rule stands")
+                continue
+            lit = lambda c: sql_literal(c) if c else "NULL"
+            call = f"SELECT platform.apply_own_row_rls('{tq(t)}'::regclass, {lit(pc)}, {lit(sc)});"
+            write = ("platform.own_row(" + ("{a}principal_id" if pc else "NULL::uuid") + ", "
+                     + ("{a}subject_id" if sc else "NULL::uuid") + ")")
+            base = "its own principal or guest"
+        elif mark == "read-beneath":
             if base != "scope_path":
                 print(f"  ! {t}: x-ticvai-rls read-beneath needs a scope_path (its rows are owned by {base}); "
                       "use grant-holder-read, or give the schema a scopePath. The base rule stands")

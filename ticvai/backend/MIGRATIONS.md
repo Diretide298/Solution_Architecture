@@ -117,6 +117,29 @@ column, and the DDL is right as it stands. A table gets this policy only when it
 no `venue_id`, no subject and no NOT NULL owning reference (the comment beside each call in
 `920-row-level-security.sql` says which).
 
+## The connection context
+
+The policies read three settings, set with `SET LOCAL` at the start of every transaction: `ticvai.scope_paths` (the
+ltree paths the caller's grants reach; unset or empty means no scoped rows), `ticvai.subject_id` (a guest's own rows)
+and `ticvai.principal_id` (the signed-in principal's own rows: its credentials and second factors, CHG-R8MIG-007).
+**Decided 20 October 2026** (the lead, option A of R8 blocker IDENTITY-C48):
+
+1. **Before a session exists** (login, the guest sign-ins, `listSsoProviders`, `listActiveSessions` with step-up) the
+   transaction opens in an explicit system context, the tenant root path, confined to Identity's own verification
+   statements, and is narrowed with `SET LOCAL` before any other table is touched: to the principal's paths and
+   `ticvai.principal_id`, or to `ticvai.subject_id` for a guest (scope paths empty). A session-less till call narrows to
+   the till's venue path once the supervisor is verified.
+2. **A guest** reads and writes its own `pii.subject` row (`x-ticvai-rls: subject-self`) and the rows keyed to its
+   subject (`subject_id`: the subject rule, or `own-row`).
+3. **A cell-internal `serviceAuth` call** has no user: the tenant comes from the cell token's `tid` claim,
+   `ticvai.scope_paths` is the tenant root, the calling cell is the audited actor, and its idempotency records are
+   claimed in that context.
+
+The schema-level marks that build on these (`tools/derive-ddl.py` RLS_MARKS): `own-row` (the row's principal or
+guest, or the tenant root: the MFA tables), `own-or-home-scope` (a principal's credential: the principal, a grant over
+its home scope, or the tenant root), `home-scope-write` (`identity.principal`: any grant reads; the tenant root or a
+grant over the home scope writes) and `subject-self` (`pii.subject`).
+
 ## The control database has no row-level security
 
 **Decided 20 October 2026** (the lead, option A of R8 blocker causes IDENTITY-C16, FOUNDATION-AI-C36 and
