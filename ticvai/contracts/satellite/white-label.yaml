@@ -8801,7 +8801,13 @@ components:
         body:
           type: object
           additionalProperties: true
-          description: Typed by `kind`, and validated against the block's own schema at save.
+          description: 'Typed by `kind`, and validated against the block''s own schema at save. **The text a
+            translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and
+            the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image
+            `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta
+            `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`,
+            `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial
+            `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated.'
         localeVariants:
           type: object
           additionalProperties: true
