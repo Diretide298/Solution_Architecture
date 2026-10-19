@@ -1,0 +1,37 @@
+id: CHG-R8SPN-004
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'The shared contract now says, once, when a guest app reads getTenantAppStatus (launch, resume, any 503), which
+  page wins (forced upgrade, maintenance, closed, sold out, then the normal screen), what platform unavailable means
+  (the status read answering 503 or timing out, shown with the last kept brand or a neutral default), where sold out
+  leads (choose another day, no id carried) and that a status page with nothing wrong shows Home. Wording only.'
+decision:
+  what: 'R8 blocker fix lane spine, cause WHITE-C09 (no decision pending; "platform unavailable" is taken to mean the
+    status read itself failing, as the cause asks the lead to confirm). contracts/shared/common.yaml, info.description,
+    section Guest app status. The screens (WEB-029, GST-047 states and navigation) and white-label getTenantAppStatus
+    503 are other lanes'' files: requests in the spine lane report.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 tickets 27889 and 27893 on 19 October 2026 (ADAM gaps 27889/0, 27889/1, 27893/1,
+  27893/2): the maintenance, upgrade, sold-out and closed pages had no trigger, no precedence, no onward link and no
+  branding fallback. Finding: R8 blocker cause list, group white-label.'
+keys_touched:
+  operations: [getTenantAppStatus]
+  screens: [WEB-029, GST-047, KSK-014]
+  files:
+  - contracts/shared/common.yaml
+root_class: 'new: undefined-rule on a guest status page (class 12 undefined-rule)'
+tickets:
+  started: []
+  unstarted:
+  - '27889 and 27893 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27889/0, 27889/1, 27893/1, 27893/2'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'No prevention beyond the rule being written where KSK-014 can reuse it.'

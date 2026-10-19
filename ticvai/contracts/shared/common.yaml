@@ -26,6 +26,19 @@ info:
     tree with deny-overrides-allow, which scopes cannot express — so they live in `x-ticvai-permission`
     and `x-ticvai-scope-level` on each operation instead.
 
+    ## Guest app status (R8 blocker fix, WHITE-C09)
+
+    **One rule for every guest app and kiosk that reads `getTenantAppStatus`** (WEB-029, GST-047, KSK-014 and any
+    screen that shows a maintenance, upgrade, closed or sold-out page). **When it is read:** at launch, when the
+    app returns to the foreground, and when any other call answers `503`. **Which page wins, in this order:**
+    `minimumAppVersion` above the running version (forced upgrade), then `isInMaintenance` (maintenance), then
+    `availability` closed, then `availability` sold out, then the normal screen: the first that holds is shown and
+    the rest are not. **Platform unavailable** means the status read itself answers `503` or times out. The client
+    then shows the last status and brand it kept (the read is offline-capable, so it keeps a copy) and, if it has
+    none, a neutral default brand and the generic wording; it retries after `Retry-After`. **Sold out** offers
+    one onward link, to choose another day (the date picker of the listing screen opened, no id carried). A
+    status page opened when nothing is wrong shows the Home screen instead.
+
     Components referenced by every TICVAI contract. Changes here are breaking changes to every consumer
     — treat accordingly.
 
