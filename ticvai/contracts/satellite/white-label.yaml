@@ -4818,7 +4818,8 @@ paths:
         CHG-GCF-005): the storefront and app tag loader reads `PublishedTenantConfig.analyticsProviders` from
         `getPublishedTenantConfig`, which needs no session, and GST-001 and WEB-001 no longer call this. This
         stays a staff read under `TENANT_CONFIGURE`; the guest audience and the optional credential stay only
-        so a client built against r1 is not broken, and a guest caller still gets the rows described above.
+        so a client built against r1 is not broken, and a guest caller still gets the rows described above,
+        carrying only the fields of `PublishedAnalyticsProvider` (the others are left out).
       tags:
       - overview
       x-ticvai-permission: TENANT_CONFIGURE
@@ -4873,11 +4874,17 @@ paths:
       x-ticvai-agreed: '29 September: matrix 22.10.29; Chinmay''s brief for the build (venue configuration: provider, measurement id, the consent category it waits on); BL-073 design §4a; shape follows setBookingFlowConfig'
       summary: Connect the storefront and app to an analytics platform
       description: >
-        **An upsert keyed on `venueId` + `provider`** (22.10.29). A null `venueId` is the tenant-wide
+        **One row per `venueId` + `provider`** (22.10.29; a database unique key, a null `venueId` counting
+        as one value). The path id is the row's identity: a PUT to an existing id replaces that row; a PUT
+        to a new id creates it, unless another row already holds the same `venueId` and `provider`, which
+        is 409 `analytics-provider-exists` (PUT to that row's id instead). A null `venueId` is the tenant-wide
         default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId`
-        is what the page tag or app SDK reports to (a GA4 `G-` id, a Tag Manager `GTM-` container, a
-        pixel id); it is public by nature, and the reporting credential is not: `reportingCredentialRef`
-        names a secret in the platform vault, is write-only and is never returned.
+        is what the page tag or app SDK reports to; it is public by nature, and the reporting credential is
+        not: `reportingCredentialRef` names a secret in the platform vault, is write-only and is never returned.
+        **`measurementId` must match its provider's format**, else 422 `measurement-id-invalid` (formats
+        proposed, client to confirm against each vendor): `googleAnalytics4` `^G-[A-Z0-9]{6,12}$`,
+        `googleTagManager` `^GTM-[A-Z0-9]{4,8}$`, `metaPixel` `^[0-9]{10,20}$`; `adobeAnalytics`, `matomo` and
+        `other` are checked for length only (1 to 100 characters).
 
         **Every provider waits on a consent category** (`consentCategory`, `analytics` unless set): it is
         not loaded, and no hit is sent, until the visitor's decision grants that category. `strictlyNecessary`
@@ -4917,6 +4924,13 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          x-ticvai-problem-types: [analytics-provider-exists]
+          description: Another row already holds this `venueId` and `provider` (`analytics-provider-exists`). Nothing is written.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [measurement-id-invalid, venue-not-active]
           description: A `measurementId` that does not match the provider's format, or a `venueId` not among the tenant's active venues
@@ -6493,8 +6507,13 @@ components:
     StorefrontAnalyticsProvider:
       type: object
       x-ticvai-persistence: whitelabel.analytics_provider
+      # One row per venue (or tenant-wide) and provider (R8 blocker IDENTITY-C09, CHG-R8STO-001).
+      x-ticvai-unique-together:
+      - [venueId, provider]
+      x-ticvai-unique-nulls: not-distinct
       description: '**One analytics platform the storefront or app reports to** (22.10.29, 29 September build). Venue
-        configuration: a null `venueId` is the tenant-wide default a venue''s own row replaces.'
+        configuration: a null `venueId` is the tenant-wide default a venue''s own row replaces. One row per `venueId`
+        and `provider`.'
       required:
       - provider
       - measurementId
@@ -6527,7 +6546,9 @@ components:
         measurementId:
           type: string
           maxLength: 100
-          description: What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id).
+          description: 'What the tag or SDK reports to. Format by provider (proposed, client to confirm): googleAnalytics4
+            `^G-[A-Z0-9]{6,12}$`, googleTagManager `^GTM-[A-Z0-9]{4,8}$`, metaPixel `^[0-9]{10,20}$`; adobeAnalytics,
+            matomo and other length only. A mismatch is 422 `measurement-id-invalid` on `setAnalyticsProvider`.'
         surfaces:
           type: array
           minItems: 1
