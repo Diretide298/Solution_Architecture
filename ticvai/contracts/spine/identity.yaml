@@ -11002,7 +11002,7 @@ components:
       x-ticvai-persistence: identity.session
       description: >-
         **The venue a staff session acts at, and the venues it may switch to** (16 October 2026 minutes, 4.8,
-        CHG-R8PRD-006). Stored as one column of the session record; the rest is resolved on read.
+        CHG-R8PRD-006). Stored in one existing column of the session record (`venue_id`); the rest is resolved on read.
       required:
       - actingVenueId
       - fixedBy
@@ -11013,7 +11013,8 @@ components:
           format: uuid
           nullable: true
           readOnly: true
-          description: The venue the session acts at; null while a session that may choose has not chosen. Set by `setSessionVenue`, or resolved from the workstation or the role.
+          x-ticvai-column: venue_id
+          description: The venue the session acts at; null while a session that may choose has not chosen. Set by `setSessionVenue`, or resolved from the workstation or the role. Stored in the session record's existing `venue_id`, the column `ActiveSession.venueId` reads, so no column is added.
         venue:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/ScopeRef
