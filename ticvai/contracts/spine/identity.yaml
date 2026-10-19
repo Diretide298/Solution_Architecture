@@ -3748,6 +3748,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MfaMethod'
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue). For `listMfaMethods` it is also the signal GST-073 hides its security section on.
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -3985,6 +3994,15 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue). For `listMfaMethods` it is also the signal GST-073 hides its security section on.
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           x-ticvai-problem-types: [last-required-mfa-method]
           description: Last remaining method of a principal who holds a permission that requires MFA
@@ -4114,8 +4132,49 @@ paths:
                   expiresAt:
                     type: string
                     format: date-time
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue). For `listMfaMethods` it is also the signal GST-073 hides its security section on.
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: A guest who signed in with an email code asks for `emailOtp` as the second factor, because the same inbox
+            twice is one factor (R8 blocker fix, IDENTITY-C18).
+          x-ticvai-problem-types:
+          - email-otp-not-second-factor
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The `methodId` names a method that is pending or inactive, or the principal has no active method
+            to challenge.
+          x-ticvai-problem-types:
+          - mfa-method-not-usable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+          description: '**Step-up is locked** (audit R126 (6)): five wrong codes voided a challenge, and no new one is issued to
+            this principal until `voidedAt` plus `PasswordPolicy.lockoutMinutes`. `Retry-After` says how long. Also the
+            shared rate limit.
+
+            '
+          x-ticvai-problem-types:
+          - rate-limited
+          - step-up-locked
+          headers:
+            Retry-After:
+              $ref: '../shared/common.yaml#/components/headers/RetryAfter'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /auth/mfa/challenge/{challengeId}/verify:
     parameters:
     - name: challengeId
