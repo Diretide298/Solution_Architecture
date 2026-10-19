@@ -3805,8 +3805,9 @@ paths:
         author, where the policy says so) approves it.
 
         **Platform staff publish a hosted tenant''s site** (Chinmay, 2 October, workbook Q144; R098; CHG-CSA-038)
-        only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant exports a site
-        package (`exportSitePackage`) instead.
+        only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant publishes first and then
+        exports a site package (`exportSitePackage`, which needs a published version); both actions are always
+        offered on CMS-014 and there is no hosting flag (r8 walk of ticket 27906; lead decision of 20 October 2026).
 
         **The server names the version** (ADAM CR-154, 18 October 2026; CHG-CRA-004). In the publish transaction it
         takes the next integer for the tenant (`1`, `2`, ...), as kiosk versions are numbered; that is the
@@ -4113,6 +4114,12 @@ paths:
         then review then publish, so a rollback is as deliberate as the change that caused it. **Not a
         one-click rollback (confirmed 28 September, audit R139)**: flow F22 is corrected to match.
 
+        **Unpublished changes** (r8 walk of ticket 27901; lead decision of 20 October 2026). A restore overwrites
+        the working draft, so it is refused with 409 `unpublished-changes` while the draft holds changes not yet
+        published, unless the request sends `discardDraftChanges` true, as `restoreKioskConfigVersion` does. The
+        CMS-015 dialog says the unpublished changes are replaced, and sends true after the user confirms. The
+        discarded draft is stored nowhere (the loss is intended, and the dialog is the only confirmation).
+
         '
       tags:
       - publishing
@@ -4122,6 +4129,17 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                discardDraftChanges:
+                  type: boolean
+                  default: false
+                  description: True overwrites unpublished changes in the draft.
       responses:
         '200':
           headers:
@@ -4135,7 +4153,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: 'The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.'
+          description: 'The working draft has unpublished changes that the restore would overwrite and `discardDraftChanges` is not true. Nothing changes.'
           x-ticvai-problem-types: [unpublished-changes]
           content:
             application/problem+json:
