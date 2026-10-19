@@ -127569,6 +127569,7 @@
    "cache:idempotency"
   ],
   "writes": [
+   "access.configuration_change",
    "access.hardware_certification",
    "cache:idempotency"
   ],

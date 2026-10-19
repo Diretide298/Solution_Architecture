@@ -456,7 +456,7 @@ def derive(stored: dict) -> dict:
     return out
 
 
-_TABLE_TEXT = re.compile(r"([a-z][a-z0-9_]*\.[a-z][a-z0-9_]*)")
+_TABLE_TEXT = re.compile(r"\b([a-z][a-z0-9_]*\.[a-z][a-z0-9_]*)\b")
 
 
 def _idempotent(op: dict, item: dict) -> bool:
