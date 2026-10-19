@@ -82,3 +82,24 @@ def test_only_an_ai_engine_task_says_its_operations_are_served_by_the_ai_gateway
     other = td.claimed_ops_sentence(["createProduct", "updateProduct"], False)
     assert "AI gateway" not in other and "ticvai-ai" not in other
     assert "are built by this task" in other and "no other back-end task builds them" in other
+
+
+def test_a_db_ticket_says_its_copied_keys_are_written_guarded(monkeypatch):
+    monkeypatch.setattr(td, "_LINEAGE", LIN)
+    db = {"type": "Task", "track": "Database", "key": "MIG-X", "description": ""}
+    assert "safe to run twice" in td.done_when(db, "", ["table platform.outbox"])
+    assert "DROP CONSTRAINT IF EXISTS" in td.GUARDED_KEYS and "pg_constraint" in td.GUARDED_KEYS
+
+
+def test_review_rows_are_read_by_the_table_they_change(tmp_path):
+    (tmp_path / "handoff").mkdir()
+    (tmp_path / "handoff" / "migration-review.md").write_text(
+        "| Kind | Database | Object | Change | What a person does |\n|---|---|---|---|---|\n"
+        "| table renamed | tenant | `catalogue.inventory_hold -> catalogue.inventory_reservation` | x | y |\n"
+        "| column renamed | tenant | `marketing.wishlist_item.price -> list_price` | x | y |\n"
+        "| statement dropped | tenant | `orders.payment, orders.payment_tip` | x | y |\n"
+        "| not null | tenant | `identity.otp_challenge.channel` | x | y |\n", encoding="utf-8")
+    rows = td.review_rows(tmp_path)
+    assert [r[0] for r in rows] == ["catalogue.inventory_reservation", "marketing.wishlist_item", "orders.payment",
+                                    "identity.otp_challenge"]
+    assert "table renamed `catalogue.inventory_hold -> catalogue.inventory_reservation`" in td.review_sentence(rows[:1])

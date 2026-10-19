@@ -165,7 +165,8 @@ def done_when(r, part, builds):
         guard = ("columns, keys and indexes; no row-level security, which the control database does not have "
                  "(backend/MIGRATIONS.md)") if control_only(names) else "columns, keys, indexes, row-level security"
         return (f"Done when the migration for {named} applies on a copy of the database at the previous state, a "
-                "second run applies nothing, and `node .claude/scripts/db-ticket.mjs <ticket>` says MATCH "
+                "second run applies nothing (it is safe to run twice: every ADD CONSTRAINT copied from the package "
+                "is written guarded), and `node .claude/scripts/db-ticket.mjs <ticket>` says MATCH "
                 f"({guard}); every migration from an empty database runs once a day and in the merge-request "
                 "pipeline; and a peer has reviewed it.")
     if kind == "Frontend" and names:
@@ -482,6 +483,16 @@ def baseline_wording(root) -> str:
             "functions, so they come first). " + BASELINE_BODIES)
 
 
+# **Every key copied from the package is written guarded** (CHG-R8MIG-013; the coordinator, 20 October 2026: ADAM's
+# database-ticket check applies each migration twice). CREATE TABLE, CREATE INDEX and ADD COLUMN have IF NOT EXISTS,
+# ADD CONSTRAINT has none, so the frozen 900-foreign-keys.sql lines (and V0102's) fail a second run as written.
+GUARDED_KEYS = ("**Safe to run twice**: write every ALTER TABLE ... ADD CONSTRAINT copied from the package guarded, "
+                "either preceded by `ALTER TABLE ... DROP CONSTRAINT IF EXISTS <name>;` or inside "
+                "`DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '<name>' AND conrelid = "
+                "'<schema.table>'::regclass) THEN ALTER TABLE ... ADD CONSTRAINT ...; END IF; END $$;` (the package's "
+                "900-foreign-keys.sql lines are written unguarded and fail a second run as they are).")
+
+
 # **The baseline creates on an empty database only with function-body checks off** (CHG-R8MIG-008; ADAM faster-db-tickets
 # report, package problem 2). The SQL-language helpers of 920 and 930 read platform.scope, which MIG-PLATFORM creates
 # later, and PostgreSQL parses a SQL function's body when it is created unless check_function_bodies is off.
@@ -545,6 +556,41 @@ def type_sentence(table: str, uses: list) -> str:
 # `order` is {migration key: its file number}.
 PARENT_POLICY = re.compile(r"SELECT platform\.apply_parent(?:_split)?_rls\('(\w+\.\w+)'::regclass, '\w+', "
                            r"'(\w+\.\w+)'::regclass")
+
+
+# **Changes no file writes reach a ticket** (CHG-R8MIG-013; R8 blocker causes IDENTITY-C43 and FOUNDATION-AI-C38). The
+# renames, moves, type and NOT NULL changes derive-ddl leaves for a person (handoff/migration-review.md) were on no
+# ticket: catalogue's inventory_hold -> inventory_reservation and identity's otp_challenge nullability among them. Each
+# row goes to the migration ticket that creates its table (by its name now), which writes it.
+REVIEW_ROW = re.compile(r"^\| ([^|]+?) \| (tenant|control) \| `([^`]+)` \| (.*?) \| (.*) \|\s*$")
+
+
+def review_rows(root) -> list:
+    """[(table now, kind, object, what a person does)] for every row of handoff/migration-review.md."""
+    from pathlib import Path
+    p = Path(root) / "handoff" / "migration-review.md"
+    if not p.exists():
+        return []
+    out = []
+    for ln in p.read_text(encoding="utf-8").splitlines():
+        m = REVIEW_ROW.match(ln)
+        if not m:
+            continue
+        kind, obj = m.group(1).strip(), m.group(3).strip()
+        left, _, right = obj.partition(" -> ")
+        # `t.old -> new` renames a column (the right side has no schema); `a -> b` moves a table; `a, b` names two
+        name = (right if "." in right else left).split(" ")[0].split(",")[0]
+        parts = name.split(".")
+        table = ".".join(parts[:2]) if len(parts) >= 2 else name
+        out.append((table, kind, obj, m.group(5).strip()))
+    return out
+
+
+def review_sentence(rows: list) -> str:
+    """The sentence a migration ticket carries for its tables' review rows."""
+    items = "; ".join(f"{kind} `{obj}`" for _t, kind, obj, _w in rows)
+    return ("**Changes no file writes, for this migration to write** (handoff/migration-review.md, where each row says "
+            f"what to write; CHG-R8MIG-013): {items}.")
 
 
 def parent_policies(root) -> dict:

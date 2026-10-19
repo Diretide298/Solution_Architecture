@@ -4268,6 +4268,16 @@ def main() -> int:
         extra_[k_] += ws_
     for c_, p_ in sorted(orphans_.items()):
         print(f"WARNING: {c_}'s row-level security reads {p_}, which no migration ticket creates (CHG-R8MIG-008)")
+    rows_by_ = defaultdict(list)
+    moves_ = ticket_done.declared_moves(ROOT)
+    for row_ in ticket_done.review_rows(ROOT):
+        tbl_ = moves_.get(row_[0], row_[0])
+        if tbl_ in made_by_:
+            rows_by_[made_by_[tbl_]].append(row_)
+        else:
+            print(f"WARNING: handoff/migration-review.md row on {tbl_} ({row_[1]}) is on no migration ticket (CHG-R8MIG-013)")
+    for k_, rs_ in rows_by_.items():
+        extra_[k_].append(ticket_done.review_sentence(rs_))
     own_src_ = {"MIG-FOREIGN-KEYS": "Source DDL: backend/tenant/900-foreign-keys.sql and backend/control/900-foreign-keys.sql "
                                     "(the constraints named here, nothing else from those files).",
                 "MIG-PARTITIONS": "Source DDL: backend/tenant/930-partitioning.sql (the monthly partitions and default "
@@ -4280,7 +4290,8 @@ def main() -> int:
                     else [])
             ar1_ = [(ticket_done.names_sentence if "__names_" in rel_ else ticket_done.after_r1_sentence)(rel_, ch_)
                     for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
-            add_ = [w_ for w_ in (src_ + ar1_ + extra_.get(t_["key"], []) + [ticket_done.MIGRATION_WORDING]
+            add_ = [w_ for w_ in (src_ + ar1_ + extra_.get(t_["key"], [])
+                                  + [ticket_done.MIGRATION_WORDING, ticket_done.GUARDED_KEYS]
                                   + ([base_words_] if t_["key"] == "MIG-BASELINE" else []))
                     if w_ not in (t_["description"] or "")]
             if add_:

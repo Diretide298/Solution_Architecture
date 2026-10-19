@@ -23,6 +23,8 @@ the ticket, `V0007__access.sql` in the document; neither exists, and MIG-RETAIL 
   M-BACKEND-MD      backend/MIGRATIONS.md names a V-file that is neither in backend/<db>/ nor on any ticket
   M-TABLE-ASSIGNED  a table in backend/ in no migration ticket and not listed, with its reason, under
                     "Tables no migration creates"; or listed there although an operation reads or writes it
+  M-REVIEW-ROW      a handoff/migration-review.md row whose table no migration ticket creates, or whose
+                    ticket does not list it (CHG-R8MIG-013)
 
 **Exempt, with the reason:** MIG-PARTITIONS is a job in the workers host that creates and detaches monthly
 partitions (ADR-0056), not a migration file. The baseline tables in 000-002 are MIG-BASELINE's.
@@ -48,6 +50,8 @@ RULES = {
     "M-MD-AGREES": "the generated MIGRATIONS.md and the ticket name different files (CHG-TBF-002)",
     "M-BACKEND-MD": "backend/MIGRATIONS.md names a file no ticket and no backend/ file has (CHG-TBF-002)",
     "M-TABLE-ASSIGNED": "a table in no migration and not listed with its reason (CHG-TBF-003)",
+    "M-REVIEW-ROW": "a handoff/migration-review.md row whose table no migration ticket creates, or whose ticket "
+                    "does not list it (CHG-R8MIG-013)",
 }
 EXEMPT = {"MIG-PARTITIONS": "a job in the workers host (ADR-0056), not a migration file"}
 FILE = re.compile(r"\b(V(\d{4})[a-z]?__[\w.-]+\.sql)\b")
@@ -173,6 +177,27 @@ def main() -> int:
         elif reached.get(t) or why.startswith("GAP"):
             guard.add("M-TABLE-ASSIGNED", t, f"{t}: listed as needing no migration, but "
                                              f"{', '.join(sorted(reached.get(t, ()))[:3]) or 'it'} reads or writes it")
+    # M-REVIEW-ROW (CHG-R8MIG-013, IDENTITY-C43): every change derive-ddl leaves for a person is on the migration ticket
+    # of its table (build-service-docs, ticket_done.review_sentence), so a row no ticket carries is a change nobody writes.
+    made_by = {}
+    for k, r in migs.items():
+        m = re.search(r"Tables: (.+?)\. Source", r["description"] or "")
+        for t in (m.group(1).split(", ") if m else []):
+            made_by.setdefault(t.strip(), k)
+    moves = td.declared_moves(g.ROOT)
+    unplanned = []
+    for t, kind, obj, _what in td.review_rows(g.ROOT):
+        now = moves.get(t, t)
+        k = made_by.get(now)
+        if not k:
+            # a table no migration has created yet: the migration that will create it takes it as it is now
+            unplanned.append(f"{kind} `{obj}`")
+        elif f"{kind} `{obj}`" not in (migs[k]["description"] or ""):
+            guard.add("M-REVIEW-ROW", f"{kind}:{obj}", f"{kind} `{obj}`: {k} creates {now} and does not list it "
+                                                      "(run tools/build-service-docs.py)")
+    if unplanned:
+        guard.note(f"{len(unplanned)} migration-review row(s) on tables no migration ticket creates yet (created as "
+                   f"they are now when planned): {'; '.join(unplanned[:6])}")
     guard.note(f"{len(file_of)} migration ticket(s) named, {len(tables)} table(s) in backend/, "
                f"{len(tables & on_ticket)} in a migration, {len(listed_storage)} listed as storage only")
     return guard.finish()
