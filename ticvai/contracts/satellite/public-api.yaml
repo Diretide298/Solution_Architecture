@@ -844,6 +844,13 @@ paths:
         oldest attached partition is 400 `replay-window-beyond-retention`. An event type the subscription does not
         hold is 400 `replay-event-type-not-subscribed`. **The caller's tenant** must be one of the subscription's
         API client's `allowedTenantIds`, else 404, as for an unknown subscription.
+
+        **What the window measures, what it filters, how large it may be** (r8 walk of ticket 27997). The window
+        is on the outbox row's `created_at`, the moment the event was written, not the moment it was first
+        delivered. The subscription's own filters (event types, venues) are applied by the dispatcher to every
+        replayed event exactly as for a live delivery, so an event of another venue is never sent. One replay
+        covers at most 7 days (`to` minus `from`, `to` defaulting to now) and at most 10,000 events; a larger
+        ask is 400 `replay-window-too-large` and nothing is queued, so the integrator replays in steps.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -877,8 +884,9 @@ paths:
           description: 'The window or the event types cannot be replayed (ADAM CR-140; CHG-CRA-004): `to` before `from`
             (`replay-window-invalid`); `from` older than the oldest outbox partition still attached
             (`replay-window-beyond-retention`); an event type the subscription does not hold
-            (`replay-event-type-not-subscribed`). Nothing is queued.'
-          x-ticvai-problem-types: [replay-window-invalid, replay-window-beyond-retention, replay-event-type-not-subscribed]
+            (`replay-event-type-not-subscribed`); a window longer than 7 days or holding more than 10,000 events
+            (`replay-window-too-large`). Nothing is queued.'
+          x-ticvai-problem-types: [replay-window-invalid, replay-window-beyond-retention, replay-event-type-not-subscribed, replay-window-too-large]
           content:
             application/problem+json:
               schema:
