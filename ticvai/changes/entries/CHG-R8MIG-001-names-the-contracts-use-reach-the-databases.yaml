@@ -1,0 +1,45 @@
+id: CHG-R8MIG-001
+date: '2026-10-19'
+source: audit
+kind: process
+summary: 'The generator now writes the column renames, the foreign keys and the dropped indexes that handoff/migration-review.md
+  used to leave "for a person" as a second forward migration per database (V0107), and every migration ticket that creates
+  one of the tables names it. A database built from the delivered migrations V0001-V0105 ends with the names the contracts use.'
+decision:
+  what: 'ORDERS-MONEY-C23 and the headline of APPROVALS-TENANCY-C01 (r8 blocker walk). tools/ddl_forward.py writes each
+    pure column rename (no type or data change), the index and constraint renames that follow it, each foreign key declared
+    since r1 and each index no longer generated as a guarded DO block in V0107__names_after_r1_<date>.sql; a block does nothing
+    when its table, key or index is not there or is there already, so it works on any database and twice. A key is added NOT
+    VALID (checked on every new write, validated by the owner), and checked outright on a partitioned table, which cannot take
+    NOT VALID. Renames that also change a type, table renames and moves, and every NOT NULL change stay in the review, because
+    each has a data question.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'r8 blocker walk finding, ADAM gaps 28311/0, 28054/3, 27828/0 (ORDERS-MONEY-C23, APPROVALS-TENANCY-C01): about 254 renames, 417 declared
+  keys and 49 dropped indexes were carried by no forward migration and no migration ticket, so the DDL developers copy had old names.'
+keys_touched:
+  operations: []
+  tables: []
+  schemas: []
+  files:
+  - tools/ddl_forward.py
+  - tools/derive-ddl.py
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+  - tools/tests/test_migration_generator.py
+  - backend/tenant/V0107__names_after_r1_20261019.sql
+  - backend/control/V0107__names_after_r1_20261019.sql
+root_class: 'A-DERIVE: a change the generator listed for a person and nothing carried'
+tickets:
+  started: []
+  unstarted:
+  - 'Every MIG-* ticket that creates a table with a renamed column, a new key or a dropped index (the sentence "Source DDL after r1: ...V0107..." is added by build-service-docs).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'gap 28311/0, 28054/3, 27828/0 (r8 blocker walk, no CR)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-wording.py
+status: open
+notes: 'Prevention: check-migration-wording MW-AFTER-R1 already fails a migration ticket that does not cite an after-r1 file for a table it changes; it now covers the names file (ticket_done.AFTER_R1_FILE), and tools/tests/test_migration_generator.py holds the generator tests (guarded rename, index follows, key NOT VALID, partitioned key checked, second run writes nothing). Regenerate with derive-ddl.py then build-service-docs.py. The names file is left out of the build-order edges (build-service-docs read_ddl), so V0002-V0034 keep their numbers. Not run against a live PostgreSQL here.'

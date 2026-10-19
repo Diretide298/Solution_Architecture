@@ -464,3 +464,113 @@ def test_every_key_the_rule_adds_is_printed():
                               lambda table, prop: {"queueId": "queue_id", "feedId": "feed_id"}[prop])
     assert len(lines) == len(keys) == 1
     assert "queue.reading.queue_id" in lines[0] and "listQueueReadings" in lines[0] and "{queueId}" in lines[0]
+
+
+# ---- R8-MIG-001: renames, keys and dropped indexes are written, guarded, and a second run writes nothing -----------
+
+REN_OLD = ("CREATE TABLE IF NOT EXISTS wallet.gift_card (id uuid PRIMARY KEY, face_value numeric(18,4), "
+           "owner_id uuid, note text);\n"
+           "CREATE TABLE IF NOT EXISTS wallet.owner (id uuid PRIMARY KEY);\n"
+           "CREATE TABLE IF NOT EXISTS wallet.ledger_line (id uuid, gift_card_id uuid) PARTITION BY RANGE (id);\n"
+           "CREATE INDEX IF NOT EXISTS gift_card_face_value_idx ON wallet.gift_card (face_value);\n"
+           "CREATE INDEX IF NOT EXISTS gift_card_note_idx ON wallet.gift_card (note);\n")
+REN_NEW = ("CREATE TABLE IF NOT EXISTS wallet.gift_card (id uuid PRIMARY KEY, face_value_amount numeric(18,4), "
+           "owner_id uuid, note text);\n"
+           "CREATE TABLE IF NOT EXISTS wallet.owner (id uuid PRIMARY KEY);\n"
+           "CREATE TABLE IF NOT EXISTS wallet.ledger_line (id uuid, gift_card_id uuid) PARTITION BY RANGE (id);\n"
+           "CREATE INDEX IF NOT EXISTS gift_card_face_value_amount_idx ON wallet.gift_card (face_value_amount);\n"
+           "ALTER TABLE wallet.gift_card ADD CONSTRAINT gift_card_owner_id_fkey FOREIGN KEY (owner_id) "
+           "REFERENCES wallet.owner(id);\n"
+           "ALTER TABLE wallet.ledger_line ADD CONSTRAINT ledger_line_gift_card_id_fkey FOREIGN KEY (gift_card_id) "
+           "REFERENCES wallet.gift_card(id);\n")
+REN_RENAMES = {"columns": {("wallet.gift_card", "face_value_amount"): "face_value"}}
+REN_RENAMES = {"columns": {("wallet.gift_card", "face_value_amount"): "face_value"}}
+
+
+def test_a_pure_column_rename_is_written_guarded_and_is_not_a_review_row():
+    p = fwd.diff("tenant", model(REN_OLD), model(REN_NEW), {"columns": {("wallet.gift_card", "face_value"):
+                                                                          "face_value_amount"}})
+    assert p.recon_counts["renames"] == 1
+    first = p.recon[0]
+    assert "DO $$ BEGIN IF EXISTS" in first and first.startswith("-- wallet.gift_card | rename column | face_value to face_value_amount") and "RENAME COLUMN face_value TO face_value_amount" in first
+    assert "NOT EXISTS" in first          # does nothing when the new name is already there
+    assert not rows(p, "column renamed"), p.review
+    assert any("RENAME COLUMN face_value_amount TO face_value" in r for r in p.recon_rollback)
+
+
+def test_the_index_on_a_renamed_column_follows_the_rename_and_comes_after_it():
+    p = fwd.diff("tenant", model(REN_OLD), model(REN_NEW), {"columns": {("wallet.gift_card", "face_value"):
+                                                                          "face_value_amount"}})
+    text = "\n".join(p.recon)
+    assert "ALTER INDEX wallet.gift_card_face_value_idx RENAME TO gift_card_face_value_amount_idx" in text
+    assert text.index("RENAME COLUMN") < text.index("ALTER INDEX")
+    assert text.index("ALTER INDEX") < text.index("ADD CONSTRAINT"), "keys after the renames they may name"
+
+
+def test_a_foreign_key_is_added_not_valid_and_guarded_but_a_partitioned_table_takes_it_checked():
+    p = fwd.diff("tenant", model(REN_OLD), model(REN_NEW), {"columns": {("wallet.gift_card", "face_value"):
+                                                                          "face_value_amount"}})
+    owner = [s for s in p.recon if "gift_card_owner_id_fkey" in s and "ADD CONSTRAINT" in s][0]
+    assert owner.rstrip().endswith("NOT VALID; END IF; END $$") and "to_regclass('wallet.owner') IS NOT NULL" in owner
+    assert "AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'gift_card_owner_id_fkey'" in owner
+    part = [s for s in p.recon if "ledger_line_gift_card_id_fkey" in s and "ADD CONSTRAINT" in s][0]
+    assert "NOT VALID" not in part, "PostgreSQL refuses NOT VALID on a partitioned table"
+    assert not rows(p, "constraint added"), p.review
+
+
+def test_an_index_no_longer_generated_is_dropped_guarded_and_the_rollback_makes_it_again():
+    p = fwd.diff("tenant", model(REN_OLD), model(REN_NEW), {"columns": {("wallet.gift_card", "face_value"):
+                                                                          "face_value_amount"}})
+    drop = [s for s in p.recon if "DROP INDEX wallet.gift_card_note_idx" in s]
+    assert drop and "to_regclass('wallet.gift_card_note_idx') IS NOT NULL" in drop[0]
+    assert any("CREATE INDEX IF NOT EXISTS gift_card_note_idx" in r for r in p.recon_rollback)
+    assert not rows(p, "index dropped"), p.review
+
+
+def test_once_the_file_is_in_the_old_side_a_second_diff_writes_nothing():
+    ren = {"columns": {("wallet.gift_card", "face_value"): "face_value_amount"}}
+    p = fwd.diff("tenant", model(REN_OLD), model(REN_NEW), ren)
+    old = model(REN_OLD)
+    old.apply_forward(";\n".join(p.recon) + ";\n")
+    again = fwd.diff("tenant", old, model(REN_NEW), ren)
+    assert not again.recon and not again.statements, (again.recon, again.statements)
+    assert not again.review, again.review
+
+
+def test_a_rename_that_also_changes_the_type_stays_a_decision_for_a_person():
+    new = REN_NEW.replace("face_value_amount numeric(18,4)", "face_value_amount integer")
+    p = fwd.diff("tenant", model(REN_OLD), model(new), {"columns": {("wallet.gift_card", "face_value"):
+                                                                      "face_value_amount"}})
+    assert p.recon_counts["renames"] == 0
+    assert rows(p, "column renamed"), p.review
+    assert not [s for s in p.recon if "ALTER INDEX" in s], "an index follows a rename only when the rename is written"
+
+
+def test_the_rendered_file_has_a_checksum_a_rollback_and_its_own_version():
+    p = fwd.diff("tenant", model(REN_OLD), model(REN_NEW), {"columns": {("wallet.gift_card", "face_value"):
+                                                                          "face_value_amount"}})
+    text = fwd.render_recon(p, "V0107", "r1 (9cec72d)", "20261019")
+    assert "VALUES ('V0107'" in text and "-- ROLLBACK" in text and "-- ALTER TABLE wallet.gift_card RENAME COLUMN" in text
+
+
+def test_a_migration_ticket_lists_what_the_names_file_does_to_its_tables():
+    import tempfile
+    from pathlib import Path
+    with tempfile.TemporaryDirectory() as d:
+        _names_ticket(Path(d))
+
+
+def _names_ticket(tmp_path):
+    import ticket_done as td
+    (tmp_path / "backend" / "tenant").mkdir(parents=True)
+    p = fwd.diff("tenant", model(REN_OLD), model(REN_NEW), {"columns": {("wallet.gift_card", "face_value"):
+                                                                          "face_value_amount"}})
+    f = tmp_path / "backend" / "tenant" / "V0107__names_after_r1_20261019.sql"
+    f.write_text(fwd.render_recon(p, "V0107", "r1", "20261019"), encoding="utf-8")
+    ch = td.after_r1_changes(tmp_path)
+    rel = "backend/tenant/V0107__names_after_r1_20261019.sql"
+    assert ("rename column", "face_value to face_value_amount") in ch[(rel, "wallet.gift_card")]
+    # a key is on the child's ticket and on its parent's
+    assert any(k == "foreign key" for k, _ in ch[(rel, "wallet.owner")])
+    text = td.names_sentence(rel, {"wallet.gift_card": ch[(rel, "wallet.gift_card")]})
+    assert text.startswith(f"Source DDL after r1: {rel}") and "rename column face_value to face_value_amount" in text

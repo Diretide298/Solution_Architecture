@@ -1894,6 +1894,17 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         written.append((dest, p))
         if apply:
             dest.write_text(ddl_forward.render(p, version, baseline, stamp), encoding="utf-8")
+    # **The second file: the names** (R8-MIG-001). It takes the next number after the additive file, or the same
+    # number when nothing additive is due, and is one number for both databases like the first.
+    recon_n = version_n + (1 if any(p.statements for p in plans) else 0)
+    recon_version = f"V{recon_n:04d}"
+    for p in plans:
+        if not p.recon:
+            continue
+        dest = OUT / p.area / f"{recon_version}__names_after_{safe_tag}_{stamp}.sql"
+        written.append((dest, p))
+        if apply:
+            dest.write_text(ddl_forward.render_recon(p, recon_version, baseline, stamp), encoding="utf-8")
     review = ddl_forward.render_review(plans, baseline, stamp, extra)
     if apply:
         for name, text in files.items():
@@ -1907,6 +1918,11 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     print(f"  FROZEN at {baseline}: the baseline files under backend/ are not rewritten")
     for dest, p in written:
         c = p.counts
+        if "__names_after_" in dest.name:
+            r = p.recon_counts
+            print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {r['renames']} column rename(s), "
+                  f"{r['keys']} key(s), {r['indexes']} index(es)" + ("" if apply else " (not written, pass --apply)"))
+            continue
         print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {c['tables']} table(s), "
               f"{c['columns']} column(s), {c['indexes']} index(es), {c['other']} other"
               + (f", {c['policies']} row-level security polic(ies) re-applied" if c.get("policies") else "")

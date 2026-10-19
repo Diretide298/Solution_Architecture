@@ -272,7 +272,10 @@ def baseline_functions(root) -> dict:
     return out
 
 
-AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d__after_r1_\d{8}\.sql$")
+AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d__(?:names_)?after_r1_\d{8}\.sql$")
+# A block of the names file (ddl_forward.tag): `-- <table> | <kind> | <detail> [| <other table>]` (R8-MIG-001)
+NAMES_TAG = re.compile(r"^-- (\w+\.\w+) \| (rename column|rename constraint|rename index|create index|drop index|"
+                       r"foreign key) \| (\S+(?: to \S+)?)(?: \| (\w+\.\w+))?$")
 _AR1 = [
     (re.compile(r"^CREATE TABLE IF NOT EXISTS (\w+\.\w+)"), None),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD COLUMN (?:IF NOT EXISTS )?(\w+)"), "column"),
@@ -329,6 +332,12 @@ def after_r1_changes(root) -> dict:
         made, seen = set(), []
         for ln in f.read_text(encoding="utf-8").splitlines():
             ln = ln.strip()
+            tg = NAMES_TAG.match(ln)
+            if tg:
+                seen.append((tg.group(1), tg.group(2), tg.group(3)))
+                if tg.group(4):   # a key names its parent too: the later of the two migrations adds it
+                    seen.append((tg.group(4), tg.group(2), f"{tg.group(3)} (from {tg.group(1)})"))
+                continue
             for rx, kind in _AR1:
                 m = rx.match(ln)
                 if not m:
@@ -366,6 +375,18 @@ def after_r1_sentence(rel: str, changes: dict) -> str:
             for k, v in by.items()))
     return (f"Source DDL after r1: {rel} ({'; '.join(parts)}); the files above are frozen at r1, so this migration, "
             "which creates those tables, carries these changes too.")
+
+
+def names_sentence(rel: str, changes: dict) -> str:
+    """The sentence a migration ticket carries for the names file (R8-MIG-001): what the file does to its tables."""
+    parts = []
+    for t, items in sorted(changes.items()):
+        parts.append(f"{t}: " + ", ".join(f"{k} {d}" for k, d in items))
+    return (f"Source DDL after r1: {rel} (the names the contracts use: {'; '.join(parts)}); the files above create "
+            "these tables with the names they had at r1, so this migration copies the blocks of that file that name "
+            "its tables, after its tables are created (each block is guarded and does nothing when its table, key or "
+            "index is not there). A key between this migration's table and one a later migration creates is copied "
+            "by both, and takes effect in the later one.")
 
 
 def baseline_wording(root) -> str:

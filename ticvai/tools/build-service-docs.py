@@ -560,8 +560,11 @@ def read_ddl() -> dict[str, dict]:
                 if name and m:
                     cols_.append((m.group(1), m.group(2).rstrip(",")))
         policy = {}
+        # **The names file is not part of the build order** (R8-MIG-001): its keys are added NOT VALID, guarded, and
+        # only when both tables are there, so they never make one migration wait for another. Read as edges they
+        # renumbered V0006-V0034, which developers have delivered.
         for f in [ROOT / "backend" / db / "900-foreign-keys.sql",
-                  ROOT / "backend" / db / "920-row-level-security.sql"] + fwd:
+                  ROOT / "backend" / db / "920-row-level-security.sql"] + [x for x in fwd if "__names_after_" not in x.name]:
             if not f.exists():
                 continue
             text = f.read_text(encoding="utf-8").replace('"', "")
@@ -4251,7 +4254,8 @@ def main() -> int:
         if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
             src_ = ([own_src_[t_["key"]]] if t_["key"] in own_src_ and "Source DDL:" not in (t_["description"] or "")
                     else [])
-            ar1_ = [ticket_done.after_r1_sentence(rel_, ch_) for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
+            ar1_ = [(ticket_done.names_sentence if "__names_after_r1_" in rel_ else ticket_done.after_r1_sentence)(rel_, ch_)
+                    for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
             add_ = [w_ for w_ in (src_ + ar1_ + [ticket_done.MIGRATION_WORDING]
                                   + ([base_words_] if t_["key"] == "MIG-BASELINE" else []))
                     if w_ not in (t_["description"] or "")]
