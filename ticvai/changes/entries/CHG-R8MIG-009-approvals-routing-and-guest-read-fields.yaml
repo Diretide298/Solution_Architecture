@@ -1,0 +1,54 @@
+id: CHG-R8MIG-009
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Approvals and guest reads get the fields the screens and routing need: approvals.request keeps the matrix and
+  rule it was routed by, the cancel reason and the assignment note; one matrix per kind, scope and version; a return
+  or request-information is a stored decision (decision widened), an external approver is stored on the decision
+  (principal or external reference, exactly one), the dispatch keeps the requester reference; the SLA restarts on the
+  answering submit. Entitlement returns productName, venueName, imageUrl and guestCategory, read on the fly;
+  GroupPackageDefinition returns name and unitPrice, stores minimumSize and has the corporate, tour operator and
+  community kinds the approved screens draw; DelegatedAccess returns the name and minor flag of the guest acted for.'
+decision:
+  what: 'R8 blocker causes APPROVALS-TENANCY-C02 and ORDERS-MONEY-C20 (no decision). contracts/spine/approvals.yaml
+    ApprovalRequest, ApprovalMatrix, ApprovalDecision, ApprovalExternalDispatch and the decideApprovalRequest text;
+    contracts/spine/access.yaml Entitlement and getEntitlement read-via; contracts/spine/catalogue.yaml
+    GroupPackageDefinition; contracts/spine/identity.yaml DelegatedAccess and listDelegations read-via. GroupPackage
+    productId stays text (a type change only for the screens would be breaking and a hand migration).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), groups approvals-tenancy and orders-money; tickets 27813, 27831,
+  27832, 27833, 28228, 28351 and 28355 and their ADAM gaps: routing, return and the external approver had no column, and
+  approved screens show fields no operation returned.'
+keys_touched:
+  operations: [decideApprovalRequest, getEntitlement, listDelegations]
+  schemas: [ApprovalRequest, ApprovalMatrix, ApprovalDecision, ApprovalExternalDispatch, Entitlement,
+    GroupPackageDefinition, DelegatedAccess]
+  tables:
+  - approvals.request
+  - approvals.matrix
+  - approvals.decision
+  - approvals.external_dispatch
+  - catalogue.group_package
+  files:
+  - contracts/spine/approvals.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/identity.yaml
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '27813, 27831, 27832, 27833, 28228, 28351, 28355.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Breaking by check-contract-compat, for the lead''s breaking-changes entry: every approvals operation returning
+  decisions[] (decision gains return and requestInformation; principalId no longer guaranteed), and getGroupPackageDefinition,
+  setGroupPackageDefinition and listGroupPackages (kind gains corporate, tourOperator, community). The widened CHECKs and
+  approvals.decision.principal_id DROP NOT NULL are generated in the next forward migration.'

@@ -1355,6 +1355,10 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
         - "P02 GST-069 Face Pass"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'minorAgeThreshold, for overSubjectIsMinor (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -10483,6 +10487,21 @@ components:
             grant written before 18 August means exactly what it meant before.
 
             '
+        overSubjectName:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The display name of the guest acted for (`pii.subject.display_name`), read with the grant;
+            null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009).
+        overSubjectIsMinor:
+          type: boolean
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: Whether the guest acted for is under the region's `RegionSettings.minorAgeThreshold` today,
+            computed from their date of birth, which is never returned; null when no date of birth is held. Not
+            stored (CHG-R8MIG-009).
         overObjectRef:
           type: string
           nullable: true

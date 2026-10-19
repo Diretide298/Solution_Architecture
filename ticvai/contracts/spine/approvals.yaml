@@ -540,11 +540,15 @@ paths:
 
         **Return and request information (decided 29 September, readiness close-out; MoM 10 Aug §5.5:
         Approve, Reject, Return, Request More Information).** `return` sends the request back to the
-        requester to amend (`returned`); `requestInformation` asks the requester a question and pauses the
+        requester to amend (`returned`); `requestInformation` asks the requester a question and stops the
         SLA clock (`informationRequested`). Neither is a rejection and neither counts against the
         requester in the rejection rate. Both need a comment saying what is wanted. The requester answers
         with `submitApprovalRequest` on the same request, and routing resumes at the level that sent it
-        back.
+        back. **Both are stored as a decision row** (`approvals.decision.decision` `return` or
+        `requestInformation`, the comment in `comment`; R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009), so the
+        request''s `decisions[]` shows them. **The SLA restarts, it does not resume**: the answering submit sets
+        `sla_due_at` again to now plus the rule''s `slaMinutes` (states/approval-request.yaml); no remaining time
+        is kept.
 
         '
       tags:
@@ -4967,6 +4971,11 @@ components:
           type: string
           nullable: true
           description: Who decided in the provider's system, as it named them.
+        requesterReference:
+          type: string
+          nullable: true
+          description: The requester as the provider knows them, sent with the item, so `approverIsRequester`
+            compares the provider's approver with it (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009).
         scopePath:
           type: string
     ApprovalExternalDecision:
@@ -5417,6 +5426,8 @@ components:
       type: object
       x-ticvai-persistence: approvals.matrix
       x-ticvai-rls: read-beneath   # ADAM CR-095, CHG-RSF-001: a matrix set at the tenant or a region governs every venue beneath it, so a venue reads the matrices it inherits (approvals.rule follows its matrix for reading) and still writes only its own
+      # One matrix per kind, scope and version, as the contract promises (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009).
+      x-ticvai-unique-together: [[kind, scopePath, version]]
       required:
       - kind
       - scopeLevel
@@ -5554,9 +5565,10 @@ components:
     ApprovalDecision:
       type: object
       x-ticvai-persistence: approvals.decision
+      # An internal approver or an external one, never both (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009).
+      x-ticvai-exactly-one-of: [[principalId, externalApproverRef]]
       required:
       - level
-      - principalId
       - decision
       - decidedAt
       properties:
@@ -5575,6 +5587,18 @@ components:
         principalId:
           type: string
           format: uuid
+          nullable: true
+          description: The approver; null when an external workflow system decided (`externalApproverRef` set).
+        externalApproverRef:
+          type: string
+          nullable: true
+          description: Who decided in the external provider's system, as it named them
+            (`recordExternalApprovalDecision`); null for an internal approver (CHG-R8MIG-009).
+        externalApproverName:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: The external approver's display name, where the provider sent one (CHG-R8MIG-009).
         displayName:
           type: string
         isDelegate:
@@ -5588,6 +5612,10 @@ components:
           enum:
           - approve
           - reject
+          - return
+          - requestInformation
+          description: '`return` and `requestInformation` are stored as decisions too, their comment in `comment`
+            (`decideApprovalRequest`; CHG-R8MIG-009).'
         comment:
           type: string
           nullable: true
@@ -5778,6 +5806,34 @@ components:
           format: date-time
           nullable: true
           readOnly: true
+        assignmentNote:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The note `assignApprovalRequest` was given, kept with the assignment (R8 blocker
+            APPROVALS-TENANCY-C02, CHG-R8MIG-009).
+        matrixId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: approvals.matrix
+          description: The matrix routing chose at submit (with `matrixVersion`), so a decision is checked against the
+            matrix the request was routed by (CHG-R8MIG-009).
+        ruleId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: approvals.rule
+          description: The matrix rule that matched on kind, scope, amount and `attributes` (CHG-R8MIG-009).
+        cancelReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: Why the request was cancelled, as `cancelApprovalRequest` was given it (CHG-R8MIG-009).
         requestedAt:
           type: string
           format: date-time
