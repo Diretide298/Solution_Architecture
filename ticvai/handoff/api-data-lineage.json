@@ -15880,6 +15880,7 @@
   "path": "/cells/{cellId}",
   "reads": [
    "cache:idempotency",
+   "control.cell",
    "control.cell_job"
   ],
   "writes": [
@@ -23914,7 +23915,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "retail.shop_and_drop"
+   "retail.shop_and_drop",
+   "retail.shop_and_drop_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -48674,7 +48676,6 @@
    "ai.policy",
    "ai.provider",
    "cache:idempotency",
-   "control.content_block",
    "marketing.message_template",
    "marketing.message_template_version"
   ],
@@ -118334,7 +118335,6 @@
    "cache:idempotency",
    "catalogue.event",
    "catalogue.product",
-   "control.content_block",
    "marketing.campaign",
    "marketing.message_template",
    "promotions.promotion",

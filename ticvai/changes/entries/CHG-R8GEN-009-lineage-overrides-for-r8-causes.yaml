@@ -24,3 +24,4 @@ prevention:
   type: check
   ref: tools/check-lineage.py
 status: open
+notes: 'Also, at other lanes'' request: collectShopAndDrop writes retail.shop_and_drop_line and updateCellTier reads control.cell (storage-sat APPROVALS-TENANCY-C34, C19); the carried raw reads of control.content_block on proposeMarketingContent and proposeTranslations are dropped (storage-sat IDENTITY-C59 reads content blocks through white-label#contentBlockRecords).'

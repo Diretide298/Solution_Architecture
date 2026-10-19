@@ -1561,10 +1561,7 @@
    "carried": true
   },
   "collectShopAndDrop": {
-   "notWrites": [
-    "retail.shop_and_drop_line"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); storage-sat lane request (APPROVALS-TENANCY-C34, CHG-R8GEN-009): collecting writes the collected lines, retail.shop_and_drop_line, so the carried removal is dropped",
    "carried": true
   },
   "commitCatalogueImport": {
@@ -11128,7 +11125,6 @@
     "ai.provider",
     "catalogue.event",
     "catalogue.product",
-    "control.content_block",
     "marketing.campaign",
     "marketing.message_template",
     "promotions.promotion",
@@ -11142,7 +11138,7 @@
     "ai.decision_record",
     "ai.proposed_action"
    ],
-   "reason": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. Grounding and target reads run as the caller; drafts are ai.proposed_action rows applied by a person through the owner's operation, never written into marketing or whitelabel tables here. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. Grounding and target reads run as the caller; drafts are ai.proposed_action rows applied by a person through the owner's operation, never written into marketing or whitelabel tables here. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); storage-sat lane IDENTITY-C59 (CHG-R8GEN-009): content blocks are read through white-label#contentBlockRecords, not control.content_block",
    "carried": true
   },
   "proposeRiskAction": {
@@ -11185,7 +11181,6 @@
    "reads": [
     "ai.policy",
     "ai.provider",
-    "control.content_block",
     "marketing.message_template",
     "marketing.message_template_version"
    ],
@@ -11193,7 +11188,7 @@
     "ai.activity",
     "ai.proposed_action"
    ],
-   "reason": "The messageTemplates scope reads every channel's template. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "The messageTemplates scope reads every channel's template. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); storage-sat lane IDENTITY-C59 (CHG-R8GEN-009): content blocks are read through white-label#contentBlockRecords, not control.content_block",
    "carried": true
   },
   "proposeVenueLabels": {
@@ -17078,6 +17073,12 @@
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
+  },
+  "updateCellTier": {
+   "reads": [
+    "control.cell"
+   ],
+   "reason": "storage-sat lane request (APPROVALS-TENANCY-C19, CHG-R8GEN-009): updateCellTier reads the cell it moves (404 when absent, 409 tier-unchanged)"
   },
   "updateChannelIncident": {
    "writes": [
