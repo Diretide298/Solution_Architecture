@@ -1419,6 +1419,10 @@ paths:
         - "P09 ADM-018 Interface Languages"
         - "P13 CMS-009 Navigation & Menus"
         - "P13 CMS-011 Translations"
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'the venues whose overrides it returns: platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       - guest
@@ -5050,6 +5054,10 @@ paths:
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P02 GST-071 Payment Methods"
         - "P05 KSK-002 Language Select"
+      x-ticvai-read-via:
+      - query: payments#providerConnectionRecords
+        route: in-process
+        for: 'its read of payments.provider_connection, for `paymentTokenisation` (lineage request, r8)'
       x-ticvai-audience:
       - anonymous
       - guest

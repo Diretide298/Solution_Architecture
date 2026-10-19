@@ -1,0 +1,50 @@
+id: CHG-R8SAT-001
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'The satellite contracts now answer what the Sprint 1 and 2 ticket walk found missing: replayEvents states its
+  window clock, filters and limit; the guest map list can return maps with no bookable spot; seat availability carries
+  the stage and viewBox; a guest can list their own visit plans, read their own seat hold and their own case with its
+  thread; generateVisitPlan can say no-suitable-plan; plan items and left-out entries carry names and limits; a map
+  availability answer names the next free date; Tenant carries its cell host; the white-label contract has a feature
+  catalogue, store URLs for the forced upgrade, policy titles derived from kind, a bookingFlow link target, a stated
+  schedule rule, active banners and resolved asset addresses in the published configuration, changed flows and
+  affected products in the diff, a review path for content blocks, and a stated store-secret shape.'
+decision:
+  what: 'Contract text and additive fields only, as the lead''s lane brief asks (no new feature). Numbers proposed and
+    marked for the owner: replay window 7 days and 10,000 events; feature catalogue values other than the wallet and
+    payment keys; Arabic policy labels.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'r8 ticket-walk findings (audit/ticvai/r8-blockers, lane-satellite.json): FOUNDATION-AI-C16, GPS-C08, GPS-C10,
+  GPS-C15, GPS-C16, GPS-C17, GPS-C22, GPS-C25, IDENTITY-C14, IDENTITY-C30, WHITE-C02 (contract part), WHITE-C04,
+  WHITE-C10, WHITE-C11, WHITE-C14 (contract part), WHITE-C18, WHITE-C19 (contract part), WHITE-C25, WHITE-C28,
+  WHITE-C29, WHITE-C30; plus the lineage lane''s read-via requests for getTenantConfig and getPublishedTenantConfig.
+  Finding: a ticket reached "done" only if its contract carried the field, read or rule the screen needs.'
+keys_touched:
+  operations: [replayEvents, listBookableVenueMaps, getSeatAvailability, listMyVisitPlans, generateVisitPlan, getMapResourceAvailability, getSeatHold, createSeatHold, getMyCase, setFeatureToggles, setPolicy, setBrandIdentity, getPublishedTenantConfig, getTenantConfig, diffConfigVersion, publishContentBlock, updateBanner, proposeTranslations]
+  schemas: [Tenant, FeatureKey, MinimumAppVersion, PolicyKind, PublishedPolicy, LinkTarget, StoreAccount, PublishedTenantConfig, PublishedBanner, PublishedPromoBlock, ConfigDiff, ContentBlock, VisitPlanItem, SeatAvailability, TranslationProposals]
+  files:
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/ai.yaml
+root_class: 'contract does not carry what the screen or ticket needs (r8 ticket walk)'
+tickets:
+  started: []
+  unstarted:
+  - 'Sprint 1 and 2 tickets named in the cause list (27997, 28690, 28197, 28694, 28200, 28204, 28202, 28693, 27886, 27776, 28335, 27893, 27890, 27891, 28337, 27919, 27905, 27914, 27920, 27926)'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: none
+triage: blocker
+prevention:
+  type: none
+  reason: 'The class is a missing field or sentence per ticket; no single mechanical rule finds them. The walk itself is the check.'
+status: open
+notes: 'Needs the lead: breaking-change entries for the response-enum value bookingFlow on LinkTarget.kind (10 operations) and PublishedPolicy.title string to LocalisedText; derive-ddl and a forward migration for control.content_block review_status and approval_request_id; derive-lineage for the new operations listMyVisitPlans and getMyCase and the read-via changes.'
