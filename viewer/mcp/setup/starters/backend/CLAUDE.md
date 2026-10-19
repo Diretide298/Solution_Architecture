@@ -115,25 +115,33 @@ This replaces the older rule of applying every migration to an empty database fo
 wherever you meet it (the ticket's Done when, `backend-patterns.md`, an older copy of these files).
 
 1. Write the file the ticket names, from the package statements in `expected-schema.json`. Every
-   statement must be safe to run twice: `IF NOT EXISTS`, `CREATE OR REPLACE`, and `DROP ... IF EXISTS`
-   before an `ADD CONSTRAINT`. Do not `BEGIN` or `COMMIT`: the runner wraps each file in one transaction.
+   statement in it must be safe to run twice: `IF NOT EXISTS`, `CREATE OR REPLACE`, and
+   `DROP ... IF EXISTS` before an `ADD CONSTRAINT`. Do not `BEGIN` or `COMMIT`: the runner wraps each
+   file in one transaction. No GRANT, OWNER, COMMENT or UNLOGGED the package does not have, and no
+   rows written into tables that are not the ticket's. Files already applied stay as they are.
 2. Run `node .claude/scripts/db-ticket.mjs <ticket>`. It applies only this file to a copy of the
    database at the previous state, applies it a second time (which must succeed and change nothing),
    applies the package statements to a second copy, and compares the two databases whole: the ticket's
-   tables must be what the package makes, and nothing else may change. It needs Docker Desktop running;
-   the first run starts its own PostgreSQL 16 container.
+   tables must be what the package makes, and nothing else may change, privileges, owners, the
+   migration register and rows included. It needs Docker Desktop running; the first run starts its own
+   PostgreSQL 16 container. **The first run for a folder can take several minutes** (it builds a
+   template of the earlier files): give the command a 10-minute timeout (Bash `timeout: 600000`) or run
+   it in the background. Later runs take seconds.
 3. A difference names the object and what differs: fix the file and run it again. **MATCH is the evidence
    for done**: quote its result lines in the comment. PARTIAL is not. A foreign key "left for a later
-   migration" is not a difference.
+   migration" is not a difference. Rows the file leaves in the ticket's own tables are listed: right
+   only if the ticket asks for a backfill.
 4. Do not rebuild the other migrations, do not work out the effect by hand, and do not run `dotnet build`
    or `dotnet test` unless the ticket changes C#.
-5. Before opening the merge request, run `node .claude/scripts/db-ticket.mjs --full <database>` once:
-   every migration applied to an empty database, each applied twice. Say the result in the comment. No
-   pipeline runs this yet.
+5. Before opening the merge request, run `node .claude/scripts/db-ticket.mjs --full <database>` once
+   (the same 10-minute timeout): every migration applied once, in order, to an empty database, as
+   SqlMigrationRunner does. Say the result in the comment. No pipeline runs this yet.
 
 If MATCH cannot be reached because the package itself is wrong (a type no file creates, a policy on a
 table a later migration creates), the check says so; that is a change request, as in "When the package
-is wrong". `node .claude/scripts/db-ticket.mjs --clean` drops this folder's check databases.
+is wrong". `node .claude/scripts/db-ticket.mjs --clean` drops this folder's check databases (template,
+copies, the --full database) and its kept snapshots; other folders' databases are dropped by themselves
+after two weeks unused.
 
 ## Searching pulled files
 

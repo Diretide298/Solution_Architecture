@@ -104,8 +104,8 @@ public sealed class RefundAuthoriser(
   `platform.schema_version`. A [DB] ticket is done when `node .claude/scripts/db-ticket.mjs <ticket>`
   says MATCH: its file, applied to a copy of the previous state and then applied again, leaves exactly
   what the package's statements leave and changes nothing else. Before the merge request,
-  `--full <database>` applies every file to an empty database, each twice. Never edit an applied
-  file: add a new one.
+  `--full <database>` applies every file once, in order, to an empty database. Never edit an
+  applied file: add a new one.
 - A retried mutating request with the same `Idempotency-Key` gets the first answer, from
   `IIdempotencyStore` (in memory in development; Redis in production).
 - Parameterised always. String-concatenated SQL is a build-blocking review finding.

@@ -8,8 +8,9 @@ Ticket $ARGUMENTS is finished.
 1. Run `dotnet test TICVAI-Backend.slnx` and note the result.
    For a [DB] ticket, run `node .claude/scripts/db-ticket.mjs $ARGUMENTS` instead and note its result
    lines: MATCH is the evidence, anything else is not finished. Then run
-   `node .claude/scripts/db-ticket.mjs --full <database>` once (every migration from an empty database,
-   each applied twice) and note that too. No `dotnet build` or `dotnet test` unless the ticket changed C#.
+   `node .claude/scripts/db-ticket.mjs --full <database>` once (every migration applied once, in order,
+   to an empty database; give it a 10-minute timeout) and note that too. No `dotnet build` or
+   `dotnet test` unless the ticket changed C#.
 2. Look at `git diff` and `git status` for what changed.
 3. `adam_propose` ticket $ARGUMENTS: the QA status (**Ready for QA** - `adam_propose` with only the ticket number lists the live statuses; use the one named for QA, and if there is none, stop and ask), 100%, and a 2-4 line comment naming what was
    built, the test result, and what QA should check. **Never propose Closed**: closing is QA's call, not the maker's. If the tests fail, propose **In progress** instead and say what fails.
