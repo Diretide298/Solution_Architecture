@@ -19267,6 +19267,264 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /field-sets:
+    get:
+      operationId: listFieldSets
+      x-ticvai-consumed-by: []
+      summary: The venue's field sets, the forms a sale asks the buyer and each ticket owner to fill
+      description: >-
+        **A field set is what the existing system calls a data mask** (16 October 2026 minutes, 4.13 and section 5:
+        reservation owner and ticket owner fields come from a configurable field set linked to the product;
+        CHG-R8PRD-004). It is designed in configuration with custom fields (text, drop-down, radio, check box)
+        and linked to products with `setProductOwnerFieldSets`, so the fields appear at sale by themselves. Some
+        businesses want a full name, others a first and a last name: that is two field sets, not a setting.
+
+        **Which sets.** Active sets only, unless `includeInactive` is true. `search` matches the start of any word
+        of `name` or of `code`, ignoring case. Each set comes with its fields.
+
+        **Order.** Sorted by `name` ascending, then by `id`.
+
+        Wireframe of 9 October (products module): the new Field sets screen of the Setup Library, and B2-S10
+        Ownership & Assignment Model.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: includeInactive
+        in: query
+        required: false
+        description: True adds the deactivated sets (`isActive` false); the default returns active sets only.
+        schema:
+          type: boolean
+          default: false
+      - name: search
+        in: query
+        required: false
+        description: Matches the start of any word of the set's `name` or `code`, ignoring case.
+        schema:
+          type: string
+          maxLength: 80
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The field sets, each with its fields
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FieldSet'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /field-sets/{fieldSetId}:
+    parameters:
+    - name: fieldSetId
+      in: path
+      required: true
+      description: 'Addresses the field set: its `id`. On the PUT, a new id creates the set.'
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getFieldSet
+      x-ticvai-consumed-by: []
+      summary: One field set with its fields
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The field set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldSet'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setFieldSetDefinition
+      x-ticvai-consumed-by: []
+      summary: Create or replace a field set, its fields whole
+      description: >-
+        **The set and all its fields in one call** (CHG-R8PRD-004): a field the body leaves out is removed from the
+        form, and the order of `fields` is the order the sale asks them in.
+
+        **What the server refuses.** A drop-down or radio field with fewer than two options, two options with one
+        `value`, or two fields with one `key` (`400 validation`); a `code` another set of the tenant uses (`409
+        duplicate-code`); a field `key` kept with a different `type` while products link the set
+        (`409 field-key-retyped`: the values already captured under that key would change meaning, so add a field
+        with a new key instead); deactivating a set that products link (`409 field-set-in-use`: link those
+        products to another set first, `setProductOwnerFieldSets`).
+
+        **What a removed field leaves.** Values already captured under its key stay on the sales that captured
+        them; new sales no longer ask for it.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FieldSet'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldSet'
+        '400':
+          description: The body breaks the schema or the field rules above (`validation`; `errors[]` names the field
+            and, for an option, its index).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: The code is taken in the tenant (`duplicate-code`), a linked set's field changes type
+            (`field-key-retyped`), or a linked set is deactivated (`field-set-in-use`).
+          x-ticvai-problem-types:
+          - duplicate-code
+          - field-key-retyped
+          - field-set-in-use
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /products/{productId}/owner-field-sets:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getProductOwnerFieldSets
+      x-ticvai-consumed-by: []
+      summary: Which field set a sale of this product asks the buyer, and which it asks each ticket owner
+      description: >-
+        **Reservation owner and ticket owner** (16 October 2026 minutes, 4.13, CHG-R8PRD-004). The reservation owner
+        is the buyer of the transaction. A ticket owner is needed only for tickets such as memberships and season
+        passes: a parent who buys a membership for a daughter is the reservation owner, the daughter the ticket
+        owner, and two profiles are created. A general admission ticket has no ticket owner.
+
+        **A product with nothing saved** answers both ids null: the sale asks the buyer nothing beyond what the
+        channel already takes, and no ticket owner.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The product's owner field sets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductOwnerFieldSets'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setProductOwnerFieldSets
+      x-ticvai-consumed-by: []
+      summary: Link a product to the field sets its sale asks
+      description: >-
+        **Replaces the product's two links** (CHG-R8PRD-004). Each id must be an active field set of the
+        product's venue (`422 unknown-field-set`, `422 inactive-field-set`). `ticketOwnerFieldSetId` null means the
+        ticket needs no owner.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductOwnerFieldSets'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductOwnerFieldSets'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: A field set id that is not a field set of the product's venue (`unknown-field-set`), or one
+            that is deactivated (`inactive-field-set`).
+          x-ticvai-problem-types:
+          - unknown-field-set
+          - inactive-field-set
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     EventResourceCostEstimate:
@@ -44159,6 +44417,172 @@ components:
                   - kioskLabel
                   - visitInstructions
                   - termsAndConditions
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). The product''s venue.'
+    FieldSet:
+      type: object
+      x-ticvai-persistence: catalogue.field_set + catalogue.field_set_field
+      description: >-
+        **A form a sale asks someone to fill: the existing system's data mask** (16 October 2026 minutes, 4.13,
+        CHG-R8PRD-004). Linked to products by `setProductOwnerFieldSets`. The values a sale captures are kept on
+        the sale under each field's `key`, in the `dataMaskValues` the order contract already carries.
+      required:
+      - code
+      - name
+      - fields
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of `setFieldSetDefinition`.
+        code:
+          type: string
+          maxLength: 64
+          pattern: ^[A-Z0-9][A-Z0-9_-]*$
+          x-ticvai-unique: tenant
+          description: Unique in the tenant, compared ignoring case (`409 duplicate-code`), so an import can name the set.
+        name:
+          type: string
+          maxLength: 120
+          description: As staff read it, e.g. *Buyer, full name and contact*.
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The name in each of the venue's languages; `name` is the fallback.
+        fields:
+          type: array
+          minItems: 1
+          maxItems: 40
+          description: The fields in the order the sale asks them.
+          items:
+            $ref: '#/components/schemas/FieldSetField'
+        isActive:
+          type: boolean
+          default: true
+          description: Deactivated rather than deleted; a set products link cannot be deactivated (`409 field-set-in-use`).
+        linkedProductCount:
+          type: integer
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The products whose reservation owner or ticket owner set this is. Counted on read.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). The venue the caller acts at.'
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    FieldSetField:
+      type: object
+      x-ticvai-persistence: catalogue.field_set_field
+      description: >-
+        **One field of a field set** (CHG-R8PRD-004). The four types the minutes name: `text`; `dropDown` and `radio`
+        pick one of `options`; `checkBox` with `options` picks any number of them, and with none is a single tick
+        (yes or no), as a consent box is.
+      required:
+      - key
+      - label
+      - type
+      properties:
+        fieldSetId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The set it belongs to; from the path.
+        key:
+          type: string
+          pattern: ^[a-z][a-zA-Z0-9]{0,39}$
+          description: The name the captured value is stored under in the sale's `dataMaskValues`. Unique in the set; keep it when the label changes.
+        label:
+          type: string
+          maxLength: 120
+          description: What the person filling the form reads, in the default language.
+        labelLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The label in each of the venue's languages; `label` is the fallback.
+        helpText:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: A line under the field, e.g. *As printed on the passport*.
+        type:
+          type: string
+          enum:
+          - text
+          - dropDown
+          - radio
+          - checkBox
+        options:
+          type: array
+          maxItems: 50
+          description: Required, at least two, for `dropDown` and `radio`; optional for `checkBox`; refused for `text`.
+          items:
+            $ref: '#/components/schemas/FieldSetOption'
+        isRequired:
+          type: boolean
+          default: false
+          description: The sale cannot complete without a value (a ticked box, for a single `checkBox`).
+        maxLength:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 500
+          description: For `text` only; null allows up to 500 characters.
+    FieldSetOption:
+      type: object
+      x-ticvai-persistence: none — jsonb column of catalogue.field_set_field
+      description: One choice of a drop-down, radio or check-box field.
+      required:
+      - value
+      - label
+      properties:
+        value:
+          type: string
+          maxLength: 80
+          description: What is stored when it is chosen; unique in the field.
+        label:
+          type: string
+          maxLength: 120
+        labelLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+    ProductOwnerFieldSets:
+      type: object
+      x-ticvai-persistence: catalogue.product_owner_field_set
+      description: >-
+        **The two forms a sale of the product asks** (16 October 2026 minutes, 4.13, CHG-R8PRD-004): the reservation
+        owner's (the buyer, once per sale) and the ticket owner's (once per credential the sale issues, and only
+        where the ticket needs an owner). One row per product.
+      required:
+      - reservationOwnerFieldSetId
+      - ticketOwnerFieldSetId
+      properties:
+        productId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path.
+        reservationOwnerFieldSetId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.field_set
+          description: The buyer's form; null asks nothing beyond what the channel already takes.
+        ticketOwnerFieldSetId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.field_set
+          description: Each ticket owner's form; null when the ticket needs no owner (general admission).
         scopePath:
           type: string
           readOnly: true
