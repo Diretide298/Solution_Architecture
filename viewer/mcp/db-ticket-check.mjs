@@ -128,6 +128,16 @@ INSERT INTO platform.schema_version (version, description, checksum) VALUES ('V0
   ok(fk?.kind === 'foreign-keys' && fk.tables.length === 0 && fk.constraints.join() === 'policy_tenant_id_fkey,b_fkey', 'the cross-schema keys, by name', JSON.stringify(fk));
   ok(kind('[BE] Build listPasses') === null && kind('[DB] Monthly partitions: create three months ahead') === null,
     'a [BE] ticket and a [DB] task with no file are not migrations');
+  ok(kind('[DB] Forward migration V1114__promotions.sql: promotions')?.forward === true && !kind('[DB] Migration V0025__promotions.sql: promotions')?.forward,
+    'V1000 and later is a forward migration');
+  const tenantFiles = readdirSync(path.join(PACKAGE, 'backend', 'tenant')).filter((n) => /\.sql$/.test(n))
+    .map((name) => ({ name, text: readFileSync(path.join(PACKAGE, 'backend', 'tenant', name), 'utf8') }));
+  const batch = ticketStatements(tenantFiles, { kind: 'tables', tables: ['promotions.voucher_batch'], forward: true });
+  const into = batch.find((s) => s.guard?.constraint === 'voucher_batch_id_fkey');
+  ok(into?.guard.incoming && into.guard.table === 'promotions.voucher',
+    'a forward migration also gets the keys into its tables from tables made before it (promotions.voucher.voucher_batch_id_fkey)', JSON.stringify(into?.guard));
+  ok(!ticketStatements(tenantFiles, { kind: 'tables', tables: ['promotions.voucher_batch'] }).some((s) => s.guard?.incoming),
+    'a first-release migration does not: the cross-schema keys ticket adds those');
 }
 
 // ---- 2. the snapshot compare --------------------------------------------------------------------
@@ -157,6 +167,14 @@ section('the snapshot compare');
   ok(changed.length === 1 && /k\.keep: the table was changed by this file.*was r; now r rls true/.test(changed[0]), 'a change to another table is named with before and after', changed.join(' | '));
   const again = script.againDiffs({ a: '1', b: '2' }, { a: '1', b: '3', c: '4' });
   ok(again.length === 2 && /changed b/.test(again[0]) && /created c/.test(again[1]), 'what a second run changed', again.join(' | '));
+  const atomic = script.splitSql('CREATE FUNCTION f() RETURNS int LANGUAGE sql BEGIN ATOMIC SELECT CASE WHEN true THEN 1 END; SELECT 2; END;\nSELECT 3;');
+  ok(atomic.length === 2 && /SELECT 2; END$/.test(atomic[0].sql), 'a BEGIN ATOMIC body is one statement', JSON.stringify(atomic));
+  const data = script.dataDiffs(script.splitSql('INSERT INTO a.t VALUES (1);\nTRUNCATE k.old, a.t;\nWITH x AS (SELECT 1) UPDATE platform.schema_version SET checksum = 1;\nCREATE TABLE a.u (id int);'), ['a.t'], 'V9__x.sql');
+  ok(data.length === 2 && /statement 2 \(line 2\) writes rows into k\.old/.test(data[0]) && /platform\.schema_version/.test(data[1]),
+    'rows written into a table that is not the ticket\'s are named; into its own, not', data.join(' | '));
+  const rows = script.backfills({ after: { 'rows a.t': '3', 'rows k.old': '0' }, expected: { 'rows a.t': '0' }, owned: ['a.t'] });
+  ok(rows.length === 1 && /a\.t: 3 rows/.test(rows[0]) && script.diffSnapshots({ before: { 'rows a.t': '0' }, after: { 'rows a.t': '3' }, expected: { 'rows a.t': '0' }, owned: ['a.t'] }).length === 0,
+    'rows left in the ticket\'s own table are listed as a backfill, not a difference', rows.join(' | '));
 }
 
 // ---- 3. adam_pull writes it ------------------------------------------------------------------------
@@ -386,11 +404,55 @@ if (!dockerUp) {
     ['a file that does not apply', `${good}ALTER TABLE subscription.nowhere ADD COLUMN x int;\n`,
       /FAILED: first run: V0005__subscription\.sql, statement \d+ \(line \d+\) failed/, /subscription\.nowhere/],
     ['a file that begins its own transaction', `BEGIN;\n${good}COMMIT;\n`, /FAILED: V0005__subscription\.sql, line 1: the file manages its own transaction/, /FAILED/],
+    ['a BEGIN ATOMIC function is read whole (and, not being the package\'s, is a difference)',
+      `${good}CREATE OR REPLACE FUNCTION subscription.f_atomic() RETURNS int LANGUAGE sql BEGIN ATOMIC SELECT 1; SELECT 2; END;\n`,
+      /function subscription\.f_atomic\(\) was created by this file/, /^(?![\s\S]*manages its own transaction)/],
+    // What review 2 found outside the snapshot: each must now be a difference.
+    ['GRANT on an earlier table', `${good}GRANT ALL ON kernel.inbox TO PUBLIC;\n`, /kernel\.inbox: the table was changed by this file.*acl \{/, /DIFFERENT/],
+    ['GRANT on the ticket\'s own table', `${good}GRANT ALL ON subscription.plan TO PUBLIC;\n`, /subscription\.plan: the table is .*acl \{.*; the package has .*acl -/, /DIFFERENT/],
+    ['a new owner for an earlier table', `${good}ALTER TABLE kernel.inbox OWNER TO probe_owner;\n`, /kernel\.inbox: the table was changed by this file.*now .*owner probe_owner/, /DIFFERENT/],
+    ['an UNLOGGED table', good.replace('CREATE TABLE IF NOT EXISTS subscription.plan_module', 'CREATE UNLOGGED TABLE IF NOT EXISTS subscription.plan_module'),
+      /subscription\.plan_module: the table is p?r? ?persistence u|subscription\.plan_module: the table is r persistence u/, /DIFFERENT/],
+    ['a storage option', `${good}ALTER TABLE subscription.plan SET (fillfactor = 10);\n`, /subscription\.plan: the table is .*options \{fillfactor=10\}/, /DIFFERENT/],
+    ['a replica identity on an earlier table', `${good}ALTER TABLE tenancy.device_assignment REPLICA IDENTITY FULL;\n`, /tenancy\.device_assignment: the table was changed by this file.*replica identity f/, /DIFFERENT/],
+    ['a comment on an earlier table', `${good}COMMENT ON TABLE kernel.inbox IS 'x';\n`, /kernel\.inbox: the table was changed by this file.*comment x/, /DIFFERENT/],
+    ['a database setting', `${good}DO $$ BEGIN EXECUTE format('ALTER DATABASE %I SET row_security = off', current_database()); END $$;\n`,
+      /database settings was changed by this file/, /DIFFERENT/],
+    ['an earlier file\'s register row changed', `${good}UPDATE platform.schema_version SET checksum = 'X' WHERE version = 'V0002__kernel.sql';\n`,
+      /register V0002__kernel\.sql was changed by this file/, /writes rows into platform\.schema_version/],
+    ['an earlier file\'s register row deleted', `${good}DELETE FROM platform.schema_version WHERE version = 'V0002__kernel.sql';\n`,
+      /register V0002__kernel\.sql was dropped by this file/, /DIFFERENT/],
+    ['an earlier table truncated', `${good}TRUNCATE tenancy.device_assignment;\n`, /writes rows into tenancy\.device_assignment, which is not one of this ticket's tables/, /DIFFERENT/],
+    ['rows put into an earlier table where the text cannot show it', `${good}DO $$ BEGIN INSERT INTO kernel.inbox (consumer, event_id, processed_at) VALUES ('x', '00000000-0000-0000-0000-000000000001', now()) ON CONFLICT DO NOTHING; END $$;\n`,
+      /kernel\.inbox: its row count was changed by this file/, /DIFFERENT/],
   ];
+  docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', 'DROP ROLE IF EXISTS probe_owner; CREATE ROLE probe_owner']);
   for (const [what, sql, a, b] of cases) {
     const r = check(sql);
     ok(r.code === 1 && a.test(r.out) && b.test(r.out), what, r.out);
   }
+  const path1 = check(`SET search_path = subscription, public;\n${good}`);
+  ok(path1.code === 0 && /MATCH: 5 tables/.test(path1.out), 'a file that sets search_path still matches (names print the same in every snapshot)', path1.out);
+  const backfill = check(`${good}INSERT INTO subscription.module_listing (id, module_code) VALUES ('00000000-0000-0000-0000-000000000001', 'core') ON CONFLICT (id) DO NOTHING;\n`);
+  ok(backfill.code === 0 && /MATCH/.test(backfill.out) && /rows this file leaves in the ticket's own tables[\s\S]*subscription\.module_listing: 1 rows/.test(backfill.out),
+    'rows in the ticket\'s own table: MATCH, with the backfill listed for the person to judge', backfill.out);
+
+  // A run killed while it builds the template: the next run must not trust what it left.
+  writeFileSync(path.join(tenant, 'V0004__slow.sql'), 'SELECT pg_sleep(8);\n');
+  writeFileSync(ticketFile, good);
+  const killed = spawn(process.execPath, [SCRIPT, '9005', '--container', CONTAINER], { cwd: repo });
+  await new Promise((r) => { setTimeout(r, 4500); });
+  killed.kill();
+  await new Promise((r) => { setTimeout(r, 500); });
+  const dbsAfterKill = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT string_agg(datname || ':' || coalesce(shobj_description(oid, 'pg_database'), ''), ' ') FROM pg_database WHERE datname LIKE 'adam\\_%\\_base' OR datname LIKE 'adam\\_%\\_build'"]).stdout;
+  ok(/_build:\{"complete":false\}/.test(dbsAfterKill) && !/V0004__slow/.test(dbsAfterKill.replace(/_build:[^ ]*/g, '')),
+    'killed half way: the build is under its temporary name, and the template does not list the file', dbsAfterKill);
+  const resumed = check(good);
+  ok(resumed.code === 0 && /template extended, 1 applied/.test(resumed.out) && /MATCH: 5 tables/.test(resumed.out),
+    'the next run drops the half-built one and builds again, then MATCH', resumed.out);
+  rmSync(path.join(tenant, 'V0004__slow.sql'));
+  const leftover = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT count(*) FROM pg_database WHERE datname LIKE 'adam\\_%\\_build'"]).stdout.trim();
+  ok(leftover === '0', 'no half-built database is left', leftover);
 
   // Through a junction, as a folder reached another way would run it.
   const link = path.join(SCRATCH, 'scripts-link');
@@ -410,10 +472,17 @@ if (!dockerUp) {
   ok(tw.code === 0 && /template built/.test(tw.out), 'another folder builds its own template and leaves this one\'s alone', tw.out);
 
   const full = runScript(repo, '--full', 'tenant');
-  ok(full.code === 0 && /MATCH: db\/tenant applies to an empty database, and a second run of each file changes nothing/.test(full.out), '--full: every file from empty, each applied twice', full.out);
-  writeFileSync(path.join(tenant, 'V0009__bad.sql'), 'CREATE TABLE kernel.once (id int);\n');
+  ok(full.code === 0 && /MATCH: db\/tenant applies to an empty database: 5 files, once each, in order/.test(full.out), '--full: every file once, in order, from empty', full.out);
+  // An applied file from before the run-twice rule: it stays as it is, and nothing fails on it.
+  writeFileSync(path.join(tenant, 'V0004__once.sql'), 'CREATE TABLE kernel.once (id int);\n');
+  const fullOld = runScript(repo, '--full', 'tenant');
+  const ticketOld = check(good);
+  ok(fullOld.code === 0 && /MATCH/.test(fullOld.out) && ticketOld.code === 0 && /MATCH: 5 tables/.test(ticketOld.out),
+    'an earlier file that cannot run twice: --full and the ticket both MATCH (only the ticket\'s own file runs twice)', `${fullOld.out}\n${ticketOld.out}`);
+  rmSync(path.join(tenant, 'V0004__once.sql'));
+  writeFileSync(path.join(tenant, 'V0009__bad.sql'), 'ALTER TABLE kernel.nowhere ADD COLUMN x int;\n');
   const fullBad = runScript(repo, '--full', 'tenant');
-  ok(fullBad.code === 1 && /second run: V0009__bad\.sql, statement 1 \(line 1\) failed/.test(fullBad.out), '--full: a file that cannot run twice fails', fullBad.out);
+  ok(fullBad.code === 1 && /FAILED: from empty: V0009__bad\.sql, statement 1 \(line 1\) failed/.test(fullBad.out), '--full: a file that does not apply fails, naming it', fullBad.out);
   rmSync(path.join(tenant, 'V0009__bad.sql'));
 
   const missing = runScript(repo, '9999');
@@ -429,7 +498,7 @@ if (!dockerUp) {
   for (let i = 0; i < 60 && docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', 'SELECT 1']).status !== 0; i++) await new Promise((r) => { setTimeout(r, 500); });
   const cleaned = runScript(repo, '--clean');
   const left = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT count(*) FROM pg_database WHERE datname LIKE 'adam\\_%'"]).stdout.trim();
-  ok(cleaned.code === 0 && /Dropped \d+ databases of this folder/.test(cleaned.out) && Number(left) > 0, '--clean drops this folder\'s databases and not the other folder\'s', `${cleaned.out} ${left} left`);
+  ok(cleaned.code === 0 && /Dropped this folder's \d+ databases \(adam_/.test(cleaned.out) && Number(left) > 0, '--clean drops this folder\'s databases and not the other folder\'s', `${cleaned.out} ${left} left`);
 }
 
 // ---- 5. the whole package against PostgreSQL ----------------------------------------------------
@@ -469,7 +538,12 @@ if (!PACKAGE_RUN) {
       + ordered.map((s) => `${s.sql};`).join('\n');
     const pr = psql(`picked_${database}`, pickedSql);
     ok(pr.status === 0, `${database}: the statements tickets are given apply in package order`, pr.stderr);
-    const snap = (db) => JSON.parse(psql(db, `SELECT ${script.SNAPSHOT_SQL};`).stdout || '{}');
+    const snap = (db) => {
+      // The package's own register rows (V01nn INSERTs) are data no ticket is given; left out.
+      const s = JSON.parse(psql(db, script.SNAPSHOT_SETUP + script.snapshotSql((body) => `SELECT ${body};\n`)).stdout.trim() || '{}');
+      for (const k of Object.keys(s)) if (k.startsWith('register ')) delete s[k];
+      return s;
+    };
     const whole = snap(`pkg_${database}`);
     const fromTickets = snap(`picked_${database}`);
     const diff = script.againDiffs(whole, fromTickets);
