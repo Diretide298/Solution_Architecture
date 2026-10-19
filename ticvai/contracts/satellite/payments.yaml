@@ -1284,6 +1284,7 @@ paths:
         - "P08 ADM-599 Mixed Tender & Credit Command Center"
         - "P08 ADM-600 Mixed Tender Rule & Combination Builder"
         - "P08 ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules"
+        - "P08 ADM-606 Partial Payment, Failure & Recovery Manager"
       summary: Which tenders may be combined, and in what order
       tags:
       - payments

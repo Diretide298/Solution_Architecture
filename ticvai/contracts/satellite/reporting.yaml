@@ -90,6 +90,7 @@ paths:
     get:
       operationId: listSeededReports
       x-ticvai-consumed-by:
+        - "P04 POS-020 Shift Exceptions & Alerts"
         - "P16 ANL-031 Report Catalogue & Library"
       summary: The reports every venue starts with
       description: 'BL-053. **A venue opening on Monday does not want a report builder — it wants the
@@ -3815,6 +3816,13 @@ components:
       - category
       - dataSource
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: 'The `report_definition` id of this venue''s seeded copy of the report (for example its
+            `shiftSummary`), so a screen can run it with `runReport` and read `getReportExecution` and
+            `getReportResult` (r8 walk of ticket 28734, POS-020).'
         code:
           type: string
         name:
