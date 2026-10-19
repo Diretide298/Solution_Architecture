@@ -40,6 +40,16 @@ import sys
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "roles-by-app.yaml"
 
@@ -69,7 +79,7 @@ def op_permissions() -> dict:
     out = {}
     for f in pathlib.Path(ROOT / "contracts").rglob("*.yaml"):
         try:
-            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+            doc = _yload(f.read_text(encoding="utf-8"))
         except Exception:
             continue
         for item in (doc.get("paths") or {}).values():
@@ -91,7 +101,7 @@ def main() -> int:
     apps: dict = collections.defaultdict(lambda: {"platforms": [], "ops": set(), "screens": 0,
                                                   "unpermissioned": set()})
     for f in sorted(glob.glob(str(ROOT / "screens" / "P*.yaml"))):
-        d = yaml.safe_load(open(f, encoding="utf-8"))
+        d = _yload(open(f, encoding="utf-8"))
         p = d["platform"]
         app = (p.get("targetApp") or {}).get("app")
         if not app:
@@ -113,7 +123,7 @@ def main() -> int:
                 elif oid in perms:
                     a["unpermissioned"].add(oid)
 
-    hand = yaml.safe_load((ROOT / "roles.yaml").read_text(encoding="utf-8"))
+    hand = _yload((ROOT / "roles.yaml").read_text(encoding="utf-8"))
     granted = {g["key"] for v in hand["roles"].values() for g in (v.get("grants") or [])}
     # **The presets' action keys map to the enum** (CHG-R8GEN-003): since audit R278 each roles.yaml grant names the
     # `Permission` values it covers (`permission:`), so the join is counted in those values, not the dotted keys.

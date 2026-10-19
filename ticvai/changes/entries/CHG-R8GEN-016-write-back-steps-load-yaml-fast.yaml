@@ -1,0 +1,27 @@
+id: CHG-R8GEN-016
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The refresh steps that write into authored inputs run in seconds instead of minutes, with byte-identical output: link-screens-contracts finds every operation line once and inserts its consumed-by blocks from the end (746 s to 34 s), and twelve screen and lineage steps load YAML with the C loader, falling back to the pure one where a file defeats it. Each was run old and new on the same tree and the files compared: no difference.'
+decision:
+  what: 'Generators lane, second r8 fix round, extra item 2 follow-up: check-regenerate-twice runs these steps in every gate run, and at about a minute each (eleven for link-screens-contracts) it cost fifteen minutes. Tools: link-screens-contracts, derive-board-flows, derive-transitions-from-flows, label-launcher-edges, derive-carries-from-entrystate, derive-entrystate-params, derive-components, derive-screen-wiring, derive-board-anchors, derive-app-roles, derive-id-register, derive-frontend, derive-read-columns.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (second round brief, generators lane extra item 2: regenerate twice, no diff, as a check the gate runs).'
+keys_touched:
+  files:
+  - tools/link-screens-contracts.py
+  - tools/check-regenerate-twice.py
+  - tools/run-checks.py
+root_class: 'a check too slow to run is a check nobody runs'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-regenerate-twice.py
+status: open

@@ -28,6 +28,16 @@ from pathlib import Path
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
 OUT = SCREENS / "_id-register.yaml"
@@ -49,7 +59,7 @@ NOTE = (
 def collect() -> dict:
     reg: dict = {}
     for f in sorted(SCREENS.glob("P*.yaml")):
-        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        doc = _yload(f.read_text(encoding="utf-8"))
         for s in doc["screens"]:
             pre, num = s["id"].rsplit("-", 1)
             # **`drawnBy`, not `origin`.** This axis and `wireframe.provenance` are both about
@@ -86,7 +96,7 @@ def write_register(out: dict, path: Path = OUT) -> bool:
     Returns True when the file changed."""
     if path.is_file():
         try:
-            old = yaml.safe_load(path.read_text(encoding="utf-8"))
+            old = _yload(path.read_text(encoding="utf-8"))
         except yaml.YAMLError:
             old = None
         if isinstance(old, dict) and old.get("updated") and                 {k: v for k, v in old.items() if k != "updated"} == {k: v for k, v in out.items() if k != "updated"}:

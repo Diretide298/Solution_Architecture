@@ -26,8 +26,7 @@ first run's output instead, which is what a refresh would have written).
 **`--once` is the form for a refreshed tree.** run-checks runs after refresh.sh, so each step has already run once on
 its own output's inputs: one more run that changes anything is the second run changing something, and is a finding.
 On a branch that was not refreshed, use the default (twice): the first run's changes are only noted. `--skip-slow`
-leaves out link-screens-contracts (eleven minutes a run on 20 October; stable in the full run of that day), which a
-release rehearsal runs with the full form.
+leaves out the steps in SLOW (none since link-screens-contracts went from eleven minutes to 34 seconds, CHG-R8GEN-016).
 
 It writes into the package while it runs, so run-checks.py runs it alone (SERIAL) and it never runs beside a refresh.
 """
@@ -64,8 +63,9 @@ WRITE_BACK = [
 ]
 
 
-# Steps too slow for every gate run (seconds per run, 20 October 2026); the full form runs them.
-SLOW = {"link-screens-contracts": 670}
+# Steps too slow for every gate run (seconds per run); the full form runs them. link-screens-contracts was here at 670 s
+# until its per-operation search was replaced (CHG-R8GEN-016, 34 s, byte-identical output); none is slow now.
+SLOW = {}
 
 
 def files_of(globs, root=ROOT):

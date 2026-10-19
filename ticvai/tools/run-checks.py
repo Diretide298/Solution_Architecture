@@ -214,7 +214,7 @@ CHECKS = [
     # 20 October (same round, CHG-R8GEN-002): a refresh step that writes into an authored input (the lineage, the
     # screens, the flows, the contracts' consumed-by, roles-by-app.yaml ...) is a fixed point: run once more after the
     # refresh it changes nothing. Runs alone (SERIAL: it writes while it runs, then puts every file back) and with the
-    # arguments in ARGS; about fifteen minutes, link-screens-contracts left to the full form (--skip-slow).
+    # arguments in ARGS; a few minutes since CHG-R8GEN-016.
     "check-regenerate-twice",
 ]
 
