@@ -22785,8 +22785,12 @@ components:
           x-ticvai-references: catalogue.inventory_reservation
           type: string
           nullable: true
-          description: Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for
-            uncontended products.
+          description: 'Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for
+            uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007;
+            decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no
+            `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and
+            `quantity`, and this names that hold''s inventory hold; the zone, its price band and keep-the-party-
+            together come from the hold, and a lapsed one is `409 hold-not-active` as for seats.'
         seatIds:
           type: array
           maxItems: 50
