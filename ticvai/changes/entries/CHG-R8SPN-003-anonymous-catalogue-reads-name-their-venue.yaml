@@ -1,0 +1,39 @@
+id: CHG-R8SPN-003
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'The catalogue reads a visitor can call with no credential now take the venue they read: listProductCategories,
+  listGroupPackages, listCatalogueBundles, listMembershipProgrammes and listMembershipBenefits gain an optional venueId
+  (required in practice when the caller has no venue; 400 venue-required or unknown-venue), and listProductCategories
+  says a guest or visitor gets only active categories of kind category, with a kind filter for a screen that asks for
+  another. Additive.'
+decision:
+  what: 'R8 blocker fix lane spine, causes GPS-C01 and WHITE-C05 (no decision pending). contracts/spine/catalogue.yaml.
+    The screens pass venueId from the session; that edit is the screens lane''s (request in the lane report).'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 tickets 28684, 28156 and 28335 on 19 October 2026 (ADAM gaps 28684/0, 28156/0, 28335/3):
+  ProductCategory.scopePath is "set by the server from the venue the caller acts at", which a visitor has none of, so Home
+  and Explore could not say whose tiles to show. Finding: R8 blocker cause list, groups guest-pos-screens and white-label.'
+keys_touched:
+  operations: [listProductCategories, listGroupPackages, listCatalogueBundles, listMembershipProgrammes,
+    listMembershipBenefits]
+  screens: [WEB-002, WEB-005, GST-001, GST-002, GST-007, GST-008]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'new: anonymous-read-without-venue (an operation a caller with no credential may call, scoped to a venue, with no key naming it)'
+tickets:
+  started: []
+  unstarted:
+  - '28684, 28156 and 28335 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28684/0, 28156/0, 28335/3'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Prevention not added: a check rule "anonymous venue-scope read has a venue key" would flag by-id reads that
+  carry the venue in the id, and 15 satellite reads (fnb, marketing-crm, retail, transport) that the satellite lane
+  owns. Candidates for that lane are listed in the spine lane report.'
