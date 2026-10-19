@@ -1809,8 +1809,9 @@ paths:
         e.g. Fast Track on a ride, a photo pass) on an item, whether or not the planner
         suggested it; `removeAddOn` takes one off. `acceptAddOn` and `declineAddOn` still answer
         the planner's own suggestion (`addOnSuggestion`). An add-on not sold for that stop's
-        product is refused 422 `add-on-not-offered`. **Nothing is priced on the plan**: the add-on
-        is priced when the plan is booked (`bookVisitPlan`, by `addCartLine`). Allowed in an
+        product is refused 422 `add-on-not-offered`. **No price is stored on the plan**: an estimate
+        is computed on read (`VisitPlan.estimate`), and the add-on is priced when the plan is booked (`bookVisitPlan`,
+        by `addCartLine`). Allowed in an
         anonymous session, like every change here.
       tags: [visitPlan]
       x-ticvai-permission: null
@@ -2011,7 +2012,8 @@ paths:
         anonymous device session is refused `403 sign-in-required` and nothing is added; the app
         asks the guest to sign in, the plan moves to the account (`generateVisitPlan`), and the
         guest books it. Add-ons on the plan (`addOnProductIds`, `addOnAccepted`) are priced here, at
-        booking, by the lines `addCartLine` creates; the plan itself carries no price.
+        booking, by the lines `addCartLine` creates; the plan stores no price, shows only an estimate computed on read
+        (`VisitPlan.estimate`), and the price is fixed when booked.
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
@@ -2332,6 +2334,22 @@ components:
                 description: >
                   `notAtVenue` (30 September, MoM 4.7): a must-include point that is at none of the
                   plan's venues, so no day could hold it.
+        estimate:
+          type: object
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: >
+            **An estimated total, computed on read from current catalogue prices and stored nowhere** (r8 walk of
+            tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, "with associated costing").
+            The 3 October rule stands: no price is stored on the plan and add-ons are priced when booked. This only
+            tells the guest roughly what the plan would cost today, for the group and the days; the price is fixed at
+            booking and may differ. Null when no product on the plan has a current price.
+          required: [total, currency]
+          properties:
+            total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            currency: { type: string }
         unmatchedPreferences:
           type: array
           readOnly: true
@@ -2478,6 +2496,20 @@ components:
           properties:
             productId: { type: string, format: uuid }
             reason: { type: string }
+            pricePerGuest:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              nullable: true
+              x-ticvai-persisted: false
+              x-ticvai-derived: onRead
+              description: The add-on's current price for one guest, computed on read and stored nowhere (the estimate rule of `VisitPlan.estimate`).
+            minutesSaved:
+              type: integer
+              minimum: 0
+              nullable: true
+              x-ticvai-persisted: false
+              x-ticvai-derived: onRead
+              description: The wait the add-on would save at this stop, worked out on read from the expected wait.
         addOnAccepted:
           type: boolean
           default: false
