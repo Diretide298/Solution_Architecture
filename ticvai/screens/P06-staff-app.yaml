@@ -11003,6 +11003,7 @@ screens:
     - TableReservation.subjectId
     - TableReservation.guestName
     - TableReservation.contactPoint
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated

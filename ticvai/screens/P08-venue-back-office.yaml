@@ -13117,6 +13117,7 @@ screens:
     - Settlement.providerName
     - Settlement.periodStart
     - Settlement.periodEnd
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
@@ -16837,6 +16838,7 @@ screens:
     - RotaAssignment.breachesWorkingHourLimit
     - RotaAssignment.labourCost
     - RotaAssignment.id
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
@@ -26913,6 +26915,8 @@ screens:
     - name: resourceId
       from: BO-095
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+    preloaded:
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
@@ -38094,6 +38098,8 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOperatingCalendarSpecial`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    preloaded:
+    - VenueSettings.calendarDayStartHour
   notes: '**Overlapping entries: the venue sets a priority per entry (decided 2 October 2026 by Chinmay,
     DEC-229; CHG-CSP-027);** equal priorities on an overlap are refused. An entry can close the whole
     venue (`venueClosed`).'
@@ -89794,7 +89800,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 111. 0 of 0 labels bound to a
     contract property; 7 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
-  entryState: {}
+  entryState:
+    params: []
+    preloaded:
+    - VenueSettings.calendarDayStartHour
 - id: BO-577
   name: Maintenance Work Order
   module: Rentals
@@ -122780,6 +122789,8 @@ screens:
     params:
     - name: resourceId
       from: navigation
+    preloaded:
+    - VenueSettings.calendarDayStartHour
   overlays:
   - id: formSetResourceSchedule
     component: modal
@@ -131790,6 +131801,7 @@ screens:
     - Completed
     - Changed
     - Cancelled
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-934
@@ -172237,6 +172249,7 @@ screens:
     - SeasonalCalendarDayTimeslotDynamicRulesView.week
     - SeasonalCalendarDayTimeslotDynamicRulesView.dateRange
     - SeasonalCalendarDayTimeslotDynamicRulesView.dimension
+    - VenueSettings.calendarDayStartHour
     params:
     - name: signalId
       from: navigation
@@ -179577,6 +179590,7 @@ screens:
   entryState:
     preloaded:
     - CampaignCalendarTimelineView.calendarState
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
@@ -210701,6 +210715,7 @@ screens:
     - Expected settlement date
     - Actual settlement date
     - Status
+    - VenueSettings.calendarDayStartHour
     params:
     - name: merchantAccountId
       from: navigation

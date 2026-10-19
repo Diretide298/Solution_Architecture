@@ -512,8 +512,8 @@ screens:
 
     Build note (r8 second round, ORDERS-MONEY-C05): the edge to GST-056 carries no `bundleId`, so GST-056
     cannot know which bundle to show; it should carry the bundle the tile names (as GST-004''s edge does) or
-    be dropped. Changing the drawn navigation waits for the client (pending entry ORDERS-MONEY-C05); until
-    then the tile opens GST-056 on the venue''s first featured bundle.'
+    be dropped. Home holds no bundle id, and dropping the drawn edge waits for the client (pending entry
+    ORDERS-MONEY-C05); until then build no Home control that opens GST-056 without a bundle.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getTenantAppStatus` reads one of them
@@ -985,7 +985,10 @@ screens:
       provenance: decided 29 September 2026, MOB-2, W9
     - to: GST-056
       trigger: Book a bundle (e.g. meal combo with admission)
-      provenance: decided 29 September 2026, MOB-2, MOB-4
+      provenance: 'decided 29 September 2026, MOB-2, MOB-4. Carries the card''s bundleId (r8, ORDERS-MONEY-C05):
+        GST-056 needs it to open'
+      carries:
+      - bundleId
     - to: BO-005
       trigger: A supervisor sees the queue building
       provenance: flow F21 step 2→3
@@ -1021,10 +1024,8 @@ screens:
     show Call sales / Email sales instead of Book.
 
 
-    Build note (r8 second round, ORDERS-MONEY-C05): the edge to GST-056 carries no `bundleId`; it should carry
-    the bundle the card names (as GST-004''s edge does). Changing the drawn navigation waits for the client
-    (pending entry ORDERS-MONEY-C05); until then the card opens GST-056 on the bundle it shows, passed as
-    `bundleId`.'
+    Build note (r8 second round, ORDERS-MONEY-C05): the edge to GST-056 now carries the `bundleId` of the bundle
+    the card shows, as GST-004''s edge does (this screen holds it: its edge to GST-004 carries it too).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
