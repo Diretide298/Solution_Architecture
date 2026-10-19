@@ -10269,8 +10269,9 @@ components:
           description: 'Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer
             from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant''s
             timezone (`states/schedule.yaml`). **The rule, which no request field moves** (r8 walk of ticket
-            27920): a new banner is `draft`. The server sets `scheduled` when `updateBanner` leaves both
-            `startsAt` and `endsAt` set, and sets `draft` again when a later update clears either. Sending
+            27920): a new banner is `draft`. The server sets `scheduled` when `updateBanner` leaves `startsAt`
+            set (`endsAt` null means no end, so the banner runs until switched off; when `endsAt` is set it must follow
+            `startsAt`), and sets `draft` again when a later update clears `startsAt`. Sending
             `isActive` false on an `active` banner pulls it to `draft`. `state` is derived by the server on every
             save and is never in a request.'
         sortOrder:
@@ -10323,7 +10324,7 @@ components:
           x-ticvai-derived: sweeper
           description: 'Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant''s timezone,
             as for `Banner.state`. A new block is `draft` and moves to `scheduled` the same way as a banner: when
-            an update leaves both dates set, and back to `draft` when either is cleared. Once `active` or `expired`
+            an update leaves `startsAt` set (a null `endsAt` means no end), and back to `draft` when `startsAt` is cleared. Once `active` or `expired`
             the block may only be withdrawn (audit R163).'
         sortOrder:
           type: integer
