@@ -9238,6 +9238,18 @@ components:
           description: '**The single most effective rule.** Refusing a password known to be breached stops
             more account takeovers than every composition rule combined.
 
+
+            **Where the breach list comes from** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C06,
+            option B; CHG-R8SPN-019; audit R117). A local corpus file shipped with each release: the SHA-1 hashes of
+            known breached passwords, sorted and indexed by their first five hex characters, held inside the region
+            with the service and never sent anywhere, so no credential hash leaves the region and there is no
+            outage mode. Identity reads it through one adapter, `checkPasswordBreached(passwordSha1Prefix)`, which
+            returns the corpus''s full hashes under that prefix with their counts; the service compares the full
+            hash itself. A match refuses the password `422 policy-not-met` (`changeOwnCredential`, and any
+            other operation that sets a password under this policy). The corpus is refreshed with the release, not at run
+            time. The client may still name a vendor under R117, which would be a second adapter behind the same
+            interface (handoff/integration-register.md row 20).
+
             '
         maxAgeDays:
           type: integer

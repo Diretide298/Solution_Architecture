@@ -897,10 +897,12 @@ paths:
         **Publishing makes the version immutable.** A workstation still running v2.3 must be able to
         say what v2.3 was, and a profile edited underneath its deployments cannot.
 
-        **PUT semantics — an upsert keyed on the body's `id`** (pull audit R103). There is no id in
-        the path, so the body names its target:
+        **PUT semantics — an upsert keyed on the path's `profileId`** (pull audit R103; corrected 20 October
+        2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017: the path carries the id, and the body's `id`
+        is server-owned). A body that sends `id` must send the path's value, else `400` `validation`:
 
-        - **No profile has that `id`:** the profile is created at version 1 and the answer is `201`.
+        - **No profile has that `profileId`:** the profile is created at version 1 with it as its id, and the
+          answer is `201`.
         - **Its latest version is `draft`:** the body replaces that draft whole, the version number
           stays, and the answer is `200`.
         - **Its latest version is `published` or later:** that version is left exactly as it is and
@@ -936,7 +938,7 @@ paths:
           headers:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '201':
-          description: Created — no profile had this `id`
+          description: Created — no profile had this `profileId`
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ConfigurationProfile' }
@@ -1115,9 +1117,11 @@ paths:
         which is what `maxOfflineHours` prevents — after it, the workstation refuses to sell rather
         than keep journalling.
 
-        **PUT semantics — one policy per scope node, upserted on the body's `scopePath`** (pull
-        audit R103, R162). There is no id in the path; `scopePath` names the target, and the
-        caller must hold the permission at or above it. Where no policy is saved at that path
+        **PUT semantics — one policy per venue, the caller's** (pull audit R103, R162; corrected 20
+        October 2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017). There is no id in the path, and
+        `scopePath` is server-owned (`readOnly`, ignored on input): the target is the scope node of the venue
+        the caller's session acts at, as the singleton note says, and the server writes that node's path into
+        `scopePath`. The caller must hold the permission there. Where no policy is saved at that node
         one is created (`201`); where one is, the body replaces it whole (`200`). `id` is
         server-owned and ignored on input. **An omitted field returns to its default** —
         `maxOfflineHours` to 24, `onCeilingBreach` to `blockNewSales`, `requiresManagerToExtend`
@@ -1207,9 +1211,11 @@ paths:
         `minimumStableSeconds` is what stops it, and **it is the field a venue with poor wifi will
         actually tune.**
 
-        **PUT semantics — one set of thresholds per scope node, upserted on the body's
-        `scopePath`** (pull audit R103). There is no id in the path; `scopePath` names the target.
-        Where nothing is saved at that path a row is created (`201`); where one is, the body
+        **PUT semantics — one set of thresholds per venue, the caller's** (pull audit R103; corrected
+        20 October 2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017). There is no id in the path, and
+        `scopePath` is server-owned (`readOnly`, ignored on input): the target is the scope node of the venue
+        the caller's session acts at, and the server writes that node's path into `scopePath`.
+        Where nothing is saved at that node a row is created (`201`); where one is, the body
         replaces it whole (`200`). `id` is server-owned and ignored on input, and **an omitted
         field returns to its default.**
       tags: [tenancy]
@@ -4541,9 +4547,12 @@ components:
           readOnly: true
           description: Taken from the path of `deployConfigurationProfile`.
         version:
-          readOnly: true
           type: integer
-          description: The published version to deploy.
+          minimum: 1
+          description: 'The published version to deploy, named by the client (`deployConfigurationProfile`''s
+            body). It was `readOnly` until 20 October 2026, which left nothing to name the version and made the
+            409 `profile-version-draft` and `profile-version-not-found` unreachable (R8 blocker cause
+            APPROVALS-TENANCY-C07, CHG-R8SPN-017).'
         targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
         targetFilter:
           type: object
@@ -4595,8 +4604,9 @@ components:
           type: string
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >
-            **The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body
-            names its target here, because the path does not.
+            **The node this policy is for, and the key `setOfflinePolicy` upserts on.** Written by the
+            server from the venue the caller's session acts at; a value sent in a body is ignored
+            (APPROVALS-TENANCY-C07, CHG-R8SPN-017).
         maxOfflineHours:
           type: integer
           default: 24
@@ -4660,7 +4670,8 @@ components:
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >
             **The node these thresholds are for, and the key `setConnectivityThresholds` upserts
-            on.** The body names its target here, because the path does not.
+            on.** Written by the server from the venue the caller's session acts at; a value sent in a
+            body is ignored (APPROVALS-TENANCY-C07, CHG-R8SPN-017).
         failuresBeforeOffline:
           type: integer
           default: 3
