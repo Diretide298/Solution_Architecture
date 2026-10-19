@@ -4903,8 +4903,11 @@ screens:
   apis:
   - operationId: listOwnRefundRequests
     contract: orders
-    purpose: The guest's own refund requests and their status
-    trigger: onLoad
+    purpose: 'The guest''s own refund requests and their status, shown on the rows of Your orders (the prototype''s
+      "refunded in full" and the request a guest has open on an order), matched by order; no component of its own,
+      since the approved screen draws none (r8 second round: the prototype view is a partial match, so no
+      shownBy). Read once when the screen opens and after Ask for a refund.'
+    trigger: background
     provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: listMyOrders
     contract: orders
@@ -7188,8 +7191,11 @@ screens:
   apis:
   - operationId: listOwnResaleListings
     contract: orders
-    purpose: The guest's own resale listings and their status
-    trigger: onLoad
+    purpose: 'The guest''s own resale listings and their status, shown on the rows of Your orders with tickets
+      (the prototype''s "Listed for resale" row), matched by order; no component of its own, since the approved
+      screen draws none (r8 second round: the prototype view is a partial match, so no shownBy). Read once when
+      the screen opens and after Create resale listing.'
+    trigger: background
     provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: transferOrderTickets
     contract: orders
@@ -7322,7 +7328,16 @@ screens:
 
     **Two jobs, one id (GAP-D3, DI-1078; CHG-SGU-020).** This is My Reservations and the web''s group-booking
     view. The group request form is a flow opened from here and from the booking listing, not a separate
-    screen; the prototype labels that dialog WEB-031.'
+    screen; the prototype labels that dialog WEB-031.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C08, the lead 20 October 2026, option A): **Pay now on a held
+    reservation opens the payment of WEB-014 with the reservation''s id** (the payment component exists
+    there); the edge WEB-031 to WEB-014 is not drawn on this client-approved screen yet, so it waits for the
+    client to confirm that Pay now belongs in r8 (pending entry ORDERS-MONEY-C08). Until then the row shows no
+    Pay now. **The resource availability panel** reads `listProductStartTimes` (the reserved product''s start
+    times on a picked date), not `getResourceAvailability`: a guest never names a resource, so `resourceId` on
+    entry pre-selects nothing.'
   density: compact
   pattern: listDetail
   patternReason: '`listReservations` reads the population and `getReservation` reads one of them — list,
@@ -7430,7 +7445,11 @@ screens:
         - ResourceAvailability.resourceId
         - ResourceAvailability.freeWindows
         - ResourceAvailability.blockedWindows
-        operation: getResourceAvailability
+        operation: listProductStartTimes
+        notes: 'Build note (r8 second round, ORDERS-MONEY-C08, option A): drawn as approved, filled from
+          `listProductStartTimes` for the reserved line''s product and variant on the picked date: the free
+          windows are its start times (`startsAt` to `endsAt`, with `freeCount`); no resource is named, so the
+          resource column stays empty, and nothing is blocked that the guest needs to see.'
         provenance: contract resources.yaml GET /resources/{resourceId}/availability
       - kind: detailPanel
         label: The reservation
@@ -7528,8 +7547,11 @@ screens:
   apis:
   - operationId: listOwnGroupBookings
     contract: orders
-    purpose: The school trips and parties this guest asked for, provisional ones included
-    trigger: onLoad
+    purpose: 'The school trips and parties this guest asked for, provisional ones included: they are rows of Your
+      reservations beside the reservations (the prototype''s "School group, 32 pupils · invoice due" row), and a
+      picked one opens The group booking (`getGroupBooking`). No component of its own, since the approved screen
+      draws none (r8 second round: the prototype view is a partial match, so no shownBy).'
+    trigger: background
     provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: listGroupPackages
     contract: catalogue
@@ -7561,10 +7583,13 @@ screens:
     contract: orders
     purpose: A group booking this guest belongs to
     trigger: onAction
-  - operationId: getResourceAvailability
+  - operationId: listProductStartTimes
     contract: resources
-    purpose: What is free and when
+    purpose: 'What is free and when, for Check another date (r8, ORDERS-MONEY-C08, the lead''s option A): the start
+      times the reserved product (its line''s `productId` and `variantId`) can be booked at on the date the guest
+      picks. A guest never names a resource, so `getResourceAvailability` is not called here.'
     trigger: onAction
+    provenance: r8 second round, ORDERS-MONEY-C08 (ticket 28228)
   - operationId: updateTableReservation
     contract: fnb
     purpose: Change or cancel it

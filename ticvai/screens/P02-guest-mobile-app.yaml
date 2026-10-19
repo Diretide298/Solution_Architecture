@@ -507,7 +507,13 @@ screens:
 
     **The client-approved app wireframe is the layout** (decided by Chinmay, 2 October 2026; DEC-163);
     it changes only where the spec breaks. The card count per section is the venue''s choice (DEC-152)
-    (CHG-SGU-005).'
+    (CHG-SGU-005).
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05): the edge to GST-056 carries no `bundleId`, so GST-056
+    cannot know which bundle to show; it should carry the bundle the tile names (as GST-004''s edge does) or
+    be dropped. Changing the drawn navigation waits for the client (pending entry ORDERS-MONEY-C05); until
+    then the tile opens GST-056 on the venue''s first featured bundle.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getTenantAppStatus` reads one of them
@@ -1012,7 +1018,13 @@ screens:
     of the app shell opens it from any screen except the booking and checkout steps. The booking steps
     behind it are unchanged and follow the published booking flow (W12). **W4:** Help me choose filters
     this list (`listProducts` `guidedAnswerIds`) with a *Show everything* link. **W3:** info-only products
-    show Call sales / Email sales instead of Book.'
+    show Call sales / Email sales instead of Book.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05): the edge to GST-056 carries no `bundleId`; it should carry
+    the bundle the card names (as GST-004''s edge does). Changing the drawn navigation waits for the client
+    (pending entry ORDERS-MONEY-C05); until then the card opens GST-056 on the bundle it shows, passed as
+    `bundleId`.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -2894,9 +2906,19 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement.
 
 
-    **The guest''s saved cards are read with listPaymentTokens (4 October 2026) so the auto top-up and
-    a stored-card exit settlement have a paymentTokenId to send; the walletId is the wallet''s own id
-    (Wallet.id, agreed with contracts in the ledger)** (CHG-FXS-003)
+    **The guest''s saved cards are read with listPaymentTokens (4 October 2026) so the auto top-up has a
+    paymentTokenId to send; the walletId is the wallet''s own id (Wallet.id, agreed with contracts in the
+    ledger)** (CHG-FXS-003)
+
+
+    Build note (r8 second round, ORDERS-MONEY-C07, the lead 20 October 2026, option A): **build to this
+    definition, not to the frame** (wireframes/frames/gst-011.html): no Top up button and no "Leaving today?
+    Settle" panel; the client-approved wallet screen shows neither, and `getWalletExitBalance` and
+    `settleWalletAtExit` are gone from this screen. **The game card panel follows the WEB-021 ruling (CR-143,
+    CHG-CRA-008)**: it opens only from a deep link carrying `cardCode` and `cardKind` `gameCard`, and is read with
+    `getGameCard` on open; without the link it stays closed. The card''s credits and bonus credits
+    (`GameCard.credits`, `bonusCredits`) are what the panel''s balance shows; adding them as drawn fields waits
+    for the client (pending entry ORDERS-MONEY-C07).
 
 
     Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
@@ -2908,7 +2930,7 @@ screens:
   pattern: listDetail
   patternReason: '`listWalletTransactions` reads the population and `getWallet` reads one of them — list,
     select, act'
-  purpose: 'My wallet: balance, activity and auto top-up, and what is due or refundable at exit.'
+  purpose: 'My wallet: balance, activity and auto top-up.'
   layout:
     template: split
     regions:
@@ -3019,13 +3041,13 @@ screens:
     provenance: build, 29 September 2026
   - operationId: getGameCard
     contract: games
-    purpose: Balance on a game card
-    trigger: onAction
+    purpose: 'Balance on a game card, read when the screen opens from a deep link with `cardCode` and `cardKind`
+      `gameCard` (the WEB-021 ruling, CR-143; r8, ORDERS-MONEY-C07); never called without the link'
+    trigger: onLoad
     provenance: flow F18 step 2, 2 October 2026 (CHG-CLN-006)
   - operationId: listPaymentTokens
     contract: orders
-    purpose: 'The guest''s saved cards: the auto top-up card and a stored-card exit settlement pick one
-      (paymentTokenId)'
+    purpose: 'The guest''s saved cards: the auto top-up card picks one (paymentTokenId)'
     trigger: onLoad
     provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
@@ -3035,6 +3057,12 @@ screens:
     - name: cardCode
       from: deepLink
       optional: true
+    - name: cardKind
+      from: deepLink
+      optional: true
+      notes: '`gameCard` (ADAM CR-143; CHG-CRA-008; r8, ORDERS-MONEY-C07): with `cardCode`, opens the game card
+        panel, read with `getGameCard` (the guest''s own cards only). Never shown. Without it, or without
+        `cardCode`, the panel stays closed.'
     - name: walletId
       from: navigation
       optional: true
@@ -3119,7 +3147,17 @@ screens:
 
 
     **Mobile v4 (decided 29 September, MOB-1, MOB-7).** The **Tickets** tab root. GST-013 Ticket Details
-    and GST-055 Dynamic QR Ticket (refresh every 30 s) are unchanged.'
+    and GST-055 Dynamic QR Ticket (refresh every 30 s) are unchanged.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05, the lead 20 October 2026): **Show QR** on a ticket opens
+    GST-055 with its `entitlementId`, and the drawn **Scan a ticket** button reads a ticket''s QR with the
+    camera: a scanned ticket is added to this guest only when its owner has shared it (an open transfer,
+    claimed as GST-014 claims one); the scan reads the transfer QR or the ticket QR and resolves to the open
+    transfer, and with no open transfer the guest is told plainly that the ticket has not been shared with
+    them. The operation that does this is requested of the core lane (orders.yaml, beside
+    claimTicketTransfer); the edge to GST-055 and the button''s binding wait for the client''s approval of the
+    visible navigation (pending entries ORDERS-MONEY-C05).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list,
@@ -9477,7 +9515,13 @@ screens:
 
 
     **The tickets to send are read with listMyEntitlements (4 October 2026); orderId is optional and comes
-    from the chosen tickets'' orderId when the screen opens from Home** (CHG-FXS-003)'
+    from the chosen tickets'' orderId when the screen opens from Home** (CHG-FXS-003)
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05): after Send tickets the guest goes to My tickets (GST-012)
+    or the order''s tickets (GST-019); a guest who is not signed in is offered sign-in and brought back (the
+    _patterns.yaml rule guestSignInReturn), as on GST-013 and GST-014. The exits and that state wait for the
+    client (pending entries ORDERS-MONEY-C05).'
   density: comfortable
   pattern: configEditor
   patternReason: the screen declares only writes (`transferOrderTickets`) and no read of a population
@@ -9833,8 +9877,14 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-048 holds none of them. The edge
         carries nothing: GST-048 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05): this screen is reached from GST-053 (Your Plan) and leaves
+    to the checkout entry GST-041 once the guest has added what they want; with no cart (`getCart` 404, or no
+    `cartId` in the session) it shows no suggestions and offers to go back. Those edges and that state are not
+    drawn on this client-approved screen yet; they wait for the client (pending entries ORDERS-MONEY-C05).'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getUpsellSuggestions` reads one record and nothing reads a population — the screen
