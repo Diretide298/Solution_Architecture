@@ -2599,8 +2599,8 @@ screens:
     - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
       getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-009
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -2608,16 +2608,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-009.html, and #GST-009 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 1 → Review & payment; also the "Confirm and pay" sheet in the booking
-        flow (exact). What v2 did differently: Prototype offers Tabby and wallet credit as payment methods;
-        the YAML does not name them.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 1 → Review & payment; also the "Confirm and pay" sheet in the booking flow
+        (exact). What v2 did differently: Prototype offers Tabby and wallet credit as payment methods; the
+        YAML does not name them.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3035,8 +3033,8 @@ screens:
     - WalletTransaction.balanceAfter
     - WalletTransaction.orderId
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-011
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -3044,14 +3042,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-011.html, and #GST-011 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → Wallet overview (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → Wallet overview (exact).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3901,8 +3897,8 @@ screens:
     - BillingStatement.periodEnd
     - BillingStatement.lines
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-015
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -3910,16 +3906,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-015.html, and #GST-015 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → Memberships; billing in "Also built, not in the plan" → Membership
-        billing (#billing) (exact). What v2 did differently: Prototype splits the screen in two (benefits
-        and delegation vs billing statement and dunning retries).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → Memberships; billing in "Also built, not in the plan" → Membership billing
+        (#billing) (exact). What v2 did differently: Prototype splits the screen in two (benefits and delegation
+        vs billing statement and dunning retries).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4610,8 +4604,8 @@ screens:
     - OrderSummary.grossAmount
     - OrderSummary.refundedAmount
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-019
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -4619,14 +4613,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-019.html, and #GST-019 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → Order history (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → Order history (exact).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6703,8 +6695,8 @@ screens:
     coldEntry: 'A guest opening a notification about their own conversation (an agent replied, a handover
       was picked up): it opens that conversation, or says it was closed.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-031
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -6712,14 +6704,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-031.html, and #GST-031 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → AI concierge – home (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → AI concierge – home (exact).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6920,8 +6910,8 @@ screens:
       if it was refunded or the performance passed, says which and offers the order list rather than an
       error.
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-032
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -6929,14 +6919,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-032.html, and #GST-032 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → AI concierge – chat (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → AI concierge – chat (exact).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7153,8 +7141,8 @@ screens:
     coldEntry: 'A guest opening a notification about their own conversation: it opens the conversation,
       or says it was closed.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-033
     prototype:
       file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
@@ -7162,8 +7150,10 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → AI concierge – contextual help
-    note: 'Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry ("Account →
-      All screens → Wave 2"), not a client-drawn layout, so the frame is treated as designed, not client-verified.'
+    note: 'Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry ("Account → All
+      screens → Wave 2"), not a client-drawn layout, so the frame was treated as designed, not client-verified,
+      until the client approved the whole guest app (confirmed by Chinmay Parab, 19 October 2026).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7700,8 +7690,8 @@ screens:
     purpose: Issue my referral code
     trigger: onAction
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-036
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -7709,14 +7699,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-036.html, and #GST-036 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → Loyalty & rewards (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → Loyalty & rewards (exact).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions
     removed 27 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026
     to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and
@@ -8230,8 +8218,8 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-039
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -8239,16 +8227,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-039.html, and #GST-039 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 1 → Profile (also Account → Profile) (exact). What v2 did differently:
-        Emirates ID upload is on Profile in the prototype; the YAML has uploadGuestDocument on GST-066.
-        Account also has a "Saved guests (heights on file)" row that no screen defines.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 1 → Profile (also Account → Profile) (exact). What v2 did differently: Emirates
+        ID upload is on Profile in the prototype; the YAML has uploadGuestDocument on GST-066. Account also
+        has a "Saved guests (heights on file)" row that no screen defines.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9154,8 +9140,8 @@ screens:
       carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with the operations
       that used it (audit R167); a second-factor challenge is created in place, never arrives by link.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-042
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -9163,16 +9149,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-042.html, and #GST-042 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + "Log in or register"
-        sheet from home (partial). What v2 did differently: Prototype has email code, Apple and Google
-        only; the YAML also has password login, UAE Pass and explicit registration.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + "Log in or register" sheet
+        from home (partial). What v2 did differently: Prototype has email code, Apple and Google only; the
+        YAML also has password login, UAE Pass and explicit registration.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9888,8 +9872,8 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-048
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -9897,14 +9881,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-048.html, and #GST-048 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → Upsell / cross-sell (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → Upsell / cross-sell (exact).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10277,8 +10259,8 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded: []
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-050
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -10286,17 +10268,15 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-050.html, and #GST-050 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map (partial).
-        What v2 did differently: Rev 3 books from a map, with a hold countdown and sold-out cabanas; the
-        YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff
-        (R073c), which contradicts both this screen and the prototype.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map (partial). What
+        v2 did differently: Rev 3 books from a map, with a hold countdown and sold-out cabanas; the YAML
+        is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff (R073c),
+        which contradicts both this screen and the prototype.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10653,8 +10633,8 @@ screens:
       from: session
     coldEntry: Lists the venue's ready-made plans; nothing is needed upstream.
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-052
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -10662,16 +10642,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-052.html, and #GST-052 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 3 → Suggested itineraries (exact). What v2 did differently: Mobile
-        v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this
-        definition in the v4 style.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 3 → Suggested itineraries (exact). What v2 did differently: Mobile v4 draws
+        no ready-made plans list: its Plan tab goes straight to the questions. Built from this definition
+        in the v4 style.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11470,8 +11448,8 @@ screens:
     - BundleSummary.contentHash
     - BundleSummary.signatureKeyId
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-056
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -11479,14 +11457,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-056.html, and #GST-056 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → Bundle package (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → Bundle package (exact).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11744,8 +11720,8 @@ screens:
   entryState:
     preloaded: []
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-058
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -11753,15 +11729,13 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-058.html, and #GST-058 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map (exact).
-        What v2 did differently: The Rev 3 cabana map puts availability and booking on one screen.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map (exact). What
+        v2 did differently: The Rev 3 cabana map puts availability and booking on one screen.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11905,8 +11879,8 @@ screens:
     coldEntry: 'Opened from a reminder on the visit day: today''s plan, or an offer to make one when there
       is none. `itemId` is the plan item the guest taps Swap on, picked on this screen.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-059
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -11914,15 +11888,13 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-059.html, and #GST-059 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 3 → Plan my day – in progress (exact). What v2 did differently: Mobile
-        v4 draws no in-progress view of the plan; built from this definition in the v4 style.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 3 → Plan my day – in progress (exact). What v2 did differently: Mobile v4 draws
+        no in-progress view of the plan; built from this definition in the v4 style.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12566,8 +12538,8 @@ screens:
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-066
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -12575,17 +12547,15 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-066.html, and #GST-066 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy) (exact).
-        What v2 did differently: The prototype labels this screen "GST-070 · Your data" (aria-label "GST-070
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy) (exact). What
+        v2 did differently: The prototype labels this screen "GST-070 · Your data" (aria-label "GST-070
         Data and privacy"), but GST-070 is Reserve a Table in the YAML, so the label is wrong. Document
         upload is on Profile instead.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14061,8 +14031,8 @@ screens:
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-073
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -14070,16 +14040,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-073.html, and #GST-073 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Wave 2 → Security & sign-in (partial). What v2 did differently: Prototype
-        offers two-step verification and a trusted-device skip, but the YAML says guests have no second
-        factor (R167). Either remove the toggle from the prototype or reopen the decision.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Wave 2 → Security & sign-in (partial). What v2 did differently: Prototype offers
+        two-step verification and a trusted-device skip, but the YAML says guests have no second factor
+        (R167). Either remove the toggle from the prototype or reopen the decision.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14357,8 +14325,8 @@ screens:
     coldEntry: '**A link to a map that is no longer published, or a day that has passed,** says which
       and offers today on the current map. Nothing is held on arrival.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-074
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -14366,14 +14334,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-074.html, and #GST-074 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Rev 3 feedback → Cabana map (r3cabmap) (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Rev 3 feedback → Cabana map (r3cabmap) (exact).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -14532,8 +14498,8 @@ screens:
       from: session
     coldEntry: Resolves the venue the app is in and lists its room types; nothing is booked on arrival.
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-075
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -14541,14 +14507,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-075.html, and #GST-075 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
-        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
-        Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room) (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account
+        → All screens → Rev 3 feedback → Meeting room by the hour (r3room) (exact).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: GST-076

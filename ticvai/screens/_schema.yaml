@@ -574,7 +574,7 @@ properties:
                 screen's own name and operations; `designed` is a frame a person drew. A
                 generated frame agreeing with the operation it was generated from is not
                 corroboration. `client-verified` (added 29 September) means the client signed off
-                a prototype that shows this screen; `prototype` says which view.
+                a prototype that shows this screen; `prototype` says which view. Since 19 October 2026 it also covers a drawn frame the client approved without a prototype view (all of P02 and P04): `source` then begins "client approval" and `prototype.match` may be `none`.
             board:
               type: string
               description: The frame this screen renders as, as `<board file>#<anchor>`.

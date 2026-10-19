@@ -1,0 +1,42 @@
+id: CHG-R8S-001
+date: '2026-10-19'
+source: client-review
+kind: spec
+summary: The 20 guest app screens and the 23 point-of-sale screens whose frame was recorded only as designed are now
+  recorded as client-verified. The client has approved all guest app and point-of-sale screens, so none of them changes
+  visibly from here on. Where the client approved the point-of-sale v2 build, that build is now the screen's prototype.
+decision:
+  what: 'Chinmay Parab confirmed on 19 October 2026 that the client approved every guest app (P02) and point-of-sale (P04)
+    screen. The 43 screens that read provenance designed (P02 GST-009, 011, 015, 019, 031, 032, 033, 036, 039, 042,
+    048, 050, 052, 056, 058, 059, 066, 073, 074, 075; P04 POS-000 to 006, 009, 010, 012, 015, 017 to 019, 021 to 025,
+    028 to 031) now read provenance client-verified, status approved, and source "client approval, confirmed by Chinmay
+    Parab 19 October 2026". The 16 point-of-sale screens that carried the v2 build as a candidate promote it to their
+    prototype block (verified 2026-10-19), as the schema says should happen on approval; the earlier approved build is
+    named in the prototype note. Screens the client never drew a prototype view for keep match none. check-wireframes
+    accepts match none with client-verified only when the source begins "client approval".'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Lead decision of 19 October 2026 (r8 fix lane screens), relaying the client''s approval of all guest app and point-of-sale
+  screens, confirmed by Chinmay Parab. Before this the record said these 43 frames were only designed, which told
+  a developer a frame was still open to change (finding of the r8 walk of the Sprint 1 and 2 tickets).'
+keys_touched:
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/_schema.yaml
+  - tools/check-wireframes.py
+root_class: 'new: approval-recorded (a client approval given after the frame was drawn must reach the wireframe record)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: none (a lead's process decision, not a package defect)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-wireframes.py
+status: open
+notes: 'Derived files that read the wireframe record (handoff/screen-index.json, the client readiness figures, design
+  specs) regenerate at the next full derive. Prevention: check-wireframes still fails a client-verified screen with no
+  prototype block, and a client-verified match none unless the source begins "client approval".'
