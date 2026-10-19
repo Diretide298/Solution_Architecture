@@ -1,0 +1,40 @@
+id: CHG-R8INT-002
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The six breaking changes the r8 lanes made on purpose are recorded with their tickets (BC-380 to BC-385):
+  setAiCredential takes PLATFORM_TENANT_MANAGE; listApiVersions and listApiScopes need no permission; a shift approval
+  can be of kind reopen; the visit planner''s pace can be balanced; a link target can be a booking flow; the
+  cabanaBySize booking flow type is gone. All move together at r8. DEV-001''s no-access wording, which the public API
+  reads made untrue, is a known gate failure until the client approves its new text.'
+decision:
+  what: 'docs/active/breaking-changes.yaml BC-380..BC-385 (tag r8; producer and consumer tickets from
+    handoff/service-docs/tasks.csv by operation name); tools/refresh-safe-baseline.json check-screen-permissions with
+    the one DEV-001 line. Each change itself was decided in the lead''s answers of 20 October 2026 or approved by him
+    before the merge; recording them is part of the merge he delegated ("all of them are on you", 20 October 2026).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'check-contract-compat fails a breaking change no entry approves, and the lanes listed these for the lead
+  (CHG-R8SAT-001 notes; CHG-R8SPN-006). Finding: r8 integration merge, check-contract-compat run of 20 October 2026.'
+keys_touched:
+  operations: [setAiCredential, listApiVersions, listApiScopes, reopenShift, generateVisitPlan, getTenantConfig,
+    createBookingFlowDefinition]
+  files:
+  - docs/active/breaking-changes.yaml
+  - tools/refresh-safe-baseline.json
+root_class: 'breaking contract change made on purpose: producer and consumers move at one tag'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration merge'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Numbered from BC-380 because lane H (fix/cr-answers-1018) took BC-373 for suspendTenant and reactivateTenant.
+  PublishedPolicy.title changed from a string to LocalisedText (CHG-R8SAT-001), a breaking response type change
+  check-contract-compat does not see (a string to a $ref object). It goes in the r8 change notice to developers; the
+  check is to learn the case.'

@@ -25,6 +25,12 @@
    "known": [
     "^39 finding\\(s\\): NP 1, P8 29, READ 9$"
    ]
+  },
+  "check-screen-permissions": {
+   "why": "DEV-001 (developer portal home): its no-access text names DEVELOPER_VIEW, which listApiVersions and listApiScopes stopped requiring when they became public (R8 blocker FOUNDATION-AI-C17, CHG-R8SAT-001). The text is visible content under check-approved-ui, so it changes only with the client's approval: the new wording is in Friday's client note and audit lane-screens-pending-ui.json (DEV-001-followup), and the screen carries a build note. Added 20 October 2026 (r8 integration). Remove when the approved wording is applied.",
+   "known": [
+    "^SP-NOACCESS\\s+P14-developer-portal\\.yaml DEV-001: emptyNoAccess names DEVELOPER_VIEW, which none of its operations requires \\(none\\)$"
+   ]
   }
  },
  "refresh_tools_coverage": {
