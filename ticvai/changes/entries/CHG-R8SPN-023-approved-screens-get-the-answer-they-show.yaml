@@ -1,0 +1,38 @@
+id: CHG-R8SPN-023
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Two approved guest and till screens get the answer they already show. getProduct returns a withdrawn (once
+  published) product to a guest or visitor in the guest projection, lifecycleState withdrawn and isSellable false, so
+  WEB-004''s withdrawn banner can show; drafts and unpublished stay not found, lists and addCartLine unchanged.
+  createOrder''s 409 gains holdNotActive (hold-not-active) for a seat hold that lapsed before the order, which POS-005
+  creates (F59 step 4), and the 409 lists its problem types.'
+decision:
+  what: 'R8 blocker causes GPS-C07 (lead answer: take the recommendation, option A) and GPS-C13 (lead answer: option A:
+    POS-005 creates the order and the payment; POS-004 only holds and carries holdId). catalogue.yaml getProduct;
+    orders.yaml createOrder 409 and OrderRefusedProblem.refusedReason. The POS-004 and POS-005 notes and bindings and
+    F59 step 4 are the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 28685 and 28206 (ADAM gaps 28685/0, 28206/0): getProduct hid a withdrawn product
+  so WEB-004''s approved banner could never show, and a lapsed seat hold had no response at order creation. Finding:
+  R8 blocker cause list, group guest-pos-screens.'
+keys_touched:
+  operations: [getProduct, createOrder]
+  schemas: [OrderRefusedProblem]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/orders.yaml
+root_class: 'screen-api gap: an approved screen shows a state no answer can produce'
+tickets:
+  started: []
+  unstarted:
+  - '28685 and 28206 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28685/0, 28206/0'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open

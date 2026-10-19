@@ -1433,6 +1433,16 @@ paths:
         behalf. **A subject with no date of birth on file is treated as a minor.** The age below which a
         subject is a minor is an open value that client counsel sets; it is not assumed here.
 
+
+        **Built with a configurable age** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C19, option
+        A; CHG-R8SPN-024; R205 still open with counsel): a subject is a minor below
+        `tenancy.RegionSettings.minorAgeThreshold` (18 by default, set per country), or with no date of birth.
+        **When the 409 `minor-grants-adult-authority` happens**: the holder the grant is for (the path''s
+        `subjectId`) is a minor and `overSubjectId` is an adult, whoever calls, a guest or staff on the guest''s
+        behalf. **How the first adult link over a minor is made**: the adult enrols the child from GST-069
+        (R205), which writes a `familyMember` or `primaryHolder` grant held by the adult over the child, with the
+        adult as grantor; this operation is how later grants are added.
+
         '
       tags:
       - identity
@@ -1500,7 +1510,9 @@ paths:
           description: '**A cycle, or a minor granting authority over an adult.** Both are refused — a
             delegation graph with a loop is one nobody can reason about, and the second is a safeguarding
             concern rather than a modelling one. A subject with no date of birth counts as a minor
-            (audit R126).
+            (audit R126). `minor-grants-adult-authority`: the path''s `subjectId` is a minor (below
+            `RegionSettings.minorAgeThreshold`, or no date of birth) and `overSubjectId` is an adult
+            (IDENTITY-C19, CHG-R8SPN-024).
 
             '
           content:
@@ -2231,6 +2243,12 @@ paths:
         `primaryRoleId` or to the principal''s permissions ends every live session of the principal at
         once** (decided 28 September, audit R126 (1)): the person signs in again and is resolved afresh.
         A change to `displayName` alone ends nothing.
+
+
+        **It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15,
+        option A; CHG-R8SPN-024). A role held at a scope is a grant: `createDelegatedAccess` gives one (role,
+        scope, validity) and `deleteDelegatedAccess` takes one away. CMS-019''s Change access calls those two for
+        the roles it adds and removes, and this operation only for the display name, active flag and validity.
 
         '
       tags:

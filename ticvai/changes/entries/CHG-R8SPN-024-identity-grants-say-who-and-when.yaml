@@ -1,0 +1,36 @@
+id: CHG-R8SPN-024
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Grants say who may make them and when they are refused. updatePrincipal never grants or removes a role:
+  createDelegatedAccess and deleteDelegatedAccess do, and CMS-019''s Change access calls them. grantDelegation''s 409
+  minor-grants-adult-authority happens when the path''s subjectId is a minor (below RegionSettings.minorAgeThreshold,
+  default 18, or no date of birth) and overSubjectId an adult; the first adult link over a minor is made by enrolling
+  the child from GST-069 (R205).'
+decision:
+  what: 'R8 blocker causes IDENTITY-C15 (lead answer: option A, createDelegatedAccess and deleteDelegatedAccess) and
+    IDENTITY-C19 (lead answer: option A, configurable, default 18, missing date of birth counts as a minor).
+    identity.yaml updatePrincipal and grantDelegation. The CMS-019 rebinding and the design note are the surface
+    lane''s part; docs/registers/audit-decisions.md R126 (3) and R205 too.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27769 and 27732 (ADAM gaps 27769/1, 27732/2): CMS-019''s Change access was bound
+  to an operation with no role field, and grantDelegation''s minor refusal had no reachable trigger. Finding: R8
+  blocker cause list, group identity.'
+keys_touched:
+  operations: [updatePrincipal, createDelegatedAccess, deleteDelegatedAccess, grantDelegation]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'contract gap: an operation''s refusal or purpose has no stated trigger'
+tickets:
+  started: []
+  unstarted:
+  - '27769 and 27732 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27769/1, 27732/2'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open

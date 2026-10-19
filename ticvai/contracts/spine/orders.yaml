@@ -4778,7 +4778,15 @@ paths:
             bound (`bundleStale`). `lineIds` names the lines a lease or capacity refusal is about. A
             resource hold that cannot be converted (`resourceHoldInvalid`, rev 3 REV3-15).
 
+            **A seat hold that lapsed before the order** (`holdNotActive`, problem type `hold-not-active`;
+            decided 20 October 2026, Chinmay, R8 blocker cause GPS-C13, option A; CHG-R8SPN-023): a line''s
+            `inventoryHoldId`, the hold behind the seats POS-004 held, is no longer active (expired, released
+            or already converted). Nothing is written; `lineIds` names the lines. At the window the order is
+            created by POS-005, which received the hold from POS-004 (F59 step 4), and on this refusal the
+            cashier goes back to the seat map to hold the seats again.
+
             '
+          x-ticvai-problem-types: [lease-expired, capacity-exhausted, bundle-stale, resource-hold-invalid, hold-not-active]
           content:
             application/problem+json:
               schema:
@@ -24963,6 +24971,7 @@ components:
             - leaseExpired              # createOrder
             - capacityExhausted         # createOrder
             - resourceHoldInvalid       # createOrder 409: the resource hold is expired, converted, released or not the caller's (REV3-15)
+            - holdNotActive             # createOrder 409: a line's inventory (seat) hold lapsed, was released or converted (GPS-C13, CHG-R8SPN-023)
             - seatLimitExceeded         # createOrder 422: over the seat limit for the channel; problem type seat-limit-exceeded (REV3-7)
             - bundleStale               # createOrder: the priced-from bundle is past its staleness bound
             - noDatedLine               # getOrderCalendarEvent
