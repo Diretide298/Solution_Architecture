@@ -86,6 +86,12 @@ ALSO = ["evaluateAiGovernance", "getAiUsage", "getAiPolicy", "proposeGuidedChoic
         "overrideAiDecision", "listAiGovernanceAlerts", "listAiEvaluations", "listAiTrainingRuns",
         "openAiIncident", "listAiIncidents", "getForecast", "listOperationalRequirements"]
 
+# **Operations a Block A setup ticket's done-when needs and no core screen calls**, with the ticket that needs it
+# (labelled with it in `platforms`, as ALSO is labelled AI). listAuditRecords (20 October 2026, r8 cause
+# FOUNDATION-AI-C21, the lead: "take the recommendation", CHG-R8GEN-007): PLATFORM-AUDIT's done-when says a support user
+# can read what the interceptor wrote, and it is the only operation that reads platform.audit_record (BO-068, ADM-004).
+ALSO_FOR = {"listAuditRecords": "PLATFORM-AUDIT"}
+
 
 # **Placed in a later block by the lead** (Chinmay, 12 October 2026, N32: the client's feedback of 6 October,
 # CHG-R6-040). A writer of a table a core operation reads becomes setup, and so Block A, by the fixpoint below, and a
@@ -168,6 +174,9 @@ def main() -> int:
     for o in ALSO:
         if o in lineage:
             core.setdefault(o, set()).add("AI")
+    for o, why in ALSO_FOR.items():
+        if o in lineage:
+            core.setdefault(o, set()).add(why)
     slice_ = set(core)
     setup_for: dict[str, set[str]] = defaultdict(set)  # setup op -> tables it makes non-empty
     while True:

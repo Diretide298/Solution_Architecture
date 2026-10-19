@@ -1,0 +1,26 @@
+id: CHG-R8GEN-007
+date: '2026-10-20'
+source: audit
+kind: plan
+proposed: '2026-10-19'
+summary: 'listAuditRecords joins the Block A delivery slice (one operation), labelled PLATFORM-AUDIT, so the PLATFORM-AUDIT done-when ''a support user can read'' what the interceptor wrote can be tested.'
+decision:
+  what: 'r8 cause FOUNDATION-AI-C21, option A (the lead, 20 October 2026: take the recommendation). tools/derive-delivery-slice.py: a new ALSO_FOR list of operations a setup ticket''s done-when needs and no core screen calls, with the ticket that needs it.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, cause FOUNDATION-AI-C21 (ticket 27694 PLATFORM-AUDIT; ADAM gap 27694/2).'
+keys_touched:
+  files:
+  - tools/derive-delivery-slice.py
+root_class: 'a done-when no slice operation can test'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
