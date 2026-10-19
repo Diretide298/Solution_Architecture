@@ -34,7 +34,8 @@ prevention:
   type: check
   ref: tools/check-contract-compat.py
 status: open
-notes: 'BC-386..BC-388 added at the storage-sat merge (semanticSearch kinds, stock reservation retailReservation, badge
+notes: 'BC-389..BC-392 added at the core merge (sync rejection cashMovement, verifyGuestEmail permission, registerGuest
+  emits guestRegistered, price ladder bands typed; FOUNDATION-AI-C13, IDENTITY-C28, IDENTITY-C55, GPS-C32). BC-386..BC-388 added at the storage-sat merge (semanticSearch kinds, stock reservation retailReservation, badge
   sourceType and status closed; ORDERS-MONEY-C37, APPROVALS-TENANCY-C34, ORDERS-MONEY-C14). Numbered from BC-380 because lane H (fix/cr-answers-1018) took BC-373 for suspendTenant and reactivateTenant.
   PublishedPolicy.title changed from a string to LocalisedText (CHG-R8SAT-001), a breaking response type change
   check-contract-compat does not see (a string to a $ref object). It goes in the r8 change notice to developers; the

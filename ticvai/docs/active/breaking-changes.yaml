@@ -1063,3 +1063,50 @@ changes:
     tag: r8
     producer-tickets: [SVC-MARKETING-LOYALTY-1]
     consumer-tickets: [AM-MARKETING-CRM-P01, AM-MARKETING-CRM-P02, AM-ORDERS-RESERVATIONS-P04, AM-SETUP-CUSTOMER-MARKETING-P08, APP-SETUP-BO-826, APP-SETUP-BO-826-REST]
+  - id: BC-389
+    contract: orders
+    operation: listSyncRejections
+    operations: [listSyncRejections, resolveSyncRejection]
+    change: "gained enum value(s) ['cashMovement']"
+    reason: 'R8 blocker FOUNDATION-AI-C13 (lead''s answers of 20 October 2026; CHG-R8SPN): a till''s offline cash movement
+      that the server refuses on sync is a rejection of its own kind, so SyncRejection.kind gains cashMovement. A value added
+      to a response enum cannot be additive.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-ORDER-SYNC-1, VM-ORDER-SYNC-1]
+    consumer-tickets: [AM-ADMISSION-ACCESS-P06, AM-ADMISSION-ACCESS-P07-BLOCK-A, AM-ORDERS-RESERVATIONS-P04, AM-ORDERS-RESERVATIONS-P08, AM-REPORTING-P08-BLOCK-A, AM-TENANCY-VENUES-P08-BLOCK-A, AM-TICKETING-P01, AM-TICKETING-P08, APP-SETUP-BO-133, APP-SETUP-BO-133-REST, TEST-AM-TENANCY-VENUES-P08-BLOCK-A, VM-BO-130]
+  - id: BC-390
+    contract: identity
+    operation: verifyGuestEmail
+    operations: [verifyGuestEmail]
+    change: "x-ticvai-permission changed"
+    reason: 'R8 blocker IDENTITY-C28 (lead''s answers of 20 October 2026; CHG-R8SPN): a guest verifying their own e-mail
+      holds no staff permission, so the operation needs none (the guest''s own session and code are the proof). A
+      permission change cannot be additive.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-IDENTITY-IDENTITY-4]
+    consumer-tickets: [AM-IDENTITY-SECURITY-P01, AM-IDENTITY-SECURITY-P02, AM-IDENTITY-SECURITY-P06-BLOCK-A, AM-MARKETING-CRM-P01, TEST-AM-IDENTITY-SECURITY-P01]
+  - id: BC-391
+    contract: identity
+    operation: registerGuest
+    operations: [registerGuest]
+    change: "x-ticvai-emits changed"
+    reason: 'R8 blocker IDENTITY-C55 (CHG-R8SPN): a new guest account is announced as identity.guestRegistered so the
+      consumers that welcome and profile a guest can react. Adding an emitted event is labelled breaking by the check;
+      consumers move with r8.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-IDENTITY-GUESTAUTH-3]
+    consumer-tickets: [AM-IDENTITY-SECURITY-P01, AM-IDENTITY-SECURITY-P02, AM-IDENTITY-SECURITY-P06-BLOCK-A]
+  - id: BC-392
+    contract: catalogue
+    operation: setPriceLadderMatrix
+    operations: [setPriceLadderMatrix]
+    reason: 'R8 blocker GPS-C32 (CHG-R8SPN): the price ladder''s bands were an untyped object a client could not build or
+      read; they become a typed array of bands, each with its code. A type change cannot be additive; the only consumer is
+      ADM-094 in setup.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-CATALOGUE-CATALOGUE-12, VM-ADM-094]
+    consumer-tickets: [AM-SETUP-TICKETING-GUEST-COMMERCE-P08, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, APP-SETUP-ADM-094-REST, TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST]
