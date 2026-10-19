@@ -1382,8 +1382,9 @@ paths:
 
         **The grant applies it, as `publishTenantConfig`''s does** (fix round 3; events/approval-granted.yaml).
         White-label''s consumer of `approval.granted` learns what to apply from the record the call wrote, named by
-        the event (the pending `config_version`, by `subjectId`), and re-checks it when the decision arrives. Here
-        the one record the call writes is the approval request, so Subscription''s consumer takes the events whose
+        the event (the pending `config_version`, by `subjectId`), and a version that waits is validated again when
+        it falls due (`scheduledFor`). Here the one record the call writes is the approval request, and the tenant
+        is re-checked when the grant arrives, so Subscription''s consumer takes the events whose
         `subjectContract` is `subscription` and `subjectType` `tenant`, reads that request by the event''s `requestId`
         through `approvals#requestRecords` (route `service`, the declared query Subscription already reads
         `approvals.request` through) for its stored `attributes` (`ApprovalRequest.attributes`), reads the tenant

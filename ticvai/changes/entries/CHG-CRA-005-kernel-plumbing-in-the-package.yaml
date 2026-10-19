@@ -104,7 +104,8 @@ notes: 'Prevention: check-ticket-builds B-KERNEL-STORAGE (KERNEL_NEEDS: each ker
 
   **Fix round 3 (lane-H review 2; the lead''s rulings of 19 October 2026).** I-1, the grant made buildable the way
   publishTenantConfig''s review is: white-label''s consumer learns what to apply from the record the call wrote, named
-  by the event, and re-checks it on arrival. Here the one record the call writes is the approval request (I-2), so
+  by the event (and a version that waits is validated again when it falls due). Here the one record the call writes
+  is the approval request (I-2), so
   approvals keeps the attributes it is sent (ApprovalRequest.attributes, stored as given; the rules match on them,
   also when a draft is submitted later) and Subscription''s consumer reads them by the event''s requestId through
   approvals#requestRecords (route service, the declared query Subscription already uses for approvals.request). On
