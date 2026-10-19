@@ -1,0 +1,40 @@
+id: CHG-R8SPN-030
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A registered device authenticates as itself: a new deviceAuth scheme checks the credential enrolment issued
+  (tenancy.device_credential) and resolves the device and its workstation scope. recordDeviceHeartbeat and
+  recordDeviceTamperEvent accept it (additive security alternatives). A heartbeat stores the reported status except
+  offline (only the 15-minute timer sets it), previousStatus is the stored value; device health uses the workstation
+  health weights per device (proposed, client to correct); a tamper report never sets its own trust or resolution.'
+decision:
+  what: 'R8 blocker cause APPROVALS-TENANCY-C27 (lead answer: take the recommendation, option A: a new deviceAuth scheme
+    validating tenancy.device_credential). contracts/shared/common.yaml deviceAuth; tenancy.yaml
+    recordDeviceHeartbeat, RegisteredDevice.health, recordDeviceTamperEvent, DeviceTamperEvent.
+    states/registered-device.yaml (initial unknown) and events/device-statusChanged.yaml are the surface lane''s
+    part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27802 and 27803 (ADAM gaps 27803/0, 27803/1, 27803/2, 27802/1): no device
+  authentication scheme, undefined status transitions, no health formula, and tamper trust set by the reporter.
+  Finding: R8 blocker cause list, group approvals-tenancy.'
+keys_touched:
+  operations: [recordDeviceHeartbeat, recordDeviceTamperEvent]
+  schemas: [RegisteredDevice, DeviceTamperEvent]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/tenancy.yaml
+root_class: 'contract gap: a non-person caller has no way to authenticate, and its writes no rule'
+tickets:
+  started: []
+  unstarted:
+  - '27802 and 27803 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27803/0, 27803/1, 27803/2, 27802/1'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+client_signoff: pending

@@ -2394,6 +2394,7 @@ paths:
     post:
       operationId: recordDeviceHeartbeat
       security:
+      - deviceAuth: []
       - apiKeyAuth: []
       - serviceAuth: []
       x-ticvai-audience: [device]
@@ -2408,6 +2409,19 @@ paths:
         is bound to — there is no other workstation to resolve, and a back-office session has
         none. A screen that shows device state reads it through `listDevices`, `getDevice` or
         `getWorkstationHealth`; it does not call this.
+
+        **How the device proves it is the device** (decided 20 October 2026, Chinmay, R8 blocker cause
+        APPROVALS-TENANCY-C27, option A; CHG-R8SPN-030): `deviceAuth`, the credential enrolment issued
+        (`tenancy.device_credential`). `apiKeyAuth` and `serviceAuth` stay listed for clients built on r1 and
+        are not issued to devices.
+
+        **What a heartbeat changes.** The reported `status` is stored on the device as sent, with one exception:
+        **`offline` is never accepted from a heartbeat** (a device that can call is not offline), and a body
+        with `status` `offline` is refused `400` `validation`. Only the timer sets `offline`: a device with no
+        heartbeat for 15 minutes moves to `offline` (and `health` `offline`). `device.statusChanged` is written
+        when the stored status changes, with `previousStatus` the value stored before this heartbeat (`unknown`
+        for a device's first). `lastHeartbeatAt` is set on every heartbeat; `health` is recomputed (see
+        `RegisteredDevice.health`).
       tags: [workstation]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: workstation
@@ -2445,6 +2459,8 @@ paths:
           description: Recorded
           headers:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -3299,11 +3315,22 @@ paths:
       operationId: recordDeviceTamperEvent
       x-ticvai-conflict-policy: append
       summary: A device reports interference
+      description: '**Reported by the device about itself** (decided 20 October 2026, Chinmay, R8 blocker cause
+        APPROVALS-TENANCY-C27, option A; CHG-R8SPN-030). A device calls with `deviceAuth` and needs no
+        permission; `deviceId` must be its own (another device''s is `404`). `DEVICE_VIEW` is what a staff caller
+        must hold to record one by hand. **The reporter never sets the trust**: the server stores `deviceTrusted`
+        false on every new event, whatever the body says, and ignores `resolvedAt`, `resolvedBy` and
+        `resolution` on input; they are set only when a person clears the device. The device is untrusted from
+        this moment.'
+      security:
+      - bearerAuth: []
+      - deviceAuth: []
       tags:
       - devices
       x-ticvai-permission: DEVICE_VIEW
       x-ticvai-audience:
       - staff
+      - device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       parameters:
@@ -4412,17 +4439,21 @@ components:
         deviceTrusted:
           type: boolean
           default: false
+          description: Set by the server, false on every new event; ignored on input (APPROVALS-TENANCY-C27).
         resolvedAt:
           type: string
           format: date-time
           nullable: true
+          description: Set when a person clears the device; ignored on `recordDeviceTamperEvent` (APPROVALS-TENANCY-C27).
         resolvedBy:
           type: string
           format: uuid
           nullable: true
+          description: Who cleared the device; ignored on `recordDeviceTamperEvent` (APPROVALS-TENANCY-C27).
         resolution:
           type: string
           nullable: true
+          description: How the device was cleared; ignored on `recordDeviceTamperEvent` (APPROVALS-TENANCY-C27).
         scopePath:
           type: string
           readOnly: true
@@ -5141,6 +5172,15 @@ components:
             **Derived, not reported.** Computed from heartbeat age, battery, firmware currency and
             error rate — a device does not know whether it is healthy, and asking it produces a
             fleet that is 100% healthy and 12% broken.
+
+            **The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause
+            APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one
+            device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25
+            heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20
+            firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour
+            (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more,
+            `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown`
+            until the first heartbeat. A battery under 15% caps the device at `warning`.
         lastHeartbeatAt: { type: string, format: date-time, nullable: true, readOnly: true }
         capabilities:
           type: array

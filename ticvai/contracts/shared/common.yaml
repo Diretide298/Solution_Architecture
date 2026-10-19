@@ -1026,6 +1026,17 @@ components:
         A caller presenting a valid token from the wrong certificate is rejected. Neither alone is sufficient.
 
         '
+    deviceAuth:
+      type: http
+      scheme: bearer
+      description: '**A registered device, authenticated as itself** (decided 20 October 2026, Chinmay, R8 blocker
+        cause APPROVALS-TENANCY-C27, option A; CHG-R8SPN-030). The credential is the one `enrolDevice` issued and
+        `tenancy.device_credential` holds (`kind` `clientCertificate`, `deviceToken` or `mutualTls`): a device token is
+        sent as the bearer value, a certificate is presented on the TLS connection (and the bearer value is then the
+        device id). The server checks it against an active, unrevoked `device_credential` row, resolves the device
+        (`platform.device`) and through it the workstation and scope the device is bound to, and acts as that device:
+        no person, no role, no permission. A device can only report about itself; a call naming another device is
+        `404`. A retired or unapproved device, or a revoked credential, is `401`.'
     apiKeyAuth:
       type: apiKey
       in: header
