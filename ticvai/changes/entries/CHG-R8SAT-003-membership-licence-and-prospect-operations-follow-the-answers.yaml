@@ -1,0 +1,59 @@
+id: CHG-R8SAT-003
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Five satellite contract causes of the second r8 round, done by the lead''s answers of 20 October. Venue staff
+  set up memberships: the 16 membership-product operations of subscription.yaml need MEMBERSHIP_VIEW or
+  MEMBERSHIP_MANAGE instead of platform-staff permissions, and BO-284..BO-303 follow (GPS-C33, option A). BO-291''s
+  profile references say what they name: a price list, a catalogue tax profile (read through taxProfileRecords),
+  and two free codes for fee and upgrade policy until the client names those entities (GPS-C34). setSubscription is
+  staff-only; a prospect''s plan choice travels on the onboarding application (APPROVALS-TENANCY-C16, option B). A
+  licence add-on is keyed by the shared ModuleKey, never a white-label feature key (APPROVALS-TENANCY-C17, option
+  B). loadGameCredits never writes games.card: an anonymous card''s load goes to the games consumer through
+  wallet.credited v2, a registered card''s wallet moves by the money paid, and credits are counted on the credit lot
+  (APPROVALS-TENANCY-C30, option A).'
+decision:
+  what: 'contracts/satellite/subscription.yaml (membership permissions, setMembershipCommercialConfig references and
+    read-via, setSubscription security and audience, submitOnboardingApplication text, LicenceAddOn.moduleKey and
+    removeLicenceAddOn moduleKey as ModuleKey); contracts/satellite/wallet.yaml (loadGameCredits text and
+    amountPaid, CreditLot.issuedCredits); events/wallet-credited.yaml v2; screens P08 BO-284..BO-303 permission and
+    BO-291 bindings, P17 SGN-019 and SGN-024 bind nothing. Breaking for check-contract-compat (19 changes): the
+    breaking-change entries are requested of the lead in the surface report. New permissions MEMBERSHIP_VIEW and
+    MEMBERSHIP_MANAGE and the ModuleKey value poweredByRemoval are requested of the generators and core lanes.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round (surface lane), tickets 29883, 27808, 27807, 27809, 27814 (ADAM
+  gaps 29883/0, 29883/5, 27808/2, 27809/0, 27807/1, 27814/0, 27814/1, 27814/2); answers.json of 20 October 2026.'
+keys_touched:
+  operations: [setSubscription, submitOnboardingApplication, setMembershipCommercialConfig, addLicenceAddOn,
+    removeLicenceAddOn, loadGameCredits, listMembershipAnnualPass, setMembershipProductTier,
+    setMembershipEligibilityQualification, setMembershipEntitlementAdmission, listMembershipUsageVisit,
+    listMembershipCommercialPricing, setRenewalAutoMembership, getMembershipProductValidation,
+    approveMembershipProductValidation, setMemberMembershipAccount, listMembershipActivationCredential,
+    listMembershipFreezeSuspension, listMembershipUpgradeDowngrade, listMembershipRenewalRetention,
+    setMembershipUsagePolicy]
+  schemas: [MembershipCommercialConfigInput, LicenceAddOn, CreditLot]
+  files:
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/wallet.yaml
+  - events/wallet-credited.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/P17-ticvai-signup.yaml
+root_class: 'contract-decision gap: an operation''s caller, permission or write path contradicts who uses it'
+tickets:
+  started: []
+  unstarted:
+  - '29883, 27808, 27807, 27809, 27814 (the walk that found the gaps); the games consumer ticket of wallet.credited
+    is built to v2.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'BO-293''s no-access text names PLATFORM_CELL_MANAGE until the client approves the new wording (pending entry
+  GPS-C33): check-screen-permissions SP-NOACCESS reports it, as it does DEV-001. CreditLot.issuedCredits needs its
+  column at the lead''s derive (check-contract-storage). check-screens reports SGN-019 and SGN-024 drifting from
+  ADM-410 and ADM-417 until the twin rule sanctions a prospect copy binding fewer operations (generators request).'
