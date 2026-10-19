@@ -939,9 +939,10 @@ paths:
         which is what `requestSuggestion` reads to route a kind to its producer. `setAiPolicy` does
         not change them; this operation is the only writer.
 
-        **What the PUT does.** Each assignment is matched on `kind`. An assignment in the body replaces
-        the stored one for that kind, or adds it where the kind had none; **a kind left out of the
-        body keeps its current assignment** — a partial body never leaves a question with nobody to
+        **What the PUT does** (r8 walk of ticket 27715; lead decision of 20 October 2026, option A). **It
+        replaces the whole routing table**, as the singleton note says: the body is the set in force afterwards,
+        and **a kind left out of the body is removed** from `AiPolicy.suggestionProviders`. A removed kind is
+        answered by its rule, as a kind with no assignment always is, so no question is left with nobody to
         answer it. The response is the full set after the write.
 
         **Also written by `promoteAiRelease`** (AI design 2.3, 3.5). Shadow mode here is the release
@@ -949,6 +950,12 @@ paths:
         gate a `promotionReady` governance alert is raised. **A person promotes it; nothing switches by
         itself** (decided 29 September). Setting a `model` basis here directly remains possible for a
         producer that has already been promoted.
+
+        **Refusals.** 422 `guard-rails-required`: an assignment with basis `model` and no `guardRails`. 422
+        `shadow-release-not-in-shadow`: a `shadowProducerRef` that does not name an `ai.release` in stage `shadow`
+        (matched on `ai.release.candidate_ref` = the `producerRef` and `suggestion_kind` = the `kind`). 409
+        `model-basis-needs-promotion`: basis `model` set directly for a producer not yet promoted. Nothing is
+        written in any of the three.
 
         '
       tags:
@@ -993,6 +1000,20 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/SuggestionProviderAssignment'
+        '409':
+          description: Basis `model` was set directly for a producer that has not been promoted (`model-basis-needs-promotion`). Nothing is written.
+          x-ticvai-problem-types: [model-basis-needs-promotion]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A `model` assignment has no guard rails (`guard-rails-required`), or a `shadowProducerRef` is not a release in stage `shadow` for that kind (`shadow-release-not-in-shadow`). Nothing is written.
+          x-ticvai-problem-types: [guard-rails-required, shadow-release-not-in-shadow]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/venue-map/{mapId}/propose-walkways:
