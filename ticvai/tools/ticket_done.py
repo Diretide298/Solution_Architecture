@@ -272,7 +272,7 @@ def baseline_functions(root) -> dict:
     return out
 
 
-AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d__(?:names_)?after_r1_\d{8}\.sql$")
+AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d5?__(?:names_(?:early_)?)?after_r1_\d{8}\.sql$")
 # A block of the names file (ddl_forward.tag): `-- <table> | <kind> | <detail> [| <other table>]` (R8-MIG-001)
 NAMES_TAG = re.compile(r"^-- (\w+\.\w+) \| (rename column|rename constraint|rename index|create index|drop index|"
                        r"foreign key) \| (\S+(?: to \S+)?)(?: \| (\w+\.\w+))?$")

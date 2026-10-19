@@ -423,6 +423,7 @@ class Model:
             if re.match(r"INSERT INTO platform\.schema_version\b", s, re.I):
                 continue
             g = None if RETIRE_GUARD.match(s) else GUARD.match(s)
+            from_guard = bool(g)
             if g:
                 # a guarded rename, key or dropped index (R8-MIG-001): fold in the one change it makes
                 stmt = s = re.sub(r" NOT VALID$", "", norm(g.group("body")), flags=re.I)
@@ -475,7 +476,8 @@ class Model:
                     a = re.match(rf"RENAME COLUMN ({NAME}) TO ({NAME})", action, re.I)
                     if a and unq(a.group(1)) in tab.cols:
                         self.rename_column(t, unq(a.group(1)), unq(a.group(2)))
-                        self.handled.add((t, unq(a.group(2))))
+                        if not from_guard:   # a written rename leaves the column's other differences listed
+                            self.handled.add((t, unq(a.group(2))))
                         handled = True
                         continue
                     a = re.match(rf"RENAME CONSTRAINT ({NAME}) TO ({NAME})", action, re.I)
@@ -769,7 +771,10 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
     def pure_rename(t, c) -> bool:
         """The renamed column `t.c` changes nothing but its name, so this file renames it (R8-MIG-001)."""
         oc = rc.get((t, c))
-        return oc is not None and t not in rt and same_but_name(c, old.tables[t].cols[oc], new.tables[t].cols[c])
+        if oc is None or t in rt:
+            return False
+        was, now = old.tables[t].cols[oc], new.tables[t].cols[c]
+        return same_but_name(c, was, now) or same_but_name(c, was, relaxed(now))
 
     def all_pure(t, cols) -> bool:
         return all(pure_rename(t, c) for c in (cols or ()) if (t, c) in rc)
@@ -822,7 +827,11 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                 if (t, c) in rc:
                     oc = rc[(t, c)]
                     same = same_but_name(c, a.cols[oc], d)
-                    if same:
+                    if same or same_but_name(c, a.cols[oc], relaxed(d)):
+                        # (a NOT NULL the new column adds is its own "not null" row, listed after this rename)
+                        if not same:
+                            review("not null", f"{t}.{c}", "renamed by the names file; the schema reference says NOT NULL",
+                                   "backfill, then ALTER COLUMN ... SET NOT NULL")
                         # **A pure rename is written** (R8-MIG-001): no type, default or data question behind it.
                         recon_cols.append((tag(t, "rename column", f"{oc} to {c}", guard_rename_column(t, oc, c)), f"ALTER TABLE {t} RENAME COLUMN {c} TO {oc};"))
                         p.recon_counts["renames"] += 1
@@ -1214,6 +1223,27 @@ def render(p: Plan, version: str, baseline: str, stamp: str) -> str:
         "",
     ]
     return "\n".join(lines)
+
+
+def split_early(p: Plan, frozen: dict) -> tuple:
+    """(early, rest): the renames a frozen forward file already depends on, and everything else (R8-MIG-001).
+    `frozen` = {file name: text} of the forward files written before the names file. V0104 calls
+    `apply_parent_rls('t'::regclass, 'new_name', ...)` for four columns that exist under their old names until renamed,
+    so on a fresh database V0104 stops unless the rename comes first. A rename is *early* when a frozen file names
+    `'<table>'::regclass, '<new column>'`. Returns the first frozen file that needs one (or None) as well."""
+    early, rest, first = ([], []), ([], []), None
+    for stmt, back in zip(p.recon, p.recon_rollback):
+        m = re.match(r"-- (\S+) \| rename column \| (\S+) to (\S+)\n", stmt)
+        need = None
+        if m:
+            pat = f"'{m.group(1)}'::regclass, '{m.group(3)}'"
+            need = next((n for n, txt in sorted(frozen.items()) if pat in txt), None)
+        tgt = early if need else rest
+        tgt[0].append(stmt)
+        tgt[1].append(back)
+        if need and (first is None or need < first):
+            first = need
+    return early, rest, first
 
 
 def render_recon(p: Plan, version: str, baseline: str, stamp: str) -> str:

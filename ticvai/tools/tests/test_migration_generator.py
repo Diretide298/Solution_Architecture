@@ -195,15 +195,24 @@ def test_a_table_check_on_an_existing_table_is_written_not_valid_then_validated(
     assert not [s for s in again.statements if name in s], again.statements
 
 
-def test_a_new_unique_index_on_a_renamed_column_is_listed_whole_to_create_after_the_rename():
+def test_a_new_unique_index_on_a_renamed_column_is_written_after_the_rename():
+    # the rename adds a NOT NULL: the rename is still written, the NOT NULL stays its own review row
     p = fwd.diff("tenant", model(TILE_OLD), model(TILE_NEW), TILE_RENAMES)
-    uniq = [r for r in p.review if "sale_board_page_id_position_uniq" in r[1]]
-    assert uniq and uniq[0][0] == "index added after rename", p.review
-    assert "CREATE UNIQUE INDEX IF NOT EXISTS sale_board_tile_sale_board_page_id_position_uniq" in uniq[0][3]
-    assert "(sale_board_page_id, position)" in uniq[0][3]
-    # the index that replaces an old one is still a rename
-    idx = [r for r in p.review if r[1].endswith("sale_board_tile_sale_board_page_id_idx")]
-    assert idx and idx[0][0] == "index after rename"
+    text = chr(10).join(p.recon)
+    assert "CREATE UNIQUE INDEX IF NOT EXISTS sale_board_tile_sale_board_page_id_position_uniq" in text
+    assert text.index("RENAME COLUMN page_id") < text.index("sale_board_page_id_position_uniq")
+    assert "ALTER INDEX platform.sale_board_tile_page_id_idx RENAME TO sale_board_tile_sale_board_page_id_idx" in text
+    assert [r for r in p.review if r[0] == "not null" and "sale_board_page_id" in r[1]], p.review
+
+
+def test_a_rename_a_frozen_file_depends_on_goes_in_the_early_file():
+    p = fwd.diff("tenant", model(TILE_OLD), model(TILE_NEW), TILE_RENAMES)
+    frozen = {"V0104__after_r1_x.sql": "SELECT platform.apply_parent_rls('platform.sale_board_tile'::regclass, "
+                                       "'sale_board_page_id', 'platform.sale_board_page'::regclass, 'id');"}
+    early, rest, first = fwd.split_early(p, frozen)
+    assert first == "V0104__after_r1_x.sql" and len(early[0]) == 1 and "RENAME COLUMN page_id" in early[0][0]
+    assert not [s for s in rest[0] if "RENAME COLUMN page_id" in s]
+    assert fwd.split_early(p, {})[0] == ([], [])
 
 
 def test_a_table_check_naming_a_renamed_column_waits_for_the_rename_whole():

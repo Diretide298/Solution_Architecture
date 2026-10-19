@@ -9,13 +9,10 @@
 -- by a migration that runs after this one copies the blocks that name it (ticket text: 'Changes this file
 -- makes to your tables'). A foreign key is added NOT VALID: it checks every new write, and the owner runs
 -- ALTER TABLE ... VALIDATE CONSTRAINT when the rows already there are known to be clean.
--- 239 column rename(s), 374 key(s) added or renamed, 64 index(es) renamed or dropped.
+-- 236 column rename(s), 375 key(s) added or renamed, 66 index(es) renamed or dropped.
 
 -- access.access_area | rename column | support_multi_park_environments to supports_multi_park_environments
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'access_area' AND column_name = 'support_multi_park_environments') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'access_area' AND column_name = 'supports_multi_park_environments') THEN ALTER TABLE access.access_area RENAME COLUMN support_multi_park_environments TO supports_multi_park_environments; END IF; END $$;
-
--- access.access_change | rename column | old_access_id to old_entitlement_id
-DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'access_change' AND column_name = 'old_access_id') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'access_change' AND column_name = 'old_entitlement_id') THEN ALTER TABLE access.access_change RENAME COLUMN old_access_id TO old_entitlement_id; END IF; END $$;
 
 -- access.access_change | rename column | new_access_id to new_entitlement_id
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'access_change' AND column_name = 'new_access_id') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'access_change' AND column_name = 'new_entitlement_id') THEN ALTER TABLE access.access_change RENAME COLUMN new_access_id TO new_entitlement_id; END IF; END $$;
@@ -82,9 +79,6 @@ DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_sche
 
 -- access.edge_package | rename column | version_valid to is_version_valid
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'edge_package' AND column_name = 'version_valid') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'edge_package' AND column_name = 'is_version_valid') THEN ALTER TABLE access.edge_package RENAME COLUMN version_valid TO is_version_valid; END IF; END $$;
-
--- access.entry_rule_point | rename column | admission_profile_id to admission_rules_id
-DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'entry_rule_point' AND column_name = 'admission_profile_id') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'entry_rule_point' AND column_name = 'admission_rules_id') THEN ALTER TABLE access.entry_rule_point RENAME COLUMN admission_profile_id TO admission_rules_id; END IF; END $$;
 
 -- access.fast_pass_profile | rename column | one_per_ride to is_one_per_ride
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'fast_pass_profile' AND column_name = 'one_per_ride') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'access' AND table_name = 'fast_pass_profile' AND column_name = 'is_one_per_ride') THEN ALTER TABLE access.fast_pass_profile RENAME COLUMN one_per_ride TO is_one_per_ride; END IF; END $$;
@@ -416,9 +410,6 @@ DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_sche
 -- marketing.waiver_signatory_rule | rename column | guardian_signs_for_each_minor to requires_guardian_signature_per_minor
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'marketing' AND table_name = 'waiver_signatory_rule' AND column_name = 'guardian_signs_for_each_minor') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'marketing' AND table_name = 'waiver_signatory_rule' AND column_name = 'requires_guardian_signature_per_minor') THEN ALTER TABLE marketing.waiver_signatory_rule RENAME COLUMN guardian_signs_for_each_minor TO requires_guardian_signature_per_minor; END IF; END $$;
 
--- marketing.waiver_signature | rename column | template_id to form_definition_id
-DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'marketing' AND table_name = 'waiver_signature' AND column_name = 'template_id') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'marketing' AND table_name = 'waiver_signature' AND column_name = 'form_definition_id') THEN ALTER TABLE marketing.waiver_signature RENAME COLUMN template_id TO form_definition_id; END IF; END $$;
-
 -- marketing.waiver_verification | rename column | participant_match to is_participant_match
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'marketing' AND table_name = 'waiver_verification' AND column_name = 'participant_match') AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'marketing' AND table_name = 'waiver_verification' AND column_name = 'is_participant_match') THEN ALTER TABLE marketing.waiver_verification RENAME COLUMN participant_match TO is_participant_match; END IF; END $$;
 
@@ -749,6 +740,9 @@ DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'cart_line_in
 -- orders.order_line | rename constraint | order_line_inventory_hold_id_fkey to order_line_inventory_reservation_id_fkey
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'order_line_inventory_hold_id_fkey' AND conrelid = to_regclass('orders.order_line')) AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'order_line_inventory_reservation_id_fkey' AND conrelid = to_regclass('orders.order_line')) THEN ALTER TABLE orders.order_line RENAME CONSTRAINT order_line_inventory_hold_id_fkey TO order_line_inventory_reservation_id_fkey; END IF; END $$;
 
+-- platform.sale_board_tile | rename constraint | sale_board_tile_page_id_fkey to sale_board_tile_sale_board_page_id_fkey
+DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'sale_board_tile_page_id_fkey' AND conrelid = to_regclass('platform.sale_board_tile')) AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'sale_board_tile_sale_board_page_id_fkey' AND conrelid = to_regclass('platform.sale_board_tile')) THEN ALTER TABLE platform.sale_board_tile RENAME CONSTRAINT sale_board_tile_page_id_fkey TO sale_board_tile_sale_board_page_id_fkey; END IF; END $$;
+
 -- retail.shop_and_drop | rename constraint | shop_and_drop_collection_point_id_fkey to shop_and_drop_collection_location_id_fkey
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'shop_and_drop_collection_point_id_fkey' AND conrelid = to_regclass('retail.shop_and_drop')) AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'shop_and_drop_collection_location_id_fkey' AND conrelid = to_regclass('retail.shop_and_drop')) THEN ALTER TABLE retail.shop_and_drop RENAME CONSTRAINT shop_and_drop_collection_point_id_fkey TO shop_and_drop_collection_location_id_fkey; END IF; END $$;
 
@@ -806,6 +800,9 @@ DO $$ BEGIN IF to_regclass('orders.order_line_inventory_hold_id_idx') IS NOT NUL
 -- orders.reservation_line | rename index | reservation_line_inventory_hold_id_idx to reservation_line_inventory_reservation_id_idx
 DO $$ BEGIN IF to_regclass('orders.reservation_line_inventory_hold_id_idx') IS NOT NULL AND to_regclass('orders.reservation_line_inventory_reservation_id_idx') IS NULL THEN ALTER INDEX orders.reservation_line_inventory_hold_id_idx RENAME TO reservation_line_inventory_reservation_id_idx; END IF; END $$;
 
+-- platform.sale_board_tile | rename index | sale_board_tile_page_id_idx to sale_board_tile_sale_board_page_id_idx
+DO $$ BEGIN IF to_regclass('platform.sale_board_tile_page_id_idx') IS NOT NULL AND to_regclass('platform.sale_board_tile_sale_board_page_id_idx') IS NULL THEN ALTER INDEX platform.sale_board_tile_page_id_idx RENAME TO sale_board_tile_sale_board_page_id_idx; END IF; END $$;
+
 -- resources.selection_policy | rename index | selection_policy_ticket_type_id_idx to selection_policy_ticket_product_id_idx
 DO $$ BEGIN IF to_regclass('resources.selection_policy_ticket_type_id_idx') IS NOT NULL AND to_regclass('resources.selection_policy_ticket_product_id_idx') IS NULL THEN ALTER INDEX resources.selection_policy_ticket_type_id_idx RENAME TO selection_policy_ticket_product_id_idx; END IF; END $$;
 
@@ -817,6 +814,9 @@ DO $$ BEGIN IF to_regclass('wallet.risk_rule_risk_rules_id_idx') IS NOT NULL AND
 
 -- wallet.wallet_transaction | rename index | wallet_transaction_wallet_hold_id_idx to wallet_transaction_fund_reservation_id_idx
 DO $$ BEGIN IF to_regclass('wallet.wallet_transaction_wallet_hold_id_idx') IS NOT NULL AND to_regclass('wallet.wallet_transaction_fund_reservation_id_idx') IS NULL THEN ALTER INDEX wallet.wallet_transaction_wallet_hold_id_idx RENAME TO wallet_transaction_fund_reservation_id_idx; END IF; END $$;
+
+-- platform.sale_board_tile | create index | sale_board_tile_sale_board_page_id_position_uniq
+DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'platform' AND table_name = 'sale_board_tile' AND column_name = 'position') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'platform' AND table_name = 'sale_board_tile' AND column_name = 'sale_board_page_id') THEN CREATE UNIQUE INDEX IF NOT EXISTS sale_board_tile_sale_board_page_id_position_uniq ON platform.sale_board_tile (sale_board_page_id, position); END IF; END $$;
 
 -- access.access_change | foreign key | access_change_new_entitlement_id_fkey | access.entitlement
 DO $$ BEGIN IF to_regclass('access.access_change') IS NOT NULL AND to_regclass('access.entitlement') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'access_change_new_entitlement_id_fkey' AND conrelid = to_regclass('access.access_change')) AND (SELECT atttypid FROM pg_attribute WHERE attrelid = to_regclass('access.access_change') AND attname = 'new_entitlement_id') = (SELECT atttypid FROM pg_attribute WHERE attrelid = to_regclass('access.entitlement') AND attname = 'id') AND EXISTS (SELECT 1 FROM pg_index i WHERE i.indrelid = to_regclass('access.entitlement') AND i.indisunique AND i.indpred IS NULL AND i.indexprs IS NULL AND (SELECT array_agg(a.attname::text ORDER BY a.attname) FROM pg_attribute a WHERE a.attrelid = i.indrelid AND a.attnum = ANY (i.indkey)) = ARRAY['id']) THEN ALTER TABLE access.access_change ADD CONSTRAINT access_change_new_entitlement_id_fkey FOREIGN KEY (new_entitlement_id) REFERENCES access.entitlement(id) NOT VALID; END IF; END $$;
@@ -2046,7 +2046,7 @@ DO $$ BEGIN IF to_regclass('queue.queue_fast_pass_id_idx') IS NOT NULL THEN DROP
 DO $$ BEGIN IF to_regclass('ledger.journal_entry_entry_number_uniq') IS NOT NULL THEN DROP INDEX ledger.journal_entry_entry_number_uniq; END IF; END $$;
 
 INSERT INTO platform.schema_version (version, description, checksum)
-VALUES ('V0107', 'after r1 (9cec72d), names the contracts use: 239 column rename(s), 374 key(s) added or renamed, 64 index(es) renamed or dropped', 'dfec579b1f03b4f559e40a73d9900db43ee73281451405fa5465f3edb94e627f')
+VALUES ('V0107', 'after r1 (9cec72d), names the contracts use: 236 column rename(s), 375 key(s) added or renamed, 66 index(es) renamed or dropped', '5f6953902c3e46d9c06e435edf6e53701ba053fdc0a766c47a7f28c6e2b8657c')
 ON CONFLICT (version) DO NOTHING;
 
 -- ============================================================================
@@ -2463,10 +2463,12 @@ ON CONFLICT (version) DO NOTHING;
 -- ALTER TABLE access.access_incident DROP CONSTRAINT IF EXISTS access_incident_venue_id_fkey;
 -- ALTER TABLE access.access_change DROP CONSTRAINT IF EXISTS access_change_old_entitlement_id_fkey;
 -- ALTER TABLE access.access_change DROP CONSTRAINT IF EXISTS access_change_new_entitlement_id_fkey;
+-- DROP INDEX IF EXISTS platform.sale_board_tile_sale_board_page_id_position_uniq;
 -- ALTER INDEX wallet.wallet_transaction_fund_reservation_id_idx RENAME TO wallet_transaction_wallet_hold_id_idx;
 -- ALTER INDEX wallet.risk_rule_risk_rule_set_id_idx RENAME TO risk_rule_risk_rules_id_idx;
 -- ALTER INDEX retail.shop_and_drop_collection_location_id_idx RENAME TO shop_and_drop_collection_point_id_idx;
 -- ALTER INDEX resources.selection_policy_ticket_product_id_idx RENAME TO selection_policy_ticket_type_id_idx;
+-- ALTER INDEX platform.sale_board_tile_sale_board_page_id_idx RENAME TO sale_board_tile_page_id_idx;
 -- ALTER INDEX orders.reservation_line_inventory_reservation_id_idx RENAME TO reservation_line_inventory_hold_id_idx;
 -- ALTER INDEX orders.order_line_inventory_reservation_id_idx RENAME TO order_line_inventory_hold_id_idx;
 -- ALTER INDEX orders.cart_line_inventory_reservation_id_idx RENAME TO cart_line_inventory_hold_id_idx;
@@ -2486,6 +2488,7 @@ ON CONFLICT (version) DO NOTHING;
 -- ALTER TABLE wallet.wallet_transaction RENAME CONSTRAINT wallet_transaction_fund_reservation_id_fkey TO wallet_transaction_wallet_hold_id_fkey;
 -- ALTER TABLE wallet.risk_rule RENAME CONSTRAINT risk_rule_risk_rule_set_id_fkey TO risk_rule_risk_rules_id_fkey;
 -- ALTER TABLE retail.shop_and_drop RENAME CONSTRAINT shop_and_drop_collection_location_id_fkey TO shop_and_drop_collection_point_id_fkey;
+-- ALTER TABLE platform.sale_board_tile RENAME CONSTRAINT sale_board_tile_sale_board_page_id_fkey TO sale_board_tile_page_id_fkey;
 -- ALTER TABLE orders.order_line RENAME CONSTRAINT order_line_inventory_reservation_id_fkey TO order_line_inventory_hold_id_fkey;
 -- ALTER TABLE orders.cart_line RENAME CONSTRAINT cart_line_inventory_reservation_id_fkey TO cart_line_inventory_hold_id_fkey;
 -- ALTER TABLE marketing.conversation_message RENAME CONSTRAINT conversation_message_ai_activity_id_fkey TO conversation_message_ai_interaction_id_fkey;
@@ -2596,7 +2599,6 @@ ON CONFLICT (version) DO NOTHING;
 -- ALTER TABLE marketing.waiver_verification RENAME COLUMN is_guardian_relationship_present TO guardian_relationship_present;
 -- ALTER TABLE marketing.waiver_verification RENAME COLUMN is_order_match TO booking_match;
 -- ALTER TABLE marketing.waiver_verification RENAME COLUMN is_participant_match TO participant_match;
--- ALTER TABLE marketing.waiver_signature RENAME COLUMN form_definition_id TO template_id;
 -- ALTER TABLE marketing.waiver_signatory_rule RENAME COLUMN requires_guardian_signature_per_minor TO guardian_signs_for_each_minor;
 -- ALTER TABLE marketing.waiver_signatory_rule RENAME COLUMN captures_relationship TO capture_relationship;
 -- ALTER TABLE marketing.sla_policy RENAME COLUMN is_business_hours_only TO business_hours_only;
@@ -2707,7 +2709,6 @@ ON CONFLICT (version) DO NOTHING;
 -- ALTER TABLE access.gate_lane RENAME COLUMN allows_re_entry TO re_entry;
 -- ALTER TABLE access.fraud_rule RENAME COLUMN is_offline_available TO offline_availability;
 -- ALTER TABLE access.fast_pass_profile RENAME COLUMN is_one_per_ride TO one_per_ride;
--- ALTER TABLE access.entry_rule_point RENAME COLUMN admission_rules_id TO admission_profile_id;
 -- ALTER TABLE access.edge_package RENAME COLUMN is_version_valid TO version_valid;
 -- ALTER TABLE access.edge_package RENAME COLUMN is_package_complete TO package_complete;
 -- ALTER TABLE access.edge_package RENAME COLUMN is_signature_valid TO signature_valid;
@@ -2730,6 +2731,5 @@ ON CONFLICT (version) DO NOTHING;
 -- ALTER TABLE access.admission_rules RENAME COLUMN is_same_day_only TO same_day_only;
 -- ALTER TABLE access.access_point RENAME COLUMN captures_vehicle_location TO vehicle_location_capture;
 -- ALTER TABLE access.access_change RENAME COLUMN new_entitlement_id TO new_access_id;
--- ALTER TABLE access.access_change RENAME COLUMN old_entitlement_id TO old_access_id;
 -- ALTER TABLE access.access_area RENAME COLUMN supports_multi_park_environments TO support_multi_park_environments;
 -- DELETE FROM platform.schema_version WHERE version = 'V0107';

@@ -1849,7 +1849,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     stamp = _dt.date.today().strftime("%Y%m%d")
     baseline = f"{tag} ({commit[:7]})"
     existing = sorted(p for d in (CONTROL, "tenant") for p in (OUT / d).glob("V*.sql")
-                      if FORWARD_FILE.match(p.name))
+                      if FORWARD_FILE.match(p.name) and "__names_early_" not in p.name)
     version_n = max([int(FORWARD_FILE.match(p.name).group(1)) + 1 for p in existing] + [FORWARD_FIRST])
     version = f"V{version_n:04d}"
     safe_tag = re.sub(r"[^\w]+", "_", tag).strip("_") or "baseline"
@@ -1862,8 +1862,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
             name = path.rsplit("/", 1)[-1]
             if path.endswith(".sql") and not FORWARD_FILE.match(name):
                 old.add_file((show(commit, path) or b"").decode("utf-8"))
-        for fwd in sorted((OUT / area_dir).glob("V*.sql"), key=lambda p: int(FORWARD_FILE.match(p.name).group(1))
-                          if FORWARD_FILE.match(p.name) else 0):
+        for fwd in sorted((OUT / area_dir).glob("V*.sql"), key=lambda p: p.name):   # the order a database applies them: by name
             if FORWARD_FILE.match(fwd.name):
                 text = fwd.read_text(encoding="utf-8")
                 old.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", text, maxsplit=1, flags=re.M)[0])
@@ -1901,6 +1900,27 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     for p in plans:
         if not p.recon:
             continue
+        # **The renames a frozen file already needs go in a file that sorts before it** (R8-MIG-001): V0104 applies
+        # row-level security on columns by their new names, so a fresh database stopped there. The file is numbered
+        # one digit longer than the frozen file's predecessor (V01035 for V0104), which sorts between them by name;
+        # a database already past V0105 sees one earlier-numbered file it has not applied (see CHG-R8MIG-003).
+        frozen = {x.name: x.read_text(encoding="utf-8") for x in (OUT / p.area).glob("V*.sql")
+                  if FORWARD_FILE.match(x.name) and "__names_" not in x.name}
+        early, rest, first = ddl_forward.split_early(p, frozen)
+        if early[0]:
+            import dataclasses as _dc
+            n_ = int(FORWARD_FILE.match(first).group(1)) - 1
+            ev = f"V{n_:04d}5"
+            ep = _dc.replace(p, recon=early[0], recon_rollback=early[1],
+                             recon_counts={"renames": len(early[0]), "keys": 0, "indexes": 0})
+            edest = OUT / p.area / f"{ev}__names_early_after_{safe_tag}_{stamp}.sql"
+            written.append((edest, ep))
+            if apply:
+                edest.write_text(ddl_forward.render_recon(ep, ev, baseline, stamp), encoding="utf-8")
+            p.recon, p.recon_rollback = rest
+            p.recon_counts["renames"] -= len(early[0])
+            if not p.recon:
+                continue
         dest = OUT / p.area / f"{recon_version}__names_after_{safe_tag}_{stamp}.sql"
         written.append((dest, p))
         if apply:
@@ -1918,7 +1938,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     print(f"  FROZEN at {baseline}: the baseline files under backend/ are not rewritten")
     for dest, p in written:
         c = p.counts
-        if "__names_after_" in dest.name:
+        if "__names_" in dest.name:
             r = p.recon_counts
             print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {r['renames']} column rename(s), "
                   f"{r['keys']} key(s), {r['indexes']} index(es)" + ("" if apply else " (not written, pass --apply)"))
