@@ -386,6 +386,18 @@ until something broke: `adam_contract('access')` — the 756 KB one — must sta
 real bugs sat behind a benign-looking `skip` line for a while, and a check that skips quietly is a
 check that lies.
 
+```bash
+node viewer/mcp/db-ticket-check.mjs              # add --package for the whole DDL (about 3 minutes)
+```
+
+A [DB] ticket's quick check (20 October 2026). `adam_pull` writes `expected-schema.json` into a
+[DB] ticket's folder: the end state of its tables, parsed from the package DDL by `tools.mjs`. The
+backend starter's `.claude/scripts/db-ticket.mjs` applies only the ticket's file to a template copy
+of the previous state, checks a second run applies nothing, and compares the tables with that file.
+This checks the parser, the compare, the pull (against a stand-in ADAM serving `ticvai/`) and, with
+Docker, the script on a developer folder made from the real DDL. `--package` applies the whole
+package to `pgvector/pgvector:pg16` and requires every table to parse exactly as PostgreSQL has it.
+
 ## What is deliberately not here
 
 A background sync of `.adam/`. Pulling is on request, so the files say when they were pulled

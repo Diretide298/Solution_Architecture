@@ -453,7 +453,7 @@ function subtaskSection(subtasks) {
 }
 
 function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined, blockedBy = [],
-  tree = {}) {
+  tree = {}, db = null) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
   out += line('Project', wp.project) + line('Type', wp.type) + line('Part of', partOfText(tree.partOf))
@@ -512,6 +512,7 @@ function ticketReadme(wp, files, missing, when, decisions = [], release = null, 
     + 'Report only what survives the check, and keep what you ruled out to one line. A real gap in the '
     + 'contract is a change request (adam_draft_change); a question the contract cannot answer is for '
     + 'whoever owns the ticket.\n';
+  out += databaseSection(db, wp.key);
   out += '\n## When you have finished\n\n'
     + 'Ask Claude to propose the change (adam_propose): the new status, % done, and a comment '
     + 'saying what was done. Check what it shows you, then say yes to apply it (adam_apply). '
@@ -600,6 +601,478 @@ async function changesFor(client, key) {
   return [...(answer.data?.items ?? [])].sort((a, b) => (a.number ?? 0) - (b.number ?? 0));
 }
 
+// ---- a database ticket's expected end state ---------------------------------
+//
+// **Why the connector writes it** (Chinmay, 20 October 2026). A [DB] ticket's agent rebuilt every
+// migration from an empty database, reasoned about the effect by itself and ran the whole dotnet
+// suite, on every ticket. The decided way: apply only the ticket's file to a copy of the database at
+// the previous state, and compare the tables with their end state in the package. That end state is
+// this file: columns, types, nullability, keys, indexes, row-level security and partitioning, read
+// from the package's derived DDL (backend/<database>/: the 010 file that creates each table, then
+// 900 keys, 910 indexes, 920 row-level security, 930 partitions and the V01nn after-r1 files, in the
+// order derive-ddl writes them). `.claude/scripts/db-ticket.mjs` in the project folder compares a
+// database with it; normalising both sides to one spelling (types, defaults, index keys) is that
+// script's job, so this keeps the DDL's own words.
+//
+// The parser reads the subset of DDL derive-ddl writes and says what it did not understand
+// (`notModelled`) instead of guessing. `db-ticket-check.mjs` holds it to the real thing: the whole
+// package applied to PostgreSQL 16 and every table compared, with no difference allowed.
+
+/** Statements of a SQL file: comments dropped, strings and dollar-quoted bodies kept whole. */
+export function sqlStatements(text) {
+  const s = String(text ?? '');
+  const out = [];
+  let cur = '';
+  const push = () => { const t = cur.trim(); if (t) out.push(t); cur = ''; };
+  for (let i = 0; i < s.length;) {
+    const ch = s[i];
+    const two = s.slice(i, i + 2);
+    if (two === '--') { const end = s.indexOf('\n', i); i = end < 0 ? s.length : end; if (!cur.endsWith(' ')) cur += ' '; continue; }
+    if (two === '/*') { const end = s.indexOf('*/', i + 2); i = end < 0 ? s.length : end + 2; if (!cur.endsWith(' ')) cur += ' '; continue; }
+    if (ch === "'" || ch === '"') {
+      let j = i + 1;
+      while (j < s.length && !(s[j] === ch && s[j + 1] !== ch)) j += s[j] === ch ? 2 : 1;
+      cur += s.slice(i, j + 1);
+      i = j + 1;
+      continue;
+    }
+    if (ch === '$') {
+      const tag = /^\$(?:[A-Za-z_]\w*)?\$/.exec(s.slice(i, i + 64))?.[0];
+      if (tag) {
+        const end = s.indexOf(tag, i + tag.length);
+        const stop = end < 0 ? s.length : end + tag.length;
+        cur += s.slice(i, stop);
+        i = stop;
+        continue;
+      }
+    }
+    if (ch === ';') { push(); i++; continue; }
+    if (/\s/.test(ch)) { if (cur && !cur.endsWith(' ')) cur += ' '; i++; continue; }
+    cur += ch;
+    i++;
+  }
+  push();
+  return out;
+}
+
+/** Where each top-level separator or keyword starts: outside quotes and parentheses. */
+function topLevel(text, test) {
+  const hits = [];
+  let depth = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "'" || ch === '"') {
+      let j = i + 1;
+      while (j < text.length && !(text[j] === ch && text[j + 1] !== ch)) j += text[j] === ch ? 2 : 1;
+      i = j;
+      continue;
+    }
+    if (ch === '(') depth++;
+    else if (ch === ')') depth--;
+    else if (depth === 0) {
+      // A keyword test answers with its length, so NULL inside NOT NULL is not a second hit.
+      const hit = test(text, i);
+      if (hit) { hits.push(i); if (typeof hit === 'number') i += hit - 1; }
+    }
+  }
+  return hits;
+}
+
+function splitTop(text, sep = ',') {
+  const at = topLevel(text, (t, i) => t[i] === sep);
+  const out = [];
+  let from = 0;
+  for (const i of at) { out.push(text.slice(from, i)); from = i + 1; }
+  out.push(text.slice(from));
+  return out.map((p) => p.trim()).filter(Boolean);
+}
+
+/** The text inside the parenthesis that opens at or after `from`, and where it ends. */
+function group(text, from = 0) {
+  const open = text.indexOf('(', from);
+  if (open < 0) return null;
+  let depth = 0;
+  for (let i = open; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "'" || ch === '"') {
+      let j = i + 1;
+      while (j < text.length && !(text[j] === ch && text[j + 1] !== ch)) j += text[j] === ch ? 2 : 1;
+      i = j;
+      continue;
+    }
+    if (ch === '(') depth++;
+    else if (ch === ')' && --depth === 0) return { inner: text.slice(open + 1, i), start: open, end: i + 1 };
+  }
+  return null;
+}
+
+const ident = (name) => String(name ?? '').trim().replace(/"/g, '').toLowerCase();
+const qualified = (name, schema) => (ident(name).includes('.') ? ident(name) : `${schema}.${ident(name)}`);
+const columnsOf = (text) => splitTop(text).map(ident);
+const shortName = (table) => table.split('.').pop();
+
+// The clauses a column definition can carry after its type, in any order.
+const COLUMN_CLAUSE = /^(NOT\s+NULL|NULL|DEFAULT|CONSTRAINT|PRIMARY\s+KEY|UNIQUE|REFERENCES|CHECK|GENERATED|COLLATE)\b/i;
+const atClause = (rx) => (t, i) => ((i === 0 || /[\s)]/.test(t[i - 1])) && rx.exec(t.slice(i))?.[0].length) || 0;
+
+function newTable(name, file) {
+  return {
+    name, file, columns: [], primaryKey: null, unique: [], foreignKeys: [], checks: [], indexes: [],
+    rls: { enabled: false, forced: false, policies: [] }, partitionBy: null, defaultPartition: false,
+  };
+}
+
+/** `REFERENCES t (c) ON DELETE x` from `text`, the clause starting at its first word. */
+function references(text, schema) {
+  const m = /^REFERENCES\s+([\w".]+)\s*/i.exec(text);
+  if (!m) return null;
+  const rest = text.slice(m[0].length);
+  const cols = rest.startsWith('(') ? group(rest) : null;
+  return {
+    references: qualified(m[1], schema),
+    refColumns: cols ? columnsOf(cols.inner) : [],
+    onDelete: (/ON\s+DELETE\s+(SET\s+NULL|SET\s+DEFAULT|NO\s+ACTION|CASCADE|RESTRICT)/i.exec(rest)?.[1] ?? null)
+      ?.toUpperCase().replace(/\s+/g, ' ') ?? null,
+  };
+}
+
+function addConstraint(table, name, body, schema) {
+  const key = /^(PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY|CHECK|EXCLUDE)\b/i.exec(body)?.[1]?.toUpperCase().replace(/\s+/g, ' ');
+  if (key === 'PRIMARY KEY') {
+    table.primaryKey = { name, columns: columnsOf(group(body).inner) };
+    for (const c of table.primaryKey.columns) {
+      const col = table.columns.find((x) => x.name === c);
+      if (col) col.notNull = true;
+    }
+  } else if (key === 'UNIQUE') {
+    table.unique.push({ name, columns: columnsOf(group(body).inner) });
+  } else if (key === 'FOREIGN KEY') {
+    const cols = group(body);
+    const ref = references(body.slice(cols.end).trim(), schema);
+    table.foreignKeys.push({ name, columns: columnsOf(cols.inner), ...ref });
+  } else if (key === 'CHECK') {
+    table.checks.push({ name });
+  } else {
+    return false;
+  }
+  return true;
+}
+
+/** One column definition, with the constraints written on it. */
+function parseColumn(table, def, schema) {
+  const m = /^("(?:[^"]|"")+"|[\w]+)\s+([\s\S]*)$/.exec(def.trim());
+  if (!m) return null;
+  const name = ident(m[1]);
+  const rest = m[2];
+  const at = topLevel(rest, atClause(COLUMN_CLAUSE));
+  const column = { name, type: (at.length ? rest.slice(0, at[0]) : rest).trim(), notNull: false };
+  let pending = null;
+  at.forEach((start, n) => {
+    const clause = rest.slice(start, n + 1 < at.length ? at[n + 1] : undefined).trim();
+    const word = COLUMN_CLAUSE.exec(clause)[1].toUpperCase().replace(/\s+/g, ' ');
+    if (word === 'NOT NULL') column.notNull = true;
+    else if (word === 'NULL') column.notNull = false;
+    else if (word === 'DEFAULT') column.default = clause.slice(7).trim();
+    else if (word === 'CONSTRAINT') { pending = ident(clause.split(/\s+/)[1]); return; }
+    else if (word === 'PRIMARY KEY') { table.primaryKey = { name: pending, columns: [name] }; column.notNull = true; }
+    else if (word === 'UNIQUE') table.unique.push({ name: pending, columns: [name] });
+    else if (word === 'REFERENCES') table.foreignKeys.push({ name: pending, columns: [name], ...references(clause, schema) });
+    else if (word === 'CHECK') table.checks.push({ name: pending ?? `${shortName(table.name)}_${name}_check` });
+    else if (word === 'GENERATED') column.generated = true;
+    pending = null;
+  });
+  return column;
+}
+
+function createTable(model, stmt, file, notModelled) {
+  const head = /^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w".]+)\s*/i.exec(stmt);
+  const name = ident(head[1]);
+  const schema = name.split('.')[0];
+  const rest = stmt.slice(head[0].length);
+  const partOf = /^PARTITION\s+OF\s+([\w".]+)\s*([\s\S]*)$/i.exec(rest);
+  if (partOf) {
+    const parent = model.get(qualified(partOf[1], schema));
+    // A month's partition depends on the day it was made; only the default one is a fixed fact.
+    if (parent && /^DEFAULT\b/i.test(partOf[2].trim())) parent.defaultPartition = true;
+    return;
+  }
+  if (model.has(name)) return; // IF NOT EXISTS: the first definition stands
+  const body = group(rest);
+  if (!body) { notModelled.push({ file, statement: stmt.slice(0, 200) }); return; }
+  const table = newTable(name, file);
+  for (const item of splitTop(body.inner)) {
+    const named = /^CONSTRAINT\s+([\w"]+)\s+([\s\S]*)$/i.exec(item);
+    if (named) { addConstraint(table, ident(named[1]), named[2], schema); continue; }
+    if (/^(PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY|CHECK|EXCLUDE)\b/i.test(item)) { addConstraint(table, null, item, schema); continue; }
+    if (/^LIKE\b/i.test(item)) { notModelled.push({ file, table: name, statement: item.slice(0, 200) }); continue; }
+    const column = parseColumn(table, item, schema);
+    if (column) table.columns.push(column);
+  }
+  const after = rest.slice(body.end).trim();
+  const part = /^PARTITION\s+BY\s+([\s\S]+)$/i.exec(after);
+  if (part) table.partitionBy = part[1].trim();
+  model.set(name, table);
+}
+
+function alterTable(model, stmt, file, notModelled) {
+  const head = /^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)\s*/i.exec(stmt);
+  const name = ident(head[1]);
+  const schema = name.split('.')[0];
+  const table = model.get(name);
+  if (!table) return;
+  const rest = stmt.slice(head[0].length);
+  const renamed = /^RENAME\s+TO\s+([\w"]+)$/i.exec(rest);
+  if (renamed) {
+    model.delete(name);
+    table.name = `${schema}.${ident(renamed[1])}`;
+    model.set(table.name, table);
+    return;
+  }
+  for (const action of splitTop(rest)) {
+    let m;
+    if ((m = /^ADD\s+CONSTRAINT\s+([\w"]+)\s+([\s\S]*)$/i.exec(action))) {
+      if (!addConstraint(table, ident(m[1]), m[2], schema)) notModelled.push({ file, table: name, statement: action.slice(0, 200) });
+    } else if (/^ADD\s+(PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY|CHECK|EXCLUDE)\b/i.test(action)) {
+      if (!addConstraint(table, null, action.replace(/^ADD\s+/i, ''), schema)) notModelled.push({ file, table: name, statement: action.slice(0, 200) });
+    } else if ((m = /^ADD\s+(?:COLUMN\s+)?(IF\s+NOT\s+EXISTS\s+)?([\s\S]*)$/i.exec(action))) {
+      const before = { pk: table.primaryKey, checks: table.checks.length, unique: table.unique.length, fks: table.foreignKeys.length };
+      const column = parseColumn(table, m[2], schema);
+      if (!column) { notModelled.push({ file, table: name, statement: action.slice(0, 200) }); continue; }
+      if (table.columns.some((c) => c.name === column.name)) {
+        // ADD COLUMN IF NOT EXISTS on a column already there does nothing, constraints included.
+        table.primaryKey = before.pk;
+        table.checks.length = before.checks;
+        table.unique.length = before.unique;
+        table.foreignKeys.length = before.fks;
+        continue;
+      }
+      table.columns.push(column);
+    } else if ((m = /^DROP\s+COLUMN\s+(?:IF\s+EXISTS\s+)?([\w"]+)/i.exec(action))) {
+      const col = ident(m[1]);
+      table.columns = table.columns.filter((c) => c.name !== col);
+    } else if ((m = /^DROP\s+CONSTRAINT\s+(?:IF\s+EXISTS\s+)?([\w"]+)/i.exec(action))) {
+      const con = ident(m[1]);
+      if (table.primaryKey?.name === con) table.primaryKey = null;
+      for (const k of ['unique', 'foreignKeys', 'checks']) table[k] = table[k].filter((c) => c.name !== con);
+    } else if ((m = /^ALTER\s+(?:COLUMN\s+)?([\w"]+)\s+([\s\S]*)$/i.exec(action))) {
+      const col = table.columns.find((c) => c.name === ident(m[1]));
+      const what = m[2];
+      if (!col) continue;
+      if (/^SET\s+NOT\s+NULL$/i.test(what)) col.notNull = true;
+      else if (/^DROP\s+NOT\s+NULL$/i.test(what)) col.notNull = false;
+      else if (/^SET\s+DEFAULT\s+/i.test(what)) col.default = what.replace(/^SET\s+DEFAULT\s+/i, '').trim();
+      else if (/^DROP\s+DEFAULT$/i.test(what)) delete col.default;
+      else if (/^(SET\s+DATA\s+)?TYPE\s+/i.test(what)) col.type = what.replace(/^(SET\s+DATA\s+)?TYPE\s+/i, '').replace(/\s+USING\s+[\s\S]*$/i, '').trim();
+      else notModelled.push({ file, table: name, statement: action.slice(0, 200) });
+    } else if ((m = /^RENAME\s+(?:COLUMN\s+)?([\w"]+)\s+TO\s+([\w"]+)$/i.exec(action))) {
+      const col = table.columns.find((c) => c.name === ident(m[1]));
+      if (col) col.name = ident(m[2]);
+    } else if (/^ENABLE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.enabled = true;
+    else if (/^DISABLE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.enabled = false;
+    else if (/^FORCE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.forced = true;
+    else if (/^NO\s+FORCE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.forced = false;
+    else if (/^(OWNER\s+TO|SET\s*\(|RESET\s*\(|ATTACH\s+PARTITION|DETACH\s+PARTITION)\b/i.test(action)) { /* not part of the shape */ }
+    else notModelled.push({ file, table: name, statement: action.slice(0, 200) });
+  }
+}
+
+function createIndex(model, stmt) {
+  const m = /^CREATE\s+(UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?(?!ON\s)([\w"]+)?\s*ON\s+(?:ONLY\s+)?([\w".]+)\s*(?:USING\s+(\w+)\s*)?/i.exec(stmt);
+  if (!m) return false;
+  const table = model.get(ident(m[3]));
+  if (!table) return true;
+  const keys = group(stmt, m[0].length - 1);
+  const after = stmt.slice(keys.end);
+  const name = m[2] ? ident(m[2]) : null;
+  if (name && table.indexes.some((i) => i.name === name)) return true; // IF NOT EXISTS
+  table.indexes.push({
+    name,
+    unique: Boolean(m[1]),
+    method: (m[4] ?? 'btree').toLowerCase(),
+    keys: keys.inner.trim(),
+    ...(/\bWHERE\b/i.test(after) ? { where: after.replace(/^[\s\S]*?\bWHERE\s+/i, '').trim() } : {}),
+  });
+  return true;
+}
+
+// What each of 920's helpers puts in the policy's USING expression, so the compare can tell a scope
+// policy from a venue one under the same name. The name is the helper's: platform.rls_policy_name.
+const RLS_MARKER = {
+  scope: () => 'in_scope(scope_path)',
+  shared_scope: () => 'in_scope(scope_path)',
+  venue: () => 'venue_in_scope(venue_id)',
+  tenant: () => 'tenant_root_in_scope()',
+  subject: () => 'subject_in_scope(subject_id)',
+  parent: (args) => ident(String(args[2] ?? '').replace(/::regclass$/i, '').replace(/'/g, '')),
+};
+
+function applyRls(model, stmt) {
+  const m = /^SELECT\s+platform\.apply_(\w+?)_rls\s*\(([\s\S]*)\)$/i.exec(stmt);
+  if (!m) return false;
+  const args = splitTop(m[2]);
+  const target = ident(args[0].replace(/::regclass$/i, '').replace(/'/g, ''));
+  const table = model.get(target);
+  if (!table) return true;
+  const policy = `${shortName(target).slice(0, 57)}_scope`;
+  table.rls.enabled = true;
+  table.rls.forced = true;
+  table.rls.policies = table.rls.policies.filter((p) => p.name !== policy && !/^(scope|venue)_isolation$/.test(p.name));
+  const marker = RLS_MARKER[m[1].toLowerCase()];
+  table.rls.policies.push({ name: policy, ...(marker ? { uses: marker(args) } : {}) });
+  return true;
+}
+
+/**
+ * Every table the files create, as it stands after all of them: `files` is [{ name, text }] for
+ * one database, in the order the package applies them. Returns { tables: Map, notModelled }.
+ */
+export function schemaModel(files) {
+  const model = new Map();
+  const notModelled = [];
+  const ordered = [...files].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  for (const { name: file, text } of ordered) {
+    for (const stmt of sqlStatements(text)) {
+      let m;
+      if (/^CREATE\s+(?:UNLOGGED\s+)?TABLE\b/i.test(stmt)) createTable(model, stmt, file, notModelled);
+      else if (/^ALTER\s+TABLE\b/i.test(stmt)) alterTable(model, stmt, file, notModelled);
+      else if (/^CREATE\s+(UNIQUE\s+)?INDEX\b/i.test(stmt)) createIndex(model, stmt);
+      else if (/^SELECT\s+platform\.apply_\w+_rls\b/i.test(stmt)) applyRls(model, stmt);
+      else if ((m = /^CREATE\s+POLICY\s+([\w"]+)\s+ON\s+([\w".]+)/i.exec(stmt))) {
+        const table = model.get(ident(m[2]));
+        if (table && !table.rls.policies.some((p) => p.name === ident(m[1]))) table.rls.policies.push({ name: ident(m[1]) });
+      } else if ((m = /^DROP\s+POLICY\s+(?:IF\s+EXISTS\s+)?([\w"]+)\s+ON\s+([\w".]+)/i.exec(stmt))) {
+        const table = model.get(ident(m[2]));
+        if (table) table.rls.policies = table.rls.policies.filter((p) => p.name !== ident(m[1]));
+      } else if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(stmt))) {
+        const index = ident(m[1]).split('.').pop();
+        for (const t of model.values()) t.indexes = t.indexes.filter((i) => i.name !== index);
+      } else if ((m = /^DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(stmt))) {
+        model.delete(ident(m[1]));
+      }
+      // CREATE SCHEMA, EXTENSION, FUNCTION, TYPE, COMMENT ON, INSERT, and SELECT of the partition
+      // helpers: not the shape of a table.
+    }
+  }
+  return { tables: model, notModelled };
+}
+
+/**
+ * A [DB] ticket's migration: the numbered file its subject names (`V0027__access.sql`), the
+ * database it is in, and the tables it links. Null for a ticket that is not one - a [BE] ticket
+ * that only reads tables, or a [DB] task with no migration file (monthly partitions).
+ */
+export function databaseTicket(wp, touches) {
+  const tables = [...new Set((touches ?? []).filter((t) => t.kind === 'table').map((t) => String(t.id)))];
+  const subject = String(wp?.subject ?? '');
+  const migration = /\b(V\d{4,}[A-Za-z]?__[\w.-]+?\.sql)\b/.exec(subject)?.[1]
+    ?? /\b(V\d{4,}[A-Za-z]?__[\w.-]+?\.sql)\b/.exec(String(wp?.description ?? ''))?.[1];
+  if (!tables.length || !migration || !/^\s*\[DB\]/i.test(subject)) return null;
+  const database = /\bcontrol database\b/i.test(String(wp?.description ?? '')) ? 'control'
+    : /\btenant database\b/i.test(String(wp?.description ?? '')) ? 'tenant' : null;
+  return { migration, tables, database };
+}
+
+/** The expected-schema.json body for `tables`, from a model of their database. */
+export function expectedSchema(model, tables, { database, migration, sources = [], release = null } = {}) {
+  const out = {};
+  const absent = [];
+  for (const name of tables) {
+    const t = model.tables.get(ident(name));
+    if (!t) { absent.push(name); continue; }
+    const { name: _n, ...shape } = t;
+    out[t.name] = shape;
+  }
+  const touched = new Set(Object.keys(out));
+  return {
+    about: 'The end state of this ticket\'s tables, from the package DDL. Compared with a database by '
+      + 'node .claude/scripts/db-ticket.mjs <ticket>. Written by adam_pull; do not edit.',
+    database,
+    migration,
+    ...(release ? { release } : {}),
+    sources,
+    tables: out,
+    ...(absent.length ? { notInPackageDdl: absent } : {}),
+    ...(model.notModelled.some((n) => touched.has(n.table))
+      ? { notModelled: model.notModelled.filter((n) => touched.has(n.table)) } : {}),
+  };
+}
+
+// Package files are the same for every ticket in one pull of a whole board; held for a minute.
+const ddlCache = new Map();
+async function packageText(client, file) {
+  const hit = ddlCache.get(file);
+  if (hit && Date.now() - hit.at < 60_000) return hit.text;
+  const answer = await client.file(file);
+  const text = answer.ok ? answer.text : null;
+  ddlCache.set(file, { at: Date.now(), text });
+  return text;
+}
+
+/**
+ * Writes expected-schema.json into a [DB] ticket's folder. Returns what README.md says about it,
+ * or null for a ticket that is not a database migration. Never the reason a pull fails: a package
+ * without the DDL, or a file that will not read, is said in README.md instead.
+ */
+async function writeExpectedSchema(client, wp, touches, folder, release) {
+  const ticket = databaseTicket(wp, touches);
+  if (!ticket) return null;
+  try {
+    const backend = await client.layer('backend');
+    const files = (backend?.migrations?.files ?? []).map((f) => f.name);
+    const where = backend?.migrations?.tables ?? {};
+    const dbOf = (t) => String(where[ident(t)]?.file ?? '').split('/')[0] || null;
+    const database = ticket.database ?? ticket.tables.map(dbOf).find(Boolean) ?? 'tenant';
+    // The files that create these tables, and every later file of that database that can change one.
+    const creating = new Set(ticket.tables.map((t) => where[ident(t)]?.file).filter((f) => f?.startsWith(`${database}/`)));
+    const wanted = files.filter((f) => {
+      const [db, base] = f.split('/');
+      if (db !== database || !base) return false;
+      return creating.has(f) || Number(/^(\d+)-/.exec(base)?.[1] ?? -1) >= 900 || /^V\d+/i.test(base);
+    });
+    const texts = [];
+    for (const f of wanted) {
+      const text = await packageText(client, `backend/${f}`);
+      if (text === null) throw new Error(`backend/${f} would not read`);
+      texts.push({ name: f.split('/')[1], text });
+    }
+    if (!texts.length) throw new Error(`no DDL for ${database} in this package`);
+    const model = schemaModel(texts);
+    const body = expectedSchema(model, ticket.tables, {
+      database, migration: ticket.migration, sources: wanted.map((f) => `backend/${f}`), release: release?.current ?? null,
+    });
+    await writeFile(path.join(folder, 'expected-schema.json'), json(body));
+    return { ...ticket, database, written: true, tables: Object.keys(body.tables).length, absent: body.notInPackageDdl ?? [] };
+  } catch (error) {
+    return { ...ticket, written: false, error: error.message };
+  }
+}
+
+function databaseSection(db, key) {
+  if (!db) return '';
+  let out = '\n## Checking this migration\n\n';
+  if (!db.written) {
+    return `${out}The expected end state of the tables could not be written (${db.error}). Check them by hand `
+      + 'against `adam_table` and the package DDL, and say so in the comment.\n';
+  }
+  out += `The file is \`db/${db.database}/${db.migration}\`. [expected-schema.json](expected-schema.json) holds the `
+    + `end state of its ${db.tables} table${db.tables === 1 ? '' : 's'}, read from the package DDL.\n\n`
+    + '```\n'
+    + `node .claude/scripts/db-ticket.mjs ${key}\n`
+    + '```\n\n'
+    + 'It applies only this file to a copy of the database at the previous state, runs it a second time '
+    + '(which must change nothing), and compares the tables with expected-schema.json. **MATCH is the evidence '
+    + 'for done**: quote its result lines in the comment. A difference names the table and what differs; fix the '
+    + 'file and run it again. A foreign key "left for a later migration" is not a difference. Do not rebuild the '
+    + 'other migrations, and do not run `dotnet build` or `dotnet test` unless this ticket changes C#: the full '
+    + 'rebuild and the full suite run once a day and in the pipeline.\n\n'
+    + 'No `.claude/scripts/db-ticket.mjs` in this folder? Run ADAM\'s setup on it again: it adds the files that '
+    + 'are missing and changes nothing else.\n';
+  if (db.absent.length) {
+    out += `\nNot in the package DDL, so not checked: ${db.absent.map((t) => `\`${t}\``).join(', ')}.\n`;
+  }
+  return out;
+}
+
 async function pullOne(client, key, base, when) {
   const answer = await client.service(`/api/work-packages/${encodeURIComponent(key)}?${await scoped(client)}`);
   if (answer.status === 428) return { key, needsSetup: true, error: answer.data?.detail };
@@ -645,8 +1118,9 @@ async function pullOne(client, key, base, when) {
     ...(subtasks !== undefined ? { subtasks } : {}),
     ...(partOf ? { partOf } : {}),
   }));
+  const db = await writeExpectedSchema(client, wp, touches, folder, release);
   await writeFile(path.join(folder, 'README.md'),
-    ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf }));
+    ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf }, db));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
@@ -670,6 +1144,9 @@ async function pullOne(client, key, base, when) {
     ...(Array.isArray(subtasks) && subtasks.length ? { subtasks: subtasks.length } : {}),
     ...(subtasks === null ? { subtasks: 'could not be read' } : {}),
     ...(partOf?.key ? { partOf: partOf.key } : {}),
+    ...(db ? { database: db.written
+      ? { migration: `db/${db.database}/${db.migration}`, expected: path.join(folder, 'expected-schema.json'), tables: db.tables }
+      : { migration: db.migration, error: db.error } } : {}),
     ...(Array.isArray(changes) && changes.length ? { changeRequests: {
       total: changes.length,
       open: changes.filter((c) => c.status === 'open').map((c) => c.id),
@@ -1791,7 +2268,9 @@ export const TOOLS = [
       'Save a ticket and everything it is linked to as files in the working folder, under '
       + '.adam/work/<ticket>/: README.md (the ticket, its milestone and description, and a list of '
       + 'the files, then the comment thread, oldest first), ticket.json, one file per linked screen, journey, contract, table, service, '
-      + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. You are always on '
+      + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. A [DB] ticket whose '
+      + 'subject names its migration file also gets expected-schema.json, the end state of its tables from the '
+      + 'package DDL, which `node .claude/scripts/db-ticket.mjs <ticket>` compares a database with. You are always on '
       + 'the latest release: every pull serves the release ADAM serves now (r1, r2, …), and when that release is '
       + 'newer than the ticket\'s previous pull, README.md says what changed and spec-diff.md has the diffs. There '
       + 'is no release to choose and nothing to ask about it. README.md also lists, near the top, every change '
@@ -1857,6 +2336,11 @@ export const TOOLS = [
             + 'Read the "Blocked by" section of README.md. Do not build the blocked part and do not work around it: '
             + 'propose the ticket On hold naming the CR (adam_propose, applied only after the person says yes), then '
             + 'find the next ticket you can finish with adam_board only: "workable". ' + next;
+        }
+        if (one.database?.expected) {
+          next += ` A database ticket: write ${one.database.migration}, then check it with `
+            + `\`node .claude/scripts/db-ticket.mjs ${one.key}\` (README.md, "Checking this migration"). MATCH is the `
+            + 'evidence for done; no dotnet build or dotnet test unless the ticket changes C#.';
         }
         if (r?.current) {
           next += ' Older /ticket instructions that mention re-pinning are out of date: there is nothing to re-pin.';
