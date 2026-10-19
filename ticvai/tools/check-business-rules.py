@@ -60,6 +60,8 @@ And one rule per decision for the CRs of 18 October 2026 (class 9, "rules nobody
                    per legal entity, the next open period, and createPayment's two settings reads.
   BR-HOLD-LAPSE    (CR-169) a seat reservation names its hold and can be `sold`; `convertInventoryHold` moves the
                    envelope's units and states the lapsed-hold rule (unitsGone, nothing refunded automatically).
+  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) login's 401 carries attemptsRemaining, counted per
+                   submitted username known or not; its 409 says since when and on what; verifyMfaChallenge's 422 too.
 
 The step-up rule of `rejectShiftVariance` (CHG-RUL-014), and of `closeShift`, `acceptShiftVariance`,
 `withdrawFromDepositBox` and the 20 MFA step-ups (CHG-RUL-019, CHG-RUL-020), is held by `check-step-up.py`
@@ -403,12 +405,38 @@ def main() -> int:
          "convertInventoryHold does not state the lapsed-hold rule (units retaken, else unitsGone; no automatic refund)")
     need("BR-HOLD-LAPSE", "channel_envelope" in ct, "convertInventoryHold does not move the envelope's leased units")
 
+    # -------------------------------------------------------------- BR-LOGIN-ATTEMPTS (ADAM CR-170; CHG-CRA-009)
+    # Decided by Chinmay Parab on 19 October 2026, option D: the door says how many attempts are left on every 401,
+    # counted per submitted username so nothing reveals which usernames exist; the 409 says since when and on what.
+    idoc = load("contracts/spine/identity.yaml")
+    ids = (idoc.get("components") or {}).get("schemas") or {}
+
+    def ext(name, field):
+        sch = ids.get(name) or {}
+        return any(field in ((part or {}).get("properties") or {}) for part in sch.get("allOf") or [])
+
+    lg = op("login")[3]
+    r401 = text((lg.get("responses") or {}).get("401") or {})
+    need("BR-LOGIN-ATTEMPTS", "LoginDeniedProblem" in r401 and ext("LoginDeniedProblem", "attemptsRemaining"),
+         "login's 401 does not carry attemptsRemaining (LoginDeniedProblem)")
+    need("BR-LOGIN-ATTEMPTS", "whether or not a principal has it" in r401,
+         "login's 401 does not count attempts per submitted username, known or not")
+    need("BR-LOGIN-ATTEMPTS", "SessionHeldProblem" in text((lg.get("responses") or {}).get("409") or {})
+         and ext("SessionHeldProblem", "openedAt") and ext("SessionHeldProblem", "deviceLabel"),
+         "login's 409 does not say since when and on what (SessionHeldProblem openedAt, deviceLabel)")
+    need("BR-LOGIN-ATTEMPTS", "credential-locked" in text((lg.get("responses") or {}).get("429") or {}),
+         "login's lock is not 429 credential-locked")
+    vm = op("verifyMfaChallenge")[3]
+    need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" in text((vm.get("responses") or {}).get("422") or {})
+         and ext("MfaCodeInvalidProblem", "attemptsRemaining"),
+         "verifyMfaChallenge's 422 does not carry attemptsRemaining")
+
     errors["BR-PARSE"].extend(PARSE_ERRORS)
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
              "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
-             "BR-HOLD-LAPSE"]
+             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

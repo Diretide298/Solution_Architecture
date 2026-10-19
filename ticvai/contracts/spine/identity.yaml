@@ -550,30 +550,35 @@ paths:
           description: 'The username and credential do not match (`unauthenticated`; one answer for an unknown
             username and a wrong credential), or the principal signs in only through the tenant''s single sign-on
             (`sso-sign-in-required`, 14 October 2026, CHG-CRD-001): `detail` names the provider so the door can offer
-            `startSsoAuthorization`.'
+            `startSsoAuthorization`. **Every `unauthenticated` answer carries `attemptsRemaining`** (ADAM CR-170,
+            option D, decided 19 October 2026; CHG-CRA-009): the wrong attempts left before the lock, **counted per
+            submitted username whether or not a principal has it**, so an unknown username has its own counter and
+            its own lock and nothing in the answer reveals which usernames exist.'
           x-ticvai-problem-types:
           - unauthenticated
           - sso-sign-in-required
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/LoginDeniedProblem'
         '409':
           x-ticvai-problem-types: [session-active-elsewhere, workstation-in-use]
           description: 'An active session already exists for this principal on another device. Per §3.1.3
             the new login is refused. A supervisor with the SESSION_FORCE_LOGOUT permission may terminate
             the existing session. **The same holds on a till somebody else is signed in to**: the sign-in
             is refused until a supervisor ends the other session with `forceLogout`; signing in never ends
-            it (confirmed 28 September, audit R184).
+            it (confirmed 28 September, audit R184). **The answer says since when and on what**
+            (`SessionHeldProblem`: `openedAt` and `deviceLabel` of the session held; ADAM CR-170, CHG-CRA-009).
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/SessionHeldProblem'
         '429':
           description: 'The request budget is exceeded (`rate-limited`), or this principal''s password or PIN is
-            locked after too many wrong attempts (`credential-locked`, 14 October 2026, CHG-CRD-001):
+            locked after too many wrong attempts (`credential-locked`, 14 October 2026, CHG-CRD-001; an unknown
+            username is locked the same way after its own wrong attempts, ADAM CR-170, so the lock reveals nothing):
             `PrincipalCredential.lockedUntil` is in the future, and `Retry-After` says when it ends. The lock is
             temporary (`PasswordPolicy.lockoutMinutes`) and per method: a locked PIN leaves a password sign-in open.'
           x-ticvai-problem-types:
@@ -4165,12 +4170,12 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
           description: 'A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure
-            specified). The problem''s detail says how many attempts remain; the fifth wrong code is the `429`
-            below.'
+            specified). The problem''s detail says how many attempts remain, and **`attemptsRemaining` carries the
+            number** (ADAM CR-170, CHG-CRA-009); the fifth wrong code is the `429` below.'
           x-ticvai-problem-types: [mfa-code-invalid]
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/MfaCodeInvalidProblem' }
         '409':
           description: 'The challenge was already completed; a challenge is single-use, so ask for a new one. Nothing changes.'
           x-ticvai-problem-types: [mfa-challenge-already-verified]
@@ -10360,6 +10365,48 @@ components:
         deviceFingerprint:
           type: string
           maxLength: 256
+    LoginDeniedProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**`login`''s 401** (ADAM CR-170, option D, 19 October 2026; CHG-CRA-009): the shared Problem
+        and, on every `unauthenticated` answer, the wrong attempts left before the lock (`429 credential-locked`
+        with `Retry-After`), counted per submitted username whether or not a principal has it.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          attemptsRemaining:
+            type: integer
+            minimum: 0
+            description: Wrong attempts left for this username before it is locked. Present on every
+              `unauthenticated` answer, for a known and an unknown username alike.
+    SessionHeldProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**`login`''s 409** (ADAM CR-170, CHG-CRA-009): the session this person already holds, so the
+        door says since when and on what (PTR-001''s sessionHeld state).'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          openedAt:
+            type: string
+            format: date-time
+            description: When the held session was opened.
+          deviceLabel:
+            type: string
+            nullable: true
+            description: 'What the held session is on, as Identity''s own session register names it (a till''s
+              label, or the browser).'
+    MfaCodeInvalidProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**`verifyMfaChallenge`''s 422** (ADAM CR-170, CHG-CRA-009): the shared Problem and the wrong
+        codes left before the challenge locks (the `429`).'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          attemptsRemaining:
+            type: integer
+            minimum: 0
     LoginResponse:
       x-ticvai-persistence: none — computed
       allOf:

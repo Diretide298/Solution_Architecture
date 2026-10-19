@@ -235,7 +235,10 @@ screens:
         operation: login
         notes: 'Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184):
           the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end
-          it; signing in never ends the other session.'
+          it; signing in never ends the other session. **Bound** (ADAM CR-170, 19 October 2026; CHG-CRA-009):
+          the denied state''s attempts left is the 401''s `attemptsRemaining` (`LoginDeniedProblem`), its "try again"
+          time the 429''s `Retry-After`; the sessionHeld state''s "since when" and "where" are the 409''s `openedAt`
+          and `deviceLabel` (`SessionHeldProblem`). Nothing new shows.'
         provenance: contract identity.yaml POST /auth/login
       - kind: cardList
         label: Sign in with your organisation
@@ -377,7 +380,7 @@ screens:
   - operationId: verifyMfaChallenge
     contract: identity
     purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
-      step-up (audit R126 (6))
+      step-up (audit R126 (6)); a wrong code's 422 carries `attemptsRemaining` (ADAM CR-170)
     trigger: onAction
   - operationId: enrolMfaMethod
     contract: identity

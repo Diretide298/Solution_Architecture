@@ -1,0 +1,46 @@
+id: CHG-CRA-009
+date: '2026-10-19'
+source: cr
+kind: contract
+summary: 'login''s 401 unauthenticated carries attemptsRemaining on every answer, counted per submitted username whether
+  or not a principal has it; the lock stays 429 credential-locked with Retry-After; login''s 409 says since when and on
+  what (SessionHeldProblem); verifyMfaChallenge''s 422 carries attemptsRemaining. All additive; the client-approved
+  PTR-001 is bound to the new fields and does not change.'
+decision:
+  what: 'ADAM CR-170, option D, decided by Chinmay Parab on 19 October 2026 with the client-approved PTR-001
+    unchanged. contracts/spine/identity.yaml: LoginDeniedProblem (allOf Problem, attemptsRemaining) on login''s 401,
+    SessionHeldProblem (allOf Problem, openedAt, deviceLabel) on its 409, MfaCodeInvalidProblem (allOf Problem,
+    attemptsRemaining) on verifyMfaChallenge''s 422; the 401 and 429 texts say an unknown username has its own counter
+    and lock, so nothing reveals which usernames exist. screens/P10-partner-reseller-portal.yaml PTR-001: the Sign in
+    button''s notes and verifyMfaChallenge''s purpose bind the denied and sessionHeld states to the new fields (notes and
+    purposes are not visible content).'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'ADAM CR-170 (Surendra, #27785, PTR-001 login), answered 19 October 2026: the approved denied and sessionHeld
+  states promise attempts left and where and since when, and the contract carried neither.'
+keys_touched:
+  operations: [login, verifyMfaChallenge]
+  screens: [PTR-001]
+  schemas: [LoginDeniedProblem, SessionHeldProblem, MfaCodeInvalidProblem]
+  files:
+  - contracts/spine/identity.yaml
+  - screens/P10-partner-reseller-portal.yaml
+  - tools/check-business-rules.py
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses carry (class 8 of the 18 October triage)'
+tickets:
+  started: []
+  unstarted:
+  - 'PTR-001 (#27785, where the CR was raised) and the 82 tickets that link login or verifyMfaChallenge (r7 links:
+    one Ready for QA, APP-MOB-GST-042#build #30702, which gets a child task if it shows attempts; the rest New).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: CR-170
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Prevention: check-business-rules BR-LOGIN-ATTEMPTS (the four answers carry their fields; the per-username
+  count is stated), failing on r7 (origin/main 807a1c24) and passing after. check-approved-ui 0 new: PTR-001''s visible
+  content is unchanged. check-contract-compat: additive (a response shape gaining fields). Where the per-username
+  counters live is the backend''s (the contract says only that an unknown username has its own).'
