@@ -228,9 +228,9 @@ paths:
       - query: marketing-crm#messageTemplateVersionRecords
         route: service
         for: 'its read of marketing.message_template_version, Marketing''s data (CHG-MOD-001)'
-      - query: platform-ops#contentBlockRecords
+      - query: white-label#contentBlockRecords
         route: service
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
+        for: 'its read of whitelabel.content_block, WhiteLabel''s data (CHG-MOD-001; moved from control, R8 blocker IDENTITY-C59)'
       summary: Fill translation gaps with a first pass, for a human to edit
       description: |-
         BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps` reports content missing a version. What was absent is filling it.
@@ -239,8 +239,10 @@ paths:
 
         **Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
         lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
-        the block or template it is for (`control.content_block`, `marketing.message_template`), its job (`translationJobId`), the language, the proposed
-        text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
+        the block or template it is for (`whitelabel.content_block`, `marketing.message_template`), its job (`translationJobId`), the language, the proposed
+        text (its `targetKind`, `targetRef`, `locale`, `fieldPath` and `draftText` columns). The run itself is one
+        `ai.translation_job` row, `running` until it ends `completed` or `failed` (R8 blocker FOUNDATION-AI-C40). Nothing
+        outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
         operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
         content; `getTranslationProposals` reads the rows back by job.
       tags:
@@ -281,6 +283,10 @@ paths:
                   description: '**Terms that must not be translated** — a venue''s ride names, its brand,
                     its membership tiers. Without one, *Ladies Night* becomes a literal translation somebody
                     has to find and undo.
+
+                    **The glossary is the tenant AI policy''s `glossaryTerms`** (R8 blocker FOUNDATION-AI-C05, the
+                    lead''s answer of 20 October 2026), edited with `setAiPolicy`; every run applies it. This field is
+                    optional and kept for clients built before: any value, or none, means "the policy''s list".
 
                     '
       responses:
@@ -366,9 +372,9 @@ paths:
       - query: marketing-crm#messageTemplateRecords
         route: service
         for: 'its read of marketing.message_template, Marketing''s data (CHG-MOD-001)'
-      - query: platform-ops#contentBlockRecords
+      - query: white-label#contentBlockRecords
         route: service
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
+        for: 'its read of whitelabel.content_block, WhiteLabel''s data (CHG-MOD-001; moved from control, R8 blocker IDENTITY-C59)'
       - query: promotions#promotionRecords
         route: service
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
@@ -1969,6 +1975,14 @@ paths:
         and `mediaType` and are scoped to the caller like every other kind: an asset the caller could not open
         through `assets.searchMedia` is never returned.
 
+
+        **Which sources a kind searches** (R8 blocker ORDERS-MONEY-C37, the lead''s answer of 20 October 2026):
+        each index source declares the one search kind it feeds (`IndexSource.kind`), and a search over a kind
+        reads the entries of the active sources of that kind only; a result''s `kind` is its source''s. Six
+        kinds: `product` (products, membership products included), `entitlement`, `knowledge` (knowledge
+        collections and every document a tenant uploads), `faq`, `report` and `media`. A kind no active
+        source feeds returns no results, not an error. `membership` and `document` are no longer kinds.
+
         '
       tags:
       - retrieval
@@ -1999,8 +2013,6 @@ paths:
                     enum:
                     - product
                     - entitlement
-                    - membership
-                    - document
                     - knowledge
                     - faq
                     - report
@@ -2103,6 +2115,11 @@ paths:
       operationId: ingestKnowledgeDocument
       x-ticvai-consumed-by:
         - "P08 BO-798 Intent & Knowledge Management"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'the source asset''s status and extracted text (assets.media_asset.extracted_text): 404 unknown asset, 409
+          asset not ready (R8 blocker ORDERS-MONEY-C19)'
       x-ticvai-audience:
       - staff
       summary: Add a document
@@ -2126,6 +2143,12 @@ paths:
 
         Sending both, or naming a document in another collection or in a state the transition does
         not start from, is refused as a validation failure.
+
+        **The text comes from the asset** (R8 blocker ORDERS-MONEY-C19): the job reads `sourceAssetId`''s
+        `status` and `extractedText` through Assets'' `mediaAssetRecords` (service route) and chunks that
+        text. An asset that does not exist or the caller cannot see is 404 `asset-not-found`; one that is
+        `processing`, `quarantined` or `failed`, or has no extracted text, is 409 `asset-not-ready`, and
+        nothing is written.
 
         '
       tags:
@@ -2152,6 +2175,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KnowledgeDocument'
+        '404':
+          description: '`sourceAssetId` names no asset the caller can see (`asset-not-found`).'
+          x-ticvai-problem-types: [asset-not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The source asset is processing, quarantined or failed, or has no extracted text yet
+            (`asset-not-ready`). Nothing is written.
+          x-ticvai-problem-types: [asset-not-ready]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /generate/configuration:
@@ -18030,6 +18068,33 @@ components:
           default: true
           description: '**A refusal a rule can decide never reaches a model.** Cheaper, faster and more
             consistent than asking a model to refuse.'
+        glossaryTerms:
+          type: array
+          maxItems: 500
+          nullable: true
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: '**The tenant''s translation glossary** (R8 blocker FOUNDATION-AI-C05, the lead''s answer of 20
+            October 2026): terms `proposeTranslations` and `proposeContent` keep as they are (`keep`) or always
+            translate one way (`translateAs`, per locale). Held on the tenant row and written with `setAiPolicy`;
+            a venue row does not carry its own. Growing it from reviewers'' edits is not in Block A.'
+          items:
+            type: object
+            required: [term, rule]
+            properties:
+              term:
+                type: string
+                maxLength: 200
+              rule:
+                type: string
+                enum: [keep, translateAs]
+              translations:
+                type: object
+                nullable: true
+                additionalProperties:
+                  type: string
+                  maxLength: 200
+                description: For `translateAs`, the translation per locale (`ar`, `fr`, ...).
         suggestionProviders:
           allOf:
           - $ref: '#/components/schemas/SuggestionProviderAssignments'
@@ -18195,8 +18260,46 @@ components:
           format: uuid
           nullable: true
           readOnly: true
+          x-ticvai-references: ai.translation_job
           description: The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a
             job's rows by it. Null on every other proposal (CHG-RFM-004).
+        targetKind:
+          type: string
+          nullable: true
+          readOnly: true
+          enum:
+          - contentBlock
+          - productName
+          - emailTemplate
+          - messageTemplate
+          description: For a translation draft, what kind of thing it sits on (`TranslationProposals.drafts[].targetKind`);
+            null on every other proposal (R8 blocker FOUNDATION-AI-C40).
+        targetRef:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 200
+          description: For a translation draft, the id of the block, product or template it sits on (the path id of the
+            target's own write, e.g. a content block's `blockId`); null otherwise (R8 blocker FOUNDATION-AI-C40).
+        locale:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 20
+          description: For a translation draft, the language it is in (the job's `targetLocale`); null otherwise.
+        fieldPath:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 300
+          description: For a translation draft, where it goes inside the target, as a dotted path in the target's own
+            body (`TranslationProposals.drafts[].fieldPath`); null otherwise. Empty for a field that is not text.
+        draftText:
+          type: string
+          nullable: true
+          readOnly: true
+          description: For a translation draft, the proposed text; null otherwise. `payload` stays the request body of
+            the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40).
         kind:
           type: string
           enum:
@@ -18518,6 +18621,18 @@ components:
           - tenant
           - region
           - venue
+        kind:
+          type: string
+          nullable: true
+          enum:
+          - product
+          - entitlement
+          - knowledge
+          - faq
+          - report
+          - media
+          description: '**The `semanticSearch` kind this source feeds** (R8 blocker ORDERS-MONEY-C37). Set it on every
+            declaration: a source with no kind is indexed but no search kind reads it.'
         invalidatedBy:
           type: array
           description: 'Domain events that make an entry stale. `catalogue.product` names `catalogue.productPublished`,
@@ -18713,7 +18828,10 @@ components:
           - venue
         scopePath:
           type: string
-          readOnly: true
+          description: '**The node the collection belongs to** (R8 blocker ORDERS-MONEY-C36). Optional on create: the
+            scope path of a tenant, region or venue node whose depth matches `scopeLevel` (else 400), inside the
+            caller''s grants (else 403); left out, the caller''s own node at `scopeLevel`. Set once: an update
+            never moves a collection. Returned on every read.'
         documentCount:
           type: integer
           readOnly: true
@@ -18797,6 +18915,15 @@ components:
           format: uuid
         mimeType:
           type: string
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+          writeOnly: true
+          x-ticvai-persisted: false
+          description: 'A venue to narrow the document to (R8 blocker ORDERS-MONEY-C36): the document''s `scopePath`
+            becomes that venue''s path, which must be at or below the collection''s node (else 400). Left out, the
+            document takes the collection''s own path. Not stored apart from `scopePath`.'
         reingestDocumentId:
           type: string
           format: uuid
@@ -18842,8 +18969,8 @@ components:
           readOnly: true
           description: '**Added 29 September (AI design 3.1):** `ai.knowledge_document` had no policy, so
             neither did its chunks. Copied from the collection at ingestion, narrowed where the document
-            is venue-specific ("documents carry the scope they may be retrieved at"). `ai.chunk_embedding`
-            is scoped through this row.
+            is venue-specific ("documents carry the scope they may be retrieved at"): the venue the request''s
+            `venueId` names. `ai.chunk_embedding` is scoped through this row.
 
             '
     SearchResult:
@@ -18852,6 +18979,14 @@ components:
       properties:
         kind:
           type: string
+          enum:
+          - product
+          - entitlement
+          - knowledge
+          - faq
+          - report
+          - media
+          description: The search kind of the index source the result came from (`IndexSource.kind`).
         id:
           type: string
         title:
@@ -19230,6 +19365,59 @@ components:
         '
       items:
         $ref: '#/components/schemas/SuggestionProviderAssignment'
+    TranslationJob:
+      type: object
+      x-ticvai-persistence: ai.translation_job
+      description: '**One `proposeTranslations` run, as stored** (R8 blocker FOUNDATION-AI-C40, CHG-R8STO-003). Never
+        returned on its own: `getTranslationProposals` returns its `status` with the drafts, which are
+        `ai.proposed_action` rows carrying `translationJobId`. A provider failure ends the job `failed` with
+        `failureReason` and no drafts.'
+      required: [id, scopePath, targetLocale, scope, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005): the tenant the job ran for.'
+        targetLocale:
+          type: string
+          maxLength: 20
+        sourceLocale:
+          type: string
+          maxLength: 20
+          nullable: true
+          description: The language translated from; null means the tenant's default language.
+        scope:
+          type: string
+          enum:
+          - allGaps
+          - contentBlocks
+          - productNames
+          - emailTemplates
+          - messageTemplates
+        status:
+          type: string
+          enum:
+          - running
+          - completed
+          - failed
+        failureReason:
+          type: string
+          maxLength: 500
+          nullable: true
+        createdByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
     TranslationProposals:
       type: object
       x-ticvai-persistence: 'none — each draft is an ai.proposed_action row (one per block and language), applied to the block only when an operator saves it through the block''s own write (ADR-0020); CHG-FXC-004'

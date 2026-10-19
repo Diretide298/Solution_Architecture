@@ -1,0 +1,47 @@
+id: CHG-R8STO-004
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The lead''s answers on where data lives and who reads it reach the satellite contracts: content blocks
+  move to the tenant database as whitelabel.content_block, owned by WhiteLabel (its contentBlockRecords query moves
+  with it); maintenance, availability and the homepage are one per tenant while each venue in the picker carries its
+  own contact; a gift card is a bearer instrument any signed-in guest checks by code, with subjectId the registered
+  owner if any; entitlement usage and the near-limit flag are worked out by a stated rule (proposed, client to
+  correct); and a second add-on for the same module is refused.'
+decision:
+  what: 'R8 blocker causes IDENTITY-C59 (answer A), WHITE-C16 (answer A for status and layout, B for contact),
+    ORDERS-MONEY-C27 (answer A) and APPROVALS-TENANCY-C14 (answer A, proposed). Storage facts: ContentBlock
+    persistence whitelabel.content_block; GiftCard.subjectId nullable, key to pii.subject. TenantAppStatus.venues[]
+    gains contact; the venue''s contact is stored on tenancy VenueSettings (requested of the spine lanes).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (walk of the Sprint 1 and 2 tickets): IDENTITY-C59 (27782), WHITE-C16 (28335,
+  27888, 27889), ORDERS-MONEY-C27 (28309, 28311), APPROVALS-TENANCY-C14 (27807, 28383); the lead''s answers of 20
+  October 2026 (answers.json).'
+keys_touched:
+  operations: [listContentBlocks, createContentBlock, updateContentBlock, publishContentBlock, proposeTranslations,
+    proposeMarketingContent, getTenantAppStatus, getGiftCard, issueGiftCard, getEntitlementUsage, addLicenceAddOn]
+  schemas: [ContentBlock, TenantAppStatus, GiftCard, EntitlementUsage]
+  tables: [whitelabel.content_block, control.content_block, wallet.gift_card]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/subscription.yaml
+root_class: 'contract does not carry what the screen or ticket needs (r8 ticket walk)'
+tickets:
+  started: []
+  unstarted:
+  - '27782, 28335, 27888, 27889, 28309, 28311, 27807, 28383 (the walk that found the gaps)'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Needs other lanes: storage-core (the move of control.content_block in derive-schema-history, the contact
+  column on platform.venue_settings, a row-security mark so a signed-in guest reads a gift card by code); generators
+  (lineage of the content-block operations to whitelabel.content_block).'

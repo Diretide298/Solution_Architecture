@@ -335,6 +335,16 @@ paths:
         **Deletion is the only end of an asset's life (decided 28 September, audit
         STATE-MEDIA).** It removes the row rather than moving the asset to a state; `archived`
         and `quarantined` are both reversible through `updateMediaAsset`.
+
+
+        **In use means** (R8 blocker ORDERS-MONEY-C29) any `assets.media_usage` row for the asset, or the
+        asset being a media collection's cover. The other modules that keep an asset's id (AI's
+        configuration sources, history imports and layout drafts; maintenance incident media and work-order
+        attachments; seating sections; transport network imports; venue maps and their versions) record
+        that use as a `media_usage` row when they take the asset, so Assets reads no other module's data
+        to answer. Any use is 409 `in-use`, naming it. **Otherwise the delete removes, in one transaction**, the asset's `media_collection_member`, `asset_version`, `rendition`
+        and `media_fingerprint` rows and clears `media_upload.asset_id`; the stored files of every version
+        and their derivatives are removed from the asset store after the transaction commits.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -376,6 +386,15 @@ paths:
 
         Derivatives regenerate. The previous version is retained for rollback.
 
+        **Where the previous file is kept** (R8 blocker ORDERS-MONEY-C29): the replace writes one
+        `assets.asset_version` row for the file it replaces (its `storageKey`, `contentType`, `fileName`,
+        `sizeBytes`, `checksum`) with `isCurrent` false, and the new file becomes the current version; the
+        first replace of an asset also writes version 1 for the original, since `completeUpload` writes
+        none. The asset passes through `processing` (derivatives regenerating, scanned again) back to
+        `ready`; a flagged file goes to `quarantined`. A replace is allowed from `ready` and `archived`; in
+        any other status it is 409 `asset-not-replaceable`. No operation rolls a version back yet: only
+        the retention is defined here.
+
         **The fingerprint is recomputed with them**: the asset's one `assets.media_fingerprint` row
         is replaced by the processing job for the new file (decided 29 September, writers pass;
         DM4), so similarity and duplicate checks compare what is actually served.
@@ -410,8 +429,9 @@ paths:
             The upload cannot be used: it is a different kind — an image cannot replace a
             document (`kindMismatch`) — or the transfer never finished (`transferIncomplete`),
             the upload ticket expired (`uploadExpired`), or the stored file is larger than the
-            ticket allowed (`sizeExceeded`)
-          x-ticvai-problem-types: [kind-mismatch, transfer-incomplete, upload-expired, size-exceeded]
+            ticket allowed (`sizeExceeded`); or the asset is not `ready` or `archived`
+            (`assetNotReplaceable`, R8 blocker ORDERS-MONEY-C29)
+          x-ticvai-problem-types: [kind-mismatch, transfer-incomplete, upload-expired, size-exceeded, asset-not-replaceable]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
@@ -1646,6 +1666,18 @@ components:
           nullable: true
         isCurrent:
           type: boolean
+        storageKey:
+          type: string
+          nullable: true
+          writeOnly: true
+          maxLength: 500
+          description: 'Where this version''s file is kept in the asset store (R8 blocker ORDERS-MONEY-C29). Written by
+            `replaceMediaAsset` for the file it replaces, so the previous version stays retrievable; never returned.'
+        contentType:
+          type: string
+          nullable: true
+          maxLength: 200
+          description: The media type of this version's file (R8 blocker ORDERS-MONEY-C29).
         usageImpact:
           x-ticvai-persisted: false
           type: array
@@ -2095,6 +2127,14 @@ components:
         version: { type: integer }
         uploadedByPrincipalId: { type: string, format: uuid }
         createdAt: { type: string, format: date-time }
+        extractedText:
+          type: string
+          nullable: true
+          readOnly: true
+          description: '**The text pulled out of an uploaded document** (R8 blocker ORDERS-MONEY-C19): written by the
+            upload''s processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the
+            file is replaced, null for an image, video or audio file or while the asset is still processing. One
+            value per asset, so AI''s `ingestKnowledgeDocument` reads it through `mediaAssetRecords`.'
 
     MediaAssetDetail:
       x-ticvai-persistence: "assets.media_asset"
@@ -2150,7 +2190,9 @@ components:
       properties:
         extractedText:
           type: string
-          description: '**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.
+          description: '**Not written; read `MediaAsset.extractedText`** (R8 blocker ORDERS-MONEY-C19). Text pulled out of
+            an uploaded document belongs to the asset, not to one place it is used, and nothing could query it here.
+            Kept on the wire for clients built before; always absent.
 
             '
         id:
@@ -2219,7 +2261,7 @@ components:
           properties:
             refusedReason:
               type: string
-              enum: [transferIncomplete, uploadExpired, sizeExceeded, kindMismatch]
+              enum: [transferIncomplete, uploadExpired, sizeExceeded, kindMismatch, assetNotReplaceable]
             uploadId: { type: string, format: uuid }
             expectedKind:
               allOf:

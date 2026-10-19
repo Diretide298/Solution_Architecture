@@ -2069,6 +2069,12 @@ paths:
       description: 'A module or limit increase sold separately. Add-ons survive a plan change unless explicitly
         removed — a tenant who paid for something extra keeps it.
 
+        **One add-on per tenant and module at a time** (R8 blocker APPROVALS-TENANCY-C14): an add-on for a
+        `moduleKey` whose validity overlaps an add-on of the same tenant and module already in force is 409
+        `add-on-already-active` (change or remove that one instead); the check runs under a lock on the tenant''s
+        add-on rows, so two requests at once cannot both pass. A `moduleKey` that is not in the module listing
+        is 400.
+
         '
       tags:
       - licensing
@@ -2094,6 +2100,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LicencePosition'
+        '409':
+          description: An add-on for this module is already in force for the tenant over an overlapping period
+            (`add-on-already-active`). Nothing is written.
+          x-ticvai-problem-types: [add-on-already-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
@@ -2343,6 +2357,15 @@ paths:
       description: 'Promotion from shared to dedicated is a migration, not a setting. Returns a job to
         track; the cell keeps trading throughout and cuts over at the end.
 
+        **What it reads and does** (R8 blocker APPROVALS-TENANCY-C19, the lead''s answer of 20 October 2026). It
+        reads the cell (`control.cell`): an unknown cell is 404; its jurisdiction is the cell''s `countryCode`.
+        **Tier by jurisdiction**: `shared`, `dedicated` and `isolated` are available in every jurisdiction;
+        `clientHosted` only in the jurisdictions agreed with the client (the list is the client''s to supply, held
+        as platform configuration); anything else is 400 `tier-unavailable-in-jurisdiction`. The same tier as
+        the cell''s is 409 `tier-unchanged`. The job (`kind: tierMigration`, `targetTier` stored on it) moves the
+        cell''s tenants with `planTenantMigration` and `executeTenantMigration`; the cell is `migrating` while it
+        runs, `cell.tier` is set to `targetTier` at cutover, and `cell.kind` does not change.
+
         '
       tags:
       - cell
@@ -2379,6 +2402,15 @@ paths:
         '400':
           x-ticvai-problem-types: [tier-unavailable-in-jurisdiction]
           description: Target tier is unavailable in this jurisdiction
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [tier-unchanged]
+          description: The cell is already on the target tier (`tier-unchanged`). Nothing is scheduled.
           content:
             application/problem+json:
               schema:
@@ -17337,6 +17369,18 @@ components:
     EntitlementUsage:
       x-ticvai-persistence: none — aggregated from usage_record
       type: object
+      description: '**How each figure is worked out** (R8 blocker APPROVALS-TENANCY-C14; the lead''s answer of 20 October
+        2026: proposed, client to correct). `current`: for a stock metric (`venues`, `workstations`, `activeUsers`,
+        `devices`, `brandedApps`, `guestProfiles`, `storageGb`) the latest `control.usage_record` per venue, summed
+        over the tenant''s venues; for a flow metric (`aiTokens`, `apiCalls`, `transactions`) the sum of the records
+        in the contract''s current billing period. Rounded up to a whole number. `limit`: the plan''s
+        `control.plan_limit` for the metric (`aiTokens`: the plan''s `includedAiTokens`), plus every add-on limit in
+        force today (`validFrom` <= today <= `validTo` or no `validTo`), plus every unexpired capacity pack; null
+        when any of them is unlimited, and then `percentUsed`, `isNearLimit` and `isExceeded` are null, false and
+        false. `percentUsed` = current / limit x 100. `isNearLimit`: `percentUsed` at or above the lowest
+        `atPercentOfAllowance` of the enforcement policy''s `notify` thresholds, or 80 when it has none.
+        `isExceeded`: current above limit and the plan limit does not allow overage. `asAt`: the latest
+        `recordedAt` read.'
       required:
       - tenantId
       - metrics
@@ -18169,6 +18213,12 @@ components:
           - backup
           - restore
           - decommission
+        targetTier:
+          allOf:
+          - $ref: '#/components/schemas/CellTier'
+          nullable: true
+          description: For a `tierMigration` job, the tier the cell moves to at cutover (`updateCellTier`); null for
+            every other kind (R8 blocker APPROVALS-TENANCY-C19).
         status:
           type: string
           enum:
