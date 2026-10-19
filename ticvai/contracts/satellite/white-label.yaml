@@ -3770,6 +3770,41 @@ paths:
                 $ref: '#/components/schemas/Preview'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tenant-config/preview/{previewId}:
+    parameters:
+    - name: previewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getPreview
+      x-ticvai-audience:
+      - staff
+      summary: Read a preview while its link lives
+      description: '**A preview is read back by its id until it expires** (r8, IDENTITY-C63; the storage-sat lane''s
+        request). `createPreview` keeps it in Redis under `cache:preview:{tenantId}:{previewId}` until `expiresAt`,
+        not in a table; this answers it as created (its link and rendered outputs), so a reviewer who reloads the
+        page sees the same preview. After `expiresAt` it is gone: 404, and the screen offers to create a new one.'
+      tags:
+      - publishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The preview, as created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preview'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenant-config/validate:
     post:
       operationId: validateTenantConfig
