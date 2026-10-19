@@ -429,7 +429,8 @@ paths:
         Platform''s consumer has written the row**, whatever the answer''s `status` says: white-label shows a domain as connected when
         `verifyCustomDomain`, polling, finds it routed (`resolveTenantHost` on the host), never on this answer. **Whose host**:
         `tenantId` is sent in the body (no longer server-owned: the service token names only the calling cell),
-        and is refused `403` unless the tenant is one of that cell''s tenants (`control.cell_tenant`).
+        and is refused `403` unless the tenant is one of that cell''s tenants, as the tenant records it already reads say
+        (`subscription#tenantRecords`).
 
 
         **`hostname-taken` is decided twice**: here, as a quick refusal (`409`) when the host is already active for

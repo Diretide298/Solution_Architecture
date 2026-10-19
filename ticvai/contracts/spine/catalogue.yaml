@@ -4316,7 +4316,7 @@ paths:
         hold per sale, while it is online, as POS-003 does, and with the link down POS-003 refuses a timed-entry
         line on a contended capacity (its offline state) while the till keeps selling uncontended products
         offline. The lease size, scope, TTL and renewal of a standing lease are not set in r8, and nothing in
-        `OfflinePolicy` configures one.
+        tenancy''s offline settings configure one.
 
         '
       tags:

@@ -1413,6 +1413,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: grantDelegation
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the minor age, RegionSettings.minorAgeThreshold in platform.region_settings, Tenancy''s data (IDENTITY-C19; CHG-R8SPN-024)'
       x-ticvai-consumed-by:
         - "P02 GST-015 Memberships"
       security:
