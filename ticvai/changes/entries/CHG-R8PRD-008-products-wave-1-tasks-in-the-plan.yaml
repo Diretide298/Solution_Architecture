@@ -11,7 +11,7 @@ decision:
   what: 'docs/active/block-a-extra-tasks.json: epic PRODUCTS-W1 and tasks PRD-W1-DB (3 points, Hrushikant Patkar),
     PRD-W1-CATEGORIES-TAGS, PRD-W1-OWNER-FORMS, PRD-W1-SALE-PERMISSIONS (5 each, Sanket Keluskar), PRD-W1-FRAME (5),
     PRD-W1-LANGUAGES (3), PRD-W1-SALE-PERMISSIONS-UI (3) (Surendra, the plan''s name for Surendra Loke), each with a
-    Done when, in Block A (no `block`), the six build tasks waiting on PRD-W1-DB. The 17 wave 1 operations (as CHG-R8PRD-009 left them) are claimed
+    Done when, in Block A (no `block`), the six build tasks waiting on PRD-W1-DB. The 18 wave 1 operations (as CHG-R8PRD-009 and -010 left them, recordSaleOwnerAnswers included) are claimed
     in the `operations` of the task that builds them (two to four per task, each in one task), so the generator forms no
     back-end task for them; existing operations a task also uses and the tables stay in `builds`. They are not added to
     blockAOperations. To ship at the r8 tag after the 24-hour cooling-off
