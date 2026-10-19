@@ -5,13 +5,6 @@ suspendTenant and reactivateTenant raise their own approval request through appr
 (`x-ticvai-write-via`), so each writes `approvals.request` by that route; derive-lineage copies the route into
 `writeVia` but records no prose write, so both are set here (the pattern of tools/applied/xdw-routes-14-october.py).
 
-**The approval request is all either call writes** (fix round 3, lane-H review 2 I-2). The tenant row and the outbox
-row are written by Subscription's approval.granted consumer (events/approval-granted.yaml lists control.tenant and
-control.outbox), so `control.tenant`, `control.outbox` and `platform.outbox` are removed from the two calls' writes.
-derive-lineage never removes a write, and this script runs after it, so a derive cannot bring them back: the event
-file no longer names suspendTenant as an emitter, and nothing else derives them. Reads are left alone (both calls
-read the tenant for their 409s).
-
 Run after `python tools/derive-lineage.py --apply`; a second run changes nothing.
 
     python tools/applied/tenant-approval-19-october.py [--apply]
@@ -25,12 +18,8 @@ import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ROUTE = [{"table": "approvals.request", "operation": "createApprovalRequest"}]
-# Written by Subscription's approval.granted consumer, never by the two calls (ADAM CR-172, fix round 3).
-APPLIED_BY_THE_GRANT = {"control.tenant", "control.outbox", "platform.outbox"}
 WHY = ("19 October 2026: CHG-CRA-005 (ADAM CR-172): raises its own approval request through createApprovalRequest "
        "(writeVia); the change is applied on approval.granted")
-WHY3 = ("19 October 2026, fix round 3: the approval request is all the call writes; the tenant row and the outbox are "
-        "written by Subscription's approval.granted consumer")
 
 
 def apply(lin: dict) -> int:
@@ -39,12 +28,11 @@ def apply(lin: dict) -> int:
         e = lin.get(o)
         if e is None:
             raise SystemExit(f"{o} is not in the lineage (run tools/derive-lineage.py --apply first)")
-        writes = sorted((set(e.get("writes") or []) - APPLIED_BY_THE_GRANT) | {"approvals.request"})
+        writes = sorted(set(e.get("writes") or []) | {"approvals.request"})
         if writes != sorted(e.get("writes") or []) or e.get("writeVia") != ROUTE:
             e["writes"], e["writeVia"] = writes, ROUTE
-            for why in (WHY, WHY3):
-                if why not in str(e.get("fixNote") or ""):
-                    e["fixNote"] = (e["fixNote"] + "; " + why) if e.get("fixNote") else why
+            if WHY not in str(e.get("fixNote") or ""):
+                e["fixNote"] = (e["fixNote"] + "; " + WHY) if e.get("fixNote") else WHY
             n += 1
     return n
 

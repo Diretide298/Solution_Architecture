@@ -14837,7 +14837,9 @@
   ],
   "writes": [
    "approvals.request",
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.tenant",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -14885,7 +14887,7 @@
     "operation": "createApprovalRequest"
    }
   ],
-  "fixNote": "19 October 2026: CHG-CRA-005 (ADAM CR-172): raises its own approval request through createApprovalRequest (writeVia); the change is applied on approval.granted; 19 October 2026, fix round 3: the approval request is all the call writes; the tenant row and the outbox are written by Subscription's approval.granted consumer"
+  "fixNote": "19 October 2026: CHG-CRA-005 (ADAM CR-172): raises its own approval request through createApprovalRequest (writeVia); the change is applied on approval.granted"
  },
  "reactivateTenant": {
   "contract": "subscription",
@@ -14897,7 +14899,8 @@
   ],
   "writes": [
    "approvals.request",
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.tenant"
   ],
   "routing": "",
   "scope": "tenant",
@@ -14945,7 +14948,7 @@
     "operation": "createApprovalRequest"
    }
   ],
-  "fixNote": "19 October 2026: CHG-CRA-005 (ADAM CR-172): raises its own approval request through createApprovalRequest (writeVia); the change is applied on approval.granted; 19 October 2026, fix round 3: the approval request is all the call writes; the tenant row and the outbox are written by Subscription's approval.granted consumer"
+  "fixNote": "19 October 2026: CHG-CRA-005 (ADAM CR-172): raises its own approval request through createApprovalRequest (writeVia); the change is applied on approval.granted"
  },
  "terminateTenant": {
   "contract": "subscription",
