@@ -1552,6 +1552,8 @@ paths:
                 $ref: '#/components/schemas/TenantAppStatus'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+        '503':
+          $ref: '../shared/common.yaml#/components/responses/ServiceUnavailable'
     put:
       operationId: setMaintenanceMode
       x-ticvai-consumed-by:
@@ -2139,7 +2141,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Theme'
         '400':
-          description: A colour pair fails the contrast requirement. The response names the pairs
+          x-ticvai-problem-types: [contrast-insufficient]
+          description: A colour pair fails the contrast requirement (`contrast-insufficient`). The response names the pairs
           content:
             application/problem+json:
               schema:
@@ -3388,6 +3391,11 @@ paths:
       description: 'Shows which modules the tenant has licensed and which are enabled. A module that is
         not licensed cannot be enabled, so the two are returned together.
 
+        **`isLicensed` uses the map on `ModuleKey`** (common.yaml; R8 blocker fix, IDENTITY-C31): a feature here is
+        licensed when its `x-ticvai-licence-module` is in the tenant''s `LicencePosition.licensedModules`.
+        **A platform operator sends `X-Tenant-Id`** (`TenantId`; APPROVALS-TENANCY-C44) to read a tenant''s
+        enablement from the cell that holds many tenants; the cell address is `Tenant.cellHost`.
+
         '
       tags:
       - modules
@@ -3395,6 +3403,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       responses:
         '200':
           description: Modules
@@ -3427,7 +3437,10 @@ paths:
       - staff
       x-ticvai-config-scope: tenant
       summary: Enable or disable modules
-      description: 'A disabled module is **hidden from the guest app entirely** — not shown and refused.
+      description: 'A disabled module is **hidden from the guest app entirely** — not shown and refused. **Enabling one whose
+        licence module (`x-ticvai-licence-module`, the map on `ModuleKey` in common.yaml) the tenant does not hold is
+        refused** as "not licensed". A platform operator sends `X-Tenant-Id` (`TenantId`).
+
         Disabling one that navigation or the homepage references is rejected, with the references named
         so the tenant can clear them first.
 
@@ -3440,6 +3453,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       requestBody:
         required: true
         content:
@@ -8455,7 +8469,8 @@ components:
           description: |-
             **The patterns, fixed** (4 October 2026, CHG-FXC-009). One per target kind, under `baseUrl`:
             `product` `/p/{productId}`, `event` `/e/{eventId}`, `contentPage` `/c/{contentPageId}`, `module` `/m/{moduleKey}`,
-            `appSection` `/s/{appSection}`, `bookingFlow` `/book/{productId}` (optionally `?date=YYYY-MM-DD`). `externalUrl` and
+            `appSection` `/s/{appSection}`, `bookingFlow` `/book/{productId}` (optionally `?date=YYYY-MM-DD`),
+            `transferClaim` `/t/{transferId}?token={claimToken}` (opens `/general/ticket-transfer` in the app; ORDERS-MONEY-C12; to be confirmed before release, because a released pattern never changes). `externalUrl` and
             `none` have no pattern. Campaign tags are appended as `utm_*` query parameters. A released pattern never changes: a new
             target kind gets a new prefix, so a link a tenant printed keeps working. Where app links are enabled the same path opens
             the app (universal links and app links on the primary domain) and the storefront where the app is not installed;
@@ -10772,8 +10787,26 @@ components:
       - lostAndFound
       - map
       - visitPlanner
+      x-ticvai-licence-module:
+        ticketsAndBooking: ticketing
+        events: ticketing
+        attractions: ticketing
+        membership: membership
+        virtualQueue: queue
+        diningAndFnb: fnb
+        shop: retail
+        parking: access
+        gamification: games
+        loyalty: marketing
+        photoGallery: core
+        wallet: core
+        lostAndFound: core
+        map: core
+        visitPlanner: core
       description: '`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab
-        and WEB-050; off, the tab and the page are not shown.'
+        and WEB-050; off, the tab and the page are not shown. **`x-ticvai-licence-module` maps each feature to the
+        licence module (`ModuleKey` in common.yaml) that licenses it**, proposed from the screens'' `requiresModule`
+        and for the product owner to confirm; `core` is always licensed.'
     KioskAssignment:
       x-ticvai-persistence: whitelabel.kiosk_assignment
       type: object

@@ -17241,8 +17241,9 @@ components:
           description: |-
             Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.
 
-            **`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of
-            `white-label.ModuleEnablement.moduleKey`.
+            **`moduleKey` values are the licence modules of `ModuleKey` in common.yaml** (R8 blocker fix, IDENTITY-C31).
+            They are **not** the white-label app features of `white-label.ModuleEnablement.moduleKey`, a finer list;
+            common.yaml maps each feature to the licence module that licenses it, and a feature key is never listed here.
           items:
             type: object
             required:

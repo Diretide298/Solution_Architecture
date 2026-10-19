@@ -1,0 +1,37 @@
+id: CHG-R8SAT-002
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The satellite contracts carry what the spine lane''s fixes need: recordDeviceConsent passes the row''s scopePath
+  to the consent identifier; setTheme names contrast-insufficient; getTenantAppStatus can answer 503 with Retry-After;
+  white-label ModuleKey maps each feature to its licence module and the module enablement reads use it; LicencePosition
+  says its module keys are licence modules, not features; the deep-link scheme has a transferClaim pattern;
+  getModuleEnablement and setModuleEnablement take the X-Tenant-Id header; and listModifierGroups, listLoyaltyProgrammes
+  and listBadges take an optional venueId.'
+decision:
+  what: 'Additive contract text and parameters only, as requested in lane-spine-report.md (Requests for other lanes, Satellite). The ModuleKey map and the transferClaim prefix are proposals to be confirmed before release.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, r8 ticket walk of the Sprint 1 and 2 tickets (requests from the spine lane): IDENTITY-C02, IDENTITY-C31, IDENTITY-C32, WHITE-C09, ORDERS-MONEY-C12, APPROVALS-TENANCY-C44, GPS-C01.'
+keys_touched:
+  operations: [recordDeviceConsent, setTheme, getTenantAppStatus, getModuleEnablement, setModuleEnablement, listModifierGroups, listLoyaltyProgrammes, listBadges]
+  schemas: [ModuleKey, LicencePosition, DeepLinkScheme]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/fnb.yaml
+root_class: 'contract does not carry what the screen or ticket needs (r8 ticket walk)'
+tickets:
+  started: []
+  unstarted:
+  - 'Tickets named in the spine lane report for the causes above'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: none
+triage: blocker
+prevention:
+  type: none
+  reason: 'Each is a missing field, header or sentence found by the ticket walk; no single mechanical rule finds them.'
+status: open
+notes: 'Merged on fix/r8-integration with fix/r8-spine, where these resolve: common.yaml parameters/TenantId, responses/ServiceUnavailable, and the ModuleKey licence map. Nothing here is breaking.'
