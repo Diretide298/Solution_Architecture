@@ -539,6 +539,56 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /my/cases/{caseId}:
+    parameters:
+    - name: caseId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getMyCase
+      x-ticvai-consumed-by:
+        - "P02 GST-040 Help & Support"
+        - "P02 GST-068 Help & My Cases"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      summary: One case the guest raised, with its thread
+      description: '**How a guest opens a case** (r8 walk of ticket 27891). `listMyCases` returns the cases without
+        their messages and `getCase` needs `CASE_VIEW`, so a guest had no way to read the thread they were having.
+        This returns the case as `CaseDetail`: the description, the resolution note, and the messages.
+
+        **Scoped to the caller, not filtered by it** (`x-ticvai-self-scoped: subject`): a case the caller did not
+        raise answers 404, exactly as one that does not exist, as `replyToMyCase` does. **A guest never receives a
+        message with `isInternal: true`**; those are staff notes and are left out of `messages`, oldest first.
+
+        Read from the primary, because a reply the guest has just sent must be in the thread they read next.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The case with its guest-visible thread
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseDetail'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /my/cases/{caseId}/messages:
     parameters:
     - name: caseId
