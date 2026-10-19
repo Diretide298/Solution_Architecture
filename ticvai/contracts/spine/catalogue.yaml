@@ -4269,6 +4269,14 @@ paths:
         A `venueEdge` workstation acquires through its edge node, which holds the venue lease and sub-leases
         to terminals.
 
+        **No standing lease in Block A** (decided 20 October 2026, Chinmay, R8 blocker causes FOUNDATION-AI-C45 and
+        GPS-C37; CHG-R8SPN-033; ADR-0013 C103 stays open for later). A till does not pre-lease units of a contended
+        timed capacity to sell offline: **contended timed entry is sold online only at the till**. A till takes a
+        hold per sale, while it is online, as POS-003 does, and with the link down POS-003 refuses a timed-entry
+        line on a contended capacity (its offline state) while the till keeps selling uncontended products
+        offline. The lease size, scope, TTL and renewal of a standing lease are not set in r8, and nothing in
+        `OfflinePolicy` configures one.
+
         '
       tags:
       - lease

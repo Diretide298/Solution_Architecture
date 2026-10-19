@@ -6638,6 +6638,14 @@ paths:
         quarantined with it, so a void is never evaluated before its sale. **Only a transient failure stops the
         batch** (a database or provider error): `stoppedAtSequence` names it and the till retries from there.
         A bad sale therefore never halts the till.
+        **A sale made under a hold that expired before the till synced is accepted** (decided 20 October 2026,
+        Chinmay, R8 blocker cause FOUNDATION-AI-C46, option A; CHG-R8SPN-033), on the principle CR-169 set for an
+        online capture: the guest already has the product, so the entry is `accepted`, the units are taken again
+        if they are still free, and otherwise the entry carries `reconcilerFlag` `unitsGone` and the order goes to
+        the reconciliation queue; nothing is refunded or voided automatically. The till stops selling against a
+        hold a minute before its `expiresAt`, so this is rare; and since contended timed entry is online only at
+        the till in Block A (FOUNDATION-AI-C45), it arises only for a sale made online whose journal entry
+        reached the server late.
       x-ticvai-emits:
       - order.paid
       - sync.rejectionRaised
@@ -24420,6 +24428,13 @@ components:
                 nullable: true
                 description: For a `rejected` or `blockedByRejection` entry, the `sync.rejection` row it was
                   quarantined into (SD-028). The batch carried on past it.
+              reconcilerFlag:
+                type: string
+                nullable: true
+                description: '`unitsGone` on an `accepted` entry whose hold had expired before the sync and whose units
+                  were no longer free: the sale stands and the order is on the reconciliation queue, nothing refunded
+                  (FOUNDATION-AI-C46, CHG-R8SPN-033; as CR-169 for an online capture). Null otherwise. Plain text so
+                  a later flag adds no enum value.'
               error:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
     SyncRejection:

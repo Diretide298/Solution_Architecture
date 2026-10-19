@@ -1,0 +1,39 @@
+id: CHG-R8SPN-033
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'No standing offline lease in Block A: contended timed entry is sold online only at the till (a hold per sale, as
+  POS-003), offline the till still sells uncontended products; lease size, TTL and renewal are not set. A sale whose
+  hold expired before the till synced is accepted, the units retaken if free, otherwise the entry carries
+  reconcilerFlag unitsGone and the order goes to the reconciler; nothing is refunded automatically (as CR-169).'
+decision:
+  what: 'R8 blocker causes FOUNDATION-AI-C45 and GPS-C37 (lead answer for both: contended timed entry is online-only at
+    the till in Block A; offline still sells uncontended products; standing lease later) and FOUNDATION-AI-C46 (lead
+    answer: option A). catalogue.yaml acquireInventoryHold; orders.yaml syncOrders note and its result''s
+    reconcilerFlag (plain text, additive). ADR-0013 (C103 and the oversell row) and POS-003''s offline state are the
+    surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27706 OFFLINE-BUNDLE and 28165 (ADAM gaps 27706/1, 27706/2, 28165/1): the till
+  offline lease had no size, scope, TTL, renewal or lifecycle, and an offline sale under an expired hold had no
+  outcome. Finding: R8 blocker cause list, groups foundation-ai and guest-pos-screens.'
+keys_touched:
+  operations: [acquireInventoryHold, syncOrders]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/orders.yaml
+root_class: 'undecided rule: an offline behaviour the build needs is set nowhere'
+tickets:
+  started: []
+  unstarted:
+  - '27706 and 28165 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27706/1, 27706/2, 28165/1'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'The OFFLINE-BUNDLE done-when ''never oversells'' must read ''an oversell after an expired hold is accepted and
+  flagged for the reconciler'' (task text: surface lane / lead).'
