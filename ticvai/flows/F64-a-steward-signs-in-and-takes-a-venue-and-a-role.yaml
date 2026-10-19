@@ -68,7 +68,7 @@ exitStates:
   description: Signed in, role taken, checklist worked.
 - state: blockedAtMfa
   description: '**A separate exit because it is common and it is a venue process failure**, not a platform
-    one.'
+    one. It is reached when the person must use MFA and has no method enrolled: `login` answers 200 with `hasMfaMethod` false, EMP-001 shows its denied state with a message, and the person enrols once on the browser sign-in (ADM-001) or on their own phone (EMP-042) before trying again (r8, IDENTITY-C17).'
 notes: '**Written 24 August.** `EMP-001` and `EMP-002` declared `forceLogout`, `revokeAllSessions` and
   `listActiveSessions` — **session administration on a sign-in screen.** Bulk-attach residue, removed.
   `EMP-002` also declared `createRole`: a staff app that could invent its own authority.'

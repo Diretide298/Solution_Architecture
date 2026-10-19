@@ -81,15 +81,19 @@ screens:
       trigger: Selects venue and role
       provenance: flow F08 step 1→2, F64 step 1→2
   notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
-    the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
-    providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
-    in can never use (platform-foundation process notes). The sequence is the same on every staff and
-    partner door: credentials (or the organisation''s SSO) -> the authentication code only when a permission
-    demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing
-    sessions moved to the staff directory (BO-053); managing MFA methods stays on each app''s own security
-    or profile screen. On the handheld the role and venue prompt is EMP-002, which follows when several
-    roles or venues are held; one of each goes straight to EMP-003. Enrolling a method happens on EMP-042,
-    not at a shared device.'
+    the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO providers
+    with Force logout and Revoke all sessions on the door, which a person who is not yet signed in can never
+    use (platform-foundation process notes). The sequence is the same on every staff and partner door: credentials
+    (or the organisation''s SSO) -> the authentication code only when a permission demands it (R135) ->
+    the role prompt when several roles are held (ADR-0003) -> the landing. Managing sessions moved to the
+    staff directory (BO-053); managing MFA methods stays on each app''s own security or profile screen.
+    On the handheld the role and venue prompt is EMP-002, which follows when several roles or venues are
+    held; one of each goes straight to EMP-003. Enrolling a method happens on EMP-042, not at a shared device.
+    Build note (r8, IDENTITY-C17, decided by the lead 20 October 2026): a person who must use MFA but has
+    no method enrolled is refused at the door. `login` answers 200 with `hasMfaMethod` false; the handheld
+    shows the existing denied state with a message saying to enrol once on the browser sign-in (ADM-001)
+    or on their own phone (EMP-042), and flow F64 ends at `blockedAtMfa`. Nothing is enrolled on this screen:
+    no enrolment form is added.'
   density: comfortable
   pattern: form
   patternReason: 'A sign-in on a shared handheld: number and PIN, the venue''s SSO where it has one, the

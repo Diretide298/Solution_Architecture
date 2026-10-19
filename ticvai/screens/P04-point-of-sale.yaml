@@ -2127,19 +2127,23 @@ screens:
     - posSaleToPayment
   notes: 'Design: Park_POS_dc.html, "Aquarium Entry" timed entry. The demand indicator is a presentation
     of remaining capacity, not a separate field. **Authoring operations removed 24 August**: createProduct,
-    forceReleaseInventoryHold, setAlternativeCodes, setProductAttributes, transitionProductLifecycle,
-    updateProduct. **A till sells the catalogue; it does not author it.** These arrived in the 18 August
-    bulk attach — the same defect that put 21 of 39 review rows in one bucket — and a flow walking a ticket
-    sale is what surfaced them.
-
-
+    forceReleaseInventoryHold, setAlternativeCodes, setProductAttributes, transitionProductLifecycle, updateProduct.
+    **A till sells the catalogue; it does not author it.** These arrived in the 18 August bulk attach —
+    the same defect that put 21 of 39 review rows in one bucket — and a flow walking a ticket sale is what
+    surfaced them.
+  
+  
     **Drawn as a step of the POS-002 drawer, not a page** (the 3 August decision, kept by v2; design-notes
     correction ticketing-guest POS-003; CHG-SPO-015).
-
-
+  
+  
     **Built as step two of the POS-002 sale drawer (date, session and ticket quantities), not a page of
     its own: the plan''s default of 4 October 2026, carried by the tickets (block-a-extra-tasks.json screenNotes),
-    closing the 3 August question ''whether this survives as a screen'' (Chinmay to confirm)** (CHG-FXS-005)'
+    closing the 3 August question ''whether this survives as a screen'' (Chinmay to confirm)** (CHG-FXS-005)
+    Build note (r8, GPS-C12, decided by the lead 20 October 2026): POS-003 is the drawer step of POS-002,
+    not a page. Build the date and the session (calendar and available times) here. The quantities and Add
+    to cart belong to POS-002''s quantity step, where every variant arrives. Not built: the five back-office
+    tables, Resolve by code, and the inventoryHoldId deep link.'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them —

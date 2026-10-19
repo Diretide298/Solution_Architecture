@@ -8263,7 +8263,7 @@ screens:
 - id: GST-040
   name: Help & Support
   module: Engagement & Support
-  requiresModule: marketing
+  requiresModule: core
   wave: 1
   capability: C17
   implementation:
@@ -9959,25 +9959,28 @@ screens:
       - holdId
       - performanceId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
-    — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is
-    the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose
-    after three derivation attempts produced nonsense. **A board that says what it draws removes the guess
-    entirely.**
-
-
+    from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** —
+    `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is the
+    first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after
+    three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**
+  
+  
     **Rev 3 (decided 29 September).** Date and time inline or as a pop-up (REV3-4); view box always below
     on mobile (REV3-5, 23SEP-14); time bar (REV3-6); at most `VenueSettings.seating.maxSeatsPerGuestOrder`
     seats per booking (default 10, bounds 1-50; `422 seat-limit-exceeded` reads *Up to {maxSeats} seats
     per booking*) and the basket lists each seat (REV3-7); may render with GST-007 as one step (REV3-7);
-    fixture strip and a direct path from GST-004 (23SEP-16). A cabana map is GST-074, not this screen
-    (REV3-15). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`,
-    resolved for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
+    fixture strip and a direct path from GST-004 (23SEP-16). A cabana map is GST-074, not this screen (REV3-15).
+    Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved
+    for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
     entry laid over field by field (decided 29 September, rev 3 CFG-11).
-
-
+  
+  
     **29 September (W2).** Sections first, zoom into a section for seats, pinch out or *Whole map* back
-    to the full map; held seats are kept.'
+    to the full map; held seats are kept. Build note (r8, GPS-C03, decided by the lead 20 October 2026):
+    `recommendSeats` takes `partySize` from the guest in the Recommend seats overlay (a How many seats stepper,
+    capped by maxSeatsPerGuestOrder) with the preference best available or together. Tickets are chosen
+    after seats, so there is no ticket count to read. The stepper is new to an approved frame: raise it
+    with the client; until then default the stepper to 2.'
   density: comfortable
   boardFrames:
   - Seat Board 4.dc.html#seat-4a
@@ -10114,8 +10117,9 @@ screens:
   - id: formRecommendSeats
     component: modal
     trigger: Recommend seats
-    body: '**How many seats, and best available or together.** The party size is the tickets already chosen;
-      the guest only picks the preference, then `recommendSeats` places them.'
+    body: '**How many seats, and best available or together.** The guest sets the party size (a How many seats
+      stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats` places them.
+      Tickets are chosen after seats, so there are none to count yet.'
     bindsTo: SeatRecommendationRequest
     confirm:
       label: Recommend seats
