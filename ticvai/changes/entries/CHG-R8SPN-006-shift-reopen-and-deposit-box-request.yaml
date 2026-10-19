@@ -1,0 +1,42 @@
+id: CHG-R8SPN-006
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'reopenShift now answers 409 shift-already-open when another shift is open or suspended on the workstation,
+  keeps the reopen (reason, supervisor, time) as an orders.pos_shift_approval row of kind reopen, and says the first
+  close stays readable (the shift''s close columns stay until the next close, the first count stays in cash_count_line
+  by count_number). allocateDepositBox takes its own request, CreateDepositBoxRequest, which needs the cashier, the
+  venue and one of openingFloat or openingDenominations; DepositBox, the response, still has openingFloat.'
+decision:
+  what: 'R8 blocker fix lane spine, causes APPROVALS-TENANCY-C49 and APPROVALS-TENANCY-C25 (no decision pending).
+    contracts/spine/shift.yaml. The existing slug shift-already-open (as openShift) is used instead of the new name
+    shift-open-on-workstation in the cause. Adding reopen to the approvals kind enum is a response enum gain, which
+    check-contract-compat labels breaking until the lead lists it in docs/active/breaking-changes.yaml (request in the lane
+    report). orders.pos_shift_approval.kind is plain text with no CHECK in the delivered schema, so no migration is needed
+    unless the migrations lane adds one.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 tickets 27818 and 27794 on 19 October 2026 (ADAM gaps 27818/2, 27818/4, 27794/3):
+  reopenShift could leave two open shifts on one till and had nowhere to store the reopen; allocateDepositBox required a
+  total although a denomination count alone is accepted. Finding: R8 blocker cause list, group approvals-tenancy.'
+keys_touched:
+  operations: [reopenShift, allocateDepositBox]
+  schemas: [Shift, CreateDepositBoxRequest, DepositBox]
+  tables: [orders.pos_shift_approval, orders.deposit_box]
+  files:
+  - contracts/spine/shift.yaml
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started: []
+  unstarted:
+  - '27818 and 27794 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27818/2, 27818/4, 27794/3'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Prevention: check-contract-compat shows the enum gain and showed the first draft of the request split as 42
+  removed request fields; CreateDepositBoxRequest therefore declares every DepositBox property by reference.'

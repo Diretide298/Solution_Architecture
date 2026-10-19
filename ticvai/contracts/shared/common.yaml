@@ -26,6 +26,19 @@ info:
     tree with deny-overrides-allow, which scopes cannot express — so they live in `x-ticvai-permission`
     and `x-ticvai-scope-level` on each operation instead.
 
+    ## Guest app status (R8 blocker fix, WHITE-C09)
+
+    **One rule for every guest app and kiosk that reads `getTenantAppStatus`** (WEB-029, GST-047, KSK-014 and any
+    screen that shows a maintenance, upgrade, closed or sold-out page). **When it is read:** at launch, when the
+    app returns to the foreground, and when any other call answers `503`. **Which page wins, in this order:**
+    `minimumAppVersion` above the running version (forced upgrade), then `isInMaintenance` (maintenance), then
+    `availability` `closed`, then `availability` `soldOut`, then the normal screen: the first that holds is shown and
+    the rest are not. **Platform unavailable** means the status read itself answers `503` or times out. The client
+    then shows the last status and brand it kept (the read is offline-capable, so it keeps a copy) and, if it has
+    none, a neutral default brand and the generic wording; it retries after `Retry-After`. **Sold out** offers
+    one onward link, to choose another day (the date picker of the listing screen opened, no id carried). A
+    status page opened when nothing is wrong shows the Home screen instead.
+
     Components referenced by every TICVAI contract. Changes here are breaking changes to every consumer
     — treat accordingly.
 
@@ -52,6 +65,20 @@ components:
         '
       schema:
         type: string
+    TenantId:
+      name: X-Tenant-Id
+      in: header
+      required: false
+      description: '**Which tenant a call acts in, where one cell holds many tenant databases** (ADR-0038; R8 blocker fix,
+        APPROVALS-TENANCY-C44). Sent by a platform operator on the operations that open or read access into a tenant
+        (`openPlatformStaffGrant`, `listOwnPlatformStaffGrants`, `getModuleEnablement`, `setModuleEnablement`); the
+        cell opens the grant, or reads, in that tenant''s database and refuses a tenant it does not hold (`404`). The
+        cell''s address (`Tenant.cellHost`) comes from `listTenants`. A tenant''s own staff never send it: their token
+        names the tenant. Optional in the schema so an r1 client still validates; **a platform operator''s call without it
+        is `400 tenant-required`.**'
+      schema:
+        type: string
+        format: uuid
     IdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -310,13 +337,21 @@ components:
 
         '
       required:
-      - principalId
       - credential
       properties:
         principalId:
           type: string
           format: uuid
-          description: The supervisor signing. Recorded against the act.
+          description: The supervisor signing. Recorded against the act. **Exactly one of `principalId` or
+            `supervisorUsername`** is sent (neither, or both, is `400`; not in the schema as a oneOf, so an r1 client still validates).
+        supervisorUsername:
+          type: string
+          maxLength: 200
+          description: '**The supervisor''s employee number**, which is what the step-up prompt asks for (R8 blocker fix,
+            IDENTITY-C44). The server resolves it to the principal (`identity.principal.username`, within the tenant) before it
+            checks the PIN; an unknown one is refused exactly as a wrong PIN, `403 supervisor-step-up-refused`, so the prompt
+            does not reveal which employee numbers exist. The act is recorded against the resolved principal. Exactly one of
+            this or `principalId`.'
         credential:
           type: string
           maxLength: 512
@@ -369,6 +404,25 @@ components:
         is the defect this schema''s own first sentence warns against**, and `SalesChannel` above
         exists for the same reason. A `$ref` is checked by `check-package` rule 34; a mirror is
         checked by nothing, which is the position `ScopeLevel` below is in.
+
+        **The white-label app feature list (`white-label.ModuleKey`) is a different, finer vocabulary, and this is
+        the map between them** (R8 blocker fix, IDENTITY-C31; **proposed from the screens'' `requiresModule`, the
+        product owner confirms**). A feature is licensed when the licence module on its row is licensed, and
+        `getModuleEnablement` / `setModuleEnablement` use this for `isLicensed` and for the "not licensed" refusal:
+
+        | white-label feature | licence module here |
+        |---|---|
+        | `ticketsAndBooking`, `events`, `attractions` | `ticketing` |
+        | `membership` | `membership` |
+        | `virtualQueue` | `queue` |
+        | `diningAndFnb` | `fnb` |
+        | `shop` | `retail` |
+        | `parking` | `access` |
+        | `gamification` | `games` |
+        | `loyalty` | `marketing` |
+        | `photoGallery`, `wallet`, `lostAndFound`, `map`, `visitPlanner` | `core` (always licensed) |
+
+        The two lists are **not** the same, so a licence position (`LicencePosition`) never lists a feature key.
 
         '
       enum:

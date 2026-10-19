@@ -474,6 +474,12 @@ paths:
         **Returned as a tree, not a flat list with parent ids.** A merchandiser reading a hierarchy five
         levels deep should not have to reassemble it, and every caller that does will reassemble it differently.
 
+        **Whose tree, and what a guest sees** (R8 blocker fix, GPS-C01 and WHITE-C05). The tree is the venue''s:
+        `venueId` names it for a caller with no venue (a visitor, an app before sign-in), as `listProducts` does, and is
+        left out by a caller who acts at one. **A guest or visitor gets only active categories of `kind` `category`**
+        (not `brand`, `collection`, `season` or `department`), at every depth, unless the screen asks for a kind:
+        `kind` narrows the tree to that kind. Staff see every kind and the inactive ones, as before.
+
         '
       tags:
       - catalogue
@@ -486,6 +492,26 @@ paths:
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: kind
+        in: query
+        required: false
+        description: 'Only categories of this kind (`category`, `brand`, `collection`, `season` or `department`). A guest
+          or visitor who sends none gets `category` only; staff who send none get every kind.'
+        schema:
+          type: string
+          enum: [category, brand, collection, season, department]
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue to read, for a caller with no venue** (R8 blocker fix, GPS-C01 and WHITE-C05). A guest
+          with a credential, or staff, act at a venue already and may leave it out; a visitor with no credential, or an app
+          before sign-in, **must send it**, because nothing else says which venue''s data to return (a missing one is `400
+          venue-required`, an id that is not a venue of the tenant `400 unknown-venue`). With a credential it must be the
+          venue the caller acts at.'
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: The tree. The root categories in `displayOrder`, each carrying its `children`
@@ -496,6 +522,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductCategoryNode'
+        '400':
+          description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
+            (`unknown-venue`).'
+          x-ticvai-problem-types: [venue-required, unknown-venue]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
@@ -2580,6 +2614,17 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue to read, for a caller with no venue** (R8 blocker fix, GPS-C01 and WHITE-C05). A guest
+          with a credential, or staff, act at a venue already and may leave it out; a visitor with no credential, or an app
+          before sign-in, **must send it**, because nothing else says which venue''s data to return (a missing one is `400
+          venue-required`, an id that is not a venue of the tenant `400 unknown-venue`). With a credential it must be the
+          venue the caller acts at.'
+        schema:
+          type: string
+          format: uuid
       - name: kind
         in: query
         required: false
@@ -2604,6 +2649,14 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/GroupPackageDefinition'
+        '400':
+          description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
+            (`unknown-venue`).'
+          x-ticvai-problem-types: [venue-required, unknown-venue]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}:
@@ -3821,6 +3874,18 @@ paths:
 
         '
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue to read, for a caller with no venue** (R8 blocker fix, GPS-C01 and WHITE-C05). A guest
+          with a credential, or staff, act at a venue already and may leave it out; a visitor with no credential, or an app
+          before sign-in, **must send it**, because nothing else says which venue''s data to return (a missing one is `400
+          venue-required`, an id that is not a venue of the tenant `400 unknown-venue`). With a credential it must be the
+          venue the caller acts at.'
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Bundles, newest first
@@ -3830,6 +3895,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleSummary'
+        '400':
+          description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
+            (`unknown-venue`).'
+          x-ticvai-problem-types: [venue-required, unknown-venue]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -16469,6 +16542,18 @@ paths:
       - guest
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue to read, for a caller with no venue** (R8 blocker fix, GPS-C01 and WHITE-C05). A guest
+          with a credential, or staff, act at a venue already and may leave it out; a visitor with no credential, or an app
+          before sign-in, **must send it**, because nothing else says which venue''s data to return (a missing one is `400
+          venue-required`, an id that is not a venue of the tenant `400 unknown-venue`). With a credential it must be the
+          venue the caller acts at.'
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Programmes
@@ -16478,6 +16563,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CatalogueMembershipProgramme'
+        '400':
+          description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
+            (`unknown-venue`).'
+          x-ticvai-problem-types: [venue-required, unknown-venue]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /membership-programmes/{programId}:
@@ -16541,6 +16634,18 @@ paths:
       - guest
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue to read, for a caller with no venue** (R8 blocker fix, GPS-C01 and WHITE-C05). A guest
+          with a credential, or staff, act at a venue already and may leave it out; a visitor with no credential, or an app
+          before sign-in, **must send it**, because nothing else says which venue''s data to return (a missing one is `400
+          venue-required`, an id that is not a venue of the tenant `400 unknown-venue`). With a credential it must be the
+          venue the caller acts at.'
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Benefits
@@ -16550,6 +16655,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CatalogueMembershipBenefit'
+        '400':
+          description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
+            (`unknown-venue`).'
+          x-ticvai-problem-types: [venue-required, unknown-venue]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /membership-benefits/{benefitId}:

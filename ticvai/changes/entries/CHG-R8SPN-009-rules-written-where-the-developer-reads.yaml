@@ -1,0 +1,41 @@
+id: CHG-R8SPN-009
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'Four rules the tickets needed are now written where a developer reads them: the map from the white-label app
+  feature keys to the licence modules (proposed, product owner to confirm); the shape of the ticket-transfer claim link
+  (/t/{transferId}?token={claimToken} under the tenant base URL); how enrolFacePass tells a re-enrolment (an active Face Pass
+  on any pass) and what face-on-another-pass is; and what usableNow, upcoming, expired and all return from
+  listMyEntitlements against status, window and the venue''s time zone. Wording only.'
+decision:
+  what: 'R8 blocker fix lane spine, causes IDENTITY-C31, ORDERS-MONEY-C12, ORDERS-MONEY-C15 and WHITE-C08 (spine parts; no
+    decision pending). contracts/shared/common.yaml ModuleKey, contracts/spine/orders.yaml TicketTransfer.claimUrl,
+    contracts/spine/access.yaml enrolFacePass and listMyEntitlements. The white-label, subscription and screen parts are
+    other lanes'': requests in the lane report.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 tickets 27776, 28237, 28355 and 28335 on 19 October 2026 (ADAM gaps 27776/0, 28237/1,
+  28355/6, 28335/6, 28335/7): each was an undefined rule. Finding: R8 blocker cause list.'
+keys_touched:
+  operations: [enrolFacePass, listMyEntitlements, claimTicketTransfer, getModuleEnablement, setModuleEnablement]
+  schemas: [ModuleKey, TicketTransfer]
+  screens: [GST-001, GST-014, GST-069]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/access.yaml
+root_class: 'new: undefined-rule in contract text (class 12 undefined-rule)'
+tickets:
+  started: []
+  unstarted:
+  - '27776, 28237, 28355 and 28335 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27776/0, 28237/1, 28355/6, 28335/6, 28335/7'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'The ModuleKey map is a proposal from the screens'' requiresModule values; five features map to core and the product
+  owner confirms them.'

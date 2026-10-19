@@ -400,6 +400,13 @@ paths:
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       - name: state
         in: query
+        description: '**What each value returns** (R8 blocker fix, WHITE-C08), against the entitlement''s `status`
+          (`states/entitlement-status.yaml`), its `validFrom` and `validTo`, and **now in the venue''s time zone** (a null
+          `validTo` is open-ended). `usableNow`: `status` is `issued` or `partiallyConsumed` and now is inside
+          `validFrom`..`validTo`. `upcoming`: `status` is `issued` and `validFrom` is later than now (use it with the
+          entitlement''s `validFrom` date to find what starts later today). `expired`: `status` is `expired` or
+          `fullyConsumed`, or `validTo` has passed. `all`: every status, `cancelled` included. An entitlement can be in
+          none of the first three only when it is `cancelled`. The default is `usableNow`.'
         schema:
           type: string
           enum:
@@ -1063,6 +1070,12 @@ paths:
         are those of the facial-reader vendor the client has contracted, and the client names that vendor. Until then
         the template is carried as the vendor''s opaque format and nothing here depends on which one it is.
 
+
+        **How a caller knows it is a re-enrolment, and what the face-on-another-pass refusal is** (R8 blocker fix,
+        ORDERS-MONEY-C15). A subject who already has an active Face Pass **on any pass** is re-enrolling and must send
+        `reasonForReEnrollment` (missing: `422`); a guest screen tells this from `listMyEntitlements`, whose
+        `facePassEnrolmentId` is set when the subject has one, and shows the reason question only then. A face already
+        held by a **different** subject is `409 face-on-another-pass`, whoever asks.
 
         **Re-enrolment is recorded** (decided 29 September, writers pass): where the subject already has a Face Pass,
         the call writes one `access.face_reenrolment_attempt` (opaque capture references, never templates) and needs `reasonForReEnrollment`.

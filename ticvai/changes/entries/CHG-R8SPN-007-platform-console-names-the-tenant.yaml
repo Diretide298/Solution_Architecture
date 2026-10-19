@@ -1,0 +1,36 @@
+id: CHG-R8SPN-007
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'A platform operator''s grant calls now say which tenant they act in: a shared X-Tenant-Id header (optional in
+  the schema; a platform operator''s call without it is 400 tenant-required) on openPlatformStaffGrant and
+  listOwnPlatformStaffGrants, because one cell holds many tenant databases. Additive.'
+decision:
+  what: 'R8 blocker fix lane spine, cause APPROVALS-TENANCY-C44 (spine part; no decision pending). contracts/shared/common.yaml
+    parameter TenantId and contracts/spine/identity.yaml. Tenant.cellHost on listTenants (subscription.yaml), the same
+    header on getModuleEnablement and setModuleEnablement (white-label.yaml) and ADM-424''s apis are other lanes'': requests in
+    the lane report.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 ticket 27810 on 19 October 2026 (ADAM gap 27810/1): the grant body carries no tenantId and the
+  cell address is nowhere on the tenant, so ADM-424 could not address the picked tenant. Finding: R8 blocker cause list.'
+keys_touched:
+  operations: [openPlatformStaffGrant, listOwnPlatformStaffGrants]
+  screens: [ADM-424]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/identity.yaml
+root_class: 'new: operation needs a value nothing on the call supplies (class 14)'
+tickets:
+  started: []
+  unstarted:
+  - '27810 (the walk that found the gap).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gap 27810/1'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'No new check.'

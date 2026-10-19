@@ -1,0 +1,36 @@
+id: CHG-R8SPN-011
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'A first sign-in now has one order and one answer: while the credential is temporary the session may call
+  changeOwnCredential and logout; a successful change leaves the same session pending on the second factor when one is
+  required (enrolMfaMethod, verifyMfaEnrolment, createMfaChallenge, verifyMfaChallenge allowed), then the role; logout is
+  open to partners as well as staff; and getCurrentSession on a session that is not yet usable answers 409 session-pending
+  with the steps left. Additive.'
+decision:
+  what: 'Lead answers of 20 October 2026: IDENTITY-C03 option A (new credential first, then second factor, then role) and
+    IDENTITY-C04 option A (409 session-pending, no schema change). contracts/spine/identity.yaml. The allow-list in
+    states/operator-session.yaml is the screens lane''s file: request in the lane report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27758, 27773, 27786, 27750, 27755 and 27756 (ADAM gaps 27786/1, 27773/4, 27758/3,
+  27756/0, 27755/2, 27750/2), answered by the lead on 20 October 2026. Finding: R8 blocker cause list, group identity.'
+keys_touched:
+  operations: [getCurrentSession, logout, changeOwnCredential, login]
+  schemas: [SessionPendingProblem, LoginResponse]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started: []
+  unstarted:
+  - '27758, 27773, 27786, 27750, 27755 and 27756 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27786/1, 27773/4, 27758/3, 27756/0, 27755/2, 27750/2'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open
+notes: 'check-states holds the allow-list once states/operator-session.yaml carries it (screens lane).'

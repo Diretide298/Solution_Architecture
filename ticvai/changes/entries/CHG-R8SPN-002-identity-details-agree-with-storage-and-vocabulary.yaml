@@ -1,0 +1,43 @@
+id: CHG-R8SPN-002
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'Three Identity details now agree with their own storage and text: the default list of permissions that
+  need a second factor holds PLATFORM_AI_MANAGE, so it equals the floor it defines (every PLATFORM_* permission); the
+  session id a client lists and passes to forceLogout is said to be identity.session.id written as text, and the stored
+  token sid is set to the same value; and the device consent capture carries the decision''s scopePath, so Identity can
+  fill the NOT NULL scope_path without reading Marketing''s table. Additive.'
+decision:
+  what: 'R8 blocker fix lane spine, cause IDENTITY-C02 (no decision pending). contracts/spine/identity.yaml:
+    PasswordPolicy.mfaRequiredForPermissions default, ActiveSession.sessionId text, forceLogout path description,
+    ConsentIdentifierCapture.scopePath (required). ActiveSession.sessionId stays type string and does not become
+    format uuid: that is a response tightening the compat check flags as breaking against r1 (listActiveSessions,
+    listOwnSessions, endOwnSession), so it waits for an approved breaking change.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 tickets 27749, 27768 and 35697 on 19 October 2026 (ADAM gaps 27749/2, 27768/1,
+  35697/0): the contract contradicted its own storage or its own vocabulary, so the test of the 400 floor rule, the
+  list-then-take-over chain and the consent identifier insert could not be written. Finding: R8 blocker cause list,
+  group identity.'
+keys_touched:
+  operations: [setPasswordPolicy, listActiveSessions, forceLogout, recordConsentIdentifier]
+  schemas: [PasswordPolicy, ActiveSession, ConsentIdentifierCapture]
+  tables: [identity.session, pii.consent_identifier]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started: []
+  unstarted:
+  - '27749, 27768 and 35697 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27749/2, 27768/1, 35697/0'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Request to the satellite lane: marketing-crm.yaml recordDeviceConsent must send scopePath (its
+  marketing.device_consent.scope_path) in the ConsentIdentifierCapture body it posts to Identity. The sessionId
+  tightening to format uuid needs an approved breaking change; none is listed.'

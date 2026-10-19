@@ -21742,6 +21742,11 @@ components:
         claimUrl:
           type: string
           nullable: true
+          description: '**The link the recipient is sent** (R8 blocker fix, ORDERS-MONEY-C12). Built from the tenant''s
+            deep-link table (`white-label.DeepLinkScheme`), pattern `transferClaim`: the tenant''s `baseUrl` plus
+            `/t/{transferId}?token={claimToken}`. It opens the app on `/general/ticket-transfer` (GST-014) where the
+            app is installed, and the storefront claim page otherwise. Once released the pattern never changes, so
+            a link already sent keeps working.'
         claimToken:
           x-ticvai-secret: blind-index
           type: string

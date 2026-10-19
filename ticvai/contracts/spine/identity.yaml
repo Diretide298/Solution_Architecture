@@ -61,7 +61,7 @@ x-ticvai-queries:
   verifySupervisorStepUp:
     module: identity
     inputs:
-      principalId: uuid, the supervisor signing (SupervisorStepUp.principalId)
+      principalId: uuid, the supervisor signing (SupervisorStepUp.principalId); or supervisorUsername (SupervisorStepUp.supervisorUsername, the employee number), exactly one of the two, resolved to the principal here
       credential: string, the supervisor's PIN (SupervisorStepUp.credential); compared, never stored or logged
       permission: Permission, the asking operation's x-ticvai-permission (contracts/shared/permissions.yaml)
       scopePath: ltree, the scope the asking operation acts at (its venue or workstation)
@@ -476,6 +476,13 @@ paths:
   /auth/login:
     post:
       operationId: login
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
@@ -606,7 +613,15 @@ paths:
       - guestAuth: []
       - {}
       summary: Send a verification link, or consume one
-      description: '**Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
+      description: '**Two ways to prove the address, one operation** (R8 blocker fix, IDENTITY-C38). The approved screens
+        (WEB-013, GST-010, GST-073) ask for a **six-digit code**, so `mode` `code` takes it in `code`: checked against the
+        guest''s `identity.otp_challenge` row with purpose `emailVerification` and channel `email`, within the venue''s attempt
+        limit (`VenueSettings.identity.guestOtpMaxAttempts`); a wrong code is `422 email-code-invalid` with
+        `attemptsRemaining`, as `verifyMfaChallenge` answers, and the last wrong one voids the code (`410
+        verification-token-expired`; ask for a new `send`). The session is the guest''s own (`guestAuth`), so the code needs no
+        address. The link path (`send` an emailed single-use link, `confirm` its `token`) stays for emailed links.
+
+        **Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
         the address on it — and **a guest account with an unverified email can receive somebody else''s
         tickets**, because a transfer is offered to an address.
 
@@ -679,6 +694,12 @@ paths:
                   enum:
                   - send
                   - confirm
+                  - code
+                code:
+                  type: string
+                  nullable: true
+                  pattern: '^[0-9]{6}$'
+                  description: For `code`. The six digits emailed by `send` or by `registerGuest` with channel `email`.
                 token:
                   type: string
                   nullable: true
@@ -707,6 +728,12 @@ paths:
                     type: string
                     format: date-time
                     nullable: true
+        '422':
+          description: 'A wrong code (`mode` `code`), attempts one up to the limit; `attemptsRemaining` says how many are left.'
+          x-ticvai-problem-types: [email-code-invalid]
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/MfaCodeInvalidProblem' }
         '410':
           x-ticvai-problem-types: [verification-token-expired, verification-token-used]
           description: '**The token expired or was already used.** Distinct from an invalid one — a guest
@@ -1480,6 +1507,13 @@ paths:
   /auth/select-role:
     post:
       operationId: selectRole
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P04 POS-001 Begin Shift"
@@ -1717,6 +1751,7 @@ paths:
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
+      - partner
       tags:
       - identity
       security:
@@ -1786,6 +1821,7 @@ paths:
       - name: sessionId
         in: path
         required: true
+        description: The `sessionId` of an `ActiveSession` from `listActiveSessions` (the session's `identity.session.id`).
         schema:
           type: string
           format: uuid
@@ -1795,13 +1831,15 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-              - reason
               properties:
                 reason:
                   type: string
                   minLength: 3
                   maxLength: 500
+                  default: supervisor-takeover
+                  description: 'Why the session is ended. **Optional (R8 blocker fix, IDENTITY-C44): the POS-000 door sends none,
+                    and the server records `supervisor-takeover`** when the call comes from the door with a supervisor step-up.
+                    BO-053 still sends one.'
                 workstationId:
                   type: string
                   format: uuid
@@ -1871,6 +1909,13 @@ paths:
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       summary: Current session and effective permissions
+      description: '**A session that is not yet usable answers `409 session-pending`** (R8 blocker fix, IDENTITY-C04, lead
+        answer A of 20 October 2026). While a role has not been chosen, a credential change is required, or a second factor
+        is required, there is no `Session` to return (`roleId` and the permissions do not exist yet), so the answer is a `409`
+        problem with `pending`, a list of the steps still to do, in order, from `credentialChange`, `mfa`, `roleSelection`.
+        `Session.roleId` stays required: no schema change. EMP-002''s context panel and POS-000''s background read treat the
+        `409` as "not yet" and render once `selectRole` returns its `Session`. `LoginResponse.session` is present only
+        when no step is pending.'
       responses:
         '200':
           description: Active session
@@ -1878,6 +1923,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Session'
+        '409':
+          description: The session is pending (`session-pending`); `pending` names the steps left.
+          x-ticvai-problem-types: [session-pending]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SessionPendingProblem'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '429':
@@ -2722,6 +2774,10 @@ paths:
   /auth/guest/register:
     post:
       operationId: registerGuest
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-013 Booking Confirmation"
         - "P01 WEB-016 Login / Register"
@@ -2736,6 +2792,12 @@ paths:
         is verified or has proved the contact by code. The full rule, including per-site guest checkout,
         is on `verifyGuestEmail` (decided 17 September 2026; gate moved to checkout by ADR-0045, 18
         September 2026).
+
+        **With `channel` `email` it sends the six-digit code** the approved screens ask for (R8 blocker fix,
+        IDENTITY-C38): an `identity.otp_challenge` row with purpose `emailVerification`, channel `email`, and the venue''s
+        attempt limit, which the guest enters through `verifyGuestEmail` with `mode` `code`. The `GuestSession` returned
+        here is the session the guest continues in; it becomes verified when the code is confirmed, and
+        `linkGuestCheckout` then runs under that same session.
 
         '
       tags:
@@ -2778,6 +2840,10 @@ paths:
   /auth/guest/otp:
     post:
       operationId: requestGuestOtp
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -2852,6 +2918,10 @@ paths:
   /auth/guest/otp/verify:
     post:
       operationId: verifyGuestOtp
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -2921,6 +2991,10 @@ paths:
   /auth/guest/password:
     post:
       operationId: guestPasswordLogin
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -3020,6 +3094,10 @@ paths:
   /auth/guest/social:
     post:
       operationId: guestSocialLogin
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -3089,6 +3167,10 @@ paths:
   /auth/guest/uae-pass:
     post:
       operationId: guestUaePassLogin
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -3161,6 +3243,10 @@ paths:
   /auth/guest/session:
     get:
       operationId: getGuestSession
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -3510,6 +3596,13 @@ paths:
         format: uuid
     post:
       operationId: completeSsoAuthorization
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       x-ticvai-consumed-by:
         - "P06 EMP-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
@@ -3651,6 +3744,10 @@ paths:
   /auth/mfa/methods:
     get:
       operationId: listMfaMethods
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
@@ -3694,10 +3791,23 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MfaMethod'
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue). For `listMfaMethods` it is also the signal GST-073 hides its security section on.
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: enrolMfaMethod
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
@@ -3803,6 +3913,10 @@ paths:
         format: uuid
     post:
       operationId: verifyMfaEnrolment
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
@@ -3875,6 +3989,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: removeMfaMethod
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P06 EMP-042 Profile"
         - "P09 ADM-699 My Account & Security"
@@ -3919,6 +4037,15 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue). For `listMfaMethods` it is also the signal GST-073 hides its security section on.
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           x-ticvai-problem-types: [last-required-mfa-method]
           description: Last remaining method of a principal who holds a permission that requires MFA
@@ -3932,6 +4059,10 @@ paths:
   /auth/mfa/challenge:
     post:
       operationId: createMfaChallenge
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -4044,8 +4175,49 @@ paths:
                   expiresAt:
                     type: string
                     format: date-time
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue). For `listMfaMethods` it is also the signal GST-073 hides its security section on.
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: A guest who signed in with an email code asks for `emailOtp` as the second factor, because the same inbox
+            twice is one factor (R8 blocker fix, IDENTITY-C18).
+          x-ticvai-problem-types:
+          - email-otp-not-second-factor
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The `methodId` names a method that is pending or inactive, or the principal has no active method
+            to challenge.
+          x-ticvai-problem-types:
+          - mfa-method-not-usable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+          description: '**Step-up is locked** (audit R126 (6)): five wrong codes voided a challenge, and no new one is issued to
+            this principal until `voidedAt` plus `PasswordPolicy.lockoutMinutes`. `Retry-After` says how long. Also the
+            shared rate limit.
+
+            '
+          x-ticvai-problem-types:
+          - rate-limited
+          - step-up-locked
+          headers:
+            Retry-After:
+              $ref: '../shared/common.yaml#/components/headers/RetryAfter'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /auth/mfa/challenge/{challengeId}/verify:
     parameters:
     - name: challengeId
@@ -4235,6 +4407,9 @@ paths:
       x-ticvai-permission: SESSION_FORCE_LOGOUT
       x-ticvai-step-up: pin
       x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in the X-Supervisor-Principal-Id and X-Supervisor-Pin headers is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
@@ -4256,6 +4431,15 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: X-Supervisor-Username
+        in: header
+        required: false
+        description: With no session (POS-000), the supervisor's employee number, **instead of** `X-Supervisor-Principal-Id`
+          (exactly one of the two; R8 blocker fix, IDENTITY-C44). Resolved as `SupervisorStepUp.supervisorUsername` is. Ignored
+          with a session.
+        schema:
+          type: string
+          maxLength: 200
       - name: X-Supervisor-Pin
         in: header
         required: false
@@ -5308,6 +5492,7 @@ paths:
       x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Opens a platform operator's access into a tenant's data.
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -5498,6 +5683,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       - name: activeOnly
         in: query
         description: True returns only grants whose window is open now.
@@ -6923,10 +7109,17 @@ components:
       required:
       - deviceConsentId
       - capturedAt
+      - scopePath
       properties:
         deviceConsentId:
           type: string
           format: uuid
+        scopePath:
+          type: string
+          description: '**The decision''s scope path** (R8 blocker fix, IDENTITY-C02; `pii.consent_identifier.scope_path`
+            is NOT NULL and under row-level security). Sent by `marketing-crm.recordDeviceConsent`, which holds it as
+            `marketing.device_consent.scope_path`; Identity may not read that table across deployables and so takes it
+            from the caller, refusing a path outside the caller''s scope.'
         ipAddress:
           type: string
           maxLength: 45
@@ -9183,6 +9376,7 @@ components:
           - PLATFORM_RELEASE_PROMOTE
           - PLATFORM_MIGRATION_VIEW
           - PLATFORM_MIGRATION_APPLY
+          - PLATFORM_AI_MANAGE
     SegregationViolation:
       type: object
       x-ticvai-persistence: none — computed from identity.grant against identity.segregation_rule
@@ -9806,6 +10000,12 @@ components:
             rather than an absence.
         sessionId:
           type: string
+          description: '**The session''s `identity.session.id`, written as text, and the key `forceLogout` takes in its
+            path** (R8 blocker fix, IDENTITY-C02). A client lists sessions, picks one and passes this value as `sessionId`;
+            nothing else names a session on the wire. The server opens a session with `session_id` set to its `id` as text,
+            so the stored `session_id` (the token''s `sid`) and the id are one value and a lookup by either finds the row.
+            It stays `type: string` here so a client built at r1 still validates; it is always a uuid, as `Session.sessionId`
+            declares.'
         principalId:
           type: string
           format: uuid
@@ -10396,6 +10596,20 @@ components:
             nullable: true
             description: 'What the held session is on, as Identity''s own session register names it (a till''s
               label, or the browser).'
+    SessionPendingProblem:
+      x-ticvai-persistence: none — error shape
+      description: '`getCurrentSession`''s 409 (IDENTITY-C04): the shared Problem and the steps the session still has to do.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required: [pending]
+        properties:
+          pending:
+            type: array
+            description: The steps left, in the order they are done.
+            items:
+              type: string
+              enum: [credentialChange, mfa, roleSelection]
     MfaCodeInvalidProblem:
       x-ticvai-persistence: none — error shape
       description: '**`verifyMfaChallenge`''s 422** (ADAM CR-170, CHG-CRA-009): the shared Problem and the wrong
@@ -10421,7 +10635,10 @@ components:
             type: boolean
             description: '**The credential just used is temporary** (14 October 2026, CHG-CRD-001, ADAM CR-078): the
               principal''s `Principal.mustChangeCredential`, set at creation and by `resetPrincipalCredential`. While it is
-              true the session may call `changeOwnCredential` and `logout` and nothing else; the door asks for the new
+              true the session may call `changeOwnCredential` and `logout` and nothing else; **a successful `changeOwnCredential`
+              leaves the same session pending on the second factor when `requiresMfa`, and then `enrolMfaMethod`,
+              `verifyMfaEnrolment`, `createMfaChallenge` and `verifyMfaChallenge` are allowed, then role selection** (R8 blocker fix,
+              IDENTITY-C03, lead answer A: new credential first, then the second factor, then the role); the door asks for the new
               password or PIN (ADM-001, SUP-001, PTR-001, EMP-001, SCN-001, POS-000) before the role prompt and the landing.
               A successful `changeOwnCredential` clears it. Always false for a single sign-on principal.'
           requiresRoleSelection:

@@ -1,0 +1,33 @@
+id: CHG-R8SPN-008
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'createMfaChallenge, listMfaMethods and removeMfaMethod now declare the refusals their text described: 403
+  guest-two-step-disabled (on listMfaMethods it is also the signal GST-073 hides its security section on), 409
+  email-otp-not-second-factor, 422 mfa-method-not-usable and 429 step-up-locked with Retry-After. Additive.'
+decision:
+  what: 'R8 blocker fix lane spine, cause IDENTITY-C18 (no decision pending). contracts/spine/identity.yaml. The 409 slug
+    name is chosen here (the cause named the case, not the slug).'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 ticket 27729 on 19 October 2026 (ADAM gap 27729/2; screen half of 27746/0): the
+  refusals sat in prose only. Finding: R8 blocker cause list, group identity.'
+keys_touched:
+  operations: [createMfaChallenge, listMfaMethods, removeMfaMethod]
+  screens: [GST-073]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started: []
+  unstarted:
+  - '27729 (the walk that found the gap).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gap 27729/2'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open
+notes: 'check-problem-types holds the ceiling at 117 and requires problem types on every new error response.'

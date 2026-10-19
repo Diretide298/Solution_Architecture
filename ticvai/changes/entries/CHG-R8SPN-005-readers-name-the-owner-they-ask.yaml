@@ -1,0 +1,44 @@
+id: CHG-R8SPN-005
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'Operations that decide on another module''s data now say which query they ask: the Identity operations that
+  read the venue''s two-step settings or the workstation and region settings (tenancy#venueSettingsRecords,
+  workstationRecords, regionSettingsRecords), the Approvals operations that read the principal and delegated access,
+  Tenancy''s device audit read of Access, and the shift open, close and reopen reads of Tenancy and Ledger. The
+  resubmit response says it writes one request and no escalation row. Declarations only.'
+decision:
+  what: 'R8 blocker fix lane spine, causes IDENTITY-C08 and the lineage lane''s contract requests (C03, C10, C20, C48 of
+    their lists); no decision pending. x-ticvai-read-via on the operations in contracts/spine/identity.yaml,
+    approvals.yaml, tenancy.yaml and shift.yaml; tools/derive-lineage.py --apply copies readVia into the lineage (lineage
+    lane). Not done here: white-label.yaml and subscription.yaml requests (satellite lane).'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 tickets 27728 and 27759 on 19 October 2026 (ADAM gaps 27759/1, 27728/4) and the lineage
+  lane report: ADR-0055 rule 2 and CR-096, a module that reads another module''s data names the query.'
+keys_touched:
+  operations: [createMfaChallenge, enrolMfaMethod, listMfaMethods, removeMfaMethod, verifyMfaEnrolment, requestGuestOtp,
+    verifyGuestOtp, registerGuest, getGuestSession, guestPasswordLogin, guestSocialLogin, guestUaePassLogin, login,
+    selectRole, completeSsoAuthorization, listActiveSessions, submitApprovalRequest, resubmitApprovalRequest,
+    assignApprovalRequest, decideApprovalRequest, listApprovalRequests, evaluateApprovalRequirement,
+    listDeviceAuditRecords, closeShift, openShift, reopenShift]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/shift.yaml
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started: []
+  unstarted:
+  - '27728 and 27759 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27759/1, 27728/4'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'check-cross-module-reads already compares the lineage readVia with the contract''s; it reports each operation
+  changed here as drifted until the lineage lane runs derive-lineage --apply.'
