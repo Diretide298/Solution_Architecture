@@ -61,7 +61,7 @@ tickets:
     index), MIG-PARTITIONS (the counter survives partitions). The kernel tickets PLATFORM-OUTBOX (27697),
     PLATFORM-KERNEL (27692), PLATFORM-FLAGS (27695) and the suspendTenant and reactivateTenant tickets are New in the
     r6 cache but their developers raised these CRs: the settlement comments reach their agents. 353 New in all.'
-release_tag: r7
+release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-152, CR-163, CR-164, CR-166, CR-172
 triage: blocker

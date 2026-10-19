@@ -35,7 +35,7 @@ tickets:
   started: []
   unstarted:
   - SETUP-SEED (27684, New in the r6 links cache; CR-159 was raised from it, so its agent gets the answer as a comment)
-release_tag: r7
+release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-159
 triage: fix-forward

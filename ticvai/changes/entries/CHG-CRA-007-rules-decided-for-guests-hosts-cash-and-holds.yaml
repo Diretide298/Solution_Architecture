@@ -59,7 +59,7 @@ tickets:
     sub-tasks for seat_reservation, channel_envelope, journal_entry, guest_profile. searchGuests (#30711),
     PLATFORM-KERNEL (#27692) and PLATFORM-SAGA-PAID (#27701), where the CRs were raised, get the answers as comments.
     202 New in all (impact file).'
-release_tag: r7
+release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-141, CR-162, CR-168, CR-169
 triage: blocker

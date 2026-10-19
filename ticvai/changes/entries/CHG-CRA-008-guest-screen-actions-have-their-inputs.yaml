@@ -36,7 +36,7 @@ tickets:
   unstarted:
   - 'APP-WEB-WEB-021 (28310) and the wallet feature AM-WALLET-CASHLESS-P01 (28308, where the CRs were raised): 19 New
     tickets link WEB-021 (impact file). No visible change, so no approved-UI entry.'
-release_tag: r7
+release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-142, CR-143
 triage: blocker

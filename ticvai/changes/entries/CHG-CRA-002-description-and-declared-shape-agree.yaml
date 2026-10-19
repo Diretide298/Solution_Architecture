@@ -55,7 +55,7 @@ tickets:
   unstarted:
   - 'SVC-ORDER-PAYMENTS-17 (setPaymentRules), SVC-IDENTITY-ADMINISTRATION-8 (createDelegatedAccess), APP-PARTNER-PTR-020,
     SETUP-SEED (27684: seeds the seven staff role grants with role_id and no permission); 214 New in all (impact file)'
-release_tag: r7
+release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-145, CR-146, CR-147, CR-151, CR-158
 triage: fix-forward
