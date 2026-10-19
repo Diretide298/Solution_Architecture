@@ -36,14 +36,15 @@ transitions:
   guard: Migration failed and rollback did not restore it
 - from: active
   to: suspended
-  operation: suspendTenant
   trigger: cascade
-  guard: Every tenant on the cell suspended
+  guard: Every tenant on the cell suspended. A tenant is suspended by Subscription's approval.granted consumer (or
+    the timer of states/tenant.yaml), not by suspendTenant, which only raises the approval request (ADAM CR-172,
+    fix round 3; CHG-CRA-005)
 - from: suspended
   to: active
-  operation: reactivateTenant
   trigger: cascade
-  guard: Reinstated
+  guard: Reinstated, when the approval.granted consumer applies a reactivation reactivateTenant asked for (ADAM
+    CR-172, fix round 3)
   isReversal: true
 - from: active
   to: decommissioning

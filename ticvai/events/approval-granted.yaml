@@ -69,9 +69,18 @@ consumers:
   purpose: Apply the decision to the partner record it was about (agreement, application, change request).
     decideApprovalRequest runs in commerce and the partner tables are in the control database, which
     PlatformService owns in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020). **And to a tenant**
-    (`subjectType` tenant; ADAM CR-172, 19 October 2026, CHG-CRA-005) - `attributes.action` suspend applies the
-    suspension raised by suspendTenant (now, or pending until its effectiveAt) and writes tenant.suspended to
-    control.outbox in the same transaction; reactivate moves the tenant to active or cancels its pending suspension
+    (`subjectType` tenant; ADAM CR-172, 19 October 2026, CHG-CRA-005; fix round 3). The payload names the tenant
+    (`subjectId`) and not the change, so the consumer reads the request back by `requestId` through
+    approvals#requestRecords (route service, the declared query Subscription already reads approvals.request
+    through) for its stored `attributes`, and reads the tenant from control.tenant. It then re-checks the tenant
+    and, in one transaction - `attributes.action` suspend applies the suspension suspendTenant raised (now, or
+    pending until its effectiveAt) and writes tenant.suspended to control.outbox; reactivate moves the tenant to
+    active or cancels its pending suspension. **Re-checked on arrival**, since the tenant may have moved while the
+    request was open. Already in the target state (suspended; or active with nothing pending) changes nothing and
+    is recorded as a no-op; a state that no longer allows the change (suspend - onboarding, terminating or
+    terminated, tenant-not-active; reactivate - terminated, tenant-terminated, or onboarding,
+    tenant-not-suspended) changes nothing and closes the request as not applied, with that reason. Both are
+    reported on the request's approved-action execution (succeeded with a note; failed with failureReason)
   writes:
   - control.partner_agreement
   - control.partner_application
