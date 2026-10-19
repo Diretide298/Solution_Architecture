@@ -1600,9 +1600,9 @@ paths:
                     properties:
                       lineId:
                         type: string
-                        format: uuid
-                        description: The order line's id (orders.order_line.id), from `order.paid` lines[].lineId. With
-                          orderId it is this consumer's per-line idempotency key (FOUNDATION-AI-C04).
+                        description: The order line's id (orders.order_line.id, a uuid as text; `format` is not added because
+                          that is a breaking change against r1), from `order.paid` lines[].lineId. With orderId it is this
+                          consumer's per-line idempotency key (FOUNDATION-AI-C04).
                       variantId:
                         type: string
                         format: uuid

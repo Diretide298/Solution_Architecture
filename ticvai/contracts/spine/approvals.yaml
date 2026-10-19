@@ -431,8 +431,16 @@ paths:
             (`currentStatus` says what it is), or `openRequestExists` where another request for the same
             subject went out while this one was a draft (`requestId` names it).
 
+            **Or the matrix in force now cannot route it** (decided 20 October 2026, Chinmay, R8 blocker cause
+            APPROVALS-TENANCY-C45, option A; CHG-R8SPN-016). No active rule matches the draft any more (a matrix
+            edit since it was saved): `approvalNoLongerRequired` (`approval-no-longer-required`); the draft stays a
+            draft and nothing is approved without an approver. A rule matches but none of its roles has a holder:
+            the rule''s `rerouteOnNoApprover` decides; true routes on to the next level, or to the out-of-office
+            delegate, and the submit succeeds; false is `noApproverAvailable` (`approval-no-approver-available`),
+            and the draft stays a draft. Nothing is approved automatically in either case.
+
             '
-          x-ticvai-problem-types: [not-draft, open-request-exists]
+          x-ticvai-problem-types: [not-draft, open-request-exists, approval-no-longer-required, approval-no-approver-available]
           content:
             application/problem+json:
               schema:
@@ -465,6 +473,11 @@ paths:
 
         Read-only and deliberately cheap. It runs on the hot path — every refund, every discount, every
         price override — and a slow answer here is a slow till.
+
+        **Rules match without a condition** (APPROVALS-TENANCY-C06, CHG-R8SPN-016): no stored rule has one, because
+        `setApprovalMatrix` and `approveMatrixMultiLevel` refuse a condition or skip condition `422
+        condition-not-supported` until a condition language exists (`ApprovalRule.condition`).
+        `createApprovalRequest` and `submitApprovalRequest` route by the same match.
 
         '
       tags:
@@ -1226,6 +1239,16 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
+        '422':
+          description: 'A rule carries a `condition` (not null), and no condition language exists yet (pull audit R104;
+            APPROVALS-TENANCY-C06, CHG-R8SPN-016). Nothing is stored; `errors[]` names the rule''s `order`. Send the
+            rule with `condition` null, or narrow it with `subjectTypes`, `minAmount`, `maxAmount` or
+            `matchAttributes`.'
+          x-ticvai-problem-types: [condition-not-supported]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegations:
@@ -1796,7 +1819,7 @@ paths:
         | `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity` | `matchAttributes` (with `module`) |
         | `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
         | `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
-        | `skipConditions` | `condition`, negated: the rule is skipped where it holds |
+        | `skipConditions` | `condition`, negated: the rule is skipped where it holds. **Refused `422 condition-not-supported` when not empty** until a condition language exists (APPROVALS-TENANCY-C06, CHG-R8SPN-016) |
         | `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has |
         | (not sent) `sort_order` | a new rule gets **last + 1 in its matrix**, so it is the last rule tried; an existing rule keeps its place. `setApprovalMatrix` reorders |
 
@@ -1857,6 +1880,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
+        '422':
+          description: '`skipConditions` is not empty, and no condition language exists yet (pull audit R104;
+            APPROVALS-TENANCY-C06, CHG-R8SPN-016): it would be the rule''s `condition`, negated, and a condition is
+            refused, never stored (`ApprovalRule.condition`). Nothing is stored. Send it empty or absent.'
+          x-ticvai-problem-types: [condition-not-supported]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -5288,6 +5320,15 @@ components:
             attributes it may name and how two conditions are compared for `unreachableRule` are an
             open decision, not something to infer from this field.
 
+
+            **So a condition is refused, never stored** (decided 20 October 2026, Chinmay, R8 blocker cause
+            APPROVALS-TENANCY-C06, option C; CHG-R8SPN-016). `setApprovalMatrix` refuses a rule whose `condition`
+            is not null, and `approveMatrixMultiLevel` one whose `skipConditions` is not empty, with `422
+            condition-not-supported`, and store nothing. Every stored rule therefore has no condition, and
+            `evaluateApprovalRequirement`, `createApprovalRequest` and `submitApprovalRequest` match on kind, scope,
+            subject type, amount and `matchAttributes` only. A rule meant to restrict can never route silently as if
+            unrestricted. The refusal is lifted when the grammar is decided.
+
             '
         approverRoleIds:
           type: array
@@ -5987,7 +6028,9 @@ components:
         `cancelled`) and `reopenApprovalRequest` (`openRequestExists`, `alreadyDecided`, `withdrawn`),
         with the values above (CHG-CSP-043). `levelFellBack` is `recordExternalApprovalDecision` answering after the level
         it was sent to timed out and fell back to people (R8 blocker fix, APPROVALS-TENANCY-C04). The same shape comes from
-        `approveUnifiedDecision` (`alreadyDecided`, `withdrawn`, `expired`, `cancelled`).
+        `approveUnifiedDecision` (`alreadyDecided`, `withdrawn`, `expired`, `cancelled`). `approvalNoLongerRequired`
+        and `noApproverAvailable` are `submitApprovalRequest` finding that the matrix in force now cannot route the
+        draft (APPROVALS-TENANCY-C45, CHG-R8SPN-016).
 
         '
       allOf:
@@ -6006,6 +6049,8 @@ components:
             - expired
             - cancelled
             - levelFellBack
+            - approvalNoLongerRequired
+            - noApproverAvailable
           requestId:
             type: string
             format: uuid

@@ -1,0 +1,44 @@
+id: CHG-R8SPN-016
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Approval routing never guesses. A rule with a condition (or the composite''s skipConditions) is refused 422
+  condition-not-supported until a condition language exists, so every stored rule matches on kind, scope, subject type,
+  amount and matchAttributes only, and evaluate, create and submit say so. Submitting a draft the matrix in force no
+  longer routes is 409 approval-no-longer-required (the draft stays); a matched rule with no role holder follows
+  rerouteOnNoApprover, and false is 409 approval-no-approver-available. Nothing is approved automatically.'
+decision:
+  what: 'R8 blocker causes APPROVALS-TENANCY-C06 (lead answer: take the recommendation, option C: refuse to store a
+    non-null condition or skipConditions) and APPROVALS-TENANCY-C45 (lead answer: option A: refuse 409
+    approval-no-longer-required, the draft stays). contracts/spine/approvals.yaml: ApprovalRule.condition,
+    setApprovalMatrix and approveMatrixMultiLevel 422, evaluateApprovalRequirement text, submitApprovalRequest 409 with
+    two new problem types and ApprovalStateProblem.refusedReason values approvalNoLongerRequired and
+    noApproverAvailable.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27812, 27813 and 27833 (ADAM gaps 27813/7, 27833/5, 27812/5, 27833/3): no
+  condition language existed, so a rule with a condition could not be honoured, and submit had no answer when the
+  matrix no longer required approval or nobody held the role. Finding: R8 blocker cause list, group approvals-tenancy;
+  pull audit R104.'
+keys_touched:
+  operations: [setApprovalMatrix, approveMatrixMultiLevel, evaluateApprovalRequirement, createApprovalRequest,
+    submitApprovalRequest]
+  schemas: [ApprovalRule, ApprovalStateProblem]
+  files:
+  - contracts/spine/approvals.yaml
+root_class: 'undecided rule: an operation has no answer for a case its inputs allow'
+tickets:
+  started: []
+  unstarted:
+  - '27812, 27813 and 27833 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27813/7, 27833/5, 27812/5, 27833/3'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open
+notes: 'Requested from the generators lane: a check-business-rules rule BR-APPROVAL-ROUTE (setApprovalMatrix and
+  approveMatrixMultiLevel declare 422 condition-not-supported; submitApprovalRequest''s 409 lists
+  approval-no-longer-required and approval-no-approver-available).'
