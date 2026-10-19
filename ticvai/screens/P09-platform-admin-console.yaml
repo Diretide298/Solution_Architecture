@@ -5940,11 +5940,15 @@ screens:
     provenance: design-note correction, 2 October 2026 (ADM-018)
   - operationId: createMfaChallenge
     contract: identity
-    purpose: Ask for the second factor before the sensitive change
-    trigger: onAction
+    purpose: 'The step-up before a grant (audit R135): sent as the Open access grant form opens, so the code
+      reaches the operator''s second factor while they fill in the reason and the permissions; nothing on the
+      screen is pressed to send it (as on the sign-in screens GST-042 and WEB-016).'
+    trigger: background
   - operationId: verifyMfaChallenge
     contract: identity
-    purpose: Check the code the person enters
+    purpose: 'Checks the code the operator enters in the Open access grant form, on its confirm; only when it
+      is accepted does the same press open the grant (`openPlatformStaffGrant`). A wrong code keeps the form
+      open with the reason and permissions kept.'
     trigger: onAction
   entryState:
     params:
@@ -5996,10 +6000,13 @@ screens:
       audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones
       this screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
-      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+      **The step-up, in order** (r8, IDENTITY-C14): opening the form sends the challenge (`createMfaChallenge`);
+      the form also asks for the code; confirm checks it (`verifyMfaChallenge`) and, once accepted, sends
+      `openPlatformStaffGrant` with the fields above.'
     confirm:
       label: Open access grant
-      operation: openPlatformStaffGrant
+      operation: verifyMfaChallenge
     dismiss:
       label: Cancel
       discards:

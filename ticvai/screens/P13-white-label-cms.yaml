@@ -1400,8 +1400,11 @@ screens:
         provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
       - kind: publishGate
         label: What publishing a block changes
+        operation: getPublishReviewPolicy
         notes: Names the page and section the block shows in, from when, and for whom; says whether the
           venue's review step applies. Blocks go live on their own schedule, not with the site Publish.
+          Whether review applies is read with `getPublishReviewPolicy` (r8, WHITE-C19); a block sent for
+          review shows its `reviewStatus` (pending) in Blocks on this page until it is decided.
         provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
   states:
     loading: The record, read by `getHomepageLayout`.
@@ -15786,7 +15789,9 @@ screens:
       - kind: publishGate
         label: What publishing changes
         impliedBy: publishTenantConfig
-        notes: '**Flows publish with the whole site**, never alone: the gate names every venue flow that
+        operation: diffConfigVersion
+        notes: '**Read with `diffConfigVersion`** (r8, WHITE-C18): the draft against the published version,
+          its `bookingFlows` area and `affectedProducts`. **Flows publish with the whole site**, never alone: the gate names every venue flow that
           changed since the last version and the products whose steps will change for guests, and says
           the rest of the draft (theme, pages, navigation) goes live with it. Refused while any enabled
           flow is invalid (`409`, `bookingFlowInvalid`). Needs `TENANT_PUBLISH`.'

@@ -8299,8 +8299,15 @@ screens:
   
   
     **Rev 3 (decided 29 September).** The Help screen shows app status and a public *What''s new* (GAP-B2).
-    Build note (r8, WHITE-C14): the page and policy body shown in the detail panel is read with `getMyCase`;
-    the operation is defined by the satellite contract (WHITE-C14).'
+    Build note (r8, WHITE-C14): the body of a help page or a policy comes with the list read that shows it
+    (`PublishedContentPage.body` from `listPublishedContentPages`, `PublishedPolicy.body` from
+    `listPublishedPolicies`); nothing more is read to open one.
+
+    Build note (r8 second round): **this screen reads no single case.** Its client-verified prototype view
+    (Help & support) shows no case thread; its "Raise a question" opens GST-068 (Help & My Cases), which reads
+    one case with `getMyCase` when the guest opens a row. A case link from a notification opens GST-068 with the
+    `caseId`, not this screen. `getMyCase` was bound here in the first r8 round and is taken off again; it also
+    loaded on open, before sign-in, a read that needs a signed-in guest (check-preauth-session).'
   density: comfortable
   pattern: commandCentre
   patternReason: 3 independent reads and no read of one record — the screen watches a population rather
@@ -8420,10 +8427,6 @@ screens:
     purpose: Terms, privacy, refund, cookie and accessibility policies, readable before sign-in (GFIX-2)
     trigger: onLoad
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)
-  - operationId: getMyCase
-    contract: marketing-crm
-    purpose: Read the guest's own case, and the page or policy body shown in the detail panel
-    trigger: onLoad
   entryState:
     params:
     - name: caseId
@@ -11881,8 +11884,11 @@ screens:
     provenance: decided 29 September 2026, MOB-6
   - operationId: listMyVisitPlans
     contract: venue-map
-    purpose: The guest's visit plans for the cold entry (date today), so the screen has a planId to open
-    trigger: onLoad
+    purpose: 'Only when signed in, like `getVisitPlan` (GFIX-6): on the cold entry (no `planId`) it asks for the
+      guest''s plans with `date` today, newest first, and takes the first one''s `id` for `getVisitPlan`. No
+      component shows the list itself: what it finds fills the Today timeline, and an empty page is the
+      emptyFirstRun state (offer to make a plan on GST-051). Opened with a `planId`, it is not called.'
+    trigger: background
   entryState:
     params:
     - name: planId
@@ -12878,8 +12884,11 @@ screens:
     trigger: onAction
   - operationId: getMyCase
     contract: marketing-crm
-    purpose: Read the guest's own case
-    trigger: onLoad
+    purpose: 'Read one of the guest''s own cases with its thread, when the guest opens a row of My cases (the
+      prototype''s View on a closed case, Reply on an open one, and the message thread under the lists). Opened
+      with a `caseId` from an edge or a notification, the screen reads that case at once.'
+    trigger: onAction
+    shownBy: View
   entryState:
     params:
     - name: subjectId
