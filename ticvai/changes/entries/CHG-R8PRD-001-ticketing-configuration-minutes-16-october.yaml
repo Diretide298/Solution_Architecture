@@ -1,0 +1,35 @@
+id: CHG-R8PRD-001
+date: '2026-10-20'
+source: mom
+kind: spec
+summary: 'The minutes of the 16 October 2026 ticketing configuration wireframe review are in the package, as the .docx
+  and a Markdown conversion beside it, so the products module changes can cite them.'
+decision:
+  what: 'sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.docx (the record, copied unchanged) and
+    sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md (its text, converted for citation, as
+    sources/mom/TICVAI_MoM_2026-09-29_Licensing_B2C_Review.md is).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The products module is the first module rebuilt from client-reviewed wireframes, and its wave 1 contract
+  additions (CHG-R8PRD-002 onward) take their decisions from these minutes, sections 4.2 to 4.14 and 5 (Key
+  Decisions). Package rule 12 (ticvai/CLAUDE.md): every source cited is inside git, so the minutes are copied in
+  before they are cited.'
+keys_touched:
+  files:
+  - sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.docx
+  - sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+client_signoff: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module preparation of 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cited-sources.py
+status: open
+notes: 'Batch R8PRD (products module, branch fix/r8b-products). The prepared-by and attendee lines of the original name
+  the two teams only; the Markdown header names the people the text names.'
