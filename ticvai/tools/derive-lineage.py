@@ -396,6 +396,10 @@ def derive(stored: dict) -> dict:
                     ruled_w.add("cache:idempotency")
                 ruled_w |= {x for x in _TABLE_TEXT.findall(str(op.get("x-ticvai-config-change-log") or ""))
                             if x in known}
+                # An operation that writes its own audit row says so (x-ticvai-audits-itself, r8 cause
+                # FOUNDATION-AI-C49, CHG-R8GEN-012); the kernel interceptor skips it, and the row is its write.
+                if op.get("x-ticvai-audits-itself") and verb != "get":
+                    ruled_w.add("platform.audit_record")
                 out[op["operationId"]] = {
                     "contract": contract,
                     "verb": verb.upper(),

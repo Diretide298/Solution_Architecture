@@ -1,0 +1,26 @@
+id: CHG-R8GEN-012
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'An operation that writes its own platform.audit_record row declares x-ticvai-audits-itself with its reason, so the kernel''s audit interceptor (PLATFORM-AUDIT) skips it and a write leaves one audit row. derive-lineage reads the extension as a write of platform.audit_record; check-write-lineage W-AUDIT fails an operation that writes the row without declaring it (the 13 found today are listed until their contracts declare it) and a declaration that is a bare flag.'
+decision:
+  what: 'r8 cause FOUNDATION-AI-C49, option A (the lead, 20 October 2026: take the recommendation), the tool part. Declaring the extension on the 13 operations (finance, identity, orders, platform-ops, inventory and payments contracts) and the PLATFORM-AUDIT detail in docs/active/block-a-extra-tasks.json are the core and surface lanes'', requested in the r8 generators report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, cause FOUNDATION-AI-C49 (ticket 27694 PLATFORM-AUDIT; ADAM gap 27694/0).'
+keys_touched:
+  files:
+  - tools/derive-lineage.py
+  - tools/check-write-lineage.py
+root_class: 'two writers of one row with no rule saying which'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open
