@@ -719,10 +719,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
         '409':
-          description: 'Already decided or closed. `refusedReason` is `alreadyDecided` and `currentStatus` names the status.
+          description: 'The request is not waiting. `refusedReason` says which: `alreadyDecided` (approved or rejected),
+            `withdrawn`, `expired` or `cancelled`, and `currentStatus` names the status it is in.
 
             '
-          x-ticvai-problem-types: [already-decided]
+          x-ticvai-problem-types: [already-decided, withdrawn, expired, cancelled]
           content:
             application/problem+json:
               schema:
@@ -1284,6 +1285,16 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/DelegationRefusedProblem'
+        '409':
+          description: 'The delegate does not hold the role the delegation names in `requiredRoleId`
+            (`delegateLacksRequiredRole`).
+
+            '
+          x-ticvai-problem-types: [delegate-lacks-required-role]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/DelegationRefusedProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegations/{delegationId}:
@@ -1725,8 +1736,8 @@ paths:
 
         | Input | Stored as |
         |---|---|
-        | `module` | the matrix: `approvals.matrix.kind`, an `ApprovalKind` value (400 when it is not one) |
-        | `venue` | the matrix's scope (`scope_level` venue, its `scope_path`); absent, the tenant's matrix |
+        | `module` | **required by the server** (`400 validation` without it; optional in the schema only so an r1 client still validates). The matrix: `approvals.matrix.kind`, an `ApprovalKind` value (400 when it is not one); it selects which matrix the rule goes into |
+        | `venue` | the matrix's scope (`scope_level` venue, its `scope_path`). **Only the caller's own scope node (audit R183):** absent, it is the venue the caller acts at, never the tenant's matrix; a venue that is not that node is `400 validation` (`errors[]` names `venue`). Nobody writes another level's matrix through this call |
         | `code` | `approvals.rule.code`, the upsert key within the matrix |
         | `approvalMode` | `compositeMode`, and what the engine runs: `single` sequential with `levels` 1; `sequential` and `multiLevel` sequential with `levels` = `minimumApprovals`; `parallel` parallel; `anyOne` parallel with `minimumApprovals` 1; `allMustApprove` consensus; `conditional` sequential, applying only where `skipConditions` does not hold |
         | `amount`, `percentage` | `minAmount`, `minPercentage` |
@@ -1734,7 +1745,8 @@ paths:
         | `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
         | `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
         | `skipConditions` | `condition`, negated: the rule is skipped where it holds |
-        | `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new |
+        | `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has |
+        | (not sent) `sort_order` | a new rule gets **last + 1 in its matrix**, so it is the last rule tried; an existing rule keeps its place. `setApprovalMatrix` reorders |
 
         The view reads the same row back in the input's shape. `setApprovalMatrix` stays the operation of record for whole
         matrices; both write the same rows, so neither overwrites the other's rules.
@@ -1758,11 +1770,41 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Approval Matrix & Multi-Level Approval Configuration
+          description: Approval Matrix & Multi-Level Approval Configuration. Stored as a new version of the existing matrix.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixMultiLevelApprovalConfigurationView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created. No matrix existed for this `module` at the caller's venue, so this is version 1 holding the one rule.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalMatrixMultiLevelApprovalConfigurationView'
+        '400':
+          description: 'Validation failed: `module` missing or not an `ApprovalKind`; `venue` not the venue the caller acts at
+            (audit R183); or a new rule with no `requiredApproverRole` (`approver-role-required`).
+
+            '
+          x-ticvai-problem-types: [validation, approver-role-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: 'Refused, and nothing is stored: the rule would loosen a rule set above (`loosensParentRule`) or can never
+            match because an earlier rule always does (`unreachableRule`), as `setApprovalMatrix` refuses it. `ruleOrder` is the
+            rule''s `sort_order` in the matrix, filled by the server since this body has no `order`.
+
+            '
+          x-ticvai-problem-types: [loosens-parent-rule, unreachable-rule]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -1803,10 +1845,10 @@ paths:
         | `delegator`, `delegate` (principal ids; `user` is the delegator when `delegator` is absent) | `delegatorPrincipalId`, `delegatePrincipalId` |
         | `start`, `end`, `reason` | `from`, `to`, `reason` |
         | `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
-        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix (409 `exceedsDelegatorAuthority`) |
+        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
         | `scope`, `venue`, `region`, `businessUnit`, `legalEntity`, `department` | `scopePath`: the most specific scope node given |
         | `delegationType` | `delegationType` |
-        | `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (409 otherwise); `role` and `position` are display only |
+        | `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
 
         Authority limits of a role stay in `setApprovalMatrix`; this sets the limit of one delegation.
       tags:
@@ -1834,6 +1876,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RolesAuthorityDelegationApprovalLimitsView'
+        '400':
+          description: 'The delegation is malformed: `invalidWindow` (`end` not after `start`) or `delegateIsDelegator`.
+
+            '
+          x-ticvai-problem-types: [invalid-window, delegate-is-delegator]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/DelegationRefusedProblem'
+        '403':
+          description: 'The delegation would hand over authority that is not there: `delegateLacksPermission` or
+            `exceedsDelegatorAuthority`, with the same status as `createApprovalDelegation`.
+
+            '
+          x-ticvai-problem-types: [delegate-lacks-permission, exceeds-delegator-authority]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/DelegationRefusedProblem'
+        '409':
+          description: 'The delegate does not hold the role the delegation names (`delegateLacksRequiredRole`).
+
+            '
+          x-ticvai-problem-types: [delegate-lacks-required-role]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/DelegationRefusedProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -2231,13 +2301,31 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: 'The approver may not decide this request, refused exactly as `decideApprovalRequest` refuses
+            it (R8 blocker fix, APPROVALS-TENANCY-C04). **Always carries `refusedReason`**: `approverIsRequester`,
+            `notInApproverChain`, `insufficientPermission`, `mfaRequired` (the matched rule or the tenant step-up
+            policy requires a fresh MFA step-up on the session), `signatureRequired`, `delegationExpired`,
+            `alreadyDecidedAtThisLevel` or `levelDecidedExternally`. The shared `Forbidden`, with no `refusedReason`,
+            is the caller lacking `APPROVAL_DECIDE`. **A rule with `requiresSignature` is refused `signatureRequired`
+            here**: this body has no signature field, so such a request is decided through `decideApprovalRequest`,
+            whose body carries one.
+
+            '
+          x-ticvai-problem-types: [approver-is-requester, not-in-approver-chain, insufficient-permission, mfa-required,
+            signature-required, delegation-expired, already-decided-at-this-level, level-decided-externally]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRefusedProblem'
         '409':
           description: The named request is not open for this approver (decided, withdrawn, expired, or not
-            theirs to decide).
+            theirs to decide). Where it is no longer open, `refusedReason` says which (`alreadyDecided`, `withdrawn`,
+            `expired` or `cancelled`) and `currentStatus` the status it is in, as `decideApprovalRequest` answers.
           x-ticvai-problem-types: [approval-not-open]
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/ApprovalStateProblem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -4041,9 +4129,9 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The request is no longer open for a decision (`alreadyDecided`, `withdrawn`,
-            `expired`, `cancelled`), or the level already fell back to people on timeout.
-          x-ticvai-problem-types: [already-decided]
+          description: The request is no longer open for a decision (`refusedReason` `alreadyDecided`, `withdrawn`,
+            `expired`, `cancelled`), or the level already fell back to people on timeout (`levelFellBack`).
+          x-ticvai-problem-types: [already-decided, level-fell-back]
           content:
             application/problem+json:
               schema:
@@ -5830,7 +5918,9 @@ components:
         value per cause, so "someone already approved it" and "it timed out" are told apart.
         Since 2 October 2026 also `cancelApprovalRequest` (`alreadyDecided`, `withdrawn`, `expired`,
         `cancelled`) and `reopenApprovalRequest` (`openRequestExists`, `alreadyDecided`, `withdrawn`),
-        with the values above (CHG-CSP-043).
+        with the values above (CHG-CSP-043). `levelFellBack` is `recordExternalApprovalDecision` answering after the level
+        it was sent to timed out and fell back to people (R8 blocker fix, APPROVALS-TENANCY-C04). The same shape comes from
+        `approveUnifiedDecision` (`alreadyDecided`, `withdrawn`, `expired`, `cancelled`).
 
         '
       allOf:
@@ -5848,6 +5938,7 @@ components:
             - withdrawn
             - expired
             - cancelled
+            - levelFellBack
           requestId:
             type: string
             format: uuid
@@ -5895,7 +5986,9 @@ components:
       x-ticvai-persistence: none — error shape
       description: 'Why `createApprovalDelegation` stored nothing. `invalidWindow` and
         `delegateIsDelegator` come with `400`; `delegateLacksPermission` and
-        `exceedsDelegatorAuthority` with `403`.
+        `exceedsDelegatorAuthority` with `403`; `delegateLacksRequiredRole` (the delegate does not hold the role the
+        delegation names, `approveRoleAuthorityDelegation`) with `409`. Also what `approveRoleAuthorityDelegation`
+        answers, with the same status for each value (R8 blocker fix, APPROVALS-TENANCY-C04).
 
         '
       allOf:
@@ -5911,6 +6004,7 @@ components:
             - delegateIsDelegator
             - delegateLacksPermission
             - exceedsDelegatorAuthority
+            - delegateLacksRequiredRole
     StepUpPolicyRefusedProblem:
       x-ticvai-persistence: none — error shape
       description: '`setStepUpPolicy` refused to lower a requirement below the operation''s own floor.
@@ -6500,13 +6594,16 @@ components:
           description: Percentage
         module:
           type: string
-          description: Module
+          description: '**Required by the server.** The approval kind the rule is for (an `ApprovalKind` value); it selects which matrix
+            (`approvals.matrix.kind`) the rule is written into, and a call without it is `400 validation`. Optional in the
+            schema only so a client built at r1 still validates (R8 blocker fix, APPROVALS-TENANCY-C47).'
         product:
           type: string
           description: Product
         venue:
           type: string
-          description: Venue
+          description: 'Venue. Optional: the venue the caller acts at, which is the only one accepted (audit R183); absent
+            means that venue, never the tenant matrix.'
         department:
           type: string
           description: Department
@@ -6546,7 +6643,8 @@ components:
           description: Skip Conditions
         requiredApproverRole:
           type: string
-          description: Role that must always approve, e.g. CFO, in an N-of-M group
+          description: Role that must always approve, e.g. CFO, in an N-of-M group. Required when the rule is new
+            (`400 approver-role-required`), because it becomes the rule's only approver role.
       required:
       - code
       - approvalMode

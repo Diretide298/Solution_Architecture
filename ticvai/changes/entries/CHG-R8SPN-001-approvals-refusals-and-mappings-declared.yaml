@@ -1,0 +1,42 @@
+id: CHG-R8SPN-001
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'The Approvals composite operations now declare the refusals their text already described, in the place a
+  developer reads them: approveUnifiedDecision answers 403 with the refusedReason values decide has and 409 with the
+  state problem; approveRoleAuthorityDelegation declares its 400, 403 and 409 (a missing required role is
+  delegateLacksRequiredRole, 409, and exceedsDelegatorAuthority is 403 as on createApprovalDelegation);
+  approveMatrixMultiLevel declares 201, 400 and 409, says a new rule goes last in its matrix and needs an approver
+  role, and writes the caller''s own venue (R183), never the tenant matrix; recordExternalApprovalDecision names
+  levelFellBack; cancelApprovalRequest lists the four states the shared problem lists. Additive.'
+decision:
+  what: 'R8 blocker fix lane spine, causes APPROVALS-TENANCY-C04 and APPROVALS-TENANCY-C47 (no decision pending, the
+    checkers'' fix applied as written). contracts/spine/approvals.yaml only. module is required by the server and left
+    optional in the schema, so the request does not become a breaking change against r1.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 tickets 27812, 27831 and 27832 on 19 October 2026 (ADAM gaps 27831/2, 27832/2,
+  27812/0 to 27812/3): a refusal sat in prose or in a different operation from the one that makes it, so a ticket could
+  not reach done. Finding: R8 blocker cause list, groups approvals-tenancy.'
+keys_touched:
+  operations: [approveUnifiedDecision, approveRoleAuthorityDelegation, approveMatrixMultiLevel,
+    recordExternalApprovalDecision, cancelApprovalRequest, createApprovalDelegation]
+  schemas: [ApprovalStateProblem, DelegationRefusedProblem, ApprovalMatrixMultiLevelApprovalConfigurationInput]
+  files:
+  - contracts/spine/approvals.yaml
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started: []
+  unstarted:
+  - '27812, 27831 and 27832 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27831/2, 27832/2, 27812/0-3'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open
+notes: 'Prevention: check-problem-types already fails a new error response without its problem types; the responses added
+  here name theirs. Derived at the release: handoff/service-docs and the lineage reads (request to the lineage lane:
+  approveUnifiedDecision reads approvals.delegation).'
