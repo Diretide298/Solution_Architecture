@@ -171,6 +171,9 @@ python3 tools/derive-capabilities.py --apply
 # The contract says it is generated at release from `x-ticvai-api-scope`; until this nothing generated it. Reads the
 # contracts only; the service loads handoff/api-scopes.json at startup.
 python3 tools/derive-api-scopes.py
+# **Where a guest's data lives, by owner** (20 October 2026, r8 cause IDENTITY-C65, CHG-R8GEN-015): every table with a
+# subject_id column, the owner's subjectDataRecords query and whether exportSubjectData asks it. After derive-schema.
+python3 tools/derive-subject-data-register.py
 # **Retired 10 September.** `derive-pack-boards.py` drew every pack screen a second time on
 # its own `WS##` board — 728 screens rendered twice, and a reviewer looking at two drawings
 # of one screen cannot tell it is one screen. The workshop grouping is now a badge and a
