@@ -2059,7 +2059,10 @@ components:
         venueId: { type: string, format: uuid, nullable: true }
         url:
           type: string
-          description: Signed and expiring for private assets; stable CDN URL for public ones.
+          description: 'Signed and expiring for private assets; stable CDN URL for public ones. **A public asset that a
+            published white-label version references is served at its stable CDN URL**, and
+            `getPublishedTenantConfig` returns that address (`brandUrls`, `banners[].imageUrl`) so a guest client
+            never needs this read (r8 walk of ticket 28335).'
         thumbnailUrl: { type: string, nullable: true }
         referenceCount:
           type: integer

@@ -1681,8 +1681,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/BrandIdentity'
         '400':
-          x-ticvai-problem-types: [media-too-large, media-type-not-permitted]
-          description: An asset is larger than 2 MB, or is not PNG or SVG (audit R270)
+          x-ticvai-problem-types: [media-too-large, media-type-not-permitted, asset-not-ready]
+          description: An asset is larger than 2 MB, or is not PNG or SVG (audit R270); or an asset is not ready to
+            use, because it is still processing, was quarantined or failed (`asset-not-ready`; r8 walk of tickets
+            28682 and 27928, so the CMS-002 preview rule has a refusal to test). The problem names the field and
+            the asset status. Nothing is saved.
           content:
             application/problem+json:
               schema:
@@ -10174,9 +10177,13 @@ components:
           - $ref: '#/components/schemas/ScheduleState'
           readOnly: true
           x-ticvai-derived: sweeper
-          description: Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer
-            from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant's
-            timezone (`states/schedule.yaml`).
+          description: 'Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer
+            from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant''s
+            timezone (`states/schedule.yaml`). **The rule, which no request field moves** (r8 walk of ticket
+            27920): a new banner is `draft`. The server sets `scheduled` when `updateBanner` leaves both
+            `startsAt` and `endsAt` set, and sets `draft` again when a later update clears either. Sending
+            `isActive` false on an `active` banner pulls it to `draft`. `state` is derived by the server on every
+            save and is never in a request.'
         sortOrder:
           type: integer
         isActive:
@@ -10225,8 +10232,10 @@ components:
           - $ref: '#/components/schemas/ScheduleState'
           readOnly: true
           x-ticvai-derived: sweeper
-          description: Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant's timezone,
-            as for `Banner.state`. Once `active` or `expired` the block may only be withdrawn (audit R163).
+          description: 'Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant''s timezone,
+            as for `Banner.state`. A new block is `draft` and moves to `scheduled` the same way as a banner: when
+            an update leaves both dates set, and back to `draft` when either is cleared. Once `active` or `expired`
+            the block may only be withdrawn (audit R163).'
         sortOrder:
           type: integer
         scopePath:
@@ -11445,6 +11454,26 @@ components:
           format: date-time
         brand:
           $ref: '#/components/schemas/BrandIdentity'
+        brandUrls:
+          type: object
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The brand assets as addresses a guest can load** (r8 walk of ticket 28335). A guest cannot
+            read `assets`, so the `*AssetRef` ids in `brand` mean nothing to a client. The server turns each asset
+            the published version references into its stable CDN address (`assets.yaml`, `MediaAsset.url`: a public
+            asset has a stable CDN address) and returns it here, beside the ids. Only assets the published version
+            names are resolved; the address is that of the asset version the publish named. A field is null where its
+            ref is null.'
+          properties:
+            logoUrl: { type: string, format: uri, nullable: true }
+            logoDarkUrl: { type: string, format: uri, nullable: true }
+            faviconUrl: { type: string, format: uri, nullable: true }
+            splashImageUrls:
+              type: array
+              items: { type: string, format: uri }
+            introVideoUrl: { type: string, format: uri, nullable: true }
         appIcons:
           $ref: '#/components/schemas/AppIcons'
         theme:
@@ -11459,6 +11488,26 @@ components:
           $ref: '#/components/schemas/NavigationConfig'
         homepage:
           $ref: '#/components/schemas/HomepageLayout'
+        banners:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The hero and other banners a guest sees now** (r8 walk of ticket 28335): the banners in the
+            published version whose state is `active` at the time of the read, by `sortOrder`. Draft, scheduled and
+            expired banners are never returned. `imageUrl` is the resolved address of `imageAssetRef`. Staff read
+            all banners with `listBanners`, which is unchanged.'
+          items:
+            $ref: '#/components/schemas/PublishedBanner'
+        promoBlocks:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The promo blocks in the published version that are `active` at the time of the read, by
+            `sortOrder`, with the same rule as `banners`.
+          items:
+            $ref: '#/components/schemas/PublishedPromoBlock'
         bookingFlow:
           allOf:
           - $ref: '#/components/schemas/BookingFlowConfig'
@@ -11528,6 +11577,37 @@ components:
             publishableKey:
               type: string
               nullable: true
+    PublishedBanner:
+      x-ticvai-persistence: none — a public projection of whitelabel.banner (r8 walk of ticket 28335)
+      type: object
+      description: One active banner as a guest reads it inside `PublishedTenantConfig`. No state, no schedule
+        dates, no author.
+      required:
+      - id
+      - imageUrl
+      properties:
+        id: { type: string, format: uuid }
+        placement:
+          type: string
+          enum: [homepageHero, homepageBlock, explore, checkout]
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        subtitle: { $ref: '#/components/schemas/LocalisedText' }
+        imageUrl: { type: string, format: uri, description: The stable address of the banner image. }
+        linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+        sortOrder: { type: integer }
+    PublishedPromoBlock:
+      x-ticvai-persistence: none — a public projection of whitelabel.promo_block (r8 walk of ticket 28335)
+      type: object
+      description: One active promo block as a guest reads it inside `PublishedTenantConfig`.
+      required:
+      - id
+      properties:
+        id: { type: string, format: uuid }
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        description: { $ref: '#/components/schemas/LocalisedText' }
+        iconUrl: { type: string, format: uri, nullable: true }
+        linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+        sortOrder: { type: integer }
     PublishedKioskConfig:
       x-ticvai-persistence: none — computed from the current KioskConfigVersion snapshot and the live state on
         whitelabel.kiosk_config and whitelabel.kiosk_assignment
