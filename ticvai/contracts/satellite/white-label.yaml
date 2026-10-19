@@ -1036,6 +1036,10 @@ paths:
         tenant has none, so the policy and the matrix never disagree: a policy that is on always has a matrix to
         route the approval request by.
 
+        **Switching it off** (r8 walk of ticket 27780; lead decision of 20 October 2026, option A): versions and
+        content blocks already `pending` review **stay pending** until a reviewer decides; the switch affects new
+        publishes only. The matrix is kept.
+
         '
       x-ticvai-write-via:
       - table: approvals.matrix
@@ -11076,6 +11080,38 @@ components:
           description: The slide, tile, flow, language or payment method the finding is about.
     ConfigFindingKind:
       type: string
+      description: 'The checks `validateTenantConfig` runs. **Severity** (r8 walk of ticket 27780; lead decision of 20
+        October 2026, option A): `missingTranslation` is a `warning` when the missing text has a fallback language
+        and an `error` when the default language is the one missing; every other kind is an `error`. A publish is
+        blocked when `errorCount` is above 0, and a warning never blocks.
+
+        | kind | severity |
+
+        |---|---|
+
+        | missingTranslation | warning with a fallback language, error when the default language is missing |
+
+        | navigationTargetsDisabledModule | error |
+
+        | homepageReferencesMissingContent | error |
+
+        | contrastFailure | error |
+
+        | missingRequiredAsset | error |
+
+        | policyVersionMissing | error |
+
+        | noVisibleNavigationItems | error |
+
+        | unlicensedModuleEnabled | error |
+
+        | arabicFontMissing | error |
+
+        | bookingFlowInvalid | error |
+
+        | bookingFlowMissing | error |
+
+        '
       enum:
       - missingTranslation
       - navigationTargetsDisabledModule
