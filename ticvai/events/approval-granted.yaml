@@ -69,9 +69,23 @@ consumers:
   purpose: Apply the decision to the partner record it was about (agreement, application, change request).
     decideApprovalRequest runs in commerce and the partner tables are in the control database, which
     PlatformService owns in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020). **And to a tenant**
-    (`subjectType` tenant; ADAM CR-172, 19 October 2026, CHG-CRA-005) - `attributes.action` suspend applies the
-    suspension raised by suspendTenant (now, or pending until its effectiveAt) and writes tenant.suspended to
-    control.outbox in the same transaction; reactivate moves the tenant to active or cancels its pending suspension
+    (`subjectContract` subscription, `subjectType` tenant; ADAM CR-172, 19 October 2026, CHG-CRA-005; fix round
+    3), the way white-label's consumer below applies a reviewed publishTenantConfig - it learns what to apply from
+    the record the call wrote, named by the event, and re-checks it on arrival. suspendTenant and reactivateTenant
+    write only the approval request, and the payload names the tenant (`subjectId`) and not the change, so the
+    consumer reads that request by `requestId` through approvals#requestRecords (route service, the declared query
+    Subscription already reads approvals.request through) for its stored `attributes`
+    (ApprovalRequest.attributes), and reads the tenant from control.tenant. It then re-checks the tenant and, in
+    one transaction - `attributes.action` suspend applies the suspension suspendTenant raised (now, or pending
+    until its effectiveAt) and writes tenant.suspended to control.outbox; reactivate moves the tenant to active or
+    cancels its pending suspension. **Re-checked on arrival**, since the tenant may have moved while the request
+    was open. Already in the target state (suspended; or active with nothing pending) changes nothing and is
+    recorded as a no-op; a state that no longer allows the change (suspend - onboarding, terminating or
+    terminated, tenant-not-active; reactivate - terminated, tenant-terminated, or onboarding,
+    tenant-not-suspended) changes nothing and the request closes as not applied, with that reason. Both are
+    reported on the request's approved-action execution, where approvals keeps whether an approved action ran
+    (succeeded with a note; failed with failureReason the reason). The consumer is the only writer of the tenant
+    row and of tenant.suspended on this path
   writes:
   - control.partner_agreement
   - control.partner_application
