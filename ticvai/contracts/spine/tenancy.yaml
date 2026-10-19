@@ -353,7 +353,8 @@ paths:
         is answered with a redirect to `redirectToHostname` by the edge. A custom domain whose CNAME stopped
         resolving to us stays routed while white-label''s `CustomDomain` is `pendingRevalidation`, and is
         `detached` here when that times out, so a released hostname cannot be served for somebody else
-        (the takeover warning on CMS-017).
+        (the takeover warning on CMS-017). **A `detached` host answers 404**, and at most one active row holds a
+        hostname, so the answer is never ambiguous (APPROVALS-TENANCY-C11, CHG-R8SPN-039).
 
 
         **The routing outcomes, decided 18 October 2026** (ADAM CR-162, option A: what the resolver does today
@@ -417,6 +418,30 @@ paths:
         `lastValidatedAt` and, on `timedOut`, sets `status: detached`. A platform subdomain is never
         detached while the tenant exists, so a tenant always has a host that works.
 
+
+        **Accepted, then written by Platform: the answer is 202** (decided 20 October 2026, Chinmay, R8 blocker
+        cause APPROVALS-TENANCY-C11, option A; CHG-R8SPN-039; the route CR-002 already decided: Tenancy has no
+        grant on the control database, and Platform writes `control.tenant_domain` from the event). The call
+        mints the row''s id (UUIDv7), writes `tenantDomain.mapped` **version 2** to the outbox with that id as the
+        event''s `aggregateId` and the whole row as its payload (id, hostname, tenantId, kind, status, cellId,
+        databaseName, channel, isPrimary, redirectToHostname, verifiedAt, lastValidatedAt), and answers `202` with
+        that row as it will be written (`TenantDomain`, its `id` the minted one). **The host is live only once
+        Platform''s consumer has written the row**, whatever the answer''s `status` says: white-label shows a domain as connected when
+        `verifyCustomDomain`, polling, finds it routed (`resolveTenantHost` on the host), never on this answer. **Whose host**:
+        `tenantId` is sent in the body (no longer server-owned: the service token names only the calling cell),
+        and is refused `403` unless the tenant is one of that cell''s tenants, as the tenant records it already reads say
+        (`subscription#tenantRecords`).
+
+
+        **`hostname-taken` is decided twice**: here, as a quick refusal (`409`) when the host is already active for
+        another tenant as Platform''s query reads it now; and finally in Platform''s consumer, under the unique
+        index on active hosts, which refuses a host another tenant took in between by writing
+        `tenantDomain.rejected` (id, hostname, tenantId, reason `hostname-taken`) for white-label to consume, so a
+        race never leaves two tenants on one host. **One host at a time**: `setPrimaryDomain` calls this once per
+        host it changes, and the consumer, writing a new primary, demotes the channel''s other primary in the same
+        transaction; when a primary custom domain is detached, the platform subdomain becomes primary in that
+        transaction. `resolveTenantHost` answers `404` for a `detached` host.
+
         '
       tags:
       - tenancy
@@ -433,15 +458,18 @@ paths:
             schema:
               $ref: '#/components/schemas/TenantDomain'
       responses:
-        '200':
+        '202':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Routed
+          description: 'Accepted (APPROVALS-TENANCY-C11): `tenantDomain.mapped` v2 is in the outbox, and Platform''s
+            consumer writes this row. Not yet routed: the answer is the row as it will be written.'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TenantDomain'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           description: The hostname is routed to another tenant (`hostname-taken`).
           x-ticvai-problem-types:
@@ -897,10 +925,12 @@ paths:
         **Publishing makes the version immutable.** A workstation still running v2.3 must be able to
         say what v2.3 was, and a profile edited underneath its deployments cannot.
 
-        **PUT semantics — an upsert keyed on the body's `id`** (pull audit R103). There is no id in
-        the path, so the body names its target:
+        **PUT semantics — an upsert keyed on the path's `profileId`** (pull audit R103; corrected 20 October
+        2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017: the path carries the id, and the body's `id`
+        is server-owned). A body that sends `id` must send the path's value, else `400` `validation`:
 
-        - **No profile has that `id`:** the profile is created at version 1 and the answer is `201`.
+        - **No profile has that `profileId`:** the profile is created at version 1 with it as its id, and the
+          answer is `201`.
         - **Its latest version is `draft`:** the body replaces that draft whole, the version number
           stays, and the answer is `200`.
         - **Its latest version is `published` or later:** that version is left exactly as it is and
@@ -936,7 +966,7 @@ paths:
           headers:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '201':
-          description: Created — no profile had this `id`
+          description: Created — no profile had this `profileId`
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ConfigurationProfile' }
@@ -1020,8 +1050,9 @@ paths:
         forty rows is forty.
 
         **The client names the version, the target and the strategy; the server owns the rest.**
-        `profileId` comes from the path, and `id`, `status`, the counts, `failureReasons`,
-        `startedAt` and `completedAt` are `readOnly` and ignored on input. **Only a published
+        The body is `DeployConfigurationProfileRequest` (since 20 October 2026, APPROVALS-TENANCY-C07,
+        CHG-R8SPN-017); `profileId` comes from the path, and the answer's `id`, `status`, the counts,
+        `failureReasons`, `startedAt` and `completedAt` are the server's. **Only a published
         version deploys** — a draft is still editable, and a version edited underneath its
         deployments is what publishing exists to prevent.
       tags: [tenancy]
@@ -1036,7 +1067,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ProfileDeployment' }
+            schema: { $ref: '#/components/schemas/DeployConfigurationProfileRequest' }
       responses:
         '202':
           description: Queued
@@ -1115,9 +1146,11 @@ paths:
         which is what `maxOfflineHours` prevents — after it, the workstation refuses to sell rather
         than keep journalling.
 
-        **PUT semantics — one policy per scope node, upserted on the body's `scopePath`** (pull
-        audit R103, R162). There is no id in the path; `scopePath` names the target, and the
-        caller must hold the permission at or above it. Where no policy is saved at that path
+        **PUT semantics — one policy per venue, the caller's** (pull audit R103, R162; corrected 20
+        October 2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017). There is no id in the path, and
+        `scopePath` is server-owned (`readOnly`, ignored on input): the target is the scope node of the venue
+        the caller's session acts at, as the singleton note says, and the server writes that node's path into
+        `scopePath`. The caller must hold the permission there. Where no policy is saved at that node
         one is created (`201`); where one is, the body replaces it whole (`200`). `id` is
         server-owned and ignored on input. **An omitted field returns to its default** —
         `maxOfflineHours` to 24, `onCeilingBreach` to `blockNewSales`, `requiresManagerToExtend`
@@ -1207,9 +1240,11 @@ paths:
         `minimumStableSeconds` is what stops it, and **it is the field a venue with poor wifi will
         actually tune.**
 
-        **PUT semantics — one set of thresholds per scope node, upserted on the body's
-        `scopePath`** (pull audit R103). There is no id in the path; `scopePath` names the target.
-        Where nothing is saved at that path a row is created (`201`); where one is, the body
+        **PUT semantics — one set of thresholds per venue, the caller's** (pull audit R103; corrected
+        20 October 2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017). There is no id in the path, and
+        `scopePath` is server-owned (`readOnly`, ignored on input): the target is the scope node of the venue
+        the caller's session acts at, and the server writes that node's path into `scopePath`.
+        Where nothing is saved at that node a row is created (`201`); where one is, the body
         replaces it whole (`200`). `id` is server-owned and ignored on input, and **an omitted
         field returns to its default.**
       tags: [tenancy]
@@ -2387,6 +2422,7 @@ paths:
     post:
       operationId: recordDeviceHeartbeat
       security:
+      - deviceAuth: []
       - apiKeyAuth: []
       - serviceAuth: []
       x-ticvai-audience: [device]
@@ -2401,6 +2437,19 @@ paths:
         is bound to — there is no other workstation to resolve, and a back-office session has
         none. A screen that shows device state reads it through `listDevices`, `getDevice` or
         `getWorkstationHealth`; it does not call this.
+
+        **How the device proves it is the device** (decided 20 October 2026, Chinmay, R8 blocker cause
+        APPROVALS-TENANCY-C27, option A; CHG-R8SPN-030): `deviceAuth`, the credential enrolment issued
+        (`tenancy.device_credential`). `apiKeyAuth` and `serviceAuth` stay listed for clients built on r1 and
+        are not issued to devices.
+
+        **What a heartbeat changes.** The reported `status` is stored on the device as sent, with one exception:
+        **`offline` is never accepted from a heartbeat** (a device that can call is not offline), and a body
+        with `status` `offline` is refused `400` `validation`. Only the timer sets `offline`: a device with no
+        heartbeat for 15 minutes moves to `offline` (and `health` `offline`). `device.statusChanged` is written
+        when the stored status changes, with `previousStatus` the value stored before this heartbeat (`unknown`
+        for a device's first). `lastHeartbeatAt` is set on every heartbeat; `health` is recomputed (see
+        `RegisteredDevice.health`).
       tags: [workstation]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: workstation
@@ -2438,6 +2487,8 @@ paths:
           description: Recorded
           headers:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -3292,11 +3343,22 @@ paths:
       operationId: recordDeviceTamperEvent
       x-ticvai-conflict-policy: append
       summary: A device reports interference
+      description: '**Reported by the device about itself** (decided 20 October 2026, Chinmay, R8 blocker cause
+        APPROVALS-TENANCY-C27, option A; CHG-R8SPN-030). A device calls with `deviceAuth` and needs no
+        permission; `deviceId` must be its own (another device''s is `404`). `DEVICE_VIEW` is what a staff caller
+        must hold to record one by hand. **The reporter never sets the trust**: the server stores `deviceTrusted`
+        false on every new event, whatever the body says, and ignores `resolvedAt`, `resolvedBy` and
+        `resolution` on input; they are set only when a person clears the device. The device is untrusted from
+        this moment.'
+      security:
+      - bearerAuth: []
+      - deviceAuth: []
       tags:
       - devices
       x-ticvai-permission: DEVICE_VIEW
       x-ticvai-audience:
       - staff
+      - device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       parameters:
@@ -3870,10 +3932,12 @@ components:
           maxLength: 253
           x-ticvai-unique: tenant
         tenantId:
-          readOnly: true
           type: string
           format: uuid
           x-ticvai-references: control.tenant
+          description: 'The tenant the host routes to. **Sent by the caller of `setTenantDomainMapping`** since 20
+            October 2026 (APPROVALS-TENANCY-C11, CHG-R8SPN-039): the service token names only the calling cell, so
+            the body names the tenant, and it must be one of that cell''s tenants.'
         cellId:
           type: string
           format: uuid
@@ -4405,17 +4469,21 @@ components:
         deviceTrusted:
           type: boolean
           default: false
+          description: Set by the server, false on every new event; ignored on input (APPROVALS-TENANCY-C27).
         resolvedAt:
           type: string
           format: date-time
           nullable: true
+          description: Set when a person clears the device; ignored on `recordDeviceTamperEvent` (APPROVALS-TENANCY-C27).
         resolvedBy:
           type: string
           format: uuid
           nullable: true
+          description: Who cleared the device; ignored on `recordDeviceTamperEvent` (APPROVALS-TENANCY-C27).
         resolution:
           type: string
           nullable: true
+          description: How the device was cleared; ignored on `recordDeviceTamperEvent` (APPROVALS-TENANCY-C27).
         scopePath:
           type: string
           readOnly: true
@@ -4543,7 +4611,8 @@ components:
         version:
           readOnly: true
           type: integer
-          description: The published version to deploy.
+          description: 'The published version deployed, as `DeployConfigurationProfileRequest.version` named it (R8
+            blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017).'
         targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
         targetFilter:
           type: object
@@ -4571,6 +4640,45 @@ components:
         startedAt: { type: string, format: date-time, readOnly: true }
         completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
+    DeployConfigurationProfileRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      description: '**What `deployConfigurationProfile` is asked to do** (20 October 2026, R8 blocker cause
+        APPROVALS-TENANCY-C07, CHG-R8SPN-017). Until then the body was `ProfileDeployment`, whose `version` is
+        `readOnly`, so nothing named the version to deploy and the 409 `profile-version-draft` and
+        `profile-version-not-found` could never happen. The client names the version, the target and the strategy;
+        the answer is the `ProfileDeployment` the server records.'
+      required: [version]
+      properties:
+        version:
+          type: integer
+          minimum: 1
+          description: The published version of the path's profile to deploy.
+        targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
+        targetFilter:
+          type: object
+          nullable: true
+          description: >
+            By department, type or venue, where the target is a set rather than a list.
+          properties:
+            venueIds: { type: array, items: { type: string, format: uuid } }
+            departmentIds: { type: array, items: { type: string, format: uuid } }
+            workstationTypes:
+              type: array
+              description: The same workstation-type values `ConfigurationProfile.venueKindScope` holds.
+              items: { type: string }
+        strategy: { type: string, enum: [immediate, staged, onNextIdle], default: onNextIdle }
+        # The answer's fields, kept readOnly (ignored on input) so a client built on r1, which sent the whole
+        # ProfileDeployment, still sends a valid body (check-contract-compat).
+        id: { type: string, format: uuid, readOnly: true }
+        profileId: { type: string, format: uuid, readOnly: true, description: Taken from the path. }
+        status: { type: string, enum: [queued, inProgress, completed, partiallyFailed, rolledBack], readOnly: true }
+        succeededCount: { type: integer, readOnly: true }
+        failedCount: { type: integer, readOnly: true }
+        failureReasons: { type: object, readOnly: true, additionalProperties: { type: integer } }
+        startedAt: { type: string, format: date-time, readOnly: true }
+        completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+
     OfflinePolicy:
       type: object
       x-ticvai-persistence: "platform.offline_policy"
@@ -4595,8 +4703,9 @@ components:
           type: string
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >
-            **The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body
-            names its target here, because the path does not.
+            **The node this policy is for, and the key `setOfflinePolicy` upserts on.** Written by the
+            server from the venue the caller's session acts at; a value sent in a body is ignored
+            (APPROVALS-TENANCY-C07, CHG-R8SPN-017).
         maxOfflineHours:
           type: integer
           default: 24
@@ -4660,7 +4769,8 @@ components:
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >
             **The node these thresholds are for, and the key `setConnectivityThresholds` upserts
-            on.** The body names its target here, because the path does not.
+            on.** Written by the server from the venue the caller's session acts at; a value sent in a
+            body is ignored (APPROVALS-TENANCY-C07, CHG-R8SPN-017).
         failuresBeforeOffline:
           type: integer
           default: 3
@@ -5092,6 +5202,15 @@ components:
             **Derived, not reported.** Computed from heartbeat age, battery, firmware currency and
             error rate — a device does not know whether it is healthy, and asking it produces a
             fleet that is 100% healthy and 12% broken.
+
+            **The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause
+            APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one
+            device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25
+            heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20
+            firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour
+            (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more,
+            `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown`
+            until the first heartbeat. A battery under 15% caps the device at `warning`.
         lastHeartbeatAt: { type: string, format: date-time, nullable: true, readOnly: true }
         capabilities:
           type: array
@@ -6370,6 +6489,14 @@ components:
 
             **The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it
             overrides the outlet, otherwise the outlet's (`saleBoardSource`).
+
+            **Resolved on read, never copied** (decided 20 October 2026, Chinmay, R8 blocker cause
+            APPROVALS-TENANCY-C39, option A; CHG-R8SPN-013). `platform.workstation.sale_board` holds only this
+            till's own override and is null when `saleBoardSource` is `outlet`. `getWorkstation`, `listWorkstations`
+            and `configureWorkstation`'s answer build `saleBoard` from the override when there is one, otherwise from
+            the outlet's `platform.outlet.sale_board_id` and that `platform.sale_board` row (its id, kind and name).
+            So `updateOutlet` and `updateSaleBoard` change what every inheriting till shows with no write to
+            `platform.workstation`, and no stored copy can go stale.
           required: [id, kind]
           properties:
             id: { type: string, format: uuid }

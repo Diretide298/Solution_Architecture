@@ -289,6 +289,13 @@ paths:
         draft is sent with `submitApprovalRequest`, which is when the matrix is read, the approvers are
         resolved and `matrixVersion` is fixed. A contract raising a request never drafts.
 
+        **No route, no request** (lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015). A request
+        that is not a draft and matches no active rule (no rule of its kind and subject type at its `scopePath`, or for
+        subject type `tenant` no active platform rule) is refused `422 no-approval-route` and nothing is written: it is
+        never approved automatically and never left `pending` with nobody to ask. The calling operation passes the
+        refusal on to its own caller (`suspendTenant`, `reactivateTenant`). A rule that matches but whose roles have
+        no holder is a different case (`rerouteOnNoApprover`, `noApproverAvailable`).
+
         '
       tags:
       - request
@@ -325,6 +332,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalStateProblem'
+        '422':
+          description: 'No approval route (`no-approval-route`; CHG-R8SPN-015): the request is not a draft and no
+            active rule matches its kind and subject type at its `scopePath` (for subject type `tenant`, no active
+            platform rule). Nothing is written; the calling operation passes this refusal on.'
+          x-ticvai-problem-types: [no-approval-route]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/submit:
@@ -415,8 +431,16 @@ paths:
             (`currentStatus` says what it is), or `openRequestExists` where another request for the same
             subject went out while this one was a draft (`requestId` names it).
 
+            **Or the matrix in force now cannot route it** (decided 20 October 2026, Chinmay, R8 blocker cause
+            APPROVALS-TENANCY-C45, option A; CHG-R8SPN-016). No active rule matches the draft any more (a matrix
+            edit since it was saved): `approvalNoLongerRequired` (`approval-no-longer-required`); the draft stays a
+            draft and nothing is approved without an approver. A rule matches but none of its roles has a holder:
+            the rule''s `rerouteOnNoApprover` decides; true routes on to the next level, or to the out-of-office
+            delegate, and the submit succeeds; false is `noApproverAvailable` (`approval-no-approver-available`),
+            and the draft stays a draft. Nothing is approved automatically in either case.
+
             '
-          x-ticvai-problem-types: [not-draft, open-request-exists]
+          x-ticvai-problem-types: [not-draft, open-request-exists, approval-no-longer-required, approval-no-approver-available]
           content:
             application/problem+json:
               schema:
@@ -449,6 +473,11 @@ paths:
 
         Read-only and deliberately cheap. It runs on the hot path — every refund, every discount, every
         price override — and a slow answer here is a slow till.
+
+        **Rules match without a condition** (APPROVALS-TENANCY-C06, CHG-R8SPN-016): no stored rule has one, because
+        `setApprovalMatrix` and `approveMatrixMultiLevel` refuse a condition or skip condition `422
+        condition-not-supported` until a condition language exists (`ApprovalRule.condition`).
+        `createApprovalRequest` and `submitApprovalRequest` route by the same match.
 
         '
       tags:
@@ -1210,6 +1239,16 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
+        '422':
+          description: 'A rule carries a `condition` (not null), and no condition language exists yet (pull audit R104;
+            APPROVALS-TENANCY-C06, CHG-R8SPN-016). Nothing is stored; `errors[]` names the rule''s `order`. Send the
+            rule with `condition` null, or narrow it with `subjectTypes`, `minAmount`, `maxAmount` or
+            `matchAttributes`.'
+          x-ticvai-problem-types: [condition-not-supported]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegations:
@@ -1780,7 +1819,7 @@ paths:
         | `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity` | `matchAttributes` (with `module`) |
         | `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
         | `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
-        | `skipConditions` | `condition`, negated: the rule is skipped where it holds |
+        | `skipConditions` | `condition`, negated: the rule is skipped where it holds. **Refused `422 condition-not-supported` when not empty** until a condition language exists (APPROVALS-TENANCY-C06, CHG-R8SPN-016) |
         | `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has |
         | (not sent) `sort_order` | a new rule gets **last + 1 in its matrix**, so it is the last rule tried; an existing rule keeps its place. `setApprovalMatrix` reorders |
 
@@ -1841,6 +1880,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
+        '422':
+          description: '`skipConditions` is not empty, and no condition language exists yet (pull audit R104;
+            APPROVALS-TENANCY-C06, CHG-R8SPN-016): it would be the rule''s `condition`, negated, and a condition is
+            refused, never stored (`ApprovalRule.condition`). Nothing is stored. Send it empty or absent.'
+          x-ticvai-problem-types: [condition-not-supported]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -5170,6 +5218,7 @@ components:
         **Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.
 
         **Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:
+        - **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane and seeded when the platform is provisioned, whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.
         - **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.
 
         **A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request
@@ -5271,6 +5320,15 @@ components:
             attributes it may name and how two conditions are compared for `unreachableRule` are an
             open decision, not something to infer from this field.
 
+
+            **So a condition is refused, never stored** (decided 20 October 2026, Chinmay, R8 blocker cause
+            APPROVALS-TENANCY-C06, option C; CHG-R8SPN-016). `setApprovalMatrix` refuses a rule whose `condition`
+            is not null, and `approveMatrixMultiLevel` one whose `skipConditions` is not empty, with `422
+            condition-not-supported`, and store nothing. Every stored rule therefore has no condition, and
+            `evaluateApprovalRequirement`, `createApprovalRequest` and `submitApprovalRequest` match on kind, scope,
+            subject type, amount and `matchAttributes` only. A rule meant to restrict can never route silently as if
+            unrestricted. The refusal is lifted when the grammar is decided.
+
             '
         approverRoleIds:
           type: array
@@ -5324,7 +5382,11 @@ components:
           description: '**Which subjects of the kind this rule matches** (decided 2 October 2026, Chinmay; CHG-CSP-028,
             CHG-CSP-036, CHG-CSP-031): the `CreateApprovalRequest.subjectType` values, for example `topologyPublication`
             or `whiteLabelPublication` under `configurationChange`. Empty matches every subject of the kind. It is how a
-            venue switches an optional review step on for one kind of act without routing every act of the kind.'
+            venue switches an optional review step on for one kind of act without routing every act of the kind.
+
+            **Except subject type `tenant`**: a tenant''s own rules never match it, even with `subjectTypes` empty. A
+            platform suspension or reactivation of a tenant is routed only by the platform rule held in the control
+            plane (`ApprovalKind`; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015).'
           items:
             type: string
             maxLength: 64
@@ -5966,7 +6028,9 @@ components:
         `cancelled`) and `reopenApprovalRequest` (`openRequestExists`, `alreadyDecided`, `withdrawn`),
         with the values above (CHG-CSP-043). `levelFellBack` is `recordExternalApprovalDecision` answering after the level
         it was sent to timed out and fell back to people (R8 blocker fix, APPROVALS-TENANCY-C04). The same shape comes from
-        `approveUnifiedDecision` (`alreadyDecided`, `withdrawn`, `expired`, `cancelled`).
+        `approveUnifiedDecision` (`alreadyDecided`, `withdrawn`, `expired`, `cancelled`). `approvalNoLongerRequired`
+        and `noApproverAvailable` are `submitApprovalRequest` finding that the matrix in force now cannot route the
+        draft (APPROVALS-TENANCY-C45, CHG-R8SPN-016).
 
         '
       allOf:
@@ -5985,6 +6049,8 @@ components:
             - expired
             - cancelled
             - levelFellBack
+            - approvalNoLongerRequired
+            - noApproverAvailable
           requestId:
             type: string
             format: uuid

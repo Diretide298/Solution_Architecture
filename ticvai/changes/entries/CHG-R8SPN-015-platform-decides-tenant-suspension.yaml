@@ -1,0 +1,56 @@
+id: CHG-R8SPN-015
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A platform suspension or reactivation of a tenant is approved by the platform, never by the tenant: approvals
+  routes kind configurationChange, subject type tenant, only by a platform rule held in the control plane and seeded at
+  provisioning (approvers hold PLATFORM_TENANT_MANAGE, four eyes), and a tenant''s own rules never match subject type
+  tenant. A request that matches no active rule is refused 422 no-approval-route by createApprovalRequest, writes nothing,
+  and suspendTenant and reactivateTenant pass the refusal on. The grant''s re-check keeps the approved request unchanged and
+  records a refusal on the approved-action execution as failed (a Retry would be refused again); a granted, not yet
+  effective suspension counts as suspended; open-request-exists comes only after the tenant''s own state refusals.
+  Additive (new 422 responses and a shared problem type).'
+decision:
+  what: 'Lead''s delegate rulings of 20 October 2026 (about 03:40) on lane H review 3, findings N-1 to N-5. N-1: platform
+    rule, four eyes, tenant rules never match subject type tenant (said on ApprovalRule.subjectTypes and ApprovalKind),
+    "as publishTenantConfig''s request is routed" dropped; createApprovalRequest 422 no-approval-route (shared type in
+    contracts/shared/common.yaml), passed on by suspendTenant and reactivateTenant. N-2: the request stays approved;
+    the execution has no notApplied status, so failed with the reason, and the text says a Retry would be refused again
+    (no retry block added to the approved BO-382 screen). N-3: order stated on both 409s. N-4: a granted pending
+    suspension is treated as already suspended (no-op). N-5: CHG-CRA-005 lists approvals.request and the approvals
+    tickets SVC-TENANCY-REQUEST-1 (27813) and SVC-TENANCY-REQUEST-3 (27833). N-6: nothing to do (clears at the
+    release derive).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: lane H review 3 (fix round 3 of ADAM CR-172), new findings N-1 to N-5: nothing routed a tenant suspension''s
+  approval request, so on a typical tenant it matched no rule and waited for ever, or a tenant rule with empty
+  subjectTypes routed the platform''s suspension to the tenant''s own approvers.'
+keys_touched:
+  operations: [createApprovalRequest, suspendTenant, reactivateTenant]
+  schemas: [ApprovalKind, ApprovalRule, Problem]
+  files:
+  - contracts/spine/approvals.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/shared/common.yaml
+  - events/approval-granted.yaml
+  - changes/entries/CHG-CRA-005-kernel-plumbing-in-the-package.yaml
+  - tools/check-states.py
+root_class: 'routing gap: an approval request no rule can route'
+tickets:
+  started: []
+  unstarted:
+  - 'SVC-TENANCY-REQUEST-1 (27813, createApprovalRequest), SVC-TENANCY-REQUEST-3 (27833), the suspendTenant and
+    reactivateTenant tickets and Subscription''s approval.granted consumer: a settlement comment each.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: CR-172
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'Prevention: check-states rule 16 now also requires an operation that raises its own approval request to pass on
+  createApprovalRequest''s 422 no-approval-route (self-test case added); it fails on suspendTenant and reactivateTenant
+  before this change and passes after. tools/check-states.py is the generators lane''s file: edited at the lead''s
+  delegate''s request, three small hunks. The platform rule''s seed row belongs to the provisioning step (seed data); it
+  is described here and not yet in docs/active/seed-data-proposal.md (surface lane''s file).'

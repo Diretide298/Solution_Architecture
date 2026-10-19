@@ -1,0 +1,41 @@
+id: CHG-R8SPN-014
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Staff token lifetimes and signing are written once, on bearerAuth, and configurable per tenant on PasswordPolicy:
+  access token 15 minutes, refresh token 12 hours sliding with rotation on every use and reuse detection (a reused
+  refresh token ends the session and revokes its family), the session ends at shift end or after 12 hours, RS256 with
+  one key per cell. All values are proposed, client to correct. Additive (three optional PasswordPolicy fields).'
+decision:
+  what: 'R8 blocker causes IDENTITY-C25 and FOUNDATION-AI-C27 (lead answer, 20 October: "15 min access, 12 h sliding
+    refresh with rotation and reuse detection, session ends at shift end, configurable per tenant, RS256 one key per
+    cell; marked proposed, client to correct"). contracts/shared/common.yaml bearerAuth; identity.yaml PasswordPolicy
+    accessTokenMinutes, refreshTokenHours, sessionMaxHours; TokenPair.expiresIn, Session.expiresAt and refreshToken
+    point to it.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27732 and 27666 SETUP-AUTH (ADAM gaps 27732/8, 27666/3): nothing set the staff
+  token and session lifetimes, the refresh rotation or the signing parameters. Finding: R8 blocker cause list, groups
+  identity and foundation-ai.'
+keys_touched:
+  operations: [refreshToken, setPasswordPolicy, login, selectRole]
+  schemas: [PasswordPolicy, TokenPair, Session]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/identity.yaml
+root_class: 'undecided value: a number the build needs is set nowhere'
+tickets:
+  started: []
+  unstarted:
+  - '27732 and 27666 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27732/8, 27666/3'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+client_signoff: pending
+notes: 'The three PasswordPolicy fields are new columns of identity.password_policy; the lead''s release derive makes them.
+  repos/ticvai-docs/setup/config-and-secrets.md is a derived mirror and picks the values up at the refresh.'

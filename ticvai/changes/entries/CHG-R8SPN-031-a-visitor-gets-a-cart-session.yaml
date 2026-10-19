@@ -1,0 +1,37 @@
+id: CHG-R8SPN-031
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A signed-out visitor gets the token addCartLine needs from createCart: called with no credential it creates the
+  cart and an anonymous guest session (a guestAuth token with no subject, bound to the cart) and returns it in
+  Cart.anonymousSessionToken (not stored). The first Continue or Add calls createCart then addCartLine;
+  checkBookingEligibility, joinWaitlist and leaveWaitlist run under the same token; claimCart ends it on sign-in.
+  Additive (a security alternative and a response field).'
+decision:
+  what: 'R8 blocker cause GPS-C23 (lead answer: take the recommendation, option A). orders.yaml createCart and
+    Cart.anonymousSessionToken; common.yaml guestAuth. The guest screens'' createCart bindings (WEB-006, GST-008,
+    GST-050, GST-075, trigger background) and ADR-0045''s sentence are the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 28152 and 28159 (ADAM gaps 28152/1, 28159/1): the anonymous cart session a
+  visitor gets with the first line had no operation that issued it. Finding: R8 blocker cause list, group
+  guest-pos-screens.'
+keys_touched:
+  operations: [createCart, addCartLine, claimCart, checkBookingEligibility, joinWaitlist, leaveWaitlist]
+  schemas: [Cart]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/shared/common.yaml
+root_class: 'screen-api gap: a credential a screen needs has no operation that issues it'
+tickets:
+  started: []
+  unstarted:
+  - '28152 and 28159 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28152/1, 28159/1'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open

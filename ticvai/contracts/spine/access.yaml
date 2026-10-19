@@ -1600,6 +1600,9 @@ paths:
                     properties:
                       lineId:
                         type: string
+                        description: The order line's id (orders.order_line.id, a uuid as text; `format` is not added because
+                          that is a breaking change against r1), from `order.paid` lines[].lineId. With orderId it is this
+                          consumer's per-line idempotency key (FOUNDATION-AI-C04).
                       variantId:
                         type: string
                         format: uuid
@@ -1717,6 +1720,10 @@ paths:
         WEB-041 and GST-027 change a parking entitlement with `updateParkingEntitlement` and never read it,
         so the plate and the dates they edit came from nowhere. Self-scoped, as the update is. Returns what
         the write stores, in the write's own shape.
+
+        **Another guest's entitlement is `404`, exactly as one that does not exist** (Pattern 4; Chinmay,
+        3 October 2026, CHG-GCF-002): there is no `403` here, so a guest cannot learn that an id belongs to
+        someone else (R8 blocker cause ORDERS-MONEY-C01, CHG-R8SPN-018).
       x-ticvai-permission: null
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
@@ -1729,7 +1736,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParkingEntitlement'
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'

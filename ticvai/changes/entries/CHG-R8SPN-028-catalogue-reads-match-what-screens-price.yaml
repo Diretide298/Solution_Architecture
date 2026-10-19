@@ -1,0 +1,39 @@
+id: CHG-R8SPN-028
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Catalogue reads carry what the screens price and edit. listProductVariants returns each variant''s listPrice (the
+  list price on the caller''s channel now, resolved on read, not stored; an optional channel parameter for a visitor),
+  which GST-008, GST-050, GST-075 and WEB-005 show. ADM-094''s price ladder read gains the write''s names (id,
+  dynamicPricingStrategyId, minimumMinutesBetweenMovements, cooldownMinutes, reversalRule) beside the old ones, now
+  deprecated; allowedEndpoints is one set of values, decimal strings on the write and Money on the read;
+  PriceLadder.bands is a typed list of {code, price, percent}.'
+decision:
+  what: 'R8 blocker causes GPS-C27 and GPS-C32 (no decision needed). catalogue.yaml listProductVariants,
+    ProductVariant.listPrice (x-ticvai-persisted false), DynamicPriceBandsLaddersAdjustmentMatrixView,
+    PriceLadder.bands and allowedEndpoints. The view keeps its r1 names (deprecated) so the rename is additive;
+    PriceLadder.bands object -> array is a type change check-contract-compat calls breaking, and the entry is
+    requested from the lead in the core lane report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 28159 and 29835 (ADAM gaps 28159/0, 29835/0): guest ticket types had no price on
+  any guest read, and ADM-094''s ladder read and write disagreed on bands, endpoints and field names. Finding: R8
+  blocker cause list, group guest-pos-screens.'
+keys_touched:
+  operations: [listProductVariants, setPriceLadderMatrix, listDynamicPriceBand]
+  schemas: [ProductVariant, PriceLadder, DynamicPriceBandsLaddersAdjustmentMatrixView]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'screen-api gap: a read does not carry what its screen shows, or names it differently from the write'
+tickets:
+  started: []
+  unstarted:
+  - '28159 and 29835 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28159/0, 29835/0'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open

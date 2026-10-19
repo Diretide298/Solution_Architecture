@@ -1,0 +1,42 @@
+id: CHG-R8SPN-039
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'setTenantDomainMapping is written to the architecture CR-002 decided: it mints the row id, writes
+  tenantDomain.mapped v2 (the whole row, id as aggregateId) to the outbox and answers 202 with the TenantDomain row as
+  it will be written (not yet routed); Platform''s consumer writes control.tenant_domain. tenantId is sent in the body
+  and checked against the calling cell''s tenants. hostname-taken is a quick 409 here and final in the consumer under
+  the unique index (tenantDomain.rejected for white-label). setPrimaryDomain maps one host per call and the consumer
+  demotes the other primary; resolveTenantHost answers 404 for a detached host.'
+decision:
+  what: 'R8 blocker cause APPROVALS-TENANCY-C11 (lead answer: take the recommendation, option A: 202 accepted/pending;
+    white-label shows the domain live only after the consumer''s row exists). tenancy.yaml setTenantDomainMapping,
+    TenantDomain.tenantId, resolveTenantHost. 200 -> 202 keeps the TenantDomain shape, so the answer stays compatible;
+    tenantId newly sent may be called breaking under check-contract-compat; the entry is requested from the lead.
+    events/tenantDomain-mapped.yaml v2, a new events/tenantDomain-rejected.yaml, white-label verifyCustomDomain,
+    relinquishCustomDomain and setPrimaryDomain, platform-ops hostnameHeldByAnotherTenant and
+    handoff/cross-deployable-writes.md are the surface lane''s part; the active-host partial unique index (C12) is
+    storage''s.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 ticket 27990 (ADAM gaps 27990/0 to 27990/4): setTenantDomainMapping was written as a
+  synchronous routed row while the row is made later by an event consumer, for no named tenant, one host at a time.
+  Finding: R8 blocker cause list, group approvals-tenancy.'
+keys_touched:
+  operations: [setTenantDomainMapping, resolveTenantHost]
+  schemas: [TenantDomain]
+  files:
+  - contracts/spine/tenancy.yaml
+root_class: 'contract gap: a write answers as if done while another deployable does it later'
+tickets:
+  started: []
+  unstarted:
+  - '27990 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27990/0, 27990/1, 27990/2, 27990/3, 27990/4'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open

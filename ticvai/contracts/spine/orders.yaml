@@ -378,9 +378,11 @@ paths:
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
+      - {}
       x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
+      - anonymous
       summary: Start a cart
       description: '**A cart holds leases; an order holds money.** Different lifetimes, different failure
         modes, and merging them is why this contract did not exist until 17 August — `createOrder` takes
@@ -388,6 +390,16 @@ paths:
 
         Created against a guest subject where one is known, or an anonymous token where it is not. **The
         token is what lets a guest browse before signing in** and keep their cart when they do (2.1.31).
+
+        **A visitor with no credential gets the token here** (decided 20 October 2026, Chinmay, R8 blocker cause
+        GPS-C23, option A; CHG-R8SPN-031). Called with no credential, this creates the cart and an anonymous guest
+        session for it, and returns the session''s token in `Cart.anonymousSessionToken` (a `guestAuth` token with
+        no subject, bound to this cart and the device, sliding like any guest token). The app calls this on the
+        first Continue or Add (trigger background) and then `addCartLine` with that token; `checkBookingEligibility`,
+        `joinWaitlist` and `leaveWaitlist` run under it too. On sign-in `claimCart` moves the cart to the account
+        and the anonymous session ends. Nothing about the visitor is stored but the cart (ADR-0045: the contact is
+        proven at checkout, not here). Called with a guest token, the token is the caller''s and
+        `anonymousSessionToken` is null.
 
         **POS does not use this.** A till builds its sale locally and submits atomically, because it works
         offline and does not need a resumable cart. Same order contract, different channel.
@@ -3680,7 +3692,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartProblem'
         '422':
-          x-ticvai-problem-types: [window-required, window-not-allowed, window-length-mismatch, deposit-not-due, seat-limit-exceeded, transport-fare-unavailable, pass-not-valid-for-trip]
+          x-ticvai-problem-types: [window-required, window-not-allowed, window-length-mismatch, deposit-not-due, seat-limit-exceeded, transport-fare-unavailable, pass-not-valid-for-trip, attendees-over-capacity]
           description: 'The booked window is missing, not allowed or the wrong length for the variant
             (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or a table deposit
             line names a booking that is not awaiting one (`depositNotDue`; rev 3 REV3-8b). More seats for
@@ -3688,6 +3700,8 @@ paths:
             `seat-limit-exceeded`; rev 3 REV3-7). A transport fare that cannot be quoted
             (`transportFareUnavailable`) or a pass that does not cover the trip (`passNotValidForTrip`;
             rev 3 REV3-21).
+            More attendees than the meeting room type holds (`attendees-over-capacity`, naming the capacity;
+            GPS-C28, CHG-R8SPN-034).
 
             '
           content:
@@ -4778,7 +4792,15 @@ paths:
             bound (`bundleStale`). `lineIds` names the lines a lease or capacity refusal is about. A
             resource hold that cannot be converted (`resourceHoldInvalid`, rev 3 REV3-15).
 
+            **A seat hold that lapsed before the order** (`holdNotActive`, problem type `hold-not-active`;
+            decided 20 October 2026, Chinmay, R8 blocker cause GPS-C13, option A; CHG-R8SPN-023): a line''s
+            `inventoryHoldId`, the hold behind the seats POS-004 held, is no longer active (expired, released
+            or already converted). Nothing is written; `lineIds` names the lines. At the window the order is
+            created by POS-005, which received the hold from POS-004 (F59 step 4), and on this refusal the
+            cashier goes back to the seat map to hold the seats again.
+
             '
+          x-ticvai-problem-types: [lease-expired, capacity-exhausted, bundle-stale, resource-hold-invalid, hold-not-active]
           content:
             application/problem+json:
               schema:
@@ -4837,9 +4859,18 @@ paths:
       x-ticvai-api-scope: ticketing.read
       parameters:
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
+      - name: X-Order-Access-Token
+        in: header
+        required: false
+        description: '`Order.orderAccessToken` from `checkoutCart`''s answer, in place of a session (IDENTITY-C52,
+          CHG-R8SPN-025). Valid 24 hours for this order only; a token for another order, expired or forged, is
+          `404`, as an order that does not exist.'
+        schema:
+          type: string
       security:
       - guestAuth: []
       - bearerAuth: []
+      - {}
       x-ticvai-audience:
       - staff
       - guest
@@ -4851,6 +4882,13 @@ paths:
         `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they
         placed; another guest's order is refused exactly as one that does not exist, never returned.
         `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
+        **Or with the order's access token and no session** (decided 20 October 2026, Chinmay, R8 blocker
+        cause IDENTITY-C52, option A; CHG-R8SPN-025): the device that checked out, or a payer with no
+        session, sends `X-Order-Access-Token` (`Order.orderAccessToken`, from `checkoutCart`) and reads this
+        one order for 24 hours. With neither a session nor a valid token for this order the answer is `404`.
+        For a signed-in guest a `404` is also what WEB-013 and WEB-012 show as their no-access state: the
+        guest's own order lookup found nothing they may see (IDENTITY-C28); no permission is involved.
       tags:
       - order
       x-ticvai-permission: ORDER_VIEW
@@ -6602,6 +6640,14 @@ paths:
         quarantined with it, so a void is never evaluated before its sale. **Only a transient failure stops the
         batch** (a database or provider error): `stoppedAtSequence` names it and the till retries from there.
         A bad sale therefore never halts the till.
+        **A sale made under a hold that expired before the till synced is accepted** (decided 20 October 2026,
+        Chinmay, R8 blocker cause FOUNDATION-AI-C46, option A; CHG-R8SPN-033), on the principle CR-169 set for an
+        online capture: the guest already has the product, so the entry is `accepted`, the units are taken again
+        if they are still free, and otherwise the entry carries `reconcilerFlag` `unitsGone` and the order goes to
+        the reconciliation queue; nothing is refunded or voided automatically. The till stops selling against a
+        hold a minute before its `expiresAt`, so this is rare; and since contended timed entry is online only at
+        the till in Block A (FOUNDATION-AI-C45), it arises only for a sale made online whose journal entry
+        reached the server late.
       x-ticvai-emits:
       - order.paid
       - sync.rejectionRaised
@@ -7284,6 +7330,10 @@ paths:
         permission; it reprints only an order the guest at it has identified (KSK-012 booking found, KSK-009
         ticket issued, KSK-010 print failure), and each reprint is recorded against the device.
 
+        **`delivery` `wallet` is "Add to wallet"** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C29,
+        option A; CHG-R8SPN-025): one call adds every ticket of the order (or the lines named) to the guest''s
+        phone wallet, which is what WEB-013''s approved button does; no other operation is needed.
+
         '
       tags:
       - order
@@ -7568,7 +7618,9 @@ paths:
         appears where the caller is its sender (`fromSubjectId`) or, once claimed, its recipient
         (`toSubjectId`).
 
-        
+        **`claimUrl` is null on a transfer the caller sent** (decided 20 October 2026, Chinmay, R8 blocker cause
+        IDENTITY-C26, option A; CHG-R8SPN-025): it carries the claim token, and the sender must not be able to
+        claim on the recipient''s behalf. It is returned only on the recipient''s own rows.
 
         **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
@@ -7607,7 +7659,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Transfers, newest offer first — `offeredAt` descending, `id` as the tiebreak.
+          description: Transfers, soonest to lapse first — `expiresAt` ascending, `id` as the tiebreak (the order the
+            description and the cursor use; IDENTITY-C26).
           content:
             application/json:
               schema:
@@ -7698,7 +7751,12 @@ paths:
         reservations; another guest''s reservation is refused exactly as one that does not exist, never
         returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
-        
+        **Upcoming and Past, as GST-016 splits them** (decided 20 October 2026, Chinmay, R8 blocker cause
+        ORDERS-MONEY-C13, option A; CHG-R8SPN-026): by status and hold expiry, from fields every row carries.
+        **Upcoming** is `status` `held` with `expiresAt` in the future; **Past** is every other row (`converted`,
+        `expired` or `cancelled`, and a `held` row whose `expiresAt` has passed but the sweeper has not yet
+        expired). The screen asks once with no `status` and splits the page itself; the card already shows when
+        the hold expires.
 
         **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
@@ -13994,6 +14052,9 @@ paths:
       - query: marketing-crm#consentQuestionVersionRecords
         route: service
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: in-process
+        for: 'its lookup of a promotion''s own code, promotions.promotion, Promotions'' data (ORDERS-MONEY-C11; CHG-R8SPN-026)'
       - query: promotions#couponCampaignRecords
         route: in-process
         for: 'its read of promotions.coupon_campaign, Catalogue''s data (CHG-MOD-001)'
@@ -14019,6 +14080,15 @@ paths:
         every read, like `appliedPromotionIds`.
 
         Applying a code the cart already holds returns the cart unchanged.
+
+        **A promotion''s own code is accepted as well as a coupon campaign''s** (decided 20 October 2026, Chinmay,
+        R8 blocker cause ORDERS-MONEY-C11: option A for automatic promotions, B for code promotions; CHG-R8SPN-026).
+        The code is looked up first among the venue''s live promotions that need a code (`promotions.Promotion`
+        with a code), then among coupon campaign codes; either way it is kept on `Cart.couponCodes` and
+        evaluated as above. This is what WEB-032''s "Use this offer" does for a promotion that needs a code: it
+        carries the code to the cart through this call, so the offer shows on the price before the guest pays.
+        An automatic promotion needs no call: `evaluatePromotions` already applies it at the basket, and the
+        button only returns to the list. No new cart field.
 
         '
       tags:
@@ -21956,7 +22026,8 @@ components:
             deep-link table (`white-label.DeepLinkScheme`), pattern `transferClaim`: the tenant''s `baseUrl` plus
             `/t/{transferId}?token={claimToken}`. It opens the app on `/general/ticket-transfer` (GST-014) where the
             app is installed, and the storefront claim page otherwise. Once released the pattern never changes, so
-            a link already sent keeps working.'
+            a link already sent keeps working. **Never returned to the sender** in `listTicketTransfers` (null on
+            the rows the caller sent; IDENTITY-C26, CHG-R8SPN-025).'
         claimToken:
           x-ticvai-secret: blind-index
           type: string
@@ -22717,8 +22788,12 @@ components:
           x-ticvai-references: catalogue.inventory_reservation
           type: string
           nullable: true
-          description: Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for
-            uncontended products.
+          description: 'Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for
+            uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007;
+            decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no
+            `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and
+            `quantity`, and this names that hold''s inventory hold; the zone, its price band and keep-the-party-
+            together come from the hold, and a lapsed one is `409 hold-not-active` as for seats.'
         seatIds:
           type: array
           maxItems: 50
@@ -23107,6 +23182,13 @@ components:
         id:
           type: string
           format: uuid
+        anonymousSessionToken:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: 'The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no
+            credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart.'
         token:
           type: string
           readOnly: true
@@ -23282,10 +23364,21 @@ components:
       x-ticvai-persistence: none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line
       description: >
         Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a
-        defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.
+        defined shape** (decided 29 September, rev 3 REV3-21); other keys are free. **`attendees` is the
+        second** (20 October 2026, R8 blocker cause GPS-C28; CHG-R8SPN-034).
       properties:
         transport:
           $ref: '#/components/schemas/TransportLineAttributes'
+        attendees:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: '**How many people a meeting-room booking is for** (GST-075; R8 blocker cause GPS-C28,
+            CHG-R8SPN-034). Sent with `addCartLine` for a meeting-room product, kept from the cart line to the order
+            line, and shown on the venue''s reception list for the booking. It must not exceed the room type''s
+            capacity, which the guest step shows beside each room type: more is refused `422 attendees-over-capacity`
+            by `addCartLine`, naming the capacity. The guest steps run in the order `listProductStartTimes` can
+            answer (lead answer, option A): date, room type, length, then start time.'
     TransportLineAttributes:
       type: object
       nullable: true
@@ -23429,6 +23522,18 @@ components:
           type: string
           format: uuid
           description: The client UUIDv7 from `CreateOrderRequest.id`.
+        orderAccessToken:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**What lets the device that just checked out read the order it paid for** (decided 20 October
+            2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in
+            `checkoutCart`''s answer, null everywhere else: a signed token bound to this order and to the cart''s
+            device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a
+            session, so a guest who checked out with no account, or whose session ended, still sees the
+            confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing
+            else.'
         orderNumber:
           x-ticvai-unique: tenant
           type: string
@@ -24343,6 +24448,13 @@ components:
                 nullable: true
                 description: For a `rejected` or `blockedByRejection` entry, the `sync.rejection` row it was
                   quarantined into (SD-028). The batch carried on past it.
+              reconcilerFlag:
+                type: string
+                nullable: true
+                description: '`unitsGone` on an `accepted` entry whose hold had expired before the sync and whose units
+                  were no longer free: the sale stands and the order is on the reconciliation queue, nothing refunded
+                  (FOUNDATION-AI-C46, CHG-R8SPN-033; as CR-169 for an online capture). Null otherwise. Plain text so
+                  a later flag adds no enum value.'
               error:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
     SyncRejection:
@@ -24369,6 +24481,11 @@ components:
           - refund
           - void
           - scan
+          - cashMovement
+          description: 'What was refused. `cashMovement` (20 October 2026, R8 blocker cause FOUNDATION-AI-C13;
+            CHG-R8SPN-021) is an offline lift or float replayed through `shift.createCashMovement` and refused
+            `409 shift-not-open` or `lift-exceeds-float`; its `payload` is the `CreateCashMovementRequest` the till
+            sent.'
         recordedAt:
           type: string
           format: date-time
@@ -24938,6 +25055,7 @@ components:
             - seatLimitExceeded      # addCartLine 422: over VenueSettings.seating.maxSeatsPerGuestOrder; problem type seat-limit-exceeded (REV3-7)
             - transportFareUnavailable # addCartLine 422: transport.quoteTransportFare refused (REV3-21)
             - passNotValidForTrip    # addCartLine 422: the owned pass does not cover the stations, has no entry left or is outside its validity (REV3-21)
+            - attendeesOverCapacity  # addCartLine 422: more attendees than the meeting room type holds (GPS-C28, CHG-R8SPN-034)
           lineIds:
             type: array
             description: The cart lines the refusal is about, where it is about lines.
@@ -24958,6 +25076,7 @@ components:
             - leaseExpired              # createOrder
             - capacityExhausted         # createOrder
             - resourceHoldInvalid       # createOrder 409: the resource hold is expired, converted, released or not the caller's (REV3-15)
+            - holdNotActive             # createOrder 409: a line's inventory (seat) hold lapsed, was released or converted (GPS-C13, CHG-R8SPN-023)
             - seatLimitExceeded         # createOrder 422: over the seat limit for the channel; problem type seat-limit-exceeded (REV3-7)
             - bundleStale               # createOrder: the priced-from bundle is past its staleness bound
             - noDatedLine               # getOrderCalendarEvent

@@ -1,0 +1,35 @@
+id: CHG-R8SPN-040
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A standing-zone (zone-priced general admission) order line carries no seatIds: it is quantity places in one zone,
+  held by seating.createSeatHold with zoneId and quantity, and its inventoryHoldId names that hold; zone, price band
+  and keep-the-party-together come from the hold, and a lapsed one is 409 hold-not-active. No new order field.'
+decision:
+  what: 'R8 blocker cause GPS-C38 (lead answer: take the recommendation, option A: createSeatHold takes zoneId and
+    quantity; SeatAvailability lists zones with remaining). Core part: orders.yaml CreateOrderLine.inventoryHoldId.
+    contracts/satellite/seating.yaml (zones with remaining in SeatAvailability, createSeatHold zoneId and quantity,
+    keep-the-party-together on the zone read) and POS-004 and WEB-007 (zoneUnavailable bound to it) are the surface
+    lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 ticket 28206 (ADAM gap 28206/3): POS-004 zone-priced general admission had no data or
+  hold operation. Finding: R8 blocker cause list, group guest-pos-screens.'
+keys_touched:
+  operations: [createOrder, addCartLine, createSeatHold]
+  schemas: [CreateOrderLine]
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'screen-api gap: an approved flow has no data or hold operation'
+tickets:
+  started: []
+  unstarted:
+  - '28206 (the walk that found the gap).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28206/3'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open

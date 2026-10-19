@@ -1,0 +1,38 @@
+id: CHG-R8SPN-018
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A guest naming another guest''s record gets 404, exactly as for one that does not exist (Pattern 4, CHG-GCF-002):
+  contracts/README.md no longer says 403 for a self-scoped mismatch, and getParkingEntitlement drops its 403. 403
+  stays for a staff caller without the permission.'
+decision:
+  what: 'R8 blocker cause ORDERS-MONEY-C01 (lead answer: take the recommendation, option A: a dead promotion link shows
+    the neutral ''This offer is no longer available'' and the list it came from; no name, no reason). Core part:
+    contracts/README.md and access.yaml getParkingEntitlement. The guest screens'' emptyNoAccess wording (GST-012,
+    GST-027, WEB-041, WEB-032 cold entry) and ADR-0030 are the surface lane''s part, requested in the core lane
+    report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 28185, 28329 and 28351 (ADAM gaps 28351/3, 28329/0, 28185/0): guest-facing ''not
+  yours'' and ''dead link says what happened'' promises contradicted the decided enumeration-safe 404. Finding: R8
+  blocker cause list, group orders-money.'
+keys_touched:
+  operations: [getParkingEntitlement]
+  files:
+  - contracts/README.md
+  - contracts/spine/access.yaml
+root_class: 'contradiction: a guest refusal reveals that another guest''s record exists'
+tickets:
+  started: []
+  unstarted:
+  - '28185, 28329 and 28351 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28351/3, 28329/0, 28185/0'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Requested from the generators lane: a check that no operation with x-ticvai-self-scoped subject and a guest
+  audience declares a 403 response.'

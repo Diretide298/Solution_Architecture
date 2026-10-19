@@ -5101,8 +5101,12 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: A simplified invoice this full invoice replaces for the same supply. Refused unless the law
-            allows it (make-or-break on issueTaxInvoice).
+          description: 'A simplified invoice this full invoice replaces for the same supply. Refused unless the law
+            allows it (make-or-break on issueTaxInvoice). **Not sent in r8** (decided 20 October 2026, Chinmay, R8
+            blocker cause ORDERS-MONEY-C06, option C; CHG-R8SPN-026): until the client''s written answer to CF-133,
+            the server refuses any value `422 supersede-not-allowed`, and "Get a tax invoice" is not offered for an
+            order already on an invoice: that order answers `409 order-already-invoiced` and the screen shows the
+            invoice it has.'
         deliverToEmail:
           type: string
           format: email
@@ -5122,6 +5126,10 @@ components:
           type: string
           maxLength: 1000
           nullable: true
+          description: 'The recipient''s postal address. **Required, not null and not empty, on a `full` or
+            `consolidated` invoice** (Executive Regulation Article 59; R8 blocker cause ORDERS-MONEY-C06,
+            CHG-R8SPN-026): without it `issueTaxInvoice` refuses `422 recipient-required`, so the guest form that
+            asks for a full invoice (GST-019) collects it. Null on a `simplified` invoice.'
         countryCode:
           type: string
           pattern: ^[A-Z]{2}$

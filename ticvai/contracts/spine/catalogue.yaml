@@ -2160,6 +2160,12 @@ paths:
         without it. **A partner caller reads here** what is assigned to its channel (M17-04): partners never
         write products, prices or performances.
 
+        **Only published answers filter here; a draft is previewed elsewhere** (decided 20 October 2026, Chinmay,
+        R8 blocker cause WHITE-C26, server option; CHG-R8SPN-036). CMS-101''s live preview of a draft guided choice
+        calls white-label''s `previewGuidedChoice` with the draft answers, which runs this operation''s own answer
+        filter (the same code: age ranges, certification, swimmer, segment tags) over the venue''s published
+        products and returns what is left for each combination; the browser never re-implements the filter.
+
         **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets products that are
         published and on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record
@@ -2698,8 +2704,15 @@ paths:
       description: >
         **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a product that is
-        published, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
+        published, and nothing in draft or unpublished; asked for by id, such a record answers as
         not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **One exception: a withdrawn product is returned to a guest or visitor** (decided 20 October 2026,
+        Chinmay, R8 blocker cause GPS-C07, option A; CHG-R8SPN-023), so WEB-004's approved withdrawn banner
+        can show. It comes in the same guest projection, with `lifecycleState` `withdrawn` and `isSellable`
+        false, and only when it was once published; a draft or unpublished product is still not found. Nothing
+        else widens: `listProducts` and the other lists leave withdrawn products out for a guest, and
+        `addCartLine` still refuses one.
       tags:
       - product
       x-ticvai-permission: PRODUCT_VIEW
@@ -2979,6 +2992,15 @@ paths:
         answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts
         (ADR-0025).
 
+        **Each variant carries its list price** (20 October 2026, R8 blocker cause GPS-C27; CHG-R8SPN-028):
+        `listPrice` is the price the guest listing shows for the variant on the caller's channel at this moment,
+        in the venue's currency, resolved by the same price-list rule as `searchCatalogue`'s `fromPrice` and the
+        `variantListingFacts` query's `listPrice`. It is what GST-008's stepper, GST-050, GST-075's price per
+        length and WEB-005 show. It is the list price only: the total a guest pays is still decided at the
+        basket by `promotions.evaluatePromotions` (offers, bundles) and tax is shown as the listing shows it.
+        The channel is the caller's (`web` for the storefront, `mobile` for the guest app, from the credential or,
+        for a visitor, the `channel` parameter); null where no price list prices the variant on that channel.
+
         **Order.** Sorted by `name` ascending, then by `id`.
       tags:
       - product
@@ -2994,6 +3016,14 @@ paths:
         '
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: channel
+        in: query
+        required: false
+        description: 'The channel `listPrice` is priced for (GPS-C27, CHG-R8SPN-028). A guest or staff credential
+          already names it and may leave it out; a visitor with no credential sends `web` or `mobile`. Absent with no
+          credential: `web`.'
+        schema:
+          $ref: '#/components/schemas/Channel'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -3319,21 +3349,56 @@ paths:
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-694 Event Catalogue Command Center"
         - "P13 CMS-101 Help Me Choose"
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
+      description: '**The venue''s programme, for a guest too** (decided 20 October 2026, Chinmay, R8 blocker cause
+        GPS-C30, option A; CHG-R8SPN-034). GST-005 What''s On lists the venue''s events from here and then each
+        event''s performances (`listPerformances`). **A guest or a visitor calls this without a permission and sees
+        published data only** (Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): events in `onSale` or `live` that
+        are active (`isActive`), and nothing in `draft`, `planned`, `closed`, `cancelled` or `archived`. A visitor
+        with no credential sends `venueId`. `PRODUCT_VIEW` is what a staff caller must hold, and staff see every
+        state.
+
+
+        **Order.** Sorted by `name` ascending, then by `id`. **Statuses.** For staff every `lifecycleState`; for a
+        guest only `onSale` and `live`, as above.'
+      security:
+      - bearerAuth: []
+      - guestAuth: []
+      - {}
       x-ticvai-audience:
       - staff
+      - guest
+      - anonymous
       x-ticvai-read-routing: replica
       summary: List events
       tags:
       - event
       x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue to read, for a caller with no venue** (as `listProductCategories`; GPS-C30). A guest
+          with a credential, or staff, act at a venue already and may leave it out; a visitor with no credential
+          **must send it** (missing: `400 venue-required`; not a venue of the tenant: `400 unknown-venue`). With a
+          credential it must be the venue the caller acts at.'
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
+        '400':
+          description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
+            (`unknown-venue`).'
+          x-ticvai-problem-types: [venue-required, unknown-venue]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '200':
           description: Events
           content:
@@ -4045,6 +4110,54 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /catalogue/bundle-signing-keys:
+    get:
+      operationId: getBundleSigningKeys
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: The public keys a till verifies catalogue bundles with
+      description: '**How a till verifies a bundle''s signature** (decided 20 October 2026, Chinmay, R8 blocker cause
+        FOUNDATION-AI-C14, option A; CHG-R8SPN-022; ADR-0013 C102). A bundle''s `signature` is an **Ed25519**
+        detached signature over its `contentHash`, made with the cell''s bundle-signing key, whose private half stays
+        in the cell''s Key Vault; `signatureKeyId` names the key. This read returns the public halves: the key in use
+        and any key retired within the last 7 days. The till caches them with the bundle and verifies offline; a
+        bundle signed by a key it does not hold makes it read this again before applying, and a signature that does
+        not verify is never applied (the till keeps the bundle it has and reports `signatureInvalid` through
+        `reportBundleApplied`). **Rotation grace**: after a rotation the previous key stays valid for 7 days
+        (`validTo`), so a till offline across a rotation can still verify the next bundle it pulls; after that
+        it must come online to fetch the new key.
+
+
+        **Order.** Newest first, by `validFrom` descending, then by `keyId`. **Statuses.** Only keys still valid
+        (`validTo` null or in the future) are returned; there are at most two, so one page always holds them.'
+      tags:
+      - bundle
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The valid bundle-signing public keys, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/BundleSigningKey'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /catalogue/bundles/{version}/applied:
     parameters:
     - name: version
@@ -4196,6 +4309,14 @@ paths:
 
         A `venueEdge` workstation acquires through its edge node, which holds the venue lease and sub-leases
         to terminals.
+
+        **No standing lease in Block A** (decided 20 October 2026, Chinmay, R8 blocker causes FOUNDATION-AI-C45 and
+        GPS-C37; CHG-R8SPN-033; ADR-0013 C103 stays open for later). A till does not pre-lease units of a contended
+        timed capacity to sell offline: **contended timed entry is sold online only at the till**. A till takes a
+        hold per sale, while it is online, as POS-003 does, and with the link down POS-003 refuses a timed-entry
+        line on a contended capacity (its offline state) while the till keeps selling uncontended products
+        offline. The lease size, scope, TTL and renewal of a standing lease are not set in r8, and nothing in
+        tenancy''s offline settings configure one.
 
         '
       tags:
@@ -4754,6 +4875,11 @@ paths:
 
         Withdrawal stops new sales and leaves existing entitlements intact. Archiving is refused while
         entitlements remain unexpired.
+
+        **Withdrawal is announced** (R8 blocker cause FOUNDATION-AI-C39; CHG-R8SPN-037): `withdraw` (live to
+        withdrawn) writes `catalogue.productWithdrawn` to the outbox in the same transaction (productId, venueIds,
+        variantIds, withdrawnAt), as `publish` writes `catalogue.productPublished`. AI''s Help me choose job consumes it
+        (a mapped product withdrawn raises a new suggestion) and white-label''s published bundle drops the product.
 
         '
       tags:
@@ -6103,6 +6229,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-availability:
+    get:
+      operationId: getChannelAvailability
+      x-ticvai-audience:
+        - staff
+      x-ticvai-read-routing: primary
+      summary: One product's channel publication, as publishChannelAvailability last stored it
+      description: '**The read this whole-replace write was missing** (20 October 2026, R8 blocker cause GPS-C39;
+        CHG-R8SPN-038). Returns the publication of the product `productId` names, within the caller''s venue, in the
+        shape `publishChannelAvailability` answers with, so a screen that changes one part can send the rest back
+        unchanged. A product with no publication saved answers `200` with an empty `channels` list. Read from the
+        primary, because the next call is the PUT that replaces it.'
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: productId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The product's channel publication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelPublicationAvailabilityView'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: publishChannelAvailability
       x-ticvai-consumed-by:
@@ -6132,7 +6293,20 @@ paths:
         are response-only (publicationPreview, validationIssues); productId and the count of issued entitlements
         that stay valid added. Removing a channel stops future sale only; previously issued tickets stay valid,
         and the response shows issuedEntitlementsUnaffected so ADM-124 can say so. Only approved or live products
-        can be exposed; channel configuration itself belongs to Sales Channel Management.'
+        can be exposed; channel configuration itself belongs to Sales Channel Management.
+
+
+        **A PUT replaces the product''s publication whole, so a caller reads it first** (20 October 2026, R8 blocker
+        cause GPS-C39; CHG-R8SPN-038). Every screen that changes one part (BO-291 its channels, ADM-124 everything)
+        reads the current publication with `getChannelAvailability`, changes what it shows, and sends the rest back
+        as read: `siteIds`, `posGroupIds`, `venueIds` and the dates it does not show are kept only because they are
+        sent. A body that leaves them out clears them.
+
+
+        **Membership channels map onto catalogue channels** (GPS-C39): the channel values BO-291''s membership view carries
+        (subscription) map `guestWeb` -> `web`, `guestApp` -> `mobile`, `Reseller` (or `partner`) -> `b2b`, and the rest
+        by the same name where one exists; `api` has no catalogue channel (public API sale is governed by the API licensing, not by this
+        list) and is not sent.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -22448,6 +22622,16 @@ components:
         id:
           type: string
           format: uuid
+        listPrice:
+          oneOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**The list price on the caller''s channel now**, resolved on read from the price lists
+            (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on
+            input. Null where no price list prices it on that channel. The list price, not the total: promotions
+            and bundles are applied at the basket.'
         productId:
           type: string
           format: uuid
@@ -23477,6 +23661,36 @@ components:
           type: string
         appliedByWorkstations:
           type: integer
+    BundleSigningKey:
+      x-ticvai-persistence: none — read from the cell's Key Vault (public halves only)
+      type: object
+      description: 'One public key a till verifies catalogue bundle signatures with (`getBundleSigningKeys`; R8 blocker
+        cause FOUNDATION-AI-C14, CHG-R8SPN-022). Nothing is stored in the database: the key pair lives in the cell''s
+        Key Vault and this is its public half.'
+      required:
+      - keyId
+      - algorithm
+      - publicKey
+      - validFrom
+      properties:
+        keyId:
+          type: string
+          description: The value a bundle carries in `signatureKeyId`.
+        algorithm:
+          type: string
+          enum:
+          - Ed25519
+        publicKey:
+          type: string
+          description: The raw 32-byte Ed25519 public key, base64url-encoded.
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null for the key in use; for a retired key, 7 days after the rotation that retired it.
     CatalogueBundle:
       x-ticvai-persistence: catalogue.published_bundle
       type: object
@@ -23505,6 +23719,10 @@ components:
           type: string
           description: 'Detached signature over `contentHash`. The terminal verifies before applying and
             rolls back on failure — a half-applied catalogue is never traded against.
+
+
+            **Ed25519**, with the key `signatureKeyId` names, whose public half `getBundleSigningKeys` returns
+            (FOUNDATION-AI-C14, CHG-R8SPN-022).
 
             '
         signatureKeyId:
@@ -34567,24 +34785,58 @@ components:
           description: Maximum bands per movement; defaults to 1 (decided 29 September, readiness close-out)
         minimumTimeBetweenMovements:
           type: integer
-          description: Minimum minutes between movements; defaults to 60 (decided 29 September, readiness close-out)
+          deprecated: true
+          description: Minimum minutes between movements; defaults to 60 (decided 29 September, readiness close-out).
+            **Deprecated, same value as `minimumMinutesBetweenMovements`** (GPS-C32, CHG-R8SPN-028), kept for clients
+            built on r1.
         reversalRules:
           type: string
+          deprecated: true
           enum:
             - allowed
             - afterCooldown
             - notAllowed
           description: Whether a movement may be reversed; defaults to afterCooldown (decided 29 September, readiness
-            close-out)
+            close-out). **Deprecated, same value as `reversalRule`** (GPS-C32), kept for clients built on r1.
         cooldownPeriod:
           type: integer
-          description: Cooldown in minutes after a movement; defaults to 60 (decided 29 September, readiness close-out)
+          deprecated: true
+          description: Cooldown in minutes after a movement; defaults to 60 (decided 29 September, readiness close-out).
+            **Deprecated, same value as `cooldownMinutes`** (GPS-C32), kept for clients built on r1.
         ladderId:
           type: string
-          description: Ladder ID
+          deprecated: true
+          description: Ladder ID. **Deprecated, same value as `id`** (GPS-C32), kept for clients built on r1.
         strategyId:
           type: string
-          description: Strategy the ladder belongs to
+          deprecated: true
+          description: Strategy the ladder belongs to. **Deprecated, same value as `dynamicPricingStrategyId`**
+            (GPS-C32), kept for clients built on r1.
+        id:
+          type: string
+          format: uuid
+          description: '**The ladder''s id, `PriceLadder.id`**: the read uses the write''s names (decided 20 October
+            2026, R8 blocker cause GPS-C32; CHG-R8SPN-028), so ADM-094 reads back exactly what `setPriceLadderMatrix`
+            took.'
+        dynamicPricingStrategyId:
+          type: string
+          format: uuid
+          description: The strategy the ladder belongs to, `PriceLadder.dynamicPricingStrategyId` (GPS-C32).
+        minimumMinutesBetweenMovements:
+          type: integer
+          nullable: true
+          description: '`PriceLadder.minimumMinutesBetweenMovements` (GPS-C32); 60 where the ladder sets none.'
+        cooldownMinutes:
+          type: integer
+          nullable: true
+          description: '`PriceLadder.cooldownMinutes` (GPS-C32); 60 where the ladder sets none.'
+        reversalRule:
+          type: string
+          enum:
+            - allowed
+            - afterCooldown
+            - notAllowed
+          description: '`PriceLadder.reversalRule` (GPS-C32).'
         basePriceSource:
           type: string
           description: Board 1 rate the ladder is built around
@@ -34643,7 +34895,10 @@ components:
           items:
             allOf:
               - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: 'Psychological pricing: governed endpoints (e.g. AED 249, 259, 279) a price may land on'
+          description: 'Psychological pricing: governed endpoints (e.g. AED 249, 259, 279) a price may land on. **The
+            same values `PriceLadder.allowedEndpoints` stores as decimal strings, returned here as Money in the
+            venue''s currency** (GPS-C32, CHG-R8SPN-028): the editor sends `"249.00"` and reads back `{amount: 249.00,
+            currency: AED}`.'
         minimumPrice:
           allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -42256,9 +42511,29 @@ components:
           - derivedBands
           - continuousRange
         bands:
-          type: object
-          additionalProperties: true
-          description: '`[{code, price, percent}]`, ascending.'
+          type: array
+          description: '**The bands, lowest first** (typed 20 October 2026, R8 blocker cause GPS-C32; CHG-R8SPN-028: it
+            was declared an object while every reader and writer used a list, so no valid body could carry it). The
+            same shape `DynamicPriceBandsLaddersAdjustmentMatrixView.bands` returns. Stored as the jsonb list it always
+            was.'
+          items:
+            type: object
+            required:
+            - code
+            properties:
+              code:
+                type: string
+                maxLength: 40
+                description: Band code, e.g. P4
+              price:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+                description: Band price (fixed and derived bands)
+              percent:
+                type: number
+                nullable: true
+                description: Band offset from base in percent (percentage bands)
         baseBandCode:
           type: string
           maxLength: 40
@@ -42314,7 +42589,9 @@ components:
           type: array
           items:
             type: string
-          description: Psychological price endings, e.g. `.99`, `.00`.
+          description: 'The governed price endpoints a price may land on, as decimal strings in the venue''s currency
+            (e.g. `"249.00"`, `"259.00"`), the DDL''s text[]. ADM-094''s view returns the same values as Money (GPS-C32,
+            CHG-R8SPN-028).'
         createdAt:
           type: string
           format: date-time

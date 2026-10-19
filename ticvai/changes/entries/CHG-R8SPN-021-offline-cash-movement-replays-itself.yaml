@@ -1,0 +1,35 @@
+id: CHG-R8SPN-021
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'An offline lift or float is replayed through createCashMovement itself, with its Idempotency-Key and recordedAt; a
+  replay refused 409 shift-not-open or lift-exceeds-float is quarantined through recordSyncRejection with the new kind
+  cashMovement and its request body as payload.'
+decision:
+  what: 'R8 blocker cause FOUNDATION-AI-C13 (lead answer: take the recommendation, option A). shift.yaml
+    createCashMovement; orders.yaml SyncRejection.kind gains cashMovement (a response enum value: breaking under
+    check-contract-compat, entry requested from the lead in the core lane report).
+    docs/active/block-a-extra-tasks.json OFFLINE-JOURNAL''s replay sentence is the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 ticket 27709 TEST-AM-FOUNDATION-OFFLINE (ADAM gap 27709/1): createCashMovement was
+  offline-capable but had no replay route or quarantine kind. Finding: R8 blocker cause list, group foundation-ai.'
+keys_touched:
+  operations: [createCashMovement, recordSyncRejection, listSyncRejections]
+  schemas: [SyncRejection]
+  files:
+  - contracts/spine/shift.yaml
+  - contracts/spine/orders.yaml
+root_class: 'contract gap: an offline-capable write has no replay path'
+tickets:
+  started: []
+  unstarted:
+  - '27709 (the walk that found the gap).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27709/1'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open

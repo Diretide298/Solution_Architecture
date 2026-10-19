@@ -498,6 +498,12 @@ paths:
       x-ticvai-permission: null
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
+      x-ticvai-offline-note: 'Signing in needs the network on every staff device in r8 (decided 20 October 2026, Chinmay,
+        R8 blocker cause IDENTITY-C01; CHG-R8SPN-027). A till (POS-000) or a staff handheld (EMP-001) already signed in
+        keeps working offline, but nobody signs in while it is offline, so their offline state says signing in needs a
+        connection, as ADM-001 does (approved wording, to be confirmed with the client). **Open for r9, not built in
+        r8**: offline sign-in on access-control devices (the handheld scanner SCN-001 and turnstiles), with a verifier
+        the device holds from the operator''s last online sign-in, an ADR-0071 exception and a security review.'
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -675,8 +681,9 @@ paths:
         '
       tags:
       - identity
-      x-ticvai-permission: GUEST_VIEW
-      x-ticvai-guest-callable: true
+      # No staff permission: a guest or a visitor proves their own address (ADR-0025; R8 blocker cause IDENTITY-C28,
+      # CHG-R8SPN-025). GUEST_VIEW was a staff permission no guest holds, so nothing could be refused for lacking it.
+      x-ticvai-permission: null
       x-ticvai-audience:
       - guest
       - anonymous
@@ -1406,6 +1413,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: grantDelegation
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the minor age, RegionSettings.minorAgeThreshold in platform.region_settings, Tenancy''s data (IDENTITY-C19; CHG-R8SPN-024)'
       x-ticvai-consumed-by:
         - "P02 GST-015 Memberships"
       security:
@@ -1432,6 +1443,16 @@ paths:
         over anybody else''s account; staff holding `GUEST_MANAGE` record a grant on the account holder''s
         behalf. **A subject with no date of birth on file is treated as a minor.** The age below which a
         subject is a minor is an open value that client counsel sets; it is not assumed here.
+
+
+        **Built with a configurable age** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C19, option
+        A; CHG-R8SPN-024; R205 still open with counsel): a subject is a minor below
+        `tenancy.RegionSettings.minorAgeThreshold` (18 by default, set per country), or with no date of birth.
+        **When the 409 `minor-grants-adult-authority` happens**: the holder the grant is for (the path''s
+        `subjectId`) is a minor and `overSubjectId` is an adult, whoever calls, a guest or staff on the guest''s
+        behalf. **How the first adult link over a minor is made**: the adult enrols the child from GST-069
+        (R205), which writes a `familyMember` or `primaryHolder` grant held by the adult over the child, with the
+        adult as grantor; this operation is how later grants are added.
 
         '
       tags:
@@ -1500,7 +1521,9 @@ paths:
           description: '**A cycle, or a minor granting authority over an adult.** Both are refused — a
             delegation graph with a loop is one nobody can reason about, and the second is a safeguarding
             concern rather than a modelling one. A subject with no date of birth counts as a minor
-            (audit R126).
+            (audit R126). `minor-grants-adult-authority`: the path''s `subjectId` is a minor (below
+            `RegionSettings.minorAgeThreshold`, or no date of birth) and `overSubjectId` is an adult
+            (IDENTITY-C19, CHG-R8SPN-024).
 
             '
           content:
@@ -1556,6 +1579,15 @@ paths:
         CHG-CSP-002, breaking change BC-001 to BC-005): a session opened from a browser or a handheld
         has no workstation and no board, and the field is absent rather than invented.
 
+
+        **The venue is chosen with the role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C45,
+        option A; CHG-R8SPN-032). A role is held through a grant, and the grant carries the scope: a steward at
+        AquaCove Abu Dhabi and at AquaCove Dubai holds two grants of one role, and `availableRoles` lists one
+        `RoleSummary` per grant, each naming its venue (`scope`). The client sends the chosen card''s `grantId`;
+        the session''s venue (`identity.session.venue_id`) and scope are set from that grant''s scope. `roleId`
+        alone still works for a role held at one venue; for a role held at several, a body with no `grantId` is
+        refused `422 grant-required`, and a `grantId` that is not the caller''s, or not of `roleId`, is `403`.
+
         '
       requestBody:
         required: true
@@ -1569,6 +1601,11 @@ paths:
                 roleId:
                   type: string
                   format: uuid
+                grantId:
+                  type: string
+                  format: uuid
+                  description: '`RoleSummary.grantId` of the card chosen: which grant of the role, and so which venue
+                    (IDENTITY-C45, CHG-R8SPN-032). Required when the role is held at more than one venue.'
       responses:
         '200':
           headers:
@@ -1581,6 +1618,14 @@ paths:
                 $ref: '#/components/schemas/Session'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '422':
+          description: 'The role is held at more than one venue and the body names no `grantId` (`grant-required`;
+            IDENTITY-C45, CHG-R8SPN-032). Nothing changes; the client shows the cards and sends the chosen grant.'
+          x-ticvai-problem-types: [grant-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/refresh:
@@ -1610,6 +1655,12 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       summary: Rotate the access token
+      description: 'Exchanges a refresh token for a new access token **and a new refresh token**; the one sent is
+        retired (rotation). A staff refresh token slides: it lives `PasswordPolicy.refreshTokenHours` (12 hours by
+        default, proposed, client to correct) from its last use, and never past the session''s `expiresAt`. **A
+        retired refresh token sent again is a reuse**: the server ends the session, revokes every refresh token
+        issued from the same sign-in, and answers 401, so a stolen token works at most once (IDENTITY-C25,
+        FOUNDATION-AI-C27; CHG-R8SPN-014; the rule is written once on `bearerAuth`).'
       security: []
       requestBody:
         required: true
@@ -1632,6 +1683,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenPair'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /auth/step-up-supervisors:
+    get:
+      operationId: listStepUpSupervisors
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: Who may sign a supervisor step-up here
+      description: '**The picker of the supervisor PIN prompt** (decided 20 October 2026, Chinmay, R8 blocker cause
+        GPS-C31, option A; CHG-R8SPN-035; `SupervisorStepUp` in contracts/shared/common.yaml). Returns the active
+        principals who hold `permission` at the venue the caller''s session acts at (through their grants, after
+        deny resolution, as the step-up check itself resolves it), **leaving out the caller**, who may never sign
+        their own act. Only what the prompt shows: the principal id and display name.
+
+
+        **Who may ask.** Any staff session at the venue, with no permission of its own: the cashier whose act needs
+        a supervisor is the one who opens the prompt, and the answer is limited to the caller''s own venue and to
+        names, never roles, contact details or anything else of the principal.
+
+
+        **Order.** By `displayName` ascending, then by `principalId`. **Statuses.** Only active principals whose grant
+        is in force now; deactivated principals and expired grants are left out.'
+      tags:
+      - identity
+      # No permission: any staff session at the venue may ask who can sign for its own pending act; the answer is
+      # scoped to the caller's own venue and session (self-scoped) and carries names only (GPS-C31).
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: principal
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: permission
+        in: query
+        required: true
+        description: The step-up operation's `x-ticvai-permission`, for example `ORDER_CANCEL`.
+        schema:
+          $ref: ../shared/permissions.yaml#/components/schemas/Permission
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The principals who may sign, by display name
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        required: [principalId, displayName]
+                        properties:
+                          principalId:
+                            type: string
+                            format: uuid
+                          displayName:
+                            type: string
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '429':
@@ -2226,6 +2341,12 @@ paths:
         once** (decided 28 September, audit R126 (1)): the person signs in again and is resolved afresh.
         A change to `displayName` alone ends nothing.
 
+
+        **It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15,
+        option A; CHG-R8SPN-024). A role held at a scope is a grant: `createDelegatedAccess` gives one (role,
+        scope, validity) and `deleteDelegatedAccess` takes one away. CMS-019''s Change access calls those two for
+        the roles it adds and removes, and this operation only for the display name, active flag and validity.
+
         '
       tags:
       - administration
@@ -2804,9 +2925,19 @@ paths:
         here is the session the guest continues in; it becomes verified when the code is confirmed, and
         `linkGuestCheckout` then runs under that same session.
 
+        **The consents given at registration are recorded by Marketing, which owns consent** (20 October 2026, R8
+        blocker cause IDENTITY-C55; CHG-R8SPN-029). Identity stores none of them: in the same transaction as the
+        account it writes `identity.guestRegistered` to the outbox carrying the new `subjectId`, the channel and
+        each `consents[]` item (purpose, granted, noticeVersion), and Marketing''s consumer records one consent per
+        item through its own `recordConsent` rules (source `registration`, idempotent on the event id and purpose).
+        A registration with no `consents` still emits the event, with an empty list. Later changes of mind go
+        through `recordConsent` directly (F56 step 5).
+
         '
       tags:
       - guestAuth
+      x-ticvai-emits:
+      - identity.guestRegistered
       x-ticvai-permission: null
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3109,7 +3240,15 @@ paths:
       x-ticvai-audience:
       - anonymous
       summary: Sign in with Apple or Google
-      description: 'Where the provider''s verified email matches an existing account, the identities are
+      description: '**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay,
+        R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label''s published tenant config, which the
+        app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple
+        and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
+        provider rows. The client secret and the audience checks stay here, server-side, in the provider row
+        (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
+        against the one registered (`DomainReadiness.uaePassRedirect`).
+
+        Where the provider''s verified email matches an existing account, the identities are
         linked rather than a duplicate created. Where it does not, a new account is created — an unverified
         email from a provider is not proof of ownership.
 
@@ -3182,7 +3321,15 @@ paths:
       x-ticvai-audience:
       - anonymous
       summary: Sign in with a national identity provider
-      description: 'OAuth authorisation-code exchange. Returns a verified identity, so an account created
+      description: '**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay,
+        R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label''s published tenant config, which the
+        app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple
+        and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
+        provider rows. The client secret and the audience checks stay here, server-side, in the provider row
+        (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
+        against the one registered (`DomainReadiness.uaePassRedirect`).
+
+        OAuth authorisation-code exchange. Returns a verified identity, so an account created
         this way needs no further verification.
 
         Government onboarding has lead time and should be started before it becomes the critical path.
@@ -3671,6 +3818,18 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          x-ticvai-problem-types: [session-active-elsewhere, workstation-in-use]
+          description: '**Refused exactly as `login` refuses** (decided 20 October 2026, Chinmay, R8 blocker cause
+            IDENTITY-C24, option A; CHG-R8SPN-025; ADR-0004, audit R184): the principal the provider proved already
+            holds an active session on another device (`session-active-elsewhere`), or the handheld or till is in
+            use by somebody else (`workstation-in-use`). Signing in through a provider never ends the other session;
+            a supervisor ends it with `forceLogout`. The answer says since when and on what (`SessionHeldProblem`:
+            `openedAt` and `deviceLabel`; ADAM CR-170).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SessionHeldProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/sso-config:
@@ -8644,6 +8803,41 @@ components:
           format: date-time
           nullable: true
           description: When the supervisor's PIN unlocks, where `refusal` is `credentialLocked`.
+    OpenShiftMarker:
+      x-ticvai-persistence: identity.open_shift_marker
+      type: object
+      description: >-
+        **Which shifts are open, as Identity knows it** (decided 20 October 2026, Chinmay, R8 blocker cause
+        IDENTITY-C51, option A; CHG-R8SPN-036). A projection Identity keeps so `ActiveSession.hasOpenShift` can be
+        answered without reading Orders' `orders.pos_shift` (Identity is Foundation and reads nothing above it,
+        ADR-0028). **Never returned by any operation**, like `SubjectHolding`. No operation writes it; Identity's
+        consumers do: `shift.opened` inserts the row (when a shift opens, in any state before `closed`), and
+        `shift.closed` deletes it (a shift that ends `autoClosed` is closed by the same event). Idempotent on
+        `shiftId`. A lagging consumer can only show a shift as open a moment longer, which errs on the side of
+        warning before a session is revoked.
+      required: [shiftId, principalId, workstationId, openedAt]
+      properties:
+        shiftId:
+          type: string
+          format: uuid
+          description: The shift (`orders.pos_shift.id`, carried by the event); the row's key.
+        principalId:
+          type: string
+          format: uuid
+          description: The principal whose shift it is.
+        workstationId:
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+        openedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), the venue's path, as the event carries it.
     SubjectHolding:
       x-ticvai-persistence: identity.subject_holding
       # One row per order or entitlement: an entitlement has one holder at a time (CHG-GDL-001).
@@ -9232,6 +9426,18 @@ components:
           description: '**The single most effective rule.** Refusing a password known to be breached stops
             more account takeovers than every composition rule combined.
 
+
+            **Where the breach list comes from** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C06,
+            option B; CHG-R8SPN-019; audit R117). A local corpus file shipped with each release: the SHA-1 hashes of
+            known breached passwords, sorted and indexed by their first five hex characters, held inside the region
+            with the service and never sent anywhere, so no credential hash leaves the region and there is no
+            outage mode. Identity reads it through one adapter, `checkPasswordBreached(passwordSha1Prefix)`, which
+            returns the corpus''s full hashes under that prefix with their counts; the service compares the full
+            hash itself. A match refuses the password `422 policy-not-met` (`changeOwnCredential`, and any
+            other operation that sets a password under this policy). The corpus is refreshed with the release, not at run
+            time. The client may still name a vendor under R117, which would be a second adapter behind the same
+            interface (handoff/integration-register.md row 20).
+
             '
         maxAgeDays:
           type: integer
@@ -9392,6 +9598,30 @@ components:
           - PLATFORM_MIGRATION_VIEW
           - PLATFORM_MIGRATION_APPLY
           - PLATFORM_AI_MANAGE
+        accessTokenMinutes:
+          type: integer
+          default: 15
+          minimum: 5
+          maximum: 60
+          description: 'How long a staff access token lives (`TokenPair.expiresIn`). **15 minutes, proposed, client
+            to correct** (decided 20 October 2026, Chinmay, IDENTITY-C25; CHG-R8SPN-014). Staff tokens only; a
+            guest token follows `guestAuth`.'
+        refreshTokenHours:
+          type: integer
+          default: 12
+          minimum: 1
+          maximum: 24
+          description: 'How long a staff refresh token lives without use. Sliding: each refresh issues a new one
+            and retires the old, and a retired one presented again ends the session and revokes its family (see
+            `bearerAuth`). **12 hours, proposed, client to correct** (IDENTITY-C25; CHG-R8SPN-014).'
+        sessionMaxHours:
+          type: integer
+          default: 12
+          minimum: 1
+          maximum: 24
+          description: 'The longest a staff session lives (`Session.expiresAt`). A till session ends sooner, when
+            the shift on its workstation closes. **12 hours, proposed, client to correct** (IDENTITY-C25;
+            CHG-R8SPN-014).'
     SegregationViolation:
       type: object
       x-ticvai-persistence: none — computed from identity.grant against identity.segregation_rule
@@ -9765,7 +9995,9 @@ components:
           pattern: ^[a-z]{2}$
         consents:
           type: array
-          description: Consent captured at registration, recorded with the notice version.
+          description: 'Consent captured at registration, recorded with the notice version. **Recorded by Marketing,
+            not stored here**: `registerGuest` carries the list on `identity.guestRegistered`, and Marketing''s
+            consumer records each item as a consent (IDENTITY-C55, CHG-R8SPN-029).'
           items:
             type: object
             properties:
@@ -10060,8 +10292,12 @@ components:
           type: boolean
           x-ticvai-persisted: false
           x-ticvai-derived: onRead
-          description: Revoking this session leaves cash unreconciled. **Computed on read** from the shift the
-            principal holds open at the workstation (`orders.pos_shift`), never stored here.
+          description: 'Revoking this session leaves cash unreconciled. **Computed on read, from Identity''s own
+            projection** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C51, option A; CHG-R8SPN-036):
+            true when `identity.open_shift_marker` (`OpenShiftMarker`) holds a row for this principal at this
+            session''s workstation. Identity is Foundation and never reads `orders.pos_shift` (ADR-0028), so the
+            marker is fed by Shift''s events, as `identity.subject_holding` is fed by Orders''. BO-053 and POS-000
+            read it here; never stored on the session.'
         mfaSatisfied:
           type: boolean
         startedAt:
@@ -10698,7 +10934,10 @@ components:
           type: string
         expiresIn:
           type: integer
-          description: Seconds
+          description: 'Seconds until the access token expires: `PasswordPolicy.accessTokenMinutes` x 60, 900 by
+            default (15 minutes; proposed, client to correct). The refresh token, its rotation and reuse detection,
+            and the signing key are described once on `bearerAuth` in contracts/shared/common.yaml
+            (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014).'
     RoleSummary:
       x-ticvai-persistence: none — projection over role
       type: object
@@ -10718,6 +10957,16 @@ components:
           type: boolean
           description: True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`);
             false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002).
+        grantId:
+          type: string
+          format: uuid
+          description: '**The grant this card stands for** (`identity.delegated_access.id`; IDENTITY-C45, CHG-R8SPN-032).
+            A role held at two venues is two grants and two cards; `selectRole` takes the chosen one.'
+        scope:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ScopeRef
+          description: The scope node the grant is held at (`platform.scope`), with its name, so the card can say which
+            venue (IDENTITY-C45).
     Session:
       type: object
       required:
@@ -10780,12 +11029,25 @@ components:
             '
         workstation:
           $ref: '#/components/schemas/WorkstationContext'
+        availableRoles:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**The roles the principal may choose, one per grant** (IDENTITY-C45, CHG-R8SPN-032), resolved on
+            read as `LoginResponse.availableRoles` is, so EMP-002 can list them on a cold open or after a relaunch
+            (`getCurrentSession`) without signing in again.'
+          items:
+            $ref: '#/components/schemas/RoleSummary'
         openedAt:
           type: string
           format: date-time
         expiresAt:
           type: string
           format: date-time
+          description: 'When the session ends at the latest: `openedAt` plus `PasswordPolicy.sessionMaxHours` (12
+            hours by default; proposed, client to correct). A till session ends earlier, when the shift on its
+            workstation closes; any session ends at `logout` or a revocation. Refreshing the access token never
+            moves this time (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014).'
     WorkstationContext:
       type: object
       required:

@@ -179,6 +179,11 @@ def approval_raised_shape(op: dict, doc: dict) -> list[str]:
         bad.append("still answers approval-required (x-ticvai-problem-types)")
     if APPROVAL_ROUTE not in (op.get("x-ticvai-write-via") or []):
         bad.append("does not route approvals.request through createApprovalRequest (x-ticvai-write-via)")
+    # No route, no request (lead's ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): a request that
+    # matches no active rule is refused 422 no-approval-route by createApprovalRequest, and the caller passes it on.
+    r422 = _local(doc, responses.get("422"))
+    if not (isinstance(r422, dict) and "no-approval-route" in (r422.get("x-ticvai-problem-types") or [])):
+        bad.append("does not pass on createApprovalRequest's 422 no-approval-route")
     for c in ("200", "201"):
         if c in responses:
             bad.append(f"answers {c}, as if the change were made in the call")
@@ -201,18 +206,21 @@ def self_test() -> list[str]:
                                  "properties": {"approvalRequestId": {"type": "string"}}}]},
         "Plain": {"type": "object", "properties": {"id": {}}}}}}
     r202 = {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Requested"}}}}
-    good = {"x-ticvai-write-via": [dict(APPROVAL_ROUTE)], "responses": {"202": r202, "409": {
+    r422 = {"x-ticvai-problem-types": ["no-approval-route"]}
+    good = {"x-ticvai-write-via": [dict(APPROVAL_ROUTE)], "responses": {"202": r202, "422": r422, "409": {
         "x-ticvai-problem-types": ["tenant-not-active", "open-request-exists"]}}}
     cases = {
         "the CR-172 shape": (good, False),
-        "a text that names the retired refusal": (dict(good, responses={"202": r202, "409": {
+        "no 422 no-approval-route": (dict(good, responses={"202": r202, "409": {
+            "x-ticvai-problem-types": ["open-request-exists"]}}), True),
+        "a text that names the retired refusal": (dict(good, responses={"202": r202, "422": r422, "409": {
             "description": "This is not the retired `approval-required`.",
             "x-ticvai-problem-types": ["open-request-exists"]}}), False),
         "a caller-supplied approvalRequestId parameter": (
             dict(good, parameters=[{"name": "approvalRequestId", "in": "query"}]), True),
         "approvalRequestId in the body": (dict(good, requestBody={"content": {"application/json": {"schema": {
             "type": "object", "properties": {"approvalRequestId": {"type": "string"}}}}}}), True),
-        "a 409 approval-required": (dict(good, responses={"202": r202, "409": {
+        "a 409 approval-required": (dict(good, responses={"202": r202, "422": r422, "409": {
             "x-ticvai-problem-types": ["approval-required"]}}), True),
         "a 200 beside the 202": (dict(good, responses={"200": r202, "202": r202}), True),
         "no 202": (dict(good, responses={"200": r202}), True),

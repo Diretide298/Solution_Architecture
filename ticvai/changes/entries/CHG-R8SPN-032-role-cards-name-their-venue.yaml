@@ -1,0 +1,37 @@
+id: CHG-R8SPN-032
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The venue is chosen with the role. RoleSummary gains grantId and scope, so a role held at two venues shows two
+  cards each naming its venue; selectRole takes grantId (required, 422 grant-required, when the role is held at
+  several venues; roleId alone still works for one) and sets the session''s venue from the grant''s scope;
+  Session.availableRoles (not stored) lets EMP-002 list the cards on a cold open via getCurrentSession. Additive.'
+decision:
+  what: 'R8 blocker cause IDENTITY-C45 (lead answer: take the recommendation, option A: chosen; a role held at two venues
+    shows two cards). identity.yaml selectRole, RoleSummary, Session. The EMP-002 note (the grant, not the role,
+    carries the scope; the card gains the venue name) and the design note are the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27755 and 27759 (ADAM gaps 27759/4, 27755/0, 27755/1): the screen, flow and
+  design notes promised a venue pick that selectRole and RoleSummary could not carry, and nothing returned the roles
+  after login. Finding: R8 blocker cause list, group identity.'
+keys_touched:
+  operations: [selectRole, getCurrentSession, login]
+  schemas: [RoleSummary, Session]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'screen-api gap: a choice the approved screen offers has no field to carry it'
+tickets:
+  started: []
+  unstarted:
+  - '27755 and 27759 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27759/4, 27755/0, 27755/1'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open
+notes: 'Lineage: selectRole and getCurrentSession read identity.delegated_access and platform.scope (Tenancy''s, through
+  its scope query) for the cards; the generators lane''s lineage derive adds them.'

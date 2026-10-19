@@ -1,0 +1,38 @@
+id: CHG-R8SPN-026
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Three guest money screens get the rule their approved text promises. A full or consolidated tax invoice needs the
+  recipient''s address (422 recipient-required otherwise), and in r8 no supersedesInvoiceId is sent: an order already
+  invoiced shows its invoice (CF-133 still open). applyCartPromoCode accepts a promotion''s own code as well as a
+  coupon campaign''s, which is how WEB-032''s Use this offer reaches the price; automatic promotions need no call.
+  listReservations states GST-016''s split: Upcoming is held with expiresAt in the future, Past is the rest.'
+decision:
+  what: 'R8 blocker causes ORDERS-MONEY-C06 (lead answer: option C for r8; A or B from the client''s written answer to
+    CF-133), ORDERS-MONEY-C11 (lead answer: A for automatic promotions, B for code promotions; no new cart field) and
+    ORDERS-MONEY-C13 (lead answer: option A, by status and hold expiry). finance.yaml FinTaxInvoiceRecipient.address
+    and supersedesInvoiceId; orders.yaml applyCartPromoCode and listReservations. The GST-019 overlay (address field),
+    the WEB-032 binding and the GST-016 note are the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 28399, 28185 and 28241 (ADAM gaps 28399/0, 28399/1, 28185/1, 28241/0). Finding:
+  R8 blocker cause list, group orders-money.'
+keys_touched:
+  operations: [issueTaxInvoice, applyCartPromoCode, listReservations]
+  schemas: [FinTaxInvoiceRecipient, FinIssueTaxInvoiceRequest]
+  files:
+  - contracts/spine/finance.yaml
+  - contracts/spine/orders.yaml
+root_class: 'screen-api gap: an approved screen promises an outcome the contract does not decide'
+tickets:
+  started: []
+  unstarted:
+  - '28399, 28185 and 28241 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28399/0, 28399/1, 28185/1, 28241/0'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
