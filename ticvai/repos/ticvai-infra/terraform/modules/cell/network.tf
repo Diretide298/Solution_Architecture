@@ -88,7 +88,7 @@ resource "azurerm_subnet" "cell" {
 # outbound_type = "userAssignedNATGateway".
 # -----------------------------------------------------------------------------
 resource "azurerm_public_ip" "nat" {
-  count = local.create_network ? 1 : 0
+  count = local.create_network && var.nat_gateway_enabled ? 1 : 0
 
   name                = "pip-nat-ticvai-${local.cell_name}"
   resource_group_name = azurerm_resource_group.cell.name
@@ -100,7 +100,7 @@ resource "azurerm_public_ip" "nat" {
 }
 
 resource "azurerm_nat_gateway" "cell" {
-  count = local.create_network ? 1 : 0
+  count = local.create_network && var.nat_gateway_enabled ? 1 : 0
 
   name                    = "nat-ticvai-${local.cell_name}"
   resource_group_name     = azurerm_resource_group.cell.name
@@ -112,14 +112,14 @@ resource "azurerm_nat_gateway" "cell" {
 }
 
 resource "azurerm_nat_gateway_public_ip_association" "cell" {
-  count = local.create_network ? 1 : 0
+  count = local.create_network && var.nat_gateway_enabled ? 1 : 0
 
   nat_gateway_id       = azurerm_nat_gateway.cell[0].id
   public_ip_address_id = azurerm_public_ip.nat[0].id
 }
 
 resource "azurerm_subnet_nat_gateway_association" "aks" {
-  for_each = local.create_network ? local.aks_subnet_names : {}
+  for_each = local.create_network && var.nat_gateway_enabled ? local.aks_subnet_names : {}
 
   subnet_id      = azurerm_subnet.cell[each.value].id
   nat_gateway_id = azurerm_nat_gateway.cell[0].id

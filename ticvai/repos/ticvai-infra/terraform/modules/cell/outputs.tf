@@ -50,9 +50,9 @@ output "kubernetes_cluster_id" {
 }
 
 output "control_plane_registration" {
-  description = "Payload the Control Plane stores against this tenant's region record."
+  description = "Payload the Control Plane stores as this cell's record (control.cell); tenants are placed on it there (ADR-0039, FOUNDATION-AI-C55)."
   value = {
-    tenant_id      = var.tenant_id
+    environment    = var.environment
     jurisdiction   = var.jurisdiction
     tier           = var.tier
     cell_name      = local.cell_name

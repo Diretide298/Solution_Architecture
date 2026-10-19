@@ -1,6 +1,15 @@
 # Infrastructure Runtime
 
-Terraform + Kubernetes. One `cell` module instance = one tenant in one jurisdiction.
+Terraform + Kubernetes. One `cell` module instance = one cell of one environment: a region of one jurisdiction
+holding a database per tenant (ADR-0038, ADR-0040). Tenants are rows in the control database (ADR-0039), never
+module inputs; a tenant is placed on a cell (r8 cause FOUNDATION-AI-C55, 20 October 2026).
+
+**Environments** (the lead, 20 October 2026, FOUNDATION-AI-C52 and C23): dev runs on laptops with docker compose
+and has no cell; `staging` is one shared pre-production environment in the Softlabs Azure subscription
+(`terraform/environments/staging`, state in a storage account there, `backend.hcl.example`); `production` is hosted
+by the client later (`terraform/environments/production/<cell>.tfvars`). The environment is part of every resource
+name (`stg-ae1`, `prd-ae1`), and staging turns the heavy parts down with the module's switches
+(`system_min_nodes`, `nat_gateway_enabled`, `ai_gpu_enabled`, no replicas, no high availability).
 
 ## Cell rules
 

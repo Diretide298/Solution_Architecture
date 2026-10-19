@@ -194,7 +194,10 @@ documentation and pricing pages, read 30 September 2026).
   256 GB each). No licence fee; the VMs and disks are already in the cost workbook.
 - **Pin Qdrant 1.16 or later.** This ADR's reasoning assumes payload-filter RBAC is gone (deprecated in 1.15,
   removed in 1.16).
-- **TLS on the Qdrant service** (or a mesh). An API key over plain HTTP is not acceptable.
+- **TLS on the Qdrant service** (or a mesh). An API key over plain HTTP is not acceptable. **Issued by
+  cert-manager from Let's Encrypt**, installed with the Qdrant chart by the cluster bootstrap stage in
+  ticvai-infra (a second Terraform stage with the helm and kubernetes providers, after the cell module; owned by
+  SETUP-ENV's author, built in SETUP-QDRANT; the lead, 20 October 2026, r8 cause FOUNDATION-AI-C22, option A).
 - The plain Helm chart gives no zero-downtime upgrades, automatic shard rebalancing or cluster backup. Those
   are ours: SETUP-QDRANT and the runbook own them.
 

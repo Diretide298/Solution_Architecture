@@ -1,6 +1,6 @@
 # Git & Merge Requests
 
-**Platform: GitHub, with GitHub Actions for CI** (decided 28 September, audit R057). The repositories already ship `.github/workflows`. *Merge request* in this bible means a GitHub pull request.
+**Platform: GitLab, with GitLab CI** (`gitlab.softlabsgroup.in`; the lead, 20 October 2026, ADR-0007 amendment, r8 cause FOUNDATION-AI-C37; replaces audit R057's GitHub Actions). Every repository runs `.gitlab-ci.yml` on the group's shared runners. *Merge request* in this bible means a GitLab merge request.
 
 ## 9. Code Review
 

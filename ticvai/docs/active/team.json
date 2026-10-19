@@ -47,6 +47,10 @@
   "Tanmay Dukhande": "Narayan Gaonkar"
  },
  "successorsNote": "A person who left the team -> the person who took their place (CHG-PPL-001; Chinmay, 15 October 2026: \"tanmay is leaving so shift all tasks to narayan. Check in pms his exact name\"). 15 October 2026: Tanmay Dukhande (OpenProject user 108) left; Narayan Gaonkar (OpenProject user 79) took his place at the same role (Back end), pools, pace and position in areas.backend, so the load balancer sees only the name change. tools/sprint_plan.py pinned_owners hands every ticket the last release gave the person who left to their successor (a pushed ticket's owner comes from that bundle); tools/build-service-docs.py keeps the leaver's pushed onboarding key (SETUP-ONBOARD-TANMAY-DUKHANDE) for the successor's onboarding, since a pushed key is never renamed; tools/check-plan-owners.py (O-LEFT) fails on any task, in the plan or the schedule, owned, accountable or tested by someone named here, and on a name here still in the team's areas, onboard, pace, people or block-a-extra-tasks.json pins.",
+ "plannedNames": {
+  "Second AI engineer": "Mrunali"
+ },
+ "plannedNamesNote": "A placeholder in this roster whose person is named but not yet onboarded (the lead, 20 October 2026, r8 cause FOUNDATION-AI-C28): Mrunali is the second AI engineer. Her accounts (ADAM, OpenProject) are created when she starts; until then she owns nothing and the placeholder keeps its tickets' keys. The lead's answer also keeps the AI tickets with the first AI engineer, Kalpita Mejari, until she starts: moving the tasks pinned to the placeholder (block-a-extra-tasks.json) is a plan change, left to the lead's plan refresh. tools/build-service-docs.py names her on the onboarding ticket SETUP-ONBOARD-SECOND-AI-ENGINEER (a request to the storage-core lane, which owns that tool); when she starts, she replaces the placeholder through `successors` and this entry goes.",
  "serviceOwners": {
   "LedgerService": "Hrushikant Patkar"
  },

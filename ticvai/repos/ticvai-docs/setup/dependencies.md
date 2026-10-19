@@ -55,15 +55,24 @@ Versions are the starters' baseline; Renovate raises bumps within a major versio
 
 ### Infrastructure and CI (`ticvai-infra`)
 
-No infra starter ships yet, so this list follows the platform decision (audit R057: Azure in a UAE region, GitHub Actions).
+No infra starter ships yet, so this list follows the platform decision (audit R057: Azure in a UAE region; CI is GitLab CI since 20 October 2026, ADR-0007 amendment, r8 cause FOUNDATION-AI-C37).
 
 | Item | Purpose |
 |---|---|
 | Terraform with the `hashicorp/azurerm` provider | Cells, databases, key vaults |
-| GitHub Actions, using `actions/*` and `pnpm/action-setup` only, pinned to a major version | CI for every repository |
+| Terraform with the `hashicorp/helm` and `hashicorp/kubernetes` providers | The cluster bootstrap stage after the cell module: the Qdrant chart, ingress and cert-manager (the lead, 20 October 2026, r8 cause FOUNDATION-AI-C22, option A) |
+| The official Qdrant Helm chart (`qdrant/qdrant`), pinned to a chart version that installs Qdrant 1.16 or later | Self-hosted Qdrant, three nodes (ADR-0049) |
+| cert-manager (`jetstack/cert-manager`), issuing from Let's Encrypt | TLS on the Qdrant service and the cluster ingress (ADR-0049) |
+| GitLab CI (`.gitlab-ci.yml`, the group's shared runners), official images only (`node`, `python`, `mcr.microsoft.com/dotnet/sdk`, `hashicorp/terraform`, `alpine`), pinned to a version | CI for every repository (ADR-0007 amendment, 20 October 2026) |
+| The ticvai-frontend group's GitLab npm registry | Where `@ticvai/api-client` is published; each frontend repository pins it by exact version |
 | Azure Key Vault | Per-cell secrets (see config-and-secrets) |
 
-A third-party GitHub Action is a dependency like any other and needs the named approver.
+A third-party CI image or template is a dependency like any other and needs the named approver.
+
+**The cluster bootstrap** (FOUNDATION-AI-C22, option A): a second Terraform stage in ticvai-infra, run after the
+cell module against its AKS cluster with the helm and kubernetes providers. It installs cert-manager, the ingress,
+and the Qdrant chart on the `qdrant` node pool with TLS from cert-manager and JWT RBAC on (the API key from the
+cell's Key Vault). It is owned by SETUP-ENV's author and built in SETUP-QDRANT.
 
 ### AI (`ticvai-ai`, Python)
 

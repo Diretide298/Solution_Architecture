@@ -1,14 +1,20 @@
-variable "tenant_id" {
+# A cell is a region with a database per tenant (ADR-0038, ADR-0040); tenants are rows in the control database
+# (ADR-0039), so no tenant id or slug is an input here (r8 cause FOUNDATION-AI-C55, 20 October 2026).
+variable "environment" {
   type        = string
-  description = "TICVAI tenant UUID. Recorded in the Control Plane registry."
+  description = "staging | production. Part of every resource name. dev has no cell: it runs on laptops with docker compose (FOUNDATION-AI-C52)."
+  validation {
+    condition     = contains(["staging", "production"], var.environment)
+    error_message = "environment must be staging or production."
+  }
 }
 
-variable "tenant_slug" {
+variable "cell" {
   type        = string
-  description = "Short lowercase tenant identifier used in resource names."
+  description = "The cell's short name within its environment: the jurisdiction and a number, e.g. ae1, om1."
   validation {
-    condition     = can(regex("^[a-z0-9]{2,16}$", var.tenant_slug))
-    error_message = "tenant_slug must be 2-16 lowercase alphanumeric characters."
+    condition     = can(regex("^[a-z]{2}[0-9]{1,2}$", var.cell))
+    error_message = "cell must be a two-letter jurisdiction code and a number, e.g. ae1."
   }
 }
 
@@ -139,6 +145,25 @@ variable "ai_max_nodes" {
   default = 4
 }
 # The AI GPU node pool (CHG-R11-001; CHG-R4-008): one node without HA, two with HA (one per zone).
+# Pre-production switches (FOUNDATION-AI-C52): production keeps the defaults; staging turns them down in its tfvars.
+variable "system_min_nodes" {
+  type        = number
+  default     = 2
+  description = "Minimum nodes of the AKS system pool. 1 in pre-production."
+}
+
+variable "nat_gateway_enabled" {
+  type        = bool
+  default     = true
+  description = "The NAT gateway with one static egress IP for provider allow-lists. Off in pre-production unless a provider needs the fixed IP."
+}
+
+variable "qdrant_enabled" {
+  type        = bool
+  default     = true
+  description = "The Qdrant node pool (ADR-0049). Off only for a cell with no AI retrieval."
+}
+
 variable "ai_gpu_enabled" {
   type        = bool
   default     = true
