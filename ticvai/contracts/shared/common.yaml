@@ -776,6 +776,14 @@ components:
             that inherits it. One type with one status wherever the rule is checked (`createRole`,
             `setRolePermissions`, `setPrincipalModuleAccess`, `createDelegatedAccess`, `createPrincipal`);
             `requireApproval` and `warn` never refuse.
+        no-approval-route:
+          status: 422
+          title: No approval route
+          when: An approval request that is not a draft matches no active approval rule for its kind and subject
+            type (for subject type `tenant`, no active platform rule), so nobody could be asked. Nothing is written
+            and the request is never approved automatically. Answered by approvals' `createApprovalRequest` and passed
+            on unchanged by the operation that raised the request (`suspendTenant`, `reactivateTenant`; lead's ruling
+            on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015).
         server-error:
           status: 500
           title: Server error

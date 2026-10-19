@@ -33,7 +33,8 @@ why: 'ADAM CR-152 (Narayan Gaonkar, #27775), CR-163 (#27692), CR-164 (#27695) an
   checked that the package held the tables and fields they need.'
 keys_touched:
   operations: [suspendTenant, reactivateTenant, getTenantAppStatus]
-  tables: [control.outbox, control.cell_tenant, control.tenant, platform.outbox, platform.outbox_sequence]
+  tables: [control.outbox, control.cell_tenant, control.tenant, platform.outbox, platform.outbox_sequence,
+    approvals.request]
   schemas: [OutboxEntry, OutboxSequence, ControlOutboxEntry, CellTenant, TenantAppStatus, TenantChangeRequested,
     TenantChangeConflictProblem, ApprovalRequest]
   files:
@@ -69,6 +70,11 @@ tickets:
     index), MIG-PARTITIONS (the counter survives partitions). The kernel tickets PLATFORM-OUTBOX (27697),
     PLATFORM-KERNEL (27692), PLATFORM-FLAGS (27695) and the suspendTenant and reactivateTenant tickets are New in the
     r6 cache but their developers raised these CRs: the settlement comments reach their agents. 353 New in all.'
+  - 'Approvals side (lane H review 3 N-5, 20 October 2026): approvals.request gains attributes (jsonb, nullable) at the
+    release derive. SVC-TENANCY-REQUEST-1 (27813; createApprovalRequest 30848 stores attributes as sent, and
+    listApprovalRequests returns them; the declared query approvals#requestRecords, which Subscription''s consumer
+    reads them through, has no ticket of its own and is served from these reads) and SVC-TENANCY-REQUEST-3 (27833;
+    submitApprovalRequest 30903 amends attributes on a draft). Both get the settlement comment.'
 release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-152, CR-163, CR-164, CR-166, CR-172
@@ -115,7 +121,10 @@ notes: 'Prevention: check-ticket-builds B-KERNEL-STORAGE (KERNEL_NEEDS: each ker
   while one is open answers 409 open-request-exists with the fields createApprovalRequest''s own 409 declares
   (refusedReason openRequestExists, requestId, currentStatus; TenantChangeConflictProblem), documented on both
   operations. The approver is the tenant''s approval rules for configurationChange narrowed to subject type tenant, as
-  publishTenantConfig''s request is routed by the rules for its subject; no role is named. I-2: the two calls''
+  publishTenantConfig''s request is routed by the rules for its subject; no role is named (**superseded 20 October
+  2026 by CHG-R8SPN-015**, lane H review 3 N-1: the platform rule, held in the control plane and seeded at
+  provisioning, routes it to holders of PLATFORM_TENANT_MANAGE with four eyes; a tenant''s own rules never match
+  subject type tenant; no route is 422 no-approval-route, passed on). I-2: the two calls''
   lineage writes are approvals.request and cache:idempotency only, and tools/applied/tenant-approval-19-october.py
   removes control.tenant, control.outbox and platform.outbox after a derive; states/tenant.yaml credits active ->
   suspended, suspended -> active and terminating -> active to the consumer (trigger externalEvent, no operation);

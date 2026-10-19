@@ -80,13 +80,16 @@ consumers:
     one transaction - `attributes.action` suspend applies the suspension suspendTenant raised (now, or pending
     until its effectiveAt) and writes tenant.suspended to control.outbox; reactivate moves the tenant to active or
     cancels its pending suspension. **Re-checked on arrival**, since the tenant may have moved while the request
-    was open. Already in the target state (suspended; or active with nothing pending) changes nothing and is
-    recorded as a no-op; a state that no longer allows the change (suspend - onboarding, terminating or
-    terminated, tenant-not-active; reactivate - terminated, tenant-terminated, or onboarding,
-    tenant-not-suspended) changes nothing and the request closes as not applied, with that reason. Both are
-    reported on the request's approved-action execution, where approvals keeps whether an approved action ran
-    (succeeded with a note; failed with failureReason the reason). The consumer is the only writer of the tenant
-    row and of tenant.suspended on this path
+    was open. Already in the target state (suspended, or active with a suspension granted and not yet in effect,
+    which counts as suspended and keeps its time, mode and notice; or, for reactivate, active with nothing
+    pending) changes nothing and is recorded as a no-op; a state that no longer allows the change (suspend -
+    onboarding, terminating or terminated, tenant-not-active; reactivate - terminated, tenant-terminated, or
+    onboarding, tenant-not-suspended) changes nothing, with that reason. The approved request itself never
+    changes (approvals keeps it immutable); both outcomes are recorded on the request's approved-action
+    execution, where approvals keeps whether an approved action ran (succeeded with a note; failed with
+    failureReason the reason, and a Retry of it on BO-382 would be refused again by the same re-check, so it is
+    closed with investigate and a note). The consumer is the only writer of the tenant row and of
+    tenant.suspended on this path (lane H review 3 N-2, N-4; CHG-R8SPN-015)
   writes:
   - control.partner_agreement
   - control.partner_application
