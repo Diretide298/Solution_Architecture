@@ -76,8 +76,8 @@ notes: 'Prevention: check-business-rules, one rule per decision (BR-GUEST-PII, B
   journal_entry.legal_entity_id with its key, index and journal_entry_legal_entity_id_entry_number_uniq; the review
   drops journal_entry_entry_number_uniq and widens the source and seat_reservation status CHECKs; the seat reservation''s
   new column waits on the rename row of CR-011. Breaking: BC-371 and BC-372 record response enum values the decisions
-  add; their approved-by is `pending` until the lead confirms the breaking label, and check-contract-compat (which now
-  treats a pending approval as none) fails the 13 changes until then (fix round 1, I-2). Not modelled: where the order''s unitsGone flag is stored for the
+  add; the lead confirmed the breaking label on 19 October 2026 ("confirm both"; fix round 2), after fix round 1 had
+  held them pending (check-contract-compat treats a pending approval as none). Not modelled: where the order''s unitsGone flag is stored for the
   reconciler (the answer names the reason, not the field); stated in convertInventoryHold''s text. Lane F (CR-161) may
   add the same createPayment reads; the merge keeps one copy. For the lead''s baseline: check-ddl-conventions
   D-SCOPE-NOTNULL on ledger.account_mapping.scope_path (added nullable; no backfill can be derived, because a
