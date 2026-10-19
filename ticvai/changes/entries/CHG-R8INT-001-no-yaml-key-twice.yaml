@@ -1,0 +1,42 @@
+id: CHG-R8INT-001
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Two contract keys that were silently lost are restored and a check stops it happening again. retail.yaml had
+  two GuestMerchandiseItem schemas: the r8 one, an unbound guest view of lookupMerchandise, replaced the guest view
+  listMerchandise returns. It is removed; lookupMerchandise keeps PriceCheck and marks sku and siblingOutlets
+  x-ticvai-staff-only (left out for a guest), as CHG-SHP-010 does, which changes nothing for staff callers. tenancy.yaml DeviceBinding had two descriptions; they are one, keeping both sentences.
+  New check check-yaml-keys fails on any key named twice in one mapping of an authored YAML file; and
+  check-contract-shapes C-FIELD-TYPE-DRIFT follows a property that refers to another schema''s property
+  (CreateDepositBoxRequest, CHG-R8SPN-006) instead of reading the reference as a second type.'
+decision:
+  what: 'Found while merging the r8 lanes (20 October 2026). The second GuestMerchandiseItem came from the satellite lane
+    (ab0ae2d6), the second DeviceBinding description from ADAM CR-155 (CHG-CRA-004). Rename and merge as above; no
+    meaning is changed beyond what each author wrote.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'A YAML loader keeps the last of two equal keys and drops the first without a word, so every generator, the DDL and
+  the tickets saw only one; listMerchandise''s guest answer had become the price-check projection. Found by a strict
+  loader during the r8 integration merge. Finding: r8 integration merge, commits ab0ae2d6 and 1c1af276.'
+keys_touched:
+  operations: [lookupMerchandise, listMerchandise]
+  schemas: [GuestMerchandiseItem, PriceCheck, DeviceBinding, CreateDepositBoxRequest]
+  files:
+  - contracts/satellite/retail.yaml
+  - contracts/spine/tenancy.yaml
+  - tools/check-yaml-keys.py
+  - tools/run-checks.py
+  - tools/check-contract-shapes.py
+root_class: 'authored input malformed in a way the loader hides'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: found at the r8 integration merge'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-yaml-keys.py
+status: open
+notes: 'check-yaml-keys runs in run-checks.py; 1,487 authored YAML files, 0 duplicates after this change.'

@@ -515,6 +515,14 @@ def extra_rules(guard, ops, docs):
         for p, ps in (s.get("properties") or {}).items():
             if not isinstance(ps, dict):
                 continue
+            # A property that is a reference to another schema's property of the same contract
+            # (`#/components/schemas/DepositBox/properties/id`) is that one definition, not a second typing
+            # of the field: compare the property it points to (20 October 2026, r8 integration, CHG-R8INT-001).
+            pref = re.fullmatch(r"#/components/schemas/([^/]+)/properties/([^/]+)", str(ps.get("$ref", "")))
+            if pref:
+                tgt = ((by.get((stem, pref.group(1))) or {}).get("properties") or {}).get(pref.group(2))
+                if isinstance(tgt, dict):
+                    ps = tgt
             if re.search(r"colou?r$", p, re.I) and ps.get("type") == "string" and not ps.get("pattern")                     and not ps.get("enum") and not ps.get("format"):
                 guard.add("C-COLOUR-PATTERN", f"{stem}.{name}.{p}", f"{stem}.{name}.{p}: a colour with no pattern")
             if re.search(r"Id$", p) and ps.get("type") == "string" and ps.get("format") not in (None, "uuid")                     and not re.search(r"(external|provider|vendor|stripe|device|serial|code|slug|key)", p, re.I):

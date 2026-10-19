@@ -523,8 +523,9 @@ paths:
         is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
-        **A guest gets a narrower answer** (r8 walk of ticket 27820): `GuestMerchandiseItem`, which has no `sku`,
-        no stock figures, no sibling outlets and no ids but `merchandiseId`, only `isAvailable`. "Published" is the
+        **A guest gets a narrower answer** (r8 walk of ticket 27820): `sku` and `siblingOutlets` are staff-only
+        (`x-ticvai-staff-only`) and are left out of a guest response, which shows `isAvailable`. `onHand` stays in it,
+        because `PriceCheck` requires it and leaving it out would break the tills built against it. "Published" is the
         merchandise record's `isPublished` flag, set by `PRODUCT_CONFIGURE` holders.
       tags: [floor]
       x-ticvai-permission: PRODUCT_VIEW
@@ -1869,7 +1870,9 @@ components:
           description: >
             The outlet whose price and stock this is: the asking workstation's outlet, or
             `outletId` for a caller with none (decided 28 September, audit R215).
-        sku: { type: string }
+        sku:
+          type: string
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest or a visitor (r8 walk of ticket 27820).
         name: { type: string }
         listPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         effectivePrice:
@@ -1881,6 +1884,7 @@ components:
         isAvailable: { type: boolean }
         siblingOutlets:
           type: array
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest or a visitor (r8 walk of ticket 27820).
           description: Stock elsewhere in the venue, so a colleague can be sent.
           items:
             type: object
@@ -1888,22 +1892,6 @@ components:
               outletId: { type: string, format: uuid }
               outletName: { type: string }
               onHand: { type: number }
-
-    GuestMerchandiseItem:
-      x-ticvai-persistence: "none — computed; a guest projection of PriceCheck"
-      type: object
-      description: What `lookupMerchandise` returns to a guest or a visitor. No `sku`, no `onHand`, no sibling outlets.
-      required: [merchandiseId, name, effectivePrice, isAvailable]
-      properties:
-        merchandiseId: { type: string, format: uuid }
-        name: { type: string }
-        listPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        effectivePrice:
-          allOf:
-            - $ref: '../shared/common.yaml#/components/schemas/Money'
-          description: After any live promotion.
-        appliedPromotionCode: { type: string, nullable: true }
-        isAvailable: { type: boolean }
 
     CreateRetailSaleLine:
       x-ticvai-persistence: "none — request only"

@@ -134,6 +134,9 @@ CHECKS = [
     "check-write-lineage",
     "check-ai-residency",
     "check-problem-types",
+    # 20 October (r8 integration, CHG-R8INT-001): no authored YAML names one key twice in a mapping -- a loader
+    # keeps the last and drops the first silently (a retail schema and a tenancy description were lost that way).
+    "check-yaml-keys",
     # 3 October (Chinmay's r1 additions and the r1 gate, CHG-RONEP-001..003): every operation a Block A screen binds is
     # built in Block A, and no artefact the last released plan built leaves the tickets without a reason; a ticket's
     # builds are real ids, a module test names what it tests, a setup ticket links only its own part.
