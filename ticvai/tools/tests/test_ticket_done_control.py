@@ -103,3 +103,35 @@ def test_review_rows_are_read_by_the_table_they_change(tmp_path):
     assert [r[0] for r in rows] == ["catalogue.inventory_reservation", "marketing.wishlist_item", "orders.payment",
                                     "identity.otp_challenge"]
     assert "table renamed `catalogue.inventory_hold -> catalogue.inventory_reservation`" in td.review_sentence(rows[:1])
+
+
+def test_a_hand_written_task_that_builds_tables_is_their_migration(monkeypatch):
+    task = {"key": "PRD-W1-DB", "builds": ["table catalogue.product_wave", "table identity.session", "adr ADR-0058"]}
+    assert td.hand_db_tables(task) == ["catalogue.product_wave", "identity.session"]
+    assert td.hand_db_tables({**task, "operations": ["createProduct"]}) == []     # an operation task is not a [DB] task
+    assert td.hand_db_tables({"key": "PLATFORM-OUTBOX", "builds": ["table platform.outbox"]}) == []   # works on it
+    assert td.hand_db_tables({"key": "X", "track": "Database", "builds": ["table a.b"]}) == ["a.b"]
+    text = "Builds: `table catalogue.product_wave`, `table identity.session`. The wave 1 tables."
+    assert td.built_tables(text) == ["catalogue.product_wave", "identity.session"]
+    assert td.built_tables("Tenant database. Tables: a.b, a.c. Source DDL: x") == ["a.b", "a.c"]
+    monkeypatch.setattr(td, "_LINEAGE", LIN)
+    row = {"type": "Task", "track": "Database", "key": "PRD-W1-DB", "description": text}
+    done = td.done_when(row, "", td.builds_of(row, "", {}))
+    assert "safe to run twice" in done and "`catalogue.product_wave`" in done
+
+
+def test_a_key_into_a_table_a_later_migration_creates_moves_there():
+    keys = {"voucher_voucher_batch_id_fkey": ("promotions.voucher", "promotions.voucher_batch"),
+            "order_line_order_id_fkey": ("orders.order_line", "orders.sales_order"),
+            "seat_performance_id_fkey": ("seating.seat_reservation", "catalogue.performance")}
+    made_by = {"promotions.voucher": "VM-MIG-PROMOTIONS", "promotions.voucher_batch": "MIG-PROMOTIONS-2",
+               "orders.order_line": "MIG-ORDERS", "orders.sales_order": "MIG-ORDERS",
+               "seating.seat_reservation": "MIG-SEATING", "catalogue.performance": "MIG-CATALOGUE"}
+    order = {"VM-MIG-PROMOTIONS": 1017, "MIG-PROMOTIONS-2": 1114, "MIG-ORDERS": 20, "MIG-SEATING": 25,
+             "MIG-CATALOGUE": 30}
+    moved = td.key_moves(keys, made_by, order)
+    assert moved == {"voucher_voucher_batch_id_fkey": ("VM-MIG-PROMOTIONS", "MIG-PROMOTIONS-2", "promotions.voucher",
+                                                       "promotions.voucher_batch")}   # first-release pair: MIG-FOREIGN-KEYS
+    words = td.key_move_sentences(moved)
+    assert "Leave out the key" in words["VM-MIG-PROMOTIONS"][0] and "Also add the key" in words["MIG-PROMOTIONS-2"][0]
+    assert "platform.schema_version" in td.SCHEMA_VERSION_LINE and "Do not copy" in td.SCHEMA_VERSION_LINE

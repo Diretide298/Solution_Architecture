@@ -1375,7 +1375,7 @@ def main() -> int:
               "AI": "[AI]", "Test": "[Test]"}
 
     def track_of(key, area):
-        if key.startswith(("MIG", "VM-MIG", "VM-DB")):
+        if key.startswith(("MIG", "VM-MIG", "VM-DB")) or area == "database":
             return "Database"
         if key == "SETUP":
             return "Setup"
@@ -2133,6 +2133,11 @@ def main() -> int:
     # platform kernel and offline machinery the system-design review found unticketed (SD-047, SD-063), and
     # the AI engine work the two AI engineers carry. Backend-pool tasks go to the least-loaded owner, as
     # services do; AI engine tasks carry no points, because the AI engineers' capacity is separate.
+    # **A hand-written task that builds tables is their migration** (CHG-R8MIG-016; the coordinator, 20 October 2026, for
+    # the products wave 1 task PRD-W1-DB): a task whose `builds` lists `table <schema.name>` and claims no operation is a
+    # [DB] task. Its tables count as created by it (no second migration is planned for them, and they are not "Tables no
+    # migration creates"), and it carries the migration ticket text below.
+    hand_db: dict[str, str] = {}
     if EXTRA.exists():
         ex = json.loads(EXTRA.read_text(encoding="utf-8"))
         backend_ = areas.get("backend") or []
@@ -2149,8 +2154,12 @@ def main() -> int:
             who = t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else "")
             if not is_ai and who:
                 load[who] += pts
+            db_tables_ = ticket_done.hand_db_tables(t_)
+            for x_ in db_tables_:
+                hand_db.setdefault(x_, t_["key"])
             task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 1,
-                 pts=pts, area="ai" if is_ai else "backend", assignee=who, depends=t_.get("depends") or ())
+                 pts=pts, area="ai" if is_ai else ("database" if db_tables_ else "backend"), assignee=who,
+                 depends=t_.get("depends") or ())
 
     # ================================================================ the rest of the package (1 October)
     # **Every block is planned task by task now**, not only Block A: the PM's replan wants module-wise completion
@@ -2215,6 +2224,8 @@ def main() -> int:
         if ident and ident[0] == "screen":
             built_screen[ident[1]] = t_["key"]
     mig_of = dict(table_mig)
+    for t_h, k_h in hand_db.items():       # created by a hand-written [DB] task (CHG-R8MIG-016): never planned again
+        mig_of.setdefault(t_h, k_h)
     mig_of.update(vm_mig)
     later_op_task, later_mig, later_items = {}, {}, []      # later_items: (key, module, platform, kind) per screen
     later_ams = {}                                          # (module, platform) -> [(sid, key, pts, kind)]
@@ -3829,7 +3840,7 @@ def main() -> int:
     # contracts describe and no operation reads or writes yet; they are listed with that reason rather than
     # migrated (a table no code touches is a migration nobody can test), and the one an operation does reach is a
     # gap tools/check-migration-tickets.py fails on.
-    assigned = set(table_mig) | set(vm_mig) | set(later_mig)
+    assigned = set(table_mig) | set(vm_mig) | set(later_mig) | set(hand_db)
     reached = defaultdict(set)
     for o, x in lineage.items():
         for kk in ("reads", "writes"):
@@ -4237,11 +4248,14 @@ def main() -> int:
     # no ticket), and MIG-FOREIGN-KEYS and MIG-PARTITIONS name their Source DDL like every other migration.
     base_words_ = ticket_done.baseline_wording(ROOT)
     made_by_ = {}
+    hand_keys_ = set(hand_db.values())
     for t_ in tasks:
         if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
             m_ = re.search(r"Tables: (.+?)\. Source", t_["description"] or "")
             for x_ in (m_.group(1).split(", ") if m_ else []):
                 made_by_.setdefault(x_.strip(), t_["key"])
+    for x_, k_ in hand_db.items():
+        made_by_.setdefault(x_, k_)
     after_r1_ = defaultdict(lambda: defaultdict(dict))
     for (rel_, tbl_), items_ in ticket_done.after_r1_changes(ROOT).items():
         if tbl_ in made_by_:
@@ -4266,6 +4280,9 @@ def main() -> int:
                                                        ticket_done.declared_moves(ROOT))
     for k_, ws_ in ticket_done.parent_policy_sentences(moved_, orphans_).items():
         extra_[k_] += ws_
+    for k_, ws_ in ticket_done.key_move_sentences(ticket_done.key_moves(
+            ticket_done.foreign_keys(ROOT), made_by_, mig_no_, ticket_done.declared_moves(ROOT))).items():
+        extra_[k_] += ws_
     for c_, p_ in sorted(orphans_.items()):
         print(f"WARNING: {c_}'s row-level security reads {p_}, which no migration ticket creates (CHG-R8MIG-008)")
     rows_by_ = defaultdict(list)
@@ -4285,13 +4302,18 @@ def main() -> int:
                                   "platform.ensure_month_partition and platform.ensure_month_partitions are already in "
                                   "the baseline, MIG-BASELINE)."}
     for t_ in tasks:
-        if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
+        if t_["type"] == "Task" and t_["track"] == "Database" and (ticket_done.MIGRATION_KEY.match(t_["key"])
+                                                                   or t_["key"] in hand_keys_):
             src_ = ([own_src_[t_["key"]]] if t_["key"] in own_src_ and "Source DDL:" not in (t_["description"] or "")
                     else [])
+            if t_["key"] in hand_keys_:
+                dbs_ = sorted({ddl[x_]["db"] for x_, k_ in hand_db.items() if k_ == t_["key"] and x_ in ddl})
+                src_ = [f"{' and '.join(d_.capitalize() for d_ in dbs_) or 'Tenant'} database."] + src_
             ar1_ = [(ticket_done.names_sentence if "__names_" in rel_ else ticket_done.after_r1_sentence)(rel_, ch_)
                     for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
             add_ = [w_ for w_ in (src_ + ar1_ + extra_.get(t_["key"], [])
-                                  + [ticket_done.MIGRATION_WORDING, ticket_done.GUARDED_KEYS]
+                                  + [ticket_done.MIGRATION_WORDING, ticket_done.GUARDED_KEYS,
+                                     ticket_done.SCHEMA_VERSION_LINE]
                                   + ([base_words_] if t_["key"] == "MIG-BASELINE" else []))
                     if w_ not in (t_["description"] or "")]
             if add_:

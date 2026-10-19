@@ -28,6 +28,25 @@ BUILDS = re.compile(r"Builds: ((?:`[^`]+`(?:, )?)+)")
 OP_ID = re.compile(r"^[a-z][A-Za-z0-9]+$")
 
 
+def hand_db_tables(task: dict) -> list:
+    """The tables a hand-written [DB] task (docs/active/block-a-extra-tasks.json) creates: its `builds` entries `table
+    <schema.name>`, when the task is marked a database task (a key ending `-DB`, as PRD-W1-DB, or `"track":
+    "Database"`) and claims no operation. Such a task is the migration of those tables (CHG-R8MIG-016). Other tasks
+    list the tables they work on (PLATFORM-OUTBOX names platform.outbox, which MIG-PLATFORM creates), not create."""
+    if task.get("operations") or not (str(task.get("key") or "").endswith("-DB") or task.get("track") == "Database"):
+        return []
+    return [b.split(" ", 1)[1].strip() for b in task.get("builds") or [] if str(b).startswith("table ")]
+
+
+def built_tables(description: str) -> list:
+    """The tables a [DB] ticket's text says it creates: its "Tables: ..." sentence, else the `table` items of its
+    "Builds:" lead (a hand-written migration, CHG-R8MIG-016)."""
+    m = re.search(r"Tables: (.+?)\. Source", description or "")
+    if m:
+        return [x.strip() for x in m.group(1).split(", ")]
+    return [b.split(" ", 1)[1] for b in listed_builds(description) if b.startswith("table ")]
+
+
 def listed_builds(text):
     """The artefacts a "Builds:" lead names, as written ("operation ai#x", "table s.t", "screen S", "adr ADR-0058")."""
     m = BUILDS.search(text or "")
@@ -491,6 +510,66 @@ GUARDED_KEYS = ("**Safe to run twice**: write every ALTER TABLE ... ADD CONSTRAI
                 "`DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '<name>' AND conrelid = "
                 "'<schema.table>'::regclass) THEN ALTER TABLE ... ADD CONSTRAINT ...; END IF; END $$;` (the package's "
                 "900-foreign-keys.sql lines are written unguarded and fail a second run as they are).")
+
+
+# **The runner records a migration itself** (CHG-R8MIG-016; the coordinator, 20 October 2026, from ADAM's database-ticket
+# check): the package's after-r1 files end with their own `INSERT INTO platform.schema_version`, which a copied file must
+# leave out, or the version row is written twice.
+SCHEMA_VERSION_LINE = ("Do not copy the `INSERT INTO platform.schema_version ...` statement at the end of a package "
+                       "after-r1 file: SqlMigrationRunner records this migration in platform.schema_version itself.")
+
+# **A key into a table a later migration creates moves to that migration** (CHG-R8MIG-016; the coordinator: ADAM's check
+# found promotions.voucher's key to promotions.voucher_batch, V1017 before V1114, on no ticket). The first release's own
+# cross-schema keys stay MIG-FOREIGN-KEYS' (both ends there); every other key whose parent a later migration creates
+# goes in that later migration, both tickets saying so, as a parent-row policy does (parent_policy_moves).
+FK_LINE = re.compile(r"ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD CONSTRAINT (\w+) FOREIGN KEY \([^)]*\) REFERENCES "
+                     r"(\w+\.\w+)\s*\(")
+
+
+def foreign_keys(root) -> dict:
+    """{key name: (child table, parent table)} from the 900 files and the after-r1 files (tenant and control)."""
+    from pathlib import Path
+    out = {}
+    for db in ("tenant", "control"):
+        d = Path(root) / "backend" / db
+        files = [d / "900-foreign-keys.sql"] + sorted(f for f in d.glob("V0*.sql") if AFTER_R1_FILE.match(f.name))
+        for f in files:
+            if not f.exists():
+                continue
+            for ln in f.read_text(encoding="utf-8").splitlines():
+                if ln.lstrip().startswith("--"):
+                    continue
+                for child, name, parent in FK_LINE.findall(ln):
+                    out[name] = (child, parent)
+    return out
+
+
+def key_moves(keys: dict, made_by: dict, order: dict, moves: dict | None = None, first=(2, 99)) -> dict:
+    """{key name: (child's migration, parent's later migration, child, parent)} for every key whose parent a later
+    migration creates, except when both migrations are first-release ones (MIG-FOREIGN-KEYS adds those)."""
+    moves = moves or {}
+    out = {}
+    for name, (child, parent) in sorted(keys.items()):
+        child, parent = moves.get(child, child), moves.get(parent, parent)
+        mc, mp = made_by.get(child), made_by.get(parent)
+        if not mc or not mp or mc == mp:
+            continue
+        oc, op_ = order.get(mc, 0), order.get(mp, 0)
+        if op_ <= oc or (first[0] <= oc <= first[1] and first[0] <= op_ <= first[1]):
+            continue
+        out[name] = (mc, mp, child, parent)
+    return out
+
+
+def key_move_sentences(moved: dict) -> dict:
+    """{migration key: [sentence]} for both ends of each moved key."""
+    out = {}
+    for name, (mc, mp, child, parent) in sorted(moved.items()):
+        out.setdefault(mc, []).append(f"**Leave out the key {name}** ({child} to {parent}): {mp} creates {parent} "
+                                      f"later and adds it.")
+        out.setdefault(mp, []).append(f"**Also add the key {name} here** ({child} to {parent}, guarded): {mc} creates "
+                                      f"{child} before {parent} exists.")
+    return out
 
 
 # **The baseline creates on an empty database only with function-body checks off** (CHG-R8MIG-008; ADAM faster-db-tickets

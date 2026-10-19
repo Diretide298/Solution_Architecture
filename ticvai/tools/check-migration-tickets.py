@@ -89,6 +89,10 @@ def main() -> int:
             guard.note(f"{k} exempt: {EXEMPT[k]}")
             continue
         m = FILE.search(r["subject"])
+        if not m and not td.MIGRATION_KEY.match(k) and td.built_tables(r["description"]):
+            # a hand-written [DB] task (block-a-extra-tasks.json `builds`, CHG-R8MIG-016): its file is its own
+            guard.note(f"{k}: a hand-written migration of {', '.join(td.built_tables(r['description']))}")
+            continue
         if not m:
             guard.add("M-FILE-NAMED", k, f"{k}: '{r['subject'][:90]}' names no migration file")
             continue
@@ -157,9 +161,7 @@ def main() -> int:
     tables = {renamed.get(t, t) for t in tables}
     on_ticket = set()
     for r in migs.values():
-        m = re.search(r"Tables: (.+?)\. Source", r["description"] or "")
-        if m:
-            on_ticket |= set(m.group(1).split(", "))
+        on_ticket |= set(td.built_tables(r["description"]))
     lineage = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
     op_hold = td.load_holds(g.ROOT)[0]        # stub, provisional, deprecated: not built (CHG-FXP-003)
     reached = {}
@@ -181,8 +183,7 @@ def main() -> int:
     # of its table (build-service-docs, ticket_done.review_sentence), so a row no ticket carries is a change nobody writes.
     made_by = {}
     for k, r in migs.items():
-        m = re.search(r"Tables: (.+?)\. Source", r["description"] or "")
-        for t in (m.group(1).split(", ") if m else []):
+        for t in td.built_tables(r["description"]):
             made_by.setdefault(t.strip(), k)
     moves = td.declared_moves(g.ROOT)
     unplanned = []
