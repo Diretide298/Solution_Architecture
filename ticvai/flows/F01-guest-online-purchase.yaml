@@ -50,9 +50,11 @@ steps:
   screen: WEB-006
   action: Picks a date, then a time
   operations:
+  - getProduct
   - listPerformances
   - getAvailability
-  outcome: 'Holds nothing yet: capacity is held when the tickets go into the cart (step 4, `addCartLine`,
+  outcome: 'The event comes from the product WEB-004 handed on (`getProduct`, `Product.eventId`; r8, GPS-C05).
+    Holds nothing yet: capacity is held when the tickets go into the cart (step 4, `addCartLine`,
     a 15-minute cart hold), not on a look. Availability is read from a one-second cache (ADR-0065, decided 1 October; the hold decides, not the look), in one call for every time of the event in the
     window (`eventId`, `from`, `to`). **Date first, then time, then tickets** (decided 29 September,
     rev 3 REV3-2): the times stay hidden until a date is picked, per the product''s published booking

@@ -2143,7 +2143,12 @@ screens:
     Build note (r8, GPS-C12, decided by the lead 20 October 2026): POS-003 is the drawer step of POS-002,
     not a page. Build the date and the session (calendar and available times) here. The quantities and Add
     to cart belong to POS-002''s quantity step, where every variant arrives. Not built: the five back-office
-    tables, Resolve by code, and the inventoryHoldId deep link.'
+    tables, Resolve by code, and the inventoryHoldId deep link.
+
+
+    Build note (r8 second round, GPS-C11): the no-access state''s last sentence (`ORDER_CREATE` for
+    `acquireInventoryHold`) no longer applies: this screen takes no hold. Its removal changes a
+    client-approved state and waits for the client (pending entry GPS-C11); build the state without it.'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them —
@@ -2617,6 +2622,13 @@ screens:
     contract: orders
     purpose: Take a payment against an order
     trigger: onAction
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: 'The cold entry (r8, GPS-C05): a link to a performance that has happened offers the next performance
+      of the same event, the first upcoming one `listPerformances` returns for the performance''s `eventId`
+      (`getPerformance`). Not called on the ordinary way in.'
+    trigger: background
+    provenance: r8 second round, GPS-C05 (ticket 28206)
   entryState:
     params:
     - name: holdId
@@ -2626,6 +2638,11 @@ screens:
         a link or an edge that holds one opens it instead.'
     - name: performanceId
       from: deepLink
+    - name: eventId
+      from: navigation
+      optional: true
+      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`); `listPerformances` takes it on the
+        cold entry.'
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
   wireframe:
@@ -6541,7 +6558,14 @@ screens:
     board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen,
     so the title is the only join — *Till Configuration* matched at 1.0. **A cross-platform title match
     was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping
-    goes wrong quietly.'
+    goes wrong quietly.
+
+
+    Build note (r8 second round, APPROVALS-TENANCY-C24): the screen now reads `getWorkstation`, `listShifts`,
+    `listDenominations` and `listSaleBoards` (see apis); the no-access state should also name their
+    permissions (`SCOPE_VIEW`, `REPORT_VIEW_WORKSTATION`, `SHIFT_OPEN`). That wording changes a
+    client-approved state and waits for the client (pending entry APPROVALS-TENANCY-C24); build a field whose
+    read is refused as disabled, naming its permission.'
   density: touchLarge
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2b
@@ -6570,14 +6594,17 @@ screens:
         provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Cashier
-        operation: allocateDepositBox
-        notes: Picked from the staff on shift; the deposit box is allocated to them on this workstation.
+        operation: listShifts
+        notes: 'Picked from the staff on shift; the deposit box is allocated to them on this workstation. Options:
+          the cashiers of the open shifts (`listShifts`, status open) at this till''s venue (r8, APPROVALS-TENANCY-C24);
+          the pick is sent with `allocateDepositBox`.'
         provenance: contract shift.yaml allocateDepositBox
         bindsTo: DepositBox.cashierPrincipalId
       - kind: numberField
         label: Float by denomination
-        operation: allocateDepositBox
-        notes: The float, as a total or by denomination. Ids, statuses, expected and counted totals and
+        operation: listDenominations
+        notes: The denominations come from `listDenominations` (r8, APPROVALS-TENANCY-C24); the float is sent with
+          `allocateDepositBox`. The float, as a total or by denomination. Ids, statuses, expected and counted totals and
           the variance are computed or closing data and are not fields (design-notes corrections platform-foundation
           POS-016).
         provenance: contract shift.yaml allocateDepositBox
@@ -6599,15 +6626,17 @@ screens:
       - kind: numberField
         label: Drawer limit for this till (override)
         bindsTo: ConfigureWorkstationRequest.cashDrawerLimit
-        operation: configureWorkstation
-        notes: Empty uses the venue default (`VenueSettings.cashDrawerLimit`); the till warns and offers
+        operation: getWorkstation
+        notes: Shown as `getWorkstation` returns it and saved with the rest of the workstation by `configureWorkstation`
+          (r8, APPROVALS-TENANCY-C24). Empty uses the venue default (`VenueSettings.cashDrawerLimit`); the till warns and offers
           a lift above it (DEC-179; CHG-CSP-016).
         provenance: contract tenancy.yaml PUT /workstations/{workstationId}
       - kind: selectField
         label: Sale board (till override)
         bindsTo: ConfigureWorkstationRequest.saleBoardId
-        operation: configureWorkstation
-        notes: Empty inherits the outlet's board; set only to override it on this till (BO-109 "Per outlet,
+        operation: listSaleBoards
+        notes: Options from `listSaleBoards` for this till's venue, the current value from `getWorkstation`, saved by
+          `configureWorkstation` (r8, APPROVALS-TENANCY-C24). Empty inherits the outlet's board; set only to override it on this till (BO-109 "Per outlet,
           with a till override"; DEC-183; CHG-CSP-006).
         provenance: contract tenancy.yaml PUT /workstations/{workstationId}
       - kind: primaryButton
@@ -6660,11 +6689,37 @@ screens:
     provenance: decided 29 September, readiness close-out (QA wiring note)
     invalidates:
     - listDevices
+    - getDeviceAssignment
+    - getWorkstation
   - operationId: getDeviceAssignment
     contract: tenancy
-    purpose: Show where the selected device is assigned
+    purpose: 'Show where the selected device is assigned; it also fills the Assign peripheral form, which sends
+      the record back whole (r8, APPROVALS-TENANCY-C24)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: getWorkstation
+    contract: tenancy
+    purpose: 'This till as saved (`workstationId` from the session): it fills the drawer limit and sale board
+      fields and the Configure workstation form, which `configureWorkstation` sends back whole; its linked
+      `devices` are this till''s peripherals (r8, APPROVALS-TENANCY-C24)'
+    trigger: onLoad
+    provenance: r8 second round, APPROVALS-TENANCY-C24 (tickets 27793, 27794)
+  - operationId: listShifts
+    contract: shift
+    purpose: 'The cashier picker: the open shifts (status open) at this till''s venue, and so the staff on shift;
+      also the custodian picker of the Assign peripheral form (r8, APPROVALS-TENANCY-C24)'
+    trigger: onLoad
+    provenance: r8 second round, APPROVALS-TENANCY-C24 (tickets 27793, 27794)
+  - operationId: listDenominations
+    contract: shift
+    purpose: The denominations the float is counted in (r8, APPROVALS-TENANCY-C24)
+    trigger: onLoad
+    provenance: r8 second round, APPROVALS-TENANCY-C24 (tickets 27793, 27794)
+  - operationId: listSaleBoards
+    contract: tenancy
+    purpose: The sale boards a till may override its outlet's board with (r8, APPROVALS-TENANCY-C24)
+    trigger: onLoad
+    provenance: r8 second round, APPROVALS-TENANCY-C24 (tickets 27793, 27794)
   entryState:
     params:
     - name: workstationId
@@ -6702,7 +6757,13 @@ screens:
     trigger: Assign peripheral to this till
     body: '**Collects what `setDeviceAssignment` sends before it is called.** Till peripherals come from
       device management, not the gate-reader write: the workstation it is assigned to (`assignedWorkstationId`),
-      who holds it and where it is. Dismissing sends nothing; the screen behind is unchanged.'
+      who holds it and where it is. Dismissing sends nothing; the screen behind is unchanged. **The form opens
+      filled with the assignment as `getDeviceAssignment` returns it and sends it back whole** (r8,
+      APPROVALS-TENANCY-C24): the call replaces the record, so the owner, asset tag and dates set on BO-732 are
+      sent as read and never erased; only the workstation and the custodian (picked from the staff on shift,
+      `listShifts`) are edited here. A peripheral assigned here is custody and location, not a binding: it does
+      not appear in `listDevices` (which lists by workstation); this till''s peripherals are the `devices` linked
+      on the workstation (`getWorkstation`, saved by `configureWorkstation`).'
     bindsTo: DeviceAssignment
     confirm:
       label: Assign peripheral to this till

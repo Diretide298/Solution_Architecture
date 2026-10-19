@@ -1721,18 +1721,25 @@ screens:
   apis:
   - operationId: getPerformance
     contract: catalogue
-    purpose: Read a performance
+    purpose: 'Read a performance, when the screen is opened with `performanceId` (What''s On, GST-005, or a link)
+      (r8, GPS-C05)'
     trigger: onLoad
   - operationId: getProduct
     contract: catalogue
-    purpose: Read a product
+    purpose: 'Read a product, when the screen is opened with `productId` (Home, GST-001, or a link) (r8, GPS-C05)'
     trigger: onLoad
   entryState:
     params:
     - name: performanceId
       from: deepLink
+      optional: true
+      notes: 'r8 (GPS-C05): **one of `performanceId` and `productId` is enough.** What''s On opens this screen
+        with a performance, Home with a product; neither can be derived from the other (a performance names its
+        event, not a product). The panel of the id given loads; the other stays closed.'
     - name: productId
       from: deepLink
+      optional: true
+      notes: 'r8 (GPS-C05): see `performanceId`: one of the two is enough.'
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event. **A shared product link after the product retired.** Shows what replaced it where a successor
       exists, and the catalogue where none does.'
@@ -10169,12 +10176,25 @@ screens:
       for the old performance (decided 29 September), with the guest session the device already holds:
       signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
     trigger: background
+  - operationId: getPerformance
+    contract: catalogue
+    purpose: 'Resolves a performance given without its event (r8, GPS-C05): its `eventId` drives
+      `listPerformances` (time bar, fixture strip, date pop-up), and its `startsAt` and `status` the cold entry (a
+      performance that has happened offers the next one of the same event). No component of its own.'
+    trigger: background
+    provenance: r8 second round, GPS-C05 (ticket 28202)
   entryState:
     params:
     - name: performanceId
       from: deepLink
+      optional: true
+      notes: 'r8 (GPS-C05): an edge that carries only `eventId` (from GST-001) opens on the event''s first on-sale
+        performance, the first `listPerformances` returns.'
     - name: eventId
       from: GST-007
+      optional: true
+      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`) when a deep link or the GST-077 edge
+        carries only `performanceId`.'
     - name: holdId
       from: navigation
       optional: true

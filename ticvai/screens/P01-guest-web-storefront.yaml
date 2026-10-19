@@ -864,6 +864,7 @@ screens:
       trigger: Book (a fixture with one on-sale performance opens straight on the seat map)
       carries:
       - performanceId
+      - productId
       provenance: 'decided 29 September, rev 3 23SEP-16 and REV3-4: WEB-006 is skipped when the event
         has exactly one on-sale performance'
       operation: getPublishedBookingFlow
@@ -1700,6 +1701,13 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: getProduct
+    contract: catalogue
+    purpose: 'Resolves the event from the product (r8, GPS-C05): WEB-004 opens this screen with `productId`
+      only, and `Product.eventId` is the event `listPerformances` and `getAvailability` need. Not called when
+      the edge carried `eventId`. No component of its own: what it finds drives the date and time pickers.'
+    trigger: background
+    provenance: r8 second round, GPS-C05 (ticket 28152)
   wireframe:
     status: review
     provenance: client-verified
@@ -1724,10 +1732,18 @@ screens:
     params:
     - name: performanceId
       from: navigation
+      optional: true
+      notes: 'r8 (GPS-C05): picked on this screen; an edge that holds one opens on that time.'
     - name: cartId
       from: navigation
+    - name: productId
+      from: WEB-004
+      notes: 'r8 (GPS-C05): what WEB-004''s Book carries; `getPublishedBookingFlow` and
+        `checkBookingEligibility` take it, and `getProduct` turns it into the event.'
     - name: eventId
       from: WEB-004
+      optional: true
+      notes: 'r8 (GPS-C05): read from `Product.eventId` (`getProduct`) when the edge carries only `productId`.'
     - name: venueId
       from: session
     - name: entryId
@@ -1790,6 +1806,7 @@ screens:
     - WEB-006
     - WEB-004
     - WEB-049
+    - WEB-005
     exitTo:
     - WEB-001
     - WEB-005
@@ -1981,12 +1998,28 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: getPerformance
+    contract: catalogue
+    purpose: 'Resolves a deep-linked performance (r8, GPS-C05): its `eventId` drives `listPerformances` (time
+      bar, fixture strip) and its `startsAt` and `status` the cold entry (a performance that has happened offers
+      the next one of the same event). No component of its own.'
+    trigger: background
+    provenance: r8 second round, GPS-C05 (ticket 28197)
   entryState:
     params:
     - name: performanceId
       from: deepLink
     - name: eventId
       from: WEB-006
+      optional: true
+      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`) when a deep link or the WEB-004
+        edge carries only `performanceId`.'
+    - name: productId
+      from: WEB-004
+      optional: true
+      notes: 'r8 (GPS-C05): carried by the WEB-004 edge and the deep link, for `getPublishedBookingFlow`. When it
+        is absent the screen asks `getPublishedBookingFlow` by `flowTypeKey`: `seatedFixedPerformance`, or
+        `seatedDateTimeSeatMap` when the venue''s `seatEventDateMode` puts the date over the map.'
     - name: holdId
       from: navigation
       optional: true
@@ -10066,7 +10099,7 @@ screens:
   implementation:
     app: guest-web
     route: /help-centre-and-accessibility
-    component: src/routes/engagement-and-support/HelpCentreFaqDetail.tsx
+    component: src/routes/HelpCentreAccessibility.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10084,7 +10117,8 @@ screens:
     Build note (r8 second round, WHITE-C12): **WEB-045 is not a page of its own.** It is WEB-025''s Help
     centre page reached at its own route (`/help-centre-and-accessibility`, the header''s *Policies and
     accessibility* and the footer''s *Accessibility*), opened scrolled to its policies and accessibility
-    pages; it is built once, as WEB-025''s component, and this id stays for its route and its tickets. The
+    pages; it is built once: this screen''s component is a thin route that renders WEB-025''s page, and this id
+    stays for its route and its tickets. The
     case actions (Ask for help, Reply) and their reads stay WEB-025''s; the offline state''s *raising a case
     is disabled* is about that shared page. **No results** is the page''s search box (*Search help articles*
     in the prototype): it filters the FAQs, help pages and policies already loaded, by title, on the device;
