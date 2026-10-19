@@ -735,6 +735,59 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroupBookingRequest'
+    get:
+      operationId: listOwnGroupBookings
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-read-routing: replica
+      summary: The group bookings the caller asked for
+      description: 'Added for My Reservations (R8 blocker ORDERS-MONEY-C26): after `requestGroupBooking` answered 201 a
+        guest could never see the request again, because `getGroupBooking` needs an id no screen carries and
+        `listGroupBooking` is the staff command centre. Each item is a `GroupBooking` whose `leaderSubjectId` is the
+        caller, provisional ones included. **Every status is returned, `cancelled` too**, so a guest sees a request the
+        venue turned down; `status` narrows the list.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest sees only the groups they lead; another guest''s group is not in
+        the list and, by id, is refused as one that does not exist.
+
+        **Order.** Soonest `preferredDate` first, then by `id`.'
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: status
+        in: query
+        description: Exact match. Omit for every status, `cancelled` included.
+        schema:
+          type: string
+          enum: [provisional, confirmed, namesPending, complete, cancelled]
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The caller's group bookings.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/GroupBooking'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /deposit-policy:
     get:
       operationId: getDepositPolicy
@@ -2046,6 +2099,66 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ResaleRefusedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    get:
+      operationId: listOwnResaleListings
+      x-ticvai-consumed-by:
+        - "P01 WEB-030 Ticket Transfer"
+        - "P02 GST-067 Refunds & Resale"
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-read-routing: replica
+      summary: The caller's own resale listings
+      description: 'Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a listing made with
+        `createResaleListing` was never readable again by the seller. Each item is a `ResaleListing` whose
+        `sellerSubjectId` is the caller, with its `status`.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): another guest''s listing, named by `entitlementId`, is refused exactly as
+        one that does not exist (404).
+
+        **Order.** Newest first, by `listedAt` descending, then by `id`.'
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: entitlementId
+        in: query
+        description: Only the listings of this entitlement. Omit for every listing of the caller.
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        description: Exact match. Omit for every status.
+        schema:
+          type: string
+          enum: [pendingReview, listed, reserved, sold, withdrawn, expired, rejected]
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The caller's listings, newest first.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ResaleListing'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /orders/{orderId}/upgrade-quote:
@@ -5755,6 +5868,101 @@ paths:
                     - declined
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    get:
+      operationId: listOwnRefundRequests
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P02 GST-067 Refunds & Resale"
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-read-routing: replica
+      summary: The caller's own refund requests
+      description: 'Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a request made with
+        `createRefundRequest` was never readable again, so the screen showed nothing after a reload. Each item is
+        the `Refund` row the request made (`requestId` in the 202 is its `id`), with its `status`.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): the list holds the refunds on orders that belong to the caller, and
+        another guest''s order, named in `orderId`, is refused exactly as one that does not exist (404), never
+        returned and never an empty list that hints it is there.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
+      tags:
+      - refund
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: orderId
+        in: query
+        description: Only the refunds on this order. Omit for every order of the caller.
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The caller's refund requests, newest first.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Refund'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/guest-refund-policy:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getGuestRefundPolicy
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-read-routing: replica
+      summary: What a guest is told about refunds at a venue
+      description: 'The part of the venue''s refund policy a guest is told before asking for a refund (R8 blocker
+        ORDERS-MONEY-C26; GST-067 shows it before any request exists): the time bands, whether a part of an order can
+        be refunded, and the refund window, read from the same `orders.refund_policy` row `getRefundPolicy` returns
+        to staff. Who may authorise a refund (`selfAuthoriseLimit`, `requiresSecondUserAbove`,
+        `requiresApprovalAbove`) and `varianceThreshold` are staff matters and are not in `GuestRefundPolicy`.
+
+        A venue with no refund policy answers `404`.'
+      tags:
+      - policy
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The guest's view of the policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestRefundPolicy'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venues/{venueId}/refund-policy:
     parameters:
     - name: venueId
@@ -5778,6 +5986,8 @@ paths:
       summary: Read a venue's refund policy
       description: 'Thresholds and time bands are venue configuration, not permission scope (CF-36). Cached
         locally so a terminal can present the right prompt before it calls.
+
+        A guest reads the part that concerns them with `getGuestRefundPolicy` (R8 blocker ORDERS-MONEY-C26).
 
         '
       tags:
@@ -23443,6 +23653,33 @@ components:
         createdAt:
           type: string
           format: date-time
+    GuestRefundPolicy:
+      x-ticvai-persistence: "none — guest projection of RefundPolicy"
+      type: object
+      description: >
+        **What `getGuestRefundPolicy` returns** (R8 blocker ORDERS-MONEY-C26): how much of a ticket
+        comes back and until when, and nothing about who authorises a refund. `additionalProperties: false` is the
+        guarantee: a staff field added to `RefundPolicy` does not reach a guest by default.
+      additionalProperties: false
+      required: [venueId, timeBands, allowPartial, refundWindowDays]
+      properties:
+        venueId: { type: string, format: uuid }
+        timeBands:
+          type: array
+          description: Refundable percentage by time before the performance, as on `RefundPolicy`.
+          items:
+            type: object
+            required: [hoursBefore, percentage]
+            properties:
+              hoursBefore: { type: integer, minimum: 0 }
+              percentage: { type: number, minimum: 0, maximum: 100 }
+        allowPartial: { type: boolean }
+        refundWindowDays:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: As on `RefundPolicy`; null means no window.
+
     RefundPolicy:
       # `timeBands` is an array of objects, so its rows live in a child table rather than a column the
       # derived DDL would silently drop — until 26 September a PUT that sent bands had nowhere to keep them.

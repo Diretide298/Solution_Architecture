@@ -1,0 +1,38 @@
+id: CHG-R8INT-003
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'A read added to a client-approved prototype screen names the element of the prototype that shows it
+  (shownBy), instead of a new component the client never saw. GST-067 Refunds & Resale: the guest''s own refund
+  requests and resale listings fill "Tickets you can act on" and the venue''s refund terms fill "Rules". GST-071
+  Payment methods: the loyalty position fills "Balances" and the rewards fill "Spend points". check-screen-wiring
+  counts such a read as reached and fails a shownBy the prototype does not hold (S-SHOWN-BY).'
+decision:
+  what: 'screens/_schema.yaml documents apis[].shownBy; tools/check-screen-wiring.py: R273 S-OP-UNREACHED accepts a
+    read whose shownBy is a quoted string of the screen''s exact, client-verified prototype file; new rule S-SHOWN-BY.
+    screens/P02-guest-mobile-app.yaml: shownBy on five bindings. No visible field changes (check-approved-ui passes).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The approved UI is fixed (the lead, 14 October 2026; CHG-GRD-002), so a read the r8 walk found missing on an
+  approved screen cannot bring a new component; but the client''s prototype view already shows the data
+  (sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html, views refunds and paymethods),
+  and check-screen-wiring reported the reads as unreached. Finding: r8 integration merge, check-screen-wiring run of
+  20 October 2026 (ORDERS-MONEY-C26, ORDERS-MONEY-C10).'
+keys_touched:
+  operations: [listOwnRefundRequests, listOwnResaleListings, getGuestRefundPolicy, getLoyaltyPosition, listRewards]
+  files:
+  - screens/_schema.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - tools/check-screen-wiring.py
+root_class: 'A-SCREEN: a declared operation no component reaches (R273)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration merge'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open

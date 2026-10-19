@@ -1,0 +1,44 @@
+id: CHG-R8SPN-012
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A guest can read back what they asked for: listOwnRefundRequests, listOwnResaleListings and
+  listOwnGroupBookings return only the caller''s own refund requests, resale listings and group bookings (another
+  guest''s, named by id, is a 404); getGuestRefundPolicy gives a guest the venue''s refund terms as GuestRefundPolicy (time
+  bands, partial refunds and the refund window, never the approval thresholds). GST-067, WEB-019, WEB-030 and WEB-031
+  bind them. Additive.'
+decision:
+  what: 'R8 blocker cause ORDERS-MONEY-C26 (no decision needed; fix as the cause proposes, with a separate guest list
+    for group bookings so the staff command centre listGroupBooking keeps its audience). contracts/spine/orders.yaml:
+    three GET operations on the existing paths, self-scoped by subject (Pattern 4), paged, listOwnGroupBookings with a
+    status filter; a fourth, getGuestRefundPolicy, for the guest''s part of the policy. getRefundPolicy stays staff-only
+    and unchanged: answering a guest from it with a narrower shape would change its response for every staff caller
+    (a union type, or required fields made optional), which check-contract-compat rightly calls breaking. Screens: bindings and GST-067 venueId from the
+    session only; no visible text changes (check-approved-ui passes with 0 changes).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 28228 and 28239 (ADAM gaps 28239/0, 28228/2): the Refunds & Resale tracker and
+  My Reservations showed nothing after a reload because no guest operation returned what the guest had submitted.
+  Finding: R8 blocker cause list, group orders-money.'
+keys_touched:
+  operations: [listOwnGroupBookings, listOwnResaleListings, listOwnRefundRequests, getGuestRefundPolicy, getRefundPolicy]
+  schemas: [GuestRefundPolicy]
+  files:
+  - contracts/spine/orders.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'screen-api gap: a screen shows records no operation it may call returns'
+tickets:
+  started: []
+  unstarted:
+  - '28228 and 28239 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28239/0, 28228/2'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open
+notes: 'Lineage for the four new reads (orders.refund with orders.order for ownership, orders.resale_listing,
+  orders.group_booking, orders.refund_policy with its time bands) comes from the lineage derivation on the merged r8 branch.'

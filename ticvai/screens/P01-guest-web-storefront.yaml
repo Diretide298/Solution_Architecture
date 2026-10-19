@@ -4846,6 +4846,11 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: listOwnRefundRequests
+    contract: orders
+    purpose: The guest's own refund requests and their status
+    trigger: onLoad
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: listMyOrders
     contract: orders
     purpose: The orders this guest placed
@@ -7119,6 +7124,11 @@ screens:
     offline: '**The offline banner shows.** Sending, claiming and listing for resale need the connection
       — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible.'
   apis:
+  - operationId: listOwnResaleListings
+    contract: orders
+    purpose: The guest's own resale listings and their status
+    trigger: onLoad
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
@@ -7454,6 +7464,11 @@ screens:
       changing and cancelling need the connection — a table held offline is a table two people think they
       have.'
   apis:
+  - operationId: listOwnGroupBookings
+    contract: orders
+    purpose: The school trips and parties this guest asked for, provisional ones included
+    trigger: onLoad
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: listGroupPackages
     contract: catalogue
     purpose: School-trip formats and party packages

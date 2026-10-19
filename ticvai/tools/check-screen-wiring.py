@@ -34,6 +34,14 @@ three rules. `x-ticvai-outbox-replay: true` marks the outbox's own replay call (
 queues and never has to call disabled. S-OFFLINE-CLAIM, like S-OFFLINE-QUEUED, reads an offline state that also refuses ("Nothing here is
 offered offline ... a request queued and never sent is worse") as a refusal, not a promise.
 
+**What the client's prototype already shows** (20 October 2026, r8 integration, CHG-R8INT-003). A client-approved
+screen whose layout is the client's prototype (`wireframe.provenance: client-verified`, `prototype.match: exact`) is
+built from that view, and its visible YAML is fixed (check-approved-ui). A read it gains to fill what the view already
+shows -- GST-067's "Tickets you can act on" rows and "Rules" note, from the guest's own refund requests and listings and
+the venue's refund terms -- names that element in the binding: `shownBy: <the element's text in the prototype>`. Such
+a read counts as reached, and S-SHOWN-BY fails a `shownBy` whose text the prototype file does not hold (as a quoted
+string), or on a screen whose layout is not an exact, client-verified prototype view.
+
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
     python3 tools/check-screen-wiring.py [--all] [--update-baseline]
@@ -46,10 +54,38 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
 from typed_props import DEVICE_GUEST_PLATFORMS  # noqa: E402
 
+ROOT = Path(__file__).resolve().parents[1]
+_PROTO_TEXT = {}
+
+
+def prototype_text(rel):
+    """The client prototype file's text, read once; empty when the file is absent (a gitignored design file)."""
+    if rel not in _PROTO_TEXT:
+        f = ROOT / rel
+        _PROTO_TEXT[rel] = f.read_text(encoding="utf-8", errors="replace") if f.is_file() else ""
+    return _PROTO_TEXT[rel]
+
+
+def shown_in_prototype(s, shown):
+    """None when `shown` is a quoted string of the screen's exact client-verified prototype file, else why not."""
+    wf = s.get("wireframe") or {}
+    proto = wf.get("prototype") if isinstance(wf.get("prototype"), dict) else {}
+    if wf.get("provenance") != "client-verified" or proto.get("match") != "exact" or not proto.get("file"):
+        return "its layout is not an exact, client-verified prototype view"
+    text = prototype_text(proto["file"])
+    if not text:
+        return "its prototype file %s is not present to check against" % proto["file"]
+    if not any(q + shown + q in text for q in ("'", '"')):
+        return "%s does not hold %r as a quoted string" % (proto["file"], shown)
+    return None
+
+
 RULES = {
     "S-STATE-BOILERPLATE": "empty-state text promises a create action, filter or permission the screen lacks (R250)",
     "S-DUP-REGION": "a region name used twice on one screen (R253)",
     "S-OP-UNREACHED": "a declared operation no component, overlay or transition reaches (R273)",
+    "S-SHOWN-BY": "an api's shownBy names text the screen's exact client-verified prototype does not hold, or the "
+                  "screen's layout is no such prototype (CHG-R8INT-003)",
     "S-ONLOAD-WRITE": "a write operation triggered onLoad (R268)",
     "S-BUTTON-FORM": "a button calls an operation with a required body and nothing collects it (R264)",
     "S-SCREEN-PERMISSION": "permissioned operations and a no-access state, but no screen permission (R255)",
@@ -273,6 +309,13 @@ def main() -> int:
             if isinstance(t, dict) and t.get("operation"):
                 refs.add(t["operation"])
         for a in apis:
+            if a.get("shownBy"):
+                why = shown_in_prototype(s, str(a["shownBy"]))
+                if why:
+                    guard.add("S-SHOWN-BY", f"{sid}:{a['operationId']}",
+                              f"{sid}: {a['operationId']} shownBy {a['shownBy']!r}, but {why}")
+                    continue
+                refs.add(a["operationId"])
             if a["operationId"] not in refs and a.get("trigger") not in ("background", "onInterval"):
                 guard.add("S-OP-UNREACHED", f"{sid}:{a['operationId']}",
                           f"{sid}: declares {a['operationId']} ({a.get('trigger')}) and no component reaches it")

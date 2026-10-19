@@ -12682,6 +12682,24 @@ screens:
     offline: '**Not available, and the offline banner says why.** Refunds and resale listings need the
       server — a queued refund request is a promise nobody made.'
   apis:
+  - operationId: listOwnRefundRequests
+    contract: orders
+    purpose: The guest's own refund requests and their status
+    trigger: onLoad
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
+    shownBy: Tickets you can act on
+  - operationId: listOwnResaleListings
+    contract: orders
+    purpose: The guest's own resale listings and their status
+    trigger: onLoad
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
+    shownBy: Tickets you can act on
+  - operationId: getGuestRefundPolicy
+    contract: orders
+    purpose: How much comes back and until when, before any request
+    trigger: onLoad
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
+    shownBy: Rules
   - operationId: createRefundRequest
     contract: orders
     purpose: Guest-initiated refund request
@@ -12701,6 +12719,8 @@ screens:
       from: session
     - name: orderId
       from: navigation
+    - name: venueId
+      from: session
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
@@ -13571,10 +13591,12 @@ screens:
     contract: marketing-crm
     purpose: The guest's loyalty position
     trigger: onLoad
+    shownBy: Balances
   - operationId: listRewards
     contract: marketing-crm
     purpose: The rewards the guest can redeem
     trigger: onLoad
+    shownBy: Spend points
   entryState:
     params:
     - name: subjectId
