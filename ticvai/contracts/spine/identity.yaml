@@ -61,7 +61,7 @@ x-ticvai-queries:
   verifySupervisorStepUp:
     module: identity
     inputs:
-      principalId: uuid, the supervisor signing (SupervisorStepUp.principalId)
+      principalId: uuid, the supervisor signing (SupervisorStepUp.principalId); or supervisorUsername (SupervisorStepUp.supervisorUsername, the employee number), exactly one of the two, resolved to the principal here
       credential: string, the supervisor's PIN (SupervisorStepUp.credential); compared, never stored or logged
       permission: Permission, the asking operation's x-ticvai-permission (contracts/shared/permissions.yaml)
       scopePath: ltree, the scope the asking operation acts at (its venue or workstation)
@@ -613,7 +613,15 @@ paths:
       - guestAuth: []
       - {}
       summary: Send a verification link, or consume one
-      description: '**Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
+      description: '**Two ways to prove the address, one operation** (R8 blocker fix, IDENTITY-C38). The approved screens
+        (WEB-013, GST-010, GST-073) ask for a **six-digit code**, so `mode` `code` takes it in `code`: checked against the
+        guest''s `identity.otp_challenge` row with purpose `emailVerification` and channel `email`, within the venue''s attempt
+        limit (`VenueSettings.identity.guestOtpMaxAttempts`); a wrong code is `422 email-code-invalid` with
+        `attemptsRemaining`, as `verifyMfaChallenge` answers, and the last wrong one voids the code (`410
+        verification-token-expired`; ask for a new `send`). The session is the guest''s own (`guestAuth`), so the code needs no
+        address. The link path (`send` an emailed single-use link, `confirm` its `token`) stays for emailed links.
+
+        **Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
         the address on it — and **a guest account with an unverified email can receive somebody else''s
         tickets**, because a transfer is offered to an address.
 
@@ -686,6 +694,12 @@ paths:
                   enum:
                   - send
                   - confirm
+                  - code
+                code:
+                  type: string
+                  nullable: true
+                  pattern: '^[0-9]{6}$'
+                  description: For `code`. The six digits emailed by `send` or by `registerGuest` with channel `email`.
                 token:
                   type: string
                   nullable: true
@@ -714,6 +728,12 @@ paths:
                     type: string
                     format: date-time
                     nullable: true
+        '422':
+          description: 'A wrong code (`mode` `code`), attempts one up to the limit; `attemptsRemaining` says how many are left.'
+          x-ticvai-problem-types: [email-code-invalid]
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/MfaCodeInvalidProblem' }
         '410':
           x-ticvai-problem-types: [verification-token-expired, verification-token-used]
           description: '**The token expired or was already used.** Distinct from an invalid one — a guest
@@ -1810,13 +1830,15 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-              - reason
               properties:
                 reason:
                   type: string
                   minLength: 3
                   maxLength: 500
+                  default: supervisor-takeover
+                  description: 'Why the session is ended. **Optional (R8 blocker fix, IDENTITY-C44): the POS-000 door sends none,
+                    and the server records `supervisor-takeover`** when the call comes from the door with a supervisor step-up.
+                    BO-053 still sends one.'
                 workstationId:
                   type: string
                   format: uuid
@@ -2755,6 +2777,12 @@ paths:
         is verified or has proved the contact by code. The full rule, including per-site guest checkout,
         is on `verifyGuestEmail` (decided 17 September 2026; gate moved to checkout by ADR-0045, 18
         September 2026).
+
+        **With `channel` `email` it sends the six-digit code** the approved screens ask for (R8 blocker fix,
+        IDENTITY-C38): an `identity.otp_challenge` row with purpose `emailVerification`, channel `email`, and the venue''s
+        attempt limit, which the guest enters through `verifyGuestEmail` with `mode` `code`. The `GuestSession` returned
+        here is the session the guest continues in; it becomes verified when the code is confirmed, and
+        `linkGuestCheckout` then runs under that same session.
 
         '
       tags:
@@ -4388,6 +4416,15 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: X-Supervisor-Username
+        in: header
+        required: false
+        description: With no session (POS-000), the supervisor's employee number, **instead of** `X-Supervisor-Principal-Id`
+          (exactly one of the two; R8 blocker fix, IDENTITY-C44). Resolved as `SupervisorStepUp.supervisorUsername` is. Ignored
+          with a session.
+        schema:
+          type: string
+          maxLength: 200
       - name: X-Supervisor-Pin
         in: header
         required: false

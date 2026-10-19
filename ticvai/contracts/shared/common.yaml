@@ -337,13 +337,21 @@ components:
 
         '
       required:
-      - principalId
       - credential
       properties:
         principalId:
           type: string
           format: uuid
-          description: The supervisor signing. Recorded against the act.
+          description: The supervisor signing. Recorded against the act. **Exactly one of `principalId` or
+            `supervisorUsername`** is sent (neither, or both, is `400`; not in the schema as a oneOf, so an r1 client still validates).
+        supervisorUsername:
+          type: string
+          maxLength: 200
+          description: '**The supervisor''s employee number**, which is what the step-up prompt asks for (R8 blocker fix,
+            IDENTITY-C44). The server resolves it to the principal (`identity.principal.username`, within the tenant) before it
+            checks the PIN; an unknown one is refused exactly as a wrong PIN, `403 supervisor-step-up-refused`, so the prompt
+            does not reveal which employee numbers exist. The act is recorded against the resolved principal. Exactly one of
+            this or `principalId`.'
         credential:
           type: string
           maxLength: 512

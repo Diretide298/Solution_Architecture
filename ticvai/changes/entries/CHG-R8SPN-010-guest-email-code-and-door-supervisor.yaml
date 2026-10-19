@@ -1,0 +1,39 @@
+id: CHG-R8SPN-010
+date: '2026-10-19'
+source: audit
+kind: contract
+summary: 'verifyGuestEmail takes a six-digit code (mode code, 422 email-code-invalid with attemptsRemaining) beside the
+  emailed link, registerGuest with channel email sends that code and says which session linkGuestCheckout runs under;
+  the supervisor step-up accepts the employee number (supervisorUsername, header X-Supervisor-Username) instead of the
+  principal id; forceLogout reason becomes optional and defaults to supervisor-takeover. Additive.'
+decision:
+  what: 'R8 blocker fix lane spine, causes IDENTITY-C38 and IDENTITY-C44 (contract parts; no decision pending).
+    contracts/spine/identity.yaml and contracts/shared/common.yaml SupervisorStepUp. Exactly-one-of is stated in text and
+    left out of the schema (a oneOf is labelled breaking against r1 by check-contract-compat). POS-000 permission null is
+    the screens lane''s edit (request in the lane report).'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Walk of the Sprint 1 and 2 tickets 27733, 27737, 27742, 27767 and 27768 on 19 October 2026 (ADAM gaps 27733/0,
+  27737/0, 27742/0, 27767/1, 27767/2, 27768/2): the approved screens ask for a code and an employee number the contract
+  did not take. Finding: R8 blocker cause list, group identity.'
+keys_touched:
+  operations: [verifyGuestEmail, registerGuest, linkGuestCheckout, forceLogout, listActiveSessions, verifySupervisorStepUp]
+  schemas: [SupervisorStepUp]
+  screens: [POS-000, WEB-013, GST-010]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/shared/common.yaml
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started: []
+  unstarted:
+  - '27733, 27737, 27742, 27767 and 27768 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27733/0, 27737/0, 27742/0, 27767/1, 27767/2, 27768/2'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'check-step-up.py passes with the new header.'
