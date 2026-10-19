@@ -1,0 +1,26 @@
+id: CHG-R8GEN-009
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The lineage takes the same-module reads and writes eleven r8 causes need, as override entries with the cause in their reason: closeShift and submitShiftCount no longer write ledger.journal_entry (the shift.closed consumer posts); escalateApprovalRequest reads approvals.sla_policy; setModuleEnablement reads and writes whitelabel.tenant_config; getOrderStatement reads orders.order_event, order_fee and chargeback; getTenantAppStatus and setMaintenanceMode read whitelabel.module_enablement and content_page; getOrderCalendarEvent reads orders.order_event; modifyOrder, rescheduleOrder and exchangeOrderLines read orders.order_line, refund and refund_policy; publishContentBlock reads whitelabel.publish_review_policy; runReport reads reporting.report_column and report_filter; the retail return, shop-and-drop and reservation operations read the sale, its lines, the return policy and the merchandise row.'
+decision:
+  what: 'r8 causes APPROVALS-TENANCY-C40 (option A), C05 (option A), C41 (option A), C22 (option A), C33, ORDERS-MONEY-C42, IDENTITY-C47, C53, C61, C67: the lineage parts within one module. Reads of another module''s data are x-ticvai-read-via facts in the asking contract (core and surface lanes; requests in the r8 generators report); the derived lineage follows them.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, causes APPROVALS-TENANCY-C05, C22, C33, C40, C41, ORDERS-MONEY-C42, IDENTITY-C47, C53, C61, C67 (ADAM gaps 27829/0, 28029/1, 28732/1, 27820/5, 27792/2, 27809/1, 28231/3, 27885/2, 27736/1, 27734/5, 27782/2).'
+keys_touched:
+  files:
+  - handoff/api-data-lineage-overrides.json
+  - handoff/api-data-lineage.json
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-lineage.py
+status: open

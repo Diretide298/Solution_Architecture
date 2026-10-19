@@ -4858,6 +4858,8 @@
    "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
+   "orders.refund",
+   "orders.refund_policy",
    "orders.sales_order"
   ],
   "writes": [
@@ -5183,6 +5185,9 @@
   "path": "/orders/{orderId}/exchanges",
   "reads": [
    "cache:idempotency",
+   "orders.order_line",
+   "orders.refund",
+   "orders.refund_policy",
    "orders.sales_order"
   ],
   "writes": [
@@ -5222,6 +5227,9 @@
   "path": "/orders/{orderId}/reschedule",
   "reads": [
    "cache:idempotency",
+   "orders.order_line",
+   "orders.refund",
+   "orders.refund_policy",
    "orders.sales_order"
   ],
   "writes": [
@@ -5421,6 +5429,9 @@
   "path": "/orders/{orderId}/statement",
   "reads": [
    "ledger.posting",
+   "orders.chargeback",
+   "orders.order_event",
+   "orders.order_fee",
    "orders.payment",
    "orders.refund",
    "orders.sales_order"
@@ -7475,7 +7486,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.journal_entry",
    "orders.cash_count_line",
    "orders.pos_shift",
    "platform.outbox"
@@ -23213,8 +23223,12 @@
   "reads": [
    "cache:idempotency",
    "inventory.kit_component",
+   "retail.merchandise",
    "retail.return",
-   "retail.return_line"
+   "retail.return_line",
+   "retail.return_policy",
+   "retail.sale",
+   "retail.sale_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -23764,6 +23778,8 @@
   "path": "/shop-and-drop",
   "reads": [
    "cache:idempotency",
+   "retail.sale",
+   "retail.sale_line",
    "retail.shop_and_drop",
    "retail.shop_and_drop_line"
   ],
@@ -23832,6 +23848,8 @@
   "verb": "GET",
   "path": "/shop-and-drop/lookup",
   "reads": [
+   "retail.sale",
+   "retail.sale_line",
    "retail.shop_and_drop",
    "retail.shop_and_drop_line"
   ],
@@ -23948,6 +23966,7 @@
    "cache:idempotency",
    "inventory.movement",
    "inventory.stock_earmark",
+   "retail.merchandise",
    "retail.reservation",
    "retail.reservation_line"
   ],
@@ -26663,7 +26682,9 @@
   "reads": [
    "cache:idempotency",
    "reporting.execution",
+   "reporting.report_column",
    "reporting.report_definition",
+   "reporting.report_filter",
    "reporting.report_parameter"
   ],
   "writes": [
@@ -32717,6 +32738,8 @@
   "path": "/tenant-config/status",
   "reads": [
    "whitelabel.config_version",
+   "whitelabel.content_page",
+   "whitelabel.module_enablement",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -32742,6 +32765,8 @@
   "path": "/tenant-config/status",
   "reads": [
    "cache:idempotency",
+   "whitelabel.content_page",
+   "whitelabel.module_enablement",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -33923,12 +33948,14 @@
    "control.contract",
    "control.licence_add_on",
    "control.plan",
-   "whitelabel.module_enablement"
+   "whitelabel.module_enablement",
+   "whitelabel.tenant_config"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "whitelabel.module_enablement"
+   "whitelabel.module_enablement",
+   "whitelabel.tenant_config"
   ],
   "routing": "",
   "scope": "tenant",
@@ -35304,6 +35331,7 @@
    "approvals.escalation",
    "approvals.request",
    "approvals.rule",
+   "approvals.sla_policy",
    "cache:idempotency"
   ],
   "writes": [
@@ -46019,7 +46047,8 @@
   "reads": [
    "cache:idempotency",
    "control.content_block",
-   "identity.principal"
+   "identity.principal",
+   "whitelabel.publish_review_policy"
   ],
   "writes": [
    "cache:idempotency",
@@ -96263,6 +96292,7 @@
   "verb": "GET",
   "path": "/orders/{orderId}/calendar-event",
   "reads": [
+   "orders.order_event",
    "orders.order_line",
    "orders.sales_order",
    "platform.scope"
@@ -123283,7 +123313,8 @@
   "verb": "GET",
   "path": "/api-scopes",
   "reads": [
-   "control.api_licence"
+   "control.api_licence",
+   "release:api-scopes"
   ],
   "writes": [],
   "routing": "replica",
@@ -123300,7 +123331,7 @@
   "service": "PlatformService",
   "stores": [
    "postgres",
-   "redis"
+   "release"
   ],
   "note": "catalogue generated at release from x-ticvai-api-scope; licensed flag from the tenant licence"
  },
@@ -124895,7 +124926,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.journal_entry",
    "orders.cash_count_line",
    "orders.pos_shift",
    "platform.outbox"

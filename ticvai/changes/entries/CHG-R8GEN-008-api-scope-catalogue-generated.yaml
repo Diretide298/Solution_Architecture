@@ -1,0 +1,29 @@
+id: CHG-R8GEN-008
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The partner API scope catalogue listApiScopes serves is generated: tools/derive-api-scopes.py writes handoff/api-scopes.json from x-ticvai-api-scope on every partner-callable operation (11 scopes over 119 operations), ordered by module, then access (read before write), then scope, and refuses a scope value that is not <ModuleKey>.read or .write. A refresh step runs it; the lineage of listApiScopes reads the generated catalogue (release:api-scopes) and control.api_licence.'
+decision:
+  what: 'r8 cause FOUNDATION-AI-C47, the generator part. The contract text of listApiScopes (the order sentence, the licensed rule marked proposed, client to confirm) is the surface lane''s, requested in the r8 generators report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, cause FOUNDATION-AI-C47 (ticket 27981 SVC-PLATFORM-PUBLICAPI-7; ADAM gaps 27981/0, 27981/1, 27981/2).'
+keys_touched:
+  files:
+  - tools/derive-api-scopes.py
+  - tools/refresh.sh
+  - handoff/api-scopes.json
+  - handoff/api-data-lineage-overrides.json
+  - handoff/api-data-lineage.json
+root_class: 'a generated artefact the contract promises and nothing generates'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-api-scopes.py
+status: open

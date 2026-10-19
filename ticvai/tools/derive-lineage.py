@@ -487,7 +487,8 @@ CARRIED_REASON = ("hand-kept in the lineage before r8; no contract fact states i
 def load_overrides(path: Path = OVERRIDES) -> dict:
     """`handoff/api-data-lineage-overrides.json`: what the contracts cannot state, one entry per operation.
 
-    `reads`/`writes` add tables, `notReads`/`notWrites` remove ones the contract derives, `reason` says why. An entry
+    `reads`/`writes` add tables, `notReads`/`notWrites` remove ones the contract derives, `stores` replaces the
+    entry's datastores (a generated file, say), `reason` says why. An entry
     with `carried: true` was copied from the hand-kept lineage when it became derived (20 October 2026); their number
     may only fall (`carriedCeiling`, check-lineage LN-OVERRIDE). Authored by hand; nothing in the refresh writes it."""
     if not path.exists():
@@ -534,6 +535,8 @@ def expected(stored: dict, fresh: dict, overrides: dict, stale: list = None) -> 
         if not e.get("stores"):
             e["stores"] = f.get("stores") or ["postgres"]
         ov = ops.get(o) or {}
+        if ov.get("stores"):
+            e["stores"] = list(ov["stores"])     # where the operation's data lives, when no table says it
         reads = set(f.get("reads") or [])
         writes = set(f.get("writes") or []) | set(f.get("_response_writes") or [])
         if e.get("pure"):

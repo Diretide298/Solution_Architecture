@@ -167,6 +167,10 @@ python3 tools/derive-app-roles.py
 # `x-ticvai-permission`. Runs here because adding one operation with a permission changes a
 # checklist, and a checklist that lags the contracts grants access to operations that moved.
 python3 tools/derive-capabilities.py --apply
+# **The partner API scope catalogue listApiScopes serves** (20 October 2026, r8 cause FOUNDATION-AI-C47, CHG-R8GEN-008).
+# The contract says it is generated at release from `x-ticvai-api-scope`; until this nothing generated it. Reads the
+# contracts only; the service loads handoff/api-scopes.json at startup.
+python3 tools/derive-api-scopes.py
 # **Retired 10 September.** `derive-pack-boards.py` drew every pack screen a second time on
 # its own `WS##` board — 728 screens rendered twice, and a reviewer looking at two drawings
 # of one screen cannot tell it is one screen. The workshop grouping is now a badge and a

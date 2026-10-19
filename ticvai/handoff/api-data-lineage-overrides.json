@@ -1505,14 +1505,13 @@
     "platform.venue_settings"
    ],
    "writes": [
-    "ledger.journal_entry",
     "orders.cash_count_line"
    ],
    "notWrites": [
     "orders.pos_shift_approval",
     "orders.pos_shift_incident"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause APPROVALS-TENANCY-C40 (CHG-R8GEN-009): no ledger.journal_entry write: the shift.closed consumer in Ledger posts the cash position (the lead, 20 October 2026, option A; ADR-0055 rule 3)",
    "carried": true
   },
   "closeTableVisit": {
@@ -2462,12 +2461,16 @@
   },
   "createRetailReturn": {
    "reads": [
-    "inventory.kit_component"
+    "inventory.kit_component",
+    "retail.merchandise",
+    "retail.return_policy",
+    "retail.sale",
+    "retail.sale_line"
    ],
    "writes": [
     "inventory.movement"
    ],
-   "reason": "restock or write-off per component for a kit; the refund is raised in orders (RetailReturn.refundId), where orders.fraud_rule refund rules are read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "restock or write-off per component for a kit; the refund is raised in orders (RetailReturn.refundId), where orders.fraud_rule refund rules are read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause APPROVALS-TENANCY-C33 (CHG-R8GEN-009): a return is checked against the sale, its lines, the return policy and the merchandise row",
    "carried": true
   },
   "createRetailSale": {
@@ -2535,6 +2538,13 @@
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
+  },
+  "createShopAndDrop": {
+   "reads": [
+    "retail.sale",
+    "retail.sale_line"
+   ],
+   "reason": "r8 cause APPROVALS-TENANCY-C33 (CHG-R8GEN-009): shop-and-drop lines are the sale's lines held for collection"
   },
   "createStockReservation": {
    "reads": [
@@ -3247,12 +3257,13 @@
   },
   "escalateApprovalRequest": {
    "reads": [
-    "approvals.rule"
+    "approvals.rule",
+    "approvals.sla_policy"
    ],
    "notWrites": [
     "approvals.decision"
    ],
-   "reason": "pending->escalated emits approval.escalated (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "pending->escalated emits approval.escalated (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause APPROVALS-TENANCY-C05 (CHG-R8GEN-009): the escalation target falls back to the SLA policy's escalation_group_id when the matched rule names no escalate_to_role_ids (option A)",
    "carried": true
   },
   "escalateCase": {
@@ -3316,6 +3327,9 @@
   },
   "exchangeOrderLines": {
    "reads": [
+    "orders.order_line",
+    "orders.refund",
+    "orders.refund_policy",
     "orders.sales_order"
    ],
    "writes": [
@@ -3324,7 +3338,7 @@
     "orders.sales_order",
     "platform.outbox"
    ],
-   "reason": "emits order.exchanged (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "emits order.exchanged (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause IDENTITY-C61 (CHG-R8GEN-009): the difference is settled or refunded under orders.refund_policy against the order lines (orders.refund)",
    "carried": true
   },
   "expireCreditLots": {
@@ -4385,21 +4399,25 @@
   },
   "getOrderCalendarEvent": {
    "reads": [
+    "orders.order_event",
     "orders.order_line",
     "orders.sales_order",
     "platform.scope"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause IDENTITY-C53 (CHG-R8GEN-009): the calendar SEQUENCE is the count of the order's order_event rows of kind rescheduled",
    "carried": true
   },
   "getOrderStatement": {
    "reads": [
     "ledger.posting",
+    "orders.chargeback",
+    "orders.order_event",
+    "orders.order_fee",
     "orders.payment",
     "orders.refund",
     "orders.sales_order"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause ORDERS-MONEY-C42 (CHG-R8GEN-009): void, modification and exchange entries come from orders.order_event, fees from orders.order_fee, chargebacks from orders.chargeback",
    "carried": true
   },
   "getOrgUnit": {
@@ -4881,9 +4899,11 @@
   "getTenantAppStatus": {
    "reads": [
     "whitelabel.config_version",
+    "whitelabel.content_page",
+    "whitelabel.module_enablement",
     "whitelabel.tenant_config"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause IDENTITY-C47 (CHG-R8GEN-009): activeModuleCount and licensedModuleCount from whitelabel.module_enablement, activePageCount from whitelabel.content_page (own tables)",
    "carried": true
   },
   "getTenantConfig": {
@@ -5785,10 +5805,14 @@
   },
   "listApiScopes": {
    "reads": [
-    "control.api_licence"
+    "control.api_licence",
+    "release:api-scopes"
    ],
-   "reason": "catalogue generated at release from x-ticvai-api-scope; licensed flag from the tenant licence (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "stores": [
+    "postgres",
+    "release"
+   ],
+   "reason": "r8 cause FOUNDATION-AI-C47 (CHG-R8GEN-008): the scope catalogue is handoff/api-scopes.json, generated at release by tools/derive-api-scopes.py from x-ticvai-api-scope and loaded at startup (ApiScope persists to nothing); licensed is computed per request from the caller's tenant's control.api_licence rows effective today."
   },
   "listApprovalDelegations": {
    "reads": [
@@ -10629,6 +10653,13 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
+  "lookupShopAndDrop": {
+   "reads": [
+    "retail.sale",
+    "retail.sale_line"
+   ],
+   "reason": "r8 cause APPROVALS-TENANCY-C33 (CHG-R8GEN-009): shop-and-drop lines are the sale's lines held for collection"
+  },
   "lookupTicket": {
    "reads": [
     "access.scan_event",
@@ -10731,6 +10762,11 @@
    "carried": true
   },
   "modifyOrder": {
+   "reads": [
+    "orders.order_line",
+    "orders.refund",
+    "orders.refund_policy"
+   ],
    "writes": [
     "orders.order_event"
    ],
@@ -10738,7 +10774,7 @@
     "orders.order_line_discount",
     "orders.order_line_eligibility"
    ],
-   "reason": "order_event writer (29 September: writers pass; DM5 open item) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "order_event writer (29 September: writers pass; DM5 open item) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause IDENTITY-C61 (CHG-R8GEN-009): the difference is settled or refunded under orders.refund_policy against the order lines (orders.refund)",
    "carried": true
   },
   "moveTableVisit": {
@@ -11284,12 +11320,13 @@
   },
   "publishContentBlock": {
    "reads": [
-    "identity.principal"
+    "identity.principal",
+    "whitelabel.publish_review_policy"
    ],
    "writes": [
     "cache:resolution"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause IDENTITY-C67 (CHG-R8GEN-009): the review path reads the tenant's publish review policy, as publishTenantConfig does after CR-154",
    "carried": true
   },
   "publishForecastVersion": {
@@ -12641,13 +12678,16 @@
   },
   "rescheduleOrder": {
    "reads": [
+    "orders.order_line",
+    "orders.refund",
+    "orders.refund_policy",
     "orders.sales_order"
    ],
    "writes": [
     "orders.order_event",
     "orders.sales_order"
    ],
-   "reason": "order_event writer (29 September: writers pass; DM5 open item) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "order_event writer (29 September: writers pass; DM5 open item) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause IDENTITY-C61 (CHG-R8GEN-009): the difference is settled or refunded under orders.refund_policy against the order lines (orders.refund)",
    "carried": true
   },
   "resendPaymentLink": {
@@ -12663,12 +12703,13 @@
   "reserveMerchandise": {
    "reads": [
     "inventory.movement",
-    "inventory.stock_earmark"
+    "inventory.stock_earmark",
+    "retail.merchandise"
    ],
    "writes": [
     "inventory.stock_earmark"
    ],
-   "reason": "4 October 2026 (CHG-FXC-004): stock available to allocate, and the allocation (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "4 October 2026 (CHG-FXC-004): stock available to allocate, and the allocation (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause APPROVALS-TENANCY-C33 (CHG-R8GEN-009): a reservation holds a merchandise row",
    "carried": true
   },
   "resetPrincipalCredential": {
@@ -13264,10 +13305,12 @@
   },
   "runReport": {
    "reads": [
+    "reporting.report_column",
     "reporting.report_definition",
+    "reporting.report_filter",
     "reporting.report_parameter"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause APPROVALS-TENANCY-C22 (CHG-R8GEN-009): a definition compiles with its columns and filters (option A: the sources behind the eight seeded reports)",
    "carried": true
   },
   "runSemanticQuery": {
@@ -14720,12 +14763,14 @@
   },
   "setMaintenanceMode": {
    "reads": [
+    "whitelabel.content_page",
+    "whitelabel.module_enablement",
     "whitelabel.tenant_config"
    ],
    "writes": [
     "whitelabel.tenant_config"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause IDENTITY-C47 (CHG-R8GEN-009): activeModuleCount and licensedModuleCount from whitelabel.module_enablement, activePageCount from whitelabel.content_page (own tables)",
    "carried": true
   },
   "setMapZones": {
@@ -14917,12 +14962,14 @@
    "reads": [
     "control.contract",
     "control.licence_add_on",
-    "control.plan"
+    "control.plan",
+    "whitelabel.tenant_config"
    ],
    "writes": [
-    "cache:resolution"
+    "cache:resolution",
+    "whitelabel.tenant_config"
    ],
-   "reason": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause APPROVALS-TENANCY-C41 (CHG-R8GEN-009): enablement hangs off the tenant's current draft tenant_config, created when none exists (option A)",
    "carried": true
   },
   "setMultiPaymentSplit": {
@@ -16598,11 +16645,10 @@
     "platform.venue_settings"
    ],
    "writes": [
-    "ledger.journal_entry",
     "orders.cash_count_line",
     "orders.pos_shift"
    ],
-   "reason": "CHG-FIN-003 (2 October 2026): the cashier-facing blind close; reads and writes as closeShift, returns no expected figure (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "CHG-FIN-003 (2 October 2026): the cashier-facing blind close; reads and writes as closeShift, returns no expected figure (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause APPROVALS-TENANCY-C40 (CHG-R8GEN-009): no ledger.journal_entry write: the shift.closed consumer in Ledger posts the cash position (the lead, 20 October 2026, option A; ADR-0055 rule 3)",
    "carried": true
   },
   "suggestGuidedChoice": {
