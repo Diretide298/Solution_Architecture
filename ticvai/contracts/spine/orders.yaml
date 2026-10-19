@@ -7736,7 +7736,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Reservations, soonest `expiresAt` first, `id` as the tiebreak.
+          description: Reservations, newest first (`createdAt` descending, `id` as the tiebreak), the order the
+            operation states and the cursor follows (R8 blocker ORDERS-MONEY-C35, CHG-R8MIG-017).
           content:
             application/json:
               schema:
@@ -18922,10 +18923,14 @@ components:
         `cancelReservation`, `convertReservation`, `createPayment`, `capturePayment`, `voidPayment`,
         `createRefund`, `approveRefund`, `createBulkRefund` and `recordGroupCheckIn`; and by the jobs
         that expire reservations, receive payment callbacks and sync partner orders, with `actorSystem`
-        set. Nothing updates or deletes a row.'
+        set. Nothing updates or deletes a row. **A held reservation has no order yet** (R8 blocker ORDERS-MONEY-C35,
+        CHG-R8MIG-017): `createReservation`, `extendReservation` and `cancelReservation` log with `reservationId` only, so
+        `orderId` is null there and `reservationId` is then required.'
+      # A row names its order, its reservation, or both (CHG-R8MIG-017).
+      x-ticvai-required-when:
+        reservationId: {orderId: null}
       required:
       - id
-      - orderId
       - eventType
       - occurredAt
       properties:
@@ -18937,6 +18942,8 @@ components:
           x-ticvai-references: orders.sales_order
           type: string
           format: uuid
+          nullable: true
+          description: The order; null on a reservation's own events before it is converted.
         reservationId:
           type: string
           format: uuid
@@ -19920,6 +19927,14 @@ components:
         preferredDate:
           type: string
           format: date
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The session, for a timed or session package** (DEC-121, Chinmay, 2 October 2026: a date and,
+            for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a `catalogue.performance` on
+            `preferredDate`. Required when the package product is a timed or session product (400 otherwise), null for an
+            open-dated one.'
         expectedSize:
           type: integer
           minimum: 2
@@ -20182,6 +20197,13 @@ components:
           nullable: true
           description: The date the guest asked for on `requestGroupBooking` — what its `409
             dateUnavailable` is checked against. Null for a group a member of staff built from an order.
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The session, for a timed or session package** (DEC-121, Chinmay, 2 October 2026: a date and,
+            for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a `catalogue.performance` on
+            `preferredDate`. Null for an open-dated package; written from the request.'
         orderId:
           type: string
           format: uuid
@@ -20256,6 +20278,15 @@ components:
           - google
         serialNumber:
           type: string
+        passUrl:
+          type: string
+          format: uri
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**What the app adds to the wallet** (R8 blocker ORDERS-MONEY-C39, CHG-R8MIG-017): for `apple` a
+            short-lived signed link to the `.pkpass` file (signed with the brand''s Pass Type ID certificate), for
+            `google` the "Save to Google Wallet" link (a signed JWT). Made when the pass is issued or read, never stored;
+            valid for 15 minutes (proposed, client to confirm), after which a read of the pass gives a new one.'
         authenticationToken:
           x-ticvai-secret: blind-index
           type: string

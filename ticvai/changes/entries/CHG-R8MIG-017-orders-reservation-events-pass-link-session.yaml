@@ -1,0 +1,44 @@
+id: CHG-R8MIG-017
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Orders storage the walk needed: a reservation''s own events are logged with no order (order_event.order_id
+  nullable, a CHECK that each row names its order or its reservation); listReservations has one stated order (newest
+  first); a wallet pass returns the link the app adds to the wallet (passUrl, made on read, not stored); a group booking
+  request and a group booking carry the session (performanceId) DEC-121 decided. `x-ticvai-required-when` accepts null
+  ("required where the other column is null").'
+decision:
+  what: 'R8 blocker causes ORDERS-MONEY-C35, ORDERS-MONEY-C39 and ORDERS-MONEY-C41 (no decision). contracts/spine/orders.yaml
+    OrderEvent, listReservations 200 text, WalletPass.passUrl, GroupBookingRequest and GroupBooking performanceId;
+    tools/derive-ddl.py required-when with a null condition; handoff/decisions-2-october.json DEC-121 status applied.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), group orders-money; tickets 28229, 28234 and 28228 and their ADAM
+  gaps: cancelReservation could not log against a held reservation, the app had no pass to add, and DEC-121''s session
+  field was never applied.'
+keys_touched:
+  operations: [listReservations, cancelReservation, createReservation, extendReservation, issueWalletPass, requestGroupBooking]
+  schemas: [OrderEvent, WalletPass, GroupBookingRequest, GroupBooking]
+  tables:
+  - orders.order_event
+  - orders.group_booking
+  files:
+  - contracts/spine/orders.yaml
+  - tools/derive-ddl.py
+  - handoff/decisions-2-october.json
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '28229, 28234, 28228.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Additive by check-contract-compat. The generated forward migration drops order_event.order_id NOT NULL and adds the
+  CHECK NOT VALID then VALIDATE (applied on PostgreSQL 16, twice). The WEB-031 request form''s session picker is the
+  screens owner''s (requested in the lane report).'

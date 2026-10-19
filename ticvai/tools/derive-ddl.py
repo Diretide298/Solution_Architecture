@@ -2550,6 +2550,11 @@ def main() -> int:
                     continue
                 exempt = []
                 for k, v in sorted(cond.items()):
+                    if v is None:
+                        # `{reservationId: {orderId: null}}`: required where the other column is null (CHG-R8MIG-017,
+                        # ORDERS-MONEY-C35), so a row names at least one of the two
+                        exempt.append(f"{q(k)} IS NOT NULL")
+                        continue
                     vals = v if isinstance(v, list) else [v]
                     lits = ", ".join(sql_literal(x) for x in vals)
                     exempt.append(f"{q(k)} IS DISTINCT FROM {lits}" if len(vals) == 1
