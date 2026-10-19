@@ -1,0 +1,30 @@
+id: CHG-R8MIG-002
+date: '2026-10-19'
+source: audit
+kind: process
+summary: 'MIG-BASELINE now names the row-level security helper functions that only the after-r1 files create (drop_rls_policies, apply_read_beneath_rls, apply_grant_holder_read_rls and the rest), so V0001 copies them and the schema migrations that call them have something to call.'
+decision:
+  what: 'FOUNDATION-AI-C03: tools/ticket_done.py baseline_wording lists, after the 920 and 930 helpers, every function an after-r1 file defines that no earlier file does, with the file that defines it. Regenerate with build-service-docs.py.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'r8 blocker walk finding, ADAM gap 27686/1 (FOUNDATION-AI-C03): 52 tickets say call apply_read_beneath_rls and nothing created it.'
+keys_touched:
+  operations: []
+  tables: []
+  schemas: []
+  files:
+  - tools/ticket_done.py
+root_class: 'A-DERIVE: a change the generator listed for a person and nothing carried'
+tickets:
+  started: []
+  unstarted:
+  - 'MIG-BASELINE and every MIG ticket whose table calls a helper.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'gap 27686/1 (r8 blocker walk, no CR)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-wording.py
+status: open
+notes: 'Prevention: check-migration-wording MW-BASELINE (names every helper function 920 and 930 define). Extending it to the after-r1 functions is left to r9; the wording is generated from the files, so it cannot go stale.'

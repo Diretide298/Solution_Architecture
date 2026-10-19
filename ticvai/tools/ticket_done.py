@@ -393,6 +393,21 @@ def baseline_wording(root) -> str:
     """The sentences MIG-BASELINE carries: its file is ours to write, and the helper functions it copies, by name."""
     fns = baseline_functions(root)
     parts = [f"from the top of {name}: {', '.join(names)}" for name, names in fns.items() if names]
+    # **The helpers only an after-r1 file creates** (FOUNDATION-AI-C03): platform.drop_rls_policies, apply_read_beneath_rls,
+    # apply_grant_holder_read_rls and the rest exist in V0102-V0105 alone, and the schema tickets say "call" them.
+    # A function an after-r1 file defines again is copied from the latest file that defines it.
+    from pathlib import Path
+    have = {n for names in fns.values() for n in names}
+    later = {}
+    for f in sorted((Path(root) / "backend" / "tenant").glob("V0*.sql")):
+        if AFTER_R1_FILE.match(f.name):
+            for n in FUNCTION_DEF.findall(f.read_text(encoding="utf-8")):
+                if n not in have:
+                    later[n] = f.name
+    by_file = {}
+    for n, fname in later.items():
+        by_file.setdefault(fname, []).append(n)
+    parts += [f"from {fname} (created by no other file): {', '.join(names)}" for fname, names in sorted(by_file.items())]
     # no V-number here: check-ticket-text T-MIG-DONE keeps file numbers to the subject and MIGRATIONS.md
     return ("The baseline file named in the subject is one you write in our repository; the package keeps no baseline "
             "file of its own. It creates the helper functions every later migration calls, copied as they are "
