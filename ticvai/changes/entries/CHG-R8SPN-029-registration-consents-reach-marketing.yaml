@@ -1,0 +1,36 @@
+id: CHG-R8SPN-029
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The consents a guest gives at registration are recorded: registerGuest writes identity.guestRegistered to the
+  outbox with the new subjectId, the channel and each consent (purpose, granted, noticeVersion), and Marketing''s
+  consumer records one consent per item through its recordConsent rules (source registration, idempotent on event id
+  and purpose). Identity stores none of them.'
+decision:
+  what: 'R8 blocker cause IDENTITY-C55 (no decision needed). identity.yaml registerGuest (x-ticvai-emits
+    identity.guestRegistered) and RegisterGuestRequest.consents. The event file events/identity-guestRegistered.yaml
+    and Marketing''s consumer are the surface lane''s part (exact content in the core lane report). Gaining an emitted
+    event is a semantic change check-contract-compat calls breaking; the entry is requested from the lead.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 ticket 27728 (ADAM gap 27728/2): registerGuest accepted consents[] that no table or
+  route recorded. Finding: R8 blocker cause list, group identity.'
+keys_touched:
+  operations: [registerGuest, recordConsent]
+  schemas: [RegisterGuestRequest]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'dead input: a request field nothing stores or forwards'
+tickets:
+  started: []
+  unstarted:
+  - '27728 (the walk that found the gap).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27728/2'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open
+notes: 'Lineage: registerGuest gains platform.outbox in its writes at the lead''s derive.'

@@ -2986,6 +2986,15 @@ paths:
         answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts
         (ADR-0025).
 
+        **Each variant carries its list price** (20 October 2026, R8 blocker cause GPS-C27; CHG-R8SPN-028):
+        `listPrice` is the price the guest listing shows for the variant on the caller's channel at this moment,
+        in the venue's currency, resolved by the same price-list rule as `searchCatalogue`'s `fromPrice` and the
+        `variantListingFacts` query's `listPrice`. It is what GST-008's stepper, GST-050, GST-075's price per
+        length and WEB-005 show. It is the list price only: the total a guest pays is still decided at the
+        basket by `promotions.evaluatePromotions` (offers, bundles) and tax is shown as the listing shows it.
+        The channel is the caller's (`web` for the storefront, `mobile` for the guest app, from the credential or,
+        for a visitor, the `channel` parameter); null where no price list prices the variant on that channel.
+
         **Order.** Sorted by `name` ascending, then by `id`.
       tags:
       - product
@@ -3001,6 +3010,14 @@ paths:
         '
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: channel
+        in: query
+        required: false
+        description: 'The channel `listPrice` is priced for (GPS-C27, CHG-R8SPN-028). A guest or staff credential
+          already names it and may leave it out; a visitor with no credential sends `web` or `mobile`. Absent with no
+          credential: `web`.'
+        schema:
+          $ref: '#/components/schemas/Channel'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -22503,6 +22520,16 @@ components:
         id:
           type: string
           format: uuid
+        listPrice:
+          oneOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**The list price on the caller''s channel now**, resolved on read from the price lists
+            (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on
+            input. Null where no price list prices it on that channel. The list price, not the total: promotions
+            and bundles are applied at the basket.'
         productId:
           type: string
           format: uuid
@@ -34656,24 +34683,58 @@ components:
           description: Maximum bands per movement; defaults to 1 (decided 29 September, readiness close-out)
         minimumTimeBetweenMovements:
           type: integer
-          description: Minimum minutes between movements; defaults to 60 (decided 29 September, readiness close-out)
+          deprecated: true
+          description: Minimum minutes between movements; defaults to 60 (decided 29 September, readiness close-out).
+            **Deprecated, same value as `minimumMinutesBetweenMovements`** (GPS-C32, CHG-R8SPN-028), kept for clients
+            built on r1.
         reversalRules:
           type: string
+          deprecated: true
           enum:
             - allowed
             - afterCooldown
             - notAllowed
           description: Whether a movement may be reversed; defaults to afterCooldown (decided 29 September, readiness
-            close-out)
+            close-out). **Deprecated, same value as `reversalRule`** (GPS-C32), kept for clients built on r1.
         cooldownPeriod:
           type: integer
-          description: Cooldown in minutes after a movement; defaults to 60 (decided 29 September, readiness close-out)
+          deprecated: true
+          description: Cooldown in minutes after a movement; defaults to 60 (decided 29 September, readiness close-out).
+            **Deprecated, same value as `cooldownMinutes`** (GPS-C32), kept for clients built on r1.
         ladderId:
           type: string
-          description: Ladder ID
+          deprecated: true
+          description: Ladder ID. **Deprecated, same value as `id`** (GPS-C32), kept for clients built on r1.
         strategyId:
           type: string
-          description: Strategy the ladder belongs to
+          deprecated: true
+          description: Strategy the ladder belongs to. **Deprecated, same value as `dynamicPricingStrategyId`**
+            (GPS-C32), kept for clients built on r1.
+        id:
+          type: string
+          format: uuid
+          description: '**The ladder''s id, `PriceLadder.id`**: the read uses the write''s names (decided 20 October
+            2026, R8 blocker cause GPS-C32; CHG-R8SPN-028), so ADM-094 reads back exactly what `setPriceLadderMatrix`
+            took.'
+        dynamicPricingStrategyId:
+          type: string
+          format: uuid
+          description: The strategy the ladder belongs to, `PriceLadder.dynamicPricingStrategyId` (GPS-C32).
+        minimumMinutesBetweenMovements:
+          type: integer
+          nullable: true
+          description: '`PriceLadder.minimumMinutesBetweenMovements` (GPS-C32); 60 where the ladder sets none.'
+        cooldownMinutes:
+          type: integer
+          nullable: true
+          description: '`PriceLadder.cooldownMinutes` (GPS-C32); 60 where the ladder sets none.'
+        reversalRule:
+          type: string
+          enum:
+            - allowed
+            - afterCooldown
+            - notAllowed
+          description: '`PriceLadder.reversalRule` (GPS-C32).'
         basePriceSource:
           type: string
           description: Board 1 rate the ladder is built around
@@ -34732,7 +34793,10 @@ components:
           items:
             allOf:
               - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: 'Psychological pricing: governed endpoints (e.g. AED 249, 259, 279) a price may land on'
+          description: 'Psychological pricing: governed endpoints (e.g. AED 249, 259, 279) a price may land on. **The
+            same values `PriceLadder.allowedEndpoints` stores as decimal strings, returned here as Money in the
+            venue''s currency** (GPS-C32, CHG-R8SPN-028): the editor sends `"249.00"` and reads back `{amount: 249.00,
+            currency: AED}`.'
         minimumPrice:
           allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -42345,9 +42409,29 @@ components:
           - derivedBands
           - continuousRange
         bands:
-          type: object
-          additionalProperties: true
-          description: '`[{code, price, percent}]`, ascending.'
+          type: array
+          description: '**The bands, lowest first** (typed 20 October 2026, R8 blocker cause GPS-C32; CHG-R8SPN-028: it
+            was declared an object while every reader and writer used a list, so no valid body could carry it). The
+            same shape `DynamicPriceBandsLaddersAdjustmentMatrixView.bands` returns. Stored as the jsonb list it always
+            was.'
+          items:
+            type: object
+            required:
+            - code
+            properties:
+              code:
+                type: string
+                maxLength: 40
+                description: Band code, e.g. P4
+              price:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+                description: Band price (fixed and derived bands)
+              percent:
+                type: number
+                nullable: true
+                description: Band offset from base in percent (percentage bands)
         baseBandCode:
           type: string
           maxLength: 40
@@ -42403,7 +42487,9 @@ components:
           type: array
           items:
             type: string
-          description: Psychological price endings, e.g. `.99`, `.00`.
+          description: 'The governed price endpoints a price may land on, as decimal strings in the venue''s currency
+            (e.g. `"249.00"`, `"259.00"`), the DDL''s text[]. ADM-094''s view returns the same values as Money (GPS-C32,
+            CHG-R8SPN-028).'
         createdAt:
           type: string
           format: date-time

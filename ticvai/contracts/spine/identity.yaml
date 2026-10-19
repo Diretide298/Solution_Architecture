@@ -2835,9 +2835,19 @@ paths:
         here is the session the guest continues in; it becomes verified when the code is confirmed, and
         `linkGuestCheckout` then runs under that same session.
 
+        **The consents given at registration are recorded by Marketing, which owns consent** (20 October 2026, R8
+        blocker cause IDENTITY-C55; CHG-R8SPN-029). Identity stores none of them: in the same transaction as the
+        account it writes `identity.guestRegistered` to the outbox carrying the new `subjectId`, the channel and
+        each `consents[]` item (purpose, granted, noticeVersion), and Marketing''s consumer records one consent per
+        item through its own `recordConsent` rules (source `registration`, idempotent on the event id and purpose).
+        A registration with no `consents` still emits the event, with an empty list. Later changes of mind go
+        through `recordConsent` directly (F56 step 5).
+
         '
       tags:
       - guestAuth
+      x-ticvai-emits:
+      - identity.guestRegistered
       x-ticvai-permission: null
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -9860,7 +9870,9 @@ components:
           pattern: ^[a-z]{2}$
         consents:
           type: array
-          description: Consent captured at registration, recorded with the notice version.
+          description: 'Consent captured at registration, recorded with the notice version. **Recorded by Marketing,
+            not stored here**: `registerGuest` carries the list on `identity.guestRegistered`, and Marketing''s
+            consumer records each item as a consent (IDENTITY-C55, CHG-R8SPN-029).'
           items:
             type: object
             properties:
