@@ -3179,6 +3179,7 @@
   "path": "/orders",
   "reads": [
    "orders.order_line",
+   "orders.payment",
    "orders.sales_order"
   ],
   "writes": [],
@@ -6834,9 +6835,12 @@
    "cache:idempotency",
    "identity.principal",
    "orders.cash_count_line",
+   "orders.cash_movement",
+   "orders.deposit_box",
    "orders.pos_shift",
    "orders.pos_shift_approval",
    "orders.pos_shift_incident",
+   "orders.till_shift_policy",
    "platform.venue_settings",
    "platform.workstation"
   ],
@@ -7099,7 +7103,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval"
   ],
   "routing": "",
   "scope": "venue",
@@ -7434,6 +7439,8 @@
    "orders.pos_shift",
    "orders.pos_shift_approval",
    "orders.pos_shift_incident",
+   "orders.sales_order",
+   "orders.till_shift_policy",
    "platform.venue_settings"
   ],
   "writes": [
@@ -7542,6 +7549,7 @@
    "cache:idempotency",
    "orders.deposit_box",
    "orders.pos_shift",
+   "orders.pos_shift_approval",
    "platform.outbox"
   ],
   "routing": "",
@@ -25463,8 +25471,12 @@
   "verb": "GET",
   "path": "/media/{mediaId}",
   "reads": [
+   "assets.asset_version",
    "assets.media_asset",
-   "assets.media_usage"
+   "assets.media_collection",
+   "assets.media_collection_member",
+   "assets.media_usage",
+   "assets.rendition"
   ],
   "writes": [],
   "routing": "replica",
@@ -25507,6 +25519,11 @@
     "venue_id",
     "version",
     "width"
+   ],
+   "assets.media_collection": [
+    "cover_asset_id",
+    "id",
+    "name"
    ],
    "assets.media_usage": [
     "asset_id",
@@ -25591,10 +25608,12 @@
   "verb": "DELETE",
   "path": "/media/{mediaId}",
   "reads": [
+   "assets.media_asset",
    "assets.media_usage",
    "cache:idempotency"
   ],
   "writes": [
+   "assets.media_asset",
    "assets.media_usage",
    "cache:idempotency"
   ],
@@ -25626,12 +25645,15 @@
   "path": "/media/{mediaId}/replace",
   "reads": [
    "assets.media_asset",
+   "assets.media_upload",
+   "assets.media_usage",
    "cache:idempotency"
   ],
   "writes": [
    "assets.asset_version",
    "assets.media_asset",
    "assets.media_fingerprint",
+   "assets.media_upload",
    "cache:idempotency"
   ],
   "routing": "",
@@ -25732,8 +25754,11 @@
    "cache:idempotency"
   ],
   "writes": [
+   "assets.asset_version",
    "assets.media_asset",
+   "assets.media_collection_member",
    "assets.media_fingerprint",
+   "assets.media_upload",
    "cache:idempotency"
   ],
   "routing": "",
@@ -33749,6 +33774,12 @@
   "reads": [
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
+   "whitelabel.content_page",
+   "whitelabel.homepage_section",
+   "whitelabel.module_enablement",
+   "whitelabel.navigation_config",
+   "whitelabel.navigation_item",
+   "whitelabel.publish_review_policy",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -33775,16 +33806,27 @@
   "verb": "POST",
   "path": "/tenant-config/publish",
   "reads": [
+   "whitelabel.analytics_provider",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version",
+   "whitelabel.content_page",
+   "whitelabel.feature_toggle",
+   "whitelabel.footer_config",
+   "whitelabel.homepage_layout",
+   "whitelabel.homepage_section",
+   "whitelabel.module_enablement",
+   "whitelabel.navigation_config",
+   "whitelabel.navigation_item",
+   "whitelabel.publish_review_policy",
    "whitelabel.tenant_config"
   ],
   "writes": [
    "approvals.request",
    "cache:idempotency",
    "platform.outbox",
-   "whitelabel.config_version"
+   "whitelabel.config_version",
+   "whitelabel.content_page"
   ],
   "routing": "",
   "scope": "tenant",
@@ -33882,6 +33924,7 @@
    "cache:idempotency",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
+   "whitelabel.config_version",
    "whitelabel.feature_toggle",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -33896,9 +33939,13 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "whitelabel.booking_flow",
    "whitelabel.feature_toggle",
+   "whitelabel.footer_config",
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
+   "whitelabel.navigation_config",
    "whitelabel.navigation_item",
    "whitelabel.tenant_config"
   ],
@@ -34058,6 +34105,7 @@
   "verb": "GET",
   "path": "/tenant-config/versions/{version}/diff",
   "reads": [
+   "whitelabel.config_version",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -95001,6 +95049,7 @@
   "verb": "GET",
   "path": "/orders/{orderId}/reminder",
   "reads": [
+   "orders.sales_order",
    "orders.visit_reminder"
   ],
   "writes": [],

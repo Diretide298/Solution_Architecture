@@ -2,15 +2,15 @@ id: CHG-R8LIN-001
 date: '2026-10-19'
 source: audit
 kind: contract
-summary: 'The lineage of 25 operations now lists the same-module tables their own text and rules read or write (sign-in
+summary: 'The lineage of 50 operations now lists the same-module tables their own text and rules read or write (sign-in
   and session, forced logout, MFA and guest e-mail checks, principal update, reprint of tickets, the approval
   operations, Tenancy settings and outlet and device operations, wallet transfer, white-label config reads, licence and
-  entitlement usage, AI forecast, maturity, provider test and pause), and the derived readColumns follow. A new check
+  entitlement usage, shift open, close and approval, order list, visit reminder, media asset upload, replace and delete, white-label publish, restore, validate and diff, AI forecast, maturity, provider test and pause), and the derived readColumns follow. A new check
   rule LN-TEXT reports every operation whose text names a table its lineage entry neither reads nor writes.'
 decision:
   what: 'r8 Sprint 1 and 2 ticket walk: causes IDENTITY-C10, IDENTITY-C22, FOUNDATION-AI-C07, FOUNDATION-AI-C34,
     APPROVALS-TENANCY-C03 (tables), APPROVALS-TENANCY-C20, APPROVALS-TENANCY-C31, APPROVALS-TENANCY-C13 (tables that
-    exist), IDENTITY-C35 (config reads). handoff/api-data-lineage.json edited by hand, then
+    exist), IDENTITY-C35 (config reads), ORDERS-MONEY-C18, APPROVALS-TENANCY-C48 (tables). handoff/api-data-lineage.json edited by hand, then
     tools/derive-read-columns.py --apply. Reads of another module''s tables are not added here: each needs the
     owner''s declared query in the asking contract (XR-UNCOVERED), which is another lane''s file.'
   by: Chinmay
@@ -19,7 +19,7 @@ why: 'Audit finding, r8 blockers walk of Sprint 1 and 2 tickets, 19 October 2026
   lineage is the build boundary ("reads only the tables its spec lists"), so a table the text needs and the lineage
   omits stops the developer.'
 keys_touched:
-  operations: [login, selectRole, getCurrentSession, completeSsoAuthorization, forceLogout, verifyMfaChallenge, verifyGuestEmail, listActiveSessions, updatePrincipal, reprintOrder, pauseAiCapability, getForecastAccuracy, listForecastVersions, importVenueHistory, testAiProvider, submitApprovalRequest, resubmitApprovalRequest, assignApprovalRequest, decideApprovalRequest, listApprovalRequests, getVenueSettings, getOfflinePolicy, setDeviceAssignment, listDeviceAuditRecords, configureWorkstation, createOutlet, updateOutlet, transferWalletBalance, getPublishedTenantConfig, getTenantConfig, getEntitlementUsage, getTenantLicences, addLicenceAddOn, setSubscription]
+  operations: [login, selectRole, getCurrentSession, completeSsoAuthorization, forceLogout, verifyMfaChallenge, verifyGuestEmail, listActiveSessions, updatePrincipal, reprintOrder, pauseAiCapability, getForecastAccuracy, listForecastVersions, importVenueHistory, testAiProvider, submitApprovalRequest, resubmitApprovalRequest, assignApprovalRequest, decideApprovalRequest, listApprovalRequests, getVenueSettings, getOfflinePolicy, setDeviceAssignment, listDeviceAuditRecords, configureWorkstation, createOutlet, updateOutlet, listOrders, getVisitReminder, getMediaAsset, replaceMediaAsset, completeUpload, deleteMediaAsset, approveShiftOpen, acceptShiftVariance, closeShift, openShift, diffConfigVersion, publishTenantConfig, restoreConfigVersion, validateTenantConfig, transferWalletBalance, getPublishedTenantConfig, getTenantConfig, getEntitlementUsage, getTenantLicences, addLicenceAddOn, setSubscription]
   tables: []
   schemas: []
   files:
