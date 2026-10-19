@@ -11,8 +11,7 @@ decision:
   what: 'viewer/mcp/setup/setup.ps1 (Role ai, team repository ticvai/ai, the role''s standards, the closing hint);
     viewer/mcp/setup/starters/ai (CLAUDE.md, .claude/commands, .claude/settings.json); viewer/mcp/update.mjs (role
     ai, told by its /ticket running pytest); viewer/lib/workspace-files.mjs and server.mjs (role ai served);
-    viewer/mcp/workspace-check.mjs (the ai starter''s markers); viewer/mcp/setup/starters/docs/backend-patterns.md and
-    repos/ticvai-docs/setup/dependencies.md and backend-patterns.md (environments, state, the ai role).'
+    viewer/mcp/workspace-check.mjs (the ai starter''s markers); repos/ticvai-docs/setup/dependencies.md (the ai role).'
   by: Chinmay
   date: '2026-10-20'
 why: 'Finding: R8 blocker cause list, second round (surface lane): ticket 27637 (ADAM gap 27637/1); answers.json of

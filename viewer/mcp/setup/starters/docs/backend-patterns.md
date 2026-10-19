@@ -150,8 +150,7 @@ as amended 1 October 2026):
 | No inline secrets | Key vault references |
 | Variables carry `description` and `validation` | Validation catches jurisdiction typos at plan time |
 | `terraform fmt` and `validate` in CI | Blocking |
-| State backed remotely, locked, per environment | `azurerm` backend (blob lease lock). Staging's state is a storage account in the Softlabs subscription, configured at `terraform init -backend-config=backend.hcl` (`environments/staging/backend.hcl.example`); production's is the client's, later (the lead, 20 October 2026, r8 causes FOUNDATION-AI-C23, C52) |
-| Environments | dev on laptops (docker compose, no cell); one shared `staging` in the Softlabs subscription; `production` hosted by the client later. `environment` and `cell` name every resource; tenants are never module inputs (ADR-0039; FOUNDATION-AI-C55) |
+| State backed remotely, locked, per environment | — |
 
 ---
 

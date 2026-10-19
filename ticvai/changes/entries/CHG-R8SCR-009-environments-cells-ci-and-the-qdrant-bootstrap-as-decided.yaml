@@ -16,7 +16,8 @@ decision:
     (root module, azurerm backend, backend.hcl.example), environments/production/ae1.tfvars and om1.tfvars (were
     environments/cells/miral-*); repos/ticvai-*/.gitlab-ci.yml replacing .github/workflows; docs/adr/0007
     amendment, 0049 TLS; docs/registers/external-dependencies.md CI row; repos/ticvai-docs/setup/dependencies.md,
-    git-and-mrs.md, backend-patterns.md, repos/infra.md; docs/active/deployment-configs-costed.md,
+    repos/ticvai-docs/setup/git-and-mrs.md, repos/ticvai-docs/setup/backend-patterns.md,
+    repos/ticvai-docs/repos/infra.md; docs/active/deployment-configs-costed.md,
     decisions/answers-3-october-gate-and-hosting.md; docs/active/block-a-extra-tasks.json SETUP-QDRANT detail;
     docs/active/team.json plannedNames.'
   by: Chinmay
