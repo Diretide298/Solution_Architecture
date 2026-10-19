@@ -18816,6 +18816,264 @@ paths:
                         $ref: '#/components/schemas/TaxProfileJurisdictionConfigurationView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-tags:
+    get:
+      operationId: listProductTags
+      x-ticvai-consumed-by: []
+      summary: The venue's tags, the master list products and promotions pick from
+      description: >-
+        **Tags are master data, not free text** (16 October 2026 minutes, 4.6 and section 5, CHG-R8PRD-002). A tag
+        groups products for marketing across categories (summer and winter, indoor and outdoor), so that a
+        promotion can target a whole tag; two products in different categories can share one. The same list serves
+        the back office's tag picker, the product list filter and the till (the POS tags the minutes name).
+
+        **A tag's `code` is what `Product.segmentTags` carries**, so `listProducts` `segmentTag` keeps filtering
+        on it, hierarchy included (`level/beginner` under `level`). Products get their tags through
+        `setProductClassification`, which takes only tags of this list.
+
+        **Which tags.** Active tags only, unless `includeInactive` is true, which adds the deactivated ones
+        (`isActive` false) that products may still carry. `search` matches the start of any word of `name` or
+        of `code`, ignoring case.
+
+        **Order.** Sorted by `displayOrder` ascending, then by `name`, then by `id`.
+
+        Wireframe of 9 October (products module): the new Tags screen of the Setup Library, the tag picker on B1-S04
+        Identity & Classification, the tag line on B11-S04 Promotion & Discount Link.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: includeInactive
+        in: query
+        required: false
+        description: True adds the deactivated tags (`isActive` false); the default returns active tags only.
+        schema:
+          type: boolean
+          default: false
+      - name: search
+        in: query
+        required: false
+        description: Matches the start of any word of the tag's `name` or `code`, ignoring case.
+        schema:
+          type: string
+          maxLength: 80
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The tags
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ProductTag'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-tags/{productTagId}:
+    put:
+      operationId: setProductTagDefinition
+      x-ticvai-consumed-by: []
+      summary: Create or replace one tag of the venue's list
+      description: >-
+        **One tag per call, created or replaced whole** (16 October 2026 minutes, 4.6, CHG-R8PRD-002). The path's
+        `productTagId` names it: a new id creates the tag, a known one replaces it.
+
+        **A tag is deactivated, never deleted** (`isActive` false): products that carry it keep it, and a promotion
+        that targeted it still reads what it meant, but `setProductClassification` no longer accepts it.
+
+        **The code is fixed once products carry it.** `Product.segmentTags` stores the code, so changing the code
+        of a tag that products carry is refused (`409 tag-code-in-use`); make a new tag instead. The code is unique
+        in the tenant (`409 duplicate-code`), compared ignoring case, as category codes are (audit R108).
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: productTagId
+        in: path
+        required: true
+        description: 'Addresses the tag this write creates or replaces: its `id`.'
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductTag'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductTag'
+        '400':
+          description: The body breaks the schema (`validation`; `errors[]` names the field).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: The code is already used by another tag of the tenant (`duplicate-code`), or the write changes
+            the code of a tag that products carry (`tag-code-in-use`).
+          x-ticvai-problem-types:
+          - duplicate-code
+          - tag-code-in-use
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /products/{productId}/classification:
+    put:
+      operationId: setProductClassification
+      x-ticvai-consumed-by: []
+      summary: File a product under a category and give it its tags, both from the master lists
+      description: >-
+        **The product form's category drop-down and tag picker write here** (16 October 2026 minutes, 4.6 and
+        section 5: categories and tags are user-defined master data linked to products from a drop-down;
+        CHG-R8PRD-002). Until now no single-product write set either: `createProduct` and `updateProduct` take
+        neither `categoryId` nor `segmentTags`, and only `bulkUpdateCatalogueProducts` set a category.
+
+        **What it writes.** `categoryId` becomes the product's `Product.categoryId` (null takes the product out of
+        every category). `tagIds` replaces the product's tags whole: `Product.segmentTags` becomes the codes of
+        those tags, in the order sent. A tag a product carried before the tag list existed is kept only if it is
+        sent again, so register its code with `setProductTagDefinition` first.
+
+        **Only master data is accepted.** A `categoryId` that is not a category of the product's venue with `kind`
+        `category` is `422 unknown-category`, an inactive one `422 inactive-category`; a tag id that is not a tag
+        of the venue is `422 unknown-tag`, a deactivated one `422 inactive-tag`.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetProductClassificationRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The product's category and tags as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductClassification'
+        '400':
+          description: The body breaks the schema (`validation`), for example the same tag twice.
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: A category or tag that is not master data of the product's venue, or is no longer active.
+          x-ticvai-problem-types:
+          - unknown-category
+          - inactive-category
+          - unknown-tag
+          - inactive-tag
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-categories/usage:
+    get:
+      operationId: listProductCategoryUsage
+      x-ticvai-consumed-by: []
+      summary: How many products each category holds
+      description: >-
+        **The Products column of the category manager** (wireframe of 9 October, B1-S05 Category & Hierarchy
+        Manager; CHG-R8PRD-002). One row per category of the venue, including the inactive ones, counted at read
+        time: `directProductCount` counts products whose `categoryId` is this category, `totalProductCount` adds
+        the products of every category below it, `liveProductCount` counts the direct ones whose
+        `lifecycleState` is `live`. Archived products are not counted. A category with a non-zero
+        `directProductCount` is one `setProductCategories` refuses to drop (`409 category-still-referenced`).
+
+        **Order.** Sorted by `categoryId` ascending.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: One row per category
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ProductCategoryUsage'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     EventResourceCostEstimate:
@@ -43396,6 +43654,146 @@ components:
           type: string
           format: date-time
           readOnly: true
+    ProductTag:
+      type: object
+      x-ticvai-persistence: catalogue.product_tag
+      description: >-
+        **One tag of the venue's master list** (16 October 2026 minutes, 4.6, CHG-R8PRD-002). Marketing groups
+        products with it across categories, and a promotion can target it. Its `code` is the value
+        `Product.segmentTags` carries.
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of `setProductTagDefinition`.
+        code:
+          type: string
+          maxLength: 64
+          pattern: ^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)*$
+          x-ticvai-unique: tenant
+          description: >-
+            Lower case, digits and hyphens, with `/` between levels (`level/beginner` sits under `level`), as
+            `Product.segmentTags` has always been read. Unique in the tenant, compared ignoring case. Fixed once
+            products carry it (`409 tag-code-in-use`).
+        name:
+          type: string
+          maxLength: 80
+          description: The tag as staff read it in the default language, e.g. *Summer*.
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The name in each of the venue's languages (`getCatalogueLanguageSettings`); `name` is the fallback.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: What the tag is for, shown under it in the picker.
+        displayOrder:
+          type: integer
+          default: 100
+          description: Where the tag sits in the picker and the filters; not alphabetical unless the venue wants it so.
+        isActive:
+          type: boolean
+          default: true
+          description: Deactivated rather than deleted; see `setProductTagDefinition`.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Set by the server from the venue the caller acts at.'
+        productCount:
+          type: integer
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The products of the venue, archived ones excepted, whose `segmentTags` carry this code. Counted on read.
+    SetProductClassificationRequest:
+      type: object
+      x-ticvai-persistence: none — request body of setProductClassification
+      description: The product's category and tags, both picked from the master lists (CHG-R8PRD-002).
+      required:
+      - categoryId
+      - tagIds
+      properties:
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A category of the product's venue (`listProductCategories`, `kind` `category`); null files the product nowhere.
+        tagIds:
+          type: array
+          maxItems: 30
+          uniqueItems: true
+          description: Tags of the venue's list (`listProductTags`), in the order the product shows them; empty removes every tag.
+          items:
+            type: string
+            format: uuid
+    ProductClassification:
+      type: object
+      x-ticvai-persistence: none — read back from catalogue.product (category_id, segment_tags) and catalogue.product_tag
+      description: What `setProductClassification` saved, with the tags spelled out so the form shows them without a second call.
+      required:
+      - productId
+      - categoryId
+      - tags
+      properties:
+        productId:
+          type: string
+          format: uuid
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductTagRef'
+    ProductTagRef:
+      type: object
+      x-ticvai-persistence: none — projection over catalogue.product_tag
+      description: A tag as a product shows it.
+      required:
+      - id
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+    ProductCategoryUsage:
+      type: object
+      x-ticvai-persistence: none — counted on read over catalogue.product and catalogue.product_category
+      description: How many products one category holds (CHG-R8PRD-002); see `listProductCategoryUsage`.
+      required:
+      - categoryId
+      - directProductCount
+      - totalProductCount
+      - liveProductCount
+      properties:
+        categoryId:
+          type: string
+          format: uuid
+        directProductCount:
+          type: integer
+          minimum: 0
+        totalProductCount:
+          type: integer
+          minimum: 0
+        liveProductCount:
+          type: integer
+          minimum: 0
   securitySchemes:
     serviceAuth:
       type: http
