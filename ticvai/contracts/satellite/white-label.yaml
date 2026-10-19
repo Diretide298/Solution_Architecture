@@ -7717,7 +7717,21 @@ components:
           - null
           description: 'The starting point. Each preset proposes the modules, the booking flow types (with
             their default step order), the homepage sections, the mobile tabs and a booking-flow `preset`;
-            nothing is written until the operator accepts a step.'
+            nothing is written until the operator accepts a step.
+
+
+            **What each preset proposes** (r8 walk of tickets 27908, 27899 and 27905; lead decision of 20 October
+            2026, option 2). `waterPark` is DEC-159: modules `ticketsAndBooking`, `diningAndFnb`, `shop`, `map`;
+            flows `datedDayPass` and `cabanaMap`; sections `heroBanner`, `tickets`, `attractions`, `dining`; tabs Home,
+            Explore, Map, Tickets. **Every other preset (`themePark`, `museum`, `theatreAndArena`,
+            `singleAttraction`, `playCentre`, `multiVenue`) proposes the same neutral default until the client
+            supplies its own values, which then arrive as data:** flow `datedDayPass`; theme primary `#1F4E79`,
+            secondary `#5B6770`, accent `#B85C00`, background `#FFFFFF`, text `#1A1A1A` (all pass the contrast
+            pairs of `Theme`); header layout `logoLeft` with logo, menu and notifications shown; footer with one
+            column, "Information", holding the policy links, and the copyright line; homepage sections and tabs from
+            `listLandingPageTemplates` for the preset. **These values are a placeholder, not a client decision**
+            (DI-885 awaits the client''s feedback): the CMS marks them "placeholder" and must not present them as
+            decided.'
         currentStep:
           allOf:
           - $ref: '#/components/schemas/SiteSetupStepKey'
