@@ -1,0 +1,55 @@
+id: CHG-R8PRD-008
+date: '2026-10-20'
+source: plan
+kind: plan
+proposed: '2026-10-20T04:20'
+summary: 'The products module''s wave 1 enters the plan as seven hand-written Block A tasks under a new epic
+  PRODUCTS-W1, pinned to their people: categories and tags, field sets and the sale-permission back end to Sanket
+  Keluskar; the back-office frame, languages and the sale-permission screens to Surendra; the forward migration of the
+  seven new catalogue tables to Hrushikant Patkar.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: epic PRODUCTS-W1 and tasks PRD-W1-DB (3 points, Hrushikant Patkar),
+    PRD-W1-CATEGORIES-TAGS, PRD-W1-FIELD-SETS, PRD-W1-SALE-PERMISSIONS (5 each, Sanket Keluskar), PRD-W1-FRAME (5),
+    PRD-W1-LANGUAGES (3), PRD-W1-SALE-PERMISSIONS-UI (3) (Surendra, the plan''s name for Surendra Loke), each with its
+    operations and tables in `builds` and a Done when, in Block A (no `block`), the six build tasks waiting on PRD-W1-DB.
+    The operations are not added to blockAOperations (see notes). To ship at the r8 tag after the 24-hour cooling-off
+    counted from `proposed`.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Minutes of 16 October 2026 (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md, 4.1 to 4.13 and
+  section 5) settle the wave 1 items, specified in the contracts by CHG-R8PRD-002 to 007. The lead''s ruling of 19
+  October 2026 (evening, after the products module plan): "give the frontend guys tasks to build ... Sanket and Surendra
+  Loke ... Hrushikant on migrations": Sanket Keluskar and Surendra Loke are free for new work while the back-office
+  frontend is held, Surendra and Surendra Loke are one person with two PMS accounts, and every migration is Hrushikant
+  Patkar''s (team.json migrations, CHG-R5-001).'
+keys_touched:
+  tickets: [PRODUCTS-W1, PRD-W1-DB, PRD-W1-CATEGORIES-TAGS, PRD-W1-FIELD-SETS, PRD-W1-SALE-PERMISSIONS, PRD-W1-FRAME,
+    PRD-W1-LANGUAGES, PRD-W1-SALE-PERMISSIONS-UI]
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: [PRD-W1-DB, PRD-W1-CATEGORIES-TAGS, PRD-W1-FIELD-SETS, PRD-W1-SALE-PERMISSIONS, PRD-W1-FRAME,
+    PRD-W1-LANGUAGES, PRD-W1-SALE-PERMISSIONS-UI]
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: open
+notes: '**Decision date.** The people and the start of wave 1 are the lead''s ruling of 19 October; this cut into seven
+  tasks is proposed now, so check-changelog reports the cooling-off until the lead records his decision of the cut at
+  the r8 tag (a date at least 24 hours after `proposed`) or waives it in writing. **Sprint.** The inputs pin a person
+  (`assignee`) but not a sprint: tools/derive-block-a-schedule.py places each task by its waits and its owner''s
+  capacity, so Sprint 2 (19 to 30 October) is where they land only if Sanket''s and Surendra''s Sprint 2 capacity is
+  free (their held back-office tasks stay in the plan). **Operations built twice.** The generator also forms a back-end
+  task for every operation the package specifies and a forward migration for every new table (tools/build-service-docs.py),
+  so at the refresh these 23 operations and seven tables get generated SVC-CATALOGUE, SVC-IDENTITY and MIG-CATALOGUE
+  tasks beside the hand-written ones, owned by the load balancer; adding them to blockAOperations would put those
+  duplicates in Block A. A hand-written task can claim operations only through `operations`, which the generator
+  treats as served by the AI engine (its ticket text says so). The smallest fix is the generators lane''s: let a non-AI
+  hand-written task claim its `operations` without the AI wording; then the operations move into each task''s
+  `operations` and no duplicate is formed.'
