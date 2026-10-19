@@ -5,474 +5,468 @@
  *     node .claude/scripts/db-ticket.mjs <ticket>             one ticket (pull it first)
  *     node .claude/scripts/db-ticket.mjs <ticket> --file db/tenant/V0027__access.sql
  *     node .claude/scripts/db-ticket.mjs --full tenant        every file from an empty database
+ *     node .claude/scripts/db-ticket.mjs --clean              drop this folder's check databases
  *
  * For one ticket it:
  *   1. keeps a template database at the state before the ticket's file: every earlier file in
  *      db/<database>/, applied once and reused until one of them changes;
- *   2. copies it (CREATE DATABASE ... TEMPLATE) and applies only the ticket's file, the way
- *      SqlMigrationRunner does: one transaction, recorded in platform.schema_version;
- *   3. runs it a second time, which must apply nothing and change nothing;
- *   4. compares the ticket's tables with .adam/work/<ticket>/expected-schema.json (written by
- *      adam_pull from the package DDL): columns, types, nullability, defaults, keys, checks,
- *      indexes, row-level security and partitioning.
+ *   2. copies it and applies only the ticket's file, the way SqlMigrationRunner does (one
+ *      transaction, recorded in platform.schema_version);
+ *   3. applies the file a second time on the result (not recorded): it must succeed and change nothing;
+ *   4. copies the template again and applies the package's own statements for the ticket, from
+ *      .adam/work/<ticket>/expected-schema.json (written by adam_pull);
+ *   5. compares a snapshot of the whole database (every schema, table, column, constraint, index,
+ *      policy, trigger, view, sequence, function and type, as PostgreSQL itself prints them) of the
+ *      two copies. The ticket's objects must be what the package's statements make, and everything
+ *      else must be exactly as it was before the file ran.
  * MATCH is the evidence for done. The result is also written to .adam/work/<ticket>/db-check.md.
  *
- * --full applies every file to an empty database, runs them all a second time, and compares
- * every pulled ticket's expected-schema.json for that database. That is the once-a-day check,
- * with dotnet build and dotnet test; a ticket does not need it.
+ * --full applies every file to an empty database and then every file a second time. Run it once
+ * before opening the merge request.
+ *
+ * Each statement of a file is run through PL/pgSQL EXECUTE, so psql never reads it: no backslash
+ * commands and no :variables, as with SqlMigrationRunner. A file must not BEGIN or COMMIT itself:
+ * the runner already wraps each file in one transaction.
  *
  * Needs Docker Desktop running. PostgreSQL runs in its own container (adam-db-check,
- * pgvector/pgvector:pg16, no port published), so it never clashes with a database you already
- * run. --container <name> uses another running container instead (user postgres).
- * Exit code: 0 match, 1 a difference or a failed apply, 2 cannot run (no Docker, no ticket file).
+ * pgvector/pgvector:pg16, no port published). --container <name> uses another container, which
+ * must already be running; it is never started or stopped. Databases are named after this
+ * folder, and one run at a time per folder holds a lock, so two folders or two agents never meet.
+ * Exit code: 0 match, 1 a difference, a failed apply or a partial check, 2 cannot run.
  */
 
-import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { spawn, spawnSync } from 'node:child_process';
+import { createHash, randomBytes } from 'node:crypto';
+import { closeSync, existsSync, openSync, readFileSync, readdirSync, realpathSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+const VERSION = 2; // a template built by another version is rebuilt
 const IMAGE = 'pgvector/pgvector:pg16';
 
-// ---- normalising: the DDL's spelling and the catalog's, made one ----------------------------
+// ---- a file, split the way the server sees it -------------------------------------------------
 
-const TYPE_ALIASES = [
-  [/^timestamptz$/, 'timestamp with time zone'],
-  [/^timestamp$/, 'timestamp without time zone'],
-  [/^timestamp\((\d+)\)$/, 'timestamp($1) without time zone'],
-  [/^timestamptz\((\d+)\)$/, 'timestamp($1) with time zone'],
-  [/^timetz$/, 'time with time zone'],
-  [/^time$/, 'time without time zone'],
-  [/^(int|int4)$/, 'integer'],
-  [/^int8$/, 'bigint'],
-  [/^int2$/, 'smallint'],
-  [/^bool$/, 'boolean'],
-  [/^varchar$/, 'character varying'],
-  [/^varchar\((\d+)\)$/, 'character varying($1)'],
-  [/^char$/, 'character(1)'],
-  [/^character$/, 'character(1)'],
-  [/^char\((\d+)\)$/, 'character($1)'],
-  [/^decimal/, 'numeric'],
-  [/^(float8|float)$/, 'double precision'],
-  [/^float4$/, 'real'],
-  [/^public\./, ''],
-];
-
-export function normType(type) {
-  if (type === null || type === undefined) return null;
-  let t = String(type).replace(/"/g, '').trim().toLowerCase().replace(/\s+/g, ' ').replace(/\s*\(\s*/g, '(')
-    .replace(/\s*,\s*/g, ',').replace(/\s*\)/g, ')');
-  let dims = '';
-  while (/\[\d*\]$/.test(t)) { dims += '[]'; t = t.replace(/\s*\[\d*\]$/, ''); }
-  for (const [rx, to] of TYPE_ALIASES) t = t.replace(rx, to);
-  return t + dims;
-}
-
-const CAST = /::\s*"?[a-z_][\w.]*"?(?:\s+(?:with|without|varying|precision|time|zone))*(?:\(\d+(?:,\s*\d+)?\))?(?:\[\])*/gi;
-
-/** Outer parentheses that wrap the whole expression, removed. */
-function unwrap(s) {
-  let out = s.trim();
-  for (;;) {
-    if (!out.startsWith('(') || !out.endsWith(')')) return out;
-    let depth = 0;
-    let whole = true;
-    for (let i = 0; i < out.length; i++) {
-      if (out[i] === '(') depth++;
-      else if (out[i] === ')') depth--;
-      if (depth === 0 && i < out.length - 1) { whole = false; break; }
-    }
-    if (!whole) return out;
-    out = out.slice(1, -1).trim();
-  }
-}
-
-export function normDefault(value) {
-  if (value === null || value === undefined) return null;
-  let d = String(value).trim();
-  if (/^null$/i.test(d)) return null;
-  d = d.replace(CAST, '');
-  d = unwrap(d);
-  d = d.replace(/^'(-?\d+(?:\.\d+)?)'$/, '$1');
-  // outside string literals: one case, no spaces
-  return d.split(/('(?:[^']|'')*')/).map((part, i) => (i % 2 ? part : part.toLowerCase().replace(/\s+/g, ''))).join('');
-}
-
-export function normKeys(keys) {
-  return String(keys ?? '').replace(CAST, '').replace(/"/g, '').toLowerCase().replace(/\s+/g, '')
-    .replace(/\(\(([^()]*)\)\)/g, '($1)');
-}
-
-const normExpr = (s) => String(s ?? '').replace(CAST, '').replace(/["()\s]/g, '').toLowerCase();
-
-const ON_DELETE = { a: null, r: 'RESTRICT', c: 'CASCADE', n: 'SET NULL', d: 'SET DEFAULT' };
-const onDelete = (v) => (v === 'NO ACTION' ? null : v ?? null);
-const list = (cols) => `(${(cols ?? []).join(', ')})`;
-
-/** Index key text and the rest, from pg_get_indexdef. */
-function indexParts(def) {
-  const at = def.search(/ USING \w+ \(/);
-  if (at < 0) return { keys: '', where: false };
-  const open = def.indexOf('(', at);
-  let depth = 0;
-  let end = open;
-  for (let i = open; i < def.length; i++) {
-    if (def[i] === '(') depth++;
-    else if (def[i] === ')' && --depth === 0) { end = i; break; }
-  }
-  return { keys: def.slice(open + 1, end), where: /\sWHERE\s/.test(def.slice(end)) };
-}
-
-// ---- comparing one table ----------------------------------------------------------------------
-
-/**
- * What differs between a table's expected shape and the catalog's, in plain sentences.
- * `exists(name)` says whether a table is in the database: a foreign key to a table no migration
- * has created yet belongs to a later migration, and is listed as deferred instead.
- */
-export function compareTable(name, expected, actual, exists = () => true) {
-  const diffs = [];
-  const deferred = [];
-  if (!actual) return { diffs: [`${name}: the table is missing`], deferred };
-  const say = (text) => diffs.push(`${name}: ${text}`);
-
-  // columns
-  const actualCols = new Map(actual.columns.map((c) => [c.name, c]));
-  for (const c of expected.columns) {
-    const a = actualCols.get(c.name);
-    if (!a) { say(`column ${c.name} is missing`); continue; }
-    actualCols.delete(c.name);
-    if (normType(a.type) !== normType(c.type)) say(`column ${c.name} is ${a.type}; the package says ${c.type}`);
-    if (Boolean(a.notNull) !== Boolean(c.notNull)) say(`column ${c.name} is ${a.notNull ? 'NOT NULL' : 'nullable'}; the package says ${c.notNull ? 'NOT NULL' : 'nullable'}`);
-    if (!c.generated && normDefault(a.default) !== normDefault(c.default)) {
-      say(`column ${c.name} defaults to ${a.default ?? 'nothing'}; the package says ${c.default ?? 'nothing'}`);
-    }
-  }
-  for (const extra of actualCols.keys()) say(`column ${extra} is not in the package`);
-
-  const cons = actual.constraints ?? [];
-  // primary key
-  const pk = cons.find((k) => k.type === 'p');
-  const wantPk = expected.primaryKey?.columns ?? null;
-  if (wantPk && !pk) say(`no primary key; the package says ${list(wantPk)}`);
-  else if (!wantPk && pk) say(`primary key ${list(pk.columns)} is not in the package`);
-  else if (wantPk && pk.columns.join(',') !== wantPk.join(',')) say(`primary key is ${list(pk.columns)}; the package says ${list(wantPk)}`);
-
-  // unique constraints, by their columns
-  const uniques = cons.filter((k) => k.type === 'u').map((k) => ({ ...k, key: k.columns.join(',') }));
-  for (const u of expected.unique ?? []) {
-    const at = uniques.findIndex((k) => k.key === u.columns.join(','));
-    if (at < 0) { say(`unique ${list(u.columns)} is missing`); continue; }
-    if (u.name && uniques[at].name !== u.name) say(`unique ${list(u.columns)} is named ${uniques[at].name}; the package says ${u.name}`);
-    uniques.splice(at, 1);
-  }
-  for (const u of uniques) say(`unique ${u.name} ${list(u.columns)} is not in the package`);
-
-  // foreign keys, by columns and target
-  const fks = cons.filter((k) => k.type === 'f');
-  for (const f of expected.foreignKeys ?? []) {
-    const at = fks.findIndex((k) => k.columns.join(',') === f.columns.join(',') && k.references === f.references
-      && (!f.refColumns?.length || (k.refColumns ?? []).join(',') === f.refColumns.join(',')));
-    if (at < 0) {
-      if (!exists(f.references)) deferred.push(`${name} ${list(f.columns)} -> ${f.references} (not created yet)`);
-      else say(`foreign key ${list(f.columns)} -> ${f.references} is missing`);
+/** The statements of a SQL file, as written, with the line each starts on. Comments stay in. */
+export function splitSql(text) {
+  const s = String(text ?? '');
+  const out = [];
+  let start = 0;
+  let line = 1;
+  let startLine = 1;
+  let meaningful = false;
+  const push = (end) => {
+    const sql = s.slice(start, end).trim();
+    if (sql && meaningful) out.push({ sql, line: startLine });
+    meaningful = false;
+  };
+  for (let i = 0; i < s.length;) {
+    const ch = s[i];
+    const two = s.slice(i, i + 2);
+    const begin = (to) => { for (let k = i; k < to && k < s.length; k++) if (s[k] === '\n') line++; i = to; };
+    if (!meaningful && /\s/.test(ch)) { if (ch === '\n') line++; i++; startLine = line; start = i; continue; }
+    if (two === '--') { const end = s.indexOf('\n', i); begin(end < 0 ? s.length : end); continue; }
+    if (two === '/*') {
+      let depth = 0;
+      let j = i;
+      for (; j < s.length; j++) {
+        if (s.slice(j, j + 2) === '/*') { depth++; j++; } else if (s.slice(j, j + 2) === '*/') { depth--; j++; if (!depth) break; }
+      }
+      begin(j + 1);
       continue;
     }
-    const k = fks[at];
-    if (f.name && k.name !== f.name) say(`foreign key ${list(f.columns)} is named ${k.name}; the package says ${f.name}`);
-    if (ON_DELETE[k.onDelete] !== onDelete(f.onDelete)) {
-      say(`foreign key ${list(f.columns)} is ON DELETE ${ON_DELETE[k.onDelete] ?? 'NO ACTION'}; the package says ${f.onDelete ?? 'NO ACTION'}`);
+    meaningful = true;
+    if (ch === "'") {
+      const escapes = /[eE]/.test(s[i - 1] ?? '') && !/\w/.test(s[i - 2] ?? '');
+      let j = i + 1;
+      for (; j < s.length; j++) {
+        if (escapes && s[j] === '\\') { j++; continue; }
+        if (s[j] === "'") { if (s[j + 1] === "'") { j++; continue; } break; }
+      }
+      begin(j + 1);
+      continue;
     }
-    fks.splice(at, 1);
+    if (ch === '"') { const end = s.indexOf('"', i + 1); begin(end < 0 ? s.length : end + 1); continue; }
+    if (ch === '$') {
+      const tag = /^\$(?:[A-Za-z_]\w*)?\$/.exec(s.slice(i, i + 64))?.[0];
+      if (tag && !/\w/.test(s[i - 1] ?? '')) {
+        const end = s.indexOf(tag, i + tag.length);
+        begin(end < 0 ? s.length : end + tag.length);
+        continue;
+      }
+    }
+    if (ch === ';') { push(i); i++; start = i; startLine = line; continue; }
+    if (ch === '\n') line++;
+    i++;
   }
-  for (const k of fks) say(`foreign key ${k.name} ${list(k.columns)} -> ${k.references} is not in the package`);
-
-  // checks, by name
-  const checks = new Set(cons.filter((k) => k.type === 'c').map((k) => k.name));
-  for (const c of expected.checks ?? []) {
-    if (!checks.delete(c.name)) say(`check ${c.name} is missing`);
-  }
-  for (const c of checks) say(`check ${c} is not in the package`);
-
-  // indexes not behind a constraint, by name
-  const indexes = new Map((actual.indexes ?? []).filter((i) => !i.constraint).map((i) => [i.name, i]));
-  for (const i of expected.indexes ?? []) {
-    const a = indexes.get(i.name);
-    if (!a) { say(`index ${i.name} is missing`); continue; }
-    indexes.delete(i.name);
-    const parts = indexParts(a.def);
-    if (Boolean(a.unique) !== Boolean(i.unique)) say(`index ${i.name} is ${a.unique ? '' : 'not '}unique; the package says ${i.unique ? '' : 'not '}unique`);
-    if (a.method !== (i.method ?? 'btree')) say(`index ${i.name} uses ${a.method}; the package says ${i.method ?? 'btree'}`);
-    if (normKeys(parts.keys) !== normKeys(i.keys)) say(`index ${i.name} is on (${parts.keys}); the package says (${i.keys})`);
-    if (parts.where !== Boolean(i.where)) say(`index ${i.name} is ${parts.where ? 'partial' : 'not partial'}; the package says ${i.where ? `WHERE ${i.where}` : 'not partial'}`);
-  }
-  for (const extra of indexes.keys()) say(`index ${extra} is not in the package`);
-
-  // row-level security
-  const rls = actual.rls ?? {};
-  const want = expected.rls ?? { enabled: false, forced: false, policies: [] };
-  if (Boolean(rls.enabled) !== Boolean(want.enabled)) say(`row-level security is ${rls.enabled ? 'on' : 'off'}; the package says ${want.enabled ? 'on' : 'off'}`);
-  if (Boolean(rls.forced) !== Boolean(want.forced)) say(`row-level security is ${rls.forced ? '' : 'not '}FORCEd; the package says ${want.forced ? 'FORCE' : 'not forced'}`);
-  const policies = new Map((rls.policies ?? []).map((p) => [p.name, p]));
-  for (const p of want.policies ?? []) {
-    const a = policies.get(p.name);
-    if (!a) { say(`policy ${p.name} is missing`); continue; }
-    policies.delete(p.name);
-    if (p.uses && !normExpr(a.using).includes(normExpr(p.uses))) say(`policy ${p.name} is USING ${a.using}; the package's uses ${p.uses}`);
-  }
-  for (const extra of policies.keys()) say(`policy ${extra} is not in the package`);
-
-  // partitioning
-  const partition = (v) => (v ? String(v).replace(/\s+/g, '').toLowerCase() : null);
-  if (partition(actual.partitionBy) !== partition(expected.partitionBy)) {
-    say(`partitioned by ${actual.partitionBy ?? 'nothing'}; the package says ${expected.partitionBy ?? 'not partitioned'}`);
-  }
-  if (Boolean(actual.defaultPartition) !== Boolean(expected.defaultPartition)) {
-    say(`${actual.defaultPartition ? 'has' : 'has no'} default partition; the package says ${expected.defaultPartition ? 'one' : 'none'}`);
-  }
-  return { diffs, deferred };
+  push(s.length);
+  return out;
 }
 
-/** Every expected table against the catalog. `created` are the tables the run made. */
-export function compareSchema(expected, catalog, { created = [], exists = (t) => Boolean(catalog[t]) } = {}) {
-  const diffs = [];
-  const deferred = [];
-  for (const [name, shape] of Object.entries(expected.tables ?? {})) {
-    const r = compareTable(name, shape, catalog[name], exists);
-    diffs.push(...r.diffs);
-    deferred.push(...r.deferred);
-  }
-  for (const t of created) {
-    if (!(t in (expected.tables ?? {}))) diffs.push(`${t}: created by this file, but not one of the ticket's tables`);
-  }
-  return { diffs, deferred };
+const TRANSACTION = /^(?:(?:--[^\n]*\n|\/\*[\s\S]*?\*\/|\s)*)(BEGIN|COMMIT|ROLLBACK|START\s+TRANSACTION|END|SAVEPOINT|RELEASE|ABORT)\b\s*(?:TRANSACTION|WORK)?\s*$/i;
+
+// ---- the snapshot: everything a migration can make, as PostgreSQL prints it --------------------
+
+const OWN = "n.nspname NOT IN ('pg_catalog', 'information_schema') AND n.nspname NOT LIKE 'pg\\_%'";
+const NOT_EXTENSION = "NOT EXISTS (SELECT 1 FROM pg_depend e WHERE e.objid = x.oid AND e.deptype = 'e')";
+
+/** One JSON object: a key per object ("table a.t column c") and its definition. */
+export const SNAPSHOT_SQL = `(SELECT coalesce(json_object_agg(k, v ORDER BY k), '{}'::json) FROM (
+  SELECT 'schema ' || n.nspname AS k, '' AS v FROM pg_namespace n WHERE ${OWN}
+  UNION ALL SELECT 'extension ' || extname, extversion FROM pg_extension
+  UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname,
+      x.relkind::text || ' rls ' || x.relrowsecurity::text || ' force ' || x.relforcerowsecurity::text
+      || coalesce(' partition by ' || pg_get_partkeydef(x.oid), '')
+    FROM pg_class x JOIN pg_namespace n ON n.oid = x.relnamespace
+    WHERE ${OWN} AND x.relkind IN ('r', 'p') AND NOT x.relispartition AND ${NOT_EXTENSION}
+  UNION ALL SELECT 'table ' || pn.nspname || '.' || p.relname || ' default partition ' || n.nspname || '.' || x.relname, ''
+    FROM pg_class x JOIN pg_namespace n ON n.oid = x.relnamespace JOIN pg_inherits h ON h.inhrelid = x.oid
+    JOIN pg_class p ON p.oid = h.inhparent JOIN pg_namespace pn ON pn.oid = p.relnamespace
+    WHERE ${OWN} AND x.relispartition AND pg_get_expr(x.relpartbound, x.oid) = 'DEFAULT'
+  UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' column ' || a.attname,
+      format_type(a.atttypid, a.atttypmod) || CASE WHEN a.attnotnull THEN ' not null' ELSE '' END
+      || coalesce(' default ' || pg_get_expr(d.adbin, d.adrelid), '')
+      || CASE a.attgenerated WHEN 's' THEN ' generated stored' ELSE '' END
+      || CASE WHEN a.attidentity <> '' THEN ' identity ' || a.attidentity::text ELSE '' END
+      || coalesce(' collate ' || (SELECT collname FROM pg_collation c WHERE c.oid = a.attcollation AND c.collname <> 'default'), '')
+    FROM pg_attribute a JOIN pg_class x ON x.oid = a.attrelid JOIN pg_namespace n ON n.oid = x.relnamespace
+    LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
+    WHERE ${OWN} AND x.relkind IN ('r', 'p') AND NOT x.relispartition AND a.attnum > 0 AND NOT a.attisdropped AND ${NOT_EXTENSION}
+  UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' constraint ' || k.conname, pg_get_constraintdef(k.oid)
+    FROM pg_constraint k JOIN pg_class x ON x.oid = k.conrelid JOIN pg_namespace n ON n.oid = x.relnamespace
+    WHERE ${OWN} AND NOT x.relispartition
+  UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' index ' || i.relname, pg_get_indexdef(i.oid)
+    FROM pg_index ix JOIN pg_class i ON i.oid = ix.indexrelid JOIN pg_class x ON x.oid = ix.indrelid
+    JOIN pg_namespace n ON n.oid = x.relnamespace WHERE ${OWN} AND NOT x.relispartition
+  UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' policy ' || p.polname,
+      CASE WHEN p.polpermissive THEN 'permissive' ELSE 'restrictive' END
+      || ' for ' || CASE p.polcmd WHEN '*' THEN 'all' WHEN 'r' THEN 'select' WHEN 'a' THEN 'insert' WHEN 'w' THEN 'update' ELSE 'delete' END
+      || ' to ' || coalesce((SELECT string_agg(CASE WHEN r = 0 THEN 'public' ELSE r::regrole::text END, ',' ORDER BY 1) FROM unnest(p.polroles) r), '')
+      || ' using ' || coalesce(pg_get_expr(p.polqual, p.polrelid), '-')
+      || ' with check ' || coalesce(pg_get_expr(p.polwithcheck, p.polrelid), '-')
+    FROM pg_policy p JOIN pg_class x ON x.oid = p.polrelid JOIN pg_namespace n ON n.oid = x.relnamespace
+    WHERE ${OWN} AND NOT x.relispartition
+  UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' trigger ' || t.tgname, pg_get_triggerdef(t.oid)
+    FROM pg_trigger t JOIN pg_class x ON x.oid = t.tgrelid JOIN pg_namespace n ON n.oid = x.relnamespace
+    WHERE ${OWN} AND NOT t.tgisinternal AND NOT x.relispartition
+  UNION ALL SELECT CASE x.relkind WHEN 'v' THEN 'view ' ELSE 'materialized view ' END || n.nspname || '.' || x.relname, pg_get_viewdef(x.oid)
+    FROM pg_class x JOIN pg_namespace n ON n.oid = x.relnamespace WHERE ${OWN} AND x.relkind IN ('v', 'm') AND ${NOT_EXTENSION}
+  UNION ALL SELECT 'sequence ' || n.nspname || '.' || x.relname,
+      format('%s start %s increment %s cycle %s', s.seqtypid::regtype, s.seqstart, s.seqincrement, s.seqcycle)
+    FROM pg_sequence s JOIN pg_class x ON x.oid = s.seqrelid JOIN pg_namespace n ON n.oid = x.relnamespace
+    WHERE ${OWN} AND ${NOT_EXTENSION}
+  UNION ALL SELECT 'function ' || x.oid::regprocedure::text, md5(pg_get_functiondef(x.oid))
+    FROM pg_proc x JOIN pg_namespace n ON n.oid = x.pronamespace WHERE ${OWN} AND x.prokind IN ('f', 'p') AND ${NOT_EXTENSION}
+  UNION ALL SELECT 'type ' || n.nspname || '.' || x.typname, x.typtype::text
+      || coalesce(' ' || (SELECT string_agg(enumlabel, ',' ORDER BY enumsortorder) FROM pg_enum WHERE enumtypid = x.oid), '')
+      || CASE WHEN x.typtype = 'd' THEN ' ' || format_type(x.typbasetype, x.typtypmod) ELSE '' END
+    FROM pg_type x JOIN pg_namespace n ON n.oid = x.typnamespace
+    WHERE ${OWN} AND x.typtype IN ('e', 'd', 'c') AND ${NOT_EXTENSION}
+      AND (x.typtype <> 'c' OR (SELECT relkind FROM pg_class WHERE oid = x.typrelid) = 'c')
+) s)`;
+
+// ---- comparing snapshots --------------------------------------------------------------------------
+
+const tableOf = (key) => /^table (\S+)/.exec(key)?.[1] ?? null;
+const clip = (v) => (String(v).length > 300 ? `${String(v).slice(0, 297)}...` : String(v));
+
+/** "a.t: column c" for a table's part, "a.t: the table" for the table, the key itself otherwise. */
+export function label(key) {
+  const m = /^table (\S+)(?: (.+))?$/.exec(key);
+  if (!m) return key;
+  return `${m[1]}: ${m[2] ?? 'the table'}`;
 }
-
-// ---- the catalog ------------------------------------------------------------------------------
-
-const quote = (s) => `'${String(s).replace(/'/g, "''")}'`;
-
-
-const SYSTEM = "n.nspname NOT IN ('pg_catalog', 'information_schema') AND n.nspname NOT LIKE 'pg\\_toast%' AND n.nspname NOT LIKE 'pg\\_temp%'";
-const TABLE_NAMES = `SELECT n.nspname || '.' || c.relname AS name FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-  WHERE c.relkind IN ('r', 'p') AND NOT c.relispartition AND ${SYSTEM}`;
 
 /**
- * The catalog's shape of `tables`, as one JSON object keyed by table name. With `alsoNew`, also
- * every table not in the temporary table adam_before: what the ticket's file created.
+ * What differs, in sentences. `before` is the copy before the file, `after` after it, `expected`
+ * the copy with the package's statements. An object is the ticket's when it belongs to one of
+ * `owned` (table names) or when the package's statements change it; everything else must be
+ * exactly as it was before.
  */
-export function catalogSql(tables, { alsoNew = false } = {}) {
-  const names = tables.filter((t) => /^[a-z_][\w]*\.[a-z_][\w]*$/i.test(t)).map(quote).join(', ') || "''";
-  return `
-WITH t AS (
-  SELECT c.oid, n.nspname || '.' || c.relname AS name, c.relkind, c.relrowsecurity, c.relforcerowsecurity
-  FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-  WHERE c.relkind IN ('r', 'p') AND NOT c.relispartition AND ${SYSTEM}
-    AND ((n.nspname || '.' || c.relname) = ANY (ARRAY[${names}]::text[])
-      ${alsoNew ? 'OR (n.nspname || \'.\' || c.relname) NOT IN (SELECT name FROM adam_before)' : ''})
-)
-SELECT coalesce(json_object_agg(t.name, json_build_object(
-  'columns', (SELECT coalesce(json_agg(json_build_object('name', a.attname, 'type', format_type(a.atttypid, a.atttypmod),
-      'notNull', a.attnotnull, 'default', pg_get_expr(d.adbin, d.adrelid)) ORDER BY a.attnum), '[]')
-    FROM pg_attribute a LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
-    WHERE a.attrelid = t.oid AND a.attnum > 0 AND NOT a.attisdropped),
-  'constraints', (SELECT coalesce(json_agg(json_build_object('name', k.conname, 'type', k.contype,
-      'columns', (SELECT json_agg(att.attname ORDER BY u.ord) FROM unnest(k.conkey) WITH ORDINALITY u(num, ord)
-                  JOIN pg_attribute att ON att.attrelid = k.conrelid AND att.attnum = u.num),
-      'references', (SELECT rn.nspname || '.' || rc.relname FROM pg_class rc JOIN pg_namespace rn ON rn.oid = rc.relnamespace
-                     WHERE rc.oid = k.confrelid),
-      'refColumns', (SELECT json_agg(att.attname ORDER BY u.ord) FROM unnest(k.confkey) WITH ORDINALITY u(num, ord)
-                     JOIN pg_attribute att ON att.attrelid = k.confrelid AND att.attnum = u.num),
-      'onDelete', k.confdeltype) ORDER BY k.conname), '[]')
-    FROM pg_constraint k WHERE k.conrelid = t.oid),
-  'indexes', (SELECT coalesce(json_agg(json_build_object('name', ic.relname, 'unique', i.indisunique,
-      'constraint', EXISTS (SELECT 1 FROM pg_constraint k WHERE k.conindid = i.indexrelid AND k.conrelid = t.oid),
-      'def', pg_get_indexdef(i.indexrelid), 'method', am.amname) ORDER BY ic.relname), '[]')
-    FROM pg_index i JOIN pg_class ic ON ic.oid = i.indexrelid JOIN pg_am am ON am.oid = ic.relam WHERE i.indrelid = t.oid),
-  'rls', json_build_object('enabled', t.relrowsecurity, 'forced', t.relforcerowsecurity,
-    'policies', (SELECT coalesce(json_agg(json_build_object('name', p.polname, 'using', pg_get_expr(p.polqual, p.polrelid))
-      ORDER BY p.polname), '[]') FROM pg_policy p WHERE p.polrelid = t.oid)),
-  'partitionBy', CASE WHEN t.relkind = 'p' THEN pg_get_partkeydef(t.oid) END,
-  'defaultPartition', EXISTS (SELECT 1 FROM pg_inherits h JOIN pg_class ch ON ch.oid = h.inhrelid
-    WHERE h.inhparent = t.oid AND pg_get_expr(ch.relpartbound, ch.oid) = 'DEFAULT')
-)), '{}'::json) FROM t`;
+export function diffSnapshots({ before, after, expected, owned = [] }) {
+  const own = new Set(owned);
+  const mine = (key) => own.has(tableOf(key)) || expected[key] !== before[key];
+  const diffs = [];
+  for (const key of [...new Set([...Object.keys(after), ...Object.keys(expected)])].sort()) {
+    const a = after[key];
+    const b = expected[key];
+    if (a === b) continue;
+    const s = before[key];
+    if (mine(key)) {
+      if (a === undefined) diffs.push(`${label(key)} is missing`);
+      else if (b === undefined) diffs.push(`${label(key)} is not in the package`);
+      else diffs.push(`${label(key)} is ${clip(a)}; the package has ${clip(b)}`);
+    } else if (a === undefined) {
+      diffs.push(`${label(key)} was dropped by this file, but it is not part of this ticket`);
+    } else if (s === undefined) {
+      diffs.push(`${label(key)} was created by this file, but it is not part of this ticket`);
+    } else {
+      diffs.push(`${label(key)} was changed by this file, but it is not part of this ticket (was ${clip(s)}; now ${clip(a)})`);
+    }
+  }
+  return diffs;
 }
 
-// ---- docker and psql --------------------------------------------------------------------------
+/** What a second run changed. */
+export function againDiffs(first, second) {
+  const out = [];
+  for (const key of [...new Set([...Object.keys(first), ...Object.keys(second)])].sort()) {
+    if (first[key] === second[key]) continue;
+    out.push(first[key] === undefined ? `the second run created ${label(key)}`
+      : second[key] === undefined ? `the second run dropped ${label(key)}`
+        : `the second run changed ${label(key)} (from ${clip(first[key])} to ${clip(second[key])})`);
+  }
+  return out;
+}
+
+// ---- docker and psql ---------------------------------------------------------------------------
 //
-// Every docker exec costs most of a second on Windows, so the work is done in as few psql
-// sessions as it can be: one to read the template's state, one to copy it, one for the ticket.
-// A session's answers come back as `TAG|value` lines; everything else it prints is ignored.
+// Every docker exec costs most of a second on Windows, so the work is done in few psql sessions.
+// A session's answers come back as `<nonce>_TAG|value` lines (the nonce is new every run, so a
+// file's own SELECT cannot pass for one); everything else it prints is ignored.
 
 let CONTAINER = 'adam-db-check';
+const NONCE = `n${randomBytes(5).toString('hex')}`;
+const tag = (name, valueSql) => `SELECT '${NONCE}_${name}|' || ${valueSql};\n`;
+
+class Usage extends Error {}
 
 function docker(args, input) {
-  const r = spawnSync('docker', args, { input, encoding: 'utf8', maxBuffer: 512 * 1024 * 1024, windowsHide: true });
+  const r = spawnSync('docker', args, { input, encoding: 'utf8', maxBuffer: 1024 * 1024 * 1024, windowsHide: true });
   if (r.error) return { ok: false, out: '', err: r.error.code === 'ENOENT' ? 'docker is not installed or not on PATH' : r.error.message };
   return { ok: r.status === 0, out: r.stdout ?? '', err: (r.stderr ?? '').trim() };
 }
 
+const psqlArgs = (db) => ['exec', '-i', CONTAINER, 'psql', '-X', '-q', '-A', '-t', '-U', 'postgres', '-d', db,
+  '-v', 'ON_ERROR_STOP=1', '-f', '-'];
+
 function session(db, sql) {
-  const r = docker(['exec', '-i', CONTAINER, 'psql', '-X', '-q', '-A', '-t', '-U', 'postgres', '-d', db,
-    '-v', 'ON_ERROR_STOP=1', '-f', '-'], sql);
+  return answers(docker(psqlArgs(db), sql));
+}
+
+/** The same, without waiting: the ticket's copy and the package's copy run side by side. */
+function sessionAsync(db, sql) {
+  return new Promise((resolve) => {
+    const child = spawn('docker', psqlArgs(db), { windowsHide: true });
+    const out = [];
+    const err = [];
+    child.stdout.on('data', (d) => out.push(d));
+    child.stderr.on('data', (d) => err.push(d));
+    child.on('error', (e) => resolve(answers({ ok: false, out: '', err: e.message })));
+    child.on('close', (code) => resolve(answers({ ok: code === 0, out: Buffer.concat(out).toString('utf8'), err: Buffer.concat(err).toString('utf8').trim() })));
+    child.stdin.on('error', () => { /* psql stopped reading: its exit says why */ });
+    child.stdin.end(sql);
+  });
+}
+
+function answers(r) {
   const tags = {};
+  const prefix = `${NONCE}_`;
   for (const line of r.out.split(/\r?\n/)) {
-    const m = /^([A-Z_]+)\|([\s\S]*)$/.exec(line);
-    if (m) (tags[m[1]] ??= []).push(m[2]);
+    if (!line.startsWith(prefix)) continue;
+    const bar = line.indexOf('|');
+    (tags[line.slice(prefix.length, bar)] ??= []).push(line.slice(bar + 1));
   }
-  return { ok: r.ok, tags, err: r.err };
+  const last = (name) => tags[name]?.[tags[name].length - 1];
+  return { ok: r.ok, tags, last, err: r.err };
 }
 
 function firstError(text) {
-  const lines = String(text).split(/\r?\n/).filter((l) => !/^(NOTICE|DETAIL: +\w+ .* will|HINT: +see)/.test(l));
+  const lines = String(text).split(/\r?\n/)
+    .filter((l) => l.trim() && !/^(NOTICE|DETAIL: +\w+ .* will|HINT: +see)/.test(l) && !/PL\/pgSQL function inline_code_block/.test(l))
+    .map((l) => clip(l.replace(/^psql:<stdin>:\d+:\s*/, '')));
   const at = lines.findIndex((l) => /ERROR|FATAL|error/.test(l));
-  return (at >= 0 ? lines.slice(at, at + 4) : lines.slice(0, 4)).join('\n').trim() || 'failed with no message';
+  return (at >= 0 ? lines.slice(at, at + 3) : lines.slice(0, 3)).join('\n').trim() || 'failed with no message';
 }
 
 function must(result) {
   if (!result.ok) throw new Error(firstError(result.err));
-  return result.tags;
+  return result;
 }
 
+const quote = (s) => `'${String(s).replace(/'/g, "''")}'`;
 const sleep = (ms) => new Promise((r) => { setTimeout(r, ms); });
-
-class Usage extends Error {}
 
 async function ensureContainer(named) {
   const state = docker(['inspect', '-f', '{{.State.Running}}', CONTAINER]);
   if (!state.ok) {
-    if (/no such object/i.test(state.err)) {
-      if (named) throw new Usage(`there is no container called ${CONTAINER}`);
-      console.log(`Starting PostgreSQL 16 in a container called ${CONTAINER} (${IMAGE}; the first time downloads it)...`);
-      const run = docker(['run', '-d', '--name', CONTAINER, '-e', 'POSTGRES_PASSWORD=adam-local', IMAGE]);
-      if (!run.ok) throw new Usage(`could not start ${CONTAINER}: ${firstError(run.err)}`);
-    } else {
-      throw new Usage(`Docker is not running (${firstError(state.err)}). Start Docker Desktop and run this again.`);
-    }
+    if (!/no such object/i.test(state.err)) throw new Usage(`Docker is not running (${firstError(state.err)}). Start Docker Desktop and run this again.`);
+    if (named) throw new Usage(`there is no container called ${CONTAINER}`);
+    console.log(`Starting PostgreSQL 16 in a container called ${CONTAINER} (${IMAGE}; the first time downloads it)...`);
+    const run = docker(['run', '-d', '--name', CONTAINER, '-e', 'POSTGRES_PASSWORD=adam-local', IMAGE]);
+    if (!run.ok) throw new Usage(`could not start ${CONTAINER}: ${firstError(run.err)}`);
   } else if (state.out.trim() !== 'true') {
+    // Someone else's container is theirs to start.
+    if (named) throw new Usage(`the container ${CONTAINER} is not running; start it yourself, or leave out --container`);
     const start = docker(['start', CONTAINER]);
     if (!start.ok) throw new Usage(`could not start ${CONTAINER}: ${firstError(start.err)}`);
   }
 }
 
-/** A session against `postgres` once the server answers; it may still be starting. */
+/** A session against `postgres` once the server answers (it may still be starting). */
 async function ready(sql) {
   let last = null;
   for (let i = 0; i < 60; i++) {
-    last = session('postgres', sql);
-    if (last.ok) return last.tags;
+    last = session('postgres', `${tag('VERSION', 'current_setting(\'server_version_num\')')}${sql}`);
+    if (last.ok) {
+      if (Number(last.last('VERSION')) < 130000) throw new Usage(`${CONTAINER} runs PostgreSQL ${last.last('VERSION')}; this needs 13 or later`);
+      return last;
+    }
     if (!/starting up|could not connect|No such file|is not running|the database system is/i.test(last.err)) break;
     await sleep(500);
   }
   throw new Usage(`PostgreSQL in ${CONTAINER} does not answer: ${firstError(last?.err ?? '')}`);
 }
 
-// ---- applying files the way SqlMigrationRunner does ------------------------------------------
+// ---- running statements ----------------------------------------------------------------------
 
 const readSql = (file) => readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
 const checksum = (text) => createHash('sha256').update(text, 'utf8').digest('hex').toUpperCase();
-
-/**
- * SQL that applies `files` in one session, each in its own transaction and recorded in
- * platform.schema_version, as SqlMigrationRunner does. APPLY and DONE lines say how far it got.
- */
-function applySql(files, folder) {
-  return files.map((file) => {
-    const sql = readSql(file);
-    const name = path.basename(file);
-    return `SELECT 'APPLY|' || ${quote(name)} || '|' || extract(epoch FROM clock_timestamp());\nBEGIN;\n${sql}\n;\n`
-      + `INSERT INTO platform.schema_version (version, description, checksum, execution_ms) VALUES (${quote(name)}, `
-      + `${quote(`applied from ${folder}`)}, ${quote(checksum(sql))}, 0);\nCOMMIT;\n`
-      + `SELECT 'DONE|' || ${quote(name)} || '|' || extract(epoch FROM clock_timestamp());\n`;
-  }).join('');
-}
-
-/** What a failed apply session got to, in words. */
-function applyFailure(result) {
-  const started = result.tags.APPLY ?? [];
-  const done = new Set((result.tags.DONE ?? []).map((l) => l.split('|')[0]));
-  const stuck = started.map((l) => l.split('|')[0]).find((n) => !done.has(n));
-  return `${stuck ?? 'the session'} did not apply:\n${firstError(result.err)}`;
-}
-
-/** The runner's second pass: every file recorded with the checksum it has now applies nothing. */
-function secondRunSql(files) {
-  const rows = files.map((f) => `(${quote(path.basename(f))}, ${quote(checksum(readSql(f)))})`).join(', ');
-  return `SELECT 'AGAIN|' || w.version || '|' || CASE
-    WHEN to_regclass('platform.schema_version') IS NULL THEN 'unrecorded'
-    WHEN NOT EXISTS (SELECT 1 FROM platform.schema_version s WHERE s.version = w.version) THEN 'unrecorded'
-    WHEN EXISTS (SELECT 1 FROM platform.schema_version s WHERE s.version = w.version AND upper(s.checksum) = w.checksum) THEN 'skipped'
-    ELSE 'changed' END
-  FROM (VALUES ${rows}) AS w(version, checksum);\n`;
-}
-
-function secondRunProblems(tags) {
-  return (tags.AGAIN ?? []).map((l) => l.split('|')).filter(([, s]) => s !== 'skipped').map(([name, s]) => (s === 'unrecorded'
-    ? `second run: ${name} is not recorded in platform.schema_version, so a second run would apply it again`
-    : `second run: ${name} is recorded with another checksum, so a second run would refuse it`));
-}
-
 const ordinal = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 const sqlFiles = (dir) => (existsSync(dir) ? readdirSync(dir).filter((f) => /\.sql$/i.test(f)).sort(ordinal) : []);
 
+/** A statement run through EXECUTE: psql only sees a dollar-quoted string. */
+function execute(sql, condition = null) {
+  let q = `${NONCE}q`;
+  while (sql.includes(`$${q}$`)) q += 'x';
+  const body = `EXECUTE $${q}$${sql}$${q}$;`;
+  return `DO $${NONCE}$ BEGIN ${condition ? `IF ${condition} THEN ${body} END IF;` : body} END $${NONCE}$;\n`;
+}
+
 /**
- * The template database at the state before the ticket's file: reused as it is, extended by the
- * files added since, or rebuilt from empty when an earlier file changed. What it holds (each
- * file's name and checksum) is kept in its comment.
+ * SQL that runs one file's statements, as it is or recorded the way SqlMigrationRunner records it.
+ * AT lines say which statement was running when one fails.
  */
-async function ensureBase(database, dir, files, folder) {
-  const base = `adam_base_${database}`;
+function fileSql(file, folder, { record, label: which }) {
+  const text = readSql(file);
+  const name = path.basename(file);
+  const statements = splitSql(text);
+  const bad = statements.find((s) => TRANSACTION.test(s.sql));
+  if (bad) throw new Error(`${name}, line ${bad.line}: the file manages its own transaction; SqlMigrationRunner already runs each file in one, so remove it`);
+  let out = 'BEGIN;\n';
+  statements.forEach((s, i) => { out += tag('AT', quote(`${which}|${name}|${i + 1}|${s.line}`)) + execute(s.sql); });
+  if (record) {
+    out += `INSERT INTO platform.schema_version (version, description, checksum, execution_ms) VALUES (${quote(name)}, `
+      + `${quote(`applied from ${folder}`)}, ${quote(checksum(text))}, 0);\n`;
+  }
+  out += 'COMMIT;\n';
+  out += tag('DONE', quote(`${which}|${name}|${statements.length}`));
+  return out;
+}
+
+/** What a failed session was doing, in words. */
+function failure(result) {
+  const at = result.last('AT');
+  const err = firstError(result.err);
+  if (!at) return err;
+  const [which, name, n, line] = at.split('|');
+  const again = which === 'second run'
+    ? '\nEvery statement must be safe to run again (IF NOT EXISTS, CREATE OR REPLACE, DROP ... IF EXISTS before ADD CONSTRAINT).'
+    : '';
+  return `${which}: ${name}, statement ${n}${line === '-' ? '' : ` (line ${line})`} failed:\n${err}${again}`;
+}
+
+// ---- the template of the previous state --------------------------------------------------------
+
+async function ensureBase(names, database, dir, files, folder) {
   const want = files.map((f) => ({ name: f, sha: checksum(readSql(path.join(dir, f))) }));
-  const tags = await ready(`SELECT 'BASE|' || coalesce((SELECT coalesce(shobj_description(oid, 'pg_database'), '[]') FROM pg_database WHERE datname = ${quote(base)}), '');\n`);
-  const comment = tags.BASE?.[0] ?? '';
+  const r = await ready(tag('BASE', `coalesce((SELECT coalesce(shobj_description(oid, 'pg_database'), '') FROM pg_database WHERE datname = ${quote(names.base)}), '')`));
+  const server = r.last('VERSION');
   let have = null;
-  try { have = comment ? JSON.parse(comment) : null; } catch { have = null; }
-  const prefix = have && have.length <= want.length && have.every((h, i) => h.name === want[i].name && h.sha === want[i].sha);
-  const from = prefix ? have.length : 0;
-  const action = !prefix ? 'built' : from < want.length ? 'extended' : 'reused';
-  if (!prefix) must(session('postgres', `DROP DATABASE IF EXISTS ${base} WITH (FORCE);\nCREATE DATABASE ${base};\n`));
+  try { have = JSON.parse(r.last('BASE') || 'null'); } catch { have = null; }
+  const same = have && have.v === VERSION && have.server === server && Array.isArray(have.files)
+    && have.files.length <= want.length && have.files.every((h, i) => h.name === want[i].name && h.sha === want[i].sha);
+  const from = same ? have.files.length : 0;
+  const action = !same ? 'built' : from < want.length ? 'extended' : 'reused';
+  const comment = (list) => `COMMENT ON DATABASE ${names.base} IS ${quote(JSON.stringify({ v: VERSION, server, files: list }))};\n`;
+  if (!same) must(session('postgres', `DROP DATABASE IF EXISTS ${names.base} WITH (FORCE);\nCREATE DATABASE ${names.base};\n${comment([])}`));
   const started = Date.now();
   if (from < want.length) {
-    const result = session(base, applySql(want.slice(from).map((w) => path.join(dir, w.name)), folder));
+    const sql = want.slice(from).map((w) => fileSql(path.join(dir, w.name), folder, { record: true, label: 'previous state' })).join('');
+    const result = session(names.base, sql);
     const done = (result.tags.DONE ?? []).length;
-    must(session('postgres', `COMMENT ON DATABASE ${base} IS ${quote(JSON.stringify(want.slice(0, from + done)))};\n`));
-    if (!result.ok) throw new Error(`an earlier migration does not apply, so the previous state cannot be built: ${applyFailure(result)}`);
-    must(session('postgres', `COMMENT ON DATABASE ${base} IS ${quote(JSON.stringify(want))};\n`));
+    must(session('postgres', comment(want.slice(0, from + done))));
+    if (!result.ok) throw new Error(`an earlier migration does not apply, so the previous state cannot be built: ${failure(result)}`);
   }
-  return { base, action, applied: want.length - from, ms: Date.now() - started };
+  return { action, applied: want.length - from, ms: Date.now() - started, state: { server, files: want } };
+}
+
+// ---- one folder, one lock ---------------------------------------------------------------------
+
+function folderId(root) {
+  return createHash('sha256').update(root.toLowerCase()).digest('hex').slice(0, 8);
+}
+
+function databaseNames(id, database) {
+  if (!/^[a-z][a-z0-9_]{0,30}$/.test(database)) throw new Usage(`"${database}" is not a database name this check uses (tenant or control)`);
+  const p = `adam_${id}_${database}`;
+  return { base: `${p}_base`, ticket: `${p}_ticket`, expect: `${p}_expect`, full: `${p}_full` };
+}
+
+async function withLock(id, work) {
+  const file = path.join(os.tmpdir(), `adam-db-ticket-${id}.lock`);
+  let said = false;
+  for (let waited = 0; ; waited += 500) {
+    try {
+      const fd = openSync(file, 'wx');
+      writeFileSync(fd, String(process.pid));
+      closeSync(fd);
+      break;
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error;
+      let holder = 0;
+      try { holder = Number(readFileSync(file, 'utf8').trim()) || 0; } catch { continue; }
+      let alive = false;
+      try { if (holder) { process.kill(holder, 0); alive = true; } } catch (e) { alive = e.code === 'EPERM'; }
+      if (!alive) { try { unlinkSync(file); } catch { /* another run took it */ } continue; }
+      if (waited > 20 * 60 * 1000) throw new Usage(`another check in this folder (process ${holder}) has held the lock for 20 minutes`);
+      if (!said) { console.log(`Waiting for another check in this folder to finish (process ${holder})...`); said = true; }
+      await sleep(500);
+    }
+  }
+  try {
+    return await work();
+  } finally {
+    try { unlinkSync(file); } catch { /* gone already */ }
+  }
+}
+
+/** Kept snapshots older than a week go. */
+function pruneCache(id) {
+  try {
+    for (const f of readdirSync(os.tmpdir()).filter((n) => n.startsWith(`adam-db-ticket-${id}-`) && n.endsWith('.json'))) {
+      const p = path.join(os.tmpdir(), f);
+      if (Date.now() - statSync(p).mtimeMs > 7 * 24 * 3600 * 1000) unlinkSync(p);
+    }
+  } catch { /* nothing to prune */ }
 }
 
 // ---- one ticket ---------------------------------------------------------------------------------
+
+const secs = (ms) => `${(ms / 1000).toFixed(1)} s`;
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 function parseArgs(argv) {
   const args = { _: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--file' || a === '--container' || a === '--full') args[a.slice(2)] = argv[++i];
+    else if (a === '--clean') args.clean = true;
     else if (a === '--help' || a === '-h') args.help = true;
     else args._.push(a);
   }
   return args;
 }
 
-const secs = (ms) => `${(ms / 1000).toFixed(1)} s`;
-const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
-
-async function ticket(root, key, args) {
-  const work = path.join(root, '.adam', 'work', key);
-  const expectedFile = path.join(work, 'expected-schema.json');
-  if (!existsSync(expectedFile)) {
-    throw new Usage(`${path.relative(root, expectedFile)} is missing. Pull the ticket first (adam_pull ${key}); `
-      + 'a [DB] ticket whose subject names its migration file gets one.');
-  }
-  const expected = JSON.parse(readFileSync(expectedFile, 'utf8'));
-  const database = expected.database ?? 'tenant';
+/** One database of a ticket. */
+async function checkOne(root, id, key, check, args, out) {
+  const database = check.database ?? 'tenant';
+  const names = databaseNames(id, database);
   const folder = `db/${database}`;
   const dir = path.join(root, 'db', database);
-  const file = args.file ? path.resolve(root, args.file) : path.join(dir, expected.migration);
+  const file = args.file ? path.resolve(root, args.file) : path.join(dir, check.migration);
   if (!existsSync(file)) {
-    const number = /^(V\d+[A-Za-z]?)__/.exec(expected.migration ?? '')?.[1];
+    const number = /^(V\d+[A-Za-z]?)__/.exec(check.migration ?? '')?.[1];
     const near = number ? sqlFiles(dir).filter((f) => f.startsWith(`${number}__`)) : [];
     throw new Usage(`${path.relative(root, file)} does not exist yet. Write it first`
       + `${near.length ? ` (found ${near.join(', ')}: rename it, or pass --file)` : ''}.`);
@@ -481,139 +475,209 @@ async function ticket(root, key, args) {
   const all = sqlFiles(path.dirname(file));
   const earlier = all.filter((f) => f !== name && ordinal(f, name) < 0);
   const later = all.filter((f) => f !== name && ordinal(f, name) > 0);
-  const tables = Object.keys(expected.tables ?? {});
+  const owned = Object.keys(check.tables ?? {});
+  const statements = check.statements ?? [];
 
-  const started = Date.now();
-  await ensureContainer(Boolean(args.container));
-  const base = await ensureBase(database, path.dirname(file), earlier, folder);
-  const db = `adam_ticket_${database}`;
-  must(session('postgres', `DROP DATABASE IF EXISTS ${db} WITH (FORCE);\nCREATE DATABASE ${db} TEMPLATE ${base.base};\n`));
+  const base = await ensureBase(names, database, path.dirname(file), earlier, folder);
+  // The previous state's snapshot and the package's result depend only on the template and the
+  // package statements, so they are kept between runs: while the file is being fixed, a run copies
+  // the template once and applies the file, and nothing else.
+  const cacheFile = path.join(os.tmpdir(), `adam-db-ticket-${id}-${database}-${createHash('sha256')
+    .update(JSON.stringify({ v: VERSION, base: base.state, statements })).digest('hex').slice(0, 16)}.json`);
+  let cached = null;
+  try { cached = JSON.parse(readFileSync(cacheFile, 'utf8')); } catch { cached = null; }
+  must(session('postgres', `DROP DATABASE IF EXISTS ${names.ticket} WITH (FORCE);\nDROP DATABASE IF EXISTS ${names.expect} WITH (FORCE);\n`
+    + `CREATE DATABASE ${names.ticket} TEMPLATE ${names.base};\n${cached ? '' : `CREATE DATABASE ${names.expect} TEMPLATE ${names.base};\n`}`));
 
-  const lines = [];
-  const out = (s = '') => { lines.push(s); console.log(s); };
-  out(`Ticket ${key}: ${path.relative(root, file).replace(/\\/g, '/')}`);
+  out(`Ticket ${key}: ${path.relative(root, file).split(path.sep).join('/')}`);
   out(`- previous state: ${plural(earlier.length, 'earlier file')} (template ${base.action}`
     + `${base.applied ? `, ${base.applied} applied in ${secs(base.ms)}` : ''})`
     + `${later.length ? `; ${plural(later.length, 'later file')} left out` : ''}`);
 
-  // One session: note the tables there are, apply the file, run it again, read the catalog.
-  const result = session(db, `CREATE TEMP TABLE adam_before AS ${TABLE_NAMES};\n`
-    + applySql([file], folder)
-    + secondRunSql([file])
-    + `SELECT 'TABLES|' || coalesce(string_agg(name, ','), '') FROM (${TABLE_NAMES}) s;\n`
-    + `SELECT 'NEW|' || coalesce(string_agg(name, ','), '') FROM (${TABLE_NAMES}) s WHERE name NOT IN (SELECT name FROM adam_before);\n`
-    + `SELECT 'CATALOG|' || translate((${catalogSql(tables, { alsoNew: true })})::text, E'\\n\\r', '  ');\n`);
+  // The ticket's file on one copy: snapshot, apply (recorded), snapshot, apply again (not recorded),
+  // snapshot. The package's statements on the other copy, at the same time.
+  const time = tag('T', 'extract(epoch FROM clock_timestamp())');
+  const aSql = (cached ? '' : tag('SNAP0', SNAPSHOT_SQL)) + time
+    + fileSql(file, folder, { record: true, label: 'first run' }) + time + tag('SNAP1', SNAPSHOT_SQL)
+    + fileSql(file, folder, { record: false, label: 'second run' }) + tag('SNAP2', SNAPSHOT_SQL);
+  let b = 'SET check_function_bodies = off;\nBEGIN;\n';
+  statements.forEach((s, i) => {
+    b += tag('AT', quote(`the package's statements|${s.file}|${i + 1}|-`));
+    if (s.guard) {
+      const both = `to_regclass(${quote(s.guard.table)}) IS NOT NULL AND to_regclass(${quote(s.guard.references)}) IS NOT NULL`;
+      b += `SELECT '${NONCE}_DEFER|' || ${quote(`${s.guard.table} (${s.guard.columns.join(', ')}) -> ${s.guard.references}`)} WHERE NOT (${both});\n`;
+      b += execute(s.sql, `${both} AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = to_regclass(${quote(s.guard.table)}) AND conname = ${quote(s.guard.constraint)})`);
+    } else {
+      b += execute(s.sql);
+    }
+  });
+  b += `COMMIT;\n${tag('SNAPB', SNAPSHOT_SQL)}`;
+  const [a, e] = await Promise.all([sessionAsync(names.ticket, aSql), cached ? null : sessionAsync(names.expect, b)]);
+  if (!a.ok) return { failed: failure(a) };
+  const [t0, t1] = (a.tags.T ?? []).map(Number);
+  const count = Number(a.tags.DONE?.[0]?.split('|')[2] ?? 0);
+  out(`- first run: ${plural(count, 'statement')} applied in ${secs((t1 - t0) * 1000)}`);
+  const after = JSON.parse(a.last('SNAP1'));
+  const again = againDiffs(after, JSON.parse(a.last('SNAP2')));
+  if (!again.length) out('- second run: applied again, changed nothing');
 
-  let diffs = [];
-  let deferred = [];
-  let failed = null;
-  if (!result.ok) {
-    failed = applyFailure(result);
-  } else {
-    const [, t0] = (result.tags.APPLY?.[0] ?? '').split('|');
-    const [, t1] = (result.tags.DONE?.[0] ?? '').split('|');
-    out(`- first run: applied in ${secs((Number(t1) - Number(t0)) * 1000)}`);
-    const again = secondRunProblems(result.tags);
-    if (again.length) diffs.push(...again);
-    else out('- second run: recorded in platform.schema_version with its checksum, so it applies nothing and changes nothing');
-    const exists = new Set((result.tags.TABLES?.[0] ?? '').split(',').filter(Boolean));
-    const created = (result.tags.NEW?.[0] ?? '').split(',').filter(Boolean);
-    const catalog = JSON.parse(result.tags.CATALOG?.[0] || '{}');
-    const r = compareSchema(expected, catalog, { created, exists: (t) => exists.has(t) });
-    diffs.push(...r.diffs);
-    deferred = r.deferred;
+  if (e && !e.ok) {
+    return {
+      failed: 'the package\'s own DDL for this ticket does not apply on the previous state, so there is nothing to compare '
+        + `with. That is a change request against the package (CLAUDE.md, "When the package is wrong"):\n${failure(e)}`,
+    };
   }
+  const known = cached ?? { before: JSON.parse(a.last('SNAP0')), expected: JSON.parse(e.last('SNAPB')), deferred: e.tags.DEFER ?? [] };
+  if (!cached) {
+    try { writeFileSync(cacheFile, JSON.stringify(known)); } catch { /* the next run works it out again */ }
+  }
+  const { deferred } = known;
+  out(`- the package's statements: ${statements.length} applied to a second copy${cached ? ' (kept from an earlier run)' : ''}`
+    + `${deferred.length ? `; ${plural(deferred.length, 'foreign key')} left for a later migration (the table is not created yet)` : ''}`);
+  for (const d of deferred) out(`  - ${d}`);
 
-  const count = tables.length;
-  if (failed) {
-    out(`FAILED: ${failed}`);
-  } else if (diffs.length) {
-    out(`DIFFERENT: ${plural(diffs.length, 'difference')} from expected-schema.json`);
-    for (const d of diffs) out(`  - ${d}`);
-  } else {
-    out(`MATCH: ${plural(count, 'table')} as expected-schema.json says (columns, types, nullability, `
-      + 'defaults, keys, checks, indexes, row-level security, partitioning)');
-  }
-  if (deferred.length) {
-    out(`- left for a later migration (the table they point at is not created yet): ${plural(deferred.length, 'foreign key')}`);
-    for (const d of deferred) out(`  - ${d}`);
-  }
-  if (expected.notInPackageDdl?.length) out(`- not checked (not in the package DDL): ${expected.notInPackageDdl.join(', ')}`);
-  if (expected.notModelled?.length) out(`- not checked (DDL this check does not read): ${plural(expected.notModelled.length, 'statement')}; see expected-schema.json`);
-  out(`- took ${secs(Date.now() - started)}. The database is left as ${db} in container ${CONTAINER} to look at.`);
+  const diffs = [...again, ...diffSnapshots({ before: known.before, after, expected: known.expected, owned })];
+  const gaps = [...(check.notInPackageDdl ?? []), ...(check.keysNotInPackageDdl ?? [])];
+  return { diffs, gaps, empty: !statements.length, owned };
+}
 
-  writeFileSync(path.join(work, 'db-check.md'), `# db-ticket check, ${new Date().toISOString().replace(/\.\d+Z$/, 'Z')}\n\n`
-    + `File checksum (SHA-256): ${checksum(readSql(file))}\n\n${lines.join('\n')}\n`);
-  return failed || diffs.length ? 1 : 0;
+async function ticket(root, id, key, args) {
+  const work = path.join(root, '.adam', 'work', key);
+  const expectedFile = path.join(work, 'expected-schema.json');
+  if (!existsSync(expectedFile)) {
+    const readme = path.join(work, 'README.md');
+    const why = existsSync(readme) && /could not be written \(([^)]*)\)/.exec(readFileSync(readme, 'utf8'))?.[1];
+    throw new Usage(why
+      ? `ADAM could not write expected-schema.json for this ticket (${why}). Check it by hand as README.md says; pulling again will not change that.`
+      : `${path.relative(root, expectedFile)} is missing. Pull the ticket first (adam_pull ${key}).`);
+  }
+  const expected = JSON.parse(readFileSync(expectedFile, 'utf8'));
+  const checks = expected.checks ?? [];
+  if (!checks.length) throw new Usage(`${path.relative(root, expectedFile)} lists nothing to check; pull the ticket again.`);
+  if (args.file && checks.length > 1) throw new Usage('--file cannot be used for a ticket with a file in each database');
+
+  const lines = [];
+  const out = (s = '') => { lines.push(s); console.log(s); };
+  const started = Date.now();
+  pruneCache(id);
+  await ensureContainer(Boolean(args.container));
+  let code = 0;
+  for (const check of checks) {
+    let r;
+    try {
+      r = await checkOne(root, id, key, check, args, out);
+    } catch (error) {
+      if (error instanceof Usage) throw error;
+      r = { failed: error.message };
+    }
+    if (r.failed) {
+      out(`FAILED: ${r.failed}`);
+      code = 1;
+    } else if (r.diffs.length) {
+      out(`DIFFERENT: ${plural(r.diffs.length, 'difference')} from what the package's statements leave`);
+      for (const d of r.diffs) out(`  - ${d}`);
+      code = 1;
+    } else if (r.gaps.length || r.empty) {
+      out(`PARTIAL: the file matches the package's statements, but ${r.empty ? 'there were none to compare with'
+        : `the package DDL lacks ${r.gaps.join(', ')}`}. Not evidence for done: that is a change request.`);
+      code = 1;
+    } else {
+      out(`MATCH: ${r.owned.length ? `${plural(r.owned.length, 'table')} (${r.owned.join(', ')})` : 'everything the package\'s statements make'}`
+        + ' exactly as the package makes them, a second run changed nothing, and nothing else changed');
+    }
+  }
+  out(`- took ${secs(Date.now() - started)}. The copies are left in container ${CONTAINER} to look at; --clean drops them.`);
+  writeFileSync(path.join(work, 'db-check.md'), `# db-ticket check, ${new Date().toISOString().replace(/\.\d+Z$/, 'Z')}\n\n${lines.join('\n')}\n`);
+  return code;
 }
 
 // ---- every file from empty ----------------------------------------------------------------------
 
-async function full(root, database, args) {
+async function full(root, id, database, args) {
+  const names = databaseNames(id, database);
   const dir = path.join(root, 'db', database);
   const folder = `db/${database}`;
   const files = sqlFiles(dir).map((f) => path.join(dir, f));
   if (!files.length) throw new Usage(`no .sql files in ${folder}`);
   const started = Date.now();
   await ensureContainer(Boolean(args.container));
-  const db = `adam_full_${database}`;
-  await ready(`DROP DATABASE IF EXISTS ${db} WITH (FORCE);\nCREATE DATABASE ${db};\n`);
-
-  const work = path.join(root, '.adam', 'work');
-  const pulled = (existsSync(work) ? readdirSync(work) : [])
-    .filter((k) => existsSync(path.join(work, k, 'expected-schema.json')))
-    .map((k) => ({ key: k, expected: JSON.parse(readFileSync(path.join(work, k, 'expected-schema.json'), 'utf8')) }))
-    .filter((p) => (p.expected.database ?? 'tenant') === database);
-  const tables = [...new Set(pulled.flatMap((p) => Object.keys(p.expected.tables ?? {})))];
-
-  const result = session(db, applySql(files, folder) + secondRunSql(files)
-    + `SELECT 'TABLES|' || coalesce(string_agg(name, ','), '') FROM (${TABLE_NAMES}) s;\n`
-    + `SELECT 'CATALOG|' || translate((${catalogSql(tables)})::text, E'\\n\\r', '  ');\n`);
-  let failed = null;
-  const diffs = [];
-  if (!result.ok) {
-    failed = applyFailure(result);
-  } else {
-    console.log(`- first run: ${plural(files.length, 'file')} applied from empty in ${secs(Date.now() - started)}`);
-    diffs.push(...secondRunProblems(result.tags));
-    if (!diffs.length) console.log('- second run: every file recorded with its checksum, so it applies nothing');
-    const exists = new Set((result.tags.TABLES?.[0] ?? '').split(',').filter(Boolean));
-    const catalog = JSON.parse(result.tags.CATALOG?.[0] || '{}');
-    for (const p of pulled) {
-      const r = compareSchema(p.expected, catalog, { exists: (t) => exists.has(t) });
-      diffs.push(...r.diffs.map((d) => `#${p.key} ${d}`));
-      // A key left for later must exist once every file has run.
-      diffs.push(...r.deferred.map((d) => `#${p.key} foreign key never created: ${d}`));
-    }
-    console.log(`- compared ${plural(tables.length, 'table')} from ${plural(pulled.length, 'pulled ticket')}`);
+  // Each file is applied and then applied again straight away, as a ticket's check does: a later
+  // file may rightly drop what an earlier one added, so the second runs are not saved for the end.
+  const hash = (name) => tag(name, `md5(${SNAPSHOT_SQL}::text)`);
+  let sql;
+  try {
+    sql = files.map((f) => fileSql(f, folder, { record: true, label: 'first run' }) + hash('H1')
+      + fileSql(f, folder, { record: false, label: 'second run' }) + hash('H2')).join('');
+  } catch (error) {
+    console.log(`FAILED: ${error.message}`);
+    return 1;
   }
-  if (failed) console.log(`FAILED: ${failed}`);
-  else if (diffs.length) { console.log(`DIFFERENT: ${plural(diffs.length, 'difference')}`); for (const d of diffs) console.log(`  - ${d}`); }
-  else console.log(`MATCH: ${folder} applies from empty, a second run applies nothing, and every pulled table matches`);
-  console.log(`- took ${secs(Date.now() - started)}. The database is left as ${db} in container ${CONTAINER}.`);
-  return failed || diffs.length ? 1 : 0;
+  await ready(`DROP DATABASE IF EXISTS ${names.full} WITH (FORCE);\nCREATE DATABASE ${names.full};\n`);
+  const r = session(names.full, sql);
+  if (!r.ok) {
+    console.log(`FAILED: ${failure(r)}`);
+    return 1;
+  }
+  console.log(`- ${plural(files.length, 'file')} applied to an empty database, each applied a second time straight after`);
+  const again = files.map((f, i) => ((r.tags.H1?.[i] !== r.tags.H2?.[i]) ? `the second run of ${path.basename(f)} changed the schema` : null)).filter(Boolean);
+  if (again.length) { console.log(`DIFFERENT: ${plural(again.length, 'difference')}`); for (const d of again) console.log(`  - ${d}`); }
+  else console.log(`MATCH: ${folder} applies to an empty database, and a second run of each file changes nothing`);
+  console.log(`- took ${secs(Date.now() - started)}. The database is left as ${names.full} in container ${CONTAINER}; --clean drops it.`);
+  return again.length ? 1 : 0;
+}
+
+async function clean(id) {
+  const state = docker(['inspect', '-f', '{{.State.Running}}', CONTAINER]);
+  if (!state.ok || state.out.trim() !== 'true') { console.log(`Nothing to clean: ${CONTAINER} is not running.`); return 0; }
+  const r = await ready(tag('DBS', `coalesce((SELECT string_agg(datname, ',') FROM pg_database WHERE datname LIKE ${quote(`adam\\_${id}\\_%`)}), '')`));
+  const dbs = (r.last('DBS') ?? '').split(',').filter(Boolean);
+  if (dbs.length) must(session('postgres', dbs.map((d) => `DROP DATABASE IF EXISTS ${d} WITH (FORCE);\n`).join('')));
+  console.log(`Dropped ${plural(dbs.length, 'database')} of this folder. To remove the container too: docker rm -f ${CONTAINER}`);
+  return 0;
 }
 
 // ---- main ---------------------------------------------------------------------------------------
 
-async function main(argv) {
+export async function main(argv) {
   const args = parseArgs(argv);
   if (args.container) CONTAINER = args.container;
-  const root = process.cwd();
-  if (args.help || (!args._.length && !args.full)) {
+  if (args.help || (!args._.length && !args.full && !args.clean)) {
     console.log('node .claude/scripts/db-ticket.mjs <ticket> [--file db/<database>/<file>.sql] [--container <name>]\n'
-      + 'node .claude/scripts/db-ticket.mjs --full <tenant|control> [--container <name>]');
+      + 'node .claude/scripts/db-ticket.mjs --full <tenant|control> [--container <name>]\n'
+      + 'node .claude/scripts/db-ticket.mjs --clean [--container <name>]');
     return args.help ? 0 : 2;
   }
   try {
-    if (args.full) return await full(root, args.full, args);
-    return await ticket(root, String(args._[0]).replace(/^#/, ''), args);
+    const root = realpathSync.native(process.cwd());
+    const id = folderId(root);
+    if (args.clean) return await withLock(id, () => clean(id));
+    if (args.full) return await withLock(id, () => full(root, id, args.full, args));
+    return await withLock(id, () => ticket(root, id, String(args._[0]).replace(/^#/, ''), args));
   } catch (error) {
     console.log(error instanceof Usage ? `Cannot run: ${error.message}` : `FAILED: ${error.message}`);
     return error instanceof Usage ? 2 : 1;
   }
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main(process.argv.slice(2)).then((code) => { process.exitCode = code; });
+// Run as a command, whatever path it was reached by (a junction, a subst drive, a short name).
+// Until main answers, the exit code says "did not run", never "passed".
+function same(a, b) {
+  try {
+    const x = realpathSync.native(a);
+    const y = realpathSync.native(b);
+    return process.platform === 'win32' ? x.toLowerCase() === y.toLowerCase() : x === y;
+  } catch {
+    return false;
+  }
+}
+if (process.argv[1] && same(process.argv[1], fileURLToPath(import.meta.url))) {
+  process.exitCode = 2;
+  main(process.argv.slice(2)).then((code) => { process.exitCode = code; }, (error) => {
+    console.log(`FAILED: ${error?.message ?? error}`);
+    process.exitCode = 1;
+  });
+} else if (/db-ticket\.mjs$/i.test(process.argv[1] ?? '')) {
+  // Named as the command but not recognised as this file: say so rather than exit 0 in silence.
+  console.log(`Cannot run: ${process.argv[1]} could not be matched to ${fileURLToPath(import.meta.url)}`);
+  process.exitCode = 2;
 }

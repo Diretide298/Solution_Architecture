@@ -3,32 +3,37 @@
  * A [DB] ticket's quick check, end to end: what adam_pull writes and what the starter's
  * .claude/scripts/db-ticket.mjs does with it.
  *
- *   node viewer/mcp/db-ticket-check.mjs              parser, compare and pull; then, with Docker, the script
- *   node viewer/mcp/db-ticket-check.mjs --package    also the whole package DDL against PostgreSQL 16 (~3 min)
+ *   node viewer/mcp/db-ticket-check.mjs              parser, pull, snapshot compare; then, with Docker, the script
+ *   node viewer/mcp/db-ticket-check.mjs --package    also the whole package DDL against PostgreSQL 16 (~4 min)
  *
  * **Why this exists** (Chinmay, 20 October 2026). A [DB] ticket's agent rebuilt every migration from
  * an empty database, reasoned about the effect by itself and ran dotnet build and the whole dotnet
- * test suite on every ticket. Now the ticket folder holds expected-schema.json (the end state of the
- * ticket's tables, read from the package DDL by tools.mjs) and the script applies only the ticket's
- * file to a template copy of the previous state, runs it twice, and compares. Both halves are only
- * worth having if they agree with PostgreSQL, so:
+ * test suite on every ticket. Now the ticket folder holds expected-schema.json (the package
+ * statements that make the ticket's tables, picked out by tools.mjs) and the script applies only the
+ * ticket's file to a template copy of the previous state, applies it again, applies the package's
+ * statements to a second copy, and compares the two databases whole. So:
  *
- *   1. the parser: statements, columns and inline constraints, ALTER TABLE, indexes, the 920 helpers;
- *   2. the compare: each kind of difference is reported, a key to a table not made yet is deferred;
- *   3. adam_pull, against a stand-in ADAM serving this repository's ticvai/ package, writes
- *      expected-schema.json and the README section for a [DB] ticket, and nothing for a [BE] one;
- *   4. with Docker: a developer folder made from the real package DDL (baseline, two earlier
- *      migrations, the ticket's, one later) - MATCH on the first run, the template reused on the
- *      second, and DIFFERENT / FAILED for a missing index, an extra table, a column changed and a
- *      file that does not apply; --full from empty;
- *   5. with --package: every table the package creates (tenant and control), parsed and compared
- *      with the catalog of the package applied to pgvector/pgvector:pg16. No difference allowed.
+ *   1. the parser and the statement picking: a [DB] ticket's kinds, the statements of its tables;
+ *   2. the snapshot compare: the ticket's objects, everything else, and a second run;
+ *   3. adam_pull, against a stand-in ADAM serving this repository's ticvai/ package: expected-schema.json
+ *      and the README section for a [DB] ticket, the baseline in both databases, the failure README,
+ *      and for a [BE] ticket a README byte for byte what 41caabcc wrote;
+ *   4. with Docker: a developer folder made from the real package DDL - MATCH on the baseline (both
+ *      databases) and on a ticket, the template reused and extended, and DIFFERENT / FAILED for a
+ *      missing index, an extra table, a changed column, a dropped and an altered earlier table, a
+ *      changed CHECK, a changed index WHERE, a weakened policy, a file that fails its second run, one
+ *      whose second run changes the schema, one that does not apply, one that BEGINs itself; the
+ *      script through a junction; two runs at once in one folder; --full; --clean;
+ *   5. with --package: every package statement for every table, picked as tickets pick them, makes
+ *      exactly the database the whole package makes (tenant and control), and the parsed shape in
+ *      expected-schema.json names every column, index, constraint and policy PostgreSQL has.
  *
  * Exits non-zero on a failure. Docker missing is a named skip of 4 and 5, never a pass.
  */
 
-import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync, existsSync } from 'node:fs';
+import { spawn, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -41,19 +46,21 @@ const PACKAGE_RUN = process.argv.includes('--package');
 
 const tools = await import(pathToFileURL(path.join(HERE, 'tools.mjs')).href);
 const script = await import(pathToFileURL(SCRIPT).href);
-const { sqlStatements, schemaModel, expectedSchema, databaseTicket, BY_NAME } = tools;
+const { sqlStatements, schemaModel, databaseTicket, ticketStatements, statementTarget, forgetPackageFiles, BY_NAME } = tools;
 
 let failures = 0;
 const ok = (cond, what, detail = '') => {
   if (cond) console.log(`  ok    ${what}`);
-  else { failures++; console.log(`  FAIL  ${what}${detail ? `\n        ${String(detail).slice(0, 600)}` : ''}`); }
+  else { failures++; console.log(`  FAIL  ${what}${detail ? `\n        ${String(detail).slice(0, 900)}` : ''}`); }
 };
 const skip = (what, why) => console.log(`  skip  ${what} - ${why}`);
 const section = (name) => console.log(`\n${name}`);
+const SCRATCH = mkdtempSync(path.join(tmpdir(), 'db-ticket-check-'));
+const CHECK_STARTED = Date.now();
 
-// ---- 1. the parser --------------------------------------------------------------------------
+// ---- 1. the parser and the statement picking ------------------------------------------------------
 
-section('the DDL parser');
+section('the DDL parser and the statements a ticket gets');
 {
   const stmts = sqlStatements(`-- a comment; with a semicolon
 CREATE TABLE a.t (x text DEFAULT 'a;b'); /* block; */
@@ -62,7 +69,7 @@ SELECT 1`);
   ok(stmts.length === 3 && stmts[0].includes("'a;b'") && stmts[1].includes('PERFORM 1; END'),
     'statements split on ; outside strings, comments and dollar-quoted bodies', JSON.stringify(stmts));
 
-  const model = schemaModel([
+  const files = [
     { name: '010-a.sql', text: `
 CREATE TABLE IF NOT EXISTS a.parent (id uuid PRIMARY KEY NOT NULL, scope_path ltree NOT NULL);
 CREATE TABLE IF NOT EXISTS a.child (
@@ -80,115 +87,107 @@ CREATE TABLE IF NOT EXISTS a.child (
     { name: '910-indexes.sql', text: `CREATE INDEX IF NOT EXISTS child_parent_id_idx ON a.child (parent_id);
 CREATE UNIQUE INDEX IF NOT EXISTS parent_root_uniq ON a.parent ((true)) WHERE scope_path IS NULL;
 CREATE INDEX IF NOT EXISTS parent_scope_path_idx ON a.parent USING gist (scope_path);` },
-    { name: '920-row-level-security.sql', text: `SELECT platform.apply_scope_rls('a.parent'::regclass);
+    { name: '920-row-level-security.sql', text: `CREATE OR REPLACE FUNCTION platform.helper() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$;
+SELECT platform.apply_scope_rls('a.parent'::regclass);
 SELECT platform.apply_parent_rls('a.child'::regclass, 'parent_id', 'a.parent'::regclass, 'id');` },
-    { name: '930-partitioning.sql', text: 'CREATE TABLE IF NOT EXISTS a.child_default PARTITION OF a.child DEFAULT;' },
+    { name: '930-partitioning.sql', text: `CREATE TABLE IF NOT EXISTS a.child_default PARTITION OF a.child DEFAULT;
+CREATE TABLE IF NOT EXISTS a.child_2026_10 PARTITION OF a.child FOR VALUES FROM ('2026-10-01') TO ('2026-11-01');
+SELECT platform.ensure_month_partitions('a.child'::regclass, 3);` },
     { name: 'V0101__after.sql', text: `ALTER TABLE a.child ADD COLUMN IF NOT EXISTS note text CONSTRAINT child_note_chk CHECK (char_length(note) < 9);
 ALTER TABLE a.child ADD COLUMN IF NOT EXISTS status text;
 ALTER TABLE a.child ALTER COLUMN amount SET NOT NULL;
-ALTER TABLE a.child RENAME TO kid;` },
-  ]);
-  const child = model.tables.get('a.kid');
-  const parent = model.tables.get('a.parent');
-  ok(child && !model.tables.has('a.child'), 'RENAME TO moves the table', [...model.tables.keys()].join(', '));
+INSERT INTO platform.schema_version (version, description, checksum) VALUES ('V0101', 'x', 'y') ON CONFLICT (version) DO NOTHING;` },
+  ];
+  const model = schemaModel(files);
+  const child = model.tables.get('a.child');
   const col = (n) => child?.columns.find((c) => c.name === n);
-  ok(col('status')?.notNull && col('status')?.default === "'open'" && col('status')?.type === 'text',
-    'a column: type, NOT NULL and default, with its CHECK after', JSON.stringify(col('status')));
-  ok(col('amount')?.type === 'numeric(18,4)' && col('amount')?.notNull, 'numeric(18,4), and ALTER ... SET NOT NULL', JSON.stringify(col('amount')));
-  ok(col('tags')?.type === 'text[]' && !col('tags')?.notNull, 'an array type', JSON.stringify(col('tags')));
-  ok(child?.columns.filter((c) => c.name === 'status').length === 1 && child?.columns.length === 8,
-    'ADD COLUMN IF NOT EXISTS adds a new column once and leaves an existing one alone', child?.columns.map((c) => c.name).join(','));
-  ok(child?.checks.map((c) => c.name).join(',') === 'child_status_chk,child_note_chk', 'named checks, inline and added', JSON.stringify(child?.checks));
-  ok(child?.primaryKey?.columns.join(',') === 'id,occurred_at' && child?.primaryKey?.name === 'child_pkey', 'a table-level primary key', JSON.stringify(child?.primaryKey));
-  ok(child?.unique.length === 1 && child.unique[0].columns.join(',') === 'venue_id,id,occurred_at', 'an unnamed table-level UNIQUE', JSON.stringify(child?.unique));
-  const fks = child?.foreignKeys ?? [];
-  ok(fks.length === 2 && fks[0].references === 'a.parent' && fks[0].onDelete === 'CASCADE' && fks[1].name === 'child_venue_fkey' && fks[1].references === 'b.scope',
-    'foreign keys inline (ON DELETE) and from 900', JSON.stringify(fks));
-  ok(child?.indexes[0]?.name === 'child_parent_id_idx' && child.indexes[0].keys === 'parent_id' && child.indexes[0].method === 'btree', 'an index', JSON.stringify(child?.indexes));
-  const uniq = parent?.indexes.find((i) => i.name === 'parent_root_uniq');
-  ok(uniq?.unique && uniq.keys === '(true)' && uniq.where === 'scope_path IS NULL', 'a unique partial expression index', JSON.stringify(uniq));
-  ok(parent?.indexes.find((i) => i.name === 'parent_scope_path_idx')?.method === 'gist', 'USING gist', JSON.stringify(parent?.indexes));
-  ok(parent?.rls.enabled && parent.rls.forced && parent.rls.policies[0]?.name === 'parent_scope' && parent.rls.policies[0].uses === 'in_scope(scope_path)',
-    'apply_scope_rls: enabled, forced, the helper\'s policy name', JSON.stringify(parent?.rls));
-  ok(child?.rls.policies[0]?.name === 'child_scope' && child.rls.policies[0].uses === 'a.parent',
-    'apply_parent_rls names the parent (the policy keeps the name it was given before the rename)', JSON.stringify(child?.rls));
-  ok(child?.partitionBy === 'RANGE (occurred_at)' && child.defaultPartition, 'PARTITION BY and the default partition', `${child?.partitionBy} ${child?.defaultPartition}`);
-  ok(model.notModelled.length === 0, 'nothing left unread', JSON.stringify(model.notModelled));
-  const unread = schemaModel([{ name: '010.sql', text: 'CREATE TABLE x.y (a int); ALTER TABLE x.y CLUSTER ON y_idx;' }]);
-  ok(unread.notModelled.length === 1 && unread.notModelled[0].table === 'x.y', 'what it does not understand is listed, not guessed', JSON.stringify(unread.notModelled));
+  ok(col('status')?.notNull && col('status')?.default === "'open'" && col('amount')?.notNull && child.columns.length === 8,
+    'the parsed shape: columns, NOT NULL, defaults, ADD COLUMN IF NOT EXISTS once', JSON.stringify(child?.columns));
+  ok(child?.checks.map((c) => c.name).join(',') === 'child_status_chk,child_note_chk' && child.foreignKeys.length === 2
+    && child.partitionBy === 'RANGE (occurred_at)' && child.defaultPartition, 'checks, keys, partitioning', JSON.stringify(child));
+  ok(model.tables.get('a.parent')?.rls.policies[0]?.name === 'parent_scope', 'the 920 helper\'s policy name');
 
-  const exp = expectedSchema(model, ['a.kid', 'a.gone'], { database: 'tenant', migration: 'V0002__a.sql' });
-  ok(exp.tables['a.kid'] && exp.notInPackageDdl?.join() === 'a.gone' && exp.migration === 'V0002__a.sql', 'expectedSchema: the asked tables, and the ones the DDL lacks', JSON.stringify(Object.keys(exp)));
+  const tables = ticketStatements(files, { kind: 'tables', tables: ['a.child'] });
+  const picked = tables.map((s) => `${s.file}: ${s.sql.slice(0, 40)}`);
+  ok(tables.length === 8 && tables.every((s) => statementTarget(s.sql) === 'a.child'),
+    'a table\'s statements: its CREATE, its key, index, policy, default partition and after-r1 changes, nothing else', picked.join(' | '));
+  ok(!tables.some((s) => /child_2026_10|ensure_month|INSERT/.test(s.sql)), 'a month\'s partition, the partition helper and INSERTs are not picked');
+  ok(tables.find((s) => s.file === '900-foreign-keys.sql')?.guard?.references === 'b.scope', 'a foreign key carries its guard (both tables, the name)');
+  const baseline = ticketStatements([...files, { name: '000-schemas.sql', text: 'CREATE SCHEMA IF NOT EXISTS a;' }],
+    { kind: 'baseline', tables: ['platform.schema_version'] });
+  ok(baseline.length === 2 && /CREATE SCHEMA/.test(baseline[0].sql) && /platform\.helper/.test(baseline[1].sql),
+    'the baseline: 000-002 and the 920/930 functions only', baseline.map((s) => s.sql.slice(0, 40)).join(' | '));
+  const keys = ticketStatements(files, { kind: 'foreign-keys', tables: [], constraints: ['child_venue_fkey'] });
+  ok(keys.length === 1 && keys[0].guard.constraint === 'child_venue_fkey', 'the cross-schema keys ticket: its named keys only');
 
-  const db = databaseTicket({ subject: '[DB] Migration V0027__access.sql: access (19 tables)', description: 'Tenant database. Tables: ...' },
-    [{ kind: 'table', id: 'access.entitlement' }, { kind: 'table', id: 'access.scan_event' }]);
-  ok(db?.migration === 'V0027__access.sql' && db.database === 'tenant' && db.tables.length === 2, 'a [DB] ticket: its file, database and tables', JSON.stringify(db));
-  ok(databaseTicket({ subject: '[DB] Forward migration V1001__identity.sql: identity for X (2 tables)', description: '' }, [{ kind: 'table', id: 'identity.sso_provider' }])?.migration === 'V1001__identity.sql',
-    'a forward migration ticket too');
-  ok(databaseTicket({ subject: '[BE] Build listPasses', description: '' }, [{ kind: 'table', id: 'access.pass' }]) === null, 'a [BE] ticket that reads tables is not one');
-  ok(databaseTicket({ subject: '[DB] Monthly partitions: create three months ahead', description: '' }, [{ kind: 'table', id: 'kernel.inbox' }]) === null,
-    'a [DB] task with no migration file is not one');
+  const kind = (subject, description = '', touches = [{ kind: 'table', id: 'a.t' }]) => databaseTicket({ subject, description }, touches);
+  ok(kind('[DB] Migration V0027__access.sql: access (19 tables)', 'Tenant database. Tables: ...')?.kind === 'tables', 'a [DB] migration ticket');
+  ok(kind('[DB] Forward migration V1001__identity.sql: identity for X (2 tables)')?.migration === 'V1001__identity.sql', 'a forward migration ticket');
+  ok(kind('[DB] Migration V0001__baseline.sql: schemas, extensions')?.kind === 'baseline', 'the baseline');
+  const fk = kind('[DB] Migration V0034__cross_schema_foreign_keys.sql (35 keys)', 'ai.policy(tenant_id) -> platform.tenant as policy_tenant_id_fkey; x as b_fkey');
+  ok(fk?.kind === 'foreign-keys' && fk.tables.length === 0 && fk.constraints.join() === 'policy_tenant_id_fkey,b_fkey', 'the cross-schema keys, by name', JSON.stringify(fk));
+  ok(kind('[BE] Build listPasses') === null && kind('[DB] Monthly partitions: create three months ahead') === null,
+    'a [BE] ticket and a [DB] task with no file are not migrations');
 }
 
-// ---- 2. the compare -------------------------------------------------------------------------
+// ---- 2. the snapshot compare --------------------------------------------------------------------
 
-section('the compare');
+section('the snapshot compare');
 {
-  ok(script.normType('timestamptz') === 'timestamp with time zone' && script.normType('char(2)') === 'character(2)'
-    && script.normType('int[]') === 'integer[]' && script.normType('numeric(18, 4)') === 'numeric(18,4)', 'types to the catalog\'s spelling');
-  ok(script.normDefault("'open'::text") === "'open'" && script.normDefault("'-1'::integer") === '-1' && script.normDefault("'{}'::text[]") === "'{}'"
-    && script.normDefault('now()') === 'now()' && script.normDefault('NULL') === null, 'defaults without casts');
-  const expected = {
-    columns: [{ name: 'id', type: 'uuid', notNull: true }, { name: 'n', type: 'integer', notNull: false, default: '0' }],
-    primaryKey: { name: null, columns: ['id'] }, unique: [], checks: [{ name: 't_n_chk' }],
-    foreignKeys: [{ name: 't_p_fkey', columns: ['p'], references: 'b.later', refColumns: ['id'], onDelete: null }],
-    indexes: [{ name: 't_n_idx', unique: false, method: 'btree', keys: 'n' }],
-    rls: { enabled: true, forced: true, policies: [{ name: 't_scope', uses: 'in_scope(scope_path)' }] }, partitionBy: null, defaultPartition: false,
-  };
-  const actual = {
-    columns: [{ name: 'id', type: 'uuid', notNull: true, default: null }, { name: 'n', type: 'integer', notNull: false, default: '0' }],
-    constraints: [{ name: 't_pkey', type: 'p', columns: ['id'] }, { name: 't_n_chk', type: 'c', columns: ['n'] }],
-    indexes: [{ name: 't_pkey', constraint: true, unique: true, def: 'CREATE UNIQUE INDEX t_pkey ON a.t USING btree (id)', method: 'btree' },
-      { name: 't_n_idx', constraint: false, unique: false, def: 'CREATE INDEX t_n_idx ON a.t USING btree (n)', method: 'btree' }],
-    rls: { enabled: true, forced: true, policies: [{ name: 't_scope', using: 'platform.in_scope(scope_path)' }] }, partitionBy: null, defaultPartition: false,
-  };
-  const same = script.compareTable('a.t', expected, actual, () => false);
-  ok(same.diffs.length === 0 && same.deferred.length === 1, 'a match, with the key to a table not made yet deferred', JSON.stringify(same));
-  const broken = structuredClone(actual);
-  broken.columns[1] = { name: 'n', type: 'bigint', notNull: true, default: null };
-  broken.columns.push({ name: 'extra', type: 'text', notNull: false, default: null });
-  broken.indexes.pop();
-  broken.rls.forced = false;
-  broken.constraints = broken.constraints.filter((k) => k.type !== 'c');
-  const r = script.compareTable('a.t', expected, broken, () => true);
-  const want = ['column n is bigint', 'column n is NOT NULL', 'column n defaults to nothing', 'column extra is not in the package',
-    'index t_n_idx is missing', 'is not FORCEd', 'check t_n_chk is missing', 'foreign key (p) -> b.later is missing'];
-  ok(want.every((w) => r.diffs.some((d) => d.includes(w))) && r.diffs.length === want.length, 'each difference said once, in words', r.diffs.join(' | '));
-  const created = script.compareSchema({ tables: { 'a.t': expected } }, { 'a.t': actual }, { created: ['a.t', 'a.stray'], exists: () => false });
-  ok(created.diffs.length === 1 && /a\.stray: created by this file/.test(created.diffs[0]), 'a table the file made that is not the ticket\'s', created.diffs.join(' | '));
+  const split = script.splitSql("-- head\nCREATE TABLE a (x text DEFAULT 'a;b');\n\n/* one; /* two; */ */\nSELECT E'it\\'s;';\nDO $x$ BEGIN PERFORM 1; END $x$;\n-- tail only\n");
+  ok(split.length === 3 && split[0].line === 2 && split[1].line === 5 && split[2].sql.startsWith('DO $x$') && split[2].line === 6,
+    'a file split as the server reads it, with each statement\'s line', JSON.stringify(split));
+  const before = { 'table k.old': 'r', 'table k.old column a': 'integer', 'table k.keep': 'r' };
+  const expected = { ...before, 'table a.t': 'r', 'table a.t column id': 'uuid not null', 'table a.t constraint t_chk': "CHECK ((s = ANY (ARRAY['x'::text, 'y'::text])))",
+    'table a.t policy t_scope': 'permissive for all to public using platform.in_scope(scope_path) with check platform.in_scope(scope_path)', 'function platform.f()': 'abc' };
+  const match = script.diffSnapshots({ before, after: { ...expected }, expected, owned: ['a.t'] });
+  ok(match.length === 0, 'the same database: no difference', match.join(' | '));
+  const after = { ...expected };
+  delete after['table k.old column a'];
+  after['table k.new'] = 'r';
+  after['table a.t constraint t_chk'] = "CHECK ((s = ANY (ARRAY['x'::text])))";
+  after['table a.t policy t_scope'] = 'permissive for all to public using (platform.in_scope(scope_path) OR true) with check platform.in_scope(scope_path)';
+  delete after['function platform.f()'];
+  after['table a.t index t_extra_idx'] = 'CREATE INDEX t_extra_idx ON a.t USING btree (id)';
+  const d = script.diffSnapshots({ before, after, expected, owned: ['a.t'] });
+  const want = ['k.old: column a was dropped by this file, but it is not part of this ticket', 'k.new: the table was created by this file',
+    'a.t: constraint t_chk is CHECK', 'a.t: policy t_scope is permissive', 'function platform.f() is missing', 'a.t: index t_extra_idx is not in the package'];
+  ok(want.every((w) => d.some((x) => x.includes(w))) && d.length === want.length, 'each difference said once, in words', d.join(' | '));
+  const changed = script.diffSnapshots({ before, after: { ...expected, 'table k.keep': 'r rls true' }, expected, owned: ['a.t'] });
+  ok(changed.length === 1 && /k\.keep: the table was changed by this file.*was r; now r rls true/.test(changed[0]), 'a change to another table is named with before and after', changed.join(' | '));
+  const again = script.againDiffs({ a: '1', b: '2' }, { a: '1', b: '3', c: '4' });
+  ok(again.length === 2 && /changed b/.test(again[0]) && /created c/.test(again[1]), 'what a second run changed', again.join(' | '));
 }
 
-// ---- 3. adam_pull writes it ------------------------------------------------------------------
+// ---- 3. adam_pull writes it ------------------------------------------------------------------------
 
 section('adam_pull writes expected-schema.json for a [DB] ticket');
-const SCRATCH = mkdtempSync(path.join(tmpdir(), 'db-ticket-check-'));
 const SUB = ['subscription.contract', 'subscription.module_listing', 'subscription.plan', 'subscription.plan_limit', 'subscription.plan_module'];
-let expectedSub = null;
+const expectedOf = {};
 {
   const { buildBackend } = await import(pathToFileURL(path.join(REPO, 'viewer', 'lib', 'backend.mjs')).href);
   const backend = await buildBackend(PACKAGE);
   const tickets = {
     9005: { workPackage: { key: '9005', subject: '[DB] Migration V0005__subscription.sql: subscription (5 tables)', description: `Tenant database. Tables: ${SUB.join(', ')}.` },
       touches: SUB.map((id) => ({ kind: 'table', id })) },
-    9100: { workPackage: { key: '9100', subject: '[BE] Build getPlan', description: '' }, touches: [{ kind: 'table', id: 'subscription.plan' }] },
+    9001: { workPackage: { key: '9001', subject: '[DB] Migration V0001__baseline.sql: schemas, extensions, migration register, RLS helper functions', description: 'Tables: platform.schema_version.' },
+      touches: [{ kind: 'table', id: 'platform.schema_version' }] },
+    9034: { workPackage: { key: '9034', subject: '[DB] Migration V0034__cross_schema_foreign_keys.sql (2 keys)',
+      description: 'ai.policy(tenant_id) -> platform.tenant as policy_tenant_id_fkey; ai.provider(region_id) -> platform.scope as provider_region_id_fkey.' },
+      touches: [{ kind: 'table', id: 'ai.policy' }, { kind: 'table', id: 'ai.provider' }] },
+    9006: { workPackage: { key: '9006', subject: '[DB] Migration V0006__transport.sql: transport (1 tables)', description: 'Tenant database.' },
+      touches: [{ kind: 'table', id: 'transport.departure' }] },
+    9100: { workPackage: { key: '9100', subject: '[BE] Build getPlan', description: 'Builds getPlan.' }, touches: [{ kind: 'table', id: 'subscription.plan' }] },
   };
   let fileReads = 0;
+  let failRead = null;
   const client = {
     async projectId() { return 'ticvai'; },
     async layer(route) { return route === 'backend' ? backend : {}; },
     async file(p) {
       fileReads++;
       const full = path.join(PACKAGE, p);
+      if (failRead && p.endsWith(failRead)) return { ok: false, status: 500, text: 'broken' };
       return existsSync(full) ? { ok: true, status: 200, text: readFileSync(full, 'utf8') } : { ok: false, status: 404, text: '' };
     },
     async service(route) {
@@ -200,25 +199,71 @@ let expectedSub = null;
   const dir = path.join(SCRATCH, 'pulled');
   mkdirSync(dir);
   const pull = BY_NAME.get('adam_pull');
+  const read = (key, f) => { const p = path.join(dir, '.adam', 'work', key, f); return existsSync(p) ? readFileSync(p, 'utf8') : null; };
+
   const one = await pull.run(client, { key: '9005', dir });
-  const folder = path.join(dir, '.adam', 'work', '9005');
-  const file = path.join(folder, 'expected-schema.json');
-  ok(one.found && existsSync(file), 'expected-schema.json is in the ticket folder', JSON.stringify(one).slice(0, 400));
-  expectedSub = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null;
-  ok(expectedSub?.database === 'tenant' && expectedSub.migration === 'V0005__subscription.sql' && Object.keys(expectedSub.tables).length === 5,
-    'it names the database, the file and the five tables', JSON.stringify({ ...expectedSub, tables: Object.keys(expectedSub?.tables ?? {}) }));
-  ok(expectedSub?.sources.includes('backend/tenant/010-subscription.sql') && expectedSub.sources.includes('backend/tenant/910-indexes.sql')
-    && !expectedSub.sources.includes('backend/tenant/010-access.sql'), 'read from the 010 file that creates them and every later file', expectedSub?.sources.join(', '));
-  const readme = readFileSync(path.join(folder, 'README.md'), 'utf8');
+  const sub = JSON.parse(read('9005', 'expected-schema.json') ?? 'null');
+  expectedOf[9005] = sub;
+  const c = sub?.checks?.[0];
+  ok(one.found && sub?.checks.length === 1 && c.database === 'tenant' && c.migration === 'V0005__subscription.sql' && Object.keys(c.tables).length === 5,
+    'expected-schema.json: one database, the file, the five tables\' shape', JSON.stringify({ ...c, tables: Object.keys(c?.tables ?? {}), statements: c?.statements?.length }));
+  ok(c?.statements.length > 10 && c.statements.every((s) => SUB.includes(statementTarget(s.sql))) && c.statements.some((s) => s.file === '920-row-level-security.sql')
+    && c.statements.some((s) => s.guard?.references === 'platform.tenant'), 'and the package statements that make them, each about one of them, keys guarded',
+  c?.statements.map((s) => s.file).join(', '));
+  const readme = read('9005', 'README.md');
   ok(/## Checking this migration/.test(readme) && readme.includes('node .claude/scripts/db-ticket.mjs 9005') && readme.includes('db/tenant/V0005__subscription.sql')
-    && /do not run `dotnet build`/.test(readme), 'README.md says how to check it, and that dotnet build and test are not for this ticket');
-  ok(one.database?.migration === 'db/tenant/V0005__subscription.sql' && /db-ticket\.mjs 9005/.test(one.next), 'the answer points at the check', one.next);
+    && /This replaces older instructions for a \[DB\] ticket/.test(readme) && /--full tenant/.test(readme) && !/once a day|pipeline/.test(readme),
+  'README.md: the command, that it replaces the older rule, the full run before the merge request, no daily or pipeline promise');
+  ok(one.database?.migration === 'db/tenant/V0005__subscription.sql' && /db-ticket\.mjs 9005/.test(one.next) && /replaces older/.test(one.next), 'the answer points at the check', one.next);
   const reads = fileReads;
   await pull.run(client, { key: '9005', dir });
   ok(fileReads === reads, 'a second pull within the minute reads the DDL from memory', `${fileReads - reads} reads`);
-  const be = await pull.run(client, { key: '9100', dir });
-  ok(be.found && !existsSync(path.join(dir, '.adam', 'work', '9100', 'expected-schema.json')) && !be.database,
-    'a [BE] ticket gets no expected-schema.json');
+
+  await pull.run(client, { key: '9001', dir });
+  const base = JSON.parse(read('9001', 'expected-schema.json') ?? 'null');
+  expectedOf[9001] = base;
+  ok(base?.checks.map((x) => x.database).join() === 'tenant,control' && base.checks.every((x) => x.kind === 'baseline'
+    && x.statements.some((s) => /^CREATE (OR REPLACE )?FUNCTION/i.test(s.sql)) && x.statements.some((s) => s.file === '002-migration-register.sql')),
+  'the baseline: one check per database, with 000-002 and the helper functions', JSON.stringify(base?.checks.map((x) => [x.database, x.statements.length])));
+  ok(/`db\/tenant\/V0001__baseline\.sql` and `db\/control\/V0001__baseline\.sql`/.test(read('9001', 'README.md')), 'README.md names both files');
+
+  await pull.run(client, { key: '9034', dir });
+  const fk = JSON.parse(read('9034', 'expected-schema.json') ?? 'null')?.checks?.[0];
+  ok(fk?.kind === 'foreign-keys' && fk.statements.length === 2 && Object.keys(fk.tables).length === 0 && !fk.keysNotInPackageDdl,
+    'the cross-schema keys ticket: its two keys, and no tables of its own', JSON.stringify(fk?.statements?.map((s) => s.guard?.constraint)));
+
+  failRead = '910-indexes.sql';
+  forgetPackageFiles();
+  const broken = await pull.run(client, { key: '9005', dir });
+  ok(!read('9005', 'expected-schema.json') && /could not be written \(backend\/tenant\/910-indexes\.sql would not read\)/.test(read('9005', 'README.md'))
+    && broken.database?.error, 'a DDL file that will not read: no expected-schema.json left from before, and README.md says why');
+  const r = spawnSync(process.execPath, [SCRIPT, '9005'], { cwd: dir, encoding: 'utf8' });
+  ok(r.status === 2 && /could not write expected-schema\.json for this ticket/.test(r.stdout) && !/Pull the ticket first/.test(r.stdout),
+    'and the script says so, instead of sending the agent to pull again', r.stdout);
+  failRead = null;
+  forgetPackageFiles();
+
+  await pull.run(client, { key: '9006', dir });
+  ok(!/Not in the package DDL/.test(read('9006', 'README.md'))
+    && JSON.parse(read('9006', 'expected-schema.json'))?.checks?.[0]?.statements.length > 0, 'a table the DDL has: no "not in the package" note');
+
+  // A [BE] ticket's README is what the connector wrote before this change, byte for byte (but the time).
+  const old = path.join(SCRATCH, 'old-connector');
+  mkdirSync(old);
+  for (const f of ['tools.mjs']) {
+    const g = spawnSync('git', ['-C', REPO, 'show', `41caabcc:viewer/mcp/${f}`], { encoding: 'utf8', maxBuffer: 1 << 26 });
+    writeFileSync(path.join(old, f), g.stdout);
+  }
+  const oldTools = await import(pathToFileURL(path.join(old, 'tools.mjs')).href);
+  const oldDir = path.join(SCRATCH, 'pulled-old');
+  mkdirSync(oldDir);
+  const nowBe = await pull.run(client, { key: '9100', dir });
+  const thenBe = await oldTools.BY_NAME.get('adam_pull').run(client, { key: '9100', dir: oldDir });
+  const strip = (t) => String(t).replace(/Pulled \S+ by/, 'Pulled <time> by');
+  const oldReadme = readFileSync(path.join(oldDir, '.adam', 'work', '9100', 'README.md'), 'utf8');
+  ok(strip(read('9100', 'README.md')) === strip(oldReadme) && !read('9100', 'expected-schema.json') && !nowBe.database
+    && JSON.stringify(nowBe).split(JSON.stringify(dir).slice(1, -1)).join('<dir>') === JSON.stringify(thenBe).split(JSON.stringify(oldDir).slice(1, -1)).join('<dir>'),
+  'a [BE] ticket: README.md, the files and the answer are what 41caabcc wrote');
 }
 
 // ---- 4. the script, as a developer runs it -----------------------------------------------------
@@ -228,6 +273,7 @@ const CONTAINER = 'adam-db-ticket-check';
 const docker = (args, input) => spawnSync('docker', args, { input, encoding: 'utf8', maxBuffer: 1 << 30 });
 
 async function startContainer() {
+  if (docker(['inspect', '-f', '{{.State.Running}}', CONTAINER]).stdout.trim() === 'true') return null;
   docker(['rm', '-f', CONTAINER]);
   const run = docker(['run', '-d', '--name', CONTAINER, '-e', 'POSTGRES_PASSWORD=check', 'pgvector/pgvector:pg16']);
   if (run.status !== 0) return run.stderr;
@@ -238,151 +284,218 @@ async function startContainer() {
   return 'did not become ready';
 }
 
-/** The package's statements for `tables`, as a developer's migration copies them. */
+const pkgRead = (db, f) => readFileSync(path.join(PACKAGE, 'backend', db, f), 'utf8');
+const pkgFiles = (db) => readdirSync(path.join(PACKAGE, 'backend', db)).filter((n) => /\.sql$/.test(n)).sort()
+  .map((name) => ({ name, text: pkgRead(db, name) }));
+
+/** A developer's migration for `tables`: the package's statements, each safe to run twice. */
 function migrationFor(tables, { skipKeysTo = () => false } = {}) {
-  const dir = path.join(PACKAGE, 'backend', 'tenant');
-  const want = new Set(tables);
-  const target = (s) => /^(?:CREATE TABLE IF NOT EXISTS|ALTER TABLE|CREATE (?:UNIQUE )?INDEX IF NOT EXISTS \w+ ON|SELECT platform\.apply_\w+_rls\(')\s*([\w.]+)/i.exec(s)?.[1];
-  const out = [];
-  for (const f of readdirSync(dir).filter((n) => /\.sql$/.test(n)).sort()) {
-    if (/^00/.test(f)) continue;
-    for (const s of sqlStatements(readFileSync(path.join(dir, f), 'utf8'))) {
-      const t = target(s)?.replace(/'$/, '');
-      if (!t || !want.has(t)) continue;
-      const ref = /REFERENCES\s+([\w.]+)/i.exec(s)?.[1];
-      if (/^ALTER TABLE/i.test(s) && ref && skipKeysTo(ref)) continue;
-      out.push(`${s};`);
-    }
-    if (f === '930-partitioning.sql') {
-      for (const s of sqlStatements(readFileSync(path.join(dir, f), 'utf8'))) {
-        const parent = /PARTITION OF ([\w.]+) DEFAULT/i.exec(s)?.[1];
-        if (parent && want.has(parent)) out.push(`${s};`);
-      }
-    }
-  }
-  return `${out.join('\n')}\n`;
+  return `${ticketStatements(pkgFiles('tenant'), { kind: 'tables', tables })
+    .filter((s) => !(s.guard && skipKeysTo(s.guard.references)))
+    .map((s) => {
+      const add = /^ALTER TABLE ([\w.]+) ADD CONSTRAINT (\w+)/i.exec(s.sql);
+      return add ? `ALTER TABLE ${add[1]} DROP CONSTRAINT IF EXISTS ${add[2]};\n${s.sql};` : `${s.sql};`;
+    }).join('\n')}\n`;
 }
 
-function baseline() {
-  const dir = path.join(PACKAGE, 'backend', 'tenant');
-  const read = (f) => readFileSync(path.join(dir, f), 'utf8');
-  const functions = [read('920-row-level-security.sql'), read('930-partitioning.sql')]
-    .flatMap((t) => sqlStatements(t)).filter((s) => /^CREATE OR REPLACE FUNCTION/i.test(s)).map((s) => `${s};`);
-  // The SQL-language helpers read platform.scope, which a later migration creates.
-  return ['SET check_function_bodies = off;', read('000-schemas.sql'), read('001-extensions.sql'), read('002-migration-register.sql'),
-    ...functions].join('\n');
+/** A developer's baseline for one database: the package's 000-002 and helper functions. */
+function baseline(db) {
+  return `SET check_function_bodies = off;\n${ticketStatements(pkgFiles(db), { kind: 'baseline', tables: [] }).map((s) => `${s.sql};`).join('\n')}\n`;
 }
 
 function runScript(cwd, ...args) {
   const r = spawnSync(process.execPath, [SCRIPT, ...args, '--container', CONTAINER], { cwd, encoding: 'utf8' });
   return { code: r.status, out: `${r.stdout}${r.stderr}` };
 }
+function runAsync(cwd, ...args) {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [SCRIPT, ...args, '--container', CONTAINER], { cwd });
+    let out = '';
+    child.stdout.on('data', (d) => { out += d; });
+    child.stderr.on('data', (d) => { out += d; });
+    child.on('close', (code) => resolve({ code, out }));
+  });
+}
 
 section('the script on a developer folder (Docker)');
 if (!dockerUp) {
   skip('the script against PostgreSQL', 'Docker is not running here');
-} else if (!expectedSub) {
-  ok(false, 'the script needs the expected-schema.json from section 3');
+} else if (!expectedOf[9005] || !expectedOf[9001]) {
+  ok(false, 'the script needs the expected-schema.json files from section 3');
 } else {
   const started = await startContainer();
   ok(started === null, `a throwaway ${CONTAINER} container`, started);
   const repo = path.join(SCRATCH, 'backend');
-  const db = path.join(repo, 'db', 'tenant');
-  mkdirSync(db, { recursive: true });
-  mkdirSync(path.join(repo, '.adam', 'work', '9005'), { recursive: true });
-  writeFileSync(path.join(repo, '.adam', 'work', '9005', 'expected-schema.json'), JSON.stringify(expectedSub, null, 2));
-  writeFileSync(path.join(db, 'V0001__baseline.sql'), baseline());
-  writeFileSync(path.join(db, 'V0002__kernel.sql'), migrationFor(['kernel.inbox']));
-  writeFileSync(path.join(db, 'V0003__tenancy.sql'), migrationFor(['tenancy.device_assignment']));
-  writeFileSync(path.join(db, 'V0008__games.sql'), 'SELECT 1;\n');
+  const tenant = path.join(repo, 'db', 'tenant');
+  const control = path.join(repo, 'db', 'control');
+  mkdirSync(tenant, { recursive: true });
+  mkdirSync(control, { recursive: true });
+  for (const k of [9001, 9005]) {
+    mkdirSync(path.join(repo, '.adam', 'work', String(k)), { recursive: true });
+    writeFileSync(path.join(repo, '.adam', 'work', String(k), 'expected-schema.json'), JSON.stringify(expectedOf[k], null, 2));
+  }
+  writeFileSync(path.join(tenant, 'V0001__baseline.sql'), baseline('tenant'));
+  writeFileSync(path.join(control, 'V0001__baseline.sql'), baseline('control'));
+  const first = runScript(repo, '9001');
+  ok(first.code === 0 && (first.out.match(/MATCH: /g) ?? []).length === 2, 'the baseline: MATCH in both databases', first.out);
+
+  writeFileSync(path.join(tenant, 'V0002__kernel.sql'), migrationFor(['kernel.inbox']));
+  writeFileSync(path.join(tenant, 'V0008__games.sql'), 'SELECT 1;\n');
   const made = new Set([...SUB, 'kernel.inbox', 'tenancy.device_assignment']);
   const good = migrationFor(SUB, { skipKeysTo: (t) => !made.has(t) });
-  writeFileSync(path.join(db, 'V0005__subscription.sql'), good);
+  const ticketFile = path.join(tenant, 'V0005__subscription.sql');
+  const check = (sql) => { writeFileSync(ticketFile, sql); return runScript(repo, '9005'); };
 
   let t = Date.now();
-  const first = runScript(repo, '9005');
-  const firstMs = Date.now() - t;
-  ok(first.code === 0 && /MATCH: 5 tables/.test(first.out) && /template built/.test(first.out) && /second run: recorded in platform.schema_version with its checksum, so it applies nothing/.test(first.out),
-    `first run: the template built, the file applied twice, MATCH (${(firstMs / 1000).toFixed(1)} s)`, first.out);
-  ok(/1 later file left out/.test(first.out), 'a later file is left out of the previous state', first.out);
-  ok(/left for a later migration/.test(first.out), 'keys to tables no migration has made yet are listed as deferred, not as differences', first.out);
+  const m1 = check(good);
+  const ms1 = Date.now() - t;
+  ok(m1.code === 0 && /MATCH: 5 tables/.test(m1.out) && /template (built|extended)/.test(m1.out) && /second run: applied again, changed nothing/.test(m1.out),
+    `a ticket: the template made, applied twice, the package's statements on a second copy, MATCH (${(ms1 / 1000).toFixed(1)} s)`, m1.out);
+  ok(/1 later file left out/.test(m1.out) && /1 foreign key left for a later migration/.test(m1.out), 'a later file is left out; a key to a table not made yet is deferred', m1.out);
   ok(existsSync(path.join(repo, '.adam', 'work', '9005', 'db-check.md')), 'the result is kept in db-check.md');
-
   t = Date.now();
-  const again = runScript(repo, '9005');
-  const againMs = Date.now() - t;
-  ok(again.code === 0 && /template reused/.test(again.out), `second run: the template reused, MATCH (${(againMs / 1000).toFixed(1)} s)`, again.out);
-  console.log(`        timings: first ${(firstMs / 1000).toFixed(1)} s, then ${(againMs / 1000).toFixed(1)} s`);
+  const m2 = check(good);
+  const ms2 = Date.now() - t;
+  ok(m2.code === 0 && /template reused/.test(m2.out) && /\(kept from an earlier run\)/.test(m2.out),
+    `run again: the template reused and the package's result kept, MATCH (${(ms2 / 1000).toFixed(1)} s)`, m2.out);
+  writeFileSync(path.join(tenant, 'V0003__tenancy.sql'), migrationFor(['tenancy.device_assignment']));
+  const m3 = check(good);
+  ok(m3.code === 0 && /template extended, 1 applied/.test(m3.out), 'a new earlier file extends the template', m3.out);
 
-  writeFileSync(path.join(db, 'V0005__subscription.sql'), good.replace(/^CREATE INDEX IF NOT EXISTS plan_limit_plan_id_idx ON[^\n]*\n/m, ''));
-  const noIndex = runScript(repo, '9005');
-  ok(noIndex.code === 1 && /DIFFERENT/.test(noIndex.out) && /subscription\.plan_limit: index plan_limit_plan_id_idx is missing/.test(noIndex.out), 'a missing index is named', noIndex.out);
+  const cases = [
+    ['a missing index', good.replace(/^CREATE INDEX IF NOT EXISTS plan_limit_plan_id_idx ON[^\n]*\n/m, ''),
+      /DIFFERENT/, /subscription\.plan_limit: index plan_limit_plan_id_idx is missing/],
+    ['an extra table and a changed column', `${good}CREATE TABLE IF NOT EXISTS subscription.stray (id uuid PRIMARY KEY);\nALTER TABLE subscription.plan ALTER COLUMN description SET NOT NULL;\n`,
+      /subscription\.stray: the table was created by this file, but it is not part of this ticket/, /subscription\.plan: column description is text not null; the package has text/],
+    ['an earlier table dropped', `${good}DROP TABLE IF EXISTS tenancy.device_assignment;\n`,
+      /tenancy\.device_assignment: the table was dropped by this file, but it is not part of this ticket/, /DIFFERENT/],
+    ['an earlier table altered (kernel.inbox)', `${good}ALTER TABLE kernel.inbox ADD COLUMN IF NOT EXISTS note text;\nALTER TABLE kernel.inbox DROP CONSTRAINT IF EXISTS inbox_consumer_chk;\n`,
+      /kernel\.inbox: column note was created by this file/, /kernel\.inbox: constraint inbox_consumer_chk was dropped by this file/],
+    ['a changed CHECK body', good.replace(/CONSTRAINT plan_cell_tier_chk CHECK \(cell_tier IN \('shared', 'dedicated', 'isolated', 'clientHosted'\)\)/, "CONSTRAINT plan_cell_tier_chk CHECK (cell_tier IN ('shared'))"),
+      /subscription\.plan: constraint plan_cell_tier_chk is CHECK \(\(cell_tier = 'shared'::text\)\); the package has CHECK .*'clientHosted'/, /DIFFERENT/],
+    ['a changed index WHERE', good.replace(/(CREATE INDEX IF NOT EXISTS plan_limit_plan_id_idx ON subscription\.plan_limit \(plan_id\))/, '$1 WHERE plan_id IS NOT NULL'),
+      /subscription\.plan_limit: index plan_limit_plan_id_idx is CREATE INDEX .* WHERE \(plan_id IS NOT NULL\); the package has/, /DIFFERENT/],
+    ['a weakened policy', good.replace("SELECT platform.apply_tenant_rls('subscription.plan'::regclass);",
+      'ALTER TABLE subscription.plan ENABLE ROW LEVEL SECURITY;\nALTER TABLE subscription.plan FORCE ROW LEVEL SECURITY;\nDROP POLICY IF EXISTS plan_scope ON subscription.plan;\n'
+      + 'CREATE POLICY plan_scope ON subscription.plan USING (platform.tenant_root_in_scope() OR true) WITH CHECK (platform.tenant_root_in_scope());'),
+    /subscription\.plan: policy plan_scope is permissive for all to public using \(platform\.tenant_root_in_scope\(\) OR true\)/, /DIFFERENT/],
+    ['a file that fails its second run', good.replace('CREATE INDEX IF NOT EXISTS plan_limit_plan_id_idx', 'CREATE INDEX plan_limit_plan_id_idx'),
+      /FAILED: second run: V0005__subscription\.sql, statement \d+ \(line \d+\) failed/, /already exists[\s\S]*safe to run again/],
+    ['a file whose second run changes the schema', `${good}DO $$ BEGIN IF to_regclass('subscription.plan_note') IS NULL THEN CREATE TABLE subscription.plan_note (id int); ELSE ALTER TABLE subscription.plan_note ADD COLUMN IF NOT EXISTS x int; END IF; END $$;\n`,
+      /the second run created subscription\.plan_note: column x/, /DIFFERENT/],
+    ['a file that does not apply', `${good}ALTER TABLE subscription.nowhere ADD COLUMN x int;\n`,
+      /FAILED: first run: V0005__subscription\.sql, statement \d+ \(line \d+\) failed/, /subscription\.nowhere/],
+    ['a file that begins its own transaction', `BEGIN;\n${good}COMMIT;\n`, /FAILED: V0005__subscription\.sql, line 1: the file manages its own transaction/, /FAILED/],
+  ];
+  for (const [what, sql, a, b] of cases) {
+    const r = check(sql);
+    ok(r.code === 1 && a.test(r.out) && b.test(r.out), what, r.out);
+  }
 
-  writeFileSync(path.join(db, 'V0005__subscription.sql'), `${good}CREATE TABLE subscription.stray (id uuid PRIMARY KEY);\n`
-    + 'ALTER TABLE subscription.plan ALTER COLUMN description SET NOT NULL;\n');
-  const extra = runScript(repo, '9005');
-  ok(extra.code === 1 && /subscription\.stray: created by this file, but not one of the ticket's tables/.test(extra.out)
-    && /subscription\.plan: column description is NOT NULL; the package says nullable/.test(extra.out), 'an extra table and a changed column are named', extra.out);
+  // Through a junction, as a folder reached another way would run it.
+  const link = path.join(SCRATCH, 'scripts-link');
+  spawnSync('cmd', ['/c', 'mklink', '/J', link, path.dirname(SCRIPT)], { encoding: 'utf8' });
+  writeFileSync(ticketFile, good);
+  const viaLink = spawnSync(process.execPath, [path.join(link, 'db-ticket.mjs'), '9005', '--container', CONTAINER], { cwd: repo, encoding: 'utf8' });
+  ok(viaLink.status === 0 && /MATCH: 5 tables/.test(viaLink.stdout), 'the script reached through a junction runs (it used to print nothing and exit 0)', `${viaLink.status} ${viaLink.stdout}`);
 
-  writeFileSync(path.join(db, 'V0005__subscription.sql'), `${good}ALTER TABLE subscription.nowhere ADD COLUMN x int;\n`);
-  const fails = runScript(repo, '9005');
-  ok(fails.code === 1 && /FAILED: V0005__subscription\.sql did not apply/.test(fails.out) && /subscription\.nowhere/.test(fails.out), 'a file that does not apply says why', fails.out);
+  // Two at once in one folder: one waits for the other, both match.
+  const [p1, p2] = await Promise.all([runAsync(repo, '9005'), runAsync(repo, '9005')]);
+  ok(p1.code === 0 && p2.code === 0 && /Waiting for another check in this folder/.test(p1.out + p2.out), 'two runs at once in one folder: one waits, both MATCH', `${p1.out}\n---\n${p2.out}`);
 
-  writeFileSync(path.join(db, 'V0003__tenancy.sql'), `${migrationFor(['tenancy.device_assignment'])}-- edited\n`);
-  writeFileSync(path.join(db, 'V0005__subscription.sql'), good);
-  const rebuilt = runScript(repo, '9005');
-  ok(rebuilt.code === 0 && /template built/.test(rebuilt.out), 'an earlier file that changed rebuilds the template', rebuilt.out);
+  // A second folder gets databases of its own.
+  const twin = path.join(SCRATCH, 'backend-twin');
+  spawnSync('cmd', ['/c', 'xcopy', '/E', '/I', '/Q', repo, twin], { encoding: 'utf8' });
+  const tw = runScript(twin, '9005');
+  ok(tw.code === 0 && /template built/.test(tw.out), 'another folder builds its own template and leaves this one\'s alone', tw.out);
 
-  rmSync(path.join(db, 'V0008__games.sql'));
-  writeFileSync(path.join(db, 'V0010__keys.sql'), 'SELECT 1;\n');
   const full = runScript(repo, '--full', 'tenant');
-  ok(full.code === 1 && /foreign key never created/.test(full.out), '--full from empty: a deferred key that no file ever adds is reported', full.out);
+  ok(full.code === 0 && /MATCH: db\/tenant applies to an empty database, and a second run of each file changes nothing/.test(full.out), '--full: every file from empty, each applied twice', full.out);
+  writeFileSync(path.join(tenant, 'V0009__bad.sql'), 'CREATE TABLE kernel.once (id int);\n');
+  const fullBad = runScript(repo, '--full', 'tenant');
+  ok(fullBad.code === 1 && /second run: V0009__bad\.sql, statement 1 \(line 1\) failed/.test(fullBad.out), '--full: a file that cannot run twice fails', fullBad.out);
+  rmSync(path.join(tenant, 'V0009__bad.sql'));
 
   const missing = runScript(repo, '9999');
   ok(missing.code === 2 && /Pull the ticket first/.test(missing.out), 'a ticket not pulled: exit 2 and what to do', missing.out);
+  const badDb = runScript(repo, '--full', 'x;drop');
+  ok(badDb.code === 2 && /is not a database name/.test(badDb.out), 'a database name that is not one is refused', badDb.out);
+  docker(['stop', CONTAINER]);
+  const stopped = runScript(repo, '9005');
+  ok(stopped.code === 2 && /is not running; start it yourself/.test(stopped.out)
+    && docker(['inspect', '-f', '{{.State.Running}}', CONTAINER]).stdout.trim() === 'false', '--container never starts someone else\'s container', stopped.out);
+  docker(['start', CONTAINER]);
+  await startContainer();
+  for (let i = 0; i < 60 && docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', 'SELECT 1']).status !== 0; i++) await new Promise((r) => { setTimeout(r, 500); });
+  const cleaned = runScript(repo, '--clean');
+  const left = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT count(*) FROM pg_database WHERE datname LIKE 'adam\\_%'"]).stdout.trim();
+  ok(cleaned.code === 0 && /Dropped \d+ databases of this folder/.test(cleaned.out) && Number(left) > 0, '--clean drops this folder\'s databases and not the other folder\'s', `${cleaned.out} ${left} left`);
 }
 
 // ---- 5. the whole package against PostgreSQL ----------------------------------------------------
 
-section('the whole package DDL, parsed and compared with PostgreSQL (--package)');
+section('the whole package DDL against PostgreSQL (--package)');
 if (!PACKAGE_RUN) {
-  skip('every table of tenant and control', 'run with --package (about three minutes)');
+  skip('every table of tenant and control', 'run with --package (about four minutes)');
 } else if (!dockerUp) {
   skip('every table of tenant and control', 'Docker is not running here');
 } else {
+  const started = await startContainer();
+  ok(started === null, `the ${CONTAINER} container`, started);
+  const psql = (db, sql) => docker(['exec', '-i', CONTAINER, 'psql', '-X', '-q', '-At', '-U', 'postgres', '-d', db, '-v', 'ON_ERROR_STOP=1', '-f', '-'], sql);
+  // The package creates no pii.subject_kind or pii.contact_kind; give them one so 010-pii applies.
+  const types = "CREATE TYPE pii.subject_kind AS ENUM ('a'); CREATE TYPE pii.contact_kind AS ENUM ('a');\n";
   for (const database of ['tenant', 'control']) {
-    const dir = path.join(PACKAGE, 'backend', database);
-    const files = readdirSync(dir).filter((f) => /\.sql$/.test(f)).sort();
-    const name = `pkg_${database}`;
-    docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', `DROP DATABASE IF EXISTS ${name}`]);
-    docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', `CREATE DATABASE ${name}`]);
+    const files = pkgFiles(database);
+    for (const n of ['pkg', 'picked']) {
+      docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', `DROP DATABASE IF EXISTS ${n}_${database}`]);
+      docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', `CREATE DATABASE ${n}_${database}`]);
+    }
     const t = Date.now();
     let applyError = null;
     for (const f of files) {
-      let sql = readFileSync(path.join(dir, f), 'utf8');
-      // The package creates no pii.subject_kind or pii.contact_kind; give them one so 010-pii applies.
-      if (database === 'tenant' && f === '010-pii.sql') sql = "CREATE TYPE pii.subject_kind AS ENUM ('a'); CREATE TYPE pii.contact_kind AS ENUM ('a');\n" + sql;
-      const r = docker(['exec', '-i', CONTAINER, 'psql', '-X', '-q', '-U', 'postgres', '-d', name, '-v', 'ON_ERROR_STOP=1', '-f', '-'], sql);
-      if (r.status !== 0) { applyError = `${f}: ${r.stderr}`; break; }
+      const sql = database === 'tenant' && f.name === '010-pii.sql' ? types + f.text : f.text;
+      const r = psql(`pkg_${database}`, sql);
+      if (r.status !== 0) { applyError = `${f.name}: ${r.stderr}`; break; }
     }
     ok(!applyError, `${database}: the package applies to an empty database (${files.length} files, ${((Date.now() - t) / 1000).toFixed(0)} s)`, applyError);
     if (applyError) continue;
-    const model = schemaModel(files.map((f) => ({ name: f, text: readFileSync(path.join(dir, f), 'utf8') })));
+    const model = schemaModel(files);
     const tables = [...model.tables.keys()];
-    const exp = expectedSchema(model, tables, { database });
-    const r = docker(['exec', '-i', CONTAINER, 'psql', '-X', '-q', '-At', '-U', 'postgres', '-d', name, '-f', '-'], `${script.catalogSql(tables)};`);
-    const catalog = JSON.parse(r.stdout || '{}');
-    const res = script.compareSchema(exp, catalog, {});
-    const count = (o, f) => Object.values(o).reduce((a, x) => a + f(x), 0);
-    ok(Object.keys(catalog).length === tables.length && res.diffs.length === 0 && model.notModelled.length === 0,
-      `${database}: ${tables.length} tables, ${count(exp.tables, (x) => x.columns.length)} columns, ${count(exp.tables, (x) => x.indexes.length)} indexes, `
-      + `${count(exp.tables, (x) => x.foreignKeys.length)} foreign keys, ${count(exp.tables, (x) => x.checks.length)} checks, `
-      + `${count(exp.tables, (x) => x.rls.policies.length)} policies: parsed exactly as PostgreSQL has them`,
-      `${Object.keys(catalog).length} in the catalog; ${res.diffs.length} differences: ${res.diffs.slice(0, 8).join(' | ')}; notModelled ${model.notModelled.length}`);
+    // What every ticket would be given, put together: the baseline, then each table's statements.
+    const picked = [...ticketStatements(files, { kind: 'baseline', tables: [] }), ...ticketStatements(files, { kind: 'tables', tables })];
+    const ordered = [...picked.filter((s) => /^00[0-2]-/.test(s.file)), ...picked.filter((s) => !/^00[0-2]-/.test(s.file))];
+    const pickedSql = `SET check_function_bodies = off;\n${database === 'tenant' ? types.replace('CREATE TYPE pii.subject_kind', 'CREATE SCHEMA IF NOT EXISTS pii; CREATE TYPE pii.subject_kind') : ''}`
+      + ordered.map((s) => `${s.sql};`).join('\n');
+    const pr = psql(`picked_${database}`, pickedSql);
+    ok(pr.status === 0, `${database}: the statements tickets are given apply in package order`, pr.stderr);
+    const snap = (db) => JSON.parse(psql(db, `SELECT ${script.SNAPSHOT_SQL};`).stdout || '{}');
+    const whole = snap(`pkg_${database}`);
+    const fromTickets = snap(`picked_${database}`);
+    const diff = script.againDiffs(whole, fromTickets);
+    ok(diff.length === 0 && Object.keys(whole).length > 1000,
+      `${database}: ${Object.keys(whole).length} objects; the picked statements make exactly what the whole package makes`, diff.slice(0, 10).join(' | '));
+    const missing = [];
+    for (const [name, shape] of model.tables) {
+      const keys = new Set(Object.keys(whole).filter((k) => k.startsWith(`table ${name} `)));
+      const cols = [...keys].filter((k) => k.startsWith(`table ${name} column `)).length;
+      if (cols !== shape.columns.length) missing.push(`${name}: ${shape.columns.length} columns parsed, ${cols} in PostgreSQL`);
+      for (const c of shape.columns) if (!keys.has(`table ${name} column ${c.name}`)) missing.push(`${name}.${c.name}`);
+      for (const i of shape.indexes) if (!keys.has(`table ${name} index ${i.name}`)) missing.push(`${name} index ${i.name}`);
+      for (const k of [...shape.checks, ...shape.foreignKeys, ...shape.unique, shape.primaryKey].filter((x) => x?.name)) if (!keys.has(`table ${name} constraint ${k.name}`)) missing.push(`${name} constraint ${k.name}`);
+      for (const p of shape.rls.policies) if (!keys.has(`table ${name} policy ${p.name}`)) missing.push(`${name} policy ${p.name}`);
+    }
+    ok(missing.length === 0 && model.notModelled.length === 0, `${database}: the parsed shape of all ${tables.length} tables names what PostgreSQL has`, missing.slice(0, 10).join(' | '));
   }
 }
 
 if (dockerUp) docker(['rm', '-f', CONTAINER]);
+// The script keeps snapshots in the temp folder; this run's go with it.
+const ids = readdirSync(SCRATCH).map((d) => createHash('sha256').update(realpathSync.native(path.join(SCRATCH, d)).toLowerCase()).digest('hex').slice(0, 8));
+for (const f of readdirSync(tmpdir()).filter((n) => ids.some((id) => n.startsWith(`adam-db-ticket-${id}-`)) && n.endsWith('.json'))) {
+  const p = path.join(tmpdir(), f);
+  if (statSync(p).mtimeMs >= CHECK_STARTED) rmSync(p, { force: true });
+}
 rmSync(SCRATCH, { recursive: true, force: true });
 console.log(failures ? `\n${failures} failed` : '\nall passed');
 process.exitCode = failures ? 1 : 0;

@@ -24,6 +24,7 @@
       "Bash(dotnet restore:*)",
       "Bash(dotnet format:*)",
       "Bash(node .claude/scripts/db-ticket.mjs:*)",
+      "Bash(node .claude\\scripts\\db-ticket.mjs:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)"
