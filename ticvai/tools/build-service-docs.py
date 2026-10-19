@@ -4245,6 +4245,26 @@ def main() -> int:
             after_r1_[made_by_[tbl_]][rel_][tbl_] = items_
         else:
             print(f"WARNING: {rel_} changes {tbl_}, which no migration ticket creates (CHG-R5-002)")
+    # **What a migration needs that the copied DDL does not give it** (CHG-R8MIG-008; ADAM faster-db-tickets report):
+    # the enum types the frozen 010-pii.sql names and no file creates (CR-001), and a parent-row policy whose parent a
+    # later migration creates (it moves there, as a cross-schema key does).
+    extra_ = defaultdict(list)
+    for tbl_, uses_ in sorted(ticket_done.undefined_types(ROOT).items()):
+        if tbl_ in made_by_:
+            extra_[made_by_[tbl_]].append(ticket_done.type_sentence(tbl_, uses_))
+        else:
+            print(f"WARNING: {tbl_} uses a type no file creates and no migration ticket creates the table (CR-001)")
+    mig_no_ = {}
+    for t_ in tasks:
+        m_ = re.search(r"\bV(\d{4})[a-z]?__", t_.get("subject") or "")
+        if m_ and ticket_done.MIGRATION_KEY.match(t_["key"]):
+            mig_no_[t_["key"]] = int(m_.group(1))
+    moved_, orphans_ = ticket_done.parent_policy_moves(ticket_done.parent_policies(ROOT), made_by_, mig_no_,
+                                                       ticket_done.declared_moves(ROOT))
+    for k_, ws_ in ticket_done.parent_policy_sentences(moved_, orphans_).items():
+        extra_[k_] += ws_
+    for c_, p_ in sorted(orphans_.items()):
+        print(f"WARNING: {c_}'s row-level security reads {p_}, which no migration ticket creates (CHG-R8MIG-008)")
     own_src_ = {"MIG-FOREIGN-KEYS": "Source DDL: backend/tenant/900-foreign-keys.sql and backend/control/900-foreign-keys.sql "
                                     "(the constraints named here, nothing else from those files).",
                 "MIG-PARTITIONS": "Source DDL: backend/tenant/930-partitioning.sql (the monthly partitions and default "
@@ -4257,7 +4277,7 @@ def main() -> int:
                     else [])
             ar1_ = [(ticket_done.names_sentence if "__names_" in rel_ else ticket_done.after_r1_sentence)(rel_, ch_)
                     for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
-            add_ = [w_ for w_ in (src_ + ar1_ + [ticket_done.MIGRATION_WORDING]
+            add_ = [w_ for w_ in (src_ + ar1_ + extra_.get(t_["key"], []) + [ticket_done.MIGRATION_WORDING]
                                   + ([base_words_] if t_["key"] == "MIG-BASELINE" else []))
                     if w_ not in (t_["description"] or "")]
             if add_:

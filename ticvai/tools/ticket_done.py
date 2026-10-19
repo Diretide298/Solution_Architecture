@@ -146,11 +146,15 @@ def done_when(r, part, builds):
                 f"error response; each reads and writes only the tables its spec lists, {guard}; unit "
                 "tests cover its rules; and a peer in the same stack has reviewed and tested it.")
     if kind == "Database" and names:
+        # **How a [DB] ticket is proven** (CHG-R8MIG-008; the lead's delegate, 20 October 2026, from the ADAM
+        # faster-db-tickets report, item 5 point 6): on a copy of the database as it was, twice, and ADAM's db-ticket
+        # script comparing the result with the package; the full chain from empty runs daily and in every merge request.
         guard = ("columns, keys and indexes; no row-level security, which the control database does not have "
                  "(backend/MIGRATIONS.md)") if control_only(names) else "columns, keys, indexes, row-level security"
-        return (f"Done when the migration for {named} runs forward on an empty database and on the previous release's "
-                f"schema, every table matches its spec in ADAM ({guard}), and a peer "
-                "has reviewed it.")
+        return (f"Done when the migration for {named} applies on a copy of the database at the previous state, a "
+                "second run applies nothing, and `node .claude/scripts/db-ticket.mjs <ticket>` says MATCH "
+                f"({guard}); every migration from an empty database runs once a day and in the merge-request "
+                "pipeline; and a peer has reviewed it.")
     if kind == "Frontend" and names:
         step = {"build": "the layout is built from the screen spec (and its wireframe once client-verified)",
                 "wire": "every bound operation is called as the screen spec says, with its loading, empty and error states",
@@ -459,7 +463,126 @@ def baseline_wording(root) -> str:
     return ("The baseline file named in the subject is one you write in our repository; the package keeps no baseline "
             "file of its own. It creates the helper functions every later migration calls, copied as they are "
             + "; ".join(parts) + " (the row-level security of each schema migration calls the platform.apply_* "
-            "functions, so they come first).")
+            "functions, so they come first). " + BASELINE_BODIES)
+
+
+# **The baseline creates on an empty database only with function-body checks off** (CHG-R8MIG-008; ADAM faster-db-tickets
+# report, package problem 2). The SQL-language helpers of 920 and 930 read platform.scope, which MIG-PLATFORM creates
+# later, and PostgreSQL parses a SQL function's body when it is created unless check_function_bodies is off.
+BASELINE_BODIES = ("Start the file with `SET check_function_bodies = off;`: the SQL-language helpers read "
+                   "platform.scope, which the platform migration creates later, and PostgreSQL checks a function's body "
+                   "against the tables that exist when it is created unless that setting is off (the body is checked "
+                   "when the function first runs instead).")
+
+
+# **A type the frozen DDL names and no file creates** (CHG-R8MIG-008; ADAM CR-001; the faster-db-tickets report, package
+# problem 1). backend/tenant/010-pii.sql types pii.subject.kind as pii.subject_kind and pii.subject_contact.kind as
+# pii.contact_kind; the schema reference has since made them text with a CHECK, but 010 is frozen at r1, so the
+# migration that copies it cannot apply. Its ticket says what creates each type, with the values the schema reference
+# (from the contracts) gives the column.
+TYPE_USE = re.compile(r"^\s+(\w+)\s+([a-z_]+\.[a-z_0-9]+)(?:\[\])?\b", re.M)
+TYPE_DEF = re.compile(r"CREATE\s+(?:TYPE|DOMAIN)\s+(?:IF\s+NOT\s+EXISTS\s+)?([a-z_]+\.[a-z_0-9]+)", re.I)
+
+
+def undefined_types(root) -> dict:
+    """{table: [(type, column, [values])]} for every column of a baseline 0*.sql CREATE TABLE typed by a
+    schema-qualified type no backend file creates; the values are the column's `enum` in handoff/schema-reference.json."""
+    import json
+    from pathlib import Path
+    root = Path(root)
+    files = sorted((root / "backend").rglob("*.sql"))
+    defined = {n for f in files for n in TYPE_DEF.findall(f.read_text(encoding="utf-8"))}
+    try:
+        ref = json.loads((root / "handoff" / "schema-reference.json").read_text(encoding="utf-8")).get("cols") or {}
+    except (OSError, ValueError):
+        ref = {}
+    out = {}
+    for f in files:
+        if not re.match(r"^0\d\d-", f.name):
+            continue
+        for m in re.finditer(r"CREATE TABLE IF NOT EXISTS (\w+\.\w+) \((.*?)\n\)", f.read_text(encoding="utf-8"), re.S):
+            for col, typ in TYPE_USE.findall(m.group(2)):
+                if typ in defined or typ.split(".")[0] in ("pg_catalog", "public"):
+                    continue
+                rec = next((c for c in ref.get(m.group(1), []) if c.get("column") == col), {})
+                out.setdefault(m.group(1), []).append((typ, col, [str(v) for v in rec.get("enum") or []]))
+    return out
+
+
+def type_sentence(table: str, uses: list) -> str:
+    """What the migration creating `table` writes first, so the frozen file it copies applies."""
+    parts = []
+    for typ, col, values in uses:
+        vals = ", ".join("'" + v.replace("'", "''") + "'" for v in values)
+        parts.append(f"`CREATE TYPE {typ} AS ENUM ({vals});` ({table}.{col})" if values else
+                     f"`{typ}` ({table}.{col}: no values are recorded; ask the migration owner)")
+    return ("**Create the types the copied DDL names first** (ADAM CR-001): the frozen file types these columns with "
+            "enum types no package file creates, so before its CREATE TABLE write " + "; ".join(parts) + ". The values "
+            "are the contracts' (handoff/schema-reference.json); a later forward migration turns the column into text "
+            "with the same CHECK.")
+
+
+# **A parent's row-level security waits for the parent** (CHG-R8MIG-008; the faster-db-tickets report, item 5 point 7 and
+# package problem 3). A table protected through its parent row (`platform.apply_parent_rls`) reads the parent in its
+# policy, so its policy cannot be created before the parent table: like a cross-schema key, it moves to the later
+# migration. `policies` is {child: parent} from 920 and the after-r1 files; `made_by` is {table: migration key};
+# `order` is {migration key: its file number}.
+PARENT_POLICY = re.compile(r"SELECT platform\.apply_parent(?:_split)?_rls\('(\w+\.\w+)'::regclass, '\w+', "
+                           r"'(\w+\.\w+)'::regclass")
+
+
+def parent_policies(root) -> dict:
+    """{child: parent} for every parent-row policy in the tenant and control 920 files and the after-r1 files (a
+    later file's call wins: it re-applies the policy)."""
+    from pathlib import Path
+    out = {}
+    for db in ("tenant", "control"):
+        d = Path(root) / "backend" / db
+        files = [d / "920-row-level-security.sql"] + sorted(f for f in d.glob("V0*.sql") if AFTER_R1_FILE.match(f.name))
+        for f in files:
+            if not f.exists():
+                continue
+            text = f.read_text(encoding="utf-8")
+            for ln in text.splitlines():
+                if ln.lstrip().startswith("--"):
+                    continue
+                for child, parent in PARENT_POLICY.findall(ln):
+                    out[child] = parent
+                m = re.match(r"SELECT platform\.apply_(?!parent)\w+\('(\w+\.\w+)'::regclass", ln.strip())
+                if m and m.group(1) in out and f.name != "920-row-level-security.sql":
+                    out.pop(m.group(1))     # a later file gave it another rule
+    return out
+
+
+def parent_policy_moves(policies: dict, made_by: dict, order: dict, moves: dict | None = None) -> tuple:
+    """(moved, orphans): moved is {child: (its migration, the parent's later migration, parent)}; orphans is
+    {child: parent} where no migration ticket creates the parent. `moves` maps a table's r1 name to its name now
+    (declared_moves): 920 names inventory.item, which the migration tickets create as its name now."""
+    moves = moves or {}
+    moved, orphans = {}, {}
+    for child, parent in sorted(policies.items()):
+        child, parent = moves.get(child, child), moves.get(parent, parent)
+        mc, mp = made_by.get(child), made_by.get(parent)
+        if not mc:
+            continue
+        if not mp:
+            orphans[child] = parent
+        elif mp != mc and order.get(mp, 0) > order.get(mc, 0):
+            moved[child] = (mc, mp, parent)
+    return moved, orphans
+
+
+def parent_policy_sentences(moved: dict, orphans: dict) -> dict:
+    """{migration key: [sentence]} for both ends of each moved policy, and for an orphan's own migration."""
+    out = {}
+    for child, (mc, mp, parent) in sorted(moved.items()):
+        out.setdefault(mc, []).append(
+            f"**{child}'s row-level security waits for its parent**: its policy reads {parent}, which {mp} creates "
+            f"later, so leave out its `platform.apply_parent_rls` call here; {mp} applies it.")
+        out.setdefault(mp, []).append(
+            f"**Also apply {child}'s row-level security here** (its `platform.apply_parent_rls` call, "
+            f"920-row-level-security.sql, through {parent}): {mc} creates {child} before {parent} exists.")
+    return out
 
 
 def carried(r) -> list:
