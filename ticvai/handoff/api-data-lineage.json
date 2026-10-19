@@ -14836,6 +14836,7 @@
    "control.tenant"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
    "control.tenant",
    "platform.outbox"
@@ -14879,7 +14880,14 @@
     "termination_scheduled_at",
     "venue_count"
    ]
-  }
+  },
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ],
+  "fixNote": "19 October 2026: CHG-CRA-005 (ADAM CR-172): raises its own approval request through createApprovalRequest (writeVia); the change is applied on approval.granted"
  },
  "reactivateTenant": {
   "contract": "subscription",
@@ -14890,6 +14898,7 @@
    "control.tenant"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
    "control.tenant"
   ],
@@ -14932,7 +14941,14 @@
     "termination_scheduled_at",
     "venue_count"
    ]
-  }
+  },
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ],
+  "fixNote": "19 October 2026: CHG-CRA-005 (ADAM CR-172): raises its own approval request through createApprovalRequest (writeVia); the change is applied on approval.granted"
  },
  "terminateTenant": {
   "contract": "subscription",

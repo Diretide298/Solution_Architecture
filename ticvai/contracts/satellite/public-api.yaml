@@ -834,8 +834,8 @@ paths:
 
         **This validates and queues; it reads no outbox** (ADAM CR-140, option 1, 18 October 2026;
         CHG-CRA-004). It inserts one `control.webhook_replay` row (`WebhookReplayJob`, status `queued`) and
-        answers 202. **A dispatcher on the workers host drains it** (its own ticket): it reads each tenant's
-        `platform.outbox` directly, as the relay on the same host does, re-delivers the events in the window and
+        answers 202. **A dispatcher on the workers host drains it** (its own ticket): it reads each tenant
+        database's outbox directly, as the relay on the same host does, re-delivers the events in the window and
         of the types asked, and writes each delivery as a `control.webhook_delivery` with `isReplay` true and the
         replay's `replayId`; the row goes `running`, then `completed` or `failed`.
 
@@ -2204,7 +2204,7 @@ components:
       description: >
         **The webhook event catalogue: every event a subscription may name** (29 September, build
         pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`,
-        published through `platform.outbox` by exactly one context. A name is added here in the same
+        published through the outbox of the tenant database by exactly one context. A name is added here in the same
         change that adds its event file, and never before.
 
         **Added 29 September**, each closing a requirement that had the webhook mechanism and nothing

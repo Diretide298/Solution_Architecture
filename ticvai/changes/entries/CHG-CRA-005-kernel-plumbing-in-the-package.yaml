@@ -13,7 +13,7 @@ decision:
     option A; CR-166 option A. platform-ops.yaml: OutboxEntry.occurredAt (required) and x-ticvai-index
     [[aggregateId, sequence]]; OutboxSequence -> platform.outbox_sequence (aggregate_id key, last_sequence bigint, the
     aggregate''s scope_path); ControlOutboxEntry -> control.outbox. subscription.yaml: suspendTenant and
-    reactivateTenant take a granted approvalRequestId (409 approval-required), a future effectiveAt is pending and a
+    reactivateTenant raise their own approval request and answer 202 (CR-172, fix round 2), a future effectiveAt is pending and a
     workers job applies it, reactivate refuses tenant-not-suspended and cancels a pending suspension, terminating ->
     active described; CellTenant.rootScopePath. states/tenant.yaml: the timer transition. events/tenant-suspended.yaml:
     written to control.outbox, by the call or the job. white-label.yaml: TenantAppStatus.darkAppModules. New
@@ -39,6 +39,8 @@ keys_touched:
   - contracts/satellite/white-label.yaml
   - states/tenant.yaml
   - events/tenant-suspended.yaml
+  - events/approval-granted.yaml
+  - events/approval-rejected.yaml
   - docs/adr/0057-events-travel-on-rabbitmq-or-kafka.md
   - docs/adr/0058-one-relay-per-region-and-an-inbox-per-tenant-database.md
   - docs/active/cross-deployable-writes.yaml
@@ -61,7 +63,7 @@ tickets:
     r6 cache but their developers raised these CRs: the settlement comments reach their agents. 353 New in all.'
 release_tag: r7
 decision_owner: Chinmay
-adam_cr: CR-152, CR-163, CR-164, CR-166
+adam_cr: CR-152, CR-163, CR-164, CR-166, CR-172
 triage: blocker
 prevention:
   type: check
@@ -80,9 +82,12 @@ notes: 'Prevention: check-ticket-builds B-KERNEL-STORAGE (KERNEL_NEEDS: each ker
   it by hand after a plan change; --check says when it is stale), and the mirror copy to ticvai-backend
   tools/release-flags/. The existing provision-tenant.sh INSERT into control.cell_tenant names no instance_id, which
   CellTenant requires; not changed here. DB-ROLES'' ticket text is a started-ticket comment, not a rewrite.
-  **Open for the lead (fix round 1, I-3): ADM-005, the client-approved Tenant Directory, calls suspendTenant and
-  reactivateTenant and has nothing that supplies an approvalRequestId**, so as the contract stands every suspend
-  or reactivate from that screen answers 409 approval-required. The screen is not changed. The smallest ways out:
-  (a) the operation raises the approval request itself (createApprovalRequest, as publishTenantConfig does) and
-  answers 202 with the request id, applying the change when approval.granted arrives: a contract change, no screen
-  change; or (b) a visible approval step on ADM-005, which the client decides through approved-ui-changes.yaml.'
+  **Decided: option (a), by Chinmay Parab on 19 October 2026 (ADAM CR-172, answered the same day).** ADM-005, the
+  client-approved Tenant Directory, had nothing that supplied an approvalRequestId, so the round-1 check would have
+  refused every suspend and reactivate from it. Now suspendTenant and reactivateTenant take no approvalRequestId
+  and never answer 409 approval-required: after their own refusals (tenant-already-suspended, tenant-not-active,
+  tenant-terminated, tenant-not-suspended) each raises its approval request through createApprovalRequest
+  (x-ticvai-write-via; kind configurationChange, subjectContract subscription, subjectType tenant, subjectId the
+  tenant, attributes.action suspend or reactivate) and answers 202 with the request id (TenantChangeRequested);
+  Subscription''s approval.granted consumer applies the change (and writes tenant.suspended to control.outbox), and
+  approval.rejected leaves the tenant unchanged. ADM-005 is not changed. r7 never carried the round-1 check.'

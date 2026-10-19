@@ -4212,7 +4212,7 @@ paths:
 
         **Decided 18 October 2026** (ADAM CR-141; CHG-CRA-007). **Without `GUEST_VIEW_PII`** the six personal fields
         (`displayName`, `email`, `phone`, `preferredLanguage`, `preferredChannel`, `guestLinkId`; marked
-        `x-ticvai-data-class: personal` on `GuestProfile`, and `pii.subject` already treats preferred language as
+        `x-ticvai-data-class: personal` on `GuestProfile`, and Identity''s subject record already treats preferred language as
         personal) are null, and the results are ordered by `id`, not by name, so the order discloses nothing.
         **`hasConsentFor`**: a guest has consent for a purpose when their `marketing.consent_record` for that purpose
         with `superseded_at` null has decision `granted`; it is Marketing''s own table, so no read route is needed.
@@ -20071,8 +20071,8 @@ components:
         **Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json`
         as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that
         contradicts the schema is worse than a longer name. Not named `marketing.tier` either,
-        because `control.tier_allowance` is a SaaS plan's tier and one bare `tier` in a
-        package with two tier concepts is how `plan_id` came to point at `control.plan`.
+        because the control database's tier allowance is a SaaS plan's tier and one bare `tier` in a
+        package with two tier concepts is how `plan_id` came to point at the SaaS plan catalogue.
 
         **The denormalised copy on the position stays.** A till rendering *Gold* beside a
         balance must not join, and must certainly not cross a cell boundary to print a word.

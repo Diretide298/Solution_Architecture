@@ -49,7 +49,8 @@ consumers:
 - context: subscription
   purpose: Apply the rejection to the partner record it was about (agreement, application, change request).
     decideApprovalRequest runs in commerce and the partner tables are in the control database, which
-    PlatformService owns in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)
+    PlatformService owns in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020). A rejected tenant
+    suspension or reactivation (ADAM CR-172) changes nothing on the tenant
   writes:
   - control.partner_agreement
   - control.partner_application

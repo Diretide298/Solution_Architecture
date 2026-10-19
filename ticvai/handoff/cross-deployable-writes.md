@@ -14,9 +14,9 @@
 
 | | writes |
 |---|---:|
-| Cross-deployable writes in the lineage (61 operations) | 70 |
+| Cross-deployable writes in the lineage (63 operations) | 72 |
 | by event | 29 |
-| by the owner's operation | 41 |
+| by the owner's operation | 43 |
 | on the exception list | 0 |
 
 ## The kernel tables every deployable is granted directly
@@ -58,6 +58,7 @@ Sorted by the owning deployable, then the table.
 | `createPartnerAgreement` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `createPartnerChangeRequest` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `publishTenantConfig` | operations / WhiteLabelService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
+| `reactivateTenant` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `registerPartner` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setAgreementContractTerm` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setPartnerAllocations` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
@@ -65,6 +66,7 @@ Sorted by the owning deployable, then the table.
 | `setPartnerCreditProfile` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setPartnerRateNet` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setPaymentTermBilling` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
+| `suspendTenant` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `bookVisitPlan` | operations / VenueOpsService | `catalogue.inventory_reservation` | commerce / CatalogueService | operation `acquireInventoryHold` |
 | `bulkUpdateProducts` | operations / InventoryService | `catalogue.price` | commerce / CatalogueService | operation `bulkUpdateCatalogueProducts` |
 | `bulkUpdateProducts` | operations / InventoryService | `catalogue.product` | commerce / CatalogueService | operation `bulkUpdateCatalogueProducts` |

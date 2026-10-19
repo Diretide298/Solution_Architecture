@@ -3450,7 +3450,8 @@ components:
         tenant outbox''s columns without `scopePath` and with no row security (the control database has no scope
         tree, ADR-0039), drained by the workers host''s relay like each tenant''s. A control-plane state change that
         must reach anything outside its transaction writes its event here in the same transaction (ADR-0033):
-        `tenant.suspended` by `suspendTenant` or by the suspension job, with `tenantId` the suspended tenant and
+        `tenant.suspended` by Subscription''s `approval.granted` consumer applying the suspension `suspendTenant` asked
+        for (CR-172) or by the suspension job, with `tenantId` the suspended tenant and
         the event''s scope path its root (`control.cell_tenant.root_scope_path`).'
       required:
       - id

@@ -1355,6 +1355,9 @@ paths:
       operationId: suspendTenant
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       summary: Suspend a tenant
@@ -1364,13 +1367,17 @@ paths:
         **Access validation continues under every suspension mode.** A commercial dispute must not strand
         guests at a gate holding valid tickets.
 
-        **Approval comes before the call** (ADAM CR-152, 18 October 2026; CHG-CRA-005), as the partner operations
-        do: the request names a granted `approvalRequestId` (kind `configurationChange`, its subject this tenant), and
-        without one the call is refused `409 approval-required` and nothing changes.
+        **Approval is raised by the call itself** (ADAM CR-172, option (a), decided by Chinmay Parab on 19 October 2026;
+        CR-152; CHG-CRA-005). The refusals below are checked first; then this calls approvals''
+        `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, `subjectContract` `subscription`,
+        `subjectType` `tenant`, `subjectId` the tenant id, `attributes.action` `suspend`, with the mode, reason, `effectiveAt` and notice) and answers **202**
+        with the request''s id. Nothing about the tenant changes until **`approval.granted`** arrives: Subscription''s
+        consumer of it (events/approval-granted.yaml) then applies the change in its own transaction, as below. `approval.rejected` leaves
+        the tenant as it was. ADM-005 shows the request as pending; no approval id is ever sent by the caller.
 
-        **Now or later.** With no `effectiveAt`, or one not in the future, the tenant moves `active` to `suspended`
-        in this transaction and `tenant.suspended` is written to the control database''s outbox (`control.outbox`)
-        in the same transaction, with `tenantId` the suspended tenant and its scope path the tenant''s root
+        **Now or later, once approved.** With no `effectiveAt`, or one not in the future, the tenant moves `active`
+        to `suspended` and `tenant.suspended` is written to the control database''s outbox (`control.outbox`) in the
+        same transaction, with `tenantId` the suspended tenant and its scope path the tenant''s root
         (`control.cell_tenant.root_scope_path`). With a future `effectiveAt` the suspension is **pending**: it is
         recorded (`control.tenant.suspension_effective_at`, the mode and the notice), the tenant stays `active`, and
         a job on the workers host moves it to `suspended` at that time and writes `tenant.suspended` then (the
@@ -1408,24 +1415,20 @@ paths:
                     pending suspension the workers job applies then (CR-152).'
                 noticeMessage:
                   $ref: '#/components/schemas/LocalisedText'
-                approvalRequestId:
-                  type: string
-                  format: uuid
-                  description: '**The granted approval for this suspension** (ADAM CR-152; CHG-CRA-005). Without a
-                    granted one, `409 approval-required`.'
       responses:
-        '200':
+        '202':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Suspended
+          description: 'Submitted for approval (ADAM CR-172): the approval request is raised and the tenant is
+            unchanged until it is granted.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tenant'
+                $ref: '#/components/schemas/TenantChangeRequested'
         '409':
-          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`), or the request names no granted approval (`approval-required`; ADAM CR-152). Nothing changes.'
-          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active, approval-required]
+          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). Checked before any approval is raised. Nothing changes.'
+          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active]
           content:
             application/problem+json:
               schema:
@@ -1444,6 +1447,9 @@ paths:
       operationId: reactivateTenant
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       summary: Lift a suspension
@@ -1452,8 +1458,15 @@ paths:
         `terminating` moves back to `active` while the notice period runs (states/tenant.yaml); an `active` tenant
         with a pending suspension (`suspension_effective_at` in the future) has it cancelled and stays `active`.
         An `active` tenant with nothing pending, or an `onboarding` one, is refused `409 tenant-not-suspended`; a
-        `terminated` one `409 tenant-terminated`. **Approval comes before the call**, as for `suspendTenant`: a
-        granted `approvalRequestId`, else `409 approval-required`.'
+        `terminated` one `409 tenant-terminated`; both are checked before any approval is raised.
+
+        **Approval is raised by the call itself** (ADAM CR-172, option (a), decided by Chinmay Parab on 19 October 2026;
+        CR-152; CHG-CRA-005). The refusals below are checked first; then this calls approvals''
+        `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, `subjectContract` `subscription`,
+        `subjectType` `tenant`, `subjectId` the tenant id, `attributes.action` `reactivate`) and answers **202**
+        with the request''s id. Nothing about the tenant changes until **`approval.granted`** arrives: Subscription''s
+        consumer of it (events/approval-granted.yaml) then applies the change: `suspended` or `terminating` to `active`, or the pending suspension cancelled. `approval.rejected` leaves
+        the tenant as it was. ADM-005 shows the request as pending; no approval id is ever sent by the caller.'
       tags:
       - tenant
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -1462,32 +1475,22 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                approvalRequestId:
-                  type: string
-                  format: uuid
-                  description: The granted approval for this reactivation (ADAM CR-152; CHG-CRA-005).
       responses:
-        '200':
+        '202':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Reactivated
+          description: 'Submitted for approval (ADAM CR-172): the approval request is raised and the tenant is
+            unchanged until it is granted.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tenant'
+                $ref: '#/components/schemas/TenantChangeRequested'
         '409':
-          x-ticvai-problem-types: [tenant-terminated, tenant-not-suspended, approval-required]
+          x-ticvai-problem-types: [tenant-terminated, tenant-not-suspended]
           description: 'Tenant is terminated, not suspended; termination is not reversible here (`tenant-terminated`).
-            Or it is `active` with no pending suspension, or `onboarding` (`tenant-not-suspended`), or the request
-            names no granted approval (`approval-required`; ADAM CR-152, CHG-CRA-005). Nothing changes.'
+            Or it is `active` with no pending suspension, or `onboarding` (`tenant-not-suspended`; ADAM CR-152,
+            CHG-CRA-005). Checked before any approval is raised. Nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -17553,6 +17556,26 @@ components:
       - asynchronous
       - synchronous
 
+    TenantChangeRequested:
+      x-ticvai-persistence: none — response only; the request is approvals.request, the change is applied on approval.granted
+      description: '**A tenant suspension or reactivation waiting for approval** (ADAM CR-172, 19 October 2026;
+        CHG-CRA-005): what `suspendTenant` and `reactivateTenant` answer with 202: the tenant as it still is (the
+        same fields the 200 used to carry, so a client reading them keeps working), and the approval request raised.'
+      allOf:
+      - $ref: '#/components/schemas/Tenant'
+      - type: object
+        required: [action, approvalRequestId, requestedAt]
+        properties:
+          action:
+            type: string
+            enum: [suspend, reactivate]
+          approvalRequestId:
+            type: string
+            format: uuid
+            description: The approval request raised (`approvals.createApprovalRequest`); its decision applies the change.
+          requestedAt:
+            type: string
+            format: date-time
     CellTenant:
       x-ticvai-persistence: control.cell_tenant
       description: 'Which tenants a cell holds, and the database each one is. **The relation that replaced

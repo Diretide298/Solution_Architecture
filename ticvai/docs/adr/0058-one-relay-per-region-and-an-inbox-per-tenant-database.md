@@ -347,7 +347,8 @@ Actions 1–5 stand. Action 4's KERNEL-RELAY takes the drain loop and the batch 
    columns without `scope_path` and with no row security (the control database has no scope tree, ADR-0039), and
    the regional relay in the workers host drains it with the tenant databases' outboxes, under its own lease. A
    control-plane change that must reach a tenant writes its event there in the same transaction (ADR-0033):
-   `tenant.suspended` is written with the status change, by `suspendTenant` or, for a future `effectiveAt`, by the
+   `tenant.suspended` is written with the status change, by Subscription's `approval.granted` consumer that applies
+   the suspension `suspendTenant` asked for (CR-172, 19 October 2026) or, for a future `effectiveAt`, by the
    workers job that applies the suspension at `control.tenant.suspension_effective_at`; its `tenantId` is the
    suspended tenant and its scope path the tenant's root (`control.cell_tenant.root_scope_path`, CR-163).
 2. **The sequence is a counter, not the highest row plus one** (CR-166). Published outbox rows leave with their
