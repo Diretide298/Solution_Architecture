@@ -13,7 +13,8 @@ So every run now writes, for every operation a contract declares:
   `reads`   the tables behind the schemas it returns, `cache:idempotency` when it takes the Idempotency-Key header
   `writes`  the tables behind the schema it accepts (and the line table its body's lines land in, `child_writes`),
             what a 201 creates, what a write with no stored body returns, `platform.outbox` for an emitter, the
-            change-log table `x-ticvai-config-change-log` names, `cache:idempotency` as for reads
+            change-log table `x-ticvai-config-change-log` names, `cache:idempotency` as for reads, the audit row for
+            `x-ticvai-audits-itself`, and the tables `x-ticvai-reads` / `x-ticvai-writes` name (`{table, for}`)
   `readVia`, `writeVia`, `contract`, `verb`, `path`, `routing`, `scope`, `perm`, `offline`, `summary`, `audience`
             straight off the operation
   plus and minus `handoff/api-data-lineage-overrides.json`: what no contract fact can state, each entry with its
@@ -400,6 +401,16 @@ def derive(stored: dict) -> dict:
                 # FOUNDATION-AI-C49, CHG-R8GEN-012); the kernel interceptor skips it, and the row is its write.
                 if op.get("x-ticvai-audits-itself") and verb != "get":
                     ruled_w.add("platform.audit_record")
+                # **A table the operation reads or writes that no schema it takes or returns persists to** (20 October
+                # 2026, CHG-R8GEN-014): `x-ticvai-reads` / `x-ticvai-writes`, a list of `{table, for}` (or bare table
+                # names) in the operation's own module. It is how a carried override becomes a contract fact: once the
+                # contract says it, derive-lineage --audit lists the override as redundant and it is removed. A read of
+                # another module's table is never this: it is an x-ticvai-read-via to the owner's query.
+                for key, into in (("x-ticvai-reads", ruled_r), ("x-ticvai-writes", ruled_w)):
+                    for x in op.get(key) or []:
+                        tb = str(x.get("table") if isinstance(x, dict) else x).strip()
+                        if tb in known:
+                            into.add(tb)
                 out[op["operationId"]] = {
                     "contract": contract,
                     "verb": verb.upper(),
