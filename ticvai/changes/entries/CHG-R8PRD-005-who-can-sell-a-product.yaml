@@ -46,4 +46,4 @@ notes: 'Batch R8PRD. Additive only. **Open for the client:** the precedence (nar
   level, no match denies) is proposed; the minutes give the levels and allow or deny only. Left for the catalogue and
   orders owners (a CR, existing text): the variantsSellableAt query and the till bundle should apply the rules, so a
   sale is refused where they deny (today they are configured and checked, not enforced at sale). The venue scope of
-  Product (venueId) stays until the wave 2 product form; removing it is a breaking change for its own CR.'
+  Product (venueId) stays until the wave 2 product form; removing it is a breaking change for its own CR. Corrected by CHG-R8PRD-009 (review C1, I4, I8, I9): deny overrides allow, as permissions.yaml says (no narrowest-level rule); levels venue and principal for the minutes'' site and user; changes versioned and approved as product changes, audited, a self-grant refused.'

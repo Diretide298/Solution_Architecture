@@ -46,4 +46,4 @@ notes: 'Batch R8PRD. Additive only, appended after the last path and the last sc
   bulkUpdateCatalogueProducts should refuse a tag or category that is not master data; the catalogue bundle should
   carry the tag list for the till (POS tags); promotions should target a tag code (promotions.yaml). Derived tables
   (catalogue.product_tag) and lineage come at the release refresh. The prevention named is the shape check that
-  vetted these additions; a check that every key decision of a filed minute has an operation is still to write.'
+  vetted these additions; a check that every key decision of a filed minute has an operation is still to write. Corrected by CHG-R8PRD-009 (review of 20 October): tag codes are unique in the tenant, as category codes are, and fixed while a product or a Help me choose answer carries them; setProductClassification is versioned as updateProduct and audited; the usage read counts archived products.'

@@ -239,6 +239,24 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through WhiteLabel's service route (serviceAuth).
     served: [service]
+  tenantLanguageRecords:
+    module: white-label
+    table: whitelabel.tenant_config
+    inputs:
+      where: {type: object, additionalProperties: true, description: 'The rows whose columns equal these values; the tenant''s one configuration when empty.'}
+    returns:
+      type: array
+      description: 'The tenant configuration rows found, each as WhiteLabel stores it (its languages are `LanguageConfig`); none visible is empty.'
+      items: {$ref: '#/components/schemas/TenantConfig'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.tenant_config rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through WhiteLabel's service route (serviceAuth). Added for the products
+      module, wave 1 (CHG-R8PRD-009).
+    served: [service]
 paths:
   /tenant-domains:
     get:

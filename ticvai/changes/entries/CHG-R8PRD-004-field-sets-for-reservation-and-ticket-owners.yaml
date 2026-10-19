@@ -45,4 +45,4 @@ notes: 'Batch R8PRD. Additive only. Left for the orders owner (a CR, existing te
   createOrder and the till) should ask the linked field sets, validate required fields, store the buyer''s values at
   order level and each ticket owner''s on the line, and create the ticket owner''s profile (4.13: two profiles); the
   catalogue bundle should carry the field sets for offline tills. Personal-data handling of captured values follows
-  the order''s guest data and is not restated here.'
+  the order''s guest data and is not restated here. Corrected by CHG-R8PRD-009 (review C2): no second form engine. The field-set operations and the three catalogue.field_set* tables are removed before any migration; a product links Marketing forms (FormDefinition, kind dataCapture or registration) with getProductOwnerForms, setProductOwnerForms and listOwnerFormCandidates, and each owner''s answers are a form submission of their own (FormSubmission.saleContext).'

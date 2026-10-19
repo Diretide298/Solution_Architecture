@@ -15,7 +15,7 @@ decision:
     keeps rule ids matched on level and target, and that a site rule naming another venue waits for the wave 2 product
     form; FieldSetField.position (read-only) and the stored value per type; ProductTag.code and FieldSet.code unique
     per venue; setProductClassification 409 product-archived and no approval; ProductAttentionReason codes
-    missingVariants, missingChannels, missingPricing, missingEntitlements (shared with
+    missingVariants, missingChannels, missingPricing, missingEntitlements (the last three shared with
     ProductLifecycleCommandCenterView.validationIssues). contracts/spine/identity.yaml: getSessionVenue says services
     read the venue with the session. Every new table has an `id` key (CatalogueLanguageSettings, ProductChannelTexts,
     FieldSetField, ProductOwnerFieldSets gain a read-only id), as the package''s tables do; SessionVenue.actingVenueId
@@ -49,4 +49,4 @@ prevention:
   ref: tools/check-contract-shapes.py
 status: open
 notes: 'Batch R8PRD. The walk and what it leaves are in the wave 1 task drafts (outside git, for the lead). Two choices
-  in it are proposals for the lead: classification changes need no approval, and codes are unique per venue.'
+  in it are proposals for the lead: classification changes need no approval, and codes are unique per venue. Corrected by CHG-R8PRD-009: missingVariants is not a code of the lifecycle view''s validationIssues (only missingEntitlements, missingPricing, missingChannels and awaitingApproval are); codes are unique in the tenant, not the venue; the field-set items above are superseded by the owner forms.'

@@ -19,8 +19,7 @@ decision:
 why: 'Minutes of 16 October 2026 (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md), 4.1: the first
   screen is a dashboard of active, draft, pending-approval and approved products with a needs-attention list; 4.2:
   "All products" with a filter by type; 4.8: Allam "noted there is nowhere on screen to see which venue the user is
-  working in", and one admin for all venues must be supported. Contracts speak of "the venue the caller acts at" and
-  the package decided a role carries its venue scope (CHG-FXS-003), but a session whose grants reach several venues
+  working in", and one admin for all venues must be supported. Contracts speak of "the venue the caller acts at", but a session whose grants reach several venues
   had no way to say or choose its venue, and no read returned the dashboard counts (listProductGovernance counts
   governance items, not lifecycle states).'
 keys_touched:
@@ -48,4 +47,4 @@ notes: 'Batch R8PRD. Additive only. The six ticket types of the minutes map onto
   giftCard, add-on addOn); narrowing ProductKind itself is wave 2 and breaking. A "group products" filter has no
   parameter yet (listProductLifecycle would need one: existing text, a CR). check-cross-module-reads reports the two
   dashboard reads as naming access.entitlement: the phrase is in the ProductKind description they reference, as for
-  listProductApprovalWorkflows already.'
+  listProductApprovalWorkflows already. Corrected by CHG-R8PRD-009 (review I5, I7): the session''s working venue has its own column (working_venue_id) and changes no other operation; the attention reasons reuse the lifecycle view''s codes and claim no blocking. An earlier citation of CHG-FXS-003 in the why was removed: it decided nothing about a role''s venue.'

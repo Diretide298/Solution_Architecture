@@ -7112,20 +7112,19 @@ paths:
       summary: Which venue this back-office session is working in, and which it may switch to
       description: >-
         **The back office shows which venue you are in** (16 October 2026 minutes, 4.8: Allam noted there is nowhere
-        on screen to see which venue the user is working in; CHG-R8PRD-006). The venue is the one the venue-scoped
-        operations mean by "the venue the caller acts at" when the back office sends no `venueId`.
+        on screen to see which venue the user is working in; CHG-R8PRD-006). This is the session's **working venue**:
+        the venue the back office shows and works in.
 
         **Where it comes from.** A till or handheld session acts at its workstation's venue; a session whose
-        selected role is granted at one venue acts at that venue (a role carries its venue scope, CHG-FXS-003);
-        both are fixed (`fixedBy`). A session whose grants reach several venues, such as one administrator for
+        selected role is granted at one venue works in that venue; both are fixed (`fixedBy`). A session whose grants reach several venues, such as one administrator for
         every venue of the tenant (4.8: both models must be supported), acts at the venue last chosen with
         `setSessionVenue`, or at none until one is chosen; `availableVenues` lists the venues it may choose,
         those of `Session.scope` at venue level and every active venue under a wider scope node, in name order.
 
-        **How a service knows it.** It is part of the session the bearer token's `sid` names, so every service reads it
-        where it already reads the session's scope (the session registry `bearerAuth` checks); a write that sends no
-        `venueId` acts at it, and a venue-scoped call made while it is null and the session reaches several venues is
-        the service's to refuse as it refuses any call outside the caller's scope.
+        **It changes no other operation** (CHG-R8PRD-009): the back office sends it as the `venueId` of the
+        venue-scoped operations that take one, and how an operation resolves the caller's venue otherwise is unchanged.
+        It is kept in a column of its own (`identity.session.working_venue_id`), not in `venue_id`, so
+        `ActiveSession.venueId` and what `listActiveSessions` and `forceLogout` reach keep their meaning.
 
         A session that is not yet usable answers `409 session-pending`, as `getCurrentSession` does.
       responses:
@@ -7170,14 +7169,16 @@ paths:
       x-ticvai-conflict-policy: serverWins
       summary: Switch the back-office session to another venue it may act at
       description: >-
-        **The venue switcher of the back office's top bar** (CHG-R8PRD-006). Sets the venue this session acts at,
-        kept on the session (`identity.session`) until it ends or is switched again. It changes no grant: what the
+        **The venue switcher of the back office's top bar** (CHG-R8PRD-006). Sets the session's working venue, kept
+        on the session (`identity.session.working_venue_id`) until it ends or is switched again. It changes no grant: what the
         caller may do at the new venue is what `Session.permissionsByScope` already says for it, so the back office
         filters its navigation again after the switch.
 
-        **Refused** when the venue is not one of `availableVenues` (`403 venue-not-in-scope`), and when the session's
-        venue is fixed by its workstation or its role (`409 venue-fixed`); and, as every session read, while the
-        session is pending (`409 session-pending`).
+        **Refused** when the venue is not one of `availableVenues`, that is not an active venue the session's grants
+        reach (`403 venue-not-in-grants`), when the session's venue is fixed by its workstation or its role
+        (`409 venue-fixed`), and while the session is pending (`409 session-pending`). **Audited:** a switch changes
+        the security context the screens show, so it writes one entry to the security audit log that `listAuditRecords`
+        reads (the session, the venue before and after).
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -7199,9 +7200,9 @@ paths:
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '403':
-          description: The venue is not one the session's grants reach, or not active (`venue-not-in-scope`).
+          description: The venue is not one the session's grants reach, or not active (`venue-not-in-grants`).
           x-ticvai-problem-types:
-          - venue-not-in-scope
+          - venue-not-in-grants
           content:
             application/problem+json:
               schema:
@@ -11002,19 +11003,20 @@ components:
       x-ticvai-persistence: identity.session
       description: >-
         **The venue a staff session acts at, and the venues it may switch to** (16 October 2026 minutes, 4.8,
-        CHG-R8PRD-006). Stored in one existing column of the session record (`venue_id`); the rest is resolved on read.
+        CHG-R8PRD-006, CHG-R8PRD-009). Stored in one column of the session record of its own, `working_venue_id`;
+        the rest is resolved on read.
       required:
-      - actingVenueId
+      - workingVenueId
       - fixedBy
       - availableVenues
       properties:
-        actingVenueId:
+        workingVenueId:
           type: string
           format: uuid
           nullable: true
           readOnly: true
-          x-ticvai-column: venue_id
-          description: The venue the session acts at; null while a session that may choose has not chosen. Set by `setSessionVenue`, or resolved from the workstation or the role. Stored in the session record's existing `venue_id`, the column `ActiveSession.venueId` reads, so no column is added.
+          x-ticvai-column: working_venue_id
+          description: The session's working venue; null while a session that may choose has not chosen. Set by `setSessionVenue`, or resolved from the workstation or the role. Its own column, `working_venue_id`; `venue_id`, which `ActiveSession.venueId` reads, is not touched.
         venue:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/ScopeRef
@@ -11022,7 +11024,7 @@ components:
           readOnly: true
           x-ticvai-persisted: false
           x-ticvai-derived: onRead
-          description: '`actingVenueId` as a scope node, with its name, for the top bar.'
+          description: '`workingVenueId` as a scope node, with its name, for the top bar.'
         fixedBy:
           type: string
           readOnly: true
