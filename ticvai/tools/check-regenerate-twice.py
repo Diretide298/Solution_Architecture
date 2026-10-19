@@ -21,7 +21,14 @@ first run's output instead, which is what a refresh would have written).
     python tools/check-regenerate-twice.py --steps derive-lineage,link-screens-contracts
     python tools/check-regenerate-twice.py --list          # the steps and what each writes
     python tools/check-regenerate-twice.py --self-test     # the comparison on made-up files (also run first, always)
-    python tools/check-regenerate-twice.py --once --skip-slow   # what run-checks runs, after a refresh
+    python tools/check-regenerate-twice.py --chain        # what run-checks runs, after a refresh
+
+**`--chain` is the form for a refreshed tree** (CHG-R8GEN-017). It runs every step once more, in refresh order, and
+fails on a file the whole chain leaves different (RT-CHAIN), naming the steps that changed it. A step on its own need
+not be a fixed point of the refreshed tree: derive-transitions-from-flows rewrites its edges without `carries` and
+derive-carries-from-entrystate, after it, puts them back, so `--once` fails on a refresh that is in fact stable. The
+chain form found the one real case on 20 October: derive-entrystate-params ran after derive-carries-from-entrystate,
+so a parameter it added (ADM-018 challengeId) was carried only by the following refresh; refresh.sh now runs it first.
 
 **`--once` is the form for a refreshed tree.** run-checks runs after refresh.sh, so each step has already run once on
 its own output's inputs: one more run that changes anything is the second run changing something, and is a finding.
@@ -51,8 +58,8 @@ WRITE_BACK = [
     ("derive-board-flows", ["--apply"], ["flows/*.yaml", "screens/P*.yaml"]),
     ("derive-transitions-from-flows", ["--apply", "--adopt"], ["screens/P*.yaml"]),
     ("label-launcher-edges", ["--apply"], ["screens/P*.yaml"]),
-    ("derive-carries-from-entrystate", ["--apply"], ["screens/P*.yaml"]),
     ("derive-entrystate-params", ["--apply"], ["screens/P*.yaml"]),
+    ("derive-carries-from-entrystate", ["--apply"], ["screens/P*.yaml"]),
     ("derive-components", ["--apply"], ["screens/P*.yaml"]),
     ("derive-screen-wiring", ["--apply"], ["screens/P*.yaml"]),
     ("derive-board-anchors", ["--apply"], ["screens/P*.yaml"]),
@@ -116,6 +123,40 @@ def run_step(name, args):
     return r.returncode, (r.stdout or "") + (r.stderr or ""), time.time() - t
 
 
+def chain(steps, want=None, keep=False):
+    """RT-CHAIN: every step once more, in order; a file the chain as a whole leaves changed is a finding."""
+    globs = sorted({g for _n, _a, gs in steps for g in gs})
+    s0 = snapshot(globs)
+    findings, touched = [], {}
+    try:
+        prev = s0
+        for name, args, gs in steps:
+            if want and name not in want:
+                continue
+            rc, out, secs = run_step(name, args)
+            cur = snapshot(globs)
+            changed = compare(prev, cur)
+            for pth in changed:
+                touched.setdefault(pth, []).append(name)
+            print("  %-8s %-32s %5.1fs changed %3d" % ("ERROR" if rc else "ran", name, secs, len(changed)))
+            if rc:
+                findings.append("RT-ERROR %s exited %d: %s" % (name, rc, " | ".join(out.strip().splitlines()[-3:])))
+            prev = cur
+        for pth, (x, y) in sorted(compare(s0, prev).items()):
+            findings.append("RT-CHAIN %s: the chain changed it (%s): %s"
+                            % (os.path.relpath(pth, ROOT).replace("\\", "/"), ", ".join(touched.get(pth, [])),
+                               " / ".join(first_lines(x, y))))
+    finally:
+        if not keep:
+            restore(s0, globs)
+    for f in findings:
+        print("  " + f)
+    print("%s - %d finding(s); the chain of %d step(s) %s" % ("FAIL" if findings else "PASS", len(findings),
+                                                             len(steps), "left the files as it found them"
+                                                             if not findings else "is not a fixed point"))
+    return 1 if findings else 0
+
+
 def self_test():
     """The comparison and the restore on made-up files in a temporary folder."""
     import tempfile
@@ -155,6 +196,8 @@ def main():
     ap.add_argument("--keep", action="store_true", help="leave the first run's output instead of restoring")
     ap.add_argument("--once", action="store_true", help="one run per step: on a refreshed tree any change is a finding")
     ap.add_argument("--skip-slow", action="store_true", help="leave out the steps in SLOW")
+    ap.add_argument("--chain", action="store_true",
+                    help="run every step once more in order; fail on a file the chain leaves changed")
     ap.add_argument("--self-test", action="store_true")
     a = ap.parse_args()
     fails = self_test()
@@ -173,6 +216,8 @@ def main():
         print("FAIL - not in WRITE_BACK: %s" % ", ".join(sorted(unknown)))
         return 1
     findings, notes = [], []
+    if a.chain:
+        return chain(WRITE_BACK, want, a.keep)
     for name, args, globs in WRITE_BACK:
         if want and name not in want:
             continue

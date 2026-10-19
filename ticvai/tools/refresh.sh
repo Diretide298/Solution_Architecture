@@ -113,13 +113,15 @@ python3 tools/build-merge-workbook.py 2>/dev/null || true
 python3 tools/derive-board-flows.py --apply
 python3 tools/derive-transitions-from-flows.py --apply --adopt   # 94 flows -> triggers, +107 edges
 python3 tools/label-launcher-edges.py --apply            # home screens are launchers
-python3 tools/derive-carries-from-entrystate.py --apply  # carries, from what the destination needs
 # **A screen that calls `getEntitlement(entitlementId)` and declares no `entitlementId`
 # cannot know which ticket it is showing.** This fills that blank from the operation's own
 # path, and it earns its place here because it happened twice on 10 September alone —
 # once for five new P04 screens and once for thirteen when guest web and mobile were
 # brought to parity. It runs before derive-carries, which reads what it writes.
+# **And now it does** (20 October 2026, CHG-R8GEN-017): it sat after derive-carries, so a parameter it added was
+# carried only by the next refresh -- check-regenerate-twice --chain found ADM-018's challengeId that way.
 python3 tools/derive-entrystate-params.py --apply
+python3 tools/derive-carries-from-entrystate.py --apply  # carries, from what the destination needs
 # **135 screens gained components the first time this was run, on 10 September.** It had
 # been sitting in tools/ unrun, which is why check-bindings reports 634 components carrying
 # `Structure from the wireframe board. Components not yet enumerated.` — the enumeration

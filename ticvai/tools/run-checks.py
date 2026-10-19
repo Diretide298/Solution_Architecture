@@ -214,12 +214,13 @@ CHECKS = [
     # 20 October (same round, CHG-R8GEN-002): a refresh step that writes into an authored input (the lineage, the
     # screens, the flows, the contracts' consumed-by, roles-by-app.yaml ...) is a fixed point: run once more after the
     # refresh it changes nothing. Runs alone (SERIAL: it writes while it runs, then puts every file back) and with the
-    # arguments in ARGS; a few minutes since CHG-R8GEN-016.
+    # arguments in ARGS (--chain: the write-back steps once more, in refresh order; CHG-R8GEN-017); a few minutes since
+    # CHG-R8GEN-016.
     "check-regenerate-twice",
 ]
 
 # Arguments a checker is run with here, when its bare form is not the one a gate run needs (CHG-R8GEN-002).
-ARGS = {"check-regenerate-twice": ["--once", "--skip-slow"]}
+ARGS = {"check-regenerate-twice": ["--chain"]}
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
 REPORT_ONLY = {
