@@ -19127,10 +19127,25 @@ components:
           items:
             type: object
             required:
+            - proposalId
             - targetKind
             - targetRef
+            - fieldPath
             - draftText
             properties:
+              proposalId:
+                type: string
+                format: uuid
+                description: 'The `ai.proposed_action` id of this draft (r8 walk of ticket 27926). **Accept** on CMS-011
+                  saves `draftText` at `fieldPath` through the contract that owns the target (a content block update, a
+                  product update, a template update; the saver needs the grant `proposeMarketingContent` there), then
+                  records `decideProposedAction` approve with this id. **Discard** is `decideProposedAction` reject with
+                  this id and a reason; nothing is saved on the target.'
+              fieldPath:
+                type: string
+                description: Where the draft goes inside the target, as a dotted path in the target's own body, for
+                  example `localeVariants.ar.title` on a content block or `name.ar` on a product. The saver writes
+                  `draftText` there and nothing else.
               targetKind:
                 type: string
                 enum:
