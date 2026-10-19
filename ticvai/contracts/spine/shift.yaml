@@ -653,7 +653,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/DepositBox' }
+            schema: { $ref: '#/components/schemas/CreateDepositBoxRequest' }
       responses:
         '400':
           description: >
@@ -1150,6 +1150,14 @@ paths:
         verified against the principal, who must hold `SHIFT_REOPEN` at this venue and must not be
         the principal who closed the shift; otherwise a `403` and nothing is written. It does not go
         through the approvals engine.
+
+        **Where the reopen is kept, and what "retained" means** (R8 blocker fix, APPROVALS-TENANCY-C49). The reason,
+        the supervisor and the time go in one `orders.pos_shift_approval` row of kind `reopen`
+        (`reason`, `principal_id` the supervisor, `at`). The shift's `closed_at`, `closed_by_principal_id`,
+        `counted_cash_amount` and `variance_amount` are left as the first close wrote them until the next close
+        overwrites them, and the first count stays in `orders.cash_count_line` under its `count_number`; the next
+        close adds the next count number. The first close is therefore always readable, from the shift and from
+        its count lines.
       tags: [shift]
       x-ticvai-permission: SHIFT_REOPEN
       x-ticvai-step-up: pin
@@ -1204,10 +1212,12 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
-          x-ticvai-problem-types: [shift-not-closed, fiscal-period-closed]
+          x-ticvai-problem-types: [shift-not-closed, fiscal-period-closed, shift-already-open]
           description: >
-            Shift is not closed (problem type `shift-not-closed`), or the fiscal period has closed
-            over it (`fiscal-period-closed`)
+            Shift is not closed (problem type `shift-not-closed`), the fiscal period has closed
+            over it (`fiscal-period-closed`), or another shift is now open or suspended on the same
+            workstation (`shift-already-open`: the check `openShift` makes, under the same lock, so
+            two shifts are never open on one till)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -2249,6 +2259,40 @@ components:
       type: string
       enum: [allocated, open, suspended, closing, closed, reconciled]
 
+    CreateDepositBoxRequest:
+      type: object
+      x-ticvai-persistence: "none — request only; allocateDepositBox writes it as orders.deposit_box with its orders.deposit_box_opening_denomination rows, and answers with DepositBox"
+      description: >
+        **What `allocateDepositBox` takes** (R8 blocker fix, APPROVALS-TENANCY-C25). The cashier, the venue and **one of**
+        `openingFloat` or `openingDenominations`: a denomination count alone is accepted and `openingFloat` is computed
+        from it, as `allocateDepositBox` says. `DepositBox`, the response, keeps `openingFloat` required, because the
+        stored box always has one. Every other property is the one `DepositBox` declares, by reference, so the server-set
+        ones stay readOnly and are ignored on input, as before.
+      required: [cashierPrincipalId, venueId]
+      anyOf:
+        - required: [openingFloat]
+        - required: [openingDenominations]
+      properties:
+        id: { $ref: '#/components/schemas/DepositBox/properties/id' }
+        cashierPrincipalId: { $ref: '#/components/schemas/DepositBox/properties/cashierPrincipalId' }
+        cashierName: { $ref: '#/components/schemas/DepositBox/properties/cashierName' }
+        venueId: { $ref: '#/components/schemas/DepositBox/properties/venueId' }
+        workstationId: { $ref: '#/components/schemas/DepositBox/properties/workstationId' }
+        shiftId: { $ref: '#/components/schemas/DepositBox/properties/shiftId' }
+        status: { $ref: '#/components/schemas/DepositBox/properties/status' }
+        openingFloat: { $ref: '#/components/schemas/DepositBox/properties/openingFloat' }
+        openingDenominations: { $ref: '#/components/schemas/DepositBox/properties/openingDenominations' }
+        withdrawnTotal: { $ref: '#/components/schemas/DepositBox/properties/withdrawnTotal' }
+        overDrawerLimit: { $ref: '#/components/schemas/DepositBox/properties/overDrawerLimit' }
+        foreignHoldings: { $ref: '#/components/schemas/DepositBox/properties/foreignHoldings' }
+        expectedTotal: { $ref: '#/components/schemas/DepositBox/properties/expectedTotal' }
+        countedTotal: { $ref: '#/components/schemas/DepositBox/properties/countedTotal' }
+        variance: { $ref: '#/components/schemas/DepositBox/properties/variance' }
+        closedByPrincipalId: { $ref: '#/components/schemas/DepositBox/properties/closedByPrincipalId' }
+        allocatedAt: { $ref: '#/components/schemas/DepositBox/properties/allocatedAt' }
+        closedAt: { $ref: '#/components/schemas/DepositBox/properties/closedAt' }
+        recordedAt: { $ref: '#/components/schemas/DepositBox/properties/recordedAt' }
+
     DepositBox:
       type: object
       x-ticvai-persistence: "orders.deposit_box + orders.deposit_box_opening_denomination + orders.deposit_box_foreign_holding"
@@ -2940,10 +2984,11 @@ components:
             properties:
               kind:
                 type: string
-                enum: [open, close, variance]
+                enum: [open, close, variance, reopen]
                 description: >
                   `open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from
-                  `acceptShiftVariance`.
+                  `acceptShiftVariance`, `reopen` from `reopenShift` (the supervisor who signed it, the time and the
+                  `reason`).
               principalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
               at: { type: string, format: date-time }
               reason: { type: string }
