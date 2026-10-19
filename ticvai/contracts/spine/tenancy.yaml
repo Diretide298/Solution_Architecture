@@ -425,8 +425,8 @@ paths:
         mints the row''s id (UUIDv7), writes `tenantDomain.mapped` **version 2** to the outbox with that id as the
         event''s `aggregateId` and the whole row as its payload (id, hostname, tenantId, kind, status, cellId,
         databaseName, channel, isPrimary, redirectToHostname, verifiedAt, lastValidatedAt), and answers `202` with
-        the request (`TenantDomainMappingRequested`: id, hostname, status `pending`, requestedAt). **The host is
-        live only once Platform''s consumer has written the row**: white-label shows a domain as connected when
+        that row as it will be written (`TenantDomain`, its `id` the minted one). **The host is live only once
+        Platform''s consumer has written the row**, whatever the answer''s `status` says: white-label shows a domain as connected when
         `verifyCustomDomain`, polling, finds it routed (`resolveTenantHost` on the host), never on this answer. **Whose host**:
         `tenantId` is sent in the body (no longer server-owned: the service token names only the calling cell),
         and is refused `403` unless the tenant is one of that cell''s tenants (`control.cell_tenant`).
@@ -462,11 +462,11 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Accepted (APPROVALS-TENANCY-C11): `tenantDomain.mapped` v2 is in the outbox, and Platform''s
-            consumer writes the row. Not yet routed.'
+            consumer writes this row. Not yet routed: the answer is the row as it will be written.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TenantDomainMappingRequested'
+                $ref: '#/components/schemas/TenantDomain'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
@@ -3991,26 +3991,6 @@ components:
           nullable: true
           description: '**When the custom domain''s CNAME and `_dnsauth` record last resolved to us** (DEC-547;
             CHG-CSP-010), written by white-label''s revalidation job. Null on a platform subdomain.'
-    TenantDomainMappingRequested:
-      type: object
-      x-ticvai-persistence: none — the answer of setTenantDomainMapping
-      description: '**What `setTenantDomainMapping` accepted** (APPROVALS-TENANCY-C11, CHG-R8SPN-039). The row is
-        written by Platform''s consumer of `tenantDomain.mapped`; until then the host is not routed.'
-      required: [id, hostname, status, requestedAt]
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The row id this call minted, the event's `aggregateId`; the row Platform writes has it.
-        hostname:
-          type: string
-          maxLength: 253
-        status:
-          type: string
-          enum: [pending]
-        requestedAt:
-          type: string
-          format: date-time
     PlatformIdempotencyRecord:
       type: object
       x-ticvai-persistence: platform.idempotency_record
