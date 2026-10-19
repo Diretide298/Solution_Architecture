@@ -448,6 +448,28 @@ paths:
         file is a `document` (`application/json`). Both stay in the tenant's region (UAE-hosted for a
         UAE tenant) and are served through the platform's delivery rules; no asset goes to a
         third-party map service. `venue-map.importVenueGeometry` measures the rest of the budget.
+
+        **What may be uploaded** (r8 walk of tickets 27839 and 27843; lead decision of 20 October 2026, option A: a
+        fixed table, the numbers proposals for the client to correct). The kind is **derived from `contentType`**
+        by this table, by `completeUpload` and by `replaceMediaAsset` (whose `kindMismatch` compares against it);
+        a content type in no row is 400 `media-type-not-permitted`, and a `sizeBytes` above the row's limit is 400
+        `media-too-large`, both before any transfer.
+
+        | MediaKind | Content types | Largest file |
+        |---|---|---|
+        | image | image/jpeg, image/png, image/webp, image/gif | 25 MB |
+        | video | video/mp4, video/webm, video/quicktime | 500 MB |
+        | audio | audio/mpeg, audio/mp4, audio/wav | 50 MB |
+        | document | application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document, text/html, text/plain | 20 MB |
+        | vector | image/svg+xml | 5 MB |
+        | font | font/woff2, font/ttf, font/otf | 5 MB |
+        | archive | application/zip | 100 MB |
+        | model3d | model/gltf-binary | 40 MB (41,943,040 bytes) |
+
+        The ticket the server issues carries `maxSizeBytes` (the row's limit) and expires 15 minutes after it is
+        issued (`expiresAt`); a transfer not finished by then is abandoned and `completeUpload` answers 409.
+        Surfaces that accept a narrower set (the brand logo accepts PNG or SVG up to 2 MB) say so themselves and
+        apply it after this table. Other contracts that mention "the media store's limit" mean this table.
       tags: [upload]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue

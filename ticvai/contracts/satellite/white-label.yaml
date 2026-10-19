@@ -1663,7 +1663,7 @@ paths:
         for: 'showPoweredBy false: the tenant''s licence add-on keyed poweredByRemoval, else 403 powered-by-locked (ADAM CR-096)'
       - query: assets#mediaAssetRecords
         route: in-process
-        for: 'each asset''s type, size and dimensions: PNG or SVG, up to 2 MB (ADAM CR-096)'
+        for: 'each asset''s type, size and dimensions: image fields PNG or SVG up to 2 MB, the intro video as a video asset within the library''s limit (ADAM CR-096)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -1674,8 +1674,12 @@ paths:
         and a store submission. **On the guest web app a splash change is immediate (decided 28 September,
         audit R163)**: it reaches web guests with the publish, with no build.
 
-        **Each asset is PNG or SVG, up to 2 MB (decided 28 September, audit R270).** Anything else is
-        refused with 400 before it is stored against the brand.
+        **Each image asset (logo, dark logo, favicon, splash images) is PNG or SVG, up to 2 MB (decided 28
+        September, audit R270).** Anything else is refused with 400 before it is stored against the brand.
+        **`introVideoAssetRef` is a video asset and is not held to that rule** (r8 walk of ticket 27912; lead decision
+        of 20 October 2026): it takes the asset library''s own limit for kind `video` (`assets.createUpload`: mp4,
+        webm or quicktime, up to 500 MB), so there is one number; any other kind is refused with 400
+        `media-type-not-permitted`.
 
         **"Powered by TICVAI" is a toggle, on by default** (Chinmay, 2 October, workbook Q160; CHG-CSA-036):
         `showPoweredBy` false is accepted only where the tenant''s licence allows it, or 403 `powered-by-locked`.
@@ -1707,7 +1711,7 @@ paths:
                 $ref: '#/components/schemas/BrandIdentity'
         '400':
           x-ticvai-problem-types: [media-too-large, media-type-not-permitted, asset-not-ready]
-          description: An asset is larger than 2 MB, or is not PNG or SVG (audit R270); or an asset is not ready to
+          description: An image asset is larger than 2 MB, or is not PNG or SVG (audit R270); the intro video is not a video asset or is above the library limit; or an asset is not ready to
             use, because it is still processing, was quarantined or failed (`asset-not-ready`; r8 walk of tickets
             28682 and 27928, so the CMS-002 preview rule has a refusal to test). The problem names the field and
             the asset status. Nothing is saved.
@@ -9115,7 +9119,8 @@ components:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
       description: 'Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload`
-        then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).
+        then `completeUpload`). The image fields are PNG or SVG and at most 2 MB (decided 28 September, audit R270);
+        `introVideoAssetRef` is a video asset within the library''s limit for kind `video` (`assets.createUpload`).
 
         '
       required:

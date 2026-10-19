@@ -2288,7 +2288,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/IncidentMedia' }
         '400':
-          description: Content type not permitted, or size beyond the media store's limit for that kind.
+          description: Content type not permitted, or size beyond the limit for that kind in the table on `assets.createUpload`.
           x-ticvai-problem-types: [media-type-not-permitted, media-too-large]
           content:
             application/problem+json:
