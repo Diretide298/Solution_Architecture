@@ -36,9 +36,14 @@ Checks:
      the approval. The ones found on 18 October are listed in APPROVAL_ENTRY_KNOWN; a new one fails.
  15. The edges a decision fixed are there, and the operations it took away are not (DECIDED_EDGES):
      migration-run resumes from `failed` through `applyMigration` and names its own operations, not the
-     rollout's (ADAM CR-160); a future suspension has its timer (CR-152).
+     rollout's (ADAM CR-160); a future suspension has its timer (CR-152); a tenant is suspended and
+     reactivated by the approval.granted consumer, never by suspendTenant or reactivateTenant (CR-172).
+ 16. An operation that raises its own approval request keeps that shape (APPROVAL_RAISED; ADAM CR-172 option
+     (a), CHG-CRA-005): it takes no `approvalRequestId` (parameter or body), has no `approval-required`
+     refusal, routes `approvals.request` through `createApprovalRequest` (`x-ticvai-write-via`), and answers
+     202, not 200 or 201, with the request's id (`approvalRequestId`, required). Its self-tests run first.
 
-Run: python3 tools/check-states.py
+Run: python tools/check-states.py [--self-test]
 """
 import json
 import re
@@ -113,11 +118,115 @@ DECIDED_EDGES = {
         "why": "ADAM CR-160, 18 October 2026: PLATFORM-MIGRATE's spec, a failed tenant is resumed from its row",
     },
     "tenant": {
-        "must": [("active", "suspended", None, "timer")],
-        "never": {},
-        "why": "ADAM CR-152, 18 October 2026: a future effectiveAt is applied by a workers job",
+        "must": [("active", "suspended", None, "timer"),
+                 ("active", "suspended", None, "externalEvent"),
+                 ("suspended", "active", None, "externalEvent")],
+        "never": {"suspendTenant": "which only raises the approval request; the approval.granted consumer moves the "
+                                   "tenant (CR-172 option (a))",
+                  "reactivateTenant": "which only raises the approval request; the approval.granted consumer moves "
+                                      "the tenant (CR-172 option (a))"},
+        "why": "ADAM CR-152, 18 October 2026: a future effectiveAt is applied by a workers job; ADAM CR-172 option "
+               "(a), 19 October 2026: the approval.granted consumer applies a granted suspension or reactivation",
     },
 }
+
+# Rule 16: operations that raise their own approval request and answer 202 with it (ADAM CR-172 option (a), decided by
+# Chinmay Parab on 19 October 2026; CHG-CRA-005). Re-adding a caller-supplied approvalRequestId, a 409
+# approval-required, or a 200 that says the change happened would bring back the shape the decision retired.
+APPROVAL_RAISED = {
+    "suspendTenant": "ADAM CR-172 option (a)",
+    "reactivateTenant": "ADAM CR-172 option (a)",
+}
+APPROVAL_ROUTE = {"table": "approvals.request", "operation": "createApprovalRequest"}
+
+
+def _local(doc: dict, node, depth: int = 0):
+    """Follow a `#/components/...` $ref within the same contract; other refs are returned as they are."""
+    while isinstance(node, dict) and str(node.get("$ref", "")).startswith("#/") and depth < 20:
+        cur = doc
+        for part in node["$ref"][2:].split("/"):
+            cur = cur.get(part) if isinstance(cur, dict) else None
+        node, depth = cur, depth + 1
+    return node
+
+
+def _props(doc: dict, sch) -> tuple[set, set]:
+    """(properties, required) of a schema, through local refs and allOf."""
+    sch = _local(doc, sch)
+    if not isinstance(sch, dict):
+        return set(), set()
+    props, req = set((sch.get("properties") or {}).keys()), set(sch.get("required") or [])
+    for part in sch.get("allOf") or []:
+        p, r = _props(doc, part)
+        props |= p
+        req |= r
+    return props, req
+
+
+def approval_raised_shape(op: dict, doc: dict) -> list[str]:
+    """What breaks rule 16 on one operation; empty when it keeps the CR-172 shape."""
+    bad = []
+    for prm in op.get("parameters") or []:
+        prm = _local(doc, prm)
+        if isinstance(prm, dict) and prm.get("name") == "approvalRequestId":
+            bad.append("takes approvalRequestId as a parameter")
+    body = (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema")
+    if body is not None and "approvalRequestId" in _props(doc, body)[0]:
+        bad.append("takes approvalRequestId in its body")
+    responses = {str(k): v for k, v in (op.get("responses") or {}).items()}
+    if any("approval-required" in ((_local(doc, r) or {}).get("x-ticvai-problem-types") or [])
+           for r in responses.values() if isinstance(_local(doc, r), dict)):
+        bad.append("still answers approval-required (x-ticvai-problem-types)")
+    if APPROVAL_ROUTE not in (op.get("x-ticvai-write-via") or []):
+        bad.append("does not route approvals.request through createApprovalRequest (x-ticvai-write-via)")
+    for c in ("200", "201"):
+        if c in responses:
+            bad.append(f"answers {c}, as if the change were made in the call")
+    ok202 = _local(doc, responses.get("202"))
+    if not isinstance(ok202, dict):
+        bad.append("does not answer 202")
+    else:
+        sch = ((ok202.get("content") or {}).get("application/json") or {}).get("schema")
+        props, req = _props(doc, sch)
+        if "approvalRequestId" not in props or "approvalRequestId" not in req:
+            bad.append("its 202 does not carry the request's id (approvalRequestId, required)")
+    return bad
+
+
+def self_test() -> list[str]:
+    """Rule 16 on made-up operations: the CR-172 shape passes, and each retired shape fails."""
+    doc = {"components": {"schemas": {
+        "Requested": {"allOf": [{"type": "object", "properties": {"id": {}}},
+                                {"type": "object", "required": ["approvalRequestId"],
+                                 "properties": {"approvalRequestId": {"type": "string"}}}]},
+        "Plain": {"type": "object", "properties": {"id": {}}}}}}
+    r202 = {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Requested"}}}}
+    good = {"x-ticvai-write-via": [dict(APPROVAL_ROUTE)], "responses": {"202": r202, "409": {
+        "x-ticvai-problem-types": ["tenant-not-active", "open-request-exists"]}}}
+    cases = {
+        "the CR-172 shape": (good, False),
+        "a text that names the retired refusal": (dict(good, responses={"202": r202, "409": {
+            "description": "This is not the retired `approval-required`.",
+            "x-ticvai-problem-types": ["open-request-exists"]}}), False),
+        "a caller-supplied approvalRequestId parameter": (
+            dict(good, parameters=[{"name": "approvalRequestId", "in": "query"}]), True),
+        "approvalRequestId in the body": (dict(good, requestBody={"content": {"application/json": {"schema": {
+            "type": "object", "properties": {"approvalRequestId": {"type": "string"}}}}}}), True),
+        "a 409 approval-required": (dict(good, responses={"202": r202, "409": {
+            "x-ticvai-problem-types": ["approval-required"]}}), True),
+        "a 200 beside the 202": (dict(good, responses={"200": r202, "202": r202}), True),
+        "no 202": (dict(good, responses={"200": r202}), True),
+        "a 202 without the request id": (dict(good, responses={"202": {"content": {"application/json": {
+            "schema": {"$ref": "#/components/schemas/Plain"}}}}}), True),
+        "no route to createApprovalRequest": (dict(good, **{"x-ticvai-write-via": []}), True),
+    }
+    fails = []
+    for name, (op, should_fail) in cases.items():
+        found = approval_raised_shape(op, doc)
+        if bool(found) != should_fail:
+            fails.append(f"rule 16 self-test '{name}': expected {'a finding' if should_fail else 'none'}, "
+                         f"got {found or 'none'}")
+    return fails
 
 
 def check_duplicate_paths() -> None:
@@ -139,6 +248,7 @@ def check_duplicate_paths() -> None:
 
 OP_VERBS: dict[str, str] = {}
 OP_TEXT: dict = {}   # operationId -> (its text, its response codes, its description), for rule 14
+OP_RAW: dict = {}    # operationId -> (the operation, its contract document), for rule 16
 
 
 def load_contracts() -> tuple[dict[str, list[str]], set[str], dict[str, set[str]]]:
@@ -179,12 +289,30 @@ def load_contracts() -> tuple[dict[str, list[str]], set[str], dict[str, set[str]
                             OP_TEXT[oid] = (json.dumps(op, default=str),
                                             {str(c) for c in (op.get("responses") or {})},
                                             str(op.get("description") or ""))
+                            OP_RAW[oid] = (op, doc)
     return enums, ops, object_schemas
 
 
 def main() -> int:
+    tests = self_test()
+    for x in tests:
+        print(f"  SELF-TEST  {x}")
+    if tests:
+        print(f"FAIL {len(tests)} self-test(s)")
+        return 1
+    if "--self-test" in sys.argv:
+        print("PASS - the rule 16 self-tests")
+        return 0
     check_duplicate_paths()
     enums, ops, object_schemas = load_contracts()
+    # 16. an operation that raises its own approval request keeps that shape (ADAM CR-172; CHG-CRA-005)
+    for o, why in sorted(APPROVAL_RAISED.items()):
+        if o not in OP_RAW:
+            ERRORS.append(f"{o} is in no contract ({why}; rule 16)")
+            continue
+        for b in approval_raised_shape(*OP_RAW[o]):
+            ERRORS.append(f"{o} {b}: it raises its own approval request and answers 202 with it ({why}, "
+                          "CHG-CRA-005; rule 16)")
     state_files = sorted(f for f in STATES.glob("*.yaml") if f.name != "_schema.yaml")
     event_files = sorted(f for f in EVENTS.glob("*.yaml") if f.name != "_schema.yaml")
 
@@ -426,7 +554,7 @@ def main() -> int:
     if ERRORS:
         print(f"{len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")
         return 1
-    print(f"PASS — {len(WARNINGS)} warning(s)")
+    print(f"PASS — {len(WARNINGS)} warning(s); the rule 16 self-tests pass")
     return 0
 
 
