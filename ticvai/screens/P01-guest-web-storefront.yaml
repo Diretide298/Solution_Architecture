@@ -1997,8 +1997,9 @@ screens:
   - id: formRecommendSeats
     component: modal
     trigger: Recommend seats
-    body: '**How many seats, and best available or together.** The party size is the tickets already chosen;
-      the guest only picks the preference, then `recommendSeats` places them.'
+    body: '**How many seats, and best available or together.** The guest sets the party size (a How many seats stepper, at most
+      `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats` places them. Tickets are chosen after
+      seats, so there are none to count yet.'
     bindsTo: SeatRecommendationRequest
     confirm:
       label: Recommend seats
@@ -8810,13 +8811,14 @@ screens:
     - WEB-001
   notes: '**`getVenueMap` was already `guest` audience and offline-capable and no web screen drew it.**
     A map in a browser is a map. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3c`. **The frame
-    names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and
-    Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense.
-    **A board that says what it draws removes the guess entirely.**
-
-
+    names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail
+    boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board
+    that says what it draws removes the guess entirely.**
+  
+  
     **The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists),
-    so a normal visit has a map to load** (CHG-FXS-003)'
+    so a normal visit has a map to load** (CHG-FXS-003) Build note (r8, GPS-C08): send `onlyBookable=false`
+    on `listBookableVenueMaps`, so a venue map with no bookable resource still opens.'
   density: compact
   boardFrames:
   - Seat Board 3.dc.html#seat-3c

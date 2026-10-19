@@ -1,0 +1,44 @@
+id: CHG-R8SCR-002
+date: '2026-10-19'
+source: audit
+kind: spec
+summary: Screens and the permission map now say what the Sprint 1 and 2 tickets need. The till's action keys map to the Permission the session carries. The two brand-kit screens edit separate fields of the brand identity. Guest app and console screens bind the new operations. The test strategy says who the allowed and refused user is on a guest screen.
+decision:
+  what: 'roles.yaml gives payment.take, sale.create, sale.resume, shift.reopen, cash.variance.approve and inventory.conflict.resolve a Permission (GPS-C02). docs/active/block-test-strategy.md defines the allowed and refused pair for guest and public screens (ORDERS-MONEY-C02). CMS-002 and CMS-004 save only their own BrandIdentity fields and send the rest as read; the design notes name CMS-002 as the owner of the logo, dark logo, variant and favicon (WHITE-C23). CMS-012 and CMS-003 state what their operations do (WHITE-C03). GST-059, GST-040, GST-068, GST-071, ADM-018, CMS-007 and CMS-103 bind the operations the satellite contracts add (GPS-C15, WHITE-C14, ORDERS-MONEY-C10, WHITE-C18, WHITE-C19). events/approval-requested.yaml is also emitted by resubmitApprovalRequest. After the answers from the lead of 20 October: EMP-001 and flow F64 define the refusal for a person with no MFA method (IDENTITY-C17); POS-003 is the drawer step of POS-002 (GPS-C12); the Recommend seats overlay on GST-049 and WEB-007 takes the party size from the guest (GPS-C03); GST-040 is core (WHITE-C15). Wording on client-approved screens is not changed: the lane prepared it in lane-screens-pending-ui.json for client approval.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'r8 walk of the Sprint 1 and 2 tickets (finding of 19 October 2026, causes GPS-C02, ORDERS-MONEY-C02, WHITE-C03, WHITE-C23, GPS-C15, WHITE-C14, WHITE-C18) and CHG-SGU-022 for who owns which brand field.'
+keys_touched:
+  screens:
+  - ADM-018
+  - CMS-003
+  - CMS-004
+  - CMS-007
+  - CMS-012
+  - CMS-103
+  - GST-040
+  - GST-059
+  - GST-068
+  - GST-049
+  - GST-071
+  - EMP-001
+  - POS-003
+  - WEB-007
+  files:
+  - roles.yaml
+  - docs/active/block-test-strategy.md
+  - handoff/design-notes/white-label.yaml
+  - events/approval-requested.yaml
+root_class: 'new: screen-follows-ticket-walk (generated wording and missing bindings found when tickets were walked)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: none (r8 fix lane, lead's decision)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screens.py
+status: open
+notes: 'check-screens already fails a screen that binds an operation no contract defines, which is why GST-040, GST-059 and GST-068 fail on this branch alone and pass once fix/r8-satellite is merged.'
