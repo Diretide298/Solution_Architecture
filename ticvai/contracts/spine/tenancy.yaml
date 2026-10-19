@@ -353,7 +353,8 @@ paths:
         is answered with a redirect to `redirectToHostname` by the edge. A custom domain whose CNAME stopped
         resolving to us stays routed while white-label''s `CustomDomain` is `pendingRevalidation`, and is
         `detached` here when that times out, so a released hostname cannot be served for somebody else
-        (the takeover warning on CMS-017).
+        (the takeover warning on CMS-017). **A `detached` host answers 404**, and at most one active row holds a
+        hostname, so the answer is never ambiguous (APPROVALS-TENANCY-C11, CHG-R8SPN-039).
 
 
         **The routing outcomes, decided 18 October 2026** (ADAM CR-162, option A: what the resolver does today
@@ -417,6 +418,29 @@ paths:
         `lastValidatedAt` and, on `timedOut`, sets `status: detached`. A platform subdomain is never
         detached while the tenant exists, so a tenant always has a host that works.
 
+
+        **Accepted, then written by Platform: the answer is 202** (decided 20 October 2026, Chinmay, R8 blocker
+        cause APPROVALS-TENANCY-C11, option A; CHG-R8SPN-039; the route CR-002 already decided: Tenancy has no
+        grant on the control database, and Platform writes `control.tenant_domain` from the event). The call
+        mints the row''s id (UUIDv7), writes `tenantDomain.mapped` **version 2** to the outbox with that id as the
+        event''s `aggregateId` and the whole row as its payload (id, hostname, tenantId, kind, status, cellId,
+        databaseName, channel, isPrimary, redirectToHostname, verifiedAt, lastValidatedAt), and answers `202` with
+        the request (`TenantDomainMappingRequested`: id, hostname, status `pending`, requestedAt). **The host is
+        live only once Platform''s consumer has written the row**: white-label shows a domain as connected when
+        `verifyCustomDomain`, polling, finds it routed (`resolveTenantHost` on the host), never on this answer. **Whose host**:
+        `tenantId` is sent in the body (no longer server-owned: the service token names only the calling cell),
+        and is refused `403` unless the tenant is one of that cell''s tenants (`control.cell_tenant`).
+
+
+        **`hostname-taken` is decided twice**: here, as a quick refusal (`409`) when the host is already active for
+        another tenant as Platform''s query reads it now; and finally in Platform''s consumer, under the unique
+        index on active hosts, which refuses a host another tenant took in between by writing
+        `tenantDomain.rejected` (id, hostname, tenantId, reason `hostname-taken`) for white-label to consume, so a
+        race never leaves two tenants on one host. **One host at a time**: `setPrimaryDomain` calls this once per
+        host it changes, and the consumer, writing a new primary, demotes the channel''s other primary in the same
+        transaction; when a primary custom domain is detached, the platform subdomain becomes primary in that
+        transaction. `resolveTenantHost` answers `404` for a `detached` host.
+
         '
       tags:
       - tenancy
@@ -433,15 +457,18 @@ paths:
             schema:
               $ref: '#/components/schemas/TenantDomain'
       responses:
-        '200':
+        '202':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Routed
+          description: 'Accepted (APPROVALS-TENANCY-C11): `tenantDomain.mapped` v2 is in the outbox, and Platform''s
+            consumer writes the row. Not yet routed.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TenantDomain'
+                $ref: '#/components/schemas/TenantDomainMappingRequested'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           description: The hostname is routed to another tenant (`hostname-taken`).
           x-ticvai-problem-types:
@@ -3904,10 +3931,12 @@ components:
           maxLength: 253
           x-ticvai-unique: tenant
         tenantId:
-          readOnly: true
           type: string
           format: uuid
           x-ticvai-references: control.tenant
+          description: 'The tenant the host routes to. **Sent by the caller of `setTenantDomainMapping`** since 20
+            October 2026 (APPROVALS-TENANCY-C11, CHG-R8SPN-039): the service token names only the calling cell, so
+            the body names the tenant, and it must be one of that cell''s tenants.'
         cellId:
           type: string
           format: uuid
@@ -3962,6 +3991,26 @@ components:
           nullable: true
           description: '**When the custom domain''s CNAME and `_dnsauth` record last resolved to us** (DEC-547;
             CHG-CSP-010), written by white-label''s revalidation job. Null on a platform subdomain.'
+    TenantDomainMappingRequested:
+      type: object
+      x-ticvai-persistence: none — the answer of setTenantDomainMapping
+      description: '**What `setTenantDomainMapping` accepted** (APPROVALS-TENANCY-C11, CHG-R8SPN-039). The row is
+        written by Platform''s consumer of `tenantDomain.mapped`; until then the host is not routed.'
+      required: [id, hostname, status, requestedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The row id this call minted, the event's `aggregateId`; the row Platform writes has it.
+        hostname:
+          type: string
+          maxLength: 253
+        status:
+          type: string
+          enum: [pending]
+        requestedAt:
+          type: string
+          format: date-time
     PlatformIdempotencyRecord:
       type: object
       x-ticvai-persistence: platform.idempotency_record
