@@ -10095,6 +10095,16 @@ components:
         mobile Home''s description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not
         enabled, and `setModuleEnablement` refuses to disable a module a section still needs.
 
+
+        **Which catalogue slice a type tile shows, and whose card count applies** (r8 walk of tickets 28335 and
+        28682; lead decision of 20 October 2026, option 1, no schema change; DEC-152 and DEC-153 stand as they are).
+        A Home type tile is a product category, and its highlights are `listProducts(venueId, categoryId, pageSize)`
+        in `displayOrder`, the order `listProducts` documents. The card count (`maxItems`) is that of the section
+        whose kind matches the tile: `attractions`, `dining` or `shop`; **every other category uses the count of the
+        `whatsOn` section**. On GST-038 (At the Venue), Food is kind `fnb` (opens GST-024), Shop is kind `retail`
+        (GST-026), Services opens GST-029, Shows is `listPerformances` of the venue for today, and Map and Waits
+        show in place.
+
         '
       enum:
       - heroBanner
