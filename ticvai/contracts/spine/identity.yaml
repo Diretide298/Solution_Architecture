@@ -8799,6 +8799,41 @@ components:
           format: date-time
           nullable: true
           description: When the supervisor's PIN unlocks, where `refusal` is `credentialLocked`.
+    OpenShiftMarker:
+      x-ticvai-persistence: identity.open_shift_marker
+      type: object
+      description: >-
+        **Which shifts are open, as Identity knows it** (decided 20 October 2026, Chinmay, R8 blocker cause
+        IDENTITY-C51, option A; CHG-R8SPN-036). A projection Identity keeps so `ActiveSession.hasOpenShift` can be
+        answered without reading Orders' `orders.pos_shift` (Identity is Foundation and reads nothing above it,
+        ADR-0028). **Never returned by any operation**, like `SubjectHolding`. No operation writes it; Identity's
+        consumers do: `shift.opened` inserts the row (when a shift opens, in any state before `closed`), and
+        `shift.closed` deletes it (a shift that ends `autoClosed` is closed by the same event). Idempotent on
+        `shiftId`. A lagging consumer can only show a shift as open a moment longer, which errs on the side of
+        warning before a session is revoked.
+      required: [shiftId, principalId, workstationId, openedAt]
+      properties:
+        shiftId:
+          type: string
+          format: uuid
+          description: The shift (`orders.pos_shift.id`, carried by the event); the row's key.
+        principalId:
+          type: string
+          format: uuid
+          description: The principal whose shift it is.
+        workstationId:
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+        openedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), the venue's path, as the event carries it.
     SubjectHolding:
       x-ticvai-persistence: identity.subject_holding
       # One row per order or entitlement: an entitlement has one holder at a time (CHG-GDL-001).
@@ -10253,8 +10288,12 @@ components:
           type: boolean
           x-ticvai-persisted: false
           x-ticvai-derived: onRead
-          description: Revoking this session leaves cash unreconciled. **Computed on read** from the shift the
-            principal holds open at the workstation (`orders.pos_shift`), never stored here.
+          description: 'Revoking this session leaves cash unreconciled. **Computed on read, from Identity''s own
+            projection** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C51, option A; CHG-R8SPN-036):
+            true when `identity.open_shift_marker` (`OpenShiftMarker`) holds a row for this principal at this
+            session''s workstation. Identity is Foundation and never reads `orders.pos_shift` (ADR-0028), so the
+            marker is fed by Shift''s events, as `identity.subject_holding` is fed by Orders''. BO-053 and POS-000
+            read it here; never stored on the session.'
         mfaSatisfied:
           type: boolean
         startedAt:

@@ -1,0 +1,40 @@
+id: CHG-R8SPN-036
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Identity answers ActiveSession.hasOpenShift from its own projection, identity.open_shift_marker (OpenShiftMarker:
+  inserted by shift.opened, deleted by shift.closed, idempotent on shiftId), never from orders.pos_shift (ADR-0028).
+  And a draft Help me choose is previewed by white-label''s previewGuidedChoice, which runs listProducts'' own answer
+  filter; listProducts filters by published answers only.'
+decision:
+  what: 'R8 blocker causes IDENTITY-C51 (lead answer: take the recommendation, option A: an event-fed projection, new
+    shift.opened event, table identity.open_shift_marker) and WHITE-C26 (lead answer: server, previewGuidedChoice;
+    lead to confirm). identity.yaml ActiveSession.hasOpenShift and the new OpenShiftMarker schema (a new table:
+    storage facts, key shiftId, requested from storage-core); catalogue.yaml listProducts. The event file
+    events/shift-opened.yaml, the identity consumer on events/shift-closed.yaml, and white-label previewGuidedChoice
+    are the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27766 and 27916 (ADAM gaps 27766/0, 27916/0): ActiveSession.hasOpenShift needed
+  Orders'' shift data that Identity may not read, and the Help me choose preview of a draft could not be computed.
+  Finding: R8 blocker cause list, groups identity and white-label.'
+keys_touched:
+  operations: [listActiveSessions, listProducts]
+  schemas: [ActiveSession, OpenShiftMarker]
+  tables: [identity.open_shift_marker]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/catalogue.yaml
+root_class: 'tier breach: a foundation read needs data from above it'
+tickets:
+  started: []
+  unstarted:
+  - '27766 and 27916 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27766/0, 27916/0'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
