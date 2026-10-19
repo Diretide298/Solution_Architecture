@@ -1,0 +1,39 @@
+id: CHG-R8SPN-034
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Two guest booking screens get the data they show. A meeting-room cart line carries attendees
+  (OrderLineAttributes.attendees, kept to the order line and the reception list; more than the room type holds is 422
+  attendees-over-capacity), and GST-075''s steps run date, room type, length, start time. listEvents is the venue''s
+  programme for a guest too (guest-callable, published events only: onSale and live and active; a visitor sends
+  venueId), so GST-005 What''s On has a single list. Additive.'
+decision:
+  what: 'R8 blocker causes GPS-C28 (lead answer: option A, date, room type, length, start time) and GPS-C30 (lead answer:
+    option A, a guest-callable listing with a venue filter: listEvents widened rather than a new operation).
+    orders.yaml OrderLineAttributes.attendees, addCartLine 422, CartProblem; catalogue.yaml listEvents. The room
+    type''s guest capacity (resources.yaml ProductStartTime and the guest product view), white-label
+    meetingRoomHourly''s step order, and GST-075 and GST-005 are the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 28161 and 28157 (ADAM gaps 28161/0, 28161/1, 28157/0): meeting-room capacity and
+  attendees had no field and the step order could not be queried; What''s On had no single event list. Finding: R8
+  blocker cause list, group guest-pos-screens.'
+keys_touched:
+  operations: [addCartLine, listEvents, listPerformances, listProductStartTimes]
+  schemas: [OrderLineAttributes, CartProblem]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/catalogue.yaml
+root_class: 'screen-api gap: a guest screen shows data no guest read returns'
+tickets:
+  started: []
+  unstarted:
+  - '28161 and 28157 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28161/0, 28161/1, 28157/0'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: open

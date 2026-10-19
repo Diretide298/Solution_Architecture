@@ -3343,21 +3343,56 @@ paths:
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-694 Event Catalogue Command Center"
         - "P13 CMS-101 Help Me Choose"
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
+      description: '**The venue''s programme, for a guest too** (decided 20 October 2026, Chinmay, R8 blocker cause
+        GPS-C30, option A; CHG-R8SPN-034). GST-005 What''s On lists the venue''s events from here and then each
+        event''s performances (`listPerformances`). **A guest or a visitor calls this without a permission and sees
+        published data only** (Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): events in `onSale` or `live` that
+        are active (`isActive`), and nothing in `draft`, `planned`, `closed`, `cancelled` or `archived`. A visitor
+        with no credential sends `venueId`. `PRODUCT_VIEW` is what a staff caller must hold, and staff see every
+        state.
+
+
+        **Order.** Sorted by `name` ascending, then by `id`. **Statuses.** For staff every `lifecycleState`; for a
+        guest only `onSale` and `live`, as above.'
+      security:
+      - bearerAuth: []
+      - guestAuth: []
+      - {}
       x-ticvai-audience:
       - staff
+      - guest
+      - anonymous
       x-ticvai-read-routing: replica
       summary: List events
       tags:
       - event
       x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue to read, for a caller with no venue** (as `listProductCategories`; GPS-C30). A guest
+          with a credential, or staff, act at a venue already and may leave it out; a visitor with no credential
+          **must send it** (missing: `400 venue-required`; not a venue of the tenant: `400 unknown-venue`). With a
+          credential it must be the venue the caller acts at.'
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
+        '400':
+          description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
+            (`unknown-venue`).'
+          x-ticvai-problem-types: [venue-required, unknown-venue]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '200':
           description: Events
           content:

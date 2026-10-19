@@ -3692,7 +3692,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartProblem'
         '422':
-          x-ticvai-problem-types: [window-required, window-not-allowed, window-length-mismatch, deposit-not-due, seat-limit-exceeded, transport-fare-unavailable, pass-not-valid-for-trip]
+          x-ticvai-problem-types: [window-required, window-not-allowed, window-length-mismatch, deposit-not-due, seat-limit-exceeded, transport-fare-unavailable, pass-not-valid-for-trip, attendees-over-capacity]
           description: 'The booked window is missing, not allowed or the wrong length for the variant
             (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or a table deposit
             line names a booking that is not awaiting one (`depositNotDue`; rev 3 REV3-8b). More seats for
@@ -3700,6 +3700,8 @@ paths:
             `seat-limit-exceeded`; rev 3 REV3-7). A transport fare that cannot be quoted
             (`transportFareUnavailable`) or a pass that does not cover the trip (`passNotValidForTrip`;
             rev 3 REV3-21).
+            More attendees than the meeting room type holds (`attendees-over-capacity`, naming the capacity;
+            GPS-C28, CHG-R8SPN-034).
 
             '
           content:
@@ -23355,10 +23357,21 @@ components:
       x-ticvai-persistence: none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line
       description: >
         Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a
-        defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.
+        defined shape** (decided 29 September, rev 3 REV3-21); other keys are free. **`attendees` is the
+        second** (20 October 2026, R8 blocker cause GPS-C28; CHG-R8SPN-034).
       properties:
         transport:
           $ref: '#/components/schemas/TransportLineAttributes'
+        attendees:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: '**How many people a meeting-room booking is for** (GST-075; R8 blocker cause GPS-C28,
+            CHG-R8SPN-034). Sent with `addCartLine` for a meeting-room product, kept from the cart line to the order
+            line, and shown on the venue''s reception list for the booking. It must not exceed the room type''s
+            capacity, which the guest step shows beside each room type: more is refused `422 attendees-over-capacity`
+            by `addCartLine`, naming the capacity. The guest steps run in the order `listProductStartTimes` can
+            answer (lead answer, option A): date, room type, length, then start time.'
     TransportLineAttributes:
       type: object
       nullable: true
@@ -25035,6 +25048,7 @@ components:
             - seatLimitExceeded      # addCartLine 422: over VenueSettings.seating.maxSeatsPerGuestOrder; problem type seat-limit-exceeded (REV3-7)
             - transportFareUnavailable # addCartLine 422: transport.quoteTransportFare refused (REV3-21)
             - passNotValidForTrip    # addCartLine 422: the owned pass does not cover the stations, has no entry left or is outside its validity (REV3-21)
+            - attendeesOverCapacity  # addCartLine 422: more attendees than the meeting room type holds (GPS-C28, CHG-R8SPN-034)
           lineIds:
             type: array
             description: The cart lines the refusal is about, where it is about lines.
