@@ -171,6 +171,38 @@ def main():
             ERRORS.append("schema '%s' is claimed by %s — a service that shares a schema is "
                           "not separately deployable" % (sch, " and ".join(owners)))
 
+    # 8 — LN-TEXT (r8, CHG-R8LIN-001): the lineage is the build boundary ("reads only the tables its spec lists"),
+    # so a table the operation's own description names and the lineage lists nowhere is a gap the developer meets as a
+    # refusal they cannot build (r8 walk of Sprint 1 and 2: IDENTITY-C10, ORDERS-MONEY-C18, APPROVALS-TENANCY-C03 ...).
+    # Reported as a warning with the count, `--text` lists every one; a mention may be a deliberate "not X", so it is
+    # never a failure. Fix the lineage entry (hand-maintained) or reword the text.
+    text_gaps = []
+    for f in sorted(glob.glob(os.path.join(ROOT, "contracts", "*", "*.yaml"))):
+        try:
+            d = yaml.load(io.open(f, encoding="utf-8"), Loader=yaml.CSafeLoader) or {}
+        except yaml.YAMLError:
+            continue
+        for _p, m in (d.get("paths") or {}).items():
+            if not isinstance(m, dict):
+                continue
+            for v, op in m.items():
+                if v not in VERBS or not isinstance(op, dict) or not op.get("operationId"):
+                    continue
+                e = lin.get(op["operationId"])
+                if not e:
+                    continue
+                said = set(re.findall(r"([a-z][a-z_]*\.[a-z][a-z_]*)",
+                                      str(op.get("summary") or "") + " " + str(op.get("description") or ""))) & set(cols)
+                gone = sorted(t for t in said if t not in (e.get("reads") or []) and t not in (e.get("writes") or []))
+                if gone:
+                    text_gaps.append((op["operationId"], gone))
+    if text_gaps:
+        WARNINGS.append("LN-TEXT: %d operation(s) name a table in their own text that their lineage entry neither reads "
+                        "nor writes (--text lists them)" % len(text_gaps))
+    if "--text" in sys.argv:
+        for o, g in text_gaps:
+            print("  LN-TEXT  %-36s %s" % (o, ", ".join(g)))
+
     # Coverage — reported, never failed.
     #
     # **An operation with `service` or `device` as its only audience is complete without a

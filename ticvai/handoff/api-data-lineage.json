@@ -2589,6 +2589,9 @@
    "cache:idempotency",
    "orders.pos_shift",
    "platform.device",
+   "platform.outlet",
+   "platform.region_settings",
+   "platform.sale_board",
    "platform.workstation"
   ],
   "writes": [
@@ -2710,7 +2713,8 @@
   "reads": [
    "cache:idempotency",
    "platform.outlet",
-   "platform.outlet_opening_hour"
+   "platform.outlet_opening_hour",
+   "platform.region_settings"
   ],
   "writes": [
    "cache:idempotency",
@@ -2767,7 +2771,8 @@
   "reads": [
    "cache:idempotency",
    "platform.outlet",
-   "platform.outlet_opening_hour"
+   "platform.outlet_opening_hour",
+   "platform.region_settings"
   ],
   "writes": [
    "cache:idempotency",
@@ -5244,10 +5249,13 @@
   "path": "/orders/{orderId}/reprints",
   "reads": [
    "cache:idempotency",
+   "orders.order_line",
    "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
+   "orders.order_event",
+   "orders.order_line",
    "orders.sales_order"
   ],
   "routing": "",
@@ -8371,7 +8379,8 @@
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
-   "identity.role"
+   "identity.role",
+   "identity.role_permission"
   ],
   "writes": [
    "cache:idempotency",
@@ -8417,7 +8426,9 @@
   "reads": [
    "cache:idempotency",
    "identity.delegated_access",
+   "identity.password_policy",
    "identity.role",
+   "identity.role_permission",
    "identity.session"
   ],
   "writes": [
@@ -8506,6 +8517,7 @@
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
+   "identity.role_permission",
    "identity.session",
    "platform.workstation"
   ],
@@ -8544,8 +8556,10 @@
   "reads": [
    "cache:resolution",
    "identity.delegated_access",
+   "identity.password_policy",
    "identity.principal",
    "identity.role",
+   "identity.role_permission",
    "identity.session"
   ],
   "writes": [
@@ -8739,11 +8753,15 @@
   "path": "/principals/{principalId}",
   "reads": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.role"
   ],
   "writes": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.principal",
+   "identity.refresh_token",
+   "identity.session"
   ],
   "routing": "",
   "scope": "venue",
@@ -9494,8 +9512,10 @@
    "cache:idempotency",
    "identity.delegated_access",
    "identity.mfa_method",
+   "identity.password_policy",
    "identity.principal",
    "identity.role",
+   "identity.role_permission",
    "identity.sso_group_mapping",
    "identity.sso_provider"
   ],
@@ -9503,6 +9523,7 @@
    "cache:idempotency",
    "identity.delegated_access",
    "identity.principal",
+   "identity.refresh_token",
    "identity.session",
    "platform.outbox"
   ],
@@ -9805,8 +9826,10 @@
   "reads": [
    "cache:idempotency",
    "identity.mfa_challenge",
+   "identity.mfa_method",
    "identity.mfa_recovery_code",
-   "identity.password_policy"
+   "identity.password_policy",
+   "identity.session"
   ],
   "writes": [
    "cache:idempotency",
@@ -9840,6 +9863,7 @@
   "path": "/auth/sessions",
   "reads": [
    "identity.principal",
+   "identity.role",
    "identity.session"
   ],
   "writes": [],
@@ -9866,6 +9890,10 @@
    }
   ],
   "readColumns": {
+   "identity.role": [
+    "id",
+    "name"
+   ],
    "identity.session": [
     "device_info",
     "id",
@@ -14756,20 +14784,6 @@
     "termination_retention_until",
     "termination_scheduled_at",
     "venue_count"
-   ],
-   "control.contract": [
-    "billing_period",
-    "cancelled_at",
-    "current_price",
-    "id",
-    "plan_id",
-    "plan_name",
-    "plan_version",
-    "renews_at",
-    "scheduled_change",
-    "starts_at",
-    "status",
-    "tenant_id"
    ]
   },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
@@ -15003,39 +15017,6 @@
   "audience": [
    "staff"
   ],
-  "readColumns": {
-   "control.plan": [
-    "base_price",
-    "billing_period",
-    "cell_tier",
-    "code",
-    "description",
-    "id",
-    "included_ai_tokens",
-    "includes_branded_app",
-    "is_active",
-    "name",
-    "offered_to_tenant_id",
-    "package_kind",
-    "published_at",
-    "request_limits",
-    "subscriber_count",
-    "version"
-   ],
-   "control.plan_limit": [
-    "id",
-    "is_overage_allowed",
-    "limit_value",
-    "metric",
-    "overage_unit_price",
-    "plan_id"
-   ],
-   "control.plan_module": [
-    "id",
-    "licensed_module",
-    "plan_id"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "createPlan": {
@@ -15070,39 +15051,6 @@
    "staff"
   ],
   "lineageNote": "new columns package_kind, offered_to_tenant_id; control.tenant read to validate offeredToTenantId",
-  "readColumns": {
-   "control.plan": [
-    "base_price",
-    "billing_period",
-    "cell_tier",
-    "code",
-    "description",
-    "id",
-    "included_ai_tokens",
-    "includes_branded_app",
-    "is_active",
-    "name",
-    "offered_to_tenant_id",
-    "package_kind",
-    "published_at",
-    "request_limits",
-    "subscriber_count",
-    "version"
-   ],
-   "control.plan_limit": [
-    "id",
-    "is_overage_allowed",
-    "limit_value",
-    "metric",
-    "overage_unit_price",
-    "plan_id"
-   ],
-   "control.plan_module": [
-    "id",
-    "licensed_module",
-    "plan_id"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "getPlan": {
@@ -15128,39 +15076,6 @@
   "audience": [
    "staff"
   ],
-  "readColumns": {
-   "control.plan": [
-    "base_price",
-    "billing_period",
-    "cell_tier",
-    "code",
-    "description",
-    "id",
-    "included_ai_tokens",
-    "includes_branded_app",
-    "is_active",
-    "name",
-    "offered_to_tenant_id",
-    "package_kind",
-    "published_at",
-    "request_limits",
-    "subscriber_count",
-    "version"
-   ],
-   "control.plan_limit": [
-    "id",
-    "is_overage_allowed",
-    "limit_value",
-    "metric",
-    "overage_unit_price",
-    "plan_id"
-   ],
-   "control.plan_module": [
-    "id",
-    "licensed_module",
-    "plan_id"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "createPlanVersion": {
@@ -15195,39 +15110,6 @@
    "staff"
   ],
   "lineageNote": "as createPlan",
-  "readColumns": {
-   "control.plan": [
-    "base_price",
-    "billing_period",
-    "cell_tier",
-    "code",
-    "description",
-    "id",
-    "included_ai_tokens",
-    "includes_branded_app",
-    "is_active",
-    "name",
-    "offered_to_tenant_id",
-    "package_kind",
-    "published_at",
-    "request_limits",
-    "subscriber_count",
-    "version"
-   ],
-   "control.plan_limit": [
-    "id",
-    "is_overage_allowed",
-    "limit_value",
-    "metric",
-    "overage_unit_price",
-    "plan_id"
-   ],
-   "control.plan_module": [
-    "id",
-    "licensed_module",
-    "plan_id"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "getSubscription": {
@@ -15251,22 +15133,6 @@
   "audience": [
    "staff"
   ],
-  "readColumns": {
-   "control.contract": [
-    "billing_period",
-    "cancelled_at",
-    "current_price",
-    "id",
-    "plan_id",
-    "plan_name",
-    "plan_version",
-    "renews_at",
-    "scheduled_change",
-    "starts_at",
-    "status",
-    "tenant_id"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "setSubscription": {
@@ -15280,7 +15146,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.contract"
+   "control.contract",
+   "control.tenant"
   ],
   "routing": "",
   "scope": "tenant",
@@ -15297,26 +15164,6 @@
    "staff"
   ],
   "lineageNote": "adds subscription.plan read for the plan-not-offered check",
-  "readColumns": {
-   "control.contract": [
-    "billing_period",
-    "cancelled_at",
-    "current_price",
-    "id",
-    "plan_id",
-    "plan_name",
-    "plan_version",
-    "renews_at",
-    "scheduled_change",
-    "starts_at",
-    "status",
-    "tenant_id"
-   ],
-   "control.plan": [
-    "id",
-    "version"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "previewSubscriptionChange": {
@@ -15364,7 +15211,9 @@
   "reads": [
    "control.contract",
    "control.licence_add_on",
-   "control.plan"
+   "control.licence_add_on_limit",
+   "control.plan",
+   "control.tenant"
   ],
   "writes": [],
   "routing": "primary",
@@ -15384,6 +15233,10 @@
    "control.licence_add_on": [
     "id",
     "tenant_id"
+   ],
+   "control.tenant": [
+    "id",
+    "plan_id"
    ]
   },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
@@ -15394,7 +15247,9 @@
   "path": "/tenants/{tenantId}/licences/add-ons",
   "reads": [
    "cache:idempotency",
-   "control.licence_add_on"
+   "control.licence_add_on",
+   "control.licence_add_on_limit",
+   "control.tenant"
   ],
   "writes": [
    "cache:idempotency",
@@ -15419,6 +15274,10 @@
    "control.licence_add_on": [
     "id",
     "tenant_id"
+   ],
+   "control.tenant": [
+    "id",
+    "plan_id"
    ]
   }
  },
@@ -15462,8 +15321,9 @@
   "verb": "GET",
   "path": "/tenants/{tenantId}/entitlement-usage",
   "reads": [
-   "access.entitlement",
    "control.licence_add_on",
+   "control.licence_add_on_limit",
+   "control.tenant",
    "control.usage_record"
   ],
   "writes": [],
@@ -32302,6 +32162,7 @@
   "reads": [
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
+   "whitelabel.config_version",
    "whitelabel.feature_toggle",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -34501,7 +34362,9 @@
   "path": "/approval-requests",
   "reads": [
    "approvals.decision",
+   "approvals.delegation",
    "approvals.escalation",
+   "approvals.matrix",
    "approvals.request"
   ],
   "writes": [],
@@ -34764,7 +34627,9 @@
   "path": "/approval-requests/{requestId}/decide",
   "reads": [
    "approvals.decision",
+   "approvals.delegation",
    "approvals.escalation",
+   "approvals.matrix",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
@@ -35070,14 +34935,17 @@
   "path": "/approval-requests/{requestId}/resubmit",
   "reads": [
    "approvals.decision",
+   "approvals.delegation",
    "approvals.escalation",
+   "approvals.matrix",
    "approvals.request",
    "cache:idempotency"
   ],
   "writes": [
    "approvals.escalation",
    "approvals.request",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -38873,22 +38741,6 @@
   "audience": [
    "staff"
   ],
-  "readColumns": {
-   "control.contract": [
-    "billing_period",
-    "cancelled_at",
-    "current_price",
-    "id",
-    "plan_id",
-    "plan_name",
-    "plan_version",
-    "renews_at",
-    "scheduled_change",
-    "starts_at",
-    "status",
-    "tenant_id"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "requestBill": {
@@ -39978,6 +39830,8 @@
   "verb": "POST",
   "path": "/ai-providers/{providerId}/test",
   "reads": [
+   "ai.byok_enablement",
+   "ai.model",
    "ai.provider",
    "cache:idempotency"
   ],
@@ -40000,7 +39854,13 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "readColumns": {
+   "ai.model": [
+    "id",
+    "model_name"
+   ]
+  }
  },
  "listConversations": {
   "contract": "marketing-crm",
@@ -43011,6 +42871,7 @@
   "path": "/venues/{venueId}/settings",
   "reads": [
    "cache:resolution",
+   "platform.scope",
    "platform.venue_settings"
   ],
   "writes": [],
@@ -47826,11 +47687,17 @@
   "reads": [
    "cache:idempotency",
    "pii.subject",
+   "wallet.balance",
+   "wallet.credit_lot",
+   "wallet.credit_type",
+   "wallet.transfer_rule",
    "wallet.wallet",
    "wallet.wallet_transaction"
   ],
   "writes": [
    "cache:idempotency",
+   "wallet.balance",
+   "wallet.credit_lot",
    "wallet.wallet",
    "wallet.wallet_transaction"
   ],
@@ -48616,7 +48483,8 @@
   "reads": [
    "cache:idempotency",
    "identity.otp_challenge",
-   "pii.subject"
+   "pii.subject",
+   "pii.subject_contact"
   ],
   "writes": [
    "cache:idempotency",
@@ -76526,20 +76394,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.capacity_pack": [
-    "approved_by",
-    "id",
-    "invoice_id",
-    "is_temporary",
-    "list_price",
-    "quantity",
-    "tenant_id",
-    "unit",
-    "valid_from",
-    "valid_to"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "allocateGroupSeats": {
@@ -79618,19 +79472,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.go_live_readiness": [
-    "blockers",
-    "groups",
-    "id",
-    "run_at",
-    "signed_off_at",
-    "signed_off_by",
-    "status",
-    "tenant_id",
-    "warnings"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "getGuestAttributeModel": {
@@ -80861,15 +80702,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.vsi_model": [
-    "factors",
-    "id",
-    "published_at",
-    "tiers",
-    "version"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "getWalletFundingRules": {
@@ -82137,6 +81969,7 @@
   "verb": "GET",
   "path": "/devices/{deviceId}/audit",
   "reads": [
+   "platform.device",
    "tenancy.device_audit"
   ],
   "writes": [],
@@ -82555,23 +82388,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.licensing_model": [
-    "billable_unit",
-    "code",
-    "effective_from",
-    "id",
-    "included_allowances",
-    "minimum_guarantee",
-    "minimum_guarantee_period",
-    "name",
-    "on_below_minimum",
-    "overage_pricing",
-    "revenue_share_percent",
-    "tier_code",
-    "unit_price"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "listMediaAssetAudit": {
@@ -82743,25 +82559,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.module_listing": [
-    "category",
-    "description",
-    "id",
-    "included_in_tiers",
-    "incompatible_with_modules",
-    "list_price",
-    "metered_metric",
-    "metered_unit_size",
-    "module_code",
-    "name",
-    "pricing_basis",
-    "provisioning_minutes",
-    "requires_modules",
-    "requires_professional_services",
-    "status"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "listOpenShifts": {
@@ -85080,19 +84877,6 @@
    "redis"
   ],
   "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
-  "readColumns": {
-   "control.go_live_readiness": [
-    "blockers",
-    "groups",
-    "id",
-    "run_at",
-    "signed_off_at",
-    "signed_off_by",
-    "status",
-    "tenant_id",
-    "warnings"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "scoreVsiAssessment": {
@@ -85812,6 +85596,7 @@
   "verb": "PUT",
   "path": "/devices/{deviceId}/assignment",
   "reads": [
+   "platform.device",
    "tenancy.device_assignment"
   ],
   "writes": [
@@ -86679,14 +86464,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.enforcement_policy": [
-    "grace_days",
-    "id",
-    "is_hard_stop_allowed",
-    "thresholds"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "setLicensingModel": {
@@ -86714,23 +86491,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.licensing_model": [
-    "billable_unit",
-    "code",
-    "effective_from",
-    "id",
-    "included_allowances",
-    "minimum_guarantee",
-    "minimum_guarantee_period",
-    "name",
-    "on_below_minimum",
-    "overage_pricing",
-    "revenue_share_percent",
-    "tier_code",
-    "unit_price"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "setMediaAssetApproval": {
@@ -87007,25 +86767,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.module_listing": [
-    "category",
-    "description",
-    "id",
-    "included_in_tiers",
-    "incompatible_with_modules",
-    "list_price",
-    "metered_metric",
-    "metered_unit_size",
-    "module_code",
-    "name",
-    "pricing_basis",
-    "provisioning_minutes",
-    "requires_modules",
-    "requires_professional_services",
-    "status"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "setPaymentAuthenticationPolicy": {
@@ -88485,20 +88226,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.trial_config": [
-    "conversion_offer_percent",
-    "duration_days",
-    "id",
-    "included_modules",
-    "notice_days_before_expiry",
-    "on_expiry",
-    "requires_payment_method_up_front",
-    "retain_data_days",
-    "tier_code",
-    "usage_caps"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "setVsiModel": {
@@ -88526,15 +88253,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.vsi_model": [
-    "factors",
-    "id",
-    "published_at",
-    "tiers",
-    "version"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "setWalletAccountingMapping": {
@@ -92407,7 +92125,6 @@
     "is_active",
     "max_payment_amount",
     "min_payment_amount",
-    "payment_policy_id",
     "rounding_increment",
     "scope_path",
     "settlement_currency_code",
@@ -92424,7 +92141,6 @@
     "max_order_amount",
     "min_order_amount",
     "payment_method_id",
-    "payment_policy_id",
     "priority",
     "scope_path",
     "updated_at"
@@ -92442,7 +92158,6 @@
     "min_fee",
     "name",
     "payment_method_id",
-    "payment_policy_id",
     "provider_id",
     "scope_path",
     "updated_at",
@@ -92474,30 +92189,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.tier_allowance": [
-    "code",
-    "created_at",
-    "id",
-    "is_active",
-    "is_unlimited",
-    "limit_value",
-    "name",
-    "period",
-    "plan_id",
-    "updated_at"
-   ],
-   "control.tier_module": [
-    "code",
-    "created_at",
-    "id",
-    "is_active",
-    "is_included",
-    "notes",
-    "plan_id",
-    "updated_at"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "getRentalAgreement": {
@@ -93706,7 +93397,6 @@
     "is_active",
     "max_payment_amount",
     "min_payment_amount",
-    "payment_policy_id",
     "rounding_increment",
     "scope_path",
     "settlement_currency_code",
@@ -93723,7 +93413,6 @@
     "max_order_amount",
     "min_order_amount",
     "payment_method_id",
-    "payment_policy_id",
     "priority",
     "scope_path",
     "updated_at"
@@ -93741,7 +93430,6 @@
     "min_fee",
     "name",
     "payment_method_id",
-    "payment_policy_id",
     "provider_id",
     "scope_path",
     "updated_at",
@@ -93776,30 +93464,6 @@
    "postgres-analytical",
    "redis"
   ],
-  "readColumns": {
-   "control.tier_allowance": [
-    "code",
-    "created_at",
-    "id",
-    "is_active",
-    "is_unlimited",
-    "limit_value",
-    "name",
-    "period",
-    "plan_id",
-    "updated_at"
-   ],
-   "control.tier_module": [
-    "code",
-    "created_at",
-    "id",
-    "is_active",
-    "is_included",
-    "notes",
-    "plan_id",
-    "updated_at"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "setSlaPolicy": {
@@ -96643,7 +96307,8 @@
   "verb": "GET",
   "path": "/offline-policy",
   "reads": [
-   "platform.offline_policy"
+   "platform.offline_policy",
+   "platform.scope"
   ],
   "writes": [],
   "routing": "replica",
@@ -97910,7 +97575,9 @@
   "path": "/approval-requests/{requestId}/submit",
   "reads": [
    "approvals.decision",
+   "approvals.delegation",
    "approvals.escalation",
+   "approvals.matrix",
    "approvals.request",
    "approvals.rule",
    "cache:idempotency"
@@ -113490,7 +113157,8 @@
   "verb": "GET",
   "path": "/forecast-accuracy",
   "reads": [
-   "ai.forecast_accuracy"
+   "ai.forecast_accuracy",
+   "ai.forecast_definition"
   ],
   "writes": [],
   "routing": "analytical",
@@ -113757,12 +113425,6 @@
    "redis"
   ],
   "lineageNote": "projection as getLicenceEnforcement, pricing as simulateCommercialPackage (same tables), computed at read time",
-  "readColumns": {
-   "control.tier_module": [
-    "code",
-    "id"
-   ]
-  },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "getRiskCase": {
@@ -115885,6 +115547,7 @@
   "verb": "GET",
   "path": "/forecast-versions",
   "reads": [
+   "ai.forecast_definition",
    "ai.forecast_version"
   ],
   "writes": [],
@@ -116921,6 +116584,7 @@
   "verb": "POST",
   "path": "/governance/capabilities/{capabilityKey}/pause",
   "reads": [
+   "ai.action_plan",
    "ai.capability",
    "cache:idempotency"
   ],
@@ -121774,6 +121438,7 @@
    "cache:idempotency"
   ],
   "writes": [
+   "ai.capability_maturity",
    "ai.history_import",
    "ai.history_observation",
    "cache:idempotency"
@@ -123792,13 +123457,16 @@
   "verb": "GET",
   "path": "/storefront/tenant-config",
   "reads": [
+   "whitelabel.analytics_provider",
+   "whitelabel.config_version",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
    "whitelabel.footer_config_social_link",
    "whitelabel.homepage_layout",
    "whitelabel.homepage_section",
    "whitelabel.navigation_config",
-   "whitelabel.navigation_item"
+   "whitelabel.navigation_item",
+   "whitelabel.tenant_config"
   ],
   "writes": [],
   "routing": "replica",
@@ -123865,6 +123533,30 @@
     "navigation_config_id",
     "sort_order",
     "target"
+   ],
+   "whitelabel.tenant_config": [
+    "accessibility",
+    "app_icons",
+    "availability",
+    "availability_message",
+    "booking_flow",
+    "brand",
+    "contact",
+    "expected_back_at",
+    "fonts",
+    "footer_config_id",
+    "header",
+    "homepage_layout_id",
+    "homepage_section_id",
+    "id",
+    "is_in_maintenance",
+    "languages",
+    "maintenance_message",
+    "minimum_app_version",
+    "navigation_config_id",
+    "navigation_item_id",
+    "tenant_id",
+    "theme"
    ]
   }
  },
@@ -124093,11 +123785,14 @@
   "path": "/approval-requests/{requestId}/assignment",
   "reads": [
    "approvals.decision",
+   "approvals.delegation",
    "approvals.escalation",
+   "approvals.matrix",
    "approvals.request"
   ],
   "writes": [
-   "approvals.request"
+   "approvals.request",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "venue",
