@@ -1606,7 +1606,7 @@ paths:
       summary: Build a visit plan from the party, the dates and what they like
       description: >
         **The Plan tab's first answer, and it needs no AI** (29 September, MOB-6). The guest gives
-        party size, each person's height or age, the dates, the pace (packed or relaxed), interests
+        party size, each person's height or age, the dates, the pace (packed, balanced or relaxed), interests
         and cuisines; the planner returns one itinerary per day with timed items and add-ons such
         as Fast Track.
 
@@ -1637,7 +1637,9 @@ paths:
         unmatched cuisine recorded; a retail stop is placed when the party chose `shopping` or a
         `retailTags` value, at a retail point of the day's venue that matches, late in the day or
         on the way to the exit; `relaxed` leaves a 30-minute gap after every two items and stops
-        by 18:00, `packed` fills to closing. (5) Add-ons: where the expected wait on a planned ride
+        by 18:00, `packed` fills to closing, and `balanced` (DI-1098, agreed 30 September; r8 walk of tickets 28701
+        and 28200) sits between them: a 15-minute gap after every two items, filling to 85% of the venue's opening
+        hours. **The balanced numbers are the planner owner's proposal, to be confirmed by the lead.** (5) Add-ons: where the expected wait on a planned ride
         exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that
         item, never added.
 
@@ -2169,7 +2171,7 @@ components:
               ageYears: { type: integer, minimum: 0, maximum: 120, nullable: true }
         pace:
           type: string
-          enum: [packed, relaxed]
+          enum: [packed, balanced, relaxed]
           default: relaxed
         interestTags:
           type: array

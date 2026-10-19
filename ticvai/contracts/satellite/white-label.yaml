@@ -1351,7 +1351,7 @@ paths:
         **The review path, as `publishTenantConfig` has it** (r8 walk of ticket 27919; ADAM CR-154). With the
         tenant''s publish-review policy off, the block is published or scheduled at once (200). With it on, this
         calls approvals'' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix
-        subject `whiteLabelPublication`, `subjectId` the block id), records its `approvalRequestId`, leaves `status`
+        subject `whiteLabelPublication`, `subjectId` the block id; the request points at the block, and the block keeps no link back), leaves `status`
         as it is and sets `reviewStatus` `pending`, and answers 202. White-label''s consumer of `approval.granted`
         then publishes or schedules the block (`reviewStatus` `approved`); its consumer of `approval.rejected`
         sets `reviewStatus` `rejected` and the block stays a draft. While `pending`, a second publish of the block
@@ -1396,7 +1396,7 @@ paths:
                 $ref: '#/components/schemas/ContentBlock'
         '202':
           description: Submitted for review; the tenant's publish-review policy is on. The block keeps its `status`,
-            carries `reviewStatus` `pending` and its `approvalRequestId`, and is published or scheduled when the
+            carries `reviewStatus` `pending`, and is published or scheduled when the
             request is approved.
           content:
             application/json:
@@ -8748,12 +8748,6 @@ components:
           default: notRequired
           description: The review step of `publishContentBlock`, where the tenant's publish-review policy is on (r8 walk
             of ticket 27919). `pending` from the 202 until the approval is decided; `status` does not change meanwhile.
-        approvalRequestId:
-          type: string
-          format: uuid
-          nullable: true
-          readOnly: true
-          description: The approval request `publishContentBlock` raised; null while no review has been asked for.
         scopePath:
           type: string
           readOnly: true
