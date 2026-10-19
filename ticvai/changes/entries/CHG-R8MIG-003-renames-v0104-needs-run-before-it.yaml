@@ -1,0 +1,60 @@
+id: CHG-R8MIG-003
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'A fresh database now builds through V0104: the four column renames V0104 already uses (it applies row-level
+  security on access.access_change.old_entitlement_id, access.entry_rule_point.admission_rules_id,
+  marketing.waiver_signature.form_definition_id and platform.sale_board_tile.sale_board_page_id) are written in
+  backend/tenant/V0103a__names_early_after_r1_20261020.sql, which sorts after V0103 and before V0104; V0107 keeps the other
+  renames, and its blocks for these four find them done. V0100-V0105 are unchanged.'
+decision:
+  what: 'tools/ddl_forward.py split_early moves a rename to the early file when a frozen forward file (or this run''s own
+    additive file) names the table and the new column; early_version names it with the number before that file and the next
+    free letter (V0103a), which sorts between the two by file name, the order SqlMigrationRunner (ordinal) and
+    provision-tenant.sh apply. A five-digit number (V01035, the stopped attempt) was not used: it sorts before V0103, reads as
+    1035 (the plan gives V1035__fnb.sql), and build-service-docs, check-migration-tickets and ticket_done read four digits and
+    an optional letter only. A rename that also adds NOT NULL is now written as a rename (sale_board_tile.page_id), the
+    NOT NULL staying a review row. FORWARD_FILE (derive-ddl, build-service-docs), check-migration-freeze FORWARD,
+    ticket_done.AFTER_R1_FILE and check-ticket-text accept the letter. backend/MIGRATIONS.md says what V0107 and V0103a are.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'r8 blocker walk, migrations lane (lane-migrations-report.md, "V0104 fix"): V0104__after_r1_20261015.sql stopped a fresh
+  PostgreSQL 16 build at r7 already, and again after CHG-R8MIG-001 put the renames in V0107, after it.'
+keys_touched:
+  operations: []
+  tables:
+  - access.access_change
+  - access.entry_rule_point
+  - marketing.waiver_signature
+  - platform.sale_board_tile
+  schemas: []
+  files:
+  - tools/ddl_forward.py
+  - tools/derive-ddl.py
+  - tools/build-service-docs.py
+  - tools/ticket_done.py
+  - tools/check-migration-freeze.py
+  - tools/check-ticket-text.py
+  - tools/tests/test_migration_generator.py
+  - backend/tenant/V0103a__names_early_after_r1_20261020.sql
+  - backend/tenant/V0107__names_after_r1_20261019.sql
+  - backend/MIGRATIONS.md
+root_class: 'A-DERIVE: a frozen file named a column by a name a later file gives it'
+tickets:
+  started: []
+  unstarted:
+  - 'MIG-ACCESS, MIG-MARKETING and MIG-PLATFORM: their "Source DDL after r1" sentence names V0103a for these four renames
+    (build-service-docs regenerates it).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'r8 blocker walk, no CR'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::early_version
+status: open
+notes: 'Tested on PostgreSQL 16 (pgvector/pgvector:pg16): control and tenant apply from empty end to end with no error and
+  V0107 reruns clean; a database already past V0105 that has never seen V0103a applies it with no change (every block is
+  guarded; it only adds its schema_version row). tools/tests/test_migration_generator.py: early_version and the early header.
+  Not a check: a frozen file naming a column a later file renames is caught by split_early when the generator runs, not by
+  run-checks; a fresh-build CI job would catch the rest.'

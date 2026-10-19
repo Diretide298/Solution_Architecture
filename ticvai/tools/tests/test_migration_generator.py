@@ -215,6 +215,32 @@ def test_a_rename_a_frozen_file_depends_on_goes_in_the_early_file():
     assert fwd.split_early(p, {})[0] == ([], [])
 
 
+def test_the_early_file_takes_a_letter_and_sorts_between_the_two_frozen_files():
+    # CHG-R8MIG-003: V01035 sorted before V0103 and read as 1035 (the plan's V1035__fnb.sql); a letter does neither
+    ev = fwd.early_version("V0104__after_r1_20261015.sql", {"V0100", "V0103", "V0104", "V0105", "V0107"})
+    assert ev == "V0103a"
+    names = ["V0103__after_r1_20261013.sql", f"{ev}__names_early_after_r1_20261020.sql", "V0104__after_r1_20261015.sql",
+             "V0105__after_r1_20261018.sql", "V0107__names_after_r1_20261020.sql"]
+    assert sorted(names) == names                                   # ordinal, as SqlMigrationRunner sorts
+    assert fwd.early_version("V0104__x.sql", {"V0103a"}) == "V0103b"  # a letter already taken is not reused
+    import ticket_done as td
+    assert td.AFTER_R1_FILE.match(names[1])
+    dd = _load("derive_ddl_early", "derive-ddl.py")
+    assert dd.FORWARD_FILE.match(names[1]), "derive-ddl must read the early file back, or a second run writes it again"
+
+
+def test_the_early_file_says_which_file_it_runs_before():
+    p = fwd.diff("tenant", model(TILE_OLD), model(TILE_NEW), TILE_RENAMES)
+    early, rest, first = fwd.split_early(p, {"V0104__after_r1_x.sql": "SELECT platform.apply_parent_rls("
+                                             "'platform.sale_board_tile'::regclass, 'sale_board_page_id', 'x'::regclass, 'id');"})
+    import dataclasses
+    ep = dataclasses.replace(p, recon=early[0], recon_rollback=early[1],
+                             recon_counts={"renames": len(early[0]), "keys": 0, "indexes": 0})
+    text = fwd.render_recon(ep, "V0103a", "r1", "20261020", before=first, rest="V0107")
+    assert "runs before V0104__after_r1_x.sql" in text and "VALUES ('V0103a'" in text and "are in V0107" in text
+    assert "RENAME COLUMN page_id TO sale_board_page_id" in text
+
+
 def test_a_table_check_naming_a_renamed_column_waits_for_the_rename_whole():
     chk = "CONSTRAINT sale_board_tile_sale_board_page_id_when_chk CHECK (kind IS DISTINCT FROM 'x' OR " \
           "sale_board_page_id IS NOT NULL)"

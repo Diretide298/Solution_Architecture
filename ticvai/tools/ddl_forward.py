@@ -1246,8 +1246,21 @@ def split_early(p: Plan, frozen: dict) -> tuple:
     return early, rest, first
 
 
-def render_recon(p: Plan, version: str, baseline: str, stamp: str) -> str:
-    """The second forward file for one database: the renames, keys and dropped indexes (R8-MIG-001)."""
+def early_version(first: str, taken: set) -> str:
+    """The version of the file that runs just before the frozen file `first` (R8-MIG-001, CHG-R8MIG-003): the number
+    before it and the first letter not taken, `V0103a` for `V0104__...`. By name (SqlMigrationRunner sorts ordinal)
+    `V0103__` < `V0103a__` < `V0104__`, since `_` sorts before every lower-case letter. A longer number does not do it:
+    V01035 sorts before V0103 (`5` < `_`), reads as 1035, the plan's V1035__fnb.sql, and no check reads five digits."""
+    n = int(re.match(r"V(\d+)", first).group(1)) - 1
+    for letter in "abcdefghijklmnopqrstuvwxyz":
+        if f"V{n:04d}{letter}" not in taken:
+            return f"V{n:04d}{letter}"
+    raise ValueError(f"no free letter after V{n:04d}")
+
+
+def render_recon(p: Plan, version: str, baseline: str, stamp: str, before: str = "", rest: str = "") -> str:
+    """The second forward file for one database: the renames, keys and dropped indexes (R8-MIG-001). With `before`,
+    the early file: the renames the frozen file `before` names by their new names, the rest in `rest`."""
     import hashlib as _h
     body = "\n\n".join(x.rstrip().rstrip(";") + ";" for x in p.recon)
     checksum = _h.sha256(body.encode("utf-8")).hexdigest()
@@ -1268,6 +1281,13 @@ def render_recon(p: Plan, version: str, baseline: str, stamp: str) -> str:
         "-- makes to your tables'). A foreign key is added NOT VALID: it checks every new write, and the owner runs",
         "-- ALTER TABLE ... VALIDATE CONSTRAINT when the rows already there are known to be clean.",
         f"-- {what}.",
+    ] + ([
+        "--",
+        f"-- **This file runs before {before}**, which applies row-level security on these columns by their new",
+        f"-- names: without it a database built from the files in name order stops at {before}. The other renames,",
+        f"-- with the keys and indexes that follow them, are in {rest}; its blocks for these columns find them renamed",
+        "-- and do nothing.",
+    ] if before else []) + [
         "",
         body,
         "",

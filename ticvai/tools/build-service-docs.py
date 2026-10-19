@@ -448,8 +448,9 @@ def state_facts(o: str, x: dict, models: dict, by_op: dict) -> tuple[list[str], 
 
 # ---- DDL to migrations --------------------------------------------------------------------------
 
-# A forward migration derive-ddl writes after r1 (`V0100__after_r1_20261002.sql`); the same pattern as derive-ddl's.
-FORWARD_FILE = re.compile(r"^V(\d{4})__[\w.-]+\.sql$")
+# A forward migration derive-ddl writes after r1 (`V0100__after_r1_20261002.sql`); the same pattern as derive-ddl's,
+# including a letter after the number for a file that runs between two frozen ones (`V0103a__`, CHG-R8MIG-003).
+FORWARD_FILE = re.compile(r"^V(\d{4})[a-z]?__[\w.-]+\.sql$")
 # The row-level policy each `platform.apply_<kind>_rls` gives a table (backend/<db>/920-row-level-security.sql), as the
 # documents name it (CHG-TBF-004). **`tenant` is not a missing tenant_id**: a tenant database holds one tenant
 # (ADR-0038), so the tenant-root policy is platform.tenant_root_in_scope() and needs no tenant column.
@@ -531,7 +532,7 @@ def read_ddl() -> dict[str, dict]:
         # access.hardware_certification ...) out of every migration ticket although operations read and write
         # them; their columns added after r1 were missing from the counts as well.
         fwd = sorted((p for p in (ROOT / "backend" / db).glob("V*.sql") if FORWARD_FILE.match(p.name)),
-                     key=lambda p: int(FORWARD_FILE.match(p.name).group(1)))
+                     key=lambda p: p.name)   # the order a database applies them: by name (V0103a after V0103)
         for f in sorted((ROOT / "backend" / db).glob("010-*.sql")) + fwd:
             name, cols_ = None, []
             for line in f.read_text(encoding="utf-8").splitlines():
