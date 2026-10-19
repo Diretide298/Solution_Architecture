@@ -1,0 +1,37 @@
+id: CHG-R8SPN-038
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A product''s channel publication can be read before it is replaced: new getChannelAvailability (PRODUCT_VIEW, by
+  productId, from the primary) returns what publishChannelAvailability stored, and the PUT says it replaces the
+  publication whole, so BO-291 and ADM-124 read first and send back what they do not show. The membership view''s
+  channel values map onto catalogue channels (guestWeb -> web, guestApp -> mobile, Reseller -> b2b; api is not sent).'
+decision:
+  what: 'R8 blocker cause GPS-C39 (no decision needed). Core part: catalogue.yaml getChannelAvailability and
+    publishChannelAvailability''s text. subscription.yaml''s view (catalogueProductId and variantId, which
+    membership_product.catalogue_product_id already holds) and BO-291''s apis (the read first; capacity writers bound
+    or moved to ADM-124) are the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 ticket 29883 (ADAM gaps 29883/1 to 29883/4): BO-291 could not call its bound catalogue
+  writers for the membership it shows, and a whole-replace write with no read would erase ADM-124''s settings.
+  Finding: R8 blocker cause list, group guest-pos-screens.'
+keys_touched:
+  operations: [getChannelAvailability, publishChannelAvailability]
+  schemas: [ChannelPublicationAvailabilityView]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'contract gap: a whole-replace write has no read to start from'
+tickets:
+  started: []
+  unstarted:
+  - '29883 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 29883/1, 29883/2, 29883/3, 29883/4'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'New operation gates: PRODUCT_VIEW, no config noun, not a list (one product''s publication).'

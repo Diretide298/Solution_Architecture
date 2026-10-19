@@ -6229,6 +6229,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-availability:
+    get:
+      operationId: getChannelAvailability
+      x-ticvai-audience:
+        - staff
+      x-ticvai-read-routing: primary
+      summary: One product's channel publication, as publishChannelAvailability last stored it
+      description: '**The read this whole-replace write was missing** (20 October 2026, R8 blocker cause GPS-C39;
+        CHG-R8SPN-038). Returns the publication of the product `productId` names, within the caller''s venue, in the
+        shape `publishChannelAvailability` answers with, so a screen that changes one part can send the rest back
+        unchanged. A product with no publication saved answers `200` with an empty `channels` list. Read from the
+        primary, because the next call is the PUT that replaces it.'
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: productId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The product's channel publication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelPublicationAvailabilityView'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: publishChannelAvailability
       x-ticvai-consumed-by:
@@ -6258,7 +6293,20 @@ paths:
         are response-only (publicationPreview, validationIssues); productId and the count of issued entitlements
         that stay valid added. Removing a channel stops future sale only; previously issued tickets stay valid,
         and the response shows issuedEntitlementsUnaffected so ADM-124 can say so. Only approved or live products
-        can be exposed; channel configuration itself belongs to Sales Channel Management.'
+        can be exposed; channel configuration itself belongs to Sales Channel Management.
+
+
+        **A PUT replaces the product''s publication whole, so a caller reads it first** (20 October 2026, R8 blocker
+        cause GPS-C39; CHG-R8SPN-038). Every screen that changes one part (BO-291 its channels, ADM-124 everything)
+        reads the current publication with `getChannelAvailability`, changes what it shows, and sends the rest back
+        as read: `siteIds`, `posGroupIds`, `venueIds` and the dates it does not show are kept only because they are
+        sent. A body that leaves them out clears them.
+
+
+        **Membership channels map onto catalogue channels** (GPS-C39): the channel values BO-291''s membership view carries
+        (subscription) map `guestWeb` -> `web`, `guestApp` -> `mobile`, `Reseller` (or `partner`) -> `b2b`, and the rest
+        by the same name where one exists; `api` has no catalogue channel (public API sale is governed by the API licensing, not by this
+        list) and is not sent.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
