@@ -335,6 +335,16 @@ components:
         (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and
         the operation declares `x-ticvai-step-up: pin`.
 
+
+        **Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay,
+        R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by
+        `identity.listStepUpSupervisors` with the operation''s permission: the active principals who hold it at the
+        caller''s venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends
+        the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`).
+        **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller''s own
+        principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the
+        picker leaves the caller out.
+
         '
       required:
       - credential

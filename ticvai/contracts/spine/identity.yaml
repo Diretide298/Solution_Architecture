@@ -1683,6 +1683,70 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /auth/step-up-supervisors:
+    get:
+      operationId: listStepUpSupervisors
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: Who may sign a supervisor step-up here
+      description: '**The picker of the supervisor PIN prompt** (decided 20 October 2026, Chinmay, R8 blocker cause
+        GPS-C31, option A; CHG-R8SPN-035; `SupervisorStepUp` in contracts/shared/common.yaml). Returns the active
+        principals who hold `permission` at the venue the caller''s session acts at (through their grants, after
+        deny resolution, as the step-up check itself resolves it), **leaving out the caller**, who may never sign
+        their own act. Only what the prompt shows: the principal id and display name.
+
+
+        **Who may ask.** Any staff session at the venue, with no permission of its own: the cashier whose act needs
+        a supervisor is the one who opens the prompt, and the answer is limited to the caller''s own venue and to
+        names, never roles, contact details or anything else of the principal.
+
+
+        **Order.** By `displayName` ascending, then by `principalId`. **Statuses.** Only active principals whose grant
+        is in force now; deactivated principals and expired grants are left out.'
+      tags:
+      - identity
+      # No permission: any staff session at the venue may ask who can sign for its own pending act; the answer is
+      # scoped to the caller's own venue and session (self-scoped) and carries names only (GPS-C31).
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: principal
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: permission
+        in: query
+        required: true
+        description: The step-up operation's `x-ticvai-permission`, for example `ORDER_CANCEL`.
+        schema:
+          $ref: ../shared/permissions.yaml#/components/schemas/Permission
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The principals who may sign, by display name
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        required: [principalId, displayName]
+                        properties:
+                          principalId:
+                            type: string
+                            format: uuid
+                          displayName:
+                            type: string
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/credential:
     post:
       operationId: changeOwnCredential

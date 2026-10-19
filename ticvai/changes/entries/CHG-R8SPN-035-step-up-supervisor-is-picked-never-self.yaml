@@ -1,0 +1,39 @@
+id: CHG-R8SPN-035
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Every supervisor step-up gets its principalId from one convention: the PIN prompt''s picker is filled by the new
+  identity.listStepUpSupervisors (the active principals holding the operation''s permission at the caller''s venue, by
+  display name, the caller left out; paged), and nobody signs their own act (403 supervisor-step-up-refused). Written
+  once on SupervisorStepUp in contracts/shared/common.yaml.'
+decision:
+  what: 'R8 blocker cause GPS-C31 (lead answer: take the recommendation, option A: a picker of principals who hold the
+    permission at this venue, a new read, self-approval refused). common.yaml SupervisorStepUp; identity.yaml
+    listStepUpSupervisors (permission null, self-scoped principal: any staff session at the venue, names only). The
+    PIN prompt component in screens/_components.yaml is the surface lane''s part.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 ticket 28195 (ADAM gap 28195/1): nothing said where a supervisor step-up''s principalId
+  came from. Finding: R8 blocker cause list, group guest-pos-screens.'
+keys_touched:
+  operations: [listStepUpSupervisors]
+  schemas: [SupervisorStepUp]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/identity.yaml
+root_class: 'screen-api gap: a value an operation needs has no source on the screen'
+tickets:
+  started: []
+  unstarted:
+  - '28195 (the walk that found the gap).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 28195/1'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-step-up.py
+status: open
+notes: 'New operation gates: permission null with a self-scoped reason (comment on the operation), no config noun, PageSize
+  and PageCursor with order and statuses stated. Lineage: reads identity.principal, identity.delegated_access,
+  identity.role_permission at the generators lane''s derive.'
