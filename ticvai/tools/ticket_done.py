@@ -331,6 +331,9 @@ _AR1 = [
     (re.compile(r"^CREATE TABLE IF NOT EXISTS (\w+\.\w+)"), None),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD COLUMN (?:IF NOT EXISTS )?(\w+)"), "column"),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD CONSTRAINT (\w+)"), "constraint"),
+    # a key the additive file adds guarded (ddl_forward.guard_add_constraint, CHG-R8MIG-010)
+    (re.compile(r"^DO \$\$ BEGIN IF NOT EXISTS \(SELECT 1 FROM pg_constraint WHERE .*? THEN ALTER TABLE (?:ONLY )?"
+                r"(\w+\.\w+) ADD CONSTRAINT (\w+)"), "constraint"),
     (re.compile(r"^CREATE (?:UNIQUE )?INDEX (?:IF NOT EXISTS )?(\w+) ON (?:ONLY )?(\w+\.\w+)"), "index"),
     (re.compile(r"^SELECT platform\.(apply_\w+)\('(\w+\.\w+)'"), "row-level security"),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) (.+?);?$"), "change"),

@@ -5,7 +5,7 @@ kind: contract
 summary: 'The spine contracts state the storage the r8 walk found missing, so the next derive writes it as a forward
   migration: control.tenant_domain hostname unique across tenants among active rows; tenancy.device_assignment one row
   per device; platform.dead_letter keeps the outbox envelope (event id, tenant, aggregate, sequence) so a requeue is the
-  same event; access.access_point.zone_id (the zone the offline package filters by); platform.audit_read holds every
+  same event; access.access_point.access_area_id (the zone the offline package filters by); platform.audit_read holds every
   audited read (AuditRead: target, filter, record count, subject optional) and any grant holder appends to it. The
   generator now writes a guarded DROP NOT NULL when the contract makes a column optional and changes nothing else.'
 decision:

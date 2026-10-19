@@ -675,3 +675,20 @@ def test_a_foreign_key_the_contract_withdraws_is_dropped_guarded_in_the_names_fi
     folded.apply_forward(";\n".join(s.split("\n", 1)[1] for s in p.recon) + ";\n")
     again = fwd.diff("tenant", folded, model(PSG))
     assert not again.recon and not again.review, (again.recon, again.review)
+
+
+AP_OLD = ("CREATE TABLE IF NOT EXISTS access.access_area (id uuid PRIMARY KEY NOT NULL);\n"
+          "CREATE TABLE IF NOT EXISTS access.access_point (id uuid PRIMARY KEY NOT NULL);\n")
+AP_NEW = ("CREATE TABLE IF NOT EXISTS access.access_area (id uuid PRIMARY KEY NOT NULL);\n"
+          "CREATE TABLE IF NOT EXISTS access.access_point (id uuid PRIMARY KEY NOT NULL, zone_id uuid);\n"
+          "ALTER TABLE access.access_point ADD CONSTRAINT access_point_zone_id_fkey FOREIGN KEY (zone_id) "
+          "REFERENCES access.access_area(id);\n")
+
+
+def test_a_key_on_a_new_column_is_added_guarded_so_the_file_applies_twice():
+    p = fwd.diff("tenant", model(AP_OLD), model(AP_NEW))
+    fk = [s for s in p.statements if "access_point_zone_id_fkey" in s]
+    assert len(fk) == 1 and fk[0].startswith("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint")
+    assert "conname = 'access_point_zone_id_fkey'" in fk[0] and "NOT VALID" not in fk[0]
+    again = fwd.diff("tenant", fold(AP_OLD, p), model(AP_NEW))
+    assert not again.statements and not again.review, (again.statements, again.review)

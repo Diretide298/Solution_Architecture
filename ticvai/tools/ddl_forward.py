@@ -350,6 +350,12 @@ def widened_check(old_def: str, new_def: str):
     return n[0], n[1]
 
 
+def guard_add_constraint(t: str, name: str, stmt: str) -> str:
+    """`stmt` (an ALTER TABLE ... ADD CONSTRAINT) only when the constraint is not there yet (CHG-R8MIG-010)."""
+    return (f"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
+            f"to_regclass('{t}')) THEN {norm(stmt).rstrip(';')}; END IF; END $$")
+
+
 def guard_drop_constraint(t: str, name: str) -> str:
     return (f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
             f"to_regclass('{t}')) THEN ALTER TABLE {t} DROP CONSTRAINT {name}; END IF; END $$")
@@ -1088,7 +1094,10 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             if k in old.stmts and subst(old.stmts[k]) == new.stmts[k]:
                 continue   # a key to a renamed table: Postgres follows the rename
             if k not in old.stmts and (t in new_tables or (cols and cols <= new_cols.get(t, set()))):
-                p.statements.append(stmt)
+                # **Guarded, so the file applies twice** (CHG-R8MIG-010, the storage-sat lane's request): every other
+                # statement of the file is IF [NOT] EXISTS, and ADD CONSTRAINT has no such form, so a second run
+                # stopped at the first key. Checked, not NOT VALID: the column is new, so no row can break it.
+                p.statements.append(guard_add_constraint(t, name, stmt) if parse_fk(stmt) else stmt)
                 if t not in new_tables:
                     p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};")
                 p.counts["other"] += 1
