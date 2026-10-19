@@ -549,6 +549,13 @@ def self_test() -> list:
     case("branch: detached HEAD refuses", bool(branch_refusal("HEAD")), True)
     case("branch: empty refuses", bool(branch_refusal("")), True)
 
+    # -- the bash the gate runs ----------------------------------------------------------------------------------
+    import shutil
+    case("gate bash: a bash program, not a bare name Windows resolves in System32",
+         Path(bash()).name.lower() in ("bash", "bash.exe") and (Path(bash()).is_file() or not shutil.which("bash")), True)
+    case("gate bash: not WSL's (System32 or WindowsApps)",
+         bool(re.search(r"(?i)[\/](system32|windowsapps)[\/]", bash())), False)
+
     # -- tag numbering --------------------------------------------------------------------------------------------
     try:
         case("only r<N> tags count, numerically", release_numbers(["r1", "r10", "r6-rc", "rx", "r2", "v3", "r06", "r6"]),
@@ -950,6 +957,25 @@ def last_full_run_seconds():
     return None, None
 
 
+def bash():
+    """The bash that runs refresh-safe.sh: the first on PATH. A bare "bash" given to subprocess on Windows is looked up
+    in System32 before PATH and finds WSL's, which cannot read the script's CRLF working copy:
+    the r7 gate died that way in 8 s on 19 October (refresh-manifest.py had the same fix, CHG-SRF-003)."""
+    import shutil
+    found = shutil.which("bash")
+    if found and not re.search(r"(?i)[\/](system32|windowsapps)[\/]", found):
+        return found
+    # PowerShell puts System32 ahead of Git on PATH: take the bash beside git.exe (Git for Windows: cmd\git.exe
+    # with binash.exe one level up).
+    git_exe = shutil.which("git")
+    if git_exe:
+        root = Path(git_exe).resolve().parent.parent
+        for cand in (root / "bin" / "bash.exe", root / "usr" / "bin" / "bash.exe"):
+            if cand.is_file():
+                return str(cand)
+    return found or "bash"
+
+
 def gate_command(changed_file, json_out):
     flag = scoped_flag()
     if flag == "--changed-from":
@@ -962,7 +988,7 @@ def gate_command(changed_file, json_out):
         return ("change-scoped checks (lane C's run-checks.py --changed): only the checks that read a changed file",
                 [sys.executable, "tools/run-checks.py", "--changed", *paths, "--json", str(json_out)], len(paths))
     return ("the full refresh and gate (run-checks.py has no --changed yet: lane C has not merged)",
-            ["bash", "tools/refresh-safe.sh", "--head-only", "--no-merge", "--parallel", "4"], None)
+            [bash(), "tools/refresh-safe.sh", "--head-only", "--no-merge", "--parallel", "4"], None)
 
 
 def branch_refusal(branch):
