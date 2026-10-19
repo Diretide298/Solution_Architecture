@@ -988,7 +988,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                         p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};"
                                           + (f" ALTER TABLE {t} ADD {old_ic[1]} NOT VALID;" if old_ic else ""))
                         p.counts["other"] += 1
-                        review("constraint not validated", f"{t} {name}", f"`{clause}`, added NOT VALID",
+                        # a "column changed" row on the column, so the checks reading the frozen DDL see it pending
+                        review("column changed", f"{t}.{c}", f"`{clause}` added NOT VALID by the forward migration",
                                f"check the rows, then ALTER TABLE {t} VALIDATE CONSTRAINT {name}")
                     elif only_not_null_dropped(a.cols[c], d):
                         # **A column the contract makes optional loses its NOT NULL here** (CHG-R8MIG-004, R8 blockers

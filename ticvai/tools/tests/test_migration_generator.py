@@ -655,7 +655,7 @@ def test_a_column_check_that_only_gains_values_is_written_not_valid_then_validat
 def test_a_column_check_that_loses_a_value_is_added_not_valid_and_left_to_validate():
     p = fwd.diff("control", model(CH_NEW), model(CH_OLD))
     assert not [s for s in p.statements if "VALIDATE CONSTRAINT tenant_domain_channel_chk" in s]
-    assert [r for r in p.review if r[0] == "constraint not validated"]
+    assert [r for r in p.review if r[0] == "column changed" and "VALIDATE CONSTRAINT" in r[3]]
 
 
 PSG = ("CREATE TABLE IF NOT EXISTS identity.principal (id uuid PRIMARY KEY NOT NULL);\n"
@@ -704,8 +704,7 @@ def test_a_check_added_to_an_existing_column_is_written_not_valid_and_validation
     add = [s for s in p.statements if "ADD CONSTRAINT customer_badge_status_chk" in s]
     assert add and add[0].endswith("NOT VALID")
     assert not [s for s in p.statements if "VALIDATE" in s]
-    assert [r for r in p.review if r[0] == "constraint not validated" and "VALIDATE CONSTRAINT" in r[3]]
-    assert not [r for r in p.review if r[0] == "column changed"]
+    assert [r for r in p.review if r[0] == "column changed" and "VALIDATE CONSTRAINT" in r[3] and "NOT VALID" in r[2]]
     again = fwd.diff("tenant", fold(CB_OLD, p), model(CB_NEW))
     assert not again.statements and not again.review, (again.statements, again.review)
 
@@ -714,4 +713,4 @@ def test_a_narrowed_check_is_written_not_valid_too():
     narrow = CB_NEW.replace(", 'revoked'", "")
     p = fwd.diff("tenant", model(CB_NEW), model(narrow))
     assert [s for s in p.statements if "ADD CONSTRAINT customer_badge_status_chk" in s and "'revoked'" not in s]
-    assert [r for r in p.review if r[0] == "constraint not validated"]
+    assert [r for r in p.review if r[0] == "column changed" and "VALIDATE CONSTRAINT" in r[3]]

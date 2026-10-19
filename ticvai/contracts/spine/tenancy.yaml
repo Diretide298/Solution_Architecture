@@ -6448,6 +6448,9 @@ components:
         scopePath: { type: string }
         saleBoard:
           type: object
+          # Stored only when the till overrides its outlet; the response resolves the effective board on read
+          # (R8 blocker APPROVALS-TENANCY-C39, core lane; CHG-R8MIG-014): platform.workstation.sale_board is nullable.
+          x-ticvai-column-nullable: true
           description: >
             Determines which front end loads. Bound to the workstation, not the role — the
             F&B terminal opens the F&B board. What the operator may then DO within it is
