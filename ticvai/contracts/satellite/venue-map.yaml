@@ -2306,6 +2306,24 @@ components:
             properties:
               pointId: { type: string, format: uuid }
               productId: { type: string, format: uuid, nullable: true }
+              name:
+                type: string
+                nullable: true
+                x-ticvai-persisted: false
+                x-ticvai-derived: onRead
+                description: The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693).
+              limit:
+                type: object
+                nullable: true
+                x-ticvai-persisted: false
+                x-ticvai-derived: onRead
+                description: >
+                  The rule that left it out, worked out on read from the product's eligibility rule: for
+                  `heightRule` a minimum or maximum height in centimetres, for `ageRule` a minimum or maximum age in
+                  years. Null for the other reasons. The banner says "Min height 120 cm" from it.
+                properties:
+                  kind: { type: string, enum: [minHeightCm, maxHeightCm, minAge, maxAge] }
+                  value: { type: integer, minimum: 0 }
               reason:
                 type: string
                 enum: [heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue]
@@ -2408,6 +2426,24 @@ components:
           format: uuid
           nullable: true
           x-ticvai-references: venuemap.point
+        name:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'What the stop is called on the timeline (GST-059, GST-053; r8 walk of ticket 28693): the
+            point''s name, or the performance''s title for a show, in the request language. Worked out on read from
+            `pointId` or `performanceId`, as `VisitPlanAlternative.name` is; nothing is stored. Null for a travel
+            stop.'
+        zoneName:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The name of the zone the stop is in, from the point's zone on the map the plan was laid out
+            on. Worked out on read; null when the point has no zone.
         productId:
           type: string
           format: uuid
