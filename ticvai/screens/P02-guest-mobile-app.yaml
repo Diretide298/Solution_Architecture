@@ -4801,30 +4801,31 @@ screens:
       crossesDevice: true
       back: false
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue
-    map 18 August (CF-123).** The whole map arrives in one call and the client filters locally — which
-    is also what makes it work with no signal in the middle of a park. **Routing happens on the device.**
-    The platform guarantees the graph — connected, versioned, with step-free marked — and the client walks
-    it, because a phone with the graph cached routes with no signal and a server round-trip per step does
-    not. **The version is how a stale route is caught**: a guest holding a route across a path that closed
-    this morning gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html`
-    frame `seat-4b`. **The frame names this screen on its own face**, which is the first pack to do that:
-    the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts
-    produced nonsense. **A board that says what it draws removes the guess entirely.**
-
-
+    from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue map
+    18 August (CF-123).** The whole map arrives in one call and the client filters locally — which is also
+    what makes it work with no signal in the middle of a park. **Routing happens on the device.** The platform
+    guarantees the graph — connected, versioned, with step-free marked — and the client walks it, because
+    a phone with the graph cached routes with no signal and a server round-trip per step does not. **The
+    version is how a stale route is caught**: a guest holding a route across a path that closed this morning
+    gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4b`.
+    **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B,
+    POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense.
+    **A board that says what it draws removes the guess entirely.**
+  
+  
     **Mobile v4 (decided 29 September, MOB-1).** The **Map** view of GST-038 At the Venue: **one implementation
     with GST-038, the ids kept** (as GAP-D3).
-
-
-    **3D navigation (client meeting 30 September, MoM 4.8): ADR-0069.** Where the venue map has a GLB
-    model, this view renders it natively (react-three-fiber) and the walking-navigation mode follows the
-    guest in 3D; the route still comes from `getVenueMapGraph`, snapped from live GPS, with no external
-    mapping service. No model, a weak phone or failed rendering: the 2D map, same route.
-
-
+  
+  
+    **3D navigation (client meeting 30 September, MoM 4.8): ADR-0069.** Where the venue map has a GLB model,
+    this view renders it natively (react-three-fiber) and the walking-navigation mode follows the guest
+    in 3D; the route still comes from `getVenueMapGraph`, snapped from live GPS, with no external mapping
+    service. No model, a weak phone or failed rendering: the 2D map, same route.
+  
+  
     **The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists),
-    so a normal visit has a map to load** (CHG-FXS-003)'
+    so a normal visit has a map to load** (CHG-FXS-003) Build note (r8, GPS-C08): send `onlyBookable=false`
+    on `listBookableVenueMaps`, so a venue map with no bookable resource still opens.'
   density: comfortable
   boardFrames:
   - Seat Board 4.dc.html#seat-4b
@@ -8292,12 +8293,14 @@ screens:
       - caseId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Guest case operations
-    wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read
-    nothing, and `check-screens` refused the staff-permissioned ones on a guest surface. `listMyCases`,
-    `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.
-
-
-    **Rev 3 (decided 29 September).** The Help screen shows app status and a public *What''s new* (GAP-B2).'
+    wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read nothing,
+    and `check-screens` refused the staff-permissioned ones on a guest surface. `listMyCases`, `raiseMyCase`
+    and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.
+  
+  
+    **Rev 3 (decided 29 September).** The Help screen shows app status and a public *What''s new* (GAP-B2).
+    Build note (r8, WHITE-C14): the page and policy body shown in the detail panel is read with `getMyCase`;
+    the operation is defined by the satellite contract (WHITE-C14).'
   density: comfortable
   pattern: commandCentre
   patternReason: 3 independent reads and no read of one record — the screen watches a population rather
@@ -8417,6 +8420,10 @@ screens:
     purpose: Terms, privacy, refund, cookie and accessibility policies, readable before sign-in (GFIX-2)
     trigger: onLoad
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)
+  - operationId: getMyCase
+    contract: marketing-crm
+    purpose: Read the guest's own case, and the page or policy body shown in the detail panel
+    trigger: onLoad
   entryState:
     params:
     - name: caseId
@@ -9664,11 +9671,11 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-047 holds none of them. The edge
         carries nothing: GST-047 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
-  notes: Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7
-    and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two
-    screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion`
+  notes: 'Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7
+    and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two screens.
+    Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion`
     for the forced upgrade and to `availability` and `availabilityMessage` for sold out and closed (decided
-    28 September, audit R073 (b)(f)).
+    28 September, audit R073 (b)(f)). Build note (r8, WHITE-C10): the store link comes from `MinimumAppVersion.storeUrl`.'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
@@ -11774,31 +11781,32 @@ screens:
       trigger: Home tab
       provenance: decided 29 September 2026, MOB-1
   notes: 'Minuted 10 Aug §4.9. **The in-visit half of GST-051** — one capability, two moments. ** wired
-    24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with
-    a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the
-    heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused
-    it and was right: **a guest does not record an outcome — the platform observes what they did.** A
-    guest app that self-reports whether it took the advice is a training label the guest could forge,
-    and the observation belongs server-side where the plan and the visit can be compared. **Deferred on
-    28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave:
-    4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded
-    that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed
-    28 September** (decided 28 September, audit R209): the planner was deferred (R187) and `requestSuggestion`
-    refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day
-    plan.
-
-
+    24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a
+    kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic
+    later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and
+    was right: **a guest does not record an outcome — the platform observes what they did.** A guest app
+    that self-reports whether it took the advice is a training label the guest could forge, and the observation
+    belongs server-side where the plan and the visit can be compared. **Deferred on 28 September (audit
+    R187), and brought back the next day**: the itinerary planner was put in `wave: 4` with a `deferred`
+    block and kept rather than deleted; the 29 September re-plan below superseded that, and the screen is
+    in Block A, wave 1 (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed 28 September** (decided
+    28 September, audit R209): the planner was deferred (R187) and `requestSuggestion` refuses a guest anything
+    but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.
+  
+  
     **Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan
     below.
-
-
-    **Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based
-    planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and
-    rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.
-
-
-    **Mobile v4 role (MOB-6): "Plan in Progress".** Today''s plan against live waits (`getWaitTimes`);
-    rules-based, AI not required.'
+  
+  
+    **Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner
+    with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3;
+    the `deferred` block is removed and the screen is wave 1.
+  
+  
+    **Mobile v4 role (MOB-6): "Plan in Progress".** Today''s plan against live waits (`getWaitTimes`); rules-based,
+    AI not required. Build note (r8, GPS-C15): the cold entry (no planId) reads `listMyVisitPlans` for today;
+    the edges from GST-001, GST-022 and GST-041 carry the chosen plan''s id, so the earlier "planId has
+    no source" notes no longer apply.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -11867,6 +11875,10 @@ screens:
     purpose: Swap candidates for one item that suit everyone in the party
     trigger: onAction
     provenance: decided 29 September 2026, MOB-6
+  - operationId: listMyVisitPlans
+    contract: venue-map
+    purpose: The guest's visit plans for the cold entry (date today), so the screen has a planId to open
+    trigger: onLoad
   entryState:
     params:
     - name: planId
@@ -12840,6 +12852,10 @@ screens:
     contract: marketing-crm
     purpose: Reply on a case the guest raised
     trigger: onAction
+  - operationId: getMyCase
+    contract: marketing-crm
+    purpose: Read the guest's own case
+    trigger: onLoad
   entryState:
     params:
     - name: subjectId
@@ -13547,6 +13563,14 @@ screens:
     purpose: The guest's wallet and its id, for a balance transfer
     trigger: onLoad
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: getLoyaltyPosition
+    contract: marketing-crm
+    purpose: The guest's loyalty position
+    trigger: onLoad
+  - operationId: listRewards
+    contract: marketing-crm
+    purpose: The rewards the guest can redeem
+    trigger: onLoad
   entryState:
     params:
     - name: subjectId

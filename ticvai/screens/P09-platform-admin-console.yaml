@@ -5938,6 +5938,14 @@ screens:
     purpose: The tenant's languages in force
     trigger: onLoad
     provenance: design-note correction, 2 October 2026 (ADM-018)
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: Ask for the second factor before the sensitive change
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Check the code the person enters
+    trigger: onAction
   entryState:
     params:
     - name: bannerId

@@ -1492,6 +1492,10 @@ screens:
       proposed and nobody has decided'
     trigger: onInterval
     provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
+  - operationId: getPublishReviewPolicy
+    contract: white-label
+    purpose: Whether publishing a content block needs review; the screen shows each block's reviewStatus
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
@@ -15904,12 +15908,19 @@ screens:
     trigger: onAction
     invalidates:
     - listProductCategories
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare two configuration versions, including the booking flows and the products they affect
+    trigger: onLoad
   entryState:
     params:
     - name: venueId
       from: session
     - name: bookingFlowId
       from: CMS-102
+      optional: true
+    - name: version
+      from: CMS-015
       optional: true
     - name: productId
       from: navigation
