@@ -785,13 +785,15 @@
    ],
    "subject": "Products wave 1: categories and tags as master data, back end and screens",
    "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 007), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end in CatalogueService: listProductCategoryUsage, listProductTags, setProductTagDefinition, setProductClassification (listProductCategories and setProductCategories exist). Screens: B1-S05 Category & Hierarchy Manager, the new Tags screen of the Setup Library, the category drop-down and tag picker of B1-S04 Identity & Classification (the rest of B1-S04 is wave 2), the tag line of B11-S04. Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); paged lists keep their stated order; nothing is written outside the tables listed. Done when: the category manager shows each category's product counts and refuses dropping a used category; tags are listed, created, replaced and deactivated, with duplicate-code and tag-code-in-use refused; setProductClassification writes category_id and segment_tags and refuses unknown-category, inactive-category, unknown-tag, inactive-tag and product-archived; listProducts with segmentTag finds the products a tag was given.",
+   "operations": [
+    "listProductCategoryUsage",
+    "listProductTags",
+    "setProductTagDefinition",
+    "setProductClassification"
+   ],
    "builds": [
     "operation listProductCategories",
     "operation setProductCategories",
-    "operation listProductCategoryUsage",
-    "operation listProductTags",
-    "operation setProductTagDefinition",
-    "operation setProductClassification",
     "table catalogue.product_category",
     "table catalogue.product_tag",
     "table catalogue.product"
@@ -807,12 +809,14 @@
    ],
    "subject": "Products wave 1: field sets (data masks) for the reservation owner and the ticket owner, back end and screens",
    "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 007), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end in CatalogueService: listFieldSets, getFieldSet, setFieldSetDefinition, getProductOwnerFieldSets, setProductOwnerFieldSets. Screens: the new Field sets screen of the Setup Library with its preview, and the two field-set drop-downs of B2-S10 Ownership & Assignment Model. Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); paged lists keep their stated order; nothing is written outside the tables listed. Done when: a field set saves whole with its fields in order (position from the order sent), text, drop-down, radio and check box behave as FieldSetField says, and validation, duplicate-code, field-key-retyped and field-set-in-use are refused; a product links a reservation-owner set and an optional ticket-owner set, unknown or inactive sets refused; the preview renders the form as a sale would ask it in each venue language. Asking the forms at sale is not in this task (orders).",
+   "operations": [
+    "listFieldSets",
+    "getFieldSet",
+    "setFieldSetDefinition",
+    "getProductOwnerFieldSets",
+    "setProductOwnerFieldSets"
+   ],
    "builds": [
-    "operation listFieldSets",
-    "operation getFieldSet",
-    "operation setFieldSetDefinition",
-    "operation getProductOwnerFieldSets",
-    "operation setProductOwnerFieldSets",
     "table catalogue.field_set",
     "table catalogue.field_set_field",
     "table catalogue.product_owner_field_set"
@@ -828,11 +832,13 @@
    ],
    "subject": "Products wave 1: who can sell a product, back end",
    "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 007), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). Back end in CatalogueService: getProductSalePermissionRules, setProductSalePermissionRules, checkProductSalePermission, listSalePermissionTargets, reading other modules only through their declared queries (tenancy#activeVenues, tenancy#workstationRecords, identity#roleRecords, identity#principalRecords). Serves the Who can sell section of B1-S04 and B7-S07 (PRD-W1-SALE-PERMISSIONS-UI). Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); paged lists keep their stated order; nothing is written outside the tables listed. Done when: a rule set saves whole and a rule sent again with its level and target keeps its id; validation and unknown-sale-permission-target are refused; targetName is filled on read; checkProductSalePermission decides by the stated precedence (narrowest matching level, DENY wins within a level, no match denies, no rules sells as before) and names the deciding rule, one test per level and per tie; listSalePermissionTargets answers a caller holding only PRODUCT_CONFIGURE; and a test shows admin rights per venue with the existing grants: a principal granted PRODUCT_CONFIGURE at venue A's scope path (createDelegatedAccess) changes venue A's products and is refused at venue B, while a grant at the tenant's path reaches both. Enforcing the rules at sale is not in this task.",
+   "operations": [
+    "getProductSalePermissionRules",
+    "setProductSalePermissionRules",
+    "checkProductSalePermission",
+    "listSalePermissionTargets"
+   ],
    "builds": [
-    "operation getProductSalePermissionRules",
-    "operation setProductSalePermissionRules",
-    "operation checkProductSalePermission",
-    "operation listSalePermissionTargets",
     "table catalogue.product_sale_permission",
     "table catalogue.sales_channel",
     "table catalogue.product"
@@ -849,12 +855,14 @@
    ],
    "subject": "Products wave 1: back-office frame (session venue and switcher, navigation, dashboard, All products)",
    "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 007), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end: identity getSessionVenue and setSessionVenue (the session's existing venue_id), catalogue getProductDashboard and listProductAttentionItems; the screens also use getCurrentSession, listProductLifecycle and listProducts. Screens: the top bar and navigation of every back-office screen, B1-S01 Catalogue Command Center, B1-S02 Ticket Product Directory (All products). Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); paged lists keep their stated order; nothing is written outside the tables listed. Done when: the top bar shows the venue the session acts at and switches among availableVenues (fixed by a workstation or role: no switcher), refusing venue-not-in-scope, venue-fixed and session-pending, and the navigation is filtered again from permissionsByScope after a switch; the dashboard tiles read countsByLifecycleState (Active live, Draft draft, Pending approval inReview, Approved approved) and open All products filtered the same way; Products by type reads countsByKind; Needs attention lists listProductAttentionItems in its order; All products filters by search, status, type, channel, venue and department on listProductLifecycle, paged. The type filter maps the six ticket types of the minutes onto ProductKind (openDated, datedAdmission, timedAdmission, membership, giftCard, addOn) until wave 2.",
+   "operations": [
+    "getSessionVenue",
+    "setSessionVenue",
+    "getProductDashboard",
+    "listProductAttentionItems"
+   ],
    "builds": [
-    "operation getSessionVenue",
-    "operation setSessionVenue",
     "operation getCurrentSession",
-    "operation getProductDashboard",
-    "operation listProductAttentionItems",
     "operation listProductLifecycle",
     "operation listProducts",
     "table identity.session",
@@ -874,11 +882,13 @@
    ],
    "subject": "Products wave 1: the venue's product languages and translatable product texts, back end and screens",
    "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 007), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end in CatalogueService: getCatalogueLanguageSettings, setCatalogueLanguageSettings, getProductChannelTexts, setProductChannelTexts; the product's own name and description per language through getProduct and updateProduct. Screens: the new Languages screen of the Setup Library, B1-S06 Content & Localization (one block per configured language and the channel-specific section), the preview of B1-S09. Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); paged lists keep their stated order; nothing is written outside the tables listed. Done when: languages are set by code with a default (default-language-not-enabled refused), named with the browser's language names and marked right to left, and a venue with nothing saved shows English and Arabic; translationGaps lists what is missing per language; channel texts save per language within their limits and refuse language-not-enabled; missingTranslations drives the per-language status; the preview shows the POS button label, receipt name and B2B description separately per language.",
+   "operations": [
+    "getCatalogueLanguageSettings",
+    "setCatalogueLanguageSettings",
+    "getProductChannelTexts",
+    "setProductChannelTexts"
+   ],
    "builds": [
-    "operation getCatalogueLanguageSettings",
-    "operation setCatalogueLanguageSettings",
-    "operation getProductChannelTexts",
-    "operation setProductChannelTexts",
     "operation getProduct",
     "operation updateProduct",
     "table catalogue.catalogue_language_setting",

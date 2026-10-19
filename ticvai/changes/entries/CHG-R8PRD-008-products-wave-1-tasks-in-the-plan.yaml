@@ -10,9 +10,11 @@ summary: 'The products module''s wave 1 enters the plan as seven hand-written Bl
 decision:
   what: 'docs/active/block-a-extra-tasks.json: epic PRODUCTS-W1 and tasks PRD-W1-DB (3 points, Hrushikant Patkar),
     PRD-W1-CATEGORIES-TAGS, PRD-W1-FIELD-SETS, PRD-W1-SALE-PERMISSIONS (5 each, Sanket Keluskar), PRD-W1-FRAME (5),
-    PRD-W1-LANGUAGES (3), PRD-W1-SALE-PERMISSIONS-UI (3) (Surendra, the plan''s name for Surendra Loke), each with its
-    operations and tables in `builds` and a Done when, in Block A (no `block`), the six build tasks waiting on PRD-W1-DB.
-    The operations are not added to blockAOperations (see notes). To ship at the r8 tag after the 24-hour cooling-off
+    PRD-W1-LANGUAGES (3), PRD-W1-SALE-PERMISSIONS-UI (3) (Surendra, the plan''s name for Surendra Loke), each with a
+    Done when, in Block A (no `block`), the six build tasks waiting on PRD-W1-DB. The 21 wave 1 operations are claimed
+    in the `operations` of the task that builds them (four to six per task, each in one task), so the generator forms no
+    back-end task for them; existing operations a task also uses and the tables stay in `builds`. They are not added to
+    blockAOperations. To ship at the r8 tag after the 24-hour cooling-off
     counted from `proposed`.'
   by: Chinmay
   date: '2026-10-19'
@@ -45,11 +47,11 @@ notes: '**Decision date.** The people and the start of wave 1 are the lead''s ru
   the r8 tag (a date at least 24 hours after `proposed`) or waives it in writing. **Sprint.** The inputs pin a person
   (`assignee`) but not a sprint: tools/derive-block-a-schedule.py places each task by its waits and its owner''s
   capacity, so Sprint 2 (19 to 30 October) is where they land only if Sanket''s and Surendra''s Sprint 2 capacity is
-  free (their held back-office tasks stay in the plan). **Operations built twice.** The generator also forms a back-end
-  task for every operation the package specifies and a forward migration for every new table (tools/build-service-docs.py),
-  so at the refresh these 23 operations and seven tables get generated SVC-CATALOGUE, SVC-IDENTITY and MIG-CATALOGUE
-  tasks beside the hand-written ones, owned by the load balancer; adding them to blockAOperations would put those
-  duplicates in Block A. A hand-written task can claim operations only through `operations`, which the generator
-  treats as served by the AI engine (its ticket text says so). The smallest fix is the generators lane''s: let a non-AI
-  hand-written task claim its `operations` without the AI wording; then the operations move into each task''s
-  `operations` and no duplicate is formed.'
+  free (their held back-office tasks stay in the plan). **Operations claimed, not built twice** (coordinator''s ruling, 20 October): a hand-written task''s `operations` take
+  them out of the generator''s back-end tasks; the storage-core lane changes tools/build-service-docs.py so the AI-gateway
+  wording applies only to AI engine tasks. **The seven tables.** Because only claimed operations reach them, the
+  generator forms no forward migration for them beside PRD-W1-DB, but it lists them under "Tables no migration creates"
+  as GAP, and check-migration-tickets (M-TABLE-ASSIGNED) fails at the refresh: a hand-written task is not a migration
+  ticket (its track is Backend, its subject names no V-file). No input alone fixes it; see the products lane report. Until the release refresh
+  regenerates the plan, check-plan-closure reports the 21 claimed operations as C-DECIDED (decided, built by no task
+  in the derived plan); the refresh builds them in their PRD-W1-* tasks.'
