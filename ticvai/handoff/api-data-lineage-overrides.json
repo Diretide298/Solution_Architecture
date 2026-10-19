@@ -1,6 +1,6 @@
 {
  "about": "What the contracts cannot state about an operation's tables, one entry per operation, each with its reason. tools/derive-lineage.py adds `reads`/`writes` to what the contract derives and takes `notReads`/`notWrites` away. Authored by hand: nothing in the refresh writes it. An entry marked `carried` was copied from the hand-kept lineage when it became derived (20 October 2026, CHG-R8GEN-001); their number may only fall (carriedCeiling, check-lineage LN-OVERRIDE). To change an operation's tables, change its contract (a persisted schema, x-ticvai-read-via, x-ticvai-write-via, x-ticvai-config-change-log); add an override only for what no contract fact can say, with a reason, and without `carried`.",
- "carriedCeiling": 1698,
+ "carriedCeiling": 1671,
  "operations": {
   "abandonCart": {
    "reads": [
@@ -566,7 +566,6 @@
     "access.media_template_version"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_template",
     "access.media_template_version"
    ],
@@ -701,13 +700,6 @@
     "catalogue.audit_entry"
    ],
    "reason": "DM3: catalogue.approval_policy with subject product (stages); requests themselves are approvals.ApprovalRequest | L2: input persistence: no existing table shares a field; approval stages/routing need catalogue.approval_workflow (missing); idempotent PUT (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "archiveMediaTemplate": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "askReportingQuestion": {
@@ -1560,10 +1552,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "collectShopAndDrop": {
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); storage-sat lane request (APPROVALS-TENANCY-C34, CHG-R8GEN-009): collecting writes the collected lines, retail.shop_and_drop_line, so the carried removal is dropped",
-   "carried": true
-  },
   "commitCatalogueImport": {
    "writes": [
     "catalogue.product",
@@ -1747,13 +1735,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "createAccessPoint": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "createAccessReviewCampaign": {
    "reads": [
     "identity.access_decision",
@@ -1779,13 +1760,6 @@
     "accreditation.identity_conflict"
    ],
    "reason": "Changed: runs the same identity-conflict check as importAccreditationHolders and writes a pending accreditation.identity_conflict; a pair already rejected is not raised again (the description now says so). (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "createAdmissionRules": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "createAiGovernancePolicyDraft": {
@@ -2839,8 +2813,7 @@
     "access.gate_mode_policy"
    ],
    "writes": [
-    "access.access_point_group",
-    "access.configuration_change"
+    "access.access_point_group"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -2943,7 +2916,6 @@
     "access.journey_sequence_rule"
    ],
    "writes": [
-    "access.configuration_change",
     "access.journey_sequence_rule"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -2978,7 +2950,6 @@
     "access.media_binding_rule"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_binding_rule"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -2989,7 +2960,6 @@
     "access.operating_calendar_entry"
    ],
    "writes": [
-    "access.configuration_change",
     "access.operating_calendar_entry"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -3000,7 +2970,6 @@
     "access.podium_shift"
    ],
    "writes": [
-    "access.configuration_change",
     "access.podium"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -3022,7 +2991,6 @@
     "access.scan_event"
    ],
    "writes": [
-    "access.configuration_change",
     "access.reason_code"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -10760,7 +10728,6 @@
   },
   "modifyOrder": {
    "reads": [
-    "orders.order_line",
     "orders.refund",
     "orders.refund_policy"
    ],
@@ -10971,9 +10938,6 @@
     "access.access_area",
     "access.access_point",
     "access.hardware_model"
-   ],
-   "writes": [
-    "access.configuration_change"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -11435,7 +11399,6 @@
     "catalogue.entitlement_template"
    ],
    "writes": [
-    "access.configuration_change",
     "access.configuration_version"
    ],
    "reason": "ruleVersionId is an access.configuration_version row; simulate writes nothing but idempotency, validate/schedule/publish/rollBack update the version (lastStep, status, conflicts, scheduledAt) and log to configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -11477,7 +11440,6 @@
     "access.operating_calendar_entry"
    ],
    "writes": [
-    "access.configuration_change",
     "access.configuration_version",
     "access.hardware_deployment"
    ],
@@ -13125,7 +13087,6 @@
     "access.dynamic_policy_version"
    ],
    "writes": [
-    "access.configuration_change",
     "access.dynamic_policy",
     "access.dynamic_policy_version"
    ],
@@ -13150,13 +13111,6 @@
     "ai.policy"
    ],
    "reason": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "rollbackConfigurationVersion": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "rollbackDeviceFirmware": {
@@ -13538,20 +13492,12 @@
    "reason": "EXISTING entry (amend by hand; derive-lineage --apply does not update). The call writes message_dispatch; the dispatch worker and provider webhooks behind it (and behind campaign sends, launchCampaign) write message_dispatch_attempt and communication_policy_decision. Recorded on the operation description and as job notes on MessageDispatchAttempt and ConsentPreferenceCommunicationPolicyEnforcementView (DM6). If the lineage should keep worker writes off the operation, name the worker instead and leave writes as they are. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "setAccessAreaCapacity": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "setAccessAreaZone": {
    "reads": [
     "access.access_area"
    ],
    "writes": [
-    "access.access_area",
-    "access.configuration_change"
+    "access.access_area"
    ],
    "reason": "zone is an access.access_area row (entityType zone, zoneType); access.parking_facility guess in the old note is wrong (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -13562,8 +13508,7 @@
     "access.dynamic_policy"
    ],
    "writes": [
-    "access.access_attribute",
-    "access.configuration_change"
+    "access.access_attribute"
    ],
    "reason": "Upsert keyed by attributeKey; the 409 check reads published access.dynamic_policy conditions; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -13574,32 +13519,14 @@
     "venuemap.map"
    ],
    "writes": [
-    "access.access_map",
-    "access.configuration_change"
+    "access.access_map"
    ],
    "reason": "mapId still references venuemap.map (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setAccessPointDirection": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setAccessPointGeofence": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setAccessPointGroup": {
    "reads": [
     "access.access_point"
-   ],
-   "writes": [
-    "access.configuration_change"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -13715,7 +13642,6 @@
     "access.media_template"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_template"
    ],
    "reason": "upsert of the template named by templateId; the body is its design document (jsonb), designer set by the operation; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -13748,8 +13674,7 @@
     "access.attraction_access"
    ],
    "writes": [
-    "access.attraction_access",
-    "access.configuration_change"
+    "access.attraction_access"
    ],
    "reason": "Upsert of the attraction's row in access.attraction_access; entry/exit points still validated against access.access_point; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -13777,8 +13702,7 @@
     "access.biometric_profile"
    ],
    "writes": [
-    "access.biometric_profile",
-    "access.configuration_change"
+    "access.biometric_profile"
    ],
    "reason": "Upsert of a profileKind=verification row; gateId stored as accessPointId; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -13790,7 +13714,6 @@
    ],
    "writes": [
     "access.access_point",
-    "access.configuration_change",
     "access.device_placement"
    ],
    "reason": "beacon is an access.device_placement row (hardwareType beacon, proximityThresholdMeters); the geofence itself stays on access.access_point.geofence; health and lastDetected are device-reported, not written (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -13838,8 +13761,7 @@
     "access.branding_profile"
    ],
    "writes": [
-    "access.branding_profile",
-    "access.configuration_change"
+    "access.branding_profile"
    ],
    "reason": "upsert keyed by level+scopeId; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -14057,7 +13979,6 @@
     "access.dynamic_policy"
    ],
    "writes": [
-    "access.configuration_change",
     "access.dynamic_policy",
     "access.dynamic_policy_version"
    ],
@@ -14076,24 +13997,9 @@
     "access.credential_policy"
    ],
    "writes": [
-    "access.configuration_change",
     "access.credential_policy"
    ],
    "reason": "upsert keyed by ruleId, kind=activationDisplay; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setCredentialEventPropagationRule": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setCredentialIssuanceRetryPolicy": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setCurrencyRoundingRule": {
@@ -14187,13 +14093,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "setDeviceBindingPolicy": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "setDeviceFirmwareStatus": {
    "reads": [
     "tenancy.device_rollout"
@@ -14210,7 +14109,6 @@
     "access.device_configuration"
    ],
    "writes": [
-    "access.configuration_change",
     "access.device_configuration"
    ],
    "reason": "configurationId is an access.device_configuration row with configurationKind deviceGroup; deploying stays publishHardwareDeployment (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14221,7 +14119,6 @@
     "access.media_template"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_template"
    ],
    "reason": "upsert of the template named by templateId; the body is its design document (jsonb), designer set by the operation; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14232,7 +14129,6 @@
     "access.media_template"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_template"
    ],
    "reason": "upsert of the template named by templateId; the body is its design document (jsonb), designer set by the operation; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14243,7 +14139,6 @@
     "access.dynamic_field"
    ],
    "writes": [
-    "access.configuration_change",
     "access.dynamic_field"
    ],
    "reason": "upsert keyed by fieldKey (unique per scope); logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14279,7 +14174,6 @@
     "access.credential_security_profile"
    ],
    "writes": [
-    "access.configuration_change",
     "access.credential_security_profile"
    ],
    "reason": "upsert keyed by profileId; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14302,7 +14196,6 @@
     "access.edge_node"
    ],
    "writes": [
-    "access.configuration_change",
     "access.edge_node"
    ],
    "reason": "edgeNodeId is the access.edge_node id; lastHeartbeat is node-set, not written by this op (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14313,7 +14206,6 @@
     "access.credential_security_profile"
    ],
    "writes": [
-    "access.configuration_change",
     "access.credential_security_profile"
    ],
    "reason": "sets embeddedClaims on the profile named by profileId. Supersedes the proposed access.embedded_payload_profile; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14324,7 +14216,6 @@
     "access.consumption_rule"
    ],
    "writes": [
-    "access.configuration_change",
     "access.consumption_rule"
    ],
    "reason": "upsert keyed by ruleId; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14335,13 +14226,6 @@
     "catalogue.audit_entry"
    ],
    "reason": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setEntryRulePoints": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setEventLifecycleState": {
@@ -14367,8 +14251,7 @@
     "access.biometric_profile"
    ],
    "writes": [
-    "access.biometric_profile",
-    "access.configuration_change"
+    "access.biometric_profile"
    ],
    "reason": "Upsert keyed by profileId of a profileKind=faceMatch row (face_match_profile merged into biometric_profile); logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -14378,8 +14261,7 @@
     "access.biometric_profile"
    ],
    "writes": [
-    "access.biometric_profile",
-    "access.configuration_change"
+    "access.biometric_profile"
    ],
    "reason": "Upsert of the venue's single profileKind=facePassEnrolment row (face_enrolment_policy merged into biometric_profile); logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -14389,8 +14271,7 @@
     "access.biometric_profile"
    ],
    "writes": [
-    "access.biometric_profile",
-    "access.configuration_change"
+    "access.biometric_profile"
    ],
    "reason": "Upsert of a profileKind=faceTagEnrolment row. The current note's access.face_tag_profile is wrong: it is access.biometric_profile; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -14406,13 +14287,6 @@
     "subscription.membership_household_policy_role_limit"
    ],
    "reason": "Idempotent PUT; upserts subscription.membership_household_policy and replaces its roleLimits rows in subscription.membership_household_policy_role_limit; product resolved via subscription.membership_product. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setFastPassProfile": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setFeatureToggles": {
@@ -14463,7 +14337,6 @@
     "access.fraud_rule"
    ],
    "writes": [
-    "access.configuration_change",
     "access.fraud_rule"
    ],
    "reason": "Upsert keyed by ruleId of a ruleKind=signal row; scope maps to scopePath; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14502,7 +14375,6 @@
     "access.gate_lane"
    ],
    "writes": [
-    "access.configuration_change",
     "access.gate_lane"
    ],
    "reason": "gateId is the access.gate_lane id under accessPointId; type is stored as laneType; live mode stays on access.access_point via setTurnstileMode (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14512,17 +14384,7 @@
    "reads": [
     "access.access_point_group"
    ],
-   "writes": [
-    "access.configuration_change"
-   ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setGateOfflinePolicy": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "setGoogleWalletPass": {
@@ -14530,7 +14392,6 @@
     "access.media_template"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_template"
    ],
    "reason": "upsert of the template named by templateId; the body is its design document (jsonb), designer set by the operation; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14541,7 +14402,6 @@
     "access.group_admission_rule"
    ],
    "writes": [
-    "access.configuration_change",
     "access.group_admission_rule"
    ],
    "reason": "Upsert keyed by profileId+venueId. The current note's access.group_admission_profile is wrong: merged into access.group_admission_rule; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14620,8 +14480,7 @@
     "access.companion_rule"
    ],
    "writes": [
-    "access.companion_rule",
-    "access.configuration_change"
+    "access.companion_rule"
    ],
    "reason": "Upsert keyed by ruleId (UUIDv7 id); logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -14631,17 +14490,9 @@
     "access.device_configuration"
    ],
    "writes": [
-    "access.configuration_change",
     "access.device_configuration"
    ],
    "reason": "profileId is an access.device_configuration row with configurationKind handheldProfile (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setHardwareModel": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setHeader": {
@@ -14659,7 +14510,6 @@
     "access.external_credential_integration"
    ],
    "writes": [
-    "access.configuration_change",
     "access.external_credential_integration"
    ],
    "reason": "upsert keyed by integrationId; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14695,20 +14545,6 @@
     "cache:resolution"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "setJourneyProfile": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setJourneySequenceRule": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setKioskOutOfService": {
@@ -14823,9 +14659,6 @@
    "reads": [
     "access.media_type"
    ],
-   "writes": [
-    "access.configuration_change"
-   ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
@@ -14835,7 +14668,6 @@
     "access.media_type"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_encoding_profile"
    ],
    "reason": "upsert keyed by encodingProfileId; mediaTypeId must name a media_type; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14846,7 +14678,6 @@
     "access.media_replacement_policy"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_replacement_policy"
    ],
    "reason": "upsert keyed by replacementReason; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14858,7 +14689,6 @@
     "access.media_type"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_type"
    ],
    "reason": "upsert keyed by mediaTypeId; retire refused while an active media_encoding_profile names it (read only, not written); logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -14992,13 +14822,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "setOperatingCalendarEntry": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "setOperationalIncidentException": {
    "reads": [
     "access.access_incident",
@@ -15067,13 +14890,6 @@
     "catalogue.audit_entry"
    ],
    "reason": "W-WE (new, writers pass): draft saved directly; active needs a change request (409) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setParkingFacility": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setPartnerAllocations": {
@@ -15235,7 +15051,6 @@
     "access.media_template"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_template"
    ],
    "reason": "upsert of the template named by templateId; the body is its design document (jsonb), designer set by the operation; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -15244,16 +15059,6 @@
   "setPodium": {
    "reads": [
     "access.access_point"
-   ],
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setPolicyEvaluationSetting": {
-   "writes": [
-    "access.configuration_change"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -15264,7 +15069,6 @@
     "access.policy_scope_assignment"
    ],
    "writes": [
-    "access.configuration_change",
     "access.policy_scope_assignment"
    ],
    "reason": "Upsert keyed by policyId+scopeLevel+scopeId; the policy must exist in access.dynamic_policy; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -15524,8 +15328,7 @@
     "access.hardware_model"
    ],
    "writes": [
-    "access.access_point_configuration",
-    "access.configuration_change"
+    "access.access_point_configuration"
    ],
    "reason": "readers/priority/range/height on access.access_point_configuration; capabilityWarnings computed from the attached devices and their models, not stored (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -15535,17 +15338,9 @@
     "access.security_playbook"
    ],
    "writes": [
-    "access.configuration_change",
     "access.security_playbook"
    ],
    "reason": "Upsert keyed by playbookId; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setReasonCode": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setRecipe": {
@@ -15574,13 +15369,6 @@
     "cache:resolution"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "setRelationshipFraudRule": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setRenewalAutoMembership": {
@@ -15656,7 +15444,6 @@
     "access.media_encoding_profile"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_encoding_profile"
    ],
    "reason": "upsert keyed by rfidNfcProfileId into the RFID/NFC columns. Supersedes the proposed access.rfid_nfc_profile; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -15667,17 +15454,9 @@
     "access.media_template"
    ],
    "writes": [
-    "access.configuration_change",
     "access.media_template"
    ],
    "reason": "upsert of the template named by templateId; the body is its design document (jsonb), designer set by the operation; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setRiskScoringConfig": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setRolePermissions": {
@@ -15898,13 +15677,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "setTicketStatusTransition": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "rows seeded from states/entitlement-status.yaml at venue creation (job); this op narrows them (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "setTransportFareTable": {
    "reads": [
     "transport.route"
@@ -15945,8 +15717,7 @@
     "access.access_point_configuration"
    ],
    "writes": [
-    "access.access_point_configuration",
-    "access.configuration_change"
+    "access.access_point_configuration"
    ],
    "reason": "timings on access.access_point_configuration; mode is echoed from access.access_point.operatingMode, not stored here (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -15978,7 +15749,6 @@
     "access.gate_outcome_profile"
    ],
    "writes": [
-    "access.configuration_change",
     "access.gate_outcome_profile"
    ],
    "reason": "customMessage+language written as one entry of access.gate_outcome_profile.messages (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -16021,9 +15791,6 @@
    "reads": [
     "catalogue.product"
    ],
-   "writes": [
-    "access.configuration_change"
-   ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
@@ -16046,7 +15813,6 @@
     "access.credential_policy"
    ],
    "writes": [
-    "access.configuration_change",
     "access.credential_policy"
    ],
    "reason": "upsert of the venue's credential_policy kind=virtualTicketIdentity. Supersedes the proposed access.virtual_ticket_config; logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -16059,7 +15825,6 @@
    ],
    "writes": [
     "access.admission_rules",
-    "access.configuration_change",
     "access.entry_rule_point"
    ],
    "reason": "rule on access.admission_rules (conditions/logic/decision/consequences in the new ruleConditions jsonb column), locationIds in access.entry_rule_point; overlaps updateAdmissionRules (operation of record); logs the change to access.configuration_change (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
@@ -16081,7 +15846,6 @@
     "access.dynamic_policy"
    ],
    "writes": [
-    "access.configuration_change",
     "access.dynamic_policy",
     "access.dynamic_policy_version"
    ],
@@ -16998,17 +16762,7 @@
    "reads": [
     "access.hardware_model"
    ],
-   "writes": [
-    "access.configuration_change"
-   ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "updateAccessPoint": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "updateAccreditationApplication": {
@@ -17016,13 +16770,6 @@
     "accreditation.requirements"
    ],
    "reason": "only draft or informationRequested (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "updateAdmissionRules": {
-   "writes": [
-    "access.configuration_change"
-   ],
-   "reason": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "updateAsset": {
