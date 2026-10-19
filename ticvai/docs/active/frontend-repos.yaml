@@ -121,6 +121,8 @@ platforms:
     assumed: true
     note: 'The lead maps the Venue Staff App (venue-staff-app) to ticvai-employee-app as an assumption of
       13 October 2026, not yet confirmed.'
+    shared: 'The scanner (P07) is built inside the employee app, as the platform decision of 10 September says
+      (screens/P07 targetApp, siblings P06); the lead, 20 October 2026, r8 cause IDENTITY-C05, option A.'
     observed:
       by: the Block A audit's frontend-repos batch (RPO), for Chinmay
       date: '2026-10-14'
@@ -132,12 +134,28 @@ platforms:
   P07:
     name: Venue Scanner - Access Control
     app: venue-scanner
-    repo: null
+    repo: ticvai-employee-app
+    assumed: true
+    note: 'The lead, 20 October 2026 (r8 cause IDENTITY-C05, option A): the scanner screens are built inside
+      ticvai-employee-app with P06, one handheld app for staff (the platform decision of 10 September, screens/P07
+      targetApp venue-staff-mobile). `venue-scanner` stays the package''s name for the scanner part of that app.'
+    shared: 'Built inside the employee app with P06 (screens/P07 targetApp, siblings P06); IDENTITY-C05.'
+    observed:
+      by: the Block A audit's frontend-repos batch (RPO), for Chinmay
+      date: '2026-10-14'
+      how: a shallow, read-only clone of the url above with the GitLab access the package team holds
+      reachable: false
+      result: 'GitLab answered that the project could not be found: nothing inside the repository was read, so
+        its profile is the default above (assumed). The repository''s owner confirms the real layout. (The same
+        repository as P06''s; recorded here when P07 was mapped to it, 20 October 2026.)'
+      confirmed: false
   P08:
     name: Venue Management - Back Office
     app: venue-management-web
     repo: ticvai-venue-management
     assumed: false
+    shared: 'The Venue CMS (P13) is built inside venue management, the same app (venue-management-web); the lead,
+      20 October 2026, r8 cause IDENTITY-C05, option A.'
     observed:
       by: the Block A audit's frontend-repos batch (RPO), for Chinmay
       date: '2026-10-14'
@@ -149,7 +167,19 @@ platforms:
   P09:
     name: TICVAI Web - Platform Console
     app: ticvai-web
-    repo: null
+    repo: ticvai-web
+    assumed: true
+    note: 'A new repository for the platform console, ticvai-web in the ticvai-frontend group (the lead, 20 October
+      2026, r8 causes APPROVALS-TENANCY-C43 and IDENTITY-C05, option A). The lead creates it in GitLab; until it
+      exists a developer asks the lead before building a P09 screen.'
+    observed:
+      by: the r8 surface lane, for Chinmay
+      date: '2026-10-20'
+      how: the lead's answer of 20 October 2026 (r8 causes APPROVALS-TENANCY-C43, IDENTITY-C05)
+      reachable: false
+      result: 'Not created yet: the lead creates ticvai-web in the ticvai-frontend group. Nothing inside it can be
+        read, so its profile is the default above (assumed); its owner confirms the real layout once it exists.'
+      confirmed: false
   P10:
     name: Partner Web - Reseller Portal
     app: partner-web
@@ -165,9 +195,20 @@ platforms:
   P13:
     name: Venue CMS - White Label
     app: venue-management-web
-    repo: null
-    note: 'The package serves P13 from the same app as P08 (venue-management-web); no repository is named for it
-      yet, and ADAM setup tells a developer to ask the lead.'
+    repo: ticvai-venue-management
+    assumed: true
+    note: 'The package serves P13 from the same app as P08 (venue-management-web), and the lead puts it in the
+      same repository (20 October 2026, r8 cause IDENTITY-C05, option A).'
+    shared: 'Built inside venue management with P08, the same app (venue-management-web); IDENTITY-C05.'
+    observed:
+      by: the Block A audit's frontend-repos batch (RPO), for Chinmay
+      date: '2026-10-14'
+      how: a shallow, read-only clone of the url above with the GitLab access the package team holds
+      reachable: false
+      result: 'GitLab answered that the project could not be found: nothing inside the repository was read, so
+        its profile is the default above (assumed). The repository''s owner confirms the real layout. (The same
+        repository as P08''s; recorded here when P13 was mapped to it, 20 October 2026.)'
+      confirmed: false
   P14:
     name: Developer Portal
     app: developer-portal-web

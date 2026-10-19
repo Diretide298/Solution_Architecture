@@ -109,6 +109,22 @@ resource "azurerm_postgresql_flexible_server_configuration" "max_connections" {
   value     = var.max_connections
 }
 
+# The pooler is Azure's built-in PgBouncer on port 6432 (the lead, 20 October 2026, r8 cause
+# FOUNDATION-AI-C53): no self-run pgbouncer pair in Block A. Services connect on 6432 in transaction mode;
+# OBS-TENANT-POOL reads SHOW POOLS / SHOW DATABASES through the admin console with a monitoring role and
+# alerts on one tenant's share of its pool (docs/architecture/observability.md).
+resource "azurerm_postgresql_flexible_server_configuration" "pgbouncer_enabled" {
+  name      = "pgbouncer.enabled"
+  server_id = azurerm_postgresql_flexible_server.primary.id
+  value     = "true"
+}
+
+resource "azurerm_postgresql_flexible_server_configuration" "pgbouncer_pool_mode" {
+  name      = "pgbouncer.pool_mode"
+  server_id = azurerm_postgresql_flexible_server.primary.id
+  value     = "TRANSACTION"
+}
+
 # Read replicas. Reads route here by default; access validation deliberately
 # does not (§3.3.8) — a ticket sold at the gate must not be refused seconds
 # later by a lagging replica.

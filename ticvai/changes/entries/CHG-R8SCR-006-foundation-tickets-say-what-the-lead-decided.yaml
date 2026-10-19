@@ -1,0 +1,44 @@
+id: CHG-R8SCR-006
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Six foundation tickets say what the lead decided on 20 October. The Qdrant tenant token is issued by the
+  workers host, read-write on the tenant''s own collection, 30 days, reissued weekly (ADR-0049, AI-ENGINE-QDRANT;
+  FOUNDATION-AI-C10). Block A prints prep sheets, not kitchen tickets (POS-KDS-ROUTING; C15). PLATFORM-SAGA-PAID is
+  done in the sandbox with the provider''s test payloads and a local secret until the client''s credentials arrive
+  (C18). One tenant''s pool share is server connections against pool_size (ADR-0064, OBS-TENANT-POOL; C24). The
+  first alerts have proposed thresholds, windows and severities (observability.md, PLATFORM-OBSERVE; C25). The
+  pooler is Azure''s built-in PgBouncer, turned on in the cell module, and the per-tenant pool alert is one alert
+  built by OBS-TENANT-POOL (ADR-0060, infra answers, Terraform; C53).'
+decision:
+  what: 'docs/adr/0049, 0060, 0064; docs/architecture/observability.md (alert table with proposed thresholds);
+    docs/active/infra-answers-30-september.md; docs/active/block-a-extra-tasks.json (AI-ENGINE-QDRANT, POS-KDS-ROUTING,
+    PLATFORM-SAGA-PAID, OBS-TENANT-POOL, PLATFORM-OBSERVE detail); repos/ticvai-infra/terraform/modules/cell/main.tf
+    (pgbouncer.enabled, pool mode). Thresholds are proposed, client to confirm.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round (surface lane): tickets 27720, 27708, 27701, 27702, 27691 (ADAM
+  gaps 27720/2, 27708/4, 27701/2, 27702/0, 27702/1, 27702/4, 27691/2); answers.json of 20 October 2026.'
+keys_touched:
+  files:
+  - docs/adr/0049-vectors-live-in-qdrant-one-collection-per-tenant.md
+  - docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md
+  - docs/adr/0064-per-tenant-limits.md
+  - docs/architecture/observability.md
+  - docs/active/infra-answers-30-september.md
+  - docs/active/block-a-extra-tasks.json
+  - repos/ticvai-infra/terraform/modules/cell/main.tf
+root_class: 'decision-not-recorded: a ticket''s done-when depends on a choice the package did not write down'
+tickets:
+  started: []
+  unstarted:
+  - '27720, 27708, 27701, 27702, 27691 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-text.py
+status: open
+notes: 'handoff/service-docs/tasks.csv and the LLD are regenerated from these at the lead''s refresh.'

@@ -202,7 +202,17 @@ documentation and pricing pages, read 30 September 2026).
 
 - **JWT RBAC is in open-source Qdrant since v1.9**: set `service.api_key` and `service.jwt_rbac: true`.
 - **The token is HS256, signed with the admin API key itself.** The token issuer holds `service.api_key` and
-  mints each tenant's token with `{"access":[{"collection":"t_<id>_bge-m3-v1","access":"r"}]}` and an `exp`.
+  mints each tenant's token with `{"access":[{"collection":"t_<id>_bge-m3-v1","access":"rw"},{"collection":"tenant_<id>","access":"rw"}]}` and an `exp`.
+- **Who issues, and what the token may do** (decided by the lead, 20 October 2026, r8 cause FOUNDATION-AI-C10,
+  option A). **The issuer is the workers host** (the .NET background-job deployable), not `ticvai-ai`: it is
+  the only thing that reads the admin API key from Key Vault, and it also runs the admin work the key is
+  needed for (creating a tenant's collection and alias, the shadow collection and alias swap of a model
+  change, snapshots, and deleting the collections and revoking the token at offboarding). **The tenant token
+  is read-write (`rw`) on that tenant's own collection and alias only**, so `ticvai-ai` can upsert and delete
+  points (indexing, erasure) without the admin key; it cannot create or drop a collection or reach another
+  tenant's. **`exp` is 30 days and the workers host reissues every tenant's token weekly**, writing it to Key
+  Vault as that tenant's secret; `ticvai-ai` reads the token from Key Vault and reloads it when the secret
+  version changes, so a reissue needs no restart.
 - **Key Vault holds the API key as a *secret*, not an HSM key**: Key Vault keys cannot do HMAC signing. Only
   the issuer reads it; `ticvai-ai` never does (as the Decision above already says). The HSM tier of Key Vault
   is justified by the per-tenant keys, not by Qdrant.
