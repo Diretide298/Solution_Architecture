@@ -498,6 +498,12 @@ paths:
       x-ticvai-permission: null
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
+      x-ticvai-offline-note: 'Signing in needs the network on every staff device in r8 (decided 20 October 2026, Chinmay,
+        R8 blocker cause IDENTITY-C01; CHG-R8SPN-027). A till (POS-000) or a staff handheld (EMP-001) already signed in
+        keeps working offline, but nobody signs in while it is offline, so their offline state says signing in needs a
+        connection, as ADM-001 does (approved wording, to be confirmed with the client). **Open for r9, not built in
+        r8**: offline sign-in on access-control devices (the handheld scanner SCN-001 and turnstiles), with a verifier
+        the device holds from the operator''s last online sign-in, an ADR-0071 exception and a security review.'
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey

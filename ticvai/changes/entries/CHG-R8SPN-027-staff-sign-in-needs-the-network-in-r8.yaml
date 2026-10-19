@@ -1,0 +1,40 @@
+id: CHG-R8SPN-027
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Staff sign-in needs the network on every device in r8: a till or staff handheld already signed in keeps working
+  offline, nobody signs in while offline. Offline sign-in on access-control devices (scanner, turnstiles) is recorded
+  as an open r9 item (device-held verifier, ADR-0071 exception, security review) and not built. Written on login
+  (x-ticvai-offline-note).'
+decision:
+  what: 'R8 blocker cause IDENTITY-C01 (lead answer, 20 October: offline sign-in is required for access-control devices,
+    not tills, staff handhelds or guest apps; for r8 tills and staff handhelds online-only, approved wording to be
+    confirmed with the client; scanner and turnstile offline sign-in is an r9 feature, recorded as a decision and an
+    open item, not built). identity.yaml login. The offline-state wording of POS-000, EMP-001 and SCN-001, F32 and F64
+    and the design notes are the surface lane''s part; the wording change on approved screens needs the client''s
+    acceptance.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27758, 27759, 27761, 27762, 27767 and 27768 (ADAM gaps 27762/0, 27759/3,
+  27768/3, 27758/1, 27761/1, 27767/0): approved door screens promised offline sign-in that login, F64 and ADR-0071 do
+  not allow. Finding: R8 blocker cause list, group identity.'
+keys_touched:
+  operations: [login]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'contradiction: an approved screen promises what the contract and the ADR forbid'
+tickets:
+  started: []
+  unstarted:
+  - '27758, 27759, 27761, 27762, 27767 and 27768 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27762/0, 27759/3, 27768/3, 27758/1, 27761/1, 27767/0'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+client_signoff: pending
+notes: 'Open item for r9: offline sign-in on the handheld scanner and turnstiles. For the client note: the offline-state
+  wording of POS-000, EMP-001 and SCN-001 (approved) must change to ''signing in needs a connection''.'
