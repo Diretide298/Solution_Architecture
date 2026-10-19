@@ -1654,6 +1654,16 @@ paths:
         cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
         do it for a guest at a till or in the back office (ADR-0025).
 
+
+        **The hold model on a guest screen: one hold per tap** (r8 walk of tickets 28202 and 28197). Each tap
+        on a free seat is one `createSeatHold` with that seat, and the screen keeps the `holdId` of each. A
+        deselect is `relinquishSeatHold` of that seat''s hold. The seats a guest holds on a performance are
+        therefore several holds, which is what the `seat-limit-exceeded` rule above already counts. **Switching
+        the time** relinquishes the guest''s holds on the performance being left, then holds the seats still
+        wanted on the new one, one hold each; a seat the new time does not have free is dropped and the screen
+        says so. The way on to the basket (the edge from WEB-007 or GST-049) carries the list of `holdIds`. A
+        screen opened again with a `holdId` reads it with `getSeatHold`.
+
         '
       tags:
       - hold
@@ -1726,16 +1736,31 @@ paths:
     get:
       operationId: getSeatHold
       x-ticvai-consumed-by:
+        - "P01 WEB-007 Interactive Seat Selection"
+        - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-987 Hold Tracker"
         - "P08 BO-999 Cart & Multi-Seat Management"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
+      - guest
       x-ticvai-read-routing: primary
       summary: Read a hold
+      description: '**A guest may read their own hold** (r8 walk of ticket 28202), so WEB-007 and GST-049, opened
+        again with a `holdId`, show the seats and the time left. On a guest channel only a hold the same guest
+        session or subject placed with `createSeatHold` can be read; any other hold answers `404`, exactly as
+        `relinquishSeatHold` does, so hold ids cannot be probed. Staff keep reading any hold at their venue under
+        `ORDER_VIEW`.
+
+        '
       tags:
       - hold
       x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-agreed: 'r8 walk of ticket 28202: guest audience added with the own-hold rule of relinquishSeatHold; shape unchanged'
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4859,6 +4884,27 @@ components:
             what it got: `list` means the map has no geometry (the seat map''s `noGeometry` state), so
             the client sells from categories and best-available groups and does not draw a plan.
             `graphical` means every seat carries `position`.
+
+            '
+        viewBox:
+          type: object
+          nullable: true
+          description: 'The coordinate space the seat positions are in, as `SeatMap.viewBox`, so the section view
+            is drawn from this response alone (WEB-007, GST-049; r8 walk of ticket 28197). Null when `renderMode`
+            is `list`.
+
+            '
+          properties:
+            width:
+              type: number
+            height:
+              type: number
+        stagePosition:
+          allOf:
+          - $ref: '#/components/schemas/Point'
+          nullable: true
+          description: 'Where the stage sits in the same space, as `SeatMap.stagePosition`; the section view orients
+            the seats towards it. Null when `renderMode` is `list`.
 
             '
         totals:

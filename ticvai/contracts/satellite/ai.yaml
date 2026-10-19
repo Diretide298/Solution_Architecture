@@ -939,9 +939,10 @@ paths:
         which is what `requestSuggestion` reads to route a kind to its producer. `setAiPolicy` does
         not change them; this operation is the only writer.
 
-        **What the PUT does.** Each assignment is matched on `kind`. An assignment in the body replaces
-        the stored one for that kind, or adds it where the kind had none; **a kind left out of the
-        body keeps its current assignment** — a partial body never leaves a question with nobody to
+        **What the PUT does** (r8 walk of ticket 27715; lead decision of 20 October 2026, option A). **It
+        replaces the whole routing table**, as the singleton note says: the body is the set in force afterwards,
+        and **a kind left out of the body is removed** from `AiPolicy.suggestionProviders`. A removed kind is
+        answered by its rule, as a kind with no assignment always is, so no question is left with nobody to
         answer it. The response is the full set after the write.
 
         **Also written by `promoteAiRelease`** (AI design 2.3, 3.5). Shadow mode here is the release
@@ -949,6 +950,12 @@ paths:
         gate a `promotionReady` governance alert is raised. **A person promotes it; nothing switches by
         itself** (decided 29 September). Setting a `model` basis here directly remains possible for a
         producer that has already been promoted.
+
+        **Refusals.** 422 `guard-rails-required`: an assignment with basis `model` and no `guardRails`. 422
+        `shadow-release-not-in-shadow`: a `shadowProducerRef` that does not name an `ai.release` in stage `shadow`
+        (matched on `ai.release.candidate_ref` = the `producerRef` and `suggestion_kind` = the `kind`). 409
+        `model-basis-needs-promotion`: basis `model` set directly for a producer not yet promoted. Nothing is
+        written in any of the three.
 
         '
       tags:
@@ -993,6 +1000,20 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/SuggestionProviderAssignment'
+        '409':
+          description: Basis `model` was set directly for a producer that has not been promoted (`model-basis-needs-promotion`). Nothing is written.
+          x-ticvai-problem-types: [model-basis-needs-promotion]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A `model` assignment has no guard rails (`guard-rails-required`), or a `shadowProducerRef` is not a release in stage `shadow` for that kind (`shadow-release-not-in-shadow`). Nothing is written.
+          x-ticvai-problem-types: [guard-rails-required, shadow-release-not-in-shadow]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/venue-map/{mapId}/propose-walkways:
@@ -1430,10 +1451,16 @@ paths:
         the platform provisions for attribution; nobody types it, and this refuses it with 409
         `provider-managed-by-ticvai`.
 
+        **Platform staff only, as `setAiProvider`** (r8 walk of ticket 27711; lead decision of 20 October 2026,
+        option A: no tenant self-service in Block A). The key is stored by platform staff on ADM-037 holding
+        `PLATFORM_TENANT_MANAGE`, read from the operator''s platform token, with a platform-staff grant into the
+        tenant open (`openPlatformStaffGrant`). Without that grant it refuses `403 platform-grant-required`. **A
+        tenant''s own staff are refused whatever they hold**, `AI_CONFIGURE` included.
+
         '
       tags:
       - ai
-      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1479,6 +1506,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiProvider'
+        '403':
+          description: The caller is a tenant's own staff, or platform staff with no grant into this tenant open (`platform-grant-required`). Nothing is stored.
+          x-ticvai-problem-types:
+          - platform-grant-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: The provider is TICVAI-managed; its key is provisioned by the platform (`provider-managed-by-ticvai`).
           x-ticvai-problem-types:
@@ -3160,9 +3195,15 @@ paths:
       description: 'Needed for three reasons and worth naming them: the embedding model changed, the `textFields`
         changed, or incremental indexing drifted and nobody knows why.
 
-        **Builds into a shadow collection and swaps on completion.** Reindexing in place leaves the assistant
-        answering from a half-built index, which is worse than answering from a stale one — a stale answer
-        is wrong in a knowable way.
+        **Builds without exposing a half-built index** (r8 walk of ticket 27841; lead decision of 20 October 2026,
+        option A, to be confirmed with the AI lead). A tenant has one collection per embedding model holding every
+        source and every document (ADR-0049), so rebuilding one source cannot swap a whole collection. **A rebuild
+        of one source uses no shadow collection.** The new points are written into the same collection carrying a new
+        index epoch in their payload; retrieval keeps filtering on the old epoch until the rebuild is verified, then
+        the filter flips to the new epoch in one step, and the old-epoch points of that source are deleted. The reader
+        sees either the old index or the new one, never a mix. **The shadow collection and alias swap are for a change
+        of embedding model only**, which rebuilds every source. `IndexJob.shadowCollection` is therefore null for a
+        single-source rebuild. `IndexJob.shardKey` names the tenant, which ADR-0049 makes the owner of the collection.
 
         '
       tags:
@@ -10563,7 +10604,27 @@ components:
       x-ticvai-persistence: none — embedded as jsonb on ai.suggestion and ai.forecast_version
       description: '**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn).
         The customer sees a stage badge and a "Based on" chip, never a bare percentage (design 5.6), and "Limited
-        historical data" while the starting pattern carries more than half the weight.'
+        historical data" while the starting pattern carries more than half the weight.
+
+
+        **The stage rule per kind** (r8 walk of ticket 27723; lead decision of 20 October 2026, option A). The
+        stage of an answer is decided by the days of the tenant''s own data behind its kind, against that kind''s
+        `Minimum` in `SuggestionKind`: `starting` below the minimum, `learning` from the minimum, `established` from
+        three times the minimum, `learned` only by promotion (AI-D16). For the Block A kinds that is:
+
+        | kind | minimum | learning from | established from |
+
+        |---|---|---|---|
+
+        | queueBalancing | 14 days | day 14 | day 42 |
+
+        | prepPlan | 28 days (4 weeks) | day 28 | day 84 |
+
+        | upsell | 90 days | day 90 | day 270 |
+
+        The 28-day seeded run of AI-ENGINE-BASELINE therefore proves `learning` for `queueBalancing` and `prepPlan`.
+        `upsell` cannot read `learning` at day 28 and is checked at day 90 with a seeded fixture of 90 days of orders.
+        Other kinds follow the same rule with their own minimum.'
       required:
       - stage
       - basedOn
@@ -18531,8 +18592,9 @@ components:
         shadowCollection:
           type: string
           nullable: true
-          description: 'A full rebuild writes here and swaps on completion. Reindexing in place leaves
-            the assistant answering from a half-built index.
+          description: 'Set only for a change of embedding model: the rebuild writes here and the alias swaps on
+            completion. Null for a one-source rebuild, which uses an index epoch in the same collection
+            (`reindexSource`).
 
             '
         shardKey:
@@ -19127,10 +19189,25 @@ components:
           items:
             type: object
             required:
+            - proposalId
             - targetKind
             - targetRef
+            - fieldPath
             - draftText
             properties:
+              proposalId:
+                type: string
+                format: uuid
+                description: 'The `ai.proposed_action` id of this draft (r8 walk of ticket 27926). **Accept** on CMS-011
+                  saves `draftText` at `fieldPath` through the contract that owns the target (a content block update, a
+                  product update, a template update; the saver needs the grant `proposeMarketingContent` there), then
+                  records `decideProposedAction` approve with this id. **Discard** is `decideProposedAction` reject with
+                  this id and a reason; nothing is saved on the target.'
+              fieldPath:
+                type: string
+                description: Where the draft goes inside the target, as a dotted path in the target's own body, for
+                  example `localeVariants.ar.title` on a content block or `name.ar` on a product. The saver writes
+                  `draftText` there and nothing else.
               targetKind:
                 type: string
                 enum:

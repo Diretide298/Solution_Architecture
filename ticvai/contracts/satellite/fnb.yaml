@@ -11010,6 +11010,18 @@ components:
         zone:
           type: string
           nullable: true
+        opensAt:
+          type: string
+          format: time
+          nullable: true
+          description: 'When a collection point opens, local to the venue (r8 walk of ticket 27820). Used by retail
+            `createShopAndDrop` (`collectionPointClosed`). Null means no stated hours.'
+        closesAt:
+          type: string
+          format: time
+          nullable: true
+          description: When a collection point closes, local to the venue; retail `collectBy` defaults to this on the
+            day. Null means no stated hours.
         tableId:
           type: string
           format: uuid

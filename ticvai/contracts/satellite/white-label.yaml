@@ -1036,6 +1036,10 @@ paths:
         tenant has none, so the policy and the matrix never disagree: a policy that is on always has a matrix to
         route the approval request by.
 
+        **Switching it off** (r8 walk of ticket 27780; lead decision of 20 October 2026, option A): versions and
+        content blocks already `pending` review **stay pending** until a reviewer decides; the switch affects new
+        publishes only. The matrix is kept.
+
         '
       x-ticvai-write-via:
       - table: approvals.matrix
@@ -1333,6 +1337,9 @@ paths:
       - query: platform-ops#contentBlockRecords
         route: in-process
         for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       summary: Publish now, or schedule it
       description: '**A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom`
         fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
@@ -1344,6 +1351,16 @@ paths:
 
         **`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or
         400. A scheduled job makes the publish and the expiry at those times (audit R163).
+
+        **The review path, as `publishTenantConfig` has it** (r8 walk of ticket 27919; ADAM CR-154). With the
+        tenant''s publish-review policy off, the block is published or scheduled at once (200). With it on, this
+        calls approvals'' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix
+        subject `whiteLabelPublication`, `subjectId` the block id; the request points at the block, and the block keeps no link back), leaves `status`
+        as it is and sets `reviewStatus` `pending`, and answers 202. White-label''s consumer of `approval.granted`
+        then publishes or schedules the block (`reviewStatus` `approved`); its consumer of `approval.rejected`
+        sets `reviewStatus` `rejected` and the block stays a draft. While `pending`, a second publish of the block
+        is refused with 409 `content-block-awaiting-review`. CMS-007 reads `getPublishReviewPolicy` to say whether
+        review applies and shows `reviewStatus` on the block.
 
         '
       tags:
@@ -1381,9 +1398,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '202':
+          description: Submitted for review; the tenant's publish-review policy is on. The block keeps its `status`,
+            carries `reviewStatus` `pending`, and is published or scheduled when the
+            request is approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentBlock'
         '409':
-          description: 'The block is already `published` (`content-block-published`; a change goes through a new draft) or is `archived` (`content-block-archived`). Nothing changes.'
-          x-ticvai-problem-types: [content-block-published, content-block-archived]
+          description: 'The block is already `published` (`content-block-published`; a change goes through a new draft), is `archived` (`content-block-archived`), or is already waiting for review (`content-block-awaiting-review`). Nothing changes.'
+          x-ticvai-problem-types: [content-block-published, content-block-archived, content-block-awaiting-review]
           content:
             application/problem+json:
               schema:
@@ -1398,6 +1423,10 @@ paths:
         - "P09 ADM-018 Interface Languages"
         - "P13 CMS-009 Navigation & Menus"
         - "P13 CMS-011 Translations"
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'the venues whose overrides it returns: platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       - guest
@@ -1638,7 +1667,7 @@ paths:
         for: 'showPoweredBy false: the tenant''s licence add-on keyed poweredByRemoval, else 403 powered-by-locked (ADAM CR-096)'
       - query: assets#mediaAssetRecords
         route: in-process
-        for: 'each asset''s type, size and dimensions: PNG or SVG, up to 2 MB (ADAM CR-096)'
+        for: 'each asset''s type, size and dimensions: image fields PNG or SVG up to 2 MB, the intro video as a video asset within the library''s limit (ADAM CR-096)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -1649,8 +1678,12 @@ paths:
         and a store submission. **On the guest web app a splash change is immediate (decided 28 September,
         audit R163)**: it reaches web guests with the publish, with no build.
 
-        **Each asset is PNG or SVG, up to 2 MB (decided 28 September, audit R270).** Anything else is
-        refused with 400 before it is stored against the brand.
+        **Each image asset (logo, dark logo, favicon, splash images) is PNG or SVG, up to 2 MB (decided 28
+        September, audit R270).** Anything else is refused with 400 before it is stored against the brand.
+        **`introVideoAssetRef` is a video asset and is not held to that rule** (r8 walk of ticket 27912; lead decision
+        of 20 October 2026): it takes the asset library''s own limit for kind `video` (`assets.createUpload`: mp4,
+        webm or quicktime, up to 500 MB), so there is one number; any other kind is refused with 400
+        `media-type-not-permitted`.
 
         **"Powered by TICVAI" is a toggle, on by default** (Chinmay, 2 October, workbook Q160; CHG-CSA-036):
         `showPoweredBy` false is accepted only where the tenant''s licence allows it, or 403 `powered-by-locked`.
@@ -1681,8 +1714,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/BrandIdentity'
         '400':
-          x-ticvai-problem-types: [media-too-large, media-type-not-permitted]
-          description: An asset is larger than 2 MB, or is not PNG or SVG (audit R270)
+          x-ticvai-problem-types: [media-too-large, media-type-not-permitted, asset-not-ready]
+          description: An image asset is larger than 2 MB, or is not PNG or SVG (audit R270); the intro video is not a video asset or is above the library limit; or an asset is not ready to
+            use, because it is still processing, was quarantined or failed (`asset-not-ready`; r8 walk of tickets
+            28682 and 27928, so the CMS-002 preview rule has a refusal to test). The problem names the field and
+            the asset status. Nothing is saved.
           content:
             application/problem+json:
               schema:
@@ -3273,6 +3309,7 @@ paths:
       description: '**Policies are versioned and never overwritten.** A guest who consented to version
         3 consented to version 3, and a privacy notice that changes silently under a recorded consent
         is a compliance failure. Publishing creates a new version; prior versions remain readable.
+        **There is no title to send**: the heading a guest sees is derived from `kind` (`PolicyKind`).
 
         **English and Arabic are both required before a policy can be published (decided 28 September,
         audit R096)**: `body` must carry non-empty `en` and `ar` entries, or 400. Other enabled languages
@@ -3485,6 +3522,10 @@ paths:
 
         Several are build-time on native apps and are flagged accordingly. A tenant enabling Apple Wallet
         should know it needs a release, not a publish.
+
+        **The caller sends only `featureKey` and `isEnabled`.** `displayName`, `changeScope` and
+        `requiresConfiguration` come from the feature catalogue on `FeatureKey`, and the server writes them into
+        each row it inserts, including every row of the whole-set replace.
 
         '
       tags:
@@ -3764,8 +3805,9 @@ paths:
         author, where the policy says so) approves it.
 
         **Platform staff publish a hosted tenant''s site** (Chinmay, 2 October, workbook Q144; R098; CHG-CSA-038)
-        only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant exports a site
-        package (`exportSitePackage`) instead.
+        only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant publishes first and then
+        exports a site package (`exportSitePackage`, which needs a published version); both actions are always
+        offered on CMS-014 and there is no hosting flag (r8 walk of ticket 27906; lead decision of 20 October 2026).
 
         **The server names the version** (ADAM CR-154, 18 October 2026; CHG-CRA-004). In the publish transaction it
         takes the next integer for the tenant (`1`, `2`, ...), as kiosk versions are numbered; that is the
@@ -4072,6 +4114,12 @@ paths:
         then review then publish, so a rollback is as deliberate as the change that caused it. **Not a
         one-click rollback (confirmed 28 September, audit R139)**: flow F22 is corrected to match.
 
+        **Unpublished changes** (r8 walk of ticket 27901; lead decision of 20 October 2026). A restore overwrites
+        the working draft, so it is refused with 409 `unpublished-changes` while the draft holds changes not yet
+        published, unless the request sends `discardDraftChanges` true, as `restoreKioskConfigVersion` does. The
+        CMS-015 dialog says the unpublished changes are replaced, and sends true after the user confirms. The
+        discarded draft is stored nowhere (the loss is intended, and the dialog is the only confirmation).
+
         '
       tags:
       - publishing
@@ -4081,6 +4129,17 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                discardDraftChanges:
+                  type: boolean
+                  default: false
+                  description: True overwrites unpublished changes in the draft.
       responses:
         '200':
           headers:
@@ -4094,7 +4153,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: 'The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.'
+          description: 'The working draft has unpublished changes that the restore would overwrite and `discardDraftChanges` is not true. Nothing changes.'
           x-ticvai-problem-types: [unpublished-changes]
           content:
             application/problem+json:
@@ -4115,12 +4174,24 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-015 Version History"
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (ADR-0055), to name the products a changed flow reaches'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
       summary: Compare a version against the working draft
       description: 'What a review step actually needs. A publish note saying "updated homepage" is not
         a review; a field-level diff is.
+
+        **Changed booking flows and the products they reach** (r8 walk of ticket 28337). The publish gate on
+        CMS-103 says which flows changed and which products are affected, and it reads both here. `changes` has an
+        area `bookingFlows` with one entry per flow added, removed or modified (`path` is the flow key).
+        `affectedProducts` lists, for the flows that differ, each product the flow serves, found by the rule
+        `Product.bookingFlowId` already states: the product''s own flow, else its category''s, else the venue''s
+        default flow for the product''s kind. The server applies that rule on read; nothing is stored.
 
         '
       tags:
@@ -5009,6 +5080,10 @@ paths:
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P02 GST-071 Payment Methods"
         - "P05 KSK-002 Language Select"
+      x-ticvai-read-via:
+      - query: payments#providerConnectionRecords
+        route: in-process
+        for: 'its read of payments.provider_connection, for `paymentTokenisation` (lineage request, r8)'
       x-ticvai-audience:
       - anonymous
       - guest
@@ -6911,8 +6986,9 @@ components:
     BookingFlowTypeKey:
       type: string
       description: '**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).**
-        `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize`
-        are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation`
+        `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` is the one cabana flow
+        (W6; `cabanaBySize` was removed in r8: a guest books a cabana from the map only, lead decision of 20
+        October 2026); `experienceWorkshop` puts the product before the date (W8); `multiLocation`
         opens on the location switcher.
 
         '
@@ -6926,7 +7002,6 @@ components:
       - surfSession
       - meetingRoomHourly
       - cabanaMap
-      - cabanaBySize
       - guidedTourByLanguage
       - transport
       - tableReservation
@@ -7141,20 +7216,6 @@ components:
           - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
           orderConstraints:
           - {kind: before, stepKey: date, otherStepKey: resourceMap}
-        - key: cabanaBySize
-          productKinds: [rental]
-          steps:
-          - {stepKey: location, requirement: conditional}
-          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
-          - {stepKey: partySize, requirement: required, stepSettings: [{name: minGuests, type: integer, default: 1}, {name: maxGuests, type: integer}]}
-          - {stepKey: resourceSize, requirement: required, note: the server assigns a unit of the chosen size}
-          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
-          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
-          - {stepKey: review, requirement: optional}
-          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
-          orderConstraints:
-          - {kind: before, stepKey: date, otherStepKey: resourceSize}
-          - {kind: before, stepKey: partySize, otherStepKey: resourceSize}
         - key: guidedTourByLanguage
           productKinds: [timedAdmission]
           steps:
@@ -7642,7 +7703,21 @@ components:
           - null
           description: 'The starting point. Each preset proposes the modules, the booking flow types (with
             their default step order), the homepage sections, the mobile tabs and a booking-flow `preset`;
-            nothing is written until the operator accepts a step.'
+            nothing is written until the operator accepts a step.
+
+
+            **What each preset proposes** (r8 walk of tickets 27908, 27899 and 27905; lead decision of 20 October
+            2026, option 2). `waterPark` is DEC-159: modules `ticketsAndBooking`, `diningAndFnb`, `shop`, `map`;
+            flows `datedDayPass` and `cabanaMap`; sections `heroBanner`, `tickets`, `attractions`, `dining`; tabs Home,
+            Explore, Map, Tickets. **Every other preset (`themePark`, `museum`, `theatreAndArena`,
+            `singleAttraction`, `playCentre`, `multiVenue`) proposes the same neutral default until the client
+            supplies its own values, which then arrive as data:** flow `datedDayPass`; theme primary `#1F4E79`,
+            secondary `#5B6770`, accent `#B85C00`, background `#FFFFFF`, text `#1A1A1A` (all pass the contrast
+            pairs of `Theme`); header layout `logoLeft` with logo, menu and notifications shown; footer with one
+            column, "Information", holding the policy links, and the copyright line; homepage sections and tabs from
+            `listLandingPageTemplates` for the preset. **These values are a placeholder, not a client decision**
+            (DI-885 awaits the client''s feedback): the CMS marks them "placeholder" and must not present them as
+            decided.'
         currentStep:
           allOf:
           - $ref: '#/components/schemas/SiteSetupStepKey'
@@ -7729,8 +7804,11 @@ components:
           type: string
           nullable: true
           writeOnly: true
-          description: App Store Connect API key or Play service-account key, sent once and kept in the secret
-            store; this is its reference. Needed only for `submitToStore`.
+          description: 'App Store Connect API key or Play service-account key. **What the browser sends** (r8
+            walk of ticket 27914): the request carries the secret itself once, as the key text (the .p8 text for
+            Apple, the service-account JSON for Google); the server puts it in the cell''s Key Vault and the row
+            keeps only the vault name. It is never returned: a read shows `hasApiCredential`, nothing else. Same
+            rule as `ai.setAiCredential`. Needed only for `submitToStore`.'
         hasApiCredential:
           type: boolean
           readOnly: true
@@ -7747,11 +7825,23 @@ components:
           type: string
           nullable: true
           writeOnly: true
-          description: '**The Pass Type ID certificate** (its .p12 and password), from the client''s Apple Developer
-            account, sent once and kept in Key Vault; this is its reference, as `apiCredentialSecretRef` is. It signs
+          description: '**The Pass Type ID certificate**, from the client''s Apple Developer account. **What the
+            browser sends** (r8 walk of ticket 27914): the request carries the .p12 file itself, base64 text, in this
+            field, and its password in `passCertificatePassword`; the server keeps both in Key Vault as one secret and
+            the row keeps only the vault name, as for `apiCredentialSecretRef`. A read shows `hasPassCertificate`
+            and `passCertificateExpiresAt`, never the certificate or the password. It signs
             every Apple pass the brand issues (orders `issueWalletPass`, `pushWalletPassUpdate`). On save the server
             reads the certificate''s Pass Type ID, team and expiry; a certificate whose Pass Type ID is not
             `passTypeIdentifier`, or whose team is not `developerAccountId`, is refused with 400 (CHG-R6-033).'
+        passCertificatePassword:
+          type: string
+          format: password
+          writeOnly: true
+          nullable: true
+          x-ticvai-persisted: false
+          description: 'The password of the .p12 sent in `passCertificateSecretRef`. Required with it, refused
+            without it (400). Kept with the certificate in Key Vault, never stored in the row, never returned, never
+            logged, masked in any audit record.'
         hasPassCertificate:
           type: boolean
           readOnly: true
@@ -8381,7 +8471,7 @@ components:
                 description: A `LinkTarget.kind`, or `bookingFlow`.
               pattern:
                 type: string
-                description: e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{flowKey}`.
+                description: e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{productId}`.
         appLinksEnabled:
           type: boolean
     SitePackage:
@@ -8673,6 +8763,17 @@ components:
           format: uuid
           nullable: true
           readOnly: true
+        reviewStatus:
+          type: string
+          readOnly: true
+          enum:
+          - notRequired
+          - pending
+          - approved
+          - rejected
+          default: notRequired
+          description: The review step of `publishContentBlock`, where the tenant's publish-review policy is on (r8 walk
+            of ticket 27919). `pending` from the 202 until the approval is decided; `status` does not change meanwhile.
         scopePath:
           type: string
           readOnly: true
@@ -8961,6 +9062,13 @@ components:
         (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through
         `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.
 
+
+        **`storeUrl`** (r8 walk of ticket 27893): the store page GST-047''s "Update" button opens, one per
+        platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A
+        store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade
+        screen opens the URL for the platform it runs on; where it is null the screen shows the message without
+        the button and the guest updates from the store by hand.
+
         '
       properties:
         ios:
@@ -8971,6 +9079,21 @@ components:
           type: string
           nullable: true
           pattern: ^\d+\.\d+\.\d+$
+        storeUrl:
+          type: object
+          nullable: true
+          description: The store page of the tenant's app for each platform. https only.
+          properties:
+            ios:
+              type: string
+              format: uri
+              pattern: ^https://
+              nullable: true
+            android:
+              type: string
+              format: uri
+              pattern: ^https://
+              nullable: true
     VenueContact:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -9018,7 +9141,8 @@ components:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
       description: 'Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload`
-        then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).
+        then `completeUpload`). The image fields are PNG or SVG and at most 2 MB (decided 28 September, audit R270);
+        `introVideoAssetRef` is a video asset within the library''s limit for kind `video` (`assets.createUpload`).
 
         '
       required:
@@ -9826,9 +9950,13 @@ components:
           - event
           - externalUrl
           - appSection
+          - bookingFlow
           - none
           description: '`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1),
-            so the bottom navigation can hold Home, Explore, Plan and Tickets.'
+            so the bottom navigation can hold Home, Explore, Plan and Tickets. `bookingFlow` (r8 walk of ticket
+            27905) opens the booking flow of one product, optionally on a date: `productId` is required, `date`
+            optional; the link is `/book/{productId}?date=YYYY-MM-DD` (see `DeepLinkScheme`), and the flow shown is
+            the one that product resolves to.'
         moduleKey:
           $ref: '#/components/schemas/ModuleKey'
         appSection:
@@ -9852,6 +9980,12 @@ components:
         eventId:
           type: string
           format: uuid
+        date:
+          type: string
+          format: date
+          nullable: true
+          description: Used when `kind` is `bookingFlow`, the date the flow opens on. Absent opens it on today or the
+            first date with availability, as the product page does.
         url:
           type: string
     NavigationConfig:
@@ -9946,6 +10080,16 @@ components:
         `venueOverview` and `spacer` need no module. `venueOverview` (decided 29 September, MOB-3) is the
         mobile Home''s description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not
         enabled, and `setModuleEnablement` refuses to disable a module a section still needs.
+
+
+        **Which catalogue slice a type tile shows, and whose card count applies** (r8 walk of tickets 28335 and
+        28682; lead decision of 20 October 2026, option 1, no schema change; DEC-152 and DEC-153 stand as they are).
+        A Home type tile is a product category, and its highlights are `listProducts(venueId, categoryId, pageSize)`
+        in `displayOrder`, the order `listProducts` documents. The card count (`maxItems`) is that of the section
+        whose kind matches the tile: `attractions`, `dining` or `shop`; **every other category uses the count of the
+        `whatsOn` section**. On GST-038 (At the Venue), Food is kind `fnb` (opens GST-024), Shop is kind `retail`
+        (GST-026), Services opens GST-029, Shows is `listPerformances` of the venue for today, and Map and Waits
+        show in place.
 
         '
       enum:
@@ -10122,9 +10266,14 @@ components:
           - $ref: '#/components/schemas/ScheduleState'
           readOnly: true
           x-ticvai-derived: sweeper
-          description: Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer
-            from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant's
-            timezone (`states/schedule.yaml`).
+          description: 'Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer
+            from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant''s
+            timezone (`states/schedule.yaml`). **The rule, which no request field moves** (r8 walk of ticket
+            27920): a new banner is `draft`. The server sets `scheduled` when `updateBanner` leaves `startsAt`
+            set (`endsAt` null means no end, so the banner runs until switched off; when `endsAt` is set it must follow
+            `startsAt`), and sets `draft` again when a later update clears `startsAt`. Sending
+            `isActive` false on an `active` banner pulls it to `draft`. `state` is derived by the server on every
+            save and is never in a request.'
         sortOrder:
           type: integer
         isActive:
@@ -10173,8 +10322,10 @@ components:
           - $ref: '#/components/schemas/ScheduleState'
           readOnly: true
           x-ticvai-derived: sweeper
-          description: Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant's timezone,
-            as for `Banner.state`. Once `active` or `expired` the block may only be withdrawn (audit R163).
+          description: 'Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant''s timezone,
+            as for `Banner.state`. A new block is `draft` and moves to `scheduled` the same way as a banner: when
+            an update leaves `startsAt` set (a null `endsAt` means no end), and back to `draft` when `startsAt` is cleared. Once `active` or `expired`
+            the block may only be withdrawn (audit R163).'
         sortOrder:
           type: integer
         scopePath:
@@ -10525,6 +10676,26 @@ components:
           description: The partition key (ADR-0005). Written at `venue` scope.
     PolicyKind:
       type: string
+      description: 'The kinds of policy a tenant publishes. **Each kind has one fixed title in English and Arabic**
+        (r8 walk of ticket 27890), the only source of `PublishedPolicy.title`; `setPolicy` takes no title. The
+        Arabic labels are the standard names of each document and the client should approve them.
+
+
+        | kind | en | ar |
+
+        |---|---|---|
+
+        | privacy | Privacy policy | سياسة الخصوصية |
+
+        | termsAndConditions | Terms and conditions | الشروط والأحكام |
+
+        | refund | Refund policy | سياسة الاسترداد |
+
+        | cookie | Cookie policy | سياسة ملفات تعريف الارتباط |
+
+        | accessibility | Accessibility statement | بيان إمكانية الوصول |
+
+        '
       enum:
       - privacy
       - termsAndConditions
@@ -10545,7 +10716,10 @@ components:
           $ref: '#/components/schemas/PolicyKind'
         title:
           type: string
-          description: 'The heading a guest sees, and the field a refund question retrieves against.
+          nullable: true
+          readOnly: true
+          description: 'Not written by anyone: `setPolicy` takes no title and the column stays null. The heading a
+            guest sees is `PublishedPolicy.title`, derived from `kind` (see `PolicyKind`).
 
             '
         version:
@@ -10681,7 +10855,58 @@ components:
       description: 'The feature toggles a tenant can set — one list for `FeatureToggle` and the `setFeatureToggles`
         body, which took a free string where the response had this enum.
 
+
+        **The catalogue** (`x-ticvai-feature-catalogue`; r8 walk of ticket 27776): the table below is the one
+        source of each key''s `displayName`, `changeScope` and `requiresConfiguration`. `setFeatureToggles`
+        takes only `featureKey` and `isEnabled` from the caller; it fills the other three columns of the
+        `whitelabel.feature_toggle` row from this table when it inserts the row, and its whole-set replace does
+        the same for every row it writes, so no caller can set or change them. `buildTime` means a native app
+        needs a new release to take the change, a `runtime` one takes it on the next publish.
+        **Wallet and payment keys are `buildTime`** (stated before r8); the other values are proposals for the
+        owner to confirm and are marked below.
+
+        | featureKey | displayName | changeScope | requiresConfiguration |
+
+        |---|---|---|---|
+
+        | digitalCompanionMode | Digital companion mode | runtime | false (proposed) |
+
+        | aiConciergeChat | AI concierge chat | runtime | true: the platform must have set an AI provider (proposed) |
+
+        | lostAndFound | Lost and found | runtime | false (proposed) |
+
+        | pushNotifications | Push notifications | buildTime | true: push credentials in the app build (proposed) |
+
+        | socialSharing | Social sharing | runtime | false (proposed) |
+
+        | multiLanguage | Multiple languages | runtime | false (proposed) |
+
+        | appleWallet | Apple Wallet passes | buildTime | true: pass certificate on the store account |
+
+        | googlePay | Google Pay | buildTime | true: payment provider setup |
+
+        | applePay | Apple Pay | buildTime | true: payment provider setup |
+
+        | cashOnDelivery | Cash on delivery | runtime | false (proposed) |
+
+        | guestCheckout | Guest checkout | runtime | false |
+
+        | uaePassLogin | UAE PASS sign-in | buildTime | true: UAE PASS client credentials (proposed) |
+
         '
+      x-ticvai-feature-catalogue:
+        digitalCompanionMode: { displayName: Digital companion mode, changeScope: runtime, requiresConfiguration: false }
+        aiConciergeChat: { displayName: AI concierge chat, changeScope: runtime, requiresConfiguration: true }
+        lostAndFound: { displayName: Lost and found, changeScope: runtime, requiresConfiguration: false }
+        pushNotifications: { displayName: Push notifications, changeScope: buildTime, requiresConfiguration: true }
+        socialSharing: { displayName: Social sharing, changeScope: runtime, requiresConfiguration: false }
+        multiLanguage: { displayName: Multiple languages, changeScope: runtime, requiresConfiguration: false }
+        appleWallet: { displayName: Apple Wallet passes, changeScope: buildTime, requiresConfiguration: true }
+        googlePay: { displayName: Google Pay, changeScope: buildTime, requiresConfiguration: true }
+        applePay: { displayName: Apple Pay, changeScope: buildTime, requiresConfiguration: true }
+        cashOnDelivery: { displayName: Cash on delivery, changeScope: runtime, requiresConfiguration: false }
+        guestCheckout: { displayName: Guest checkout, changeScope: runtime, requiresConfiguration: false }
+        uaePassLogin: { displayName: UAE PASS sign-in, changeScope: buildTime, requiresConfiguration: true }
       enum:
       - digitalCompanionMode
       - aiConciergeChat
@@ -10884,6 +11109,38 @@ components:
           description: The slide, tile, flow, language or payment method the finding is about.
     ConfigFindingKind:
       type: string
+      description: 'The checks `validateTenantConfig` runs. **Severity** (r8 walk of ticket 27780; lead decision of 20
+        October 2026, option A): `missingTranslation` is a `warning` when the missing text has a fallback language
+        and an `error` when the default language is the one missing; every other kind is an `error`. A publish is
+        blocked when `errorCount` is above 0, and a warning never blocks.
+
+        | kind | severity |
+
+        |---|---|
+
+        | missingTranslation | warning with a fallback language, error when the default language is missing |
+
+        | navigationTargetsDisabledModule | error |
+
+        | homepageReferencesMissingContent | error |
+
+        | contrastFailure | error |
+
+        | missingRequiredAsset | error |
+
+        | policyVersionMissing | error |
+
+        | noVisibleNavigationItems | error |
+
+        | unlicensedModuleEnabled | error |
+
+        | arabicFontMissing | error |
+
+        | bookingFlowInvalid | error |
+
+        | bookingFlowMissing | error |
+
+        '
       enum:
       - missingTranslation
       - navigationTargetsDisabledModule
@@ -11083,6 +11340,21 @@ components:
           type: string
         toVersion:
           type: string
+        affectedProducts:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The products served by a booking flow that differs between the two versions (area
+            `bookingFlows` in `changes`), by the product-to-flow rule of `Product.bookingFlowId`. Empty when no flow
+            differs. Bounded by the venue''s products; the screen shows the first page and the count.'
+          items:
+            type: object
+            required: [productId, name, flowKey]
+            properties:
+              productId: { type: string, format: uuid }
+              name: { type: string }
+              flowKey: { type: string, description: The changed flow that serves this product. }
         changes:
           type: array
           items:
@@ -11319,6 +11591,38 @@ components:
           format: date-time
         brand:
           $ref: '#/components/schemas/BrandIdentity'
+        assetsBaseUrl:
+          type: string
+          format: uri
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**How any guest screen turns an asset id into a picture** (r8 walk of ticket 28156; lead
+            decision of 20 October 2026, option A). The address of a published asset is `assetsBaseUrl` + `/` +
+            the asset id + `/` + a rendition name, for example `{assetsBaseUrl}/{assetId}/card.webp`. The renditions are
+            `thumb`, `card`, `hero` and `original`. Every media object in every guest response carries an asset id and
+            nothing else, so no screen makes a media call per tile. Only public assets referenced by a published
+            version are served at it. `brandUrls` and the banner addresses below are this rule worked out for you.'
+        brandUrls:
+          type: object
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The brand assets as addresses a guest can load** (r8 walk of ticket 28335). A guest cannot
+            read `assets`, so the `*AssetRef` ids in `brand` mean nothing to a client. The server turns each asset
+            the published version references into its stable CDN address (`assets.yaml`, `MediaAsset.url`: a public
+            asset has a stable CDN address) and returns it here, beside the ids. Only assets the published version
+            names are resolved; the address is that of the asset version the publish named. A field is null where its
+            ref is null.'
+          properties:
+            logoUrl: { type: string, format: uri, nullable: true }
+            logoDarkUrl: { type: string, format: uri, nullable: true }
+            faviconUrl: { type: string, format: uri, nullable: true }
+            splashImageUrls:
+              type: array
+              items: { type: string, format: uri }
+            introVideoUrl: { type: string, format: uri, nullable: true }
         appIcons:
           $ref: '#/components/schemas/AppIcons'
         theme:
@@ -11333,6 +11637,26 @@ components:
           $ref: '#/components/schemas/NavigationConfig'
         homepage:
           $ref: '#/components/schemas/HomepageLayout'
+        banners:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The hero and other banners a guest sees now** (r8 walk of ticket 28335): the banners in the
+            published version whose state is `active` at the time of the read, by `sortOrder`. Draft, scheduled and
+            expired banners are never returned. `imageUrl` is the resolved address of `imageAssetRef`. Staff read
+            all banners with `listBanners`, which is unchanged.'
+          items:
+            $ref: '#/components/schemas/PublishedBanner'
+        promoBlocks:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The promo blocks in the published version that are `active` at the time of the read, by
+            `sortOrder`, with the same rule as `banners`.
+          items:
+            $ref: '#/components/schemas/PublishedPromoBlock'
         bookingFlow:
           allOf:
           - $ref: '#/components/schemas/BookingFlowConfig'
@@ -11402,6 +11726,37 @@ components:
             publishableKey:
               type: string
               nullable: true
+    PublishedBanner:
+      x-ticvai-persistence: none — a public projection of whitelabel.banner (r8 walk of ticket 28335)
+      type: object
+      description: One active banner as a guest reads it inside `PublishedTenantConfig`. No state, no schedule
+        dates, no author.
+      required:
+      - id
+      - imageUrl
+      properties:
+        id: { type: string, format: uuid }
+        placement:
+          type: string
+          enum: [homepageHero, homepageBlock, explore, checkout]
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        subtitle: { $ref: '#/components/schemas/LocalisedText' }
+        imageUrl: { type: string, format: uri, description: The stable address of the banner image. }
+        linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+        sortOrder: { type: integer }
+    PublishedPromoBlock:
+      x-ticvai-persistence: none — a public projection of whitelabel.promo_block (r8 walk of ticket 28335)
+      type: object
+      description: One active promo block as a guest reads it inside `PublishedTenantConfig`.
+      required:
+      - id
+      properties:
+        id: { type: string, format: uuid }
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        description: { $ref: '#/components/schemas/LocalisedText' }
+        iconUrl: { type: string, format: uri, nullable: true }
+        linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+        sortOrder: { type: integer }
     PublishedKioskConfig:
       x-ticvai-persistence: none — computed from the current KioskConfigVersion snapshot and the live state on
         whitelabel.kiosk_config and whitelabel.kiosk_assignment
@@ -11536,7 +11891,16 @@ components:
         kind:
           $ref: '#/components/schemas/PolicyKind'
         title:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The heading, with `en` and `ar`, derived on read from `kind` by the fixed label table on
+            `PolicyKind`. Nothing is stored (`whitelabel.policy.title` stays unused), so a tenant cannot retitle a
+            policy and the heading is the same in the app, on the web and in a consent record.
+
+            '
         version:
           type: string
           description: The version a consent records (a guest who consented to version 3 consented to version 3).
