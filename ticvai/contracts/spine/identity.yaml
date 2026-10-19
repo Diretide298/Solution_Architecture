@@ -1824,6 +1824,11 @@ paths:
         it authorises this one call. With a session (BO-053 Staff Directory) the caller''s own
         `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
+
+        **What it writes** (R8 blocker IDENTITY-C46, CHG-R8MIG-015): the session''s `status` `terminated`, `endedAt`,
+        `endedByPrincipalId` (the caller, or the supervisor of the step-up) and `endReason` (the body''s `reason`), and
+        one `identity.authz_audit` row for the decision.
+
         '
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -3117,6 +3122,12 @@ paths:
         linked rather than a duplicate created. Where it does not, a new account is created — an unverified
         email from a provider is not proof of ownership.
 
+
+        **The link is stored** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): one `pii.subject_identity` row
+        (`SubjectIdentity`) per provider and provider subject (`sub`), unique on the pair, so a returning Apple user
+        whose email is a private-relay address still resolves to the same account. A new account also writes the
+        provider''s email to `pii.subject_contact`.
+
         '
       tags:
       - guestAuth
@@ -3198,6 +3209,12 @@ paths:
         client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`);
         the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider`
         `icp`). Each venue''s own redirect URI is part of its domain setup (white-label `CustomDomain`; DEC-547).
+
+
+        **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider`
+        `uaePass`, the UAE Pass user id as `providerSubject`), and on a new account a `pii.subject_document` of kind
+        `emiratesId` with the number from the UAE Pass identity-number claim (the claim''s name to be confirmed with the
+        client''s UAE Pass sandbox).
 
         '
       tags:
@@ -3564,6 +3581,12 @@ paths:
         UAE Pass, each returning a `GuestSession`; this flow maps groups to roles and returns a staff
         session, which a guest surface cannot use.
 
+
+        **The pending sign-in is kept in Redis** (R8 blocker IDENTITY-C58, CHG-R8MIG-015): `cache:sso-state:<state>`
+        holds the provider id, the nonce, the PKCE verifier, the redirect URI and the workstation, for as long as
+        `expiresAt`; `completeSsoAuthorization` takes it once and deletes it. A `redirectUri` that is not on the
+        provider''s `allowedRedirectUris` is refused 400.
+
         '
       tags:
       - sso
@@ -3625,6 +3648,16 @@ paths:
         way to mint access nobody configured.
 
         **Staff and partner sign-in only; guests never use SSO** (decided 28 September, audit R167).
+
+
+        **The state, and who the IdP user is here** (R8 blockers IDENTITY-C57 and IDENTITY-C58, CHG-R8MIG-015). The
+        callback takes the pending sign-in from `cache:sso-state:<state>` once; an unknown, expired or already used
+        state is 401 `sso-state-invalid` (the sign-in page says the link has expired), and the redirect URI used is
+        the stored one, whatever the body sends. The IdP user (`sub`, or the SAML NameID) is looked up in
+        `identity.principal_external_identity` (`PrincipalExternalIdentity`) for this provider. No match: with
+        `autoProvisionPrincipals` a principal is created (username, display name, home scope and primary role from
+        the provider''s claim mapping and `groupMappings`) and linked; without it, 403 `sso-principal-not-provisioned`.
+        A match whose principal is inactive is 403 `forbidden`.
 
         '
       tags:
@@ -4418,7 +4451,7 @@ paths:
 
         **Ordered by `startedAt` descending, `sessionId` as the tiebreak** (decided 14 October 2026, ADAM
         CR-077; CHG-IDR-002): the session that began last is first, which on a till is the one somebody is
-        asking about.
+        asking about. **Only `active` sessions unless `status` asks for another** (CHG-R8MIG-015).
 
         '
       tags:
@@ -4490,6 +4523,13 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: status
+        in: query
+        description: '**Which sessions come back** (R8 blocker IDENTITY-C46, CHG-R8MIG-015): `active` when absent, the live
+          holder BO-053 and POS-000 ask about; another value returns the ended sessions of that status, kept with who
+          ended them and why.'
+        schema:
+          $ref: '#/components/schemas/SessionStatus'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -9138,7 +9178,8 @@ components:
             '
         identityProviders:
           type: array
-          description: Linked providers. Several may resolve to one account.
+          description: Linked providers. Several may resolve to one account. Read from `pii.subject_identity`
+            (apple, google, uaePass), `identity.guest_credential` (password) and a verified contact (otp) (CHG-R8MIG-015).
           items:
             type: string
             enum:
@@ -9889,6 +9930,72 @@ components:
         scopePath:
           type: string
           description: Scope the mapped role is granted at.
+    SubjectIdentity:
+      type: object
+      x-ticvai-persistence: pii.subject_identity
+      # One account per provider identity (R8 blocker IDENTITY-C54, CHG-R8MIG-015).
+      x-ticvai-unique-together: [[provider, providerSubject]]
+      description: '**An Apple, Google or UAE Pass identity linked to a guest account** (R8 blocker IDENTITY-C54,
+        CHG-R8MIG-015). Written by `guestSocialLogin` and `guestUaePassLogin` when they link or create an account, read
+        by them to find the account again (a private-relay email changes nothing) and by `GuestSession.identityProviders`.
+        Storage only, never returned.'
+      required: [id, subjectId, provider, providerSubject, linkedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+          description: The guest account.
+        provider:
+          type: string
+          enum: [apple, google, uaePass]
+        providerSubject:
+          type: string
+          maxLength: 255
+          x-ticvai-unique-compare: exact
+          description: The provider's own stable id for the user (`sub`; the UAE Pass user id), compared exactly.
+        emailAtLink:
+          type: string
+          maxLength: 320
+          nullable: true
+          description: The email the provider gave when the identity was linked (may be a private relay).
+        linkedAt:
+          type: string
+          format: date-time
+    PrincipalExternalIdentity:
+      type: object
+      x-ticvai-persistence: identity.principal_external_identity
+      # One principal per IdP identity (R8 blocker IDENTITY-C57, CHG-R8MIG-015).
+      x-ticvai-unique-together: [[ssoProviderId, externalSubject]]
+      description: '**Which principal an SSO user is** (R8 blocker IDENTITY-C57, CHG-R8MIG-015). Written by
+        `completeSsoAuthorization` when it provisions or first links a principal, read by it on every sign-in.
+        Storage only, never returned.'
+      required: [id, principalId, ssoProviderId, externalSubject, linkedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        principalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+        ssoProviderId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.sso_provider
+        externalSubject:
+          type: string
+          maxLength: 255
+          x-ticvai-unique-compare: exact
+          description: The IdP's `sub` claim, or the SAML NameID, compared exactly.
+        linkedAt:
+          type: string
+          format: date-time
     SsoProviderConfig:
       x-ticvai-persistence: identity.sso_provider
       type: object
@@ -9932,6 +10039,36 @@ components:
           type: boolean
           default: false
           description: Create a principal on first successful sign-in.
+        usernameClaim:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: 'The claim (OIDC) or attribute (SAML) a provisioned principal''s username is taken from; null
+            means `preferred_username`, else the email (R8 blocker IDENTITY-C57, CHG-R8MIG-015).'
+        displayNameClaim:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The claim a provisioned principal's display name is taken from; null means `name`.
+        groupsClaim:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The claim that lists the user's groups, matched against `groupMappings`; null means `groups`.
+        defaultHomeScopeId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: platform.scope
+          description: The home scope a provisioned principal gets when its mapped groups name none; null means the
+            scope of the first mapped group.
+        allowedRedirectUris:
+          type: array
+          items:
+            type: string
+            maxLength: 2000
+          description: '**The only redirect URIs a start may name** (R8 blocker IDENTITY-C58, CHG-R8MIG-015):
+            `startSsoAuthorization` refuses 400 a `redirectUri` not on this list.'
         isEnforced:
           type: boolean
           default: false
@@ -10119,6 +10256,27 @@ components:
           type: string
           x-ticvai-persisted: false
           description: Read from `identity.principal` with the row.
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the session ended; null while `active` (R8 blocker IDENTITY-C46, CHG-R8MIG-015).
+        endedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: Who ended it (`forceLogout`'s caller or supervisor); null when the principal signed out or it
+            expired.
+        endReason:
+          type: string
+          minLength: 3
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door).
         roleId:
           type: string
           format: uuid

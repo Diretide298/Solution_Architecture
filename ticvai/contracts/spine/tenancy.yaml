@@ -1702,6 +1702,10 @@ paths:
       operationId: getWorkstation
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
+      x-ticvai-read-via:
+      - query: catalogue#bundleApplicationRecords
+        route: in-process
+        for: 'catalogueState, from catalogue.bundle_application, Catalogue''s data (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a workstation
@@ -6332,11 +6336,15 @@ components:
       enum: [terminalLocal, venueEdge, thin]
 
     CatalogueState:
-      x-ticvai-persistence: "none — computed from workstation bundle_version"
+      x-ticvai-persistence: "none — computed from catalogue.bundle_application, the workstation's latest applied report (CHG-R8MIG-015)"
       type: object
       description: >
         The workstation's local catalogue position. A terminal beyond `staleAfter` must
-        refuse to trade rather than transact against stale prices.
+        refuse to trade rather than transact against stale prices. **Read from Catalogue**
+        (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015): the workstation's latest `applied` row in
+        `catalogue.bundle_application` (catalogue#bundleApplicationRecords) gives `appliedBundleVersion`
+        and `appliedAt`, that bundle's `catalogue.published_bundle.stale_after` gives `staleAfter`, and the
+        venue's newest published bundle, when newer, is `pendingBundleVersion`.
       required: [appliedBundleVersion, appliedAt, staleAfter, isStale]
       properties:
         appliedBundleVersion: { type: string }

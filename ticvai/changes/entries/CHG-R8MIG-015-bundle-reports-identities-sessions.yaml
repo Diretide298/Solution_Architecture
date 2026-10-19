@@ -1,0 +1,54 @@
+id: CHG-R8MIG-015
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Five records the tickets had nowhere to keep get tables or columns: each bundle report is a
+  catalogue.bundle_application row (the workstation''s current bundle is its latest applied report) and a published
+  bundle keeps who published it and when; an Apple, Google or UAE Pass identity linked to a guest is a
+  pii.subject_identity row; an SSO user is a principal through identity.principal_external_identity, with the claim
+  mapping on the provider; the pending SSO sign-in is a Redis entry and the allowed redirect URIs are a column; an
+  ended session keeps when, by whom and why, and listActiveSessions filters by status (active by default).'
+decision:
+  what: 'R8 blocker causes FOUNDATION-AI-C44, IDENTITY-C54, IDENTITY-C57, IDENTITY-C58 and IDENTITY-C46 (no decision).
+    contracts/spine/catalogue.yaml BundleApplication, CatalogueBundle.publishedAt/publishedBy, the
+    bundleApplicationRecords query and the reportBundleApplied text; contracts/spine/tenancy.yaml CatalogueState and the
+    getWorkstation read-via; contracts/spine/identity.yaml SubjectIdentity, PrincipalExternalIdentity, SsoProviderConfig
+    claim mapping and allowedRedirectUris, ActiveSession endedAt/endedByPrincipalId/endReason, the listActiveSessions
+    status parameter, and the guestSocialLogin, guestUaePassLogin, startSsoAuthorization, completeSsoAuthorization and
+    forceLogout text. Additive.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), groups foundation-ai and identity; tickets 27706 (OFFLINE-BUNDLE),
+  27731, 27757, 27750 and 27766 and their ADAM gaps.'
+keys_touched:
+  operations: [reportBundleApplied, getWorkstation, guestSocialLogin, guestUaePassLogin, startSsoAuthorization,
+    completeSsoAuthorization, forceLogout, listActiveSessions]
+  schemas: [BundleApplication, CatalogueBundle, CatalogueState, SubjectIdentity, PrincipalExternalIdentity,
+    SsoProviderConfig, ActiveSession]
+  tables:
+  - catalogue.bundle_application
+  - catalogue.published_bundle
+  - pii.subject_identity
+  - identity.principal_external_identity
+  - identity.sso_provider
+  - identity.session
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/identity.yaml
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '27706, 27731, 27757, 27750, 27766.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'The problem types sso-state-invalid (401) and sso-principal-not-provisioned (403) are named in the
+  completeSsoAuthorization text; their response entries and catalogue rows are the core lane''s (requested in the lane
+  report). Applied on PostgreSQL 16 from empty, the generated forward files twice.'

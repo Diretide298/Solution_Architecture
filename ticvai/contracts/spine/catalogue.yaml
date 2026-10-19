@@ -354,6 +354,21 @@ x-ticvai-queries:
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
     served: [in-process, service]
+  bundleApplicationRecords:
+    module: catalogue
+    table: catalogue.bundle_application
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.bundle_application rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as workstationId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/BundleApplication'}
+    rule: >-
+      A data read, not a rule question (CHG-MOD-001; R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015). Catalogue answers
+      with its catalogue.bundle_application rows, as it stores them and as the caller's scope lets it see them; the
+      asker takes the latest applied row per workstation. Asked in process within commerce (Tenancy's getWorkstation).
+    served: [in-process, service]
   productCategoryRecords:
     module: catalogue
     table: catalogue.product_category
@@ -4062,6 +4077,11 @@ paths:
       summary: Report that a workstation applied a bundle
       description: 'Lets the back office see which terminals are current and which are drifting toward
         their staleness bound. A terminal that stops reporting is a terminal about to refuse to trade.
+
+
+        **Each call appends one `catalogue.bundle_application` row** (`BundleApplication`: the session''s
+        workstation and venue, the path''s version, `appliedAt`, `outcome`, `error`; R8 blocker FOUNDATION-AI-C44,
+        CHG-R8MIG-015). The latest `applied` row per workstation is the bundle it runs.
 
         '
       tags:
@@ -23501,6 +23521,46 @@ components:
           type: string
         appliedByWorkstations:
           type: integer
+    BundleApplication:
+      type: object
+      x-ticvai-persistence: catalogue.bundle_application
+      # The latest applied row per workstation is its current bundle (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015).
+      x-ticvai-index: [[workstationId, appliedAt]]
+      description: '**One report from a workstation that it applied, or failed to apply, a bundle** (R8 blocker
+        FOUNDATION-AI-C44, CHG-R8MIG-015). Written by `reportBundleApplied`, append-only, never returned whole: the latest
+        `applied` row per workstation is the bundle it runs, which `BundleSummary.appliedByWorkstations` counts and
+        Tenancy''s workstation `CatalogueState` reads (catalogue#bundleApplicationRecords). Nothing is written on
+        `platform.workstation`, so Catalogue writes no other module''s table.'
+      required: [id, workstationId, venueId, bundleVersion, appliedAt, outcome]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        workstationId:
+          type: string
+          format: uuid
+          description: The reporting workstation, from the caller's session.
+        venueId:
+          type: string
+          format: uuid
+          description: The workstation's venue (the bundle's venue).
+        bundleVersion:
+          type: string
+          description: The bundle version from the path.
+        appliedAt:
+          type: string
+          format: date-time
+        outcome:
+          type: string
+          enum:
+          - applied
+          - rolledBack
+          - signatureInvalid
+        error:
+          type: string
+          maxLength: 2000
+          nullable: true
     CatalogueBundle:
       x-ticvai-persistence: catalogue.published_bundle
       type: object
@@ -23519,6 +23579,19 @@ components:
         venueId:
           type: string
           format: uuid
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the bundle was published; `BundleSummary.publishedAt` (CHG-R8MIG-015).
+        publishedBy:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: Who published it; `BundleSummary.publishedBy` (CHG-R8MIG-015).
         isDelta:
           type: boolean
         baseVersion:
