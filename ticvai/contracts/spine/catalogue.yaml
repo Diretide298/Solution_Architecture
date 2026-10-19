@@ -18849,6 +18849,15 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to read the tags of. Absent, the session''s working venue
+          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+          `403 venue-not-in-grants`.'
+        schema:
+          type: string
+          format: uuid
       - name: includeInactive
         in: query
         required: false
@@ -18879,8 +18888,24 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ProductTag'
+        '400':
+          description: No `venueId` and no working venue (`venue-required`).
+          x-ticvai-problem-types:
+          - venue-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: The caller lacks the permission (`forbidden`), or the venue is one the caller's grants do not
+            reach (`venue-not-in-grants`).
+          x-ticvai-problem-types:
+          - forbidden
+          - venue-not-in-grants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-tags/{productTagId}:
@@ -18902,8 +18927,8 @@ paths:
         **The code is fixed once anything uses it.** `Product.segmentTags` stores the code, and so does a Help me
         choose answer's filter (its `segmentTags`), so changing the code of a
         tag that a product or such an answer carries is refused (`409 tag-code-in-use`); make a new tag instead. The
-        code is unique in the tenant (`409 duplicate-code`), as a category code is (audit R108), because a product
-        and a promotion reach across venues.
+        code is unique in the venue, compared ignoring case (`409 duplicate-code`; CHG-R8PRD-010): the tag list is the
+        venue's, as the product list it filters is.
 
         **Audited:** written to `catalogue.audit_entry` (`domain: product`, `action: update`, `category: tags`,
         `entityType: productTag`, the tag before and after).
@@ -18917,6 +18942,15 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to write the tag in. Absent, the session''s working venue
+          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+          `403 venue-not-in-grants`.'
+        schema:
+          type: string
+          format: uuid
       - name: productTagId
         in: path
         required: true
@@ -18942,17 +18976,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProductTag'
         '400':
-          description: The body breaks the schema (`validation`; `errors[]` names the field).
+          description: No `venueId` and no working venue (`venue-required`); or The body breaks the schema (`validation`; `errors[]` names the field).
           x-ticvai-problem-types:
           - validation
+          - venue-required
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: The caller lacks the permission (`forbidden`), or the venue is one the caller's grants do not
+            reach (`venue-not-in-grants`).
+          x-ticvai-problem-types:
+          - forbidden
+          - venue-not-in-grants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: The code is already used by another tag of the tenant (`duplicate-code`), or the write changes
+          description: The code is already used by another tag of the venue (`duplicate-code`), or the write changes
             the code of a tag that products or Help me choose answers carry (`tag-code-in-use`).
           x-ticvai-problem-types:
           - duplicate-code
@@ -18977,8 +19020,10 @@ paths:
         **What it writes.** `categoryId` becomes the product's `Product.categoryId` (null takes the product out of
         every category). `tagIds` replaces the product's tags whole: `Product.segmentTags` becomes the codes of
         those tags, in the order sent. A tag a product carried before the tag list existed is kept only if it is
-        sent again; the wave 1 migration registers every distinct `segmentTags` value already stored as a tag, so
-        none is lost.
+        sent again. **The wave 1 migration maps every value already stored to exactly one tag** of its product's
+        venue (CHG-R8PRD-010; the rule is PRD-W1-DB's): trimmed, compared ignoring case, a value that fits the code
+        pattern becomes that code, one outside it a derived code with the original kept as the tag's `name`, and
+        each product's `segmentTags` is rewritten to those codes, so none is lost.
 
         **Only master data is accepted.** A `categoryId` that is not a category of the product's venue with `kind`
         `category` is `422 unknown-category`, an inactive one `422 inactive-category`; a tag id that is not a tag
@@ -19079,6 +19124,15 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to count. Absent, the session''s working venue
+          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+          `403 venue-not-in-grants`.'
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -19095,8 +19149,24 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ProductCategoryUsage'
+        '400':
+          description: No `venueId` and no working venue (`venue-required`).
+          x-ticvai-problem-types:
+          - venue-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: The caller lacks the permission (`forbidden`), or the venue is one the caller's grants do not
+            reach (`venue-not-in-grants`).
+          x-ticvai-problem-types:
+          - forbidden
+          - venue-not-in-grants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/channel-texts:
@@ -19113,7 +19183,7 @@ paths:
       x-ticvai-read-via:
       - query: white-label#tenantLanguageRecords
         route: service
-        for: 'the tenant''s enabled languages, which `missingTranslations` is counted against: whitelabel.tenant_config, WhiteLabel''s data'
+        for: 'the tenant''s enabled (published) languages, which `missingTranslations` is counted against: whitelabel.config_version, WhiteLabel''s data'
       summary: The product's texts per sales channel, in each of the tenant's languages
       description: >-
         **What each channel prints or shows for this product** (16 October 2026 minutes, 4.10: the POS button label
@@ -19122,8 +19192,8 @@ paths:
         The kiosk label, website and app description, visit instructions and terms are the other texts of the
         wireframe of 9 October, B1-S06 Content & Localization, section "Channel-specific content".
 
-        **The languages are the tenant's** (white-label `setLanguages`, `LanguageConfig.languages`; any ISO 639-1 code
-        since CHG-CSA-039): every text is keyed by those codes, as `LocalisedText` says, and no venue keeps a list of
+        **The languages are the tenant's** (white-label `setLanguages`, the published `LanguageConfig.languages`; any
+        ISO 639-1 code since CHG-CSA-039; a language added to the draft counts once it is published): every text is keyed by those codes, as `LocalisedText` says, and no venue keeps a list of
         its own (CHG-R8PRD-009).
 
         **A product with nothing saved** answers every text null, which means each channel shows the product's own
@@ -19157,7 +19227,7 @@ paths:
       x-ticvai-read-via:
       - query: white-label#tenantLanguageRecords
         route: service
-        for: 'every key must be an enabled language of the tenant: whitelabel.tenant_config, WhiteLabel''s data'
+        for: 'every key must be an enabled (published) language of the tenant: whitelabel.config_version, WhiteLabel''s data'
       summary: Set the product's texts per sales channel
       description: >-
         **Replaces all of the product's channel texts** (CHG-R8PRD-003): a text sent as null, or left out, falls
@@ -19256,12 +19326,15 @@ paths:
         product links a `ticketOwner` form only where the ticket needs one.
 
         **Where the answers are kept**, so no two owners' answers share a key: each owner's answers are one
-        Marketing form submission (`submitForm`), bound to the form version the sale asked (`formVersion`), with its
+        Marketing form submission, written by the Orders service through `recordSaleOwnerAnswers` and bound to the form version the sale asked (`formVersion`), with its
         `answers` keyed by that form's field keys, and its `saleContext` naming the order, the role (`reservationOwner`
         or `ticketOwner`) and, for a ticket owner, the order line and the unit (one submission per credential the line
         issues). The buyer's submission and each ticket owner's are separate records, so a `fullName` on both never
-        collides. Asking the forms in the sale path and writing these submissions is the orders change request of this
-        batch; this read and its write only configure them.
+        collides; a second answer for the same slot is refused there. Asking the forms in the sale path and calling
+        `recordSaleOwnerAnswers` is the orders change request of this batch; this read and its write only configure them.
+
+        **One link only.** Owner forms are asked through this link alone: a form's own `appliesToProductIds` (Marketing's
+        link of a capture form to products) is not read for owner capture, so the sale asks each owner form once.
 
         **A product with nothing linked** answers `forms` empty: the sale asks nothing beyond what the channel already
         takes.
@@ -19391,6 +19464,15 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to list the forms of. Absent, the session''s working venue
+          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+          `403 venue-not-in-grants`.'
+        schema:
+          type: string
+          format: uuid
       - name: search
         in: query
         required: false
@@ -19414,8 +19496,24 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/OwnerFormCandidate'
+        '400':
+          description: No `venueId` and no working venue (`venue-required`).
+          x-ticvai-problem-types:
+          - venue-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: The caller lacks the permission (`forbidden`), or the venue is one the caller's grants do not
+            reach (`venue-not-in-grants`).
+          x-ticvai-problem-types:
+          - forbidden
+          - venue-not-in-grants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/sale-permission-rules:
@@ -19501,16 +19599,18 @@ paths:
         product to selling wherever its channels allow.
 
         **What the server refuses.** A `global` rule with a `targetId`, any other rule without one, two rules with one
-        `level` and `targetId`, or a set with a `DENY` and no `ALLOW`, which would sell nowhere (withdraw the product
-        for that) (`400 validation`, `no-allow-rule`); a `targetId` that is not one `listSalePermissionTargets` offers
-        at its level (`422 unknown-sale-permission-target`); an `ALLOW` at level `principal` naming the caller
+        `level` and `targetId` (`400 validation`); a set with a `DENY` and no `ALLOW` (`400 no-allow-rule`) or a
+        `global` `DENY` (`400 global-deny`), either of which sells nowhere (withdraw the product for that); a new or
+        changed rule whose `targetId` is not one `listSalePermissionTargets` offers for the product at its level
+        (`422 unknown-sale-permission-target`); a rule sent unchanged (same `level`, `targetId` and `effect` as a saved
+        one) is kept as it is and not checked again, so a rule naming a principal since deactivated, or a venue outside
+        the editor's grants, does not block other changes; an `ALLOW` at level `principal` naming the caller
         (`403 sale-permission-self-grant`: nobody grants themselves the right to sell, as an approver is never the
         submitter); an archived product (`409 product-archived`).
 
-        **Governed as the product's other changes.** The rule set is part of the product: it is versioned as
-        `updateProduct` versions the product, and on a product that is `approved` or `live` a changed rule set takes
-        effect only when that version is approved and published (`transitionProductLifecycle`), as the product's other
-        changes do; on a `draft` it applies at once. **Audited:** written to `catalogue.audit_entry` (`domain:
+        **Takes effect at once, as `updateProduct` does** (CHG-R8PRD-010), in every lifecycle state but `archived`,
+        and is versioned as `updateProduct` versions the product. Whether a change on a live product should wait for
+        approval is an open question for the client; it is not built. **Audited:** written to `catalogue.audit_entry` (`domain:
         product`, `action: update`, `category: salePermissions`, the rule set before and after).
       tags:
       - product
@@ -19541,10 +19641,11 @@ paths:
                 $ref: '#/components/schemas/ProductSalePermissionRuleSet'
         '400':
           description: A rule whose target does not fit its level, a level and target twice (`validation`; `errors[]`
-            names the rule's index), or a `DENY` with no `ALLOW` (`no-allow-rule`).
+            names the rule's index), a `DENY` with no `ALLOW` (`no-allow-rule`), or a `global` `DENY` (`global-deny`).
           x-ticvai-problem-types:
           - validation
           - no-allow-rule
+          - global-deny
           content:
             application/problem+json:
               schema:
@@ -19661,11 +19762,12 @@ paths:
         **The pickers of the who-can-sell rules** (CHG-R8PRD-007). A person who configures products holds
         `PRODUCT_CONFIGURE`, not `ROLE_MANAGE` or `USER_MANAGE`, so `listRoles` and `listPrincipals` refuse them; this
         read gives, for one `level`, the ids and names a rule may name and nothing else, and
-        `setProductSalePermissionRules` accepts exactly these: the active venues the caller's own grants reach
-        (`venue`; a per-venue administrator sees only its venue, minutes 4.8), the sales channels of the venue the
-        caller acts at (`salesChannel`, `catalogue.sales_channel`), that venue's workstations, the tenant's roles, and
-        the active staff principals holding a grant that reaches that venue (`principal`; display name and username
-        only, no contact details). `global` has no targets.
+        `setProductSalePermissionRules` checks a new or changed rule against exactly these, for the same venue: **the
+        product's venue when `productId` is sent** (as the save does), else `venueId`, else the session's working
+        venue. The targets: the active venues the caller's own grants reach (`venue`; a per-venue administrator sees
+        only its venue, minutes 4.8), that venue's sales channels (`salesChannel`, `catalogue.sales_channel`), its
+        workstations, the tenant's roles, and the active staff principals holding a grant that reaches that venue
+        (`principal`; display name and username only, no contact details). `global` has no targets.
 
         **Which rows.** Active ones only (a retired role, a deactivated principal or workstation is left out). `search`
         matches the start of any word of the name, ignoring case.
@@ -19681,6 +19783,22 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to list the targets of, when no `productId` is sent. Absent, the session''s working venue
+          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+          `403 venue-not-in-grants`.'
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: query
+        required: false
+        description: The product whose rules are being edited; its venue is the venue listed, and `venueId` is then ignored.
+        schema:
+          type: string
+          format: uuid
       - name: level
         in: query
         required: true
@@ -19710,8 +19828,26 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/SalePermissionTarget'
+        '400':
+          description: No `venueId` and no working venue (`venue-required`).
+          x-ticvai-problem-types:
+          - venue-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: The caller lacks the permission (`forbidden`), or the venue is one the caller's grants do not
+            reach (`venue-not-in-grants`).
+          x-ticvai-problem-types:
+          - forbidden
+          - venue-not-in-grants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-dashboard:
@@ -19748,7 +19884,9 @@ paths:
       - name: venueId
         in: query
         required: false
-        description: The venue to count, for a caller whose grants reach several; absent, the venue the caller acts at.
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to count. Absent, the session''s working venue
+          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+          `403 venue-not-in-grants`.'
         schema:
           type: string
           format: uuid
@@ -19759,6 +19897,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductDashboard'
+        '400':
+          description: No `venueId` and no working venue (`venue-required`).
+          x-ticvai-problem-types:
+          - venue-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           description: The caller lacks the permission (`forbidden`), or `venueId` names a venue the caller's
             grants do not reach (`venue-not-in-grants`).
@@ -19797,7 +19943,9 @@ paths:
       - name: venueId
         in: query
         required: false
-        description: The venue to read, for a caller whose grants reach several; absent, the venue the caller acts at.
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to read. Absent, the session''s working venue
+          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+          `403 venue-not-in-grants`.'
         schema:
           type: string
           format: uuid
@@ -19823,6 +19971,14 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ProductAttentionItem'
+        '400':
+          description: No `venueId` and no working venue (`venue-required`).
+          x-ticvai-problem-types:
+          - venue-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           description: The caller lacks the permission (`forbidden`), or `venueId` names a venue the caller's
             grants do not reach (`venue-not-in-grants`).
@@ -44435,10 +44591,10 @@ components:
           type: string
           maxLength: 64
           pattern: ^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)*$
-          x-ticvai-unique: tenant
+          x-ticvai-unique: venue
           description: >-
             Lower case, digits and hyphens, with `/` between levels (`level/beginner` sits under `level`), as
-            `Product.segmentTags` has always been read. Unique in the tenant, as a category code is. Fixed once
+            `Product.segmentTags` has always been read. Unique in the venue, compared ignoring case. Fixed once
             a product or a Help me choose answer carries it (`409 tag-code-in-use`).
         name:
           type: string
@@ -44448,7 +44604,7 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
           nullable: true
-          description: The name in each of the venue's languages (`getCatalogueLanguageSettings`); `name` is the fallback.
+          description: The name in each of the tenant's enabled languages (white-label `LanguageConfig`); `name` is the fallback.
         description:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
@@ -44465,7 +44621,7 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: '**The partition key** (ADR-0005). Set by the server from the venue the caller acts at.'
+          description: '**The partition key** (ADR-0005). Set by the server from the venue resolved for the write (`venueId`, else the session''s working venue).'
         productCount:
           type: integer
           readOnly: true

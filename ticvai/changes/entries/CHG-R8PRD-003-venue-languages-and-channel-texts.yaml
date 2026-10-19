@@ -42,6 +42,7 @@ prevention:
   ref: tools/check-contract-shapes.py
 status: open
 notes: 'Batch R8PRD. Additive only. Left for the catalogue owner (a CR, existing text): updateProduct and createProduct
-  should refuse nameLocalised and descriptionLocalised keys outside the venue list; the guest reads (listProducts,
+  should refuse nameLocalised and descriptionLocalised keys outside the tenant''s enabled languages (no venue list since
+  CHG-R8PRD-009); the guest reads (listProducts,
   getProduct), the till bundle and the kiosk should return the channel texts (today they return the product name and
   description only). Until then the texts are configured and previewed in the back office only. Corrected by CHG-R8PRD-009 (review I1): no venue language list; getCatalogueLanguageSettings, setCatalogueLanguageSettings and catalogue.catalogue_language_setting are removed before any migration, and the channel texts are keyed by the tenant''s enabled languages (white-label setLanguages).'

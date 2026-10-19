@@ -18972,6 +18972,81 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/NotFound'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/sale-owner-answers:
+    post:
+      operationId: recordSaleOwnerAnswers
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-consumed-by: []
+      summary: Keep one owner's answers to a product's owner form, for one sale
+      description: >-
+        **The only write of `FormSubmission.saleContext`** (products module, 16 October 2026 minutes 4.13;
+        CHG-R8PRD-010). The Orders service calls it, cell-internal over mTLS, when a sale records the answers of the
+        reservation owner (once per order) or of a ticket owner (once per credential: order line and unit) to the form
+        catalogue `getProductOwnerForms` links for that role. A guest or staff caller of `submitForm` cannot set a sale
+        context: there it is read-only.
+
+        **One submission per owner slot**: `(orderId, ownerRole, orderLineId, unitIndex)` is unique
+        (`marketing.form_submission_sale_link`), so a second answer for the same slot is refused
+        `409 owner-answers-already-recorded`. The answers are kept as any submission is: bound to the form version
+        answered, keyed by the form's field keys, the personal-data mark of each field deciding its retention.
+      tags:
+      - marketing
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleOwnerAnswers'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Kept
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormSubmission'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: This owner slot of the sale already has its answers (`owner-answers-already-recorded`).
+          x-ticvai-problem-types:
+          - owner-answers-already-recorded
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The form or its version is not a published form of the venue (`unknown-form`), or a required field
+            has no answer (`answer-required`).
+          x-ticvai-problem-types:
+          - unknown-form
+          - answer-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
 components:
   schemas:
     CookieCategory:
@@ -22363,7 +22438,8 @@ components:
             **How a choice is drawn** (products module, 16 October 2026 minutes 4.13: the data mask's field types are
             text, drop-down, radio and check box; CHG-R8PRD-009). For `select`, `dropDown` (the default) or `radio`;
             for `multiSelect`, `checkBoxes`. A single check box is a `boolean`. Null for every other type. It changes
-            how the field is drawn, never what is stored.
+            how the field is drawn, never what is stored. On any other type, or a value that does not fit the type,
+            the server stores null.
     FormSubmission:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestTimeline, getWaiverStatus, listComplianceEvidenceWaiver, listContact and others
       type: object
@@ -22448,36 +22524,19 @@ components:
           type: string
           nullable: true
         saleContext:
-          type: object
+          allOf:
+          - $ref: '#/components/schemas/FormSubmissionSaleLink'
           nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
           description: >-
-            **The sale a capture was made for** (products module, 16 October 2026 minutes 4.13; CHG-R8PRD-009): a
-            product's reservation-owner and ticket-owner forms (catalogue `getProductOwnerForms`) are answered as
-            submissions of this form, one for the buyer and one per credential for each ticket owner, so each owner's
-            answers are a record of their own and two owners' keys never collide. Null for a submission made outside a
-            sale.
-          required:
-          - orderId
-          - ownerRole
-          properties:
-            orderId:
-              type: string
-              format: uuid
-            ownerRole:
-              type: string
-              enum:
-              - reservationOwner
-              - ticketOwner
-            orderLineId:
-              type: string
-              format: uuid
-              nullable: true
-              description: For a ticket owner, the order line whose credential this owner holds; null for the buyer.
-            unitIndex:
-              type: integer
-              minimum: 1
-              nullable: true
-              description: For a ticket owner, which of the line's credentials (1 to the line's quantity); null for the buyer.
+            **The sale a capture was made for** (products module, 16 October 2026 minutes 4.13; CHG-R8PRD-009,
+            CHG-R8PRD-010): a product's reservation-owner and ticket-owner forms (catalogue `getProductOwnerForms`) are
+            answered as submissions of this form, one for the buyer and one per credential for each ticket owner, so
+            each owner's answers are a record of their own and two owners' keys never collide. **Read-only here**: it
+            is written only by the Orders service through `recordSaleOwnerAnswers` (service-to-service), never by a
+            caller of `submitForm`. Null for a submission made outside a sale.
     GuestDocument:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listComplianceEvidenceWaiver, uploadGuestDocument
       type: object
@@ -38719,6 +38778,89 @@ components:
           type: string
           readOnly: true
           description: '**The partition key** (ADR-0005), the requirement''s.'
+    SaleOwnerAnswers:
+      type: object
+      x-ticvai-persistence: none — request body of recordSaleOwnerAnswers, kept as marketing.form_submission and marketing.form_submission_sale_link
+      description: One owner's answers to an owner form, for one sale (CHG-R8PRD-010).
+      required:
+      - formId
+      - formVersion
+      - subjectId
+      - answers
+      - sale
+      properties:
+        formId:
+          type: string
+          format: uuid
+        formVersion:
+          type: integer
+          description: The published version the sale asked.
+        subjectId:
+          type: string
+          format: uuid
+          description: The owner's profile (the buyer's, or the ticket owner's, which the sale creates when it has none).
+        answers:
+          type: object
+          description: As `FormSubmission.answers`, keyed by the form's field keys.
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+        capturedAtChannel:
+          $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+        sale:
+          $ref: '#/components/schemas/FormSubmissionSaleLink'
+    FormSubmissionSaleLink:
+      type: object
+      x-ticvai-persistence: marketing.form_submission_sale_link
+      x-ticvai-unique-together:
+      - [orderId, ownerRole, orderLineId, unitIndex]
+      x-ticvai-unique-nulls: not-distinct
+      x-ticvai-required-when:
+        orderLineId:
+          ownerRole: ticketOwner
+        unitIndex:
+          ownerRole: ticketOwner
+      description: >-
+        **Which owner slot of which sale a submission answers** (CHG-R8PRD-010). One row per submission made for a
+        sale; the unique key allows one answer per slot: the buyer once per order (line and unit null), each ticket
+        owner once per order line and unit.
+      required:
+      - orderId
+      - ownerRole
+      properties:
+        submissionId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: marketing.form_submission
+        orderId:
+          type: string
+          format: uuid
+          description: The order (Orders' id; not a database reference).
+        ownerRole:
+          type: string
+          enum:
+          - reservationOwner
+          - ticketOwner
+        orderLineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For a ticket owner, the order line whose credential this owner holds; null for the buyer.
+        unitIndex:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: For a ticket owner, which of the line's credentials (1 to the line's quantity); null for the buyer.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). The order''s venue.'
   securitySchemes:
     apiKeyAuth:
       type: apiKey

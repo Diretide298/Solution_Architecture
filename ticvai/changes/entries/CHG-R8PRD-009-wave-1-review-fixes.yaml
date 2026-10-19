@@ -82,4 +82,6 @@ notes: 'Batch R8PRD. Open for Allam (products review call): whether a specific A
   FormSubmission.saleContext; variantsSellableAt and the till bundle apply the sale permissions; a transition that
   enforces the readiness reasons, if wanted. Not fixed, with why: M9 (If-Match on the whole-set PUTs: their neighbours
   omit it too, a package-wide choice); M12 (no screen binds the new operations until Pallavi''s revision lands, and the
-  per-product PUTs carry no config scope because the config-scope rule does not reach their names).'
+  per-product PUTs other than setProductSalePermissionRules carry no config scope because the config-scope rule does not
+  reach their names; that one keeps it because the rule reaches "Rule"). The approval gate on who-can-sell changes
+  written here is removed by CHG-R8PRD-010: its premise was wrong.'
