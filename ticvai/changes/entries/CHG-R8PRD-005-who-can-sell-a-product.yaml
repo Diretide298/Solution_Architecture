@@ -1,0 +1,49 @@
+id: CHG-R8PRD-005
+date: '2026-10-20'
+source: mom
+kind: contract
+summary: 'Who can sell a product is set on the product, at six levels (global, site, sales channel, workstation, role,
+  user), each ALLOW or DENY (getProductSalePermissionRules, setProductSalePermissionRules), and a sale context can be
+  checked against the rules (checkProductSalePermission). The narrowest level with a matching rule decides and DENY
+  wins within a level: proposed, the client to confirm. Admin rights limited per venue need no new operation: a grant
+  at a venue''s scope path (createDelegatedAccess) already does it. Additive.'
+decision:
+  what: 'contracts/spine/catalogue.yaml, appended: GET and PUT /products/{productId}/sale-permission-rules (whole set;
+    400 validation, 422 unknown-sale-permission-target; read-via tenancy#activeVenues, tenancy#workstationRecords,
+    identity#roleRecords, identity#principalRecords), POST /sale-permission-checks checkProductSalePermission;
+    schemas SalePermissionLevel, ProductSalePermissionRule (catalogue.product_sale_permission),
+    ProductSalePermissionRuleSet, SalePermissionCheckRequest, SalePermissionCheckResult. A product with no rules
+    sells as before.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Minutes of 16 October 2026 (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md), 4.8: the
+  product is created once and "what differs is who can sell it": global, a particular site, an operating area (sales
+  channel such as POS, B2C, kiosk), a workstation, a role or a specific user, "each with allow and deny options";
+  "remove venue scope from the basics step and replace it with a who can sell permission option"; the system must
+  support one admin for all venues or one admin per venue. The package had channel sales rules (ChannelSalesRule)
+  and Product.channels, but no allow or deny by venue, workstation, role or user.'
+keys_touched:
+  operations: [getProductSalePermissionRules, setProductSalePermissionRules, checkProductSalePermission]
+  schemas: [SalePermissionLevel, ProductSalePermissionRule, ProductSalePermissionRuleSet, SalePermissionCheckRequest,
+    SalePermissionCheckResult]
+  tables: [catalogue.product_sale_permission]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+client_signoff: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. Additive only. **Open for the client:** the precedence (narrowest level wins, DENY wins within a
+  level, no match denies) is proposed; the minutes give the levels and allow or deny only. Left for the catalogue and
+  orders owners (a CR, existing text): the variantsSellableAt query and the till bundle should apply the rules, so a
+  sale is refused where they deny (today they are configured and checked, not enforced at sale). The venue scope of
+  Product (venueId) stays until the wave 2 product form; removing it is a breaking change for its own CR.'

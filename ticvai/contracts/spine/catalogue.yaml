@@ -19525,6 +19525,181 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /products/{productId}/sale-permission-rules:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getProductSalePermissionRules
+      x-ticvai-consumed-by: []
+      summary: Who can sell this product
+      description: >-
+        **A product is created once; who can sell it is set on the product** (16 October 2026 minutes, 4.8 and
+        section 5, CHG-R8PRD-005). Allam's existing system grants the sale at six levels, each allow or deny:
+        global (every venue of the tenant), a site (a venue), an operating area (a sales channel such as POS, B2C
+        or kiosk), a workstation, a role (admin, cashier, supervisor) or a user. This replaces the venue scope of
+        the product form's Basics step (wireframe of 9 October, B1-S04 Identity & Classification).
+
+        **A product with no rules** answers `rules` empty: it sells as it did before this read existed, wherever
+        its channels and the channel rules allow (the `variantsSellableAt` query). How a rule set decides a sale is
+        `ProductSalePermissionRuleSet`'s description; `checkProductSalePermission` applies it to a context.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The product's sale permission rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSalePermissionRuleSet'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setProductSalePermissionRules
+      x-ticvai-consumed-by: []
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'a `site` rule''s target must be an active venue of the tenant: platform.scope, Tenancy''s data'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'a `workstation` rule''s target must be a workstation of the tenant: platform.workstation, Tenancy''s data'
+      - query: identity#roleRecords
+        route: in-process
+        for: 'a `role` rule''s target must be a role of the tenant: identity.role, Identity''s data'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'a `user` rule''s target must be a principal of the tenant: identity.principal, Identity''s data'
+      summary: Set who can sell this product
+      description: >-
+        **Replaces the product's whole rule set** (CHG-R8PRD-005); an empty `rules` returns the product to selling
+        wherever its channels allow.
+
+        **What the server refuses.** A `global` rule with a `targetId`, any other rule without one, or two rules
+        with one `level` and `targetId` (`400 validation`); a `targetId` that is not a thing of its level in the
+        tenant, that is a venue for `site`, a `catalogue.sales_channel` for `salesChannel`, a workstation, a role
+        or a principal (`422 unknown-sale-permission-target`).
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductSalePermissionRuleSet'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSalePermissionRuleSet'
+        '400':
+          description: A rule whose target does not fit its level, or a level and target twice (`validation`;
+            `errors[]` names the rule's index).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: A rule names a target that is not a venue, sales channel, workstation, role or user of the
+            tenant as its level says (`unknown-sale-permission-target`; `errors[]` names the rule's index).
+          x-ticvai-problem-types:
+          - unknown-sale-permission-target
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /sale-permission-checks:
+    post:
+      operationId: checkProductSalePermission
+      x-ticvai-consumed-by: []
+      x-ticvai-idempotency-exempt: A check that writes nothing; a replay answers the same and duplicates no row.
+      summary: Would this seller, here, be allowed to sell these products
+      description: >-
+        **Applies the products' sale permission rules to one sale context** (CHG-R8PRD-005), the way
+        `ProductSalePermissionRuleSet` describes, and says which rule decided. The back office uses it to show
+        "who can sell" in plain words and to test a rule set before saving it; it is the rule the sale path is to
+        apply (see the remaining work in CHG-R8PRD-005).
+
+        A guest channel (website, app, kiosk) has no seller: send no `roleId` and no `principalId`, and only
+        `global`, `site`, `salesChannel` and `workstation` rules can match.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalePermissionCheckRequest'
+      responses:
+        '200':
+          description: One result per product asked, in the order asked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalePermissionCheckResult'
+        '400':
+          description: The body breaks the schema (`validation`).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '422':
+          description: A product id that is not a product of the caller's venue (`unknown-product`).
+          x-ticvai-problem-types:
+          - unknown-product
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     EventResourceCostEstimate:
@@ -44587,6 +44762,168 @@ components:
           type: string
           readOnly: true
           description: '**The partition key** (ADR-0005). The product''s venue.'
+    SalePermissionLevel:
+      type: string
+      description: >-
+        **The six levels at which a sale is allowed or denied** (16 October 2026 minutes, 4.8, CHG-R8PRD-005), from
+        the widest to the narrowest: `global` (every venue of the tenant), `site` (one venue), `salesChannel` (an
+        operating area: a `catalogue.sales_channel`, such as a venue's POS, website or kiosk), `workstation`,
+        `role`, `user` (a principal).
+      enum:
+      - global
+      - site
+      - salesChannel
+      - workstation
+      - role
+      - user
+    ProductSalePermissionRule:
+      type: object
+      x-ticvai-persistence: catalogue.product_sale_permission
+      description: One allow or deny of the sale of one product at one level (CHG-R8PRD-005).
+      required:
+      - level
+      - effect
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        productId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path.
+        level:
+          $ref: '#/components/schemas/SalePermissionLevel'
+        targetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >-
+            What the rule names at its level: a venue (`site`), a `catalogue.sales_channel` (`salesChannel`), a
+            workstation, a role or a principal (`user`). Null for `global` and only for it.
+        effect:
+          type: string
+          enum:
+          - ALLOW
+          - DENY
+          description: Spelled as an identity grant's `effect` is.
+        note:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: Why the rule exists, for whoever reads it next.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). The product''s venue.'
+    ProductSalePermissionRuleSet:
+      type: object
+      x-ticvai-persistence: none — the product's rows of catalogue.product_sale_permission
+      description: >-
+        **Who can sell one product, and how the rules decide** (16 October 2026 minutes, 4.8, CHG-R8PRD-005).
+
+        **No rules: the product sells as before**, wherever its channels and the channel rules allow.
+
+        **With rules, a sale context is matched against them**: the venue the sale happens at (`site`), its sales
+        channel, its workstation, the seller's role and the seller (`user`); `global` matches every context. **The
+        narrowest level that has a matching rule decides** (`user`, then `role`, then `workstation`, then
+        `salesChannel`, then `site`, then `global`), **and within that level `DENY` wins over `ALLOW`**. A context
+        no rule matches is denied, so a product that is to sell everywhere except one place carries a `global`
+        `ALLOW` and that one `DENY`. A guest channel has no seller, so only the first four levels can match it.
+
+        **The precedence is proposed, the client to confirm**: the minutes give the six levels and allow or deny at
+        each, not which wins when two disagree (Chinmay, 20 October 2026; open item for the products review call).
+      required:
+      - rules
+      properties:
+        productId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path.
+        rules:
+          type: array
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/ProductSalePermissionRule'
+    SalePermissionCheckRequest:
+      type: object
+      x-ticvai-persistence: none — request body of checkProductSalePermission
+      description: One sale context and the products to check in it (CHG-R8PRD-005).
+      required:
+      - productIds
+      - venueId
+      properties:
+        productIds:
+          type: array
+          minItems: 1
+          maxItems: 50
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+        venueId:
+          type: string
+          format: uuid
+          description: The venue the sale happens at; matched by `site` rules.
+        salesChannelId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.sales_channel
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+        roleId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The seller's role in the session that sells; absent on a guest channel.
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The seller; absent on a guest channel.
+    SalePermissionCheckResult:
+      type: object
+      x-ticvai-persistence: none — computed
+      description: What `checkProductSalePermission` decided for each product asked.
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            required:
+            - productId
+            - allowed
+            - reason
+            properties:
+              productId:
+                type: string
+                format: uuid
+              allowed:
+                type: boolean
+              reason:
+                type: string
+                enum:
+                - noRules
+                - allowedByRule
+                - deniedByRule
+                - noMatchingRule
+                description: '`noRules`: the product has none and sells as before (allowed). `noMatchingRule`: it has rules and none matches the context (denied).'
+              decidedByRuleId:
+                type: string
+                format: uuid
+                nullable: true
+                description: The rule that decided; null for `noRules` and `noMatchingRule`.
+              decidedAtLevel:
+                allOf:
+                - $ref: '#/components/schemas/SalePermissionLevel'
+                nullable: true
   securitySchemes:
     serviceAuth:
       type: http
