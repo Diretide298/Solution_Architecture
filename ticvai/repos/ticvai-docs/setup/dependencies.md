@@ -76,4 +76,4 @@ cell's Key Vault). It is owned by SETUP-ENV's author and built in SETUP-QDRANT.
 
 ### AI (`ticvai-ai`, Python)
 
-No starter ships yet. FastAPI is the stated framework (quickstart); every other package waits for the named approver.
+No code starter ships yet: ADAM setup's `ai` role (`setup.cmd -Role ai`, 20 October 2026, r8 cause FOUNDATION-AI-C29) clones `ticvai-ai` and adds only ADAM's CLAUDE.md and commands. FastAPI is the stated framework (quickstart); every other package waits for the named approver.

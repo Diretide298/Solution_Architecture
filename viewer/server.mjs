@@ -1004,7 +1004,7 @@ const server = http.createServer(async (req, res) => {
     // already hands everyone. A role that is neither backend nor frontend is refused.
     if (url.pathname === '/connector/workspace') {
       const files = await workspaceFilesOf(url.searchParams.get('role') ?? '');
-      if (!files) return send(res, 400, JSON.stringify({ error: 'role is backend or frontend' }), MIME['.json']);
+      if (!files) return send(res, 400, JSON.stringify({ error: 'role is backend, frontend or ai' }), MIME['.json']);
       return send(res, 200, JSON.stringify(files), MIME['.json']);
     }
 
