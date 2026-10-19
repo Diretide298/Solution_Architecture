@@ -559,13 +559,14 @@ screens:
     - to: CMS-006
       trigger: Component Preview
       provenance: flow F102 step 2→3
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37
-    operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical
-    41 operations** — a Typography screen that could create banners and a Component Preview that could
-    set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label
-    journey surfaced it.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered — sound
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37 operations
+    removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations**
+    — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst
+    instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced
+    it. Build note (r8, WHITE-C03): the generated first-run text "Offers no create action" is wrong. `setFonts`
+    creates the part on first save: build the form empty with Save fonts when `getFonts` answers 404 not-configured.'
   density: compact
   pattern: statusTracker
   patternReason: '`getFonts` reads one record and nothing reads a population — the screen is about that
@@ -3000,13 +3001,17 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-012 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered — sound
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. Build note
+    (r8, WHITE-C03): nothing is read on entry. The preview is made by `createPreview` when the person presses
+    the action and is empty until then (not a 404); Validate calls `validateTenantConfig`; the no-access
+    state names `TENANT_CONFIGURE` for those two operations. Ignore the generated first-run text "Offers
+    no create action" and the `getTenantConfig` wording in the no-access state.'
   density: compact
   pattern: statusTracker
-  patternReason: '`getTenantConfig` reads one record and nothing reads a population — the screen is about
-    that one thing'
+  patternReason: 'authored: the preview is made by `createPreview` when the person asks and the draft is
+    checked by `validateTenantConfig`; nothing on this screen reads a record on entry.'
   purpose: See the site as an Arabic reader sees it.
   layout:
     template: detail
