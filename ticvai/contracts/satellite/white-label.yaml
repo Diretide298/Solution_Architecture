@@ -1333,6 +1333,9 @@ paths:
       - query: platform-ops#contentBlockRecords
         route: in-process
         for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       summary: Publish now, or schedule it
       description: '**A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom`
         fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
@@ -1344,6 +1347,16 @@ paths:
 
         **`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or
         400. A scheduled job makes the publish and the expiry at those times (audit R163).
+
+        **The review path, as `publishTenantConfig` has it** (r8 walk of ticket 27919; ADAM CR-154). With the
+        tenant''s publish-review policy off, the block is published or scheduled at once (200). With it on, this
+        calls approvals'' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix
+        subject `whiteLabelPublication`, `subjectId` the block id), records its `approvalRequestId`, leaves `status`
+        as it is and sets `reviewStatus` `pending`, and answers 202. White-label''s consumer of `approval.granted`
+        then publishes or schedules the block (`reviewStatus` `approved`); its consumer of `approval.rejected`
+        sets `reviewStatus` `rejected` and the block stays a draft. While `pending`, a second publish of the block
+        is refused with 409 `content-block-awaiting-review`. CMS-007 reads `getPublishReviewPolicy` to say whether
+        review applies and shows `reviewStatus` on the block.
 
         '
       tags:
@@ -1381,9 +1394,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '202':
+          description: Submitted for review; the tenant's publish-review policy is on. The block keeps its `status`,
+            carries `reviewStatus` `pending` and its `approvalRequestId`, and is published or scheduled when the
+            request is approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentBlock'
         '409':
-          description: 'The block is already `published` (`content-block-published`; a change goes through a new draft) or is `archived` (`content-block-archived`). Nothing changes.'
-          x-ticvai-problem-types: [content-block-published, content-block-archived]
+          description: 'The block is already `published` (`content-block-published`; a change goes through a new draft), is `archived` (`content-block-archived`), or is already waiting for review (`content-block-awaiting-review`). Nothing changes.'
+          x-ticvai-problem-types: [content-block-published, content-block-archived, content-block-awaiting-review]
           content:
             application/problem+json:
               schema:
@@ -4123,12 +4144,24 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-015 Version History"
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (ADR-0055), to name the products a changed flow reaches'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
       summary: Compare a version against the working draft
       description: 'What a review step actually needs. A publish note saying "updated homepage" is not
         a review; a field-level diff is.
+
+        **Changed booking flows and the products they reach** (r8 walk of ticket 28337). The publish gate on
+        CMS-103 says which flows changed and which products are affected, and it reads both here. `changes` has an
+        area `bookingFlows` with one entry per flow added, removed or modified (`path` is the flow key).
+        `affectedProducts` lists, for the flows that differ, each product the flow serves, found by the rule
+        `Product.bookingFlowId` already states: the product''s own flow, else its category''s, else the venue''s
+        default flow for the product''s kind. The server applies that rule on read; nothing is stored.
 
         '
       tags:
@@ -8696,6 +8729,23 @@ components:
           format: uuid
           nullable: true
           readOnly: true
+        reviewStatus:
+          type: string
+          readOnly: true
+          enum:
+          - notRequired
+          - pending
+          - approved
+          - rejected
+          default: notRequired
+          description: The review step of `publishContentBlock`, where the tenant's publish-review policy is on (r8 walk
+            of ticket 27919). `pending` from the 202 until the approval is decided; `status` does not change meanwhile.
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The approval request `publishContentBlock` raised; null while no review has been asked for.
         scopePath:
           type: string
           readOnly: true
@@ -11218,6 +11268,21 @@ components:
           type: string
         toVersion:
           type: string
+        affectedProducts:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The products served by a booking flow that differs between the two versions (area
+            `bookingFlows` in `changes`), by the product-to-flow rule of `Product.bookingFlowId`. Empty when no flow
+            differs. Bounded by the venue''s products; the screen shows the first page and the count.'
+          items:
+            type: object
+            required: [productId, name, flowKey]
+            properties:
+              productId: { type: string, format: uuid }
+              name: { type: string }
+              flowKey: { type: string, description: The changed flow that serves this product. }
         changes:
           type: array
           items:
