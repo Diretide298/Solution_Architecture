@@ -16734,6 +16734,35 @@ components:
           type: integer
         venueCount:
           type: integer
+        cellHost:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The host of the tenant''s home cell (the host part of `Cell.apiEndpoint` of the cell that
+            holds the tenant in its home region), derived on read through `control.cell_tenant`. Added for ADM-018
+            (r8 walk of ticket 27886): the console reaches the cell''s grant and language operations at this host
+            without holding `PLATFORM_CELL_VIEW`, which `listTenantCells` needs. Null while the tenant has no cell.
+
+            '
+        cellHosts:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'One entry per region the tenant is in, for a multi-region tenant; the entry with `isHome`
+            true is `cellHost`. The screen uses the home cell for language and grant operations.
+
+            '
+          items:
+            type: object
+            required: [regionId, cellId, host, isHome]
+            properties:
+              regionId: { type: string, format: uuid }
+              cellId: { type: string, format: uuid }
+              host: { type: string }
+              isHome: { type: boolean }
         regionId:
           type: string
           format: uuid
