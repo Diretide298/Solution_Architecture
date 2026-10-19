@@ -1424,16 +1424,11 @@ paths:
       description: 'Called at point of sale before applying. Returns whether the code is valid, why not
         when it is not, and what it would give.
 
-        **A guest calls this without a permission** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001;
-        `x-ticvai-guest-callable`). **The guest rule, on what is stored** (R8 blocker ORDERS-MONEY-C32, the
-        lead''s answer A of 20 October 2026; a coupon campaign has `is_active`, `valid_from` and `valid_to` and no
-        link to a promotion): an unknown code is 404; a known code is 200 with `GuestCouponCode` (code, status,
-        whether it can be applied and why not, the discount and the validity window) and nothing about its
-        allocation, owner, assignee or counts. `invalidReason` for a guest is `expired`, `notYetValid`, `voided`
-        (also when the campaign is not active), `alreadyRedeemed` (the guest''s own redemption) or
-        `notAssignedToGuest` (assigned to someone else, without saying to whom); `wrongVenue` only when the guest
-        sends `venueId` and the code is not valid there. `PRICE_VIEW` is what a staff caller must hold; staff get
-        `CouponCode` and see drafts (ADR-0025).
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets whether a code of a
+        live, published promotion is valid and what it gives, and nothing in draft, unpublished or withdrawn;
+        asked for by id, such a record answers as not found. `PRICE_VIEW` is what a staff caller must hold,
+        and staff also see drafts (ADR-0025).
 
         '
       tags:
@@ -1443,24 +1438,104 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Code state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CouponCode'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-coupon-codes/{code}:
+    parameters:
+    - name: code
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: getGuestCouponCode
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-read-routing: primary
+      summary: What a guest is told about a coupon code
+      description: 'A guest''s check of a code before applying it (R8 blocker ORDERS-MONEY-C32, the lead''s answer A of
+        20 October 2026; GST-037). Answers `GuestCouponCode`: the code, its status, whether it can be applied now and
+        why not, the discount and the validity window, never its campaign, batch, assignee, assignment, counts or the
+        order it was redeemed on. `getCouponCode` stays the staff read and is unchanged.
+
+        **The rule, on what is stored** (a coupon campaign has `is_active`, `valid_from` and `valid_to` and no link to
+        a promotion): an unknown code is 404. A known code is 200, and when it cannot be applied `invalidReason` is
+        `expired`, `notYetValid`, `voided` (also when the campaign is not active), `alreadyRedeemed` (the guest''s own
+        redemption), `notAssignedToGuest` (assigned to someone else, without saying to whom) or `wrongVenue` (only
+        when `venueId` is sent and the code is not valid there). A guest needs no permission; the code is what the
+        guest holds, and the existing `429` limits stop guessing.'
+      tags:
+      - coupon
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - name: venueId
         in: query
         required: false
-        description: The venue the guest is buying at, so `wrongVenue` can be answered; a guest session carries no
-          venue. Staff callers are answered for their session's venue.
+        description: The venue the guest is buying at, so `wrongVenue` can be answered; a guest session carries no venue.
         schema:
           type: string
           format: uuid
       responses:
         '200':
-          description: Code state. **A guest caller receives `GuestCouponCode`**; staff callers receive `CouponCode`.
+          description: The guest's view of the code.
           content:
             application/json:
               schema:
-                oneOf:
-                - $ref: '#/components/schemas/CouponCode'
-                - $ref: '#/components/schemas/GuestCouponCode'
+                $ref: '#/components/schemas/GuestCouponCode'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-bundles/{bundleId}:
+    parameters:
+    - name: bundleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getGuestBundle
+      x-ticvai-audience:
+      - guest
+      # Public, with an optional token, as getBundle: a visitor browses before signing in.
+      security:
+      - {}
+      - guestAuth: []
+      x-ticvai-read-routing: replica
+      summary: What a guest is shown of a bundle
+      description: 'A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32, the lead''s answer A
+        of 20 October 2026; GST-004, GST-056, WEB-008). Answers `GuestBundle`: name, description, kind, price and
+        savings, components and choice groups, and validity, never the allocation, owner, campaign, code or whether it
+        has been sold. A bundle in draft, unpublished or withdrawn answers 404. `getBundle` stays the staff read and
+        is unchanged. Published catalogue data, so no permission is needed.'
+      tags:
+      - bundle
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The guest's view of the bundle.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestBundle'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
@@ -1865,10 +1940,7 @@ paths:
         **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a published bundle, and
         nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
-        `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025). **A guest or
-        visitor receives `GuestBundle`** (R8 blocker ORDERS-MONEY-C32, the lead's answer A of 20 October 2026):
-        name, description, price and savings, components and choice groups, and validity, never the allocation,
-        owner, campaign or whether it has been sold.
+        `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
@@ -1884,13 +1956,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Bundle. **A guest or visitor receives `GuestBundle`**; staff callers receive `Bundle`.
+          description: Bundle
           content:
             application/json:
               schema:
-                oneOf:
-                - $ref: '#/components/schemas/Bundle'
-                - $ref: '#/components/schemas/GuestBundle'
+                $ref: '#/components/schemas/Bundle'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':

@@ -2,20 +2,23 @@ id: CHG-R8STO-006
 date: '2026-10-20'
 source: audit
 kind: contract
-summary: 'A guest reading a coupon code or a bundle gets its own narrow shape (GuestCouponCode, GuestBundle) and a
-  coupon rule built on what is stored; the Home overview, quick actions and "Book a trip" are stated from data that
+summary: 'A guest reads a coupon code or a bundle through its own new read (getGuestCouponCode, getGuestBundle) with
+  its own narrow shape (GuestCouponCode, GuestBundle) and a coupon rule built on what is stored, while the staff reads
+  stay unchanged; the Home overview, quick actions and "Book a trip" are stated from data that
   exists (a content page, the enabled modules, a transport booking flow); and ADM-603 is built with the labels its
   fields carry, the rest proposed to the client.'
 decision:
   what: 'R8 blocker causes ORDERS-MONEY-C32 (answer A), WHITE-C07 (answer: option 3 for r8, nothing new stored) and
-    ORDERS-MONEY-C28 (answer C, ownership tenant). getCouponCode and getBundle answer a guest with the new shapes
-    (oneOf, as getPromotion does) and getCouponCode takes an optional venueId. No storage change.'
+    ORDERS-MONEY-C28 (answer C, ownership tenant). Two additive guest operations, getGuestCouponCode (optional
+    venueId) and getGuestBundle, answer the new shapes (additionalProperties false); getCouponCode and getBundle are
+    not changed, because an existing response never becomes a union and a required field never becomes optional
+    (the lead''s ruling of 20 October 2026, as for getRefundPolicy and lookupMerchandise). No storage change.'
   by: Chinmay
   date: '2026-10-20'
 why: 'Finding: R8 blocker cause list (walk of the Sprint 1 and 2 tickets): ORDERS-MONEY-C32 (28190), WHITE-C07
   (28335), ORDERS-MONEY-C28 (28054); the lead''s answers of 20 October 2026.'
 keys_touched:
-  operations: [getCouponCode, getBundle]
+  operations: [getGuestCouponCode, getGuestBundle]
   schemas: [GuestCouponCode, GuestBundle, HomepageSectionKind, B2bPaymentTerms]
   files:
   - contracts/satellite/promotions.yaml
@@ -34,6 +37,7 @@ prevention:
   type: check
   ref: tools/check-audience-match.py
 status: open
-notes: 'Screen parts requested of the surface lane: GST-037 binds GuestCouponCode and drops redemptionCount; ADM-603
+notes: 'Screen parts requested of the surface lane: GST-037 binds getGuestCouponCode (GuestCouponCode) instead of getCouponCode and drops redemptionCount; GST-004, GST-056
+  and WEB-008 bind getGuestBundle instead of getBundle; ADM-603
   binds listB2bCreditAccounts to the account picker and takes ADM-602 in entryFrom; GST-001 quick-action tiles and
   Home exits. ADM-603''s unmapped labels go on the client note.'
