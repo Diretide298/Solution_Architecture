@@ -415,6 +415,12 @@ ok(onBe.code === 0, 'setup finishes with 0', onBe.text.slice(-800));
 ok(ADAM_ITEMS.every((n) => existsSync(path.join(BE, n))), 'it gets the same additions');
 ok(readFileSync(path.join(BE, 'CLAUDE.md'), 'utf8') === readFileSync(path.join(ZIPPED, 'starters', 'backend', 'CLAUDE.md'), 'utf8')
   && existsSync(path.join(BE, 'project-bible', 'setup', 'backend-patterns.md')), 'the backend ones');
+// A [DB] ticket's quick check (20 October 2026) lives in .claude/, the one folder of ADAM's that
+// reaches a clone of the team's repository, and the permissions let Claude run it.
+const dbScript = path.join(BE, '.claude', 'scripts', 'db-ticket.mjs');
+ok(existsSync(dbScript) && readFileSync(dbScript, 'utf8') === readFileSync(path.join(ZIPPED, 'starters', 'backend', '.claude', 'scripts', 'db-ticket.mjs'), 'utf8')
+  && JSON.parse(readFileSync(path.join(BE, '.claude', 'settings.json'), 'utf8')).permissions.allow.includes('Bash(node .claude/scripts/db-ticket.mjs:*)'),
+  'with the [DB] ticket check, .claude/scripts/db-ticket.mjs, allowed to run');
 ok(sameFiles(beBefore, hashes(BE)).length === 0 && !existsSync(path.join(BE, 'TICVAI-Backend.slnx')) && !existsSync(path.join(BE, 'tests')),
   'no existing file changed and no starter code came along');
 ok(git(['status', '--porcelain', '--untracked-files=all'], BE) === '', 'git status is clean: ADAM\'s files are excluded');
