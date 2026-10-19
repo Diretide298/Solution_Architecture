@@ -5659,6 +5659,16 @@ components:
           type: string
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        attributes:
+          type: object
+          nullable: true
+          readOnly: true
+          additionalProperties: true
+          description: '**The attributes the raising contract sent** (`CreateApprovalRequest.attributes`), stored as
+            given (ADAM CR-172, fix round 3; CHG-CRA-005). The rules match on them (`matchAttributes`), also when a
+            draft is submitted later, and the contract that applies the decision reads them back with the request
+            (`approvals#requestRecords`): Subscription''s `approval.granted` consumer takes a tenant suspension''s
+            `action`, mode, reason, `effectiveAt` and notice from here. Null where none were sent.'
         justification:
           type: string
           nullable: true

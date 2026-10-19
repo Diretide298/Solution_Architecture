@@ -37,7 +37,7 @@ tickets:
   - 'PLATFORM-MIGRATE (27690, New in the r6 cache; CR-160 was raised from it): the transition table allows resume
     from failed and refuses it only for a rolled-back run. MIG-CONTROL-6 (27991, Ready for QA): no table change. 19
     New in all (impact file).'
-release_tag: r7
+release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-160
 triage: blocker

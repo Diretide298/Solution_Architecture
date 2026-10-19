@@ -53,7 +53,7 @@ tickets:
   - 'Finished migrations (a child task each, for the migration owner, at settlement): MIG-SUBSCRIPTION (27651) and its
     sub-tasks for contract, module_listing, plan, plan_limit, plan_module; MIG-CONTROL (27647), MIG-CONTROL#control.tenant
     (30167), MIG-FOREIGN-KEYS (27683). 430 New tickets link an operation or table that moves (impact file).'
-release_tag: r7
+release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-150, CR-097
 triage: fix-forward

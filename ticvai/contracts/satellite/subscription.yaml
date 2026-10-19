@@ -1368,12 +1368,38 @@ paths:
         guests at a gate holding valid tickets.
 
         **Approval is raised by the call itself** (ADAM CR-172, option (a), decided by Chinmay Parab on 19 October 2026;
-        CR-152; CHG-CRA-005). The refusals below are checked first; then this calls approvals''
-        `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, `subjectContract` `subscription`,
-        `subjectType` `tenant`, `subjectId` the tenant id, `attributes.action` `suspend`, with the mode, reason, `effectiveAt` and notice) and answers **202**
-        with the request''s id. Nothing about the tenant changes until **`approval.granted`** arrives: Subscription''s
-        consumer of it (events/approval-granted.yaml) then applies the change in its own transaction, as below. `approval.rejected` leaves
-        the tenant as it was. ADM-005 shows the request as pending; no approval id is ever sent by the caller.
+        CR-152; CHG-CRA-005). The tenant''s own 409 refusals below are checked first. Then this calls approvals''
+        `createApprovalRequest` (`x-ticvai-write-via`) with kind `configurationChange`, `subjectContract`
+        `subscription`, `subjectType` `tenant`, `subjectId` the tenant id, `scopePath` the tenant''s root
+        (`control.cell_tenant.root_scope_path`) and `attributes` `{action: suspend, mode, reason, effectiveAt,
+        noticeMessage}` as sent, and answers **202** with the request''s id. **The approval request is all this call
+        writes**: the tenant row and the outbox are written when the grant is applied, never here. No approval id is
+        ever sent by the caller, and there is no `409 approval-required`.
+
+        **Who approves is the tenant''s approval rules** for kind `configurationChange` narrowed to subject type
+        `tenant`, which approvals matches at the request''s `scopePath`, as `publishTenantConfig`''s request is
+        routed by the rules for `whiteLabelPublication`. This contract names no approver role.
+
+        **The grant applies it, as `publishTenantConfig`''s does** (fix round 3; events/approval-granted.yaml).
+        White-label''s consumer of `approval.granted` learns what to apply from the record the call wrote, named by
+        the event (the pending `config_version`, by `subjectId`), and a version that waits is validated again when
+        it falls due (`scheduledFor`). Here the one record the call writes is the approval request, and the tenant
+        is re-checked when the grant arrives, so Subscription''s consumer takes the events whose
+        `subjectContract` is `subscription` and `subjectType` `tenant`, reads that request by the event''s `requestId`
+        through `approvals#requestRecords` (route `service`, the declared query Subscription already reads
+        `approvals.request` through) for its stored `attributes` (`ApprovalRequest.attributes`), reads the tenant
+        (`subjectId`) from `control.tenant`, re-checks it, and applies the suspension in one transaction, as below.
+        `approval.rejected` leaves the tenant as it was.
+
+        **Re-checked when the grant arrives**, because the tenant may have moved while the request was open. Already
+        `suspended`: nothing changes, and the grant is recorded as applied with nothing to do (a no-op). No longer
+        `active` (`onboarding`, `terminating` or `terminated` by then): nothing changes, and the request closes as
+        not applied, with the reason `tenant-not-active`. Both outcomes are reported where approvals keeps whether an
+        approved action ran, the request''s approved-action execution (`listApprovedActionExecutions`, BO-382):
+        `succeeded` with a note for the no-op, `failed` with `failureReason` `tenant-not-active` for the refusal.
+
+        **ADM-005 does not change** (client-approved). After the 202 it re-reads the tenant, whose row keeps its
+        current status until the grant applies the change; the screen shows no pending state and no new text.
 
         **Now or later, once approved.** With no `effectiveAt`, or one not in the future, the tenant moves `active`
         to `suspended` and `tenant.suspended` is written to the control database''s outbox (`control.outbox`) in the
@@ -1427,12 +1453,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/TenantChangeRequested'
         '409':
-          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). Checked before any approval is raised. Nothing changes.'
-          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active]
+          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). Checked before any approval is raised. Nothing changes.
+            **Or an approval request about this tenant is already open** (`open-request-exists`; ADAM CR-172, fix
+            round 3): the 409 approvals'' `createApprovalRequest` declares for an open request on the same subject,
+            answered as it gives it (`refusedReason` `openRequestExists`, `requestId` the open request,
+            `currentStatus` its status), so a second suspension, or one asked while a reactivation waits, raises
+            nothing and the caller can point at the open request. This is not the retired `approval-required`.'
+          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active, open-request-exists]
           content:
             application/problem+json:
               schema:
-                $ref: '../shared/common.yaml#/components/schemas/Problem'
+                $ref: '#/components/schemas/TenantChangeConflictProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/reactivate:
@@ -1461,12 +1492,30 @@ paths:
         `terminated` one `409 tenant-terminated`; both are checked before any approval is raised.
 
         **Approval is raised by the call itself** (ADAM CR-172, option (a), decided by Chinmay Parab on 19 October 2026;
-        CR-152; CHG-CRA-005). The refusals below are checked first; then this calls approvals''
-        `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, `subjectContract` `subscription`,
-        `subjectType` `tenant`, `subjectId` the tenant id, `attributes.action` `reactivate`) and answers **202**
-        with the request''s id. Nothing about the tenant changes until **`approval.granted`** arrives: Subscription''s
-        consumer of it (events/approval-granted.yaml) then applies the change: `suspended` or `terminating` to `active`, or the pending suspension cancelled. `approval.rejected` leaves
-        the tenant as it was. ADM-005 shows the request as pending; no approval id is ever sent by the caller.'
+        CR-152; CHG-CRA-005). The tenant''s own refusals above (the 409s below) are checked first. Then this calls approvals''
+        `createApprovalRequest` (`x-ticvai-write-via`) with kind `configurationChange`, `subjectContract`
+        `subscription`, `subjectType` `tenant`, `subjectId` the tenant id, `scopePath` the tenant''s root
+        (`control.cell_tenant.root_scope_path`) and `attributes` `{action: reactivate}`, and answers **202** with the
+        request''s id. **The approval request is all this call writes**: the tenant row is written when the grant is
+        applied, never here. No approval id is ever sent by the caller, and there is no `409 approval-required`.
+        Who approves is the tenant''s approval rules for the kind and subject, as for `suspendTenant`; this contract
+        names no approver role.
+
+        **The grant applies it, as `publishTenantConfig`''s does** (fix round 3; events/approval-granted.yaml), the
+        same path as `suspendTenant`''s: Subscription''s consumer of `approval.granted` takes the events whose
+        `subjectContract` is `subscription` and `subjectType` `tenant`, reads the request by the event''s
+        `requestId` through `approvals#requestRecords` (route `service`) for its stored `attributes` (`action`
+        `reactivate`), reads the tenant from `control.tenant`, re-checks it, and in one transaction moves
+        `suspended` or `terminating` to `active`, or cancels the pending suspension. `approval.rejected` leaves the
+        tenant as it was.
+
+        **Re-checked when the grant arrives.** Already `active` with nothing pending: nothing changes, and the grant
+        is recorded as applied with nothing to do (a no-op). `terminated` by then (`tenant-terminated`), or
+        `onboarding` (`tenant-not-suspended`): nothing changes, and the request closes as not applied, with that
+        reason. Both are reported on the request''s approved-action execution, as for `suspendTenant`.
+
+        **ADM-005 does not change** (client-approved). After the 202 it re-reads the tenant, whose row keeps its
+        current status until the grant applies the change; the screen shows no pending state and no new text.'
       tags:
       - tenant
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -1487,14 +1536,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/TenantChangeRequested'
         '409':
-          x-ticvai-problem-types: [tenant-terminated, tenant-not-suspended]
+          x-ticvai-problem-types: [tenant-terminated, tenant-not-suspended, open-request-exists]
           description: 'Tenant is terminated, not suspended; termination is not reversible here (`tenant-terminated`).
             Or it is `active` with no pending suspension, or `onboarding` (`tenant-not-suspended`; ADAM CR-152,
-            CHG-CRA-005). Checked before any approval is raised. Nothing changes.'
+            CHG-CRA-005). Checked before any approval is raised. Nothing changes. **Or an approval request about
+            this tenant is already open** (`open-request-exists`; ADAM CR-172, fix round 3): the 409 approvals''
+            `createApprovalRequest` declares for an open request on the same subject, answered as it gives it
+            (`refusedReason` `openRequestExists`, `requestId` the open request, `currentStatus` its status), so a
+            second reactivation, or one asked while a suspension waits, raises nothing and the caller can point at
+            the open request. This is not the retired `approval-required`.'
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/TenantChangeConflictProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/terminate:
@@ -17606,6 +17660,29 @@ components:
           requestedAt:
             type: string
             format: date-time
+    TenantChangeConflictProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**`suspendTenant`''s and `reactivateTenant`''s 409** (ADAM CR-172, fix round 3; CHG-CRA-005): the
+        shared Problem, and with `open-request-exists` the fields of the 409 approvals'' `createApprovalRequest`
+        declares for an open request on the same subject (`ApprovalStateProblem`), passed through as it gives them,
+        so the caller can point at the open request rather than raise another. Absent with the tenant''s own
+        refusals.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          refusedReason:
+            type: string
+            enum: [openRequestExists]
+            description: '`openRequestExists`, as `createApprovalRequest` gives it.'
+          requestId:
+            type: string
+            format: uuid
+            description: The approval request already open for this tenant.
+          currentStatus:
+            allOf:
+            - $ref: '../spine/approvals.yaml#/components/schemas/ApprovalStatus'
+            description: The status that request is in now.
     CellTenant:
       x-ticvai-persistence: control.cell_tenant
       description: 'Which tenants a cell holds, and the database each one is. **The relation that replaced

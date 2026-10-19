@@ -75,7 +75,7 @@ tickets:
     MIG-CATALOGUE, MIG-ORDERS, MIG-PAYMENTS, VM-MIG-CONTROL and their sub-tasks for asset_version, config_version,
     platform.device, product_version, orders.payment, provider_connection (impact file). 303 New tickets, including
     replayEvents (#31358), publishTenantConfig (#27779) and PLATFORM-PAYMENTS (#27699).'
-release_tag: r7
+release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-140, CR-154, CR-155, CR-165
 triage: blocker

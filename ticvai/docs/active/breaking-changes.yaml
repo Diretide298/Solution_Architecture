@@ -881,7 +881,7 @@ changes:
       rules are scoped by scopePath, channelId and businessArea. The field is removed from the currency, eligibility
       and fee rule schemas (and PaymentsMethodConfig); a response field cannot be removed additively.'
     approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
-    tag: r7
+    tag: r8
     producer-tickets: [SVC-ORDER-PAYMENTS-17]
     consumer-tickets: [AM-PAYMENTS-P08, AM-PAYMENTS-P08-2]
   - id: BC-369
@@ -891,7 +891,7 @@ changes:
     reason: 'As BC-368 (ADAM CR-147; CHG-CRA-002): setPaymentRules neither takes nor returns paymentPolicyId. A client
       still sending it has it ignored as an unknown field; the four columns lose NOT NULL first and are dropped after.'
     approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
-    tag: r7
+    tag: r8
     producer-tickets: [SVC-ORDER-PAYMENTS-17]
     consumer-tickets: [AM-PAYMENTS-API-BLOCK-A, AM-PAYMENTS-P08, TEST-AM-PAYMENTS-API-BLOCK-A]
   - id: BC-370
@@ -906,7 +906,7 @@ changes:
       four operations; it is the record of the lead''s approval. CreateGrantRequest requires one of permission and
       roleId (relaxing the request is additive).'
     approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
-    tag: r7
+    tag: r8
     producer-tickets: [SVC-IDENTITY-ADMINISTRATION-8]
     consumer-tickets: [APP-PARTNER-PTR-020, TEST-AM-IDENTITY-SECURITY-P10, SETUP-SEED]
   - id: BC-371
@@ -921,7 +921,7 @@ changes:
       value as other. The lead decided the value; check-contract-compat labels it breaking, so the lead confirms the
       label at merge.'
     approved-by: 'Chinmay Parab (19 Oct 2026, "confirm both")'
-    tag: r7
+    tag: r8
     producer-tickets: [SVC-LEDGER-FINANCE-3, SVC-LEDGER-LEDGER-3, VM-LEDGER-LEDGER-1, VM-LEDGER-LEDGER-2]
     consumer-tickets: [VM-BO-043, AM-FINANCE-TAX-P08, AM-FINANCE-TAX-P08-BLOCK-A, TEST-AM-FINANCE-TAX-P08-BLOCK-A]
   - id: BC-372
@@ -934,9 +934,25 @@ changes:
       value added to a response enum cannot be additive. The lead decided the status; check-contract-compat labels it
       breaking, so the lead confirms the label at merge.'
     approved-by: 'Chinmay Parab (19 Oct 2026, "confirm both")'
-    tag: r7
+    tag: r8
     producer-tickets: [SVC-CATALOGUE-HOLD-1]
     consumer-tickets: [AM-SEATING-MAPS-P01, AM-SEATING-MAPS-P02, AM-SEATING-MAPS-P04, APP-MOB-GST-049, APP-POS-POS-004, APP-WEB-WEB-007]
+  - id: BC-373
+    contract: subscription
+    operation: suspendTenant
+    operations: [suspendTenant, reactivateTenant]
+    change: "answers 202, not 200"
+    reason: 'ADAM CR-172, option (a) (decided by Chinmay Parab on 19 October 2026; CHG-CRA-005): suspendTenant and
+      reactivateTenant raise their own approval request and answer 202 with it (TenantChangeRequested); the tenant is
+      unchanged until approval.granted arrives. A client built at r1 got 200 with the tenant already suspended or
+      reactivated; it now gets 202 with the tenant as it was. The body keeps every field the 200 carried, but the
+      status and its meaning change, which cannot be additive. **check-contract-compat cannot see this change**: it
+      compares the first 2xx body and not its status code, so this entry matches nothing it reports (it prints a NOTE)
+      and approves nothing else on the two operations; it is the record of the lead''s approval.'
+    approved-by: 'Chinmay Parab, 19 October 2026 (ADAM CR-172 option a)'
+    tag: r8
+    producer-tickets: [SVC-PLATFORM-TENANT-1]
+    consumer-tickets: [APP-SETUP-ADM-005, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09]
   - id: BC-380
     contract: ai
     operation: setAiCredential

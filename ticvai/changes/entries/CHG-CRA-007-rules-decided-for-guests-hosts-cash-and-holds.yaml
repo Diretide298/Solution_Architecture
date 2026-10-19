@@ -59,7 +59,7 @@ tickets:
     sub-tasks for seat_reservation, channel_envelope, journal_entry, guest_profile. searchGuests (#30711),
     PLATFORM-KERNEL (#27692) and PLATFORM-SAGA-PAID (#27701), where the CRs were raised, get the answers as comments.
     202 New in all (impact file).'
-release_tag: r7
+release_tag: r8
 decision_owner: Chinmay
 adam_cr: CR-141, CR-162, CR-168, CR-169
 triage: blocker
@@ -71,8 +71,9 @@ notes: 'Prevention: check-business-rules, one rule per decision (BR-GUEST-PII, B
   BR-HOLD-LAPSE), shown failing on r6 (40 findings) and passing after. Sibling query: other guest reads of GuestProfile
   take the same marks from the schema (getGuestProfile and the list reads; their text is unchanged); capturePayment
   posts the same cash receipt and got the same two reads; no other operation posts to ledger.account_mapping''s
-  lookup. Database (derived at the release; this branch''s derive in D:\wt\fix-cr-answers-1018-derived\class9): tenant
-  V0105 adds account_mapping.scope_path (backfill each row''s path, then NOT NULL) with its read-beneath policy,
+  lookup. Database (derived at the release; this branch''s derive in D:\wt\fix-cr-answers-1018-derived\class9,
+  written then as V0105; r7 has since taken V0105, so the release derive numbers this branch''s tenant migration,
+  V0106 at the round-2 derive and contested at merge): it adds account_mapping.scope_path (backfill each row''s path, then NOT NULL) with its read-beneath policy,
   journal_entry.legal_entity_id with its key, index and journal_entry_legal_entity_id_entry_number_uniq; the review
   drops journal_entry_entry_number_uniq and widens the source and seat_reservation status CHECKs; the seat reservation''s
   new column waits on the rename row of CR-011. Breaking: BC-371 and BC-372 record response enum values the decisions

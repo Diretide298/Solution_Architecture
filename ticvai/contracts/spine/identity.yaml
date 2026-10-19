@@ -557,10 +557,13 @@ paths:
           description: 'The username and credential do not match (`unauthenticated`; one answer for an unknown
             username and a wrong credential), or the principal signs in only through the tenant''s single sign-on
             (`sso-sign-in-required`, 14 October 2026, CHG-CRD-001): `detail` names the provider so the door can offer
-            `startSsoAuthorization`. **Every `unauthenticated` answer carries `attemptsRemaining`** (ADAM CR-170,
-            option D, decided 19 October 2026; CHG-CRA-009): the wrong attempts left before the lock, **counted per
-            submitted username whether or not a principal has it**, so an unknown username has its own counter and
-            its own lock and nothing in the answer reveals which usernames exist.'
+            `startSsoAuthorization`. **Every 401 this answers carries `attemptsRemaining`** (ADAM CR-170, option
+            D, decided 19 October 2026; CHG-CRA-009; "every 401" is every 401 `login` and `verifyMfaChallenge`
+            return, the lead''s reading of 19 October 2026): the wrong attempts left before the lock, **counted per
+            submitted username whether or not a principal has it, and per sign-in method** (password, PIN, card,
+            RFID), so an unknown username has its own counter and its own lock for each method, as a known one
+            does, and nothing in the answer reveals which usernames exist. `sso-sign-in-required` spends no
+            attempt and carries the count as it stands.'
           x-ticvai-problem-types:
           - unauthenticated
           - sso-sign-in-required
@@ -587,7 +590,9 @@ paths:
             locked after too many wrong attempts (`credential-locked`, 14 October 2026, CHG-CRD-001; an unknown
             username is locked the same way after its own wrong attempts, ADAM CR-170, so the lock reveals nothing):
             `PrincipalCredential.lockedUntil` is in the future, and `Retry-After` says when it ends. The lock is
-            temporary (`PasswordPolicy.lockoutMinutes`) and per method: a locked PIN leaves a password sign-in open.'
+            temporary (`PasswordPolicy.lockoutMinutes`) and per method: a locked PIN leaves a password sign-in open.
+            An unknown username has no `PrincipalCredential`; its lock is held with its own counter, per method,
+            for the same time, and answers the same way.'
           x-ticvai-problem-types:
           - rate-limited
           - credential-locked
@@ -4332,7 +4337,17 @@ paths:
                     allOf:
                     - $ref: '#/components/schemas/Session'
         '401':
-          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+          description: 'Missing, expired or superseded session (`unauthenticated`, `session-superseded`), as the
+            shared answer says. **It carries `attemptsRemaining`** (ADAM CR-170; CHG-CRA-009; "every 401" is every
+            401 `login` and `verifyMfaChallenge` return, the lead''s reading of 19 October 2026): the wrong codes
+            left on the challenge in the path, which a 401 does not spend, since no code is checked without the
+            session.'
+          x-ticvai-problem-types:
+          - unauthenticated
+          - session-superseded
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/MfaCodeInvalidProblem' }
         '410':
           description: The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the
             same purpose). Ask for a new one (CHG-R1S-025; the r1 gate).
@@ -10568,21 +10583,25 @@ components:
     LoginDeniedProblem:
       x-ticvai-persistence: none — error shape
       description: '**`login`''s 401** (ADAM CR-170, option D, 19 October 2026; CHG-CRA-009): the shared Problem
-        and, on every `unauthenticated` answer, the wrong attempts left before the lock (`429 credential-locked`
-        with `Retry-After`), counted per submitted username whether or not a principal has it.'
+        and, on every 401 `login` returns, the wrong attempts left before the lock (`429 credential-locked` with
+        `Retry-After`), counted per submitted username whether or not a principal has it, and per sign-in method.'
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object
+        required: [attemptsRemaining]
         properties:
           attemptsRemaining:
             type: integer
             minimum: 0
-            description: Wrong attempts left for this username before it is locked. Present on every
-              `unauthenticated` answer, for a known and an unknown username alike.
+            description: Wrong attempts left for this username and this sign-in method before they are locked.
+              On every 401 `login` returns, for a known and an unknown username alike.
     SessionHeldProblem:
       x-ticvai-persistence: none — error shape
-      description: '**`login`''s 409** (ADAM CR-170, CHG-CRA-009): the session this person already holds, so the
-        door says since when and on what (PTR-001''s sessionHeld state).'
+      description: '**`login`''s 409** (ADAM CR-170, CHG-CRA-009): the session that refuses this sign-in, so the
+        door says since when and on what (PTR-001''s sessionHeld state). With `session-active-elsewhere` it is this
+        person''s own session on another device; with the other cause (the till is in use) it is the session
+        somebody else holds on this till. `openedAt` and `deviceLabel` describe that session, and nothing else about
+        it is said.'
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object
@@ -10612,8 +10631,8 @@ components:
               enum: [credentialChange, mfa, roleSelection]
     MfaCodeInvalidProblem:
       x-ticvai-persistence: none — error shape
-      description: '**`verifyMfaChallenge`''s 422** (ADAM CR-170, CHG-CRA-009): the shared Problem and the wrong
-        codes left before the challenge locks (the `429`).'
+      description: '**`verifyMfaChallenge`''s 422 and 401** (ADAM CR-170, CHG-CRA-009): the shared Problem and the
+        wrong codes left on the challenge before it locks (the `429`).'
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object
