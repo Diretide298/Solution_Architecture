@@ -1786,6 +1786,7 @@ paths:
       - name: sessionId
         in: path
         required: true
+        description: The `sessionId` of an `ActiveSession` from `listActiveSessions` (the session's `identity.session.id`).
         schema:
           type: string
           format: uuid
@@ -6923,10 +6924,17 @@ components:
       required:
       - deviceConsentId
       - capturedAt
+      - scopePath
       properties:
         deviceConsentId:
           type: string
           format: uuid
+        scopePath:
+          type: string
+          description: '**The decision''s scope path** (R8 blocker fix, IDENTITY-C02; `pii.consent_identifier.scope_path`
+            is NOT NULL and under row-level security). Sent by `marketing-crm.recordDeviceConsent`, which holds it as
+            `marketing.device_consent.scope_path`; Identity may not read that table across deployables and so takes it
+            from the caller, refusing a path outside the caller''s scope.'
         ipAddress:
           type: string
           maxLength: 45
@@ -9183,6 +9191,7 @@ components:
           - PLATFORM_RELEASE_PROMOTE
           - PLATFORM_MIGRATION_VIEW
           - PLATFORM_MIGRATION_APPLY
+          - PLATFORM_AI_MANAGE
     SegregationViolation:
       type: object
       x-ticvai-persistence: none — computed from identity.grant against identity.segregation_rule
@@ -9806,6 +9815,12 @@ components:
             rather than an absence.
         sessionId:
           type: string
+          description: '**The session''s `identity.session.id`, written as text, and the key `forceLogout` takes in its
+            path** (R8 blocker fix, IDENTITY-C02). A client lists sessions, picks one and passes this value as `sessionId`;
+            nothing else names a session on the wire. The server opens a session with `session_id` set to its `id` as text,
+            so the stored `session_id` (the token''s `sid`) and the id are one value and a lookup by either finds the row.
+            It stays `type: string` here so a client built at r1 still validates; it is always a uuid, as `Session.sessionId`
+            declares.'
         principalId:
           type: string
           format: uuid
