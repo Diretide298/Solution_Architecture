@@ -378,9 +378,11 @@ paths:
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
+      - {}
       x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
+      - anonymous
       summary: Start a cart
       description: '**A cart holds leases; an order holds money.** Different lifetimes, different failure
         modes, and merging them is why this contract did not exist until 17 August — `createOrder` takes
@@ -388,6 +390,16 @@ paths:
 
         Created against a guest subject where one is known, or an anonymous token where it is not. **The
         token is what lets a guest browse before signing in** and keep their cart when they do (2.1.31).
+
+        **A visitor with no credential gets the token here** (decided 20 October 2026, Chinmay, R8 blocker cause
+        GPS-C23, option A; CHG-R8SPN-031). Called with no credential, this creates the cart and an anonymous guest
+        session for it, and returns the session''s token in `Cart.anonymousSessionToken` (a `guestAuth` token with
+        no subject, bound to this cart and the device, sliding like any guest token). The app calls this on the
+        first Continue or Add (trigger background) and then `addCartLine` with that token; `checkBookingEligibility`,
+        `joinWaitlist` and `leaveWaitlist` run under it too. On sign-in `claimCart` moves the cart to the account
+        and the anonymous session ends. Nothing about the visitor is stored but the cart (ADR-0045: the contact is
+        proven at checkout, not here). Called with a guest token, the token is the caller''s and
+        `anonymousSessionToken` is null.
 
         **POS does not use this.** A till builds its sale locally and submits atomically, because it works
         offline and does not need a resumable cart. Same order contract, different channel.
@@ -23153,6 +23165,13 @@ components:
         id:
           type: string
           format: uuid
+        anonymousSessionToken:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: 'The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no
+            credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart.'
         token:
           type: string
           readOnly: true

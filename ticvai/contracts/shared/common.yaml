@@ -1011,6 +1011,11 @@ components:
         R126), and revoked independently. Scoped to the
         guest''s own resources — a guest token can never widen to another subject.
 
+
+        **An anonymous guest session** (20 October 2026, R8 blocker cause GPS-C23; CHG-R8SPN-031) is a guest token with
+        no subject, opened by `orders.createCart` for a visitor with no credential and bound to that cart; it reaches the
+        cart operations and nothing that needs a known guest, and it ends when `claimCart` moves the cart to an account.
+
         '
     serviceAuth:
       type: http
