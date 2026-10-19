@@ -7208,16 +7208,19 @@ components:
           productKinds: [rental]
           steps:
           - {stepKey: location, requirement: conditional}
+          # r8 (GPS-C28): date, then the length, then the start time, because the start times a room type offers
+          # depend on the length (listProductStartTimes takes the length variant); the room type is the product the
+          # flow is for, chosen before it. partySize carries the attendees the room must hold.
           - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
-          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
           - {stepKey: duration, requirement: required, stepSettings: [{name: minHours, type: integer, default: 1}, {name: maxHours, type: integer, default: 8}, {name: stepMinutes, type: integer, default: 60}]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
           - {stepKey: partySize, requirement: optional, stepSettings: [{name: minGuests, type: integer, default: 1}, {name: maxGuests, type: integer}]}
           - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
           - {stepKey: review, requirement: optional}
           - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
           orderConstraints:
-          - {kind: before, stepKey: date, otherStepKey: time}
-          - {kind: before, stepKey: time, otherStepKey: duration}
+          - {kind: before, stepKey: date, otherStepKey: duration}
+          - {kind: before, stepKey: duration, otherStepKey: time}
         - key: cabanaMap
           productKinds: [rental]
           steps:
@@ -11622,6 +11625,31 @@ components:
         publishedAt:
           type: string
           format: date-time
+        guestSignIn:
+          type: object
+          readOnly: true
+          additionalProperties: false
+          description: '**What the guest sign-in buttons need before anyone is signed in** (r8, IDENTITY-C21): the
+            public client ids of the tenant''s enabled social and UAE PASS providers, derived on read from Identity''s
+            provider rows (no stored column, nothing secret). A provider the tenant has not enabled is absent, and
+            its button is not drawn.'
+          properties:
+            apple:
+              type: object
+              additionalProperties: false
+              properties:
+                clientId: { type: string }
+            google:
+              type: object
+              additionalProperties: false
+              properties:
+                clientId: { type: string }
+            uaePass:
+              type: object
+              additionalProperties: false
+              properties:
+                authorizationUrl: { type: string, format: uri }
+                clientId: { type: string }
         brand:
           $ref: '#/components/schemas/BrandIdentity'
         assetsBaseUrl:

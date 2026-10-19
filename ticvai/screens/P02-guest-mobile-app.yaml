@@ -2305,6 +2305,14 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against the
+      guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the
+      device already holds: signed in, or the anonymous cart session a visitor gets with the first line
+      (ADR-0045; r8, GPS-C23).'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   entryState:
     params:
     - name: productId
@@ -3165,7 +3173,14 @@ screens:
     transfer, and with no open transfer the guest is told plainly that the ticket has not been shared with
     them. The operation that does this is requested of the core lane (orders.yaml, beside
     claimTicketTransfer); the edge to GST-055 and the button''s binding wait for the client''s approval of the
-    visible navigation (pending entries ORDERS-MONEY-C05).'
+    visible navigation (pending entries ORDERS-MONEY-C05).
+
+
+    Build note (r8 second round, ORDERS-MONEY-C01, from the core lane): build the no-access state as two
+    cases, not signed in (401: offered sign-in and brought back) and otherwise one neutral message with the
+    list it came from; "a record that is not theirs" is not a case of its own, because another guest''s record
+    answers 404 like a missing one (Pattern 4). The wording waits for the client (pending entry
+    ORDERS-MONEY-C01).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list,
@@ -4082,9 +4097,10 @@ screens:
         - Reservation.convertedOrderId
         operation: listReservations
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: Upcoming and Past, as two tabs; each card shows when it expires. Was the generated table
-          'Every reservation'; staff and plumbing columns removed (decided by Chinmay, fix before Block
-          A starts, 2 October 2026 (GFIX-3)).
+        notes: Upcoming and Past, as two tabs; each card shows when it expires. **Upcoming** is every
+          reservation still held whose `expiresAt` is in the future; **Past** is the rest (expired, converted to an
+          order, or cancelled) (r8, ORDERS-MONEY-C13). Was the generated table 'Every reservation'; staff and
+          plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
     - name: contextPanel
       slot: selection
       components:
@@ -4696,8 +4712,9 @@ screens:
   - id: formIssueTaxInvoice
     component: modal
     trigger: Get a tax invoice
-    body: The company name and TRN to put on the invoice, and where to email it; the order is the one
-      selected and the invoice type is full.
+    body: 'The company name and TRN to put on the invoice, and where to email it; the order is the one
+      selected and the invoice type is full. A full invoice also asks the recipient''s address, its country as
+      `buyerCountryCode` (r8, ORDERS-MONEY-C06).'
     confirm:
       label: Get a tax invoice
       operation: issueTaxInvoice
@@ -5971,7 +5988,14 @@ screens:
 
 
     **The car park''s parking product is ParkingFacility.productVariantId (agreed with contracts in the
-    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)'
+    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)
+
+
+    Build note (r8 second round, ORDERS-MONEY-C01, from the core lane): build the no-access state as two
+    cases, not signed in (401: offered sign-in and brought back) and otherwise one neutral message with the
+    list it came from; "a record that is not theirs" is not a case of its own, because another guest''s record
+    answers 404 like a missing one (Pattern 4). The wording waits for the client (pending entry
+    ORDERS-MONEY-C01).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -9972,10 +9996,21 @@ screens:
       signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: 'The variants of a suggested product that carries no `variantId` (r8, ORDERS-MONEY-C40, option B),
+      read when the guest taps it, so the add-to-cart form lets them choose; no component of its own.'
+    trigger: background
+    provenance: r8 second round, ORDERS-MONEY-C40
   entryState:
     params:
     - name: cartId
       from: session
+    - name: productId
+      from: navigation
+      optional: true
+      notes: 'r8 (ORDERS-MONEY-C40): the product of the suggestion the guest tapped, picked on this screen, for
+        `listProductVariants` when the suggestion carries no `variantId`.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
     status: approved
@@ -10000,9 +10035,12 @@ screens:
   - id: formAddCartLine
     component: modal
     trigger: Add cart line
-    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
-      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
-      screen behind is unchanged.'
+    body: '**Asks only what the guest decides** (r8, ORDERS-MONEY-C40): the quantity, and a date for a timed
+      product. `variantId` (and `performanceId`) come from the suggestion (`AiRecommendationItem.variantId`); when
+      the suggestion has none, the form lists the product''s variants (`listProductVariants`) and the guest picks
+      one. Never `seatIds`, `parentLineId` or `attributes`. The suggestion''s `trackingId` is sent as
+      `recommendationId`. An offer, reward or challenge suggestion has its own action and never opens this form.
+      Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: AddCartLineRequest
     confirm:
       label: Add cart line
@@ -10375,6 +10413,14 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against the
+      guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the
+      device already holds: signed in, or the anonymous cart session a visitor gets with the first line
+      (ADR-0045; r8, GPS-C23).'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   entryState:
     params:
     - name: cartId
@@ -14702,6 +14748,14 @@ screens:
     contract: orders
     purpose: Add the room type for the booked window, then the add-ons
     trigger: onAction
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against the
+      guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the
+      device already holds: signed in, or the anonymous cart session a visitor gets with the first line
+      (ADR-0045; r8, GPS-C23).'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   entryState:
     params:
     - name: productId

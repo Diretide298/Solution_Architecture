@@ -93,6 +93,10 @@ screens:
   wave: 1
   permission: SESSION_FORCE_LOGOUT
   capability: C11
+  notes: 'Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and staff
+    handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing in needs a
+    connection", not the cached-list sign-in above. The wording waits for the client (pending entry
+    IDENTITY-C01).'
   purpose: Authenticate the operator at the terminal and resolve the session every other screen on this
     app reads.
   implementation:
@@ -2148,7 +2152,12 @@ screens:
 
     Build note (r8 second round, GPS-C11): the no-access state''s last sentence (`ORDER_CREATE` for
     `acquireInventoryHold`) no longer applies: this screen takes no hold. Its removal changes a
-    client-approved state and waits for the client (pending entry GPS-C11); build the state without it.'
+    client-approved state and waits for the client (pending entry GPS-C11); build the state without it.
+
+
+    Build note (r8 second round, GPS-C37 and FOUNDATION-AI-C45, from the core lane): Block A takes no standing
+    lease, so contended timed entry is online-only at the till; build the offline state as "needs a
+    connection", not the lease text above. The wording waits for the client (pending entry GPS-C37).'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them —
@@ -2455,7 +2464,12 @@ screens:
 
     **Built as step three of the POS-002 sale drawer (section, then seats), not a page of its own: the
     plan''s default of 4 October 2026, carried by the tickets (block-a-extra-tasks.json screenNotes),
-    closing the 3 August question ''whether this survives as a screen'' (Chinmay to confirm)** (CHG-FXS-005)'
+    closing the 3 August question ''whether this survives as a screen'' (Chinmay to confirm)** (CHG-FXS-005)
+
+
+    Build note (r8 second round, GPS-C13, from the core lane): this step holds the seats and carries `holdId`
+    to POS-005, which creates the order and the payment; when `createOrder` answers 409 `hold-not-active` (the
+    hold lapsed while the cashier took payment details) POS-005 sends the cashier back here to pick again.'
   density: touchLarge
   boardFrames:
   - Seat Board 3.dc.html#seat-3a
@@ -2845,7 +2859,12 @@ screens:
     **Receipt** (CHG-FIN-011): the receipt printed or emailed on payment is the simplified tax invoice
     titled "Tax Invoice", issued automatically when the order is paid (POS-026). Foreign cash tendered
     here is recorded at its base equivalent and change is given in base currency (DI-282, unchanged by
-    CHG-FIN-001).'
+    CHG-FIN-001).
+
+
+    Build note (r8 second round, GPS-C13, from the core lane): this screen creates the order (with the
+    `holdId` POS-004 carried) and the payment; a 409 `hold-not-active` from `createOrder` sends the cashier
+    back to the seat map (POS-004) to pick again, with the guest''s other lines kept.'
   density: touchLarge
   boardFrames:
   - Retail Board 3.dc.html#ret-3e

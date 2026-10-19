@@ -1,0 +1,35 @@
+# shift.opened v1 — published by shift
+# Added 20 October 2026 (r8 cause IDENTITY-C51): Identity keeps a projection of the open shifts
+# (identity.open_shift_marker) so ActiveSession.hasOpenShift is answered without reading the shift schema.
+
+name: shift.opened
+version: 1
+publisher: shift
+description: A till shift was opened.
+aggregate: shift
+emittedWhen: ShiftStatus created (openShift); any state before closed
+emittedBy:
+- openShift
+payload:
+- field: shiftId
+  type: uuid
+- field: principalId
+  type: uuid
+- field: workstationId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: scopePath
+  type: string
+- field: openedAt
+  type: timestamp
+consumers:
+- context: identity
+  purpose: Record the open shift on identity.open_shift_marker, which ActiveSession.hasOpenShift reads (ADR-0028
+    projection)
+  writes:
+  - identity.open_shift_marker
+  idempotencyKey: shiftId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication

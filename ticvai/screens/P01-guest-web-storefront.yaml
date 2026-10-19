@@ -1708,6 +1708,14 @@ screens:
       the edge carried `eventId`. No component of its own: what it finds drives the date and time pickers.'
     trigger: background
     provenance: r8 second round, GPS-C05 (ticket 28152)
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against the
+      guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the
+      device already holds: signed in, or the anonymous cart session a visitor gets with the first line
+      (ADR-0045; r8, GPS-C23).'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   wireframe:
     status: review
     provenance: client-verified
@@ -3176,7 +3184,12 @@ screens:
     above reads.** A guest holds no permission, so the state never names one (the text above still names staff
     permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
     says so without saying whose. The corrected wording waits for the client''s approval of the visible text
-    (pending entry GPS-C09).'
+    (pending entry GPS-C09).
+
+
+    Build note (r8 second round, IDENTITY-C28, from the core lane): the no-access state is the 404 of the
+    guest''s own order lookup (an order that is not theirs answers as one that does not exist); the visible
+    text is unchanged.'
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -3417,7 +3430,14 @@ screens:
     above reads.** A guest holds no permission, so the state never names one (the text above still names staff
     permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
     says so without saying whose. The corrected wording waits for the client''s approval of the visible text
-    (pending entry GPS-C09).'
+    (pending entry GPS-C09).
+
+
+    Build note (r8 second round, IDENTITY-C28, C29, C52, from the core lane): the no-access state is the 404
+    of the guest''s own order lookup; Add to wallet sends `reprintOrder` with delivery `wallet`; the order
+    access token from checkout is kept in navigation state and sent as `X-Order-Access-Token` by a guest with
+    no account. The drawn edge to WEB-014 carries nothing and should go; removing it changes approved
+    navigation and waits for the client (pending entry IDENTITY-C52).'
   density: compact
   pattern: statusTracker
   patternReason: '`getOrder` reads one record and nothing reads a population — the screen is about that
@@ -3450,6 +3470,10 @@ screens:
         provenance: carried from the previous definition
       - kind: secondaryButton
         label: Add to wallet
+        operation: reprintOrder
+        notes: 'r8 (IDENTITY-C29): sends `reprintOrder` with delivery `wallet`, which returns the phone wallet passes
+          of the order''s tickets; the guest who has no account sends the `X-Order-Access-Token` kept in navigation
+          state from checkout (IDENTITY-C52).'
         provenance: carried from the previous definition
       - kind: secondaryButton
         label: Send me a code
@@ -7705,7 +7729,13 @@ screens:
     **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against
     a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line with a variant,
     quantity and unit price — and this screen has no cart: it arrives with `promotionId` alone. Offers
-    apply where the cart is, on WEB-005 and WEB-010, which keep the call.'
+    apply where the cart is, on WEB-005 and WEB-010, which keep the call.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C11): **Use this offer** on a promotion with a code applies it
+    to the guest''s cart with `applyCartPromoCode` and that code; an automatic promotion needs nothing
+    applied, so it goes back to the list. The button is not drawn on this client-approved screen''s definition
+    yet; adding it and its binding waits for the client (pending entry ORDERS-MONEY-C11).'
   density: compact
   pattern: listDetail
   patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list, select,
@@ -7780,11 +7810,9 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
-    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
-      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
-      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
-      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
-      Arrives with `promotionId`.'
+    coldEntry: '**A dead promotion link says "This offer is no longer available" and shows the list it came
+      from** (the offers active now), with no name and no reason (r8, ORDERS-MONEY-C01; ADR-0030 as relaxed for
+      promotions). Never a 404 page. Arrives with `promotionId`.'
     preloaded:
     - Promotion.code
     - Promotion.name
@@ -9303,7 +9331,14 @@ screens:
 
 
     **The car park''s parking product is ParkingFacility.productVariantId (agreed with contracts in the
-    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)'
+    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)
+
+
+    Build note (r8 second round, ORDERS-MONEY-C01, from the core lane): build the no-access state as two
+    cases, not signed in (401: offered sign-in and brought back) and otherwise one neutral message with the
+    list it came from; "a record that is not theirs" is not a case of its own, because another guest''s record
+    answers 404 like a missing one (Pattern 4). The wording waits for the client (pending entry
+    ORDERS-MONEY-C01).'
   density: compact
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail

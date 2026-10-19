@@ -3800,6 +3800,14 @@ components:
           type: integer
           minimum: 1
           description: Resources of the room type free for the whole window. Only times with at least one are returned.
+        maxCapacity:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: 'The most people one free room of the type holds in this window (the largest `capacity` among
+            the free resources), so the guest sees before choosing whether the party fits; the cart line''s attendees
+            above the chosen room''s capacity are refused (orders addCartLine 422 attendees-over-capacity) (r8,
+            GPS-C28). Null where the resources declare no capacity.'
     MapResourceAvailability:
       x-ticvai-persistence: none — computed from placed resources, bookings, holds and blocks
       type: object
