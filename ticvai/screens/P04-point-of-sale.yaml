@@ -2114,10 +2114,10 @@ screens:
     - to: POS-004
       trigger: Sell — Seat Map
       carries:
-      - holdId
       - performanceId
-      provenance: derived — POS-004 declares entryState.params holdId, performanceId and POS-003 holds
-        holdId, performanceId, so an edge into it carries them
+      provenance: 'r8 second round (GPS-C11): carries the picked performance only. POS-003 takes no hold of its
+        own (the cart''s hold is the only one, taken by addCartLine), so it has no holdId to hand on; POS-004''s
+        seated step makes its own seat hold (createSeatHold)'
     - to: POS-006
       trigger: Held Orders
       provenance: 'derived — POS-006 declares entryState.params orderId and POS-003 holds none of them.
@@ -2217,8 +2217,9 @@ screens:
         - InventoryHold.acquiredAt
         - InventoryHold.expiresAt
         - InventoryHold.releasedAt
-        operation: listInventoryHolds
         provenance: contract catalogue.yaml GET /inventory-holds
+        notes: 'Never drawn (GPS-C12) and bound to nothing (r8 second round, GPS-C11): the till lists no holds;
+          the cart''s countdown is the only hold the cashier sees.'
       - kind: dataTable
         label: Every product
         bindsTo: Product
@@ -2251,11 +2252,11 @@ screens:
       components:
       - kind: secondaryButton
         label: Acquire inventory hold
-        operation: acquireInventoryHold
         provenance: contract catalogue.yaml POST /inventory-holds
         notes: '**Not a cashier control** (v2, POSV2-10): the terminal takes its lease when the line is
-          added and the cashier sees only the cart''s countdown. Kept for the terminal''s own lease (ADR-0013),
-          never drawn as a button.'
+          added and the cashier sees only the cart''s countdown. Never drawn as a button, and bound to nothing
+          since r8 (GPS-C11): `addCartLine` (on POS-002''s quantity step) takes the cart''s hold, which is the
+          only hold; this screen calls no `acquireInventoryHold`.'
       - kind: secondaryButton
         label: Resolve product by code
         operation: resolveProductByCode
@@ -2300,12 +2301,6 @@ screens:
     contract: catalogue
     purpose: Per-session remaining
     trigger: onLoad
-  - operationId: acquireInventoryHold
-    contract: catalogue
-    purpose: Hold capacity for this terminal
-    trigger: onAction
-    invalidates:
-    - listProductVariants
   - operationId: listProductVariants
     contract: catalogue
     purpose: Ticket types
@@ -2317,10 +2312,6 @@ screens:
   - operationId: listAlternativeCodes
     contract: catalogue
     purpose: External identifiers for a product
-    trigger: onLoad
-  - operationId: listInventoryHolds
-    contract: catalogue
-    purpose: List leases
     trigger: onLoad
   - operationId: listProducts
     contract: catalogue
@@ -2335,8 +2326,8 @@ screens:
     - name: inventoryHoldId
       from: deepLink
       optional: true
-      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listInventoryHolds`
-        and the user picks one; an edge that holds one may still carry it to open on that record.'
+      notes: 'Not built (GPS-C12): the till lists no inventory holds and this screen takes none (GPS-C11); a link
+        carrying it opens the sale step as if it were absent.'
     - name: productId
       from: POS-002
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
@@ -2376,13 +2367,11 @@ screens:
   - id: formAcquireInventoryHold
     component: modal
     trigger: Acquire inventory hold
-    body: '**Collects what `acquireInventoryHold` sends before it is called.** Required: `id`, `channelCapacityId`,
-      `requestedUnits`, `ttlSeconds`. Optional: `channel`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+    body: '**Never opened** (r8 second round, GPS-C11): its button is never drawn and this screen takes no hold;
+      the cart''s hold, taken by `addCartLine`, is the only one. Kept only because the approved snapshot lists it.'
     bindsTo: AcquireLeaseRequest
     confirm:
       label: Acquire inventory hold
-      operation: acquireInventoryHold
     dismiss:
       label: Cancel
       discards:

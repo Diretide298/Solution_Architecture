@@ -212,6 +212,14 @@ components:
       stays the component for ordered history (audit, statements); `calendarView` is for things
       placed in time.
 
+      **Where the day-start hour and the category options come from** (r8, GPS-C18). The app shell
+      reads the venue's settings once after sign-in and on a venue switch (tenancy
+      `getVenueSettings`), and every calendar takes `calendarDayStartHour` from that read, so a
+      screen with a calendar binds no settings read of its own and lists
+      `VenueSettings.calendarDayStartHour` under its `entryState.preloaded`. The category filter's
+      options come from the read the screen binds for them (catalogue `listProductCategories` on
+      BO-015); a screen whose operation takes no `categoryId` filters what it read.
+
   - kind: emptyState
     description: Illustration, one line of explanation, and the action that resolves it.
     notes: >

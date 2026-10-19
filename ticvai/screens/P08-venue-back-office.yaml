@@ -5781,6 +5781,13 @@ screens:
     contract: catalogue
     purpose: List performances of an event
     trigger: onAction
+  - operationId: listProductCategories
+    contract: catalogue
+    purpose: 'The options of the calendar''s category filter (r8, GPS-C18), read once when the screen opens; the
+      chosen category is sent to `listPerformances` as `categoryId`. No component of its own: the filter is
+      part of the calendar.'
+    trigger: background
+    provenance: r8 second round, GPS-C18 (ticket 28195)
   - operationId: getPerformance
     contract: catalogue
     purpose: Read a performance
@@ -5850,6 +5857,7 @@ screens:
     - Performance.startsAt
     - Performance.endsAt
     - Performance.approvalRequestId
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated

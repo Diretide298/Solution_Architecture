@@ -848,28 +848,42 @@ screens:
       provenance: flow F01 step 2→3
       carries:
       - productId
+      operation: getPublishedBookingFlow
+      precondition: 'the product''s published flow (`getPublishedBookingFlow` `flowTypeKey`) is none of the four
+        below, or nothing resolves (404): the ticket counters open as the side panel'
     - to: WEB-006
       trigger: 'Book (a dated product: date first, then time, then tickets)'
       carries:
       - productId
       provenance: 'decided 29 September, rev 3 REV3-2: the dated flow runs date → time → ticket; flow
         F01 step 2→3'
+      operation: getPublishedBookingFlow
+      precondition: '`flowTypeKey` is `datedDayPass`, `timedEntry` or `seatedDateTimeSeatMap`, or it is
+        `seatedFixedPerformance` and the event has more than one on-sale performance (`listPerformances`)'
     - to: WEB-007
       trigger: Book (a fixture with one on-sale performance opens straight on the seat map)
       carries:
       - performanceId
       provenance: 'decided 29 September, rev 3 23SEP-16 and REV3-4: WEB-006 is skipped when the event
         has exactly one on-sale performance'
+      operation: getPublishedBookingFlow
+      precondition: '`flowTypeKey` is `seatedFixedPerformance` and `listPerformances` returns exactly one
+        on-sale performance, whose id the edge carries'
     - to: WEB-047
       trigger: Book (a cabana, lounger or other spot placed on the venue map)
       carries:
       - productId
       provenance: decided 29 September, rev 3 REV3-15 and GAP-C2
+      operation: getPublishedBookingFlow
+      precondition: '`flowTypeKey` is `cabanaMap` (placed on a map is the flow type the venue chose on CMS-103;
+        the product needs no field of its own)'
     - to: WEB-048
       trigger: Book (a space sold by the hour, e.g. a meeting room)
       carries:
       - productId
       provenance: decided 29 September, rev 3 REV3-13
+      operation: getPublishedBookingFlow
+      precondition: '`flowTypeKey` is `meetingRoomHourly`'
   notes: '**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with
     two renderings** — a screen named differently on web and app is two screens to a developer and one
     journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A
@@ -1060,12 +1074,22 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'Which screen Book opens (r8, GPS-C06): the product''s published flow (its own, then its category''s,
+      then the venue default for its kind), read with `productId`; its `flowTypeKey` chooses among the Book
+      transitions (each names its condition). Public, so it runs before sign-in.'
+    trigger: onLoad
+    provenance: r8 second round, GPS-C06 (ticket 28685)
   entryState:
     params:
     - name: eventId
       from: WEB-002
     - name: productId
       from: WEB-001
+    - name: venueId
+      from: session
+      notes: 'r8 (GPS-C06): the venue of the site the guest is on, for `getPublishedBookingFlow`.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - Performance.id
@@ -3112,7 +3136,14 @@ screens:
 
     **createOrder left 4 October 2026: the order is made from the cart by checkoutCart (the cart''s lines,
     holder names and opt-ins), then paid with createPayment; F01 step 7 and F02 step 5 say the same**
-    (CHG-FXS-003)'
+    (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -3346,7 +3377,14 @@ screens:
     **Create an account collects the email and the code its two calls send** (CHG-FXS-003)
 
 
-    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)'
+    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: compact
   pattern: statusTracker
   patternReason: '`getOrder` reads one record and nothing reads a population — the screen is about that
@@ -4149,6 +4187,16 @@ screens:
       from: navigation
     - name: subjectId
       from: navigation
+    - name: returnTo
+      from: navigation
+      optional: true
+      notes: 'r8 (WHITE-C13, screens/_patterns.yaml rule guestSignInReturn): the screen that sent a signed-out
+        guest here from its no-access state; after sign-in this screen opens it again. Ignored unless it is a
+        screen of this app.'
+    - name: returnParams
+      from: navigation
+      optional: true
+      notes: 'r8 (WHITE-C13): the entry parameters `returnTo` was opened with, handed back to it unchanged.'
     coldEntry: '**Needs nothing.** A guest arriving cold signs in and goes to My Account; one sent from
       the cart carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with
       the operations that used it (audit R167); a second-factor challenge is created in place, never arrives
@@ -4220,7 +4268,14 @@ screens:
     **The loyalty tile''s programmeId comes from listLoyaltyProgrammes (4 October 2026)** (CHG-FXS-003)
 
 
-    **The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)'
+    **The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: compact
   boardFrames:
   - Dashboards Board.dc.html#web-017
@@ -5968,7 +6023,14 @@ screens:
 
 
     **The Face Pass enrolmentId comes from the guest''s passes (listMyEntitlements, Entitlement.facePassEnrolmentId),
-    bound 4 October 2026** (CHG-FXS-003)'
+    bound 4 October 2026** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: compact
   pattern: listDetail
   patternReason: '`listGuestDevices` reads the population and `getWishlist` reads one of them — list,
@@ -8833,7 +8895,14 @@ screens:
   
     **The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists),
     so a normal visit has a map to load** (CHG-FXS-003) Build note (r8, GPS-C08): send `onlyBookable=false`
-    on `listBookableVenueMaps`, so a venue map with no bookable resource still opens.'
+    on `listBookableVenueMaps`, so a venue map with no bookable resource still opens.
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: compact
   boardFrames:
   - Seat Board 3.dc.html#seat-3c
@@ -9972,7 +10041,7 @@ screens:
   implementation:
     app: guest-web
     route: /help-centre-and-accessibility
-    component: src/routes/HelpCentreAccessibility.tsx
+    component: src/routes/engagement-and-support/HelpCentreFaqDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9984,7 +10053,17 @@ screens:
 
 
     **Rev 3 (decided 29 September).** Shows *What''s new* (GAP-B2). One implementation with WEB-025, both
-    ids kept (GAP-D3).'
+    ids kept (GAP-D3).
+
+
+    Build note (r8 second round, WHITE-C12): **WEB-045 is not a page of its own.** It is WEB-025''s Help
+    centre page reached at its own route (`/help-centre-and-accessibility`, the header''s *Policies and
+    accessibility* and the footer''s *Accessibility*), opened scrolled to its policies and accessibility
+    pages; it is built once, as WEB-025''s component, and this id stays for its route and its tickets. The
+    case actions (Ask for help, Reply) and their reads stay WEB-025''s; the offline state''s *raising a case
+    is disabled* is about that shared page. **No results** is the page''s search box (*Search help articles*
+    in the prototype): it filters the FAQs, help pages and policies already loaded, by title, on the device;
+    no operation takes a query, and nothing is read again.'
   density: compact
   pattern: listDetail
   patternReason: '`listFaqs` reads a population and nothing reads one of them; the detail is the row until

@@ -2679,7 +2679,14 @@ screens:
     **Create an account collects the email and the code its two calls send** (CHG-FXS-003)
 
 
-    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)'
+    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getOrder` reads one record and nothing reads a population — the screen is about that
@@ -2889,7 +2896,14 @@ screens:
 
     **The guest''s saved cards are read with listPaymentTokens (4 October 2026) so the auto top-up and
     a stored-card exit settlement have a paymentTokenId to send; the walletId is the wallet''s own id
-    (Wallet.id, agreed with contracts in the ledger)** (CHG-FXS-003)'
+    (Wallet.id, agreed with contracts in the ledger)** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listWalletTransactions` reads the population and `getWallet` reads one of them — list,
@@ -4825,7 +4839,14 @@ screens:
   
     **The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists),
     so a normal visit has a map to load** (CHG-FXS-003) Build note (r8, GPS-C08): send `onlyBookable=false`
-    on `listBookableVenueMaps`, so a venue map with no bookable resource still opens.'
+    on `listBookableVenueMaps`, so a venue map with no bookable resource still opens.
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: comfortable
   boardFrames:
   - Seat Board 4.dc.html#seat-4b
@@ -6123,7 +6144,14 @@ screens:
 
 
     **entitlementId comes from the order''s parking entitlement in listMyEntitlements (check-screens)**
-    (CHG-FXS-003)'
+    (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -9146,6 +9174,16 @@ screens:
         a link or an edge that holds one opens it instead.'
     - name: subjectId
       from: navigation
+    - name: returnTo
+      from: navigation
+      optional: true
+      notes: 'r8 (WHITE-C13, screens/_patterns.yaml rule guestSignInReturn): the screen that sent a signed-out
+        guest here from its no-access state; after sign-in this screen opens it again. Ignored unless it is a
+        screen of this app.'
+    - name: returnParams
+      from: navigation
+      optional: true
+      notes: 'r8 (WHITE-C13): the entry parameters `returnTo` was opened with, handed back to it unchanged.'
     coldEntry: '**Needs nothing.** A guest arriving cold signs in and goes Home; one sent from the cart
       carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with the operations
       that used it (audit R167); a second-factor challenge is created in place, never arrives by link.'
@@ -10351,6 +10389,9 @@ screens:
     - to: GST-052
       trigger: Take a ready-made plan
       provenance: decided 29 September 2026, MOB-6
+      carries:
+      - party
+      - dates
     - to: GST-001
       trigger: Home tab
       provenance: decided 29 September 2026, MOB-1
@@ -10638,14 +10679,28 @@ screens:
     trigger: onLoad
   - operationId: generateVisitPlan
     contract: venue-map
-    purpose: Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)
+    purpose: 'Build a rules plan from the preset''s inputs (`presetKey`) with the party and dates this screen
+      holds (r8, GPS-C14): the ones carried from GST-051 when the guest answered the questions there; on the
+      cold entry from GST-001, `dates` is today (the venue''s business date) and `party` one adult, proposed,
+      client to confirm. The guest changes either on GST-051 (Make my own) before using a plan.'
     trigger: onAction
     provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
     - name: venueId
       from: session
-    coldEntry: Lists the venue's ready-made plans; nothing is needed upstream.
+    - name: party
+      from: GST-051
+      optional: true
+      notes: 'r8 (GPS-C14): the party the guest gave on GST-051 (`VisitPlanRequest.party`). Absent on the cold
+        entry: one adult, proposed, client to confirm.'
+    - name: dates
+      from: GST-051
+      optional: true
+      notes: 'r8 (GPS-C14): the dates the guest gave on GST-051 (`VisitPlanRequest.dates`). Absent on the cold
+        entry: today, the venue''s business date.'
+    coldEntry: 'Lists the venue''s ready-made plans; nothing is needed upstream. Use this plan sends the
+      preset with today and one adult unless GST-051 carried a party and dates (r8, GPS-C14).'
   wireframe:
     status: approved
     provenance: client-verified
@@ -11668,7 +11723,14 @@ screens:
 
     **Availability is the map''s (4 October 2026): listBookableVenueMaps gives the mapId and getMapResourceAvailability
     every cabana''s status for the day, as GST-074 books them; getAvailability needs a performance, event
-    or capacity id no cabana product has, and left the screen** (CHG-FXS-003)'
+    or capacity id no cabana product has, and left the screen** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getAvailability` reads one of them — list,
@@ -12096,7 +12158,14 @@ screens:
 
 
     **The guest''s drops are found by their own tickets (listMyEntitlements, then lookupShopAndDrop per
-    entitlementId), bound 4 October 2026** (CHG-FXS-003)'
+    entitlementId), bound 4 October 2026** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: comfortable
   pattern: statusTracker
   patternReason: A status list of every shop-and-drop waiting for the guest, read by `lookupShopAndDrop`
@@ -12988,7 +13057,14 @@ screens:
     still open (ADR-0063); the build uses a stub until it is named** (CHG-FXS-003)
 
 
-    **The face is captured inside the enrol form (formEnrolFacePass) by the vendor SDK** (CHG-FXS-003)'
+    **The face is captured inside the enrol form (formEnrolFacePass) by the vendor SDK** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: comfortable
   offline: false
   pattern: statusTracker
@@ -13459,7 +13535,14 @@ screens:
     is the guest''s wallet id from getWallet (Wallet.id, agreed). Bound 4 October 2026** (CHG-FXS-003)
 
 
-    **The card is entered in the provider''s secure fields, named by the published config** (CHG-FXS-003)'
+    **The card is entered in the provider''s secure fields, named by the published config** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text
+    above reads.** A guest holds no permission, so the state never names one (the text above still names staff
+    permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs
+    says so without saying whose. The corrected wording waits for the client''s approval of the visible text
+    (pending entry GPS-C09).'
   density: comfortable
   offline: false
   pattern: listDetail
