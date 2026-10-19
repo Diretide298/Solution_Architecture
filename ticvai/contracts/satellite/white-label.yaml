@@ -6986,8 +6986,9 @@ components:
     BookingFlowTypeKey:
       type: string
       description: '**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).**
-        `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize`
-        are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation`
+        `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` is the one cabana flow
+        (W6; `cabanaBySize` was removed in r8: a guest books a cabana from the map only, lead decision of 20
+        October 2026); `experienceWorkshop` puts the product before the date (W8); `multiLocation`
         opens on the location switcher.
 
         '
@@ -7001,7 +7002,6 @@ components:
       - surfSession
       - meetingRoomHourly
       - cabanaMap
-      - cabanaBySize
       - guidedTourByLanguage
       - transport
       - tableReservation
@@ -7216,20 +7216,6 @@ components:
           - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
           orderConstraints:
           - {kind: before, stepKey: date, otherStepKey: resourceMap}
-        - key: cabanaBySize
-          productKinds: [rental]
-          steps:
-          - {stepKey: location, requirement: conditional}
-          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
-          - {stepKey: partySize, requirement: required, stepSettings: [{name: minGuests, type: integer, default: 1}, {name: maxGuests, type: integer}]}
-          - {stepKey: resourceSize, requirement: required, note: the server assigns a unit of the chosen size}
-          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
-          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
-          - {stepKey: review, requirement: optional}
-          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
-          orderConstraints:
-          - {kind: before, stepKey: date, otherStepKey: resourceSize}
-          - {kind: before, stepKey: partySize, otherStepKey: resourceSize}
         - key: guidedTourByLanguage
           productKinds: [timedAdmission]
           steps:

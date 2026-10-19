@@ -19,7 +19,7 @@ decision:
 why: 'r8 ticket-walk findings (audit/ticvai/r8-blockers, lane-satellite.json): FOUNDATION-AI-C16, GPS-C08, GPS-C10,
   GPS-C15, GPS-C16, GPS-C17, GPS-C22, GPS-C25, IDENTITY-C14, IDENTITY-C30, WHITE-C02 (contract part), WHITE-C04,
   WHITE-C10, WHITE-C11, WHITE-C14 (contract part), WHITE-C18, WHITE-C19 (contract part), WHITE-C25, WHITE-C28,
-  WHITE-C29, WHITE-C30; plus the lineage lane''s read-via requests for getTenantConfig and getPublishedTenantConfig.
+  WHITE-C29, WHITE-C30; and, after the lead''s answers of 20 October 2026, GPS-C04, GPS-C24, GPS-C26, GPS-C29, GPS-C35 (consumer), GPS-C36, ORDERS-MONEY-C03, ORDERS-MONEY-C09, ORDERS-MONEY-C25, FOUNDATION-AI-C09, FOUNDATION-AI-C11, FOUNDATION-AI-C17, FOUNDATION-AI-C30, IDENTITY-C33, WHITE-C06, WHITE-C17, WHITE-C20, WHITE-C21, WHITE-C22, APPROVALS-TENANCY-C23 (contract part), APPROVALS-TENANCY-C35; plus the lineage lane''s read-via requests for getTenantConfig and getPublishedTenantConfig.
   Finding: a ticket reached "done" only if its contract carried the field, read or rule the screen needs.'
 keys_touched:
   operations: [replayEvents, listBookableVenueMaps, getSeatAvailability, listMyVisitPlans, generateVisitPlan, getMapResourceAvailability, getSeatHold, createSeatHold, getMyCase, setFeatureToggles, setPolicy, setBrandIdentity, getPublishedTenantConfig, getTenantConfig, diffConfigVersion, publishContentBlock, updateBanner, proposeTranslations]
@@ -47,4 +47,4 @@ prevention:
   type: none
   reason: 'The class is a missing field or sentence per ticket; no single mechanical rule finds them. The walk itself is the check.'
 status: open
-notes: 'Needs the lead: breaking-change entries for the response-enum value bookingFlow on LinkTarget.kind (10 operations) and PublishedPolicy.title string to LocalisedText; derive-ddl and a forward migration for control.content_block review_status and approval_request_id; derive-lineage for the new operations listMyVisitPlans and getMyCase and the read-via changes.'
+notes: 'Needs the lead: breaking-change entries for the response-enum value bookingFlow on LinkTarget.kind (10 operations) and PublishedPolicy.title string to LocalisedText (both approved), the pace value balanced (3 operations), and the permission changes of listApiVersions, listApiScopes (to none) and setAiCredential (to PLATFORM_TENANT_MANAGE); derive-ddl and a forward migration for control.content_block review_status, fnb.delivery_location opens_at and closes_at, and a merchandise is_published flag if not present; derive-lineage for the new operations listMyVisitPlans and getMyCase and the read-via changes.'
