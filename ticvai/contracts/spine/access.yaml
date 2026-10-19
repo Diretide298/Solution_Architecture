@@ -232,8 +232,9 @@ paths:
         `accreditation.credentialIssued` (a replacement stops the credential it replaces) and
         `accreditation.holderStatusChanged` (a holder suspended, revoked, expired or archived stops admitting).
         It admits only where the credential `admits`, today is within its validity and this access point''s zone
-        is among its `zoneIds`; the same rows travel in the offline package, so a gate without a network decides
-        the same way.
+        (`access.access_point.zone_id`) is among its `zoneIds`, compared as text; a point with no zone is venue-wide
+        and applies no zone filter (CHG-R8MIG-004). The same rows travel in the offline package, so a gate without a
+        network decides the same way.
 
         '
       tags:
@@ -2132,7 +2133,9 @@ paths:
         **Accreditation credentials travel in the package** (29 September, build; BL-181):
         `accreditationCredentials` carries the admitting `access.accreditation_credential` rows whose zones include
         this access point''s, so an accredited person is admitted, and a suspended or revoked one refused, with
-        no network. A holder status change or a replacement changes the `etag`, so the next conditional refresh
+        no network. **The point''s zone is `access.access_point.zone_id`** (CHG-R8MIG-004): credentials whose
+        `zoneIds`, and dynamic policies whose `allowedZoneIds`, contain it (compared as text); a point with no zone
+        is venue-wide and gets them unfiltered. A holder status change or a replacement changes the `etag`, so the next conditional refresh
         takes it.
 
         '
@@ -27092,6 +27095,15 @@ components:
         venueId:
           type: string
           format: uuid
+        zoneId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: access.access_area
+          description: '**The zone this access point admits to** (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an
+            `access.access_area` row whose `entityType` is `zone`. `getOfflinePackage` and `validateAccess` filter
+            accreditation credentials and dynamic policies by it (their `zoneIds` / `allowedZoneIds` must contain
+            it, compared as text); null means the point is venue-wide and no zone filter applies.'
         scopePath:
           type: string
         externalCredentialSources:

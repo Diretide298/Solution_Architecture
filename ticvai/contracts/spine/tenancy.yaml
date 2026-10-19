@@ -571,7 +571,8 @@ paths:
 
         **Reading the audit log is itself audited.** `platform.audit_read` exists for that reason:
         a trail nobody can inspect is useless, and one anybody can inspect without trace is a
-        different problem.
+        different problem. Each call writes one `AuditRead` row (`target` `auditRecord`, the
+        caller, the time, the filters and the number of rows returned; CHG-R8MIG-004).
 
         **Never deletes and never edits.** The only operations on an audit record are write and
         read — which is why there is no `updateAuditRecord` here and never will be.
@@ -3521,7 +3522,11 @@ paths:
         `platform` is TenancyService''s schema in `commerce`, beside `platform.outbox`, which the dead letters drain
         from (ADR-0033); the operator''s `platform-ops.replayDeadLetter` runs in `operations` and calls this,
         cell-internal over mTLS. In one transaction it writes the dead letter''s event back to `platform.outbox`
-        as a new row and adds one to `replay_count` (**a new attempt, never a reset**, ADR-0033). The caller''s
+        as a new row and adds one to `replay_count` (**a new attempt, never a reset**, ADR-0033). **A new row, the
+        same event id**: the new outbox row takes the dead letter''s `event_id`, `tenant_id`, `aggregate_type`,
+        `aggregate_id`, `sequence`, `event_name` and `payload` as they were written (R8 blocker
+        APPROVALS-TENANCY-C29, CHG-R8MIG-004), so consumers that already handled it find their inbox row and skip
+        it, and only the consumer that failed handles it again. The caller''s
         `Idempotency-Key` makes a retried call one replay, not two.
 
         '
@@ -3765,6 +3770,55 @@ components:
           type: string
           readOnly: true
           description: The tenant. Retention is set at tenant scope only.
+    AuditRead:
+      type: object
+      x-ticvai-persistence: platform.audit_read
+      description: '**Who read audited data, when, and what they asked for** (R8 blocker APPROVALS-TENANCY-C09,
+        CHG-R8MIG-004; the lead''s answer, option A). One row per audited read, never edited: a read of a guest''s
+        PII (`target` `subject`, `subjectId` set) and every `listAuditRecords` call (`target` `auditRecord`, the
+        filter it was called with and how many rows it returned; `subjectId` null). Written by the reading
+        operation in its own transaction; storage only, no operation returns it. Any principal holding a grant
+        appends a row and only the tenant root reads one, as `platform.audit_record` (CHG-R6-002).'
+      required:
+      - id
+      - principalId
+      - readAt
+      - target
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        principalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+          description: Who read.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: pii.subject
+          description: The guest whose PII was read; null for an audit-log read.
+        readAt:
+          type: string
+          format: date-time
+          description: When the read happened.
+        target:
+          type: string
+          enum:
+          - auditRecord
+          - subject
+          description: What was read. `auditRecord` is a `listAuditRecords` call; `subject` is a guest''s PII.
+        filter:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: The query parameters the read was made with (for `auditRecord`, the list''s filters and cursor).
+        recordCount:
+          type: integer
+          nullable: true
+          description: How many rows the read returned.
     AuditRecord:
       x-ticvai-append-only: occurredAt
       type: object
@@ -3852,6 +3906,12 @@ components:
       type: object
       x-ticvai-persistence: control.tenant_domain
       x-ticvai-agreed: '29 September: system-design review SD-021'
+      # **One active row per hostname across every tenant** (R8 blocker APPROVALS-TENANCY-C12, CHG-R8MIG-004): a
+      # partial unique index on lower(hostname) where status is active, so addCustomDomain's 409 hostname-taken holds
+      # across tenants, and a detached row stays for the audit trail without blocking the host's next owner.
+      x-ticvai-unique-when:
+      - columns: [hostname]
+        when: {status: active}
       description: '**Hostname to tenant, outside every tenant database** (SD-021, 29 September). In the control
         database, because the edge must answer it before it knows which tenant database to open.
         `whitelabel.custom_domain` stays the tenant''s own record of its domain and its verification.'
@@ -3868,7 +3928,7 @@ components:
         hostname:
           type: string
           maxLength: 253
-          x-ticvai-unique: tenant
+          description: Unique across every tenant among active rows (`x-ticvai-unique-when` on the schema).
         tenantId:
           readOnly: true
           type: string
@@ -4036,7 +4096,13 @@ components:
     DeviceAssignment:
       type: object
       x-ticvai-persistence: tenancy.device_assignment
-      description: '16.2.9 to 16.2.11. **Ownership, custody and location are three facts, not one.**'
+      # **One assignment per device** (R8 blocker APPROVALS-TENANCY-C26, CHG-R8MIG-004): setDeviceAssignment upserts
+      # ON CONFLICT (device_id), so device_id is required and unique.
+      x-ticvai-unique-together: [[deviceId]]
+      description: '16.2.9 to 16.2.11. **Ownership, custody and location are three facts, not one.** One row per
+        device: `setDeviceAssignment` replaces the device''s row (insert, or update on the device''s key).'
+      required:
+      - deviceId
       properties:
         deviceId:
           type: string

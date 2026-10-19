@@ -609,3 +609,28 @@ def _names_ticket(tmp_path):
     assert any(k == "foreign key" for k, _ in ch[(rel, "wallet.owner")])
     text = td.names_sentence(rel, {"wallet.gift_card": ch[(rel, "wallet.gift_card")]})
     assert text.startswith(f"Source DDL after r1: {rel}") and "rename column face_value to face_value_amount" in text
+
+
+# ---- R8 second round: a column the contract makes optional (CHG-R8MIG-004) ----------------------------------------
+
+AR_OLD = ("CREATE TABLE IF NOT EXISTS platform.audit_read (id uuid PRIMARY KEY NOT NULL, principal_id uuid NOT NULL, "
+          "subject_id uuid NOT NULL);\n")
+AR_NEW = ("CREATE TABLE IF NOT EXISTS platform.audit_read (id uuid PRIMARY KEY NOT NULL, principal_id uuid NOT NULL, "
+          "subject_id uuid);\n")
+
+
+def test_a_column_the_contract_makes_optional_loses_not_null_guarded_and_once():
+    p = fwd.diff("tenant", model(AR_OLD), model(AR_NEW))
+    stmt = [s for s in p.statements if "DROP NOT NULL" in s]
+    assert len(stmt) == 1 and "'subject_id'" in stmt[0] and "information_schema.columns" in stmt[0]
+    assert any("SET NOT NULL" in r and "subject_id" in r for r in p.rollback)
+    assert not [r for r in p.review if r[0] == "column changed"], p.review
+    again = fwd.diff("tenant", fold(AR_OLD, p), model(AR_NEW))
+    assert not again.statements and not again.review, (again.statements, again.review)
+
+
+def test_a_type_change_with_the_not_null_dropped_is_still_a_decision():
+    new = AR_NEW.replace("subject_id uuid", "subject_id text")
+    p = fwd.diff("tenant", model(AR_OLD), model(new))
+    assert not [s for s in p.statements if "DROP NOT NULL" in s]
+    assert [r for r in p.review if r[0] == "column changed"]

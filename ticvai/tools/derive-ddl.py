@@ -615,8 +615,12 @@ $$;
 # `identity.authz_audit` (CHG-R6-014, 12 October 2026) is the second: every authorisation decision a
 # principal's request takes is appended there, venue-scoped principals included, and it sat at the tenant
 # root under `apply_tenant_rls` for the same reason `platform.audit_record` did.
+# `platform.audit_read` (CHG-R8MIG-004, R8 blocker APPROVALS-TENANCY-C09) is the third: every `listAuditRecords` call,
+# a venue's included, appends who read the trail; under the subject rule a row with no subject took the tenant-root
+# WITH CHECK and refused every venue reader.
 APPEND_AUDIT = {
     "platform.audit_record",   # CHG-R6-002 (CR-005)
+    "platform.audit_read",     # CHG-R8MIG-004
     "identity.authz_audit",    # CHG-R6-014
 }
 

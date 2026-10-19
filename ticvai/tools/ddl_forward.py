@@ -315,6 +315,13 @@ def retire_not_null(t: str, c: str) -> str:
             f"ALTER COLUMN {c} DROP NOT NULL; END IF; END $$")
 
 
+def only_not_null_dropped(old_def: str, new_def: str) -> bool:
+    """`new_def` is `old_def` with its NOT NULL taken off and nothing else changed (not a key column)."""
+    if "PRIMARY KEY" in old_def.upper() or not re.search(r"\bNOT NULL\b", old_def, re.I):
+        return False
+    return norm(re.sub(r"\s+NOT NULL\b", "", old_def, flags=re.I)) == norm(new_def)
+
+
 class Model:
     """Every statement of one database's DDL, keyed so that the same object in two versions pairs up."""
 
@@ -883,6 +890,14 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     elif a.cols[c] == relaxed(d):
                         review("not null", f"{t}.{c}", "still nullable in the databases; the schema reference "
                                "says NOT NULL", "backfill, then ALTER COLUMN ... SET NOT NULL")
+                    elif only_not_null_dropped(a.cols[c], d):
+                        # **A column the contract makes optional loses its NOT NULL here** (CHG-R8MIG-004, R8 blockers
+                        # APPROVALS-TENANCY-C09, ORDERS-MONEY-C35, IDENTITY-C12): relaxing NOT NULL touches no row and
+                        # no reader, so it is additive. Guarded like a retired column's, and folded back the same way
+                        # (RETIRE_GUARD), so the next run writes nothing.
+                        p.statements.append(retire_not_null(t, c))
+                        p.rollback.append(f"ALTER TABLE {t} ALTER COLUMN {c} SET NOT NULL;")
+                        p.counts["other"] += 1
                     else:
                         review("column changed", f"{t}.{c}", f"`{a.cols[c]}` -> `{d}`",
                                "type, default, nullability or check changed: write the ALTER COLUMN (and any "
