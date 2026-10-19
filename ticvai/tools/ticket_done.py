@@ -75,6 +75,19 @@ def builds_of(r, part, lineage):
 
 DONE_WHEN = re.compile(r"Done when[:,]?\s*(.+)", re.S | re.I)
 
+
+def claimed_ops_sentence(served, is_ai: bool) -> str:
+    """What a hand-written task says of the operations it claims (block-a-extra-tasks.json `operations`). Only an AI
+    engine task's are served by ticvai-ai behind the AI gateway; any other task builds them itself (CHG-R8MIG-012: the
+    products wave 1 tasks claim catalogue operations). Either way no back-end task of the operation formula does."""
+    names = ", ".join(served)
+    verb = "is" if len(served) == 1 else "are"
+    if is_ai:
+        return (f"{names} {verb} served by ticvai-ai behind the AI gateway, to their contracts at the release tag in "
+                "ADAM; no back-end task builds them. ")
+    return (f"{names} {verb} built by this task, to their contracts at the release tag in ADAM; no other back-end "
+            "task builds them. ")
+
 # **The control database has no row-level security** (ADR-0039; R8 blocker causes IDENTITY-C16, FOUNDATION-AI-C36,
 # APPROVALS-TENANCY-C18; the lead, 20 October 2026: option A; CHG-R8MIG-005). It holds no scope tree: only the control
 # plane's role reaches it, and each operation checks its PLATFORM_* permission and the tenant (an API client's

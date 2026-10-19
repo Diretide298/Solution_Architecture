@@ -74,3 +74,11 @@ def test_a_db_ticket_is_done_on_a_copy_twice_and_by_the_db_ticket_script(monkeyp
     assert "a second run applies nothing" in text and "db-ticket.mjs <ticket>` says MATCH" in text
     assert "runs once a day and in the merge-request pipeline" in text and "a peer has reviewed it" in text
     assert "previous release" not in text
+
+
+def test_only_an_ai_engine_task_says_its_operations_are_served_by_the_ai_gateway():
+    ai = td.claimed_ops_sentence(["askConcierge"], True)
+    assert "served by ticvai-ai behind the AI gateway" in ai and "no back-end task builds them" in ai
+    other = td.claimed_ops_sentence(["createProduct", "updateProduct"], False)
+    assert "AI gateway" not in other and "ticvai-ai" not in other
+    assert "are built by this task" in other and "no other back-end task builds them" in other

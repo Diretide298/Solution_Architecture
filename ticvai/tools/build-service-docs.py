@@ -2126,8 +2126,7 @@ def main() -> int:
             return ""
         lead = "Builds: " + ", ".join(f"`{b}`" for b in items) + ". "
         if served:
-            lead += (f"{', '.join(served)} {'is' if len(served) == 1 else 'are'} served by ticvai-ai behind the AI gateway, "
-                     "to their contracts at the release tag in ADAM; no back-end task builds them. ")
+            lead += ticket_done.claimed_ops_sentence(served, t_.get("epic") == "AI-ENGINE")
         return lead
 
     # **Tasks no screen or operation implies** (docs/active/block-a-extra-tasks.json, 30 September): the
