@@ -84,6 +84,7 @@ you can finish or its first open sub-task of yours. Start that one.
    covers; a blocking one is "When the package is wrong", step 4.
 2. Build exactly what the ticket and its linked artefacts describe. Nothing outside the ticket.
 3. Add tests for the success case and each error the contract lists. `dotnet test` must pass.
+   A [DB] ticket is checked another way: see "A [DB] ticket" below.
 4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and
    that the tests pass. Show the proposal and **wait for a yes** before `adam_apply`.
 
@@ -100,11 +101,35 @@ what "built" and "tested" mean:
 | Ticket | Built means | Tested means | Propose |
 |---|---|---|---|
 | **[BE]** (`SVC-*`) | the operations the ticket names, as the contract says | a test for the success case and each listed error; `dotnet test` passes | Ready for QA |
-| **[DB]** (`MIG-*`) | the ticket's numbered SQL file(s) in `db/<database>/`, from the package's `backend/` DDL | `SqlMigrationRunner` applies the folder to an empty PostgreSQL, and a second run applies nothing | Ready for QA |
+| **[DB]** (`MIG-*`) | the ticket's numbered SQL file in `db/<database>/`, from the package's `backend/` DDL | `node .claude/scripts/db-ticket.mjs <ticket>` says MATCH (see "A [DB] ticket") | Ready for QA |
 | **[DevOps]** (`SETUP-*`) | the pipeline, environment or seed the description names, in the repository it names | it runs once end to end; say in the comment what QA can re-run | Ready for QA |
 | **[Onboarding]** | nothing to build: the step is done when the connector answers in this folder | `adam_board` returns your board | Ready for QA with that as evidence |
 
 A setup ticket links no contract or screen; that is normal, not a gap.
+
+## A [DB] ticket
+
+The ticket is one numbered SQL file in `db/<database>/`. Its folder holds `expected-schema.json`: the
+end state of its tables, from the package (columns, types, nullability, keys, indexes, row-level security).
+
+1. Write the file the ticket names, from the package DDL that README.md lists.
+2. Run `node .claude/scripts/db-ticket.mjs <ticket>`. It applies only this file to a copy of the
+   database at the previous state, runs it a second time (which must change nothing), and compares the
+   tables with `expected-schema.json`. It needs Docker Desktop running; the first run starts its own
+   PostgreSQL 16 container.
+3. A difference names the table and what differs: fix the file and run it again. **MATCH is the evidence
+   for done**: quote its result lines in the comment. A foreign key "left for a later migration" is not
+   a difference.
+4. Do not rebuild the other migrations, do not work out the effect by hand, and do not run `dotnet build`
+   or `dotnet test` unless the ticket changes C#.
+
+If MATCH cannot be reached because the package itself is wrong (a type no file creates, a policy on a
+table a later migration creates), that is a change request, as in "When the package is wrong".
+
+The full checks run once a day and in the pipeline on each merge request, not on every ticket: every
+migration applied to an empty database and run a second time, and the whole `dotnet build` and
+`dotnet test`. On this machine, `node .claude/scripts/db-ticket.mjs --full tenant` (or `control`) does
+the first, and also compares the tables of every ticket pulled here.
 
 ## Searching pulled files
 
