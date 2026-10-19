@@ -1,0 +1,54 @@
+id: CHG-CRA-011
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'After the rebase onto r7 (807a1c24), five texts on this branch named another module''s table and r7''s
+  XR-FACT rule refused them: checkOutRental now asks orders#paymentRecords for the card deposit''s payment
+  (x-ticvai-read-via, route service), and the other texts say the fact without naming the table (searchGuests,
+  MarketingProgrammeTier, replayEvents, WebhookEventType, RentalBooking, ControlOutboxEntry). One read route added;
+  the rest is wording. Nothing is built differently.'
+decision:
+  what: 'Made in commit 5dfeffd6 (fix round 2) and recorded here (lane-H review 2 M-4). contracts/satellite/rental.yaml
+    checkOutRental: x-ticvai-read-via orders#paymentRecords (route service; refused 409 deposit-not-authorised until
+    the deposit''s payment is authorised, ADAM CR-146, CHG-CRA-002), and "never an orders.stored_value_authorisation"
+    reads "never a stored-value hold"; RentalBooking says "Orders'' stored-value authorisation".
+    contracts/satellite/marketing-crm.yaml: searchGuests says "Identity''s subject record" for pii.subject;
+    MarketingProgrammeTier says "the control database''s tier allowance" and "the SaaS plan catalogue" for
+    control.tier_allowance and control.plan. contracts/satellite/public-api.yaml: replayEvents'' dispatcher reads "each
+    tenant database''s outbox", and WebhookEventType says "the outbox of the tenant database", for platform.outbox.
+    contracts/satellite/platform-ops.yaml ControlOutboxEntry: tenant.suspended is written by Subscription''s
+    approval.granted consumer or the suspension job (CR-172, CHG-CRA-005). The lineage''s readVia for checkOutRental
+    follows at the release derive (derive-lineage --apply; XR-LINEAGE until then).'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'Finding M-4 of the lane-H review 2 (D:\Chinmay\adam\.superpowers\sdd\POST-R6-PARALLEL-PLAN\lane-H-review-2.md):
+  the rebase additions of commit 5dfeffd6 were in no change entry. They answer r7''s check-cross-module-reads XR-FACT
+  (CHG-RTE-001, ADAM CR-096 and CR-135): a text that names another module''s table asks that module''s query, or says
+  the fact without the table.'
+keys_touched:
+  operations: [checkOutRental, searchGuests, replayEvents]
+  schemas: [RentalBooking, MarketingProgrammeTier, WebhookEventType, ControlOutboxEntry]
+  files:
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/platform-ops.yaml
+root_class: 'XR-FACT: an operation''s text names another module''s table and asks no query over it (CHG-RTE-001)'
+tickets:
+  started: []
+  unstarted:
+  - 'The tickets that link checkOutRental gain one read (orders#paymentRecords, route service) at the next pull; the
+    reworded texts change no build.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: CR-146 (checkOutRental's deposit read); the rewordings follow CHG-RTE-001 (CR-096, CR-135)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Prevention: check-cross-module-reads XR-FACT, which r7 runs and which refused these texts after the rebase;
+  XR-LINEAGE holds the lineage''s readVia to the contract (checkOutRental clears at the release derive). Not changed
+  here: replayEvents'' committed lineage readVia still names tenancy#outboxRecords for "its read of platform.outbox";
+  the release derive rewrites it from the contract, and its control.webhook_replay lineage error is left for that
+  derive too.'
