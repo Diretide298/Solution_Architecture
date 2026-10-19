@@ -117659,8 +117659,8 @@ screens:
       - kind: secondaryButton
         label: Award to this guest
         operation: awardBadge
-        notes: Shown only when the screen was opened from a guest (customerId); sends badgeId, status
-          awarded and awardedAt now, sourceType manual.
+        notes: 'Shown only when the screen was opened from a guest (customerId); sends badgeId, awardedAt now and
+          sourceType `manager`, and no status: the server writes `awarded` (r8, ORDERS-MONEY-C14).'
         provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: secondaryButton
         label: Cancel
@@ -207983,6 +207983,7 @@ screens:
     entryFrom:
     - ADM-599
     - BO-102
+    - ADM-602
     exitTo:
     - ADM-599
     transitions:
@@ -208023,6 +208024,9 @@ screens:
         provenance: contract payments.yaml GET /b2b-credit-accounts/{accountId}/terms
       - kind: selectField
         label: Customer/account
+        operation: listB2bCreditAccounts
+        notes: 'The B2B credit accounts (`listB2bCreditAccounts`); the picked account''s id is the `accountId` the
+          terms are read and saved for (r8, ORDERS-MONEY-C28).'
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
       - kind: selectField
         label: Credit agreement
@@ -208083,6 +208087,11 @@ screens:
     purpose: Read the account's current payment terms before they are changed
     trigger: onLoad
     provenance: deferred workshop-pack gap closed 2 October 2026 (CHG-MOV-007)
+  - operationId: listB2bCreditAccounts
+    contract: payments
+    purpose: The accounts the terms can be set for, the Customer/account picker (r8, ORDERS-MONEY-C28)
+    trigger: onLoad
+    provenance: r8 second round, ORDERS-MONEY-C28 (the storage-sat lane's request)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-603

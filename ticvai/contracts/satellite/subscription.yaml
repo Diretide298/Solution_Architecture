@@ -19913,6 +19913,19 @@ components:
         the workshop pack''s own display and configuration directory for this screen; each property names
         the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
+        catalogueProductId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The catalogue product this membership is sold as (`MembershipProduct.catalogueProductId`,
+            subscription.membership_product.catalogue_product_id), so BO-291 can read and send back its channel
+            availability and prices (r8, GPS-C39)'
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The variant of that product the price list prices (its default variant), for setPrices
+            (r8, GPS-C39); read from catalogue at read time, not stored here'
         basePricingProfile:
           type: string
           description: Base Pricing Profile id

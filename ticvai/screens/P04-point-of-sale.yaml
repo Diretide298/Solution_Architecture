@@ -2469,7 +2469,14 @@ screens:
 
     Build note (r8 second round, GPS-C13, from the core lane): this step holds the seats and carries `holdId`
     to POS-005, which creates the order and the payment; when `createOrder` answers 409 `hold-not-active` (the
-    hold lapsed while the cashier took payment details) POS-005 sends the cashier back here to pick again.'
+    hold lapsed while the cashier took payment details) POS-005 sends the cashier back here to pick again.
+
+
+    Build note (r8 second round, GPS-C38, from the core lane): a standing zone is sold by quantity: the zone
+    and what is left come with `getSeatAvailability` (`zones`), the hold is `createSeatHold` with `zoneId` and
+    `quantity`, and a 409 `zone-unavailable` shows the zone''s state as unavailable with what is left, keeping
+    the party together where the venue asks it (`keepTogether`). The cart line names its zone hold through
+    `inventoryHoldId`.'
   density: touchLarge
   boardFrames:
   - Seat Board 3.dc.html#seat-3a

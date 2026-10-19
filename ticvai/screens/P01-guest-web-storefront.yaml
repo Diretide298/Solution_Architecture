@@ -1878,7 +1878,14 @@ screens:
 
 
     **29 September (W2).** Sections first, zoom into a section, scroll or pinch out (or *Whole map*) back
-    to the full map; held seats are kept.'
+    to the full map; held seats are kept.
+
+
+    Build note (r8 second round, GPS-C38, from the core lane): a standing zone is sold by quantity: the zone
+    and what is left come with `getSeatAvailability` (`zones`), the hold is `createSeatHold` with `zoneId` and
+    `quantity`, and a 409 `zone-unavailable` shows the zone''s state as unavailable with what is left, keeping
+    the party together where the venue asks it (`keepTogether`). The cart line names its zone hold through
+    `inventoryHoldId`.'
   density: compact
   boardFrames:
   - Seat Board 3.dc.html#seat-3b

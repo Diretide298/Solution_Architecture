@@ -2174,6 +2174,16 @@ components:
             - incident
             - inspection
             - campaign
+            # r8 (ORDERS-MONEY-C29): the other modules' uses, so each owner records its own use as a media_usage
+            # row and Assets reads no other module to know an asset is in use.
+            - aiConfigSource
+            - aiHistoryImport
+            - aiLayoutDraft
+            - workOrderAttachment
+            - seatingSection
+            - transportNetworkImport
+            - venueMap
+            - venueMapVersion
         referenceId: { type: string }
         label: { type: string }
         isLive:

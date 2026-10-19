@@ -15124,7 +15124,9 @@ screens:
         provenance: contract white-label.yaml GET /venues/{venueId}/guided-choices
       - kind: livePreview
         label: Preview
-        notes: '**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each
+        operation: previewGuidedChoice
+        notes: '**What each combination of answers leaves comes from `previewGuidedChoice`** (r8, WHITE-C26), the
+          same filter guests meet, so a combination that leaves nothing shows before publishing. **Renders the draft as a guest would meet it**: the button or pop-up, the banner, each
           question and the result card, in each language and in both directions. Drawn from the record
           in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up
           until Publish. **Preview the filtered list**: for each combination of answers, the products
@@ -15241,6 +15243,12 @@ screens:
     purpose: The reasons behind a Help me choose suggestion
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: previewGuidedChoice
+    contract: white-label
+    purpose: 'The products each combination of the draft''s answers leaves, for the preview (r8, WHITE-C26); called
+      when the draft changes, nothing stored'
+    trigger: onAction
+    provenance: r8 second round, WHITE-C26 (the core lane's request)
   entryState:
     params:
     - name: venueId
@@ -16107,7 +16115,9 @@ screens:
         notes: '**The in-platform guide M24-08 asks for**: how to get a D-U-N-S number, open each account,
           fill the listing and answer store review. Grounded on a store-publishing knowledge source, no
           tenant data. `unavailable` until the ai "app publishing guide" assistant profile exists; the
-          checklist guidance works without it.'
+          checklist guidance works without it. The conversation is started with `createAiConversation` and
+          `profileKey` `guide.appPublishing`; a 404 `assistant-profile-unavailable` shows the panel''s unavailable
+          state, not an error (r8, WHITE-C27).'
         provenance: authored 29 September, M24-08
       - kind: publishGate
         label: What a build and a submission do

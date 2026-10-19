@@ -358,3 +358,5 @@ Actions 1–5 stand. Action 4's KERNEL-RELAY takes the drain loop and the batch 
    envelope's `occurred_at`, and `(aggregate_id, sequence)` is indexed.
 3. **Dead letters** are written by the consumer wrapper straight to `platform.dead_letter` (ADR-0057 as amended the
    same day).
+
+**Amended 20 October 2026 (r8 cause FOUNDATION-AI-C41): the relay also drains `ai.outbox`.** The AI module writes its events (for example `pauseAiCapability`'s) to `ai.outbox` and `ai.outbox_sequence`, with `platform.outbox`'s columns, monthly partitions and its `(aggregate_id, sequence)` index, in the tenant transaction; the regional relay reads it exactly as it reads `platform.outbox`, and the log-database record of the act is written after commit, retried.

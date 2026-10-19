@@ -1,0 +1,47 @@
+id: CHG-R8SCR-012
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The non-contract parts the storage-sat lane and the rest of the core lane asked of this lane. Events
+  tenant.provisioned and tenant.terminated (AI''s vector store); catalogue.productPublished''s AI consumer re-runs
+  Help me choose. States: a cell moves to migrating on a tier change, a gift card is unblocked by staff, a replaced
+  media file is reprocessed. Screens: BO-826 sends no status, CMS-104''s guide is unavailable on a missing profile,
+  ADM-603 picks its account from listB2bCreditAccounts, CMS-101''s preview reads previewGuidedChoice, POS-004 and
+  WEB-007 sell standing zones by quantity; a supervisor PIN prompt component; the closure and maintenance wording
+  is pending for the client. Docs: ADR-0028, 0039, 0051, 0058 amendments, the AI design''s events and decision-record
+  hash chain, the audit register''s R117, R126 and R205 notes, F32''s sign-in.'
+decision:
+  what: 'events/tenant-provisioned.yaml, tenant-terminated.yaml (new), catalogue-productPublished.yaml;
+    states/cell.yaml, gift-card.yaml, media.yaml; screens P01, P04, P08, P13, _components.yaml; docs/adr/0028, 0039,
+    0051, 0058; docs/architecture/ai-system-design.md; docs/registers/audit-decisions.md; flows/F32.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round: the storage-sat and core lanes'' requests to the surface lane
+  (relayed by the coordinator); causes FOUNDATION-AI-C33, C39, C41, C43, C54, IDENTITY-C01, C06, C19, C59,
+  APPROVALS-TENANCY-C19, ORDERS-MONEY-C14, C27, C28, C29, WHITE-C16, C27, GPS-C31, C38.'
+keys_touched:
+  screens: [BO-826, CMS-104, ADM-603, CMS-101, POS-004, WEB-007]
+  files:
+  - events/tenant-provisioned.yaml
+  - events/tenant-terminated.yaml
+  - events/catalogue-productPublished.yaml
+  - states/cell.yaml
+  - states/gift-card.yaml
+  - states/media.yaml
+  - screens/_components.yaml
+  - docs/architecture/ai-system-design.md
+  - docs/registers/audit-decisions.md
+  - flows/F32-a-till-opens-trades-and-settles.yaml
+root_class: 'cross-lane hand-over: a cause''s non-contract half'
+tickets:
+  started: []
+  unstarted:
+  - 'the tickets of the causes named (see the core and storage-sat reports).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open

@@ -281,6 +281,18 @@ components:
     notes: >
       The consequence goes in the body, not the title. "Delete 3 assets in use on the live
       homepage" is a confirmation; "Are you sure?" is not.
+  - kind: supervisorPinPrompt
+    description: >
+      The step-up a till or handheld asks before an act that needs a supervisor: who approves, then their PIN.
+    states: [picking, entering, verifying, refused]
+    notes: >
+      **Added 20 October 2026 (r8 cause GPS-C31).** Two parts. **The picker** lists the supervisors who may
+      approve this act here: `identity.listStepUpSupervisors` with the act's operation (so its permission and the
+      venue), never a free-typed name; the person who did the act is not offered, because nobody signs their own
+      act. **The keypad** takes exactly `WorkstationContext.pinLength` digits (4, 6 or 8, the tenant's choice),
+      masked, and sends them with the picked principal as the operation's `SupervisorStepUp`. A refusal
+      (`403 supervisor-step-up-refused`) says only that the approval was refused and keeps the picked supervisor,
+      never whether the person or the PIN was wrong.
   - kind: progressIndicator
     states: [determinate, indeterminate, complete, failed]
 

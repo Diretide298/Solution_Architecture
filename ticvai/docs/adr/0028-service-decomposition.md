@@ -229,3 +229,5 @@ the grouping, the tiers, and the four decisions above — and it could only be w
 ownership was clean enough to read off. **On 20 August, four operations were writing a derived
 table and `identity.role_permission` had one column.** Neither would have shown up in a service
 decomposition drawn before then.
+
+**Amended 20 October 2026 (r8 cause IDENTITY-C51): open shifts reach Identity as a projection.** `ActiveSession.hasOpenShift` reads `identity.open_shift_marker`, a projection Identity keeps from `shift.opened` (a row per open shift) and `shift.closed` (the row deleted), keyed by `shiftId`; Identity never reads the shift schema, in line with the tiers above.
