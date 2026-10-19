@@ -9,6 +9,7 @@ aggregate: approvalRequest
 emittedWhen: ApprovalStatus draft to pending (submitApprovalRequest), or a request raised directly at pending (createApprovalRequest)
 emittedBy:
 - submitApprovalRequest
+- resubmitApprovalRequest
 payload:
 - field: requestId
   type: uuid
