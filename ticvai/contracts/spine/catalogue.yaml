@@ -2161,9 +2161,9 @@ paths:
         write products, prices or performances.
 
         **Only published answers filter here; a draft is previewed elsewhere** (decided 20 October 2026, Chinmay,
-        R8 blocker cause WHITE-C26, server option; CHG-R8SPN-036). CMS-101's live preview of a draft guided choice
-        calls white-label's `previewGuidedChoice` with the draft answers, which runs this operation's own answer
-        filter (the same code: age ranges, certification, swimmer, segment tags) over the venue's published
+        R8 blocker cause WHITE-C26, server option; CHG-R8SPN-036). CMS-101''s live preview of a draft guided choice
+        calls white-label''s `previewGuidedChoice` with the draft answers, which runs this operation''s own answer
+        filter (the same code: age ranges, certification, swimmer, segment tags) over the venue''s published
         products and returns what is left for each combination; the browser never re-implements the filter.
 
         **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
