@@ -43,4 +43,13 @@ status: open
 notes: 'Prevention: check-business-rules BR-LOGIN-ATTEMPTS (the four answers carry their fields; the per-username
   count is stated), failing on r7 (origin/main 807a1c24) and passing after. check-approved-ui 0 new: PTR-001''s visible
   content is unchanged. check-contract-compat: additive (a response shape gaining fields). Where the per-username
-  counters live is the backend''s (the contract says only that an unknown username has its own).'
+  counters live is the backend''s (the contract says only that an unknown username has its own).
+
+  **Fix round 3 (lane-H review 2 M-5, M-6; the lead''s rulings of 19 October 2026).** "Every 401" is every 401 login
+  and verifyMfaChallenge return: LoginDeniedProblem requires attemptsRemaining, and sso-sign-in-required carries the
+  count as it stands (it spends no attempt); verifyMfaChallenge''s 401 (unauthenticated, session-superseded) is
+  answered with MfaCodeInvalidProblem, the wrong codes left on the challenge in the path. The count is per submitted
+  username and per sign-in method, known or not, and an unknown username''s lock is held with its counter, per
+  method, since it has no PrincipalCredential. SessionHeldProblem says which session it describes: this person''s
+  own on another device (session-active-elsewhere), or somebody else''s on this till. BR-LOGIN-ATTEMPTS holds the
+  three new points (3 findings on 1c1af276, 0 after). check-contract-compat additive; check-approved-ui 0 new.'

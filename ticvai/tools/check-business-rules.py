@@ -60,8 +60,9 @@ And one rule per decision for the CRs of 18 October 2026 (class 9, "rules nobody
                    per legal entity, the next open period, and createPayment's two settings reads.
   BR-HOLD-LAPSE    (CR-169) a seat reservation names its hold and can be `sold`; `convertInventoryHold` moves the
                    envelope's units and states the lapsed-hold rule (unitsGone, nothing refunded automatically).
-  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) login's 401 carries attemptsRemaining, counted per
-                   submitted username known or not; its 409 says since when and on what; verifyMfaChallenge's 422 too.
+  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) every 401 of login and verifyMfaChallenge carries
+                   attemptsRemaining, counted per submitted username known or not and per sign-in method; login's
+                   409 says since when and on what; verifyMfaChallenge's 422 carries it too.
   BR-GATE-CANCEL   (CR-171, 19 October 2026; CHG-CRA-010) a cancelled gate mode change records who, when and why in
                    its own columns, leaving the scheduler's untouched.
 
@@ -423,6 +424,12 @@ def main() -> int:
          "login's 401 does not carry attemptsRemaining (LoginDeniedProblem)")
     need("BR-LOGIN-ATTEMPTS", "whether or not a principal has it" in r401,
          "login's 401 does not count attempts per submitted username, known or not")
+    # Fix round 3 (lane-H review 2 M-5): "every 401" is every 401 login and verifyMfaChallenge return, and the
+    # unknown username's counter is per sign-in method as a known one's lock is.
+    need("BR-LOGIN-ATTEMPTS", "attemptsRemaining" in ((ids.get("LoginDeniedProblem") or {}).get("allOf") or [{}, {}])[-1]
+         .get("required", []), "LoginDeniedProblem does not require attemptsRemaining (every 401 login returns)")
+    need("BR-LOGIN-ATTEMPTS", "per sign-in method" in r401,
+         "login's 401 does not count attempts per sign-in method as well as per username")
     need("BR-LOGIN-ATTEMPTS", "SessionHeldProblem" in text((lg.get("responses") or {}).get("409") or {})
          and ext("SessionHeldProblem", "openedAt") and ext("SessionHeldProblem", "deviceLabel"),
          "login's 409 does not say since when and on what (SessionHeldProblem openedAt, deviceLabel)")
@@ -432,6 +439,8 @@ def main() -> int:
     need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" in text((vm.get("responses") or {}).get("422") or {})
          and ext("MfaCodeInvalidProblem", "attemptsRemaining"),
          "verifyMfaChallenge's 422 does not carry attemptsRemaining")
+    need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" in text((vm.get("responses") or {}).get("401") or {}),
+         "verifyMfaChallenge's 401 does not carry attemptsRemaining (every 401 login and verifyMfaChallenge return)")
 
     # -------------------------------------------------------------- BR-GATE-CANCEL (ADAM CR-171; CHG-CRA-010)
     # Decided by Chinmay Parab on 19 October 2026, option B: a cancelled gate mode change records who, when and why
