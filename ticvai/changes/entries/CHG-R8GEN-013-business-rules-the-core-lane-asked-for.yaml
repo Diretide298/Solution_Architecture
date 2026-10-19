@@ -4,7 +4,7 @@ source: audit
 kind: process
 summary: 'check-business-rules holds three rules the core lane''s r8 fixes asked for: BR-APPROVAL-ROUTE (setApprovalMatrix and approveMatrixMultiLevel refuse 422 condition-not-supported; submitApprovalRequest''s 409 lists approval-no-longer-required and approval-no-approver-available), BR-GUEST-SELF-403 (a guest operation scoped to its own subject answers another''s record 404, never 403; a ratchet at 13) and BR-ALERT-RECIPIENT (reporting''s listAlerts states its recipient filter; a warning until the surface lane''s text lands).'
 decision:
-  what: 'The core lane''s report (r8 second round) requested the three rules as prevention for CHG-R8SPN-016, CHG-R8SPN-018 and CHG-R8SPN-020. BR-APPROVAL-ROUTE fails on this branch alone and passes on the core lane''s branch (checked against D:\wt8b-core at 66603b15).'
+  what: 'The core lane''s report (r8 second round) requested the three rules as prevention for CHG-R8SPN-016, CHG-R8SPN-018 and CHG-R8SPN-020. BR-APPROVAL-ROUTE fails on this branch alone and passes on the core lane''s branch (checked against D:/wt/r8b-core at 66603b15).'
   by: Chinmay
   date: '2026-10-20'
 why: 'Finding: R8 blocker cause list (core lane requests for prevention; causes APPROVALS-TENANCY-C36 and the approvals route causes under CHG-R8SPN-016, CHG-R8SPN-018, CHG-R8SPN-020).'
