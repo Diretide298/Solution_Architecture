@@ -44620,6 +44620,11 @@ components:
       - languages
       - defaultLanguage
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The row's key, set by the server; absent while the venue has saved nothing.
         languages:
           type: array
           minItems: 1
@@ -44685,6 +44690,11 @@ components:
         (`Product.nameLocalised`) for a label or name, and its description (`Product.descriptionLocalised`) for a
         description.
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The row's key, set by the server; absent while the product has saved nothing.
         productId:
           type: string
           format: uuid
@@ -44859,6 +44869,11 @@ components:
       - label
       - type
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The row's key, set by the server.
         fieldSetId:
           type: string
           format: uuid
@@ -44940,6 +44955,11 @@ components:
       - reservationOwnerFieldSetId
       - ticketOwnerFieldSetId
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The row's key, set by the server; absent while the product has saved nothing.
         productId:
           type: string
           format: uuid

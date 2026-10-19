@@ -17,7 +17,8 @@ decision:
     per venue; setProductClassification 409 product-archived and no approval; ProductAttentionReason codes
     missingVariants, missingChannels, missingPricing, missingEntitlements (shared with
     ProductLifecycleCommandCenterView.validationIssues). contracts/spine/identity.yaml: getSessionVenue says services
-    read the venue with the session.'
+    read the venue with the session. Every new table has an `id` key (CatalogueLanguageSettings, ProductChannelTexts,
+    FieldSetField, ProductOwnerFieldSets gain a read-only id), as the package''s tables do.'
   by: Chinmay
   date: '2026-10-20'
 why: 'The developer walk of the wave 1 tasks on 20 October 2026 (products module), done before the tasks go out:
