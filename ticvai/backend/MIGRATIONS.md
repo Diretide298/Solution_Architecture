@@ -117,6 +117,18 @@ column, and the DDL is right as it stands. A table gets this policy only when it
 no `venue_id`, no subject and no NOT NULL owning reference (the comment beside each call in
 `920-row-level-security.sql` says which).
 
+## The control database has no row-level security
+
+**Decided 20 October 2026** (the lead, option A of R8 blocker causes IDENTITY-C16, FOUNDATION-AI-C36 and
+APPROVALS-TENANCY-C18; CHG-R8MIG-005). The control database (ADR-0039) holds no scope tree, so there is no
+`scope_path` to write a policy against: `backend/control/920-row-level-security.sql` has policies for none of its
+tables, on purpose. It is guarded instead by **the connection**, since only the control plane's own role is granted
+on it, and by **the operation**, which checks its `PLATFORM_*` permission and, for a client-owned row (a webhook
+subscription or delivery, an API licence), that the caller's tenant is among the API client's `allowedTenantIds`
+(else 404). `api_version` and the other platform-wide tables have no owner at all. A control-database ticket's
+done-when says this instead of "under row-level security" (`tools/ticket_done.py` CONTROL_RULE). A tenant-facing
+read of a control table, when one appears, gets a `tenant_id` policy then (option B, later).
+
 ## Rules
 
 **Forward-only.** No file is ever edited after merge. A mistake is a new migration.

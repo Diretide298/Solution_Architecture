@@ -1,0 +1,43 @@
+id: CHG-R8MIG-005
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The control database has no row-level security, and says so: it holds no scope tree, only the control
+  plane''s role reaches it, and each operation checks its PLATFORM_* permission and the tenant (allowedTenantIds for a
+  client-owned row). backend/MIGRATIONS.md states the rule; a ticket that builds only control tables or operations is
+  told it in its done-when instead of "under row-level security", which no developer could meet.'
+decision:
+  what: 'R8 blocker causes IDENTITY-C16, FOUNDATION-AI-C36 and APPROVALS-TENANCY-C18, each decided option A by the lead on
+    20 October 2026 ("take the recommendation"; C18: A for r8, B later where a tenant-facing read of control appears).
+    tools/ticket_done.py control_only and CONTROL_RULE (read by build-service-docs.py and op-release.py);
+    backend/MIGRATIONS.md section "The control database has no row-level security". ADR-0039 gets the same sentence
+    from the docs owner (requested in the lane report).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), groups identity, foundation-ai and approvals-tenancy; tickets
+  27775, 27981 (SVC-PLATFORM-PUBLICAPI-7), 27997 (SVC-PLATFORM-PUBLICAPI-9), 27807 and 27995: their done-when asked for
+  row-level security on control tables that have none by design (51 of 86 control tables await a "scoping decision
+  nobody has made").'
+keys_touched:
+  operations: []
+  schemas: []
+  files:
+  - tools/ticket_done.py
+  - tools/tests/test_ticket_done_control.py
+  - backend/MIGRATIONS.md
+root_class: 'ticket text: a done-when the database design cannot meet'
+tickets:
+  started: []
+  unstarted:
+  - '27775, 27981, 27997, 27807, 27995 and every ticket that builds only control-database work: build-service-docs
+    rewrites their done-when at the next refresh.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ticket_done.py::control_only
+status: open
+notes: 'tools/tests/test_ticket_done_control.py covers both done-when kinds. A ticket mixing control and tenant work
+  keeps the general sentence (its tenant tables are under row-level security).'

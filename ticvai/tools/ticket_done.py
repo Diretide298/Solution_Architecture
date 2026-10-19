@@ -75,6 +75,50 @@ def builds_of(r, part, lineage):
 
 DONE_WHEN = re.compile(r"Done when[:,]?\s*(.+)", re.S | re.I)
 
+# **The control database has no row-level security** (ADR-0039; R8 blocker causes IDENTITY-C16, FOUNDATION-AI-C36,
+# APPROVALS-TENANCY-C18; the lead, 20 October 2026: option A; CHG-R8MIG-005). It holds no scope tree: only the control
+# plane's role reaches it, and each operation checks its PLATFORM_* permission and the tenant (an API client's
+# allowedTenantIds). A ticket that builds only control tables or operations was told "under row-level security", which
+# no developer could meet; it is told the rule that does hold.
+CONTROL_RULE = ("checked by the operation's permission and tenant check (the control database has no row-level "
+                "security: only the control plane's role reaches it, backend/MIGRATIONS.md)")
+_LINEAGE: dict | None = None
+
+
+def _lineage() -> dict:
+    global _LINEAGE
+    if _LINEAGE is None:
+        import json
+        from pathlib import Path
+        p = Path(__file__).resolve().parents[1] / "handoff" / "api-data-lineage.json"
+        try:
+            _LINEAGE = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            _LINEAGE = {}
+    return _LINEAGE
+
+
+def control_only(names, lineage: dict | None = None) -> bool:
+    """True when every artefact named is in the control database: a table `control.*`, or an operation whose
+    lineage reads and writes only `control.*` tables (stores such as `cache:` are not tables)."""
+    lin = _lineage() if lineage is None else lineage
+    seen = False
+    for n in names:
+        n = n.split("#", 1)[-1]
+        if "." in n and " " not in n:
+            if not n.startswith("control."):
+                return False
+            seen = True
+            continue
+        e = lin.get(n)
+        if not isinstance(e, dict):
+            return False
+        tables = [t for t in (e.get("reads") or []) + (e.get("writes") or []) if "." in t and ":" not in t]
+        if not tables or any(not t.startswith("control.") for t in tables):
+            return False
+        seen = True
+    return seen
+
 
 def done_when(r, part, builds):
     """What finishes this ticket, as one line every pointer carries (CHG-REL-003). The plan's own "Done when" when the
@@ -97,12 +141,15 @@ def done_when(r, part, builds):
         return ("Done when every ticket under it is done and its module test passes on the integration environment with "
                 "no open severity 1 or 2 defect (block-test-strategy).")
     if kind == "Backend" and names:
+        guard = CONTROL_RULE if control_only(names) else "under row-level security"
         return (f"Done when {named} pass their contract tests against the contract in ADAM, including every documented "
-                "error response; each reads and writes only the tables its spec lists, under row-level security; unit "
+                f"error response; each reads and writes only the tables its spec lists, {guard}; unit "
                 "tests cover its rules; and a peer in the same stack has reviewed and tested it.")
     if kind == "Database" and names:
+        guard = ("columns, keys and indexes; no row-level security, which the control database does not have "
+                 "(backend/MIGRATIONS.md)") if control_only(names) else "columns, keys, indexes, row-level security"
         return (f"Done when the migration for {named} runs forward on an empty database and on the previous release's "
-                "schema, every table matches its spec in ADAM (columns, keys, indexes, row-level security), and a peer "
+                f"schema, every table matches its spec in ADAM ({guard}), and a peer "
                 "has reviewed it.")
     if kind == "Frontend" and names:
         step = {"build": "the layout is built from the screen spec (and its wireframe once client-verified)",
