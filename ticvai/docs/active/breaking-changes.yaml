@@ -1029,3 +1029,37 @@ changes:
     tag: r8
     producer-tickets: [SVC-WHITELABEL-BOOKINGFLOWS-1, SVC-WHITELABEL-BOOKINGFLOWS-2, SVC-WHITELABEL-OVERVIEW-1, SVC-WHITELABEL-PUBLISHING-3]
     consumer-tickets: [AM-AI-P01, AM-IDENTITY-SECURITY-P09, AM-MARKETING-CRM-P01, AM-ORDERS-RESERVATIONS-P01, AM-ORDERS-RESERVATIONS-P02, AM-SEATING-MAPS-P01, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, AM-TICKETING-P01, AM-TICKETING-P02, AM-TICKETING-P08, AM-WHITE-LABEL-P08, AM-WHITE-LABEL-P09, AM-WHITE-LABEL-P13, APP-SETUP-BO-007, APP-SETUP-BO-007-REST, APP-SETUP-BO-008, APP-SETUP-BO-008-REST, TEST-AM-IDENTITY-SECURITY-P09, TEST-AM-WHITE-LABEL-P13, VM-BO-115]
+  - id: BC-386
+    contract: ai
+    operation: semanticSearch
+    operations: [semanticSearch]
+    change: "lost enum value(s)"
+    reason: 'R8 blocker ORDERS-MONEY-C37 (lead''s answer A, 20 October 2026; CHG-R8STO): the search index holds six kinds
+      and nothing indexes memberships or documents, so the request kinds lose membership and document and SearchResult.kind
+      is closed to the six. Removing a value cannot be additive; no screen sends either value.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-AI-RETRIEVAL-1]
+    consumer-tickets: [AM-AI-P06, AM-AI-P12, AM-DIGITAL-ASSETS-P13, AM-DIGITAL-ASSETS-P13-2, TEST-AM-DIGITAL-ASSETS-P13]
+  - id: BC-387
+    contract: inventory
+    operation: createStockReservation
+    operations: [listStockReservations, createStockReservation, releaseStockReservation]
+    change: "gained enum value(s) ['retailReservation']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C34 (CHG-R8STO): Retail earmarks stock through Inventory, so a stock reservation''s
+      sourceType gains retailReservation. A value added to a response enum cannot be additive.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-INVENTORY-INVENTORY-3]
+    consumer-tickets: [AM-INVENTORY-P08-2, AM-MAINTENANCE-SAFETY-P06-BLOCK-A, TEST-AM-MAINTENANCE-SAFETY-P06-BLOCK-A]
+  - id: BC-388
+    contract: marketing-crm
+    operation: awardBadge
+    operations: [awardBadge, listCustomerBadges]
+    reason: 'R8 blocker ORDERS-MONEY-C14 (CHG-R8STO): a customer badge''s sourceType (challenge, purchase, manager) and
+      status (awarded, expired, revoked) were free text; they become closed lists, as the API conventions require (section
+      4). A string becoming an enum cannot be additive. BO-826 is the only sender and stops sending status.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-MARKETING-LOYALTY-1]
+    consumer-tickets: [AM-MARKETING-CRM-P01, AM-MARKETING-CRM-P02, AM-ORDERS-RESERVATIONS-P04, AM-SETUP-CUSTOMER-MARKETING-P08, APP-SETUP-BO-826, APP-SETUP-BO-826-REST]
