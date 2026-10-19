@@ -65,6 +65,20 @@ components:
         '
       schema:
         type: string
+    TenantId:
+      name: X-Tenant-Id
+      in: header
+      required: false
+      description: '**Which tenant a call acts in, where one cell holds many tenant databases** (ADR-0038; R8 blocker fix,
+        APPROVALS-TENANCY-C44). Sent by a platform operator on the operations that open or read access into a tenant
+        (`openPlatformStaffGrant`, `listOwnPlatformStaffGrants`, `getModuleEnablement`, `setModuleEnablement`); the
+        cell opens the grant, or reads, in that tenant''s database and refuses a tenant it does not hold (`404`). The
+        cell''s address (`Tenant.cellHost`) comes from `listTenants`. A tenant''s own staff never send it: their token
+        names the tenant. Optional in the schema so an r1 client still validates; **a platform operator''s call without it
+        is `400 tenant-required`.**'
+      schema:
+        type: string
+        format: uuid
     IdempotencyKey:
       name: Idempotency-Key
       in: header

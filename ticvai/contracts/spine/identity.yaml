@@ -5381,6 +5381,7 @@ paths:
       x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Opens a platform operator's access into a tenant's data.
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -5571,6 +5572,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       - name: activeOnly
         in: query
         description: True returns only grants whose window is open now.
