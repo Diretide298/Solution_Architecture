@@ -3195,9 +3195,15 @@ paths:
       description: 'Needed for three reasons and worth naming them: the embedding model changed, the `textFields`
         changed, or incremental indexing drifted and nobody knows why.
 
-        **Builds into a shadow collection and swaps on completion.** Reindexing in place leaves the assistant
-        answering from a half-built index, which is worse than answering from a stale one — a stale answer
-        is wrong in a knowable way.
+        **Builds without exposing a half-built index** (r8 walk of ticket 27841; lead decision of 20 October 2026,
+        option A, to be confirmed with the AI lead). A tenant has one collection per embedding model holding every
+        source and every document (ADR-0049), so rebuilding one source cannot swap a whole collection. **A rebuild
+        of one source uses no shadow collection.** The new points are written into the same collection carrying a new
+        index epoch in their payload; retrieval keeps filtering on the old epoch until the rebuild is verified, then
+        the filter flips to the new epoch in one step, and the old-epoch points of that source are deleted. The reader
+        sees either the old index or the new one, never a mix. **The shadow collection and alias swap are for a change
+        of embedding model only**, which rebuilds every source. `IndexJob.shadowCollection` is therefore null for a
+        single-source rebuild. `IndexJob.shardKey` names the tenant, which ADR-0049 makes the owner of the collection.
 
         '
       tags:
@@ -18586,8 +18592,9 @@ components:
         shadowCollection:
           type: string
           nullable: true
-          description: 'A full rebuild writes here and swaps on completion. Reindexing in place leaves
-            the assistant answering from a half-built index.
+          description: 'Set only for a change of embedding model: the rebuild writes here and the alias swaps on
+            completion. Null for a one-source rebuild, which uses an index epoch in the same collection
+            (`reindexSource`).
 
             '
         shardKey:
