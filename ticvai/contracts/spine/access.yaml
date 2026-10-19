@@ -14901,6 +14901,10 @@ paths:
       description: 'Cancels a `pending` gate mode change, one `setTurnstileMode` scheduled with a future `effectiveAt`.
         An applied or already cancelled change is refused `409 not-pending`: undo an applied change with another `setTurnstileMode`.
 
+        **What it records** (ADAM CR-171, option B, decided 19 October 2026; CHG-CRA-010): `status` cancelled,
+        `cancelledByPrincipalId` the caller, `cancelledAt` now and `cancelReason` the request''s `reason`. The
+        scheduler''s `changedByPrincipalId`, `changedAt` and `reason` are left as they were.
+
         '
       tags:
       - access
@@ -21778,6 +21782,27 @@ components:
         changedAt:
           type: string
           format: date-time
+        cancelledByPrincipalId:
+          x-ticvai-references: identity.principal
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**Who cancelled the pending change** (ADAM CR-171, option B, 19 October 2026; CHG-CRA-010), set
+            by `cancelGateModeChange` from the caller. `changedByPrincipalId`, `changedAt` and `reason` stay the
+            scheduler''s.'
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When `cancelGateModeChange` cancelled it (CR-171).
+        cancelReason:
+          type: string
+          maxLength: 200
+          nullable: true
+          readOnly: true
+          description: The `reason` sent to `cancelGateModeChange` (CR-171), kept apart from the scheduler's `reason`.
         scopePath: *id001
     AccessAccessIncident:
       type: object

@@ -62,6 +62,8 @@ And one rule per decision for the CRs of 18 October 2026 (class 9, "rules nobody
                    envelope's units and states the lapsed-hold rule (unitsGone, nothing refunded automatically).
   BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) login's 401 carries attemptsRemaining, counted per
                    submitted username known or not; its 409 says since when and on what; verifyMfaChallenge's 422 too.
+  BR-GATE-CANCEL   (CR-171, 19 October 2026; CHG-CRA-010) a cancelled gate mode change records who, when and why in
+                   its own columns, leaving the scheduler's untouched.
 
 The step-up rule of `rejectShiftVariance` (CHG-RUL-014), and of `closeShift`, `acceptShiftVariance`,
 `withdrawFromDepositBox` and the 20 MFA step-ups (CHG-RUL-019, CHG-RUL-020), is held by `check-step-up.py`
@@ -431,12 +433,24 @@ def main() -> int:
          and ext("MfaCodeInvalidProblem", "attemptsRemaining"),
          "verifyMfaChallenge's 422 does not carry attemptsRemaining")
 
+    # -------------------------------------------------------------- BR-GATE-CANCEL (ADAM CR-171; CHG-CRA-010)
+    # Decided by Chinmay Parab on 19 October 2026, option B: a cancelled gate mode change records who, when and why
+    # in its own columns, and the scheduler's changedBy, changedAt and reason are left untouched.
+    adoc = load("contracts/spine/access.yaml")
+    gm = (((adoc.get("components") or {}).get("schemas") or {}).get("AccessGateModeChange") or {}).get("properties") or {}
+    for fld in ("cancelledByPrincipalId", "cancelledAt", "cancelReason"):
+        need("BR-GATE-CANCEL", fld in gm, f"AccessGateModeChange has no {fld}")
+    need("BR-GATE-CANCEL", (gm.get("cancelReason") or {}).get("maxLength") == 200,
+         "AccessGateModeChange.cancelReason is not at most 200 characters")
+    need("BR-GATE-CANCEL", "left as they were" in text(op("cancelGateModeChange")[3]),
+         "cancelGateModeChange does not leave the scheduler's columns untouched")
+
     errors["BR-PARSE"].extend(PARSE_ERRORS)
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
              "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
-             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS"]
+             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

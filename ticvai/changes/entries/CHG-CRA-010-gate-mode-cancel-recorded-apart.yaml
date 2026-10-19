@@ -1,0 +1,41 @@
+id: CHG-CRA-010
+date: '2026-10-19'
+source: cr
+kind: contract
+summary: 'A cancelled gate mode change records who cancelled it, when and why in its own columns
+  (cancelled_by_principal_id, cancelled_at, cancel_reason up to 200 characters), and cancelGateModeChange leaves the
+  scheduler''s changed_by_principal_id, changed_at and reason untouched. Additive.'
+decision:
+  what: 'ADAM CR-171, option B, decided by Chinmay Parab on 19 October 2026. contracts/spine/access.yaml:
+    AccessGateModeChange gains cancelledByPrincipalId (identity.principal), cancelledAt and cancelReason, optional and
+    server-set; cancelGateModeChange says it sets them and status cancelled and leaves the scheduler''s columns. The
+    columns come from the contract through derive-schema and derive-ddl (the next forward migration adds the three
+    columns, the CHECK on cancel_reason, the key and its index); no DDL is written by hand.'
+  by: Chinmay
+  date: '2026-10-19'
+why: 'ADAM CR-171 (Sanket Keluskar, #32455), answered 19 October 2026: cancelling a pending change had nowhere to
+  record who cancelled it except the scheduler''s own columns, which would have overwritten who scheduled it.'
+keys_touched:
+  operations: [cancelGateModeChange]
+  tables: [access.gate_mode_change]
+  schemas: [AccessGateModeChange]
+  files:
+  - contracts/spine/access.yaml
+  - tools/check-business-rules.py
+root_class: 'A-STORAGE-PROMISE: the contract promises more than its responses and storage carry (class 8)'
+tickets:
+  started: []
+  unstarted:
+  - 'cancelGateModeChange (#32455, where the CR was raised) and 8 more New tickets that link it (r7 links).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: CR-171
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Prevention: check-business-rules BR-GATE-CANCEL, failing on r7 and passing after. Database (derived at the
+  release; this branch''s derive kept in D:\wt\fix-cr-answers-1018-derived\round2): the next tenant forward migration
+  adds the three columns, gate_mode_change_cancel_reason_chk, gate_mode_change_cancelled_by_principal_id_fkey and its
+  index; a second derive writes nothing.'
