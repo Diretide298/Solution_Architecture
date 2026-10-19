@@ -476,6 +476,13 @@ paths:
   /auth/login:
     post:
       operationId: login
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
@@ -1480,6 +1487,13 @@ paths:
   /auth/select-role:
     post:
       operationId: selectRole
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P04 POS-001 Begin Shift"
@@ -2723,6 +2737,10 @@ paths:
   /auth/guest/register:
     post:
       operationId: registerGuest
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-013 Booking Confirmation"
         - "P01 WEB-016 Login / Register"
@@ -2779,6 +2797,10 @@ paths:
   /auth/guest/otp:
     post:
       operationId: requestGuestOtp
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -2853,6 +2875,10 @@ paths:
   /auth/guest/otp/verify:
     post:
       operationId: verifyGuestOtp
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -2922,6 +2948,10 @@ paths:
   /auth/guest/password:
     post:
       operationId: guestPasswordLogin
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -3021,6 +3051,10 @@ paths:
   /auth/guest/social:
     post:
       operationId: guestSocialLogin
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -3090,6 +3124,10 @@ paths:
   /auth/guest/uae-pass:
     post:
       operationId: guestUaePassLogin
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -3162,6 +3200,10 @@ paths:
   /auth/guest/session:
     get:
       operationId: getGuestSession
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -3511,6 +3553,13 @@ paths:
         format: uuid
     post:
       operationId: completeSsoAuthorization
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       x-ticvai-consumed-by:
         - "P06 EMP-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
@@ -3652,6 +3701,10 @@ paths:
   /auth/mfa/methods:
     get:
       operationId: listMfaMethods
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
@@ -3699,6 +3752,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: enrolMfaMethod
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
@@ -3804,6 +3861,10 @@ paths:
         format: uuid
     post:
       operationId: verifyMfaEnrolment
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
@@ -3876,6 +3937,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: removeMfaMethod
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P06 EMP-042 Profile"
         - "P09 ADM-699 My Account & Security"
@@ -3933,6 +3998,10 @@ paths:
   /auth/mfa/challenge:
     post:
       operationId: createMfaChallenge
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
@@ -4236,6 +4305,9 @@ paths:
       x-ticvai-permission: SESSION_FORCE_LOGOUT
       x-ticvai-step-up: pin
       x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in the X-Supervisor-Principal-Id and X-Supervisor-Pin headers is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'

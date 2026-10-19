@@ -32,7 +32,7 @@ info:
     screen that shows a maintenance, upgrade, closed or sold-out page). **When it is read:** at launch, when the
     app returns to the foreground, and when any other call answers `503`. **Which page wins, in this order:**
     `minimumAppVersion` above the running version (forced upgrade), then `isInMaintenance` (maintenance), then
-    `availability` closed, then `availability` sold out, then the normal screen: the first that holds is shown and
+    `availability` `closed`, then `availability` `soldOut`, then the normal screen: the first that holds is shown and
     the rest are not. **Platform unavailable** means the status read itself answers `503` or times out. The client
     then shows the last status and brand it kept (the read is offline-capable, so it keeps a copy) and, if it has
     none, a neutral default brand and the generic wording; it retries after `Retry-After`. **Sold out** offers

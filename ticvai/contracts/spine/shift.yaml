@@ -283,6 +283,9 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
       x-ticvai-read-via:
+      - query: tenancy#deviceRecords
+        route: in-process
+        for: 'its read of the registered device, Tenancy''s data (CHG-MOD-001; R8 lineage request)'
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
@@ -1151,6 +1154,9 @@ paths:
       x-ticvai-permission: SHIFT_REOPEN
       x-ticvai-step-up: pin
       x-ticvai-read-via:
+      - query: finance#fiscalPeriodRecords
+        route: in-process
+        for: 'the fiscal period containing the shift''s close, ledger.fiscal_period, Ledger''s data (CHG-MOD-001; R8 lineage request)'
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
@@ -1404,6 +1410,9 @@ paths:
       x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
       x-ticvai-step-up: pin
       x-ticvai-read-via:
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'what its text calls denominations: platform.denomination, Tenancy''s data (CHG-RTE-001; R8 lineage request)'
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
