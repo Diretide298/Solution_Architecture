@@ -1,0 +1,51 @@
+id: CHG-R8STO-001
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Where an operation''s text relies on "one per" something, the satellite contract now declares the key, so
+  the derived database enforces it: one index-source declaration per table (and the path id is its identity, with
+  collectionId naming the collection), one analytics provider per venue and provider, one wallet configuration
+  version number per scope, and one set of wallet funding rules per venue and wallet type; getWalletFundingRules
+  takes the wallet type and returns its ETag and first-save defaults.'
+decision:
+  what: 'R8 blocker causes FOUNDATION-AI-C08, IDENTITY-C09, APPROVALS-TENANCY-C32 and GPS-C19 (no decision needed): the
+    fix each cause proposes. Storage facts: x-ticvai-unique-together on IndexSource [table], StorefrontAnalyticsProvider
+    [venueId, provider] (nulls not distinct), WalletConfigurationVersion [scopePath, version] and WalletFundingRules
+    [scope_path, walletTypeId] (nulls not distinct); IndexSource.collectionId declared as a key to
+    ai.knowledge_collection. Operation text (the surface lane''s part, kept small): the new 409 and 422 refusals with
+    their problem types, the provider measurement-id formats (proposed, client to confirm), the credit kind mapping
+    from category (proposed, client to correct), refusal to publish with blocking findings, and the restore rule
+    (deactivate, never delete). Additive: no response field removed; derive-ddl writes the unique indexes in the next
+    forward migration.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (walk of the Sprint 1 and 2 tickets): FOUNDATION-AI-C08 (ticket 27718, gap
+  27718), IDENTITY-C09 (27777, 27885), APPROVALS-TENANCY-C32 (27816), GPS-C19 (28324). Each operation said its rows
+  were unique by a key the derived DDL did not hold, so two concurrent requests both passed the handler''s look-up.'
+keys_touched:
+  operations: [setIndexSource, setAnalyticsProvider, listAnalyticsProviders, publishWalletConfiguration,
+    restoreWalletConfigurationVersion, getWalletFundingRules]
+  schemas: [IndexSource, StorefrontAnalyticsProvider, WalletConfigurationVersion, WalletFundingRules, Wallet]
+  tables: [ai.index_source, whitelabel.analytics_provider, wallet.configuration_version, wallet.funding_rule]
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/wallet.yaml
+root_class: 'new: a uniqueness the operation text relies on with no declared key'
+tickets:
+  started: []
+  unstarted:
+  - '27718, 27777, 27885, 27816, 28324 (the walk that found the gaps); the MIG tickets of the four tables take the
+    unique indexes from the next forward migration'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'SP-DUPLICATE-409 catches an "already in use" 409 with no x-ticvai-unique. Requested of the generators lane (the
+  check''s owner): widen it to read x-ticvai-unique-together, and add a rule for an operation whose text says "one
+  per", "upsert keyed on" or "match key" with no unique key over the named fields. The wallet.funding_rule index lands
+  only after the table rename funding_rules -> funding_rule is migrated (storage-core, FOUNDATION-AI-C38).'

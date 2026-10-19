@@ -1,0 +1,50 @@
+id: CHG-R8STO-002
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Rows now store what their operation''s rule needs: an AI interaction or conversation of a guest names the
+  guest and no principal (principalId nullable, a CHECK that a staff row has a principal and a guest row a subject,
+  and a conversation exactly one owner); a conversation keeps the assistant profile it was opened under
+  (createAiConversation takes an optional profileKey, 404 when the profile is unavailable); a guest device keeps the
+  install whose sessions a revoke has not yet ended, so the retry after a 502 reaches Identity; and a customer
+  badge''s sourceType and status are closed lists.'
+decision:
+  what: 'R8 blocker causes FOUNDATION-AI-C06, WHITE-C27, IDENTITY-C23 and ORDERS-MONEY-C14 (no decision needed), as
+    each cause proposes. Storage facts: AiInteraction.principalId and AiConversation.principalId nullable;
+    x-ticvai-required-when on AiInteraction (principal for staff, subject for guest); x-ticvai-exactly-one-of
+    [principalId, subjectId] on AiConversation with a new subjectId and profileKey; GuestDevice
+    pendingSessionEndInstallationId (write-only, server-set); MarketingCustomerBadge sourceType enum challenge,
+    purchase, manager and status enum awarded, expired, revoked (expired worked out on read, revoked reserved).
+    Operation text kept small (the surface lane''s part).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (walk of the Sprint 1 and 2 tickets): FOUNDATION-AI-C06 (27711: a guest AI call
+  could not write ai.activity, principal_id NOT NULL), WHITE-C27 (27914: CMS-104 could not open the app publishing
+  guide profile), IDENTITY-C23 (27745: the retry after a 502 had lost the installationId), ORDERS-MONEY-C14 (28262:
+  badge status and sourceType had no values).'
+keys_touched:
+  operations: [createAiConversation, revokeGuestDevice, awardBadge]
+  schemas: [AiInteraction, AiConversation, GuestDevice, MarketingCustomerBadge]
+  tables: [ai.activity, ai.conversation, marketing.guest_device, marketing.customer_badge]
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'new: a rule the operation states that the stored row cannot hold'
+tickets:
+  started: []
+  unstarted:
+  - '27711, 27914, 27745, 28262 (the walk that found the gaps); the MIG tickets of the four tables take the columns and
+    CHECKs from the next forward migration'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'The two DROP NOT NULLs (ai.activity.principal_id, ai.conversation.principal_id) and the two CHECK changes on
+  marketing.customer_badge are listed in handoff/migration-review.md for the migration owner: derive-ddl writes only
+  additive statements (request to storage-core: generate a guarded DROP NOT NULL for a relaxation, as it does for a
+  retired column). Requested of the surface lane: BO-826 stops sending status and sends sourceType manager; CMS-104
+  shows its assistant as unavailable on createAiConversation 404 assistant-profile-unavailable.'

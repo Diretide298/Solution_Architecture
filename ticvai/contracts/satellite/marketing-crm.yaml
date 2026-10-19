@@ -5536,6 +5536,13 @@ paths:
         Identity does not answer, the device stays revoked and this answers `502`
         `device-sessions-not-ended`; the client calls again, which is a `204` revoke that asks Identity again.
 
+        **How the retry still reaches Identity** (R8 blocker IDENTITY-C23): the revoke clears `installationId` as
+        above but first copies it to `pendingSessionEndInstallationId`, which is kept until Identity answers.
+        On `204` from `endGuestDeviceSessions` it is cleared. On a revoked row where it is still set, a call
+        again (or a revoke of an already revoked device) asks Identity again with that value; where it is null,
+        a revoke of a revoked device is `204` with no call. A `502` is never stored as the Idempotency-Key
+        answer, so a retry with the same key runs again.
+
         '
       tags:
       - guest
@@ -16937,7 +16944,8 @@ paths:
                 $ref: '#/components/schemas/MarketingCustomerBadge'
         '409':
           x-ticvai-problem-types: [badge-already-held]
-          description: Already held and not expired
+          description: The customer already holds this badge with status `awarded` and an `expiresAt` that is null or
+            in the future (`badge-already-held`). An expired or revoked award does not block a new one.
           content:
             application/problem+json:
               schema:
@@ -20517,6 +20525,13 @@ components:
           type: string
           maxLength: 30
           nullable: true
+          enum:
+          - challenge
+          - purchase
+          - manager
+          description: 'Why the badge was awarded (R8 blocker ORDERS-MONEY-C14): `challenge` (a completed challenge,
+            `challengeId` set), `purchase` (`sourceReferenceId` the order), `manager` (awarded by hand, as BO-826
+            does).'
         sourceReferenceId:
           type: string
           format: uuid
@@ -20532,6 +20547,13 @@ components:
           readOnly: true
           type: string
           maxLength: 20
+          enum:
+          - awarded
+          - expired
+          - revoked
+          description: 'Written by the server, never sent (R8 blocker ORDERS-MONEY-C14). `awardBadge` stores
+            `awarded`. `expired` is worked out when the badge is read, from `expiresAt` in the past (no job
+            rewrites the row). `revoked` is reserved: no operation revokes a badge yet.'
     MarketingJourneyStep:
       type: object
       x-ticvai-persistence: marketing.journey_step
@@ -24577,6 +24599,16 @@ components:
           type: string
           format: date-time
           nullable: true
+        pendingSessionEndInstallationId:
+          type: string
+          format: uuid
+          nullable: true
+          writeOnly: true
+          description: 'Set only by the server (a value a client sends is ignored) and never returned (R8 blocker
+            IDENTITY-C23). The install whose guest sessions a
+            revoke has not yet ended at Identity: set from `installationId` when the device is revoked, cleared
+            when `endGuestDeviceSessions` answers `204`. While it is set the revoke is retried against Identity.
+            Not part of any unique key, so a new registration of the same phone is never blocked by it.'
     ConsentPurposeConfig:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestConsents, listCustomerPrivacyConsent, listPrivacyConsent
       x-ticvai-persistence: marketing.consent_purpose + marketing.consent_purpose_channel

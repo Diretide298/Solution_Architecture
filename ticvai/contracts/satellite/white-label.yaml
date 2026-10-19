@@ -94,6 +94,26 @@ x-ticvai-queries:
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October).
+  contentBlockRecords:
+    module: white-label
+    table: whitelabel.content_block
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.content_block rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ContentBlock'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.content_block rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface WhiteLabel implements, and asked from another
+      deployable through WhiteLabel's service route (serviceAuth). Moved from platform-ops with the table (R8 blocker
+      IDENTITY-C59): content blocks are tenant-authored content in the tenant database.
+    served: [in-process, service]
   bannerRecords:
     module: white-label
     table: whitelabel.banner
@@ -910,6 +930,11 @@ paths:
         hosting instructions. A job: answers 202, followed with `getSitePackage`. Only from a published version; the
         working draft never leaves.
 
+        **The job** (R8 blocker IDENTITY-C63): it runs in the workers host, reads the version''s
+        `whitelabel.config_version` snapshot, builds the package and stores it in the assets store; the package moves
+        `building` -> `ready` (with its download link, which expires 24 hours after it is issued) or `failed` (with
+        the reason). Nothing else is stored.
+
         '
       tags:
       - publishing
@@ -1227,10 +1252,6 @@ paths:
       operationId: listContentBlocks
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
-      x-ticvai-read-via:
-      - query: platform-ops#contentBlockRecords
-        route: in-process
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: The content blocks of a page
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
@@ -1279,9 +1300,6 @@ paths:
       - query: marketing-crm#segmentRecords
         route: in-process
         for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
-      - query: platform-ops#contentBlockRecords
-        route: in-process
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: Author a block of content
       description: 'BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose
         between things a developer had built and could not write something new.
@@ -1334,9 +1352,6 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      - query: platform-ops#contentBlockRecords
-        route: in-process
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -1521,6 +1536,13 @@ paths:
         minimum supported app version, so GST-047 can force an upgrade (`minimumAppVersion`); and the
         venue''s contact details with a sold-out or closed signal, for WEB-028 and WEB-029 (`contact`,
         `availability`). All of them are set with `setMaintenanceMode`.
+
+        **Per tenant, except each venue''s contact** (R8 blocker WHITE-C16, the lead''s answer of 20 October
+        2026). Maintenance, `availability` and the homepage layout are one per tenant in r8: a closure (a
+        weather closure, a private event) set for the site shows at every venue the guest may pick, which is a
+        known simplification, and the screens call it "the site", not "the venue". `contact` is the tenant''s
+        head-office contact. **The picked venue''s own address, phone and email** are `venues[].contact`, which
+        WEB-028 heads its page with; where a venue has none, the app shows `contact`.
 
         **And the tenant''s venues, for the guest''s venue picker (decided 28 September, audit R267)**: the
         guest picks a venue on first open of WEB-001 or GST-001, the choice is remembered on the device
@@ -3678,6 +3700,11 @@ paths:
         needs, DI-444) or a sample ticket otherwise. **Simulate, then publish** (workbook Q156, CHG-CSA-042): this is
         the simulate step.
 
+        **Where the preview is kept** (R8 blocker IDENTITY-C63): nothing is stored in a table. The rendered draft''s
+        reference is held in Redis under `cache:preview:{tenantId}:{previewId}` until `expiresAt` (its time to live),
+        and `url` is served from that entry; after it expires the link answers 404. The read that serves the link is
+        requested of the surface lane (`GET /tenant-config/preview/{previewId}`).
+
         '
       tags:
       - publishing
@@ -3868,7 +3895,12 @@ paths:
                     activates it (decided 28 September, audit R163)**: the version is validated and
                     snapshotted now, recorded with `isCurrent` false, and the job makes it current at
                     `scheduledFor`. It is validated again then; a failure leaves the current version
-                    live and is reported on the version.
+                    live and is reported on the version (`activationFailedAt`, `activationFailure`).
+                    **The job** (R8 blocker IDENTITY-C63) runs in the workers host every minute: it takes the
+                    versions whose `scheduledFor` has passed and that are not current and not failed,
+                    validates each again and makes it current, which is when `contentPublished` is emitted
+                    (CR-154); a version that fails validation keeps `isCurrent` false and records the
+                    failure.
       responses:
         '201':
           headers:
@@ -4818,7 +4850,8 @@ paths:
         CHG-GCF-005): the storefront and app tag loader reads `PublishedTenantConfig.analyticsProviders` from
         `getPublishedTenantConfig`, which needs no session, and GST-001 and WEB-001 no longer call this. This
         stays a staff read under `TENANT_CONFIGURE`; the guest audience and the optional credential stay only
-        so a client built against r1 is not broken, and a guest caller still gets the rows described above.
+        so a client built against r1 is not broken, and a guest caller still gets the rows described above,
+        carrying only the fields of `PublishedAnalyticsProvider` (the others are left out).
       tags:
       - overview
       x-ticvai-permission: TENANT_CONFIGURE
@@ -4873,11 +4906,17 @@ paths:
       x-ticvai-agreed: '29 September: matrix 22.10.29; Chinmay''s brief for the build (venue configuration: provider, measurement id, the consent category it waits on); BL-073 design §4a; shape follows setBookingFlowConfig'
       summary: Connect the storefront and app to an analytics platform
       description: >
-        **An upsert keyed on `venueId` + `provider`** (22.10.29). A null `venueId` is the tenant-wide
+        **One row per `venueId` + `provider`** (22.10.29; a database unique key, a null `venueId` counting
+        as one value). The path id is the row's identity: a PUT to an existing id replaces that row; a PUT
+        to a new id creates it, unless another row already holds the same `venueId` and `provider`, which
+        is 409 `analytics-provider-exists` (PUT to that row's id instead). A null `venueId` is the tenant-wide
         default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId`
-        is what the page tag or app SDK reports to (a GA4 `G-` id, a Tag Manager `GTM-` container, a
-        pixel id); it is public by nature, and the reporting credential is not: `reportingCredentialRef`
-        names a secret in the platform vault, is write-only and is never returned.
+        is what the page tag or app SDK reports to; it is public by nature, and the reporting credential is
+        not: `reportingCredentialRef` names a secret in the platform vault, is write-only and is never returned.
+        **`measurementId` must match its provider's format**, else 422 `measurement-id-invalid` (formats
+        proposed, client to confirm against each vendor): `googleAnalytics4` `^G-[A-Z0-9]{6,12}$`,
+        `googleTagManager` `^GTM-[A-Z0-9]{4,8}$`, `metaPixel` `^[0-9]{10,20}$`; `adobeAnalytics`, `matomo` and
+        `other` are checked for length only (1 to 100 characters).
 
         **Every provider waits on a consent category** (`consentCategory`, `analytics` unless set): it is
         not loaded, and no hit is sent, until the visitor's decision grants that category. `strictlyNecessary`
@@ -4917,6 +4956,13 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          x-ticvai-problem-types: [analytics-provider-exists]
+          description: Another row already holds this `venueId` and `provider` (`analytics-provider-exists`). Nothing is written.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [measurement-id-invalid, venue-not-active]
           description: A `measurementId` that does not match the provider's format, or a `venueId` not among the tenant's active venues
@@ -6310,10 +6356,6 @@ paths:
       operationId: updateContentBlock
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
-      x-ticvai-read-via:
-      - query: platform-ops#contentBlockRecords
-        route: in-process
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: Change a draft content block
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007).** Changes a block's `body`, `localeVariants`, `position`,
@@ -6493,8 +6535,13 @@ components:
     StorefrontAnalyticsProvider:
       type: object
       x-ticvai-persistence: whitelabel.analytics_provider
+      # One row per venue (or tenant-wide) and provider (R8 blocker IDENTITY-C09, CHG-R8STO-001).
+      x-ticvai-unique-together:
+      - [venueId, provider]
+      x-ticvai-unique-nulls: not-distinct
       description: '**One analytics platform the storefront or app reports to** (22.10.29, 29 September build). Venue
-        configuration: a null `venueId` is the tenant-wide default a venue''s own row replaces.'
+        configuration: a null `venueId` is the tenant-wide default a venue''s own row replaces. One row per `venueId`
+        and `provider`.'
       required:
       - provider
       - measurementId
@@ -6527,7 +6574,9 @@ components:
         measurementId:
           type: string
           maxLength: 100
-          description: What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id).
+          description: 'What the tag or SDK reports to. Format by provider (proposed, client to confirm): googleAnalytics4
+            `^G-[A-Z0-9]{6,12}$`, googleTagManager `^GTM-[A-Z0-9]{4,8}$`, metaPixel `^[0-9]{10,20}$`; adobeAnalytics,
+            matomo and other length only. A mismatch is 422 `measurement-id-invalid` on `setAnalyticsProvider`.'
         surfaces:
           type: array
           minItems: 1
@@ -8592,6 +8641,11 @@ components:
         the tenant''s own database, not the control plane (decided 28 September, audit R163)**: it moved
         from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.
 
+        **Links and order** (R8 blocker WHITE-C24 and IDENTITY-C60): a column''s `links` are stored with the
+        column, as one jsonb value in their array order; each column and each social link keeps its
+        `sortOrder`, which `setFooter` writes from its position in the array (0 first), and every read returns
+        `columns` and `socialLinks` ordered by it.
+
         '
       required:
       - id
@@ -8612,8 +8666,16 @@ components:
             properties:
               heading:
                 type: string
+              sortOrder:
+                type: integer
+                readOnly: true
+                description: The column's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60).
               links:
                 type: array
+                x-ticvai-persistence-column: jsonb
+                x-ticvai-persistence-kind: valueObject
+                description: The column's links in display order, stored on the column row as one value (R8 blocker
+                  WHITE-C24).
                 items:
                   type: object
                   properties:
@@ -8652,6 +8714,10 @@ components:
                 type: string
               url:
                 type: string
+              sortOrder:
+                type: integer
+                readOnly: true
+                description: The link's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60).
     AccessibilitySettings:
       type: object
       description: 'BL-065, 2.1.27. **POS and kiosk accessibility, which is a legal obligation in most
@@ -8692,7 +8758,9 @@ components:
             '
     ContentBlock:
       type: object
-      x-ticvai-persistence: control.content_block
+      # Tenant-authored content lives in the tenant database, owned by WhiteLabel (R8 blocker IDENTITY-C59, the lead's
+      # answer of 20 October 2026; as the footer moved in R163). It was control.content_block.
+      x-ticvai-persistence: whitelabel.content_block
       description: 'BL-172. **`white-label` is excellent as a configuration model and is not an authoring
         surface.** `HomepageLayout` with ordered sections, `Banner`, `PromoBlock` and `ContentPage` describe
         what a venue has chosen; **none of them lets a marketer write something new without a developer.**
@@ -8733,7 +8801,13 @@ components:
         body:
           type: object
           additionalProperties: true
-          description: Typed by `kind`, and validated against the block's own schema at save.
+          description: 'Typed by `kind`, and validated against the block''s own schema at save. **The text a
+            translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and
+            the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image
+            `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta
+            `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`,
+            `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial
+            `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated.'
         localeVariants:
           type: object
           additionalProperties: true
@@ -9010,6 +9084,13 @@ components:
                 type: string
                 maxLength: 200
                 description: The venue's name (`tenancy.OrgUnit.name`).
+              contact:
+                allOf:
+                - $ref: '#/components/schemas/VenueContact'
+                nullable: true
+                description: The venue's own contact (address, phone, email), from the venue's settings
+                  (`tenancy.VenueSettings`, read through `venueSettingsRecords`). Null when the venue has none set;
+                  the app then shows the tenant's `contact` (R8 blocker WHITE-C16).
               city:
                 type: string
                 maxLength: 120
@@ -10105,6 +10186,16 @@ components:
         `whatsOn` section**. On GST-038 (At the Venue), Food is kind `fnb` (opens GST-024), Shop is kind `retail`
         (GST-026), Services opens GST-029, Shows is `listPerformances` of the venue for today, and Map and Waits
         show in place.
+
+
+        **Where the Home overview, its quick actions and "Book a trip" come from in r8** (R8 blocker WHITE-C07, the
+        lead''s answer of 20 October 2026: option 3, nothing new stored). The `venueOverview` description is the
+        published content page its section names (`contentPageId`, read with `listPublishedContentPages`); none
+        named, the line is left out. The `quickActions` tiles are a fixed list the app shows, one per enabled
+        module (`enabledModules` of the published configuration), in the order of the approved frame; a venue does
+        not configure them in r8. "Book a trip" shows when the venue has a published booking flow of type
+        `transport` (`getPublishedBookingFlow`). Configurable tiles (a section''s own actions) come later, when the
+        client asks for them.
 
         '
       enum:
@@ -11311,6 +11402,19 @@ components:
           type: string
           format: date-time
           nullable: true
+        activationFailedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the scheduled activation of this version failed its validation again; null when it has
+            not failed (R8 blocker IDENTITY-C63). A failed version is not tried again; publish a new one.
+        activationFailure:
+          type: string
+          maxLength: 2000
+          nullable: true
+          readOnly: true
+          description: Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63).
         contentHash:
           type: string
         pendingBuildTimeChanges:

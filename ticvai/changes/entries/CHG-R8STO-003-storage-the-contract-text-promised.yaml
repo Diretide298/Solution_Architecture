@@ -1,0 +1,60 @@
+id: CHG-R8STO-003
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'What a satellite operation promised to store now has a column or table the DDL derives: the tenant''s
+  translation glossary on the AI policy, a translation job table and the draft columns on ai.proposed_action, a
+  search kind per index source, the extracted text of an uploaded document on the asset, the previous file of a
+  replaced asset on its version row, footer column links and the order of footer columns and social links, a
+  receipt barcode, cashier and override reason on a retail sale, a droppable flag on merchandise, the target tier of
+  a cell job, and the node a knowledge collection or document is written at.'
+decision:
+  what: 'R8 blocker causes FOUNDATION-AI-C05 (answer A: glossary on ai.policy), FOUNDATION-AI-C40, ORDERS-MONEY-C37
+    (answer A: membership and document dropped as search kinds), ORDERS-MONEY-C19 item 4, ORDERS-MONEY-C29,
+    WHITE-C24 with IDENTITY-C60 (one answer: links as jsonb on the column row, sortOrder on columns and social links),
+    APPROVALS-TENANCY-C34, APPROVALS-TENANCY-C19 (answer A, jurisdiction list from the client) and ORDERS-MONEY-C36,
+    each as its cause proposes. Additive columns and two new tables (ai.translation_job, and with CHG-R8STO-004
+    whitelabel.content_block); the operation text that states each rule is kept small (the surface lane''s part).
+    Breaking and needing the lead''s entries: the search-kind enum (two values removed, SearchResult.kind closed),
+    StockReservationSourceType gaining retailReservation, UploadRefusedProblem.refusedReason gaining
+    assetNotReplaceable.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (walk of the Sprint 1 and 2 tickets): FOUNDATION-AI-C05 and C40 (27713),
+  ORDERS-MONEY-C37 and C36 (27841), ORDERS-MONEY-C19 (27841, 28231, 28355), ORDERS-MONEY-C29 (27836), WHITE-C24
+  (27905), IDENTITY-C60 (27782), APPROVALS-TENANCY-C34 (27820, 27821, 27823, 27824), APPROVALS-TENANCY-C19 (27995).
+  Each operation described data the derived database had no column or table for.'
+keys_touched:
+  operations: [proposeTranslations, getTranslationProposals, semanticSearch, setIndexSource, ingestKnowledgeDocument,
+    createKnowledgeCollection, deleteMediaAsset, replaceMediaAsset, setFooter, collectShopAndDrop, reserveMerchandise,
+    createMerchandise, updateMerchandise, updateCellTier]
+  schemas: [AiPolicy, ProposedAction, TranslationJob, IndexSource, SearchResult, KnowledgeCollection, KnowledgeDocument,
+    MediaAsset, MediaUsage, MediaAssetVersion, UploadRefusedProblem, FooterConfig, RetailSale, MerchandiseItem,
+    CreateMerchandiseRequest, ShopAndDrop, StockReservationSourceType, CellJob]
+  tables: [ai.policy, ai.translation_job, ai.proposed_action, ai.index_source, assets.media_asset,
+    assets.asset_version, whitelabel.footer_config_column, whitelabel.footer_config_social_link, retail.sale,
+    retail.sale_line, retail.merchandise, control.cell_job]
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/subscription.yaml
+root_class: 'new: a rule the operation states that the stored row cannot hold'
+tickets:
+  started: []
+  unstarted:
+  - '27713, 27841, 28231, 28355, 27836, 27905, 27782, 27820, 27821, 27823, 27824, 27995 (the walk that found the
+    gaps); the MIG tickets of the tables named take the columns from the next forward migration'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'SP-ARRAY-NOWHERE already catches an array with no column; the class here is a value the text names with no
+  field. Requested of the generators lane: a rule that a description saying "stores", "kept on" or "recorded on" a
+  named column finds that column in the schema reference.'

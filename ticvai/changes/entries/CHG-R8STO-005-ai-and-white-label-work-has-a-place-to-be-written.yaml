@@ -1,0 +1,50 @@
+id: CHG-R8STO-005
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Work the AI and white-label contracts describe now has somewhere to be written: AI events go to an AI
+  outbox in the tenant database (with its own per-aggregate sequence), each tenant''s Qdrant collections are recorded
+  in ai.vector_store by the consumers of tenant.provisioned and tenant.terminated, a venue''s ready-made day plans are
+  rows of venuemap.visit_plan_preset seeded with the six built-in ones, the decision record states its hash chain
+  with a hash version and override annotations, a configuration version records why its scheduled activation
+  failed, and the starting-pattern packs are files in the AI image (no table).'
+decision:
+  what: 'R8 blocker causes FOUNDATION-AI-C41 (answer A: ai.outbox), FOUNDATION-AI-C43, GPS-C21 (answer B: a table,
+    the six as seed), FOUNDATION-AI-C33 (answer A: governed by capability risk class, no column), FOUNDATION-AI-C54
+    (answer B: files in the image) and IDENTITY-C63 (storage part), as each cause and answer says. New tables
+    ai.outbox, ai.outbox_sequence, ai.vector_store, venuemap.visit_plan_preset; new columns hash_version on
+    ai.decision_record and activation_failed_at, activation_failure on whitelabel.config_version. The events,
+    operations, state models and screens these need are other lanes'' (requests in the lane report).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (walk of the Sprint 1 and 2 tickets): FOUNDATION-AI-C41 (27717 and every ai.*
+  event emitter), FOUNDATION-AI-C43 (27720), GPS-C21 (28160, 28701, 28200), FOUNDATION-AI-C33 (27711, 27714),
+  FOUNDATION-AI-C54 (27723), IDENTITY-C63 (27778, 27779); the lead''s answers of 20 October 2026.'
+keys_touched:
+  operations: [pauseAiCapability, overrideAiDecision, publishTenantConfig, createPreview, exportSitePackage,
+    setAiVenueSettings]
+  schemas: [AiOutboxEntry, AiOutboxSequence, AiVectorStore, VisitPlanPreset, AiDecisionRecord, AiVenueSettings,
+    ConfigVersion]
+  tables: [ai.outbox, ai.outbox_sequence, ai.vector_store, venuemap.visit_plan_preset, ai.decision_record,
+    whitelabel.config_version]
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/white-label.yaml
+root_class: 'new: a rule the operation states that the stored row cannot hold'
+tickets:
+  started: []
+  unstarted:
+  - '27717, 27720, 28160, 28701, 28200, 27711, 27714, 27723, 27778, 27779 (the walk that found the gaps)'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'The ADR-0058 amendment (the relay drains ai.outbox), ADR-0051 (packs in the image), the AI system design''s
+  hash-chain subsection, the events tenant.provisioned and tenant.terminated, the planner-options and preset
+  operations and the preview read are requested of the surface lane; backend/MIGRATIONS.md''s kernel list
+  (ai.outbox) of storage-core.'
