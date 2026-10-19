@@ -83,6 +83,12 @@ The numbering:
 | V0100 to V0999 | derive-ddl's frozen-mode files in `backend/<db>/` (`V<nnnn>__after_r1_<yyyymmdd>.sql`). The three written against the old r1 (V0100-V0102, 2-3 Oct) were deleted on 6 Oct (CHG-SQL-001): the fresh r1 baseline already holds them | derive-ddl, one number per run |
 | V1000 upwards | every later forward migration (VM-MIG-*, MIG-<SCHEMA>-<n>), in build order | the plan, kept once planned |
 
+V0107 (`names_after_r1`) is derive-ddl's second file of a run: guarded blocks that bring the r1 names to the ones
+the contracts use (column, key and index renames, the keys declared since r1, the indexes no longer generated),
+each copied by the ticket of the table it names; the four renames V0104 already uses run earlier, in V0103a
+(`names_early_after_r1`), whose letter sorts it after V0103 and before V0104 by file name, and V0107's blocks for
+those columns then find them renamed and do nothing (CHG-R8MIG-001, CHG-R8MIG-003).
+
 **A number is never reused and never renumbered.** A forward migration keeps the number it was first
 planned with on every later refresh (`build-service-docs.py --renumber-migrations` drops that only
 before a first push); the frozen V01nn files are never renumbered. A V01nn change to a table that no

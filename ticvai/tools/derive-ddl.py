@@ -116,8 +116,9 @@ OUT = ROOT / "backend"
 REVIEW = ROOT / "handoff" / "migration-review.md"
 # **A forward migration: written after r1, never regenerated.** `V` sorts after every digit, so
 # provision-tenant.sh and the initdb pass, which apply `<area>/*.sql` in name order, run these after the
-# baseline's 930 file.
-FORWARD_FILE = re.compile(r"^V(\d+)__[\w.-]+\.sql$")
+# baseline's 930 file. A letter after the number (`V0103a`) is a file that has to run between two frozen ones: it
+# sorts after `V0103__` (`_` < `a`) and before `V0104` by name, the order SqlMigrationRunner applies (R8-MIG-001).
+FORWARD_FILE = re.compile(r"^V(\d+)[a-z]?__[\w.-]+\.sql$")
 FORWARD_FIRST = 100
 
 # **The one schema that is a database.** ADR-0039 took `control` out of the tenant template,
@@ -1862,8 +1863,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
             name = path.rsplit("/", 1)[-1]
             if path.endswith(".sql") and not FORWARD_FILE.match(name):
                 old.add_file((show(commit, path) or b"").decode("utf-8"))
-        for fwd in sorted((OUT / area_dir).glob("V*.sql"), key=lambda p: int(FORWARD_FILE.match(p.name).group(1))
-                          if FORWARD_FILE.match(p.name) else 0):
+        for fwd in sorted((OUT / area_dir).glob("V*.sql"), key=lambda p: p.name):   # the order a database applies them: by name
             if FORWARD_FILE.match(fwd.name):
                 text = fwd.read_text(encoding="utf-8")
                 old.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", text, maxsplit=1, flags=re.M)[0])
@@ -1894,6 +1894,42 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         written.append((dest, p))
         if apply:
             dest.write_text(ddl_forward.render(p, version, baseline, stamp), encoding="utf-8")
+    # **The second file: the names** (R8-MIG-001). It takes the next number after the additive file, or the same
+    # number when nothing additive is due, and is one number for both databases like the first.
+    recon_n = version_n + (1 if any(p.statements for p in plans) else 0)
+    recon_version = f"V{recon_n:04d}"
+    for p in plans:
+        if not p.recon:
+            continue
+        # **The renames a frozen file already needs go in a file that sorts before it** (R8-MIG-001, CHG-R8MIG-003):
+        # V0104 applies row-level security on four columns by their new names, so a fresh database stopped there.
+        # The file takes the number before the first frozen file that needs one and the next free letter (V0103a
+        # for V0104), which sorts between the two by name; a number of its own would be a number already taken
+        # (V01035 reads as 1035, the plan's V1035__fnb.sql). This run's own additive file counts as frozen too.
+        frozen = {x.name: x.read_text(encoding="utf-8") for x in (OUT / p.area).glob("V*.sql")
+                  if FORWARD_FILE.match(x.name) and "__names_" not in x.name}
+        frozen.update({f"{version}__after_{safe_tag}_{stamp}.sql": ddl_forward.render(q, version, baseline, stamp)
+                       for q in plans if q.area == p.area and q.statements})
+        early, rest, first = ddl_forward.split_early(p, frozen)
+        if early[0]:
+            import dataclasses as _dc
+            taken = {x.name.split("__", 1)[0] for x in (OUT / p.area).glob("V*.sql")}
+            ev = ddl_forward.early_version(first, taken)
+            ep = _dc.replace(p, recon=early[0], recon_rollback=early[1],
+                             recon_counts={"renames": len(early[0]), "keys": 0, "indexes": 0})
+            edest = OUT / p.area / f"{ev}__names_early_after_{safe_tag}_{stamp}.sql"
+            written.append((edest, ep))
+            if apply:
+                edest.write_text(ddl_forward.render_recon(ep, ev, baseline, stamp, before=first, rest=recon_version),
+                                 encoding="utf-8")
+            p.recon, p.recon_rollback = rest
+            p.recon_counts["renames"] -= len(early[0])
+            if not p.recon:
+                continue
+        dest = OUT / p.area / f"{recon_version}__names_after_{safe_tag}_{stamp}.sql"
+        written.append((dest, p))
+        if apply:
+            dest.write_text(ddl_forward.render_recon(p, recon_version, baseline, stamp), encoding="utf-8")
     review = ddl_forward.render_review(plans, baseline, stamp, extra)
     if apply:
         for name, text in files.items():
@@ -1907,6 +1943,11 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     print(f"  FROZEN at {baseline}: the baseline files under backend/ are not rewritten")
     for dest, p in written:
         c = p.counts
+        if "__names_" in dest.name:
+            r = p.recon_counts
+            print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {r['renames']} column rename(s), "
+                  f"{r['keys']} key(s), {r['indexes']} index(es)" + ("" if apply else " (not written, pass --apply)"))
+            continue
         print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {c['tables']} table(s), "
               f"{c['columns']} column(s), {c['indexes']} index(es), {c['other']} other"
               + (f", {c['policies']} row-level security polic(ies) re-applied" if c.get("policies") else "")

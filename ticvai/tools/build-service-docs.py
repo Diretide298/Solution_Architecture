@@ -448,8 +448,9 @@ def state_facts(o: str, x: dict, models: dict, by_op: dict) -> tuple[list[str], 
 
 # ---- DDL to migrations --------------------------------------------------------------------------
 
-# A forward migration derive-ddl writes after r1 (`V0100__after_r1_20261002.sql`); the same pattern as derive-ddl's.
-FORWARD_FILE = re.compile(r"^V(\d{4})__[\w.-]+\.sql$")
+# A forward migration derive-ddl writes after r1 (`V0100__after_r1_20261002.sql`); the same pattern as derive-ddl's,
+# including a letter after the number for a file that runs between two frozen ones (`V0103a__`, CHG-R8MIG-003).
+FORWARD_FILE = re.compile(r"^V(\d{4})[a-z]?__[\w.-]+\.sql$")
 # The row-level policy each `platform.apply_<kind>_rls` gives a table (backend/<db>/920-row-level-security.sql), as the
 # documents name it (CHG-TBF-004). **`tenant` is not a missing tenant_id**: a tenant database holds one tenant
 # (ADR-0038), so the tenant-root policy is platform.tenant_root_in_scope() and needs no tenant column.
@@ -531,7 +532,7 @@ def read_ddl() -> dict[str, dict]:
         # access.hardware_certification ...) out of every migration ticket although operations read and write
         # them; their columns added after r1 were missing from the counts as well.
         fwd = sorted((p for p in (ROOT / "backend" / db).glob("V*.sql") if FORWARD_FILE.match(p.name)),
-                     key=lambda p: int(FORWARD_FILE.match(p.name).group(1)))
+                     key=lambda p: p.name)   # the order a database applies them: by name (V0103a after V0103)
         for f in sorted((ROOT / "backend" / db).glob("010-*.sql")) + fwd:
             name, cols_ = None, []
             for line in f.read_text(encoding="utf-8").splitlines():
@@ -560,8 +561,11 @@ def read_ddl() -> dict[str, dict]:
                 if name and m:
                     cols_.append((m.group(1), m.group(2).rstrip(",")))
         policy = {}
+        # **The names file is not part of the build order** (R8-MIG-001): its keys are added NOT VALID, guarded, and
+        # only when both tables are there, so they never make one migration wait for another. Read as edges they
+        # renumbered V0006-V0034, which developers have delivered.
         for f in [ROOT / "backend" / db / "900-foreign-keys.sql",
-                  ROOT / "backend" / db / "920-row-level-security.sql"] + fwd:
+                  ROOT / "backend" / db / "920-row-level-security.sql"] + [x for x in fwd if "__names_" not in x.name]:
             if not f.exists():
                 continue
             text = f.read_text(encoding="utf-8").replace('"', "")
@@ -4251,7 +4255,8 @@ def main() -> int:
         if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
             src_ = ([own_src_[t_["key"]]] if t_["key"] in own_src_ and "Source DDL:" not in (t_["description"] or "")
                     else [])
-            ar1_ = [ticket_done.after_r1_sentence(rel_, ch_) for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
+            ar1_ = [(ticket_done.names_sentence if "__names_" in rel_ else ticket_done.after_r1_sentence)(rel_, ch_)
+                    for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
             add_ = [w_ for w_ in (src_ + ar1_ + [ticket_done.MIGRATION_WORDING]
                                   + ([base_words_] if t_["key"] == "MIG-BASELINE" else []))
                     if w_ not in (t_["description"] or "")]
