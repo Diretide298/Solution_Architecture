@@ -982,7 +982,11 @@ export function databaseTicket(wp, touches) {
     const constraints = [...new Set([...description.matchAll(/\bas\s+(\w+_fkey)\b/g)].map((m) => m[1]))];
     return { kind: 'foreign-keys', migration, tables: [], constraints, database: database ?? 'tenant' };
   }
-  return { kind: 'tables', migration, tables, database };
+  // A forward migration (V1000 and later) also owns the keys that point into its tables from tables
+  // made before it: no cross-schema keys ticket comes after it to add them (promotions.voucher's
+  // voucher_batch_id_fkey: voucher is made in V1017, voucher_batch in V1114).
+  const forward = Number(/^V(\d+)/i.exec(migration)?.[1] ?? 0) >= 1000;
+  return { kind: 'tables', migration, tables, database, ...(forward ? { forward: true } : {}) };
 }
 
 /** The table a package statement makes or changes, or null for one that is not about a table. */
@@ -1039,6 +1043,7 @@ export function ticketStatements(files, ticket) {
       }
       const target = statementTarget(sql);
       if (target && want.has(target)) out.push({ file, sql, ...(guard ? { guard } : {}) });
+      else if (ticket.forward && guard && want.has(guard.references)) out.push({ file, sql, guard: { ...guard, incoming: true } });
     }
   }
   // An after-r1 helper goes with a table only when one of the table's statements calls it; the
@@ -1168,17 +1173,19 @@ function databaseSection(db, key) {
     + `node .claude/scripts/db-ticket.mjs ${key}\n`
     + '```\n\n'
     + 'It applies only this file to a copy of the database at the previous state, then applies it a second time '
-    + '(not recorded), which must succeed and change nothing. It applies the package\'s own statements to another '
-    + 'copy and compares the two: every table, column, constraint, index, policy, function and type must be the same, '
-    + 'and nothing outside this ticket may change. **MATCH is the evidence for done**: quote its result lines in the '
-    + 'comment. Anything else names what differs; fix the file and run it again. A foreign key "left for a later '
-    + 'migration" is not a difference.\n\n'
+    + '(not recorded), which must succeed and change nothing, so every statement must be safe to run twice. It '
+    + 'applies the package\'s own statements to another copy and compares the two: every table, column, constraint, '
+    + 'index, policy, function, type, privilege, owner and comment must be the same, and nothing outside this ticket '
+    + 'may change, rows included. **MATCH is the evidence for done**: quote its result lines in the comment. Anything '
+    + 'else names what differs; fix the file and run it again. A foreign key "left for a later migration" is not a '
+    + 'difference. The first run can take minutes (it builds a template of the earlier files): give the command a '
+    + 'timeout of 10 minutes.\n\n'
     + '**This replaces older instructions for a [DB] ticket**: the "empty database" or "previous release\'s schema" '
-    + 'line in the ticket\'s Done when, and any local CLAUDE.md, `/ticket` or `/done` that says to rebuild every '
-    + 'migration or run `dotnet build` and `dotnet test`. Do not rebuild the other migrations, and do not run dotnet '
-    + 'unless this ticket changes C#. Before opening the merge request, run '
-    + `\`node .claude/scripts/db-ticket.mjs --full ${db.databases[0]}\` once: every migration from an empty database, `
-    + 'applied twice.\n\n'
+    + 'line in the ticket\'s Done when, and any local CLAUDE.md, `/ticket`, `/done`, `project-bible/setup/backend-patterns.md` '
+    + 'or `project-bible/setup/quickstart.md` that says to rebuild every migration or run `dotnet build` and `dotnet test`. '
+    + 'Do not rebuild the other migrations, and do not run dotnet unless this ticket changes C#. Before opening the merge '
+    + `request, run ${db.databases.map((d) => `\`node .claude/scripts/db-ticket.mjs --full ${d}\``).join(' and ')} once: `
+    + 'every migration applied once, in order, to an empty database, as SqlMigrationRunner does.\n\n'
     + 'No `.claude/scripts/db-ticket.mjs` in this folder? Run ADAM\'s setup on it again: it adds the files that '
     + 'are missing and changes nothing else.\n';
   if (db.absent.length) {
