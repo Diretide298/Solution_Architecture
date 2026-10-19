@@ -1451,10 +1451,16 @@ paths:
         the platform provisions for attribution; nobody types it, and this refuses it with 409
         `provider-managed-by-ticvai`.
 
+        **Platform staff only, as `setAiProvider`** (r8 walk of ticket 27711; lead decision of 20 October 2026,
+        option A: no tenant self-service in Block A). The key is stored by platform staff on ADM-037 holding
+        `PLATFORM_TENANT_MANAGE`, read from the operator''s platform token, with a platform-staff grant into the
+        tenant open (`openPlatformStaffGrant`). Without that grant it refuses `403 platform-grant-required`. **A
+        tenant''s own staff are refused whatever they hold**, `AI_CONFIGURE` included.
+
         '
       tags:
       - ai
-      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1500,6 +1506,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiProvider'
+        '403':
+          description: The caller is a tenant's own staff, or platform staff with no grant into this tenant open (`platform-grant-required`). Nothing is stored.
+          x-ticvai-problem-types:
+          - platform-grant-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: The provider is TICVAI-managed; its key is provisioned by the platform (`provider-managed-by-ticvai`).
           x-ticvai-problem-types:
