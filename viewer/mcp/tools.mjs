@@ -606,17 +606,17 @@ async function changesFor(client, key) {
 // **Why the connector writes it** (Chinmay, 20 October 2026). A [DB] ticket's agent rebuilt every
 // migration from an empty database, reasoned about the effect by itself and ran the whole dotnet
 // suite, on every ticket. The decided way: apply only the ticket's file to a copy of the database at
-// the previous state, and compare the tables with their end state in the package. That end state is
-// this file: columns, types, nullability, keys, indexes, row-level security and partitioning, read
-// from the package's derived DDL (backend/<database>/: the 010 file that creates each table, then
-// 900 keys, 910 indexes, 920 row-level security, 930 partitions and the V01nn after-r1 files, in the
-// order derive-ddl writes them). `.claude/scripts/db-ticket.mjs` in the project folder compares a
-// database with it; normalising both sides to one spelling (types, defaults, index keys) is that
-// script's job, so this keeps the DDL's own words.
+// the previous state, and compare it with the package. expected-schema.json carries two things from
+// the package's derived DDL (backend/<database>/: the 010 file that creates each table, then 900
+// keys, 910 indexes, 920 row-level security, 930 partitions and the V01nn after-r1 files):
+//   - the package statements that make the ticket's tables, in package order. The project's
+//     `.claude/scripts/db-ticket.mjs` applies them to a second copy and lets PostgreSQL compare the
+//     two databases whole (review of 20 October: a parsed shape passed a changed CHECK body, a changed
+//     index WHERE and a weakened policy, and said nothing about other tables);
+//   - the tables' shape as parsed here, for the person and the agent to read.
 //
 // The parser reads the subset of DDL derive-ddl writes and says what it did not understand
-// (`notModelled`) instead of guessing. `db-ticket-check.mjs` holds it to the real thing: the whole
-// package applied to PostgreSQL 16 and every table compared, with no difference allowed.
+// (`notModelled`) instead of guessing. `db-ticket-check.mjs --package` holds both to the real thing.
 
 /** Statements of a SQL file: comments dropped, strings and dollar-quoted bodies kept whole. */
 export function sqlStatements(text) {
@@ -956,45 +956,127 @@ export function schemaModel(files) {
   return { tables: model, notModelled };
 }
 
+
 /**
  * A [DB] ticket's migration: the numbered file its subject names (`V0027__access.sql`), the
- * database it is in, and the tables it links. Null for a ticket that is not one - a [BE] ticket
- * that only reads tables, or a [DB] task with no migration file (monthly partitions).
+ * database it is in, the tables it links, and what kind of migration it is:
+ *   tables        creates or changes the tables it links (nearly all of them);
+ *   baseline      V0001: schemas, extensions, the register and the helper functions, in both databases;
+ *   foreign-keys  the cross-schema keys added last; the constraint names come from the description.
+ * Null for a ticket that is not a [DB] migration - a [BE] ticket that only reads tables, or a [DB]
+ * task with no migration file (monthly partitions).
  */
 export function databaseTicket(wp, touches) {
   const tables = [...new Set((touches ?? []).filter((t) => t.kind === 'table').map((t) => String(t.id)))];
   const subject = String(wp?.subject ?? '');
+  const description = String(wp?.description ?? '');
   const migration = /\b(V\d{4,}[A-Za-z]?__[\w.-]+?\.sql)\b/.exec(subject)?.[1]
-    ?? /\b(V\d{4,}[A-Za-z]?__[\w.-]+?\.sql)\b/.exec(String(wp?.description ?? ''))?.[1];
-  if (!tables.length || !migration || !/^\s*\[DB\]/i.test(subject)) return null;
-  const database = /\bcontrol database\b/i.test(String(wp?.description ?? '')) ? 'control'
-    : /\btenant database\b/i.test(String(wp?.description ?? '')) ? 'tenant' : null;
-  return { migration, tables, database };
+    ?? /\b(V\d{4,}[A-Za-z]?__[\w.-]+?\.sql)\b/.exec(description)?.[1];
+  if (!migration || !/^\s*\[DB\]/i.test(subject)) return null;
+  const database = /\bcontrol database\b/i.test(description) ? 'control'
+    : /\btenant database\b/i.test(description) ? 'tenant' : null;
+  if (/^V0*1__/i.test(migration) || /\bbaseline\b/i.test(migration)) {
+    return { kind: 'baseline', migration, tables, database: null };
+  }
+  if (/foreign.?keys/i.test(migration)) {
+    const constraints = [...new Set([...description.matchAll(/\bas\s+(\w+_fkey)\b/g)].map((m) => m[1]))];
+    return { kind: 'foreign-keys', migration, tables: [], constraints, database: database ?? 'tenant' };
+  }
+  return { kind: 'tables', migration, tables, database };
 }
 
-/** The expected-schema.json body for `tables`, from a model of their database. */
-export function expectedSchema(model, tables, { database, migration, sources = [], release = null } = {}) {
+/** The table a package statement makes or changes, or null for one that is not about a table. */
+export function statementTarget(stmt) {
+  const s = String(stmt);
+  let m;
+  if ((m = /^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w".]+)\s+PARTITION\s+OF\s+([\w".]+)\s+DEFAULT\b/i.exec(s))) return ident(m[2]);
+  if (/^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[\w".]+\s+PARTITION\s+OF\b/i.test(s)) return null; // a month: depends on the day
+  if ((m = /^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w".]+)/i.exec(s))) return ident(m[1]);
+  if ((m = /^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)/i.exec(s))) return ident(m[1]);
+  if ((m = /^CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?(?:(?!ON\s)[\w"]+\s+)?ON\s+(?:ONLY\s+)?([\w".]+)/i.exec(s))) return ident(m[1]);
+  if ((m = /^SELECT\s+platform\.apply_\w+?_rls\s*\(\s*'([\w".]+)'/i.exec(s))) return ident(m[1]);
+  if ((m = /^(?:CREATE|DROP)\s+POLICY\s+(?:IF\s+EXISTS\s+)?[\w"]+\s+ON\s+([\w".]+)/i.exec(s))) return ident(m[1]);
+  return null;
+}
+
+/** A foreign key statement's guard: the script applies it only when both tables exist and the key does not. */
+function keyGuard(stmt) {
+  const m = /^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)\s+ADD\s+CONSTRAINT\s+([\w"]+)\s+FOREIGN\s+KEY\s*\(([^)]*)\)\s*REFERENCES\s+([\w".]+)/i.exec(stmt);
+  if (!m) return null;
+  return { table: ident(m[1]), constraint: ident(m[2]), columns: m[3].split(',').map(ident), references: ident(m[4]) };
+}
+
+/**
+ * The package statements a ticket's file must reproduce, in the order the package applies them.
+ * `files` is [{ name, text }] for one database. The script applies these to a copy of the previous
+ * state and lets PostgreSQL say what the result is, so nothing here has to normalise SQL.
+ */
+export function ticketStatements(files, ticket) {
+  const ordered = [...files].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  const want = new Set(ticket.tables.map(ident));
+  const keys = new Set((ticket.constraints ?? []).map(ident));
+  const out = [];
+  const helpers = []; // after-r1 functions, kept in place until we know whether a picked statement calls one
+  for (const { name: file, text } of ordered) {
+    for (const sql of sqlStatements(text)) {
+      const fn = /^CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+([\w".]+)/i.exec(sql)?.[1];
+      if (ticket.kind === 'baseline') {
+        // 000-002 whole; the helper functions every later migration calls: those at the top of 920
+        // and 930, and any an after-r1 file adds (V0102 adds platform.apply_append_audit_rls).
+        if (/^00[0-2]-/.test(file) || (fn && /^(9[23]0-|V\d)/.test(file))) out.push({ file, sql });
+        continue;
+      }
+      const guard = keyGuard(sql);
+      if (ticket.kind === 'foreign-keys') {
+        if (guard && keys.has(guard.constraint)) out.push({ file, sql, guard });
+        continue;
+      }
+      if (fn && /^V\d/.test(file)) {
+        const entry = { file, sql, helper: ident(fn) };
+        helpers.push(entry);
+        out.push(entry);
+        continue;
+      }
+      const target = statementTarget(sql);
+      if (target && want.has(target)) out.push({ file, sql, ...(guard ? { guard } : {}) });
+    }
+  }
+  // An after-r1 helper goes with a table only when one of the table's statements calls it; the
+  // baseline carries it otherwise.
+  const called = (h) => out.some((s) => !s.helper && s.sql.toLowerCase().includes(`${h.helper}(`));
+  return out.filter((s) => !s.helper || called(s)).map(({ helper: _h, ...s }) => s);
+}
+
+/** One database's check for expected-schema.json: the tables' shape and the statements behind it. */
+export function expectedCheck(model, ticket, statements, { database, sources = [] } = {}) {
   const out = {};
   const absent = [];
-  for (const name of tables) {
+  for (const name of ticket.tables) {
     const t = model.tables.get(ident(name));
     if (!t) { absent.push(name); continue; }
     const { name: _n, ...shape } = t;
     out[t.name] = shape;
   }
   const touched = new Set(Object.keys(out));
+  const keysFound = new Set(statements.map((s) => s.guard?.constraint).filter(Boolean));
+  const keysMissing = (ticket.constraints ?? []).filter((c) => !keysFound.has(ident(c)));
   return {
-    about: 'The end state of this ticket\'s tables, from the package DDL. Compared with a database by '
-      + 'node .claude/scripts/db-ticket.mjs <ticket>. Written by adam_pull; do not edit.',
     database,
-    migration,
-    ...(release ? { release } : {}),
+    migration: ticket.migration,
+    kind: ticket.kind,
     sources,
     tables: out,
+    statements,
     ...(absent.length ? { notInPackageDdl: absent } : {}),
+    ...(keysMissing.length ? { keysNotInPackageDdl: keysMissing } : {}),
     ...(model.notModelled.some((n) => touched.has(n.table))
       ? { notModelled: model.notModelled.filter((n) => touched.has(n.table)) } : {}),
   };
+}
+
+/** Kept for the parser's own check: the shape of `tables` alone, as expected-schema.json had it. */
+export function expectedSchema(model, tables, { database, migration } = {}) {
+  return expectedCheck(model, { kind: 'tables', migration, tables }, [], { database });
 }
 
 // Package files are the same for every ticket in one pull of a whole board; held for a minute.
@@ -1003,45 +1085,67 @@ async function packageText(client, file) {
   const hit = ddlCache.get(file);
   if (hit && Date.now() - hit.at < 60_000) return hit.text;
   const answer = await client.file(file);
-  const text = answer.ok ? answer.text : null;
-  ddlCache.set(file, { at: Date.now(), text });
-  return text;
+  if (!answer.ok) return null; // a failed read is not held: the next pull asks again
+  ddlCache.set(file, { at: Date.now(), text: answer.text });
+  return answer.text;
+}
+
+/** Forget the held package files (for the checks, which change what the stand-in serves). */
+export function forgetPackageFiles() {
+  ddlCache.clear();
 }
 
 /**
  * Writes expected-schema.json into a [DB] ticket's folder. Returns what README.md says about it,
  * or null for a ticket that is not a database migration. Never the reason a pull fails: a package
- * without the DDL, or a file that will not read, is said in README.md instead.
+ * without the DDL, or a file that will not read, is said in README.md instead. The pull has already
+ * removed the previous pull's copy, so a failure here never leaves an old one behind.
  */
 async function writeExpectedSchema(client, wp, touches, folder, release) {
   const ticket = databaseTicket(wp, touches);
   if (!ticket) return null;
   try {
+    if (ticket.kind === 'tables' && !ticket.tables.length) {
+      throw new Error('the ticket links no tables, so there is nothing to compare');
+    }
     const backend = await client.layer('backend');
     const files = (backend?.migrations?.files ?? []).map((f) => f.name);
     const where = backend?.migrations?.tables ?? {};
     const dbOf = (t) => String(where[ident(t)]?.file ?? '').split('/')[0] || null;
-    const database = ticket.database ?? ticket.tables.map(dbOf).find(Boolean) ?? 'tenant';
-    // The files that create these tables, and every later file of that database that can change one.
-    const creating = new Set(ticket.tables.map((t) => where[ident(t)]?.file).filter((f) => f?.startsWith(`${database}/`)));
-    const wanted = files.filter((f) => {
-      const [db, base] = f.split('/');
-      if (db !== database || !base) return false;
-      return creating.has(f) || Number(/^(\d+)-/.exec(base)?.[1] ?? -1) >= 900 || /^V\d+/i.test(base);
-    });
-    const texts = [];
-    for (const f of wanted) {
-      const text = await packageText(client, `backend/${f}`);
-      if (text === null) throw new Error(`backend/${f} would not read`);
-      texts.push({ name: f.split('/')[1], text });
+    const databases = ticket.kind === 'baseline'
+      ? ['tenant', 'control'].filter((d) => files.some((f) => f.startsWith(`${d}/`)))
+      : [ticket.database ?? ticket.tables.map(dbOf).find(Boolean) ?? 'tenant'];
+    const checks = [];
+    for (const database of databases) {
+      const mine = files.filter((f) => f.split('/')[0] === database && f.split('/')[1]);
+      // The baseline reads 000-002 and the helpers in 920, 930 and the V01nn files; the others read every file of their
+      // database, since a table's statements are spread over its 010 file, 900-930 and the V01nn files.
+      const wanted = ticket.kind === 'baseline' ? mine.filter((f) => /^((00[0-2]|9[23]0)-|V\d)/.test(f.split('/')[1])) : mine;
+      const texts = [];
+      for (const f of wanted) {
+        const text = await packageText(client, `backend/${f}`);
+        if (text === null) throw new Error(`backend/${f} would not read`);
+        texts.push({ name: f.split('/')[1], text });
+      }
+      if (!texts.length) throw new Error(`no DDL for ${database} in this package`);
+      const statements = ticketStatements(texts, ticket);
+      const used = [...new Set(statements.map((s) => s.file))].map((f) => `backend/${database}/${f}`);
+      checks.push(expectedCheck(schemaModel(texts), ticket, statements, { database, sources: used }));
     }
-    if (!texts.length) throw new Error(`no DDL for ${database} in this package`);
-    const model = schemaModel(texts);
-    const body = expectedSchema(model, ticket.tables, {
-      database, migration: ticket.migration, sources: wanted.map((f) => `backend/${f}`), release: release?.current ?? null,
-    });
+    const body = {
+      about: 'What this ticket\'s migration must leave behind, from the package DDL: the tables\' end state, and '
+        + 'the package statements that make it. node .claude/scripts/db-ticket.mjs <ticket> applies those statements '
+        + 'to a copy of the previous state and compares the result with the ticket\'s file. Written by adam_pull; do not edit.',
+      ...(release?.current ? { release: release.current } : {}),
+      checks,
+    };
     await writeFile(path.join(folder, 'expected-schema.json'), json(body));
-    return { ...ticket, database, written: true, tables: Object.keys(body.tables).length, absent: body.notInPackageDdl ?? [] };
+    return {
+      ...ticket, written: true, databases,
+      tables: Object.keys(checks[0]?.tables ?? {}).length,
+      statements: checks.reduce((n, c) => n + c.statements.length, 0),
+      absent: checks.flatMap((c) => [...(c.notInPackageDdl ?? []), ...(c.keysNotInPackageDdl ?? [])]),
+    };
   } catch (error) {
     return { ...ticket, written: false, error: error.message };
   }
@@ -1051,27 +1155,38 @@ function databaseSection(db, key) {
   if (!db) return '';
   let out = '\n## Checking this migration\n\n';
   if (!db.written) {
-    return `${out}The expected end state of the tables could not be written (${db.error}). Check them by hand `
-      + 'against `adam_table` and the package DDL, and say so in the comment.\n';
+    return `${out}The expected end state could not be written (${db.error}), so \`db-ticket.mjs\` cannot check this `
+      + 'ticket. Check the file by hand against `adam_table` and the package DDL, run '
+      + '`node .claude/scripts/db-ticket.mjs --full <database>` before the merge request, and say both in the comment.\n';
   }
-  out += `The file is \`db/${db.database}/${db.migration}\`. [expected-schema.json](expected-schema.json) holds the `
-    + `end state of its ${db.tables} table${db.tables === 1 ? '' : 's'}, read from the package DDL.\n\n`
+  const what = db.kind === 'baseline' ? 'the schemas, extensions, register and helper functions'
+    : db.kind === 'foreign-keys' ? `the ${db.statements} cross-schema keys`
+      : `${db.tables} table${db.tables === 1 ? '' : 's'}`;
+  out += `The file is ${db.databases.map((d) => `\`db/${d}/${db.migration}\``).join(' and ')}. `
+    + `[expected-schema.json](expected-schema.json) holds what it must leave behind (${what}), from the package DDL.\n\n`
     + '```\n'
     + `node .claude/scripts/db-ticket.mjs ${key}\n`
     + '```\n\n'
-    + 'It applies only this file to a copy of the database at the previous state, runs it a second time '
-    + '(which must change nothing), and compares the tables with expected-schema.json. **MATCH is the evidence '
-    + 'for done**: quote its result lines in the comment. A difference names the table and what differs; fix the '
-    + 'file and run it again. A foreign key "left for a later migration" is not a difference. Do not rebuild the '
-    + 'other migrations, and do not run `dotnet build` or `dotnet test` unless this ticket changes C#: the full '
-    + 'rebuild and the full suite run once a day and in the pipeline.\n\n'
+    + 'It applies only this file to a copy of the database at the previous state, then applies it a second time '
+    + '(not recorded), which must succeed and change nothing. It applies the package\'s own statements to another '
+    + 'copy and compares the two: every table, column, constraint, index, policy, function and type must be the same, '
+    + 'and nothing outside this ticket may change. **MATCH is the evidence for done**: quote its result lines in the '
+    + 'comment. Anything else names what differs; fix the file and run it again. A foreign key "left for a later '
+    + 'migration" is not a difference.\n\n'
+    + '**This replaces older instructions for a [DB] ticket**: the "empty database" or "previous release\'s schema" '
+    + 'line in the ticket\'s Done when, and any local CLAUDE.md, `/ticket` or `/done` that says to rebuild every '
+    + 'migration or run `dotnet build` and `dotnet test`. Do not rebuild the other migrations, and do not run dotnet '
+    + 'unless this ticket changes C#. Before opening the merge request, run '
+    + `\`node .claude/scripts/db-ticket.mjs --full ${db.databases[0]}\` once: every migration from an empty database, `
+    + 'applied twice.\n\n'
     + 'No `.claude/scripts/db-ticket.mjs` in this folder? Run ADAM\'s setup on it again: it adds the files that '
     + 'are missing and changes nothing else.\n';
   if (db.absent.length) {
-    out += `\nNot in the package DDL, so not checked: ${db.absent.map((t) => `\`${t}\``).join(', ')}.\n`;
+    out += `\nNot in the package DDL, so the check cannot pass until it is (a change request): ${db.absent.map((t) => `\`${t}\``).join(', ')}.\n`;
   }
   return out;
 }
+
 
 async function pullOne(client, key, base, when) {
   const answer = await client.service(`/api/work-packages/${encodeURIComponent(key)}?${await scoped(client)}`);
@@ -1145,7 +1260,8 @@ async function pullOne(client, key, base, when) {
     ...(subtasks === null ? { subtasks: 'could not be read' } : {}),
     ...(partOf?.key ? { partOf: partOf.key } : {}),
     ...(db ? { database: db.written
-      ? { migration: `db/${db.database}/${db.migration}`, expected: path.join(folder, 'expected-schema.json'), tables: db.tables }
+      ? { migration: db.databases.map((d) => `db/${d}/${db.migration}`).join(' and '), kind: db.kind,
+        expected: path.join(folder, 'expected-schema.json'), tables: db.tables, statements: db.statements }
       : { migration: db.migration, error: db.error } } : {}),
     ...(Array.isArray(changes) && changes.length ? { changeRequests: {
       total: changes.length,
@@ -2269,7 +2385,7 @@ export const TOOLS = [
       + '.adam/work/<ticket>/: README.md (the ticket, its milestone and description, and a list of '
       + 'the files, then the comment thread, oldest first), ticket.json, one file per linked screen, journey, contract, table, service, '
       + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. A [DB] ticket whose '
-      + 'subject names its migration file also gets expected-schema.json, the end state of its tables from the '
+      + 'subject names its migration file also gets expected-schema.json, the end state of its tables and the statements that make it, from the '
       + 'package DDL, which `node .claude/scripts/db-ticket.mjs <ticket>` compares a database with. You are always on '
       + 'the latest release: every pull serves the release ADAM serves now (r1, r2, …), and when that release is '
       + 'newer than the ticket\'s previous pull, README.md says what changed and spec-diff.md has the diffs. There '
@@ -2340,7 +2456,8 @@ export const TOOLS = [
         if (one.database?.expected) {
           next += ` A database ticket: write ${one.database.migration}, then check it with `
             + `\`node .claude/scripts/db-ticket.mjs ${one.key}\` (README.md, "Checking this migration"). MATCH is the `
-            + 'evidence for done; no dotnet build or dotnet test unless the ticket changes C#.';
+            + 'evidence for done; it replaces older [DB] instructions, and there is no dotnet build or dotnet test '
+            + 'unless the ticket changes C#.';
         }
         if (r?.current) {
           next += ' Older /ticket instructions that mention re-pinning are out of date: there is nothing to re-pin.';
