@@ -19074,6 +19074,199 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /catalogue-language-settings:
+    get:
+      operationId: getCatalogueLanguageSettings
+      x-ticvai-consumed-by: []
+      summary: The languages this venue writes its product texts in
+      description: >-
+        **The venue's language list, by code** (16 October 2026 minutes, 4.9 and section 5: languages are
+        configurable, not hard coded to English and Arabic; CHG-R8PRD-003). Qossai: a venue may need three
+        languages, or five or six, chosen by the admin, and the product text must be translatable for B2C, kiosk
+        and POS.
+
+        **Not the interface languages.** white-label `setLanguages` decides which languages the apps' own words
+        are offered in, for the tenant; this list decides which languages a venue's product texts are written in
+        (`Product.nameLocalised`, `Product.descriptionLocalised`, `ProductChannelTexts`). The two usually agree and
+        nothing forces them to.
+
+        **A venue with nothing saved** answers `languages` `[en, ar]` and `defaultLanguage` `en`, which is what
+        the product texts assumed until now, with no `scopePath`.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The venue's product languages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogueLanguageSettings'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setCatalogueLanguageSettings
+      x-ticvai-consumed-by: []
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      summary: Set the languages this venue writes its product texts in
+      description: >-
+        **Any ISO 639-1 language** (16 October 2026 minutes, 4.9, CHG-R8PRD-003): `languages` is the venue's
+        whole list and `defaultLanguage` must be one of them (`400 default-language-not-enabled`).
+
+        **Adding a language translates nothing**: the answer's `translationGaps` says how many products lack a
+        name, a description or a channel text in each language, so the back office can list what to translate.
+        **Removing a language deletes nothing**: texts already written in it are kept and come back if it is
+        added again, but no screen asks for it and `setProductChannelTexts` refuses new text in it.
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogueLanguageSettings'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved, with the translation gaps it leaves
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogueLanguageSettings'
+        '400':
+          description: The default is not in `languages` (`default-language-not-enabled`), or the body breaks the
+            schema (`validation`), for example a code twice.
+          x-ticvai-problem-types:
+          - default-language-not-enabled
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /products/{productId}/channel-texts:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getProductChannelTexts
+      x-ticvai-consumed-by: []
+      summary: The product's texts per sales channel, in each of the venue's languages
+      description: >-
+        **What each channel prints or shows for this product** (16 October 2026 minutes, 4.10: the POS button label
+        can differ from the name printed on the receipt, and the B2B partner description is what resellers see in
+        the B2B portal and the API; 4.9: every text translatable; CHG-R8PRD-003). Wireframe of 9 October, B1-S06
+        Content & Localization, section "Channel-specific content", and B1-S09 Product Preview & Preflight.
+
+        **A product with nothing saved** answers every text null, which means each channel shows the product's own
+        `nameLocalised` and `descriptionLocalised`. `missingTranslations` lists, per venue language
+        (`getCatalogueLanguageSettings`), the texts that are set in some language and not in that one.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The texts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductChannelTexts'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setProductChannelTexts
+      x-ticvai-consumed-by: []
+      summary: Set the product's texts per sales channel
+      description: >-
+        **Replaces all of the product's channel texts** (CHG-R8PRD-003): a text sent as null, or left out, falls
+        back to the product's name or description. Each text is keyed by language code, and every key must be a
+        language of the venue's list (`422 language-not-enabled`). The length limits are per language value.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductChannelTexts'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductChannelTexts'
+        '400':
+          description: A text longer than its limit in some language (`validation`; `errors[]` names the field and the
+            language).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: A text in a language that is not on the venue's list (`language-not-enabled`).
+          x-ticvai-problem-types:
+          - language-not-enabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     EventResourceCostEstimate:
@@ -43794,6 +43987,182 @@ components:
         liveProductCount:
           type: integer
           minimum: 0
+    CatalogueLanguageSettings:
+      type: object
+      x-ticvai-persistence: catalogue.catalogue_language_setting
+      description: >-
+        **The languages a venue's product texts are written in** (16 October 2026 minutes, 4.9, CHG-R8PRD-003). One
+        row per venue. Every `LocalisedText` of the venue's products is keyed by these codes.
+      required:
+      - languages
+      - defaultLanguage
+      properties:
+        languages:
+          type: array
+          minItems: 1
+          maxItems: 20
+          uniqueItems: true
+          description: ISO 639-1 codes, in the order the back office offers them (the default first is a good habit, not a rule).
+          items:
+            type: string
+            pattern: ^[a-z]{2}$
+        defaultLanguage:
+          type: string
+          pattern: ^[a-z]{2}$
+          description: One of `languages`. A text missing in a guest's language falls back to this one.
+        rtlLanguages:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The listed languages written right to left (Unicode CLDR character order `right-to-left`), as white-label `LanguageConfig.rtlLanguages` reads them. Not configured.
+          items:
+            type: string
+            pattern: ^[a-z]{2}$
+        translationGaps:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: Per listed language, how many of the venue's products that are not archived lack a text in it.
+          items:
+            type: object
+            required:
+            - language
+            - productsMissingName
+            - productsMissingDescription
+            - productsMissingChannelText
+            properties:
+              language:
+                type: string
+                pattern: ^[a-z]{2}$
+              productsMissingName:
+                type: integer
+                minimum: 0
+                description: No `Product.nameLocalised` value in this language.
+              productsMissingDescription:
+                type: integer
+                minimum: 0
+                description: A `Product.descriptionLocalised` set in some language and not in this one.
+              productsMissingChannelText:
+                type: integer
+                minimum: 0
+                description: A `ProductChannelTexts` text set in some language and not in this one.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). The venue the caller acts at; absent while the venue has saved nothing.'
+    ProductChannelTexts:
+      type: object
+      x-ticvai-persistence: catalogue.product_channel_text
+      description: >-
+        **The product's text per sales channel, per language** (16 October 2026 minutes, 4.9 and 4.10,
+        CHG-R8PRD-003). One row per product. Each text is an object keyed by language code (the venue's list,
+        `getCatalogueLanguageSettings`); null means the channel falls back to the product's own name
+        (`Product.nameLocalised`) for a label or name, and its description (`Product.descriptionLocalised`) for a
+        description.
+      properties:
+        productId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path.
+        posButtonLabel:
+          type: object
+          nullable: true
+          description: The label on the till's sale button; short, because the button is. At most 30 characters per language.
+          propertyNames:
+            pattern: ^[a-z]{2}$
+          additionalProperties:
+            type: string
+            maxLength: 30
+        receiptName:
+          type: object
+          nullable: true
+          description: The product's name as printed on the receipt and the ticket, which may differ from the button label (4.10). At most 80 characters per language.
+          propertyNames:
+            pattern: ^[a-z]{2}$
+          additionalProperties:
+            type: string
+            maxLength: 80
+        webDescription:
+          type: object
+          nullable: true
+          description: The description the website and the guest app show; null uses the product's description. At most 4000 characters per language.
+          propertyNames:
+            pattern: ^[a-z]{2}$
+          additionalProperties:
+            type: string
+            maxLength: 4000
+        partnerDescription:
+          type: object
+          nullable: true
+          description: What resellers see in the B2B portal and through the API (4.10). At most 4000 characters per language.
+          propertyNames:
+            pattern: ^[a-z]{2}$
+          additionalProperties:
+            type: string
+            maxLength: 4000
+        kioskLabel:
+          type: object
+          nullable: true
+          description: The label on the kiosk's product tile. At most 40 characters per language.
+          propertyNames:
+            pattern: ^[a-z]{2}$
+          additionalProperties:
+            type: string
+            maxLength: 40
+        visitInstructions:
+          type: object
+          nullable: true
+          description: What the guest is told to do on the day, on every channel that shows it. At most 2000 characters per language.
+          propertyNames:
+            pattern: ^[a-z]{2}$
+          additionalProperties:
+            type: string
+            maxLength: 2000
+        termsAndConditions:
+          type: object
+          nullable: true
+          description: The product's own terms, on every channel that shows them. At most 8000 characters per language.
+          propertyNames:
+            pattern: ^[a-z]{2}$
+          additionalProperties:
+            type: string
+            maxLength: 8000
+        missingTranslations:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: Per language of the venue's list, the texts above (and `name`, `description` for the product's own) set in some language and not in this one. Empty when every text is complete.
+          items:
+            type: object
+            required:
+            - language
+            - fields
+            properties:
+              language:
+                type: string
+                pattern: ^[a-z]{2}$
+              fields:
+                type: array
+                items:
+                  type: string
+                  enum:
+                  - name
+                  - description
+                  - posButtonLabel
+                  - receiptName
+                  - webDescription
+                  - partnerDescription
+                  - kioskLabel
+                  - visitInstructions
+                  - termsAndConditions
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). The product''s venue.'
   securitySchemes:
     serviceAuth:
       type: http

@@ -1,0 +1,47 @@
+id: CHG-R8PRD-003
+date: '2026-10-20'
+source: mom
+kind: contract
+summary: 'A venue keeps the list of languages its product texts are written in, by language code
+  (getCatalogueLanguageSettings, setCatalogueLanguageSettings, with the translation gaps each language leaves), and a
+  product keeps a text per sales channel in each of them: POS button label, receipt name, web, partner (B2B) and
+  kiosk texts, visit instructions and terms (getProductChannelTexts, setProductChannelTexts). Additive.'
+decision:
+  what: 'contracts/spine/catalogue.yaml, appended: GET and PUT /catalogue-language-settings (singleton per venue; 400
+    default-language-not-enabled; a venue with nothing saved answers en and ar, default en), GET and PUT
+    /products/{productId}/channel-texts (422 language-not-enabled; per-language length limits); schemas
+    CatalogueLanguageSettings (catalogue.catalogue_language_setting) and ProductChannelTexts
+    (catalogue.product_channel_text). The venue list is separate from the tenant''s interface languages
+    (white-label setLanguages).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Minutes of 16 October 2026 (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md), 4.9:
+  "The language must not be fixed; any language can be added (with a language code) and then appears for
+  translation"; Qossai: the product text must be translatable for B2C, kiosk and POS, the languages chosen by the
+  admin; 4.10: the POS button label can differ from the name on the receipt, and the B2B partner description is what
+  resellers see in the B2B portal and API; section 5: "Languages are configurable and not hard coded to Arabic". The
+  package had Product.nameLocalised and descriptionLocalised keyed by any code, but no venue language list to key
+  them by and no per-channel text.'
+keys_touched:
+  operations: [getCatalogueLanguageSettings, setCatalogueLanguageSettings, getProductChannelTexts, setProductChannelTexts]
+  schemas: [CatalogueLanguageSettings, ProductChannelTexts]
+  tables: [catalogue.catalogue_language_setting, catalogue.product_channel_text]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+client_signoff: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. Additive only. Left for the catalogue owner (a CR, existing text): updateProduct and createProduct
+  should refuse nameLocalised and descriptionLocalised keys outside the venue list; the guest reads (listProducts,
+  getProduct), the till bundle and the kiosk should return the channel texts (today they return the product name and
+  description only). Until then the texts are configured and previewed in the back office only.'
