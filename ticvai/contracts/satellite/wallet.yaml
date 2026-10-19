@@ -1972,6 +1972,13 @@ paths:
         subject can hold their own wallet and sit in a family or corporate one. `toSubjectId` is
         the guest-to-guest form and resolves to the same wallet `getWallet` returns for that
         subject: their own, never a shared wallet they belong to.
+
+        **Who a guest can name** (r8 walk of tickets 28310 and 28345; lead decision of 20 October 2026, option A).
+        A guest knows no subject id, so in r8 a guest screen offers **linked family members only**: the people from
+        `identity.listDelegations` (`familyMember` or `primaryHolder`), whose `subjectId` it sends as `toSubjectId`.
+        Peer-to-peer to another guest stays off (`WalletTransferRules.peerToPeerAllowed` false) until it is decided.
+        A guest screen sends exactly one of `toSubjectId` and `toWalletId`. The screen reads
+        `Wallet.transferRules` to hide or limit the action.
       tags: [retail]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
@@ -5846,6 +5853,21 @@ components:
           description: >
             **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
         subjectId: { type: string, format: uuid }
+        transferRules:
+          type: object
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'What the venue allows this guest to do with a transfer, read from the venue''s `WalletTransferRules`
+            so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). Worked out on read.'
+          properties:
+            peerToPeerAllowed: { type: boolean }
+            withinSharedWalletOnly: { type: boolean }
+            maximumPerTransfer:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              nullable: true
         balance: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: balance_amount }
         credits:
           type: array
