@@ -19700,6 +19700,110 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-dashboard:
+    get:
+      operationId: getProductDashboard
+      x-ticvai-consumed-by: []
+      summary: The products dashboard's counts
+      description: >-
+        **The first screen of the products module** (16 October 2026 minutes, 4.1: a dashboard of active products,
+        draft products, products pending approval and approved products; approved products are the ones that can
+        be sold; CHG-R8PRD-006). Wireframe of 9 October, B1-S01 Catalogue Command Center.
+
+        **The tiles, by `ProductLifecycleState`.** Active is `live`, Draft is `draft`, Pending approval is
+        `inReview`, Approved is `approved` (approved and not yet live). Each tile opens the product list filtered
+        the same way: `listProductLifecycle` with `lifecycleState`.
+
+        **By type.** `countsByKind` counts the products of each `ProductKind` that are not archived, for the
+        "products by type" panel and the type filter of the product list (`listProductLifecycle` `productType`,
+        `listProducts` `kind`). **`attentionCount`** is the number of rows `listProductAttentionItems` returns.
+
+        Counted at read time over `catalogue.product` of the venue: `venueId` for a caller who manages several,
+        else the venue the caller acts at.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: The venue to count, for a caller whose grants reach several; absent, the venue the caller acts at.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDashboard'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-dashboard/attention:
+    get:
+      operationId: listProductAttentionItems
+      x-ticvai-consumed-by: []
+      summary: The products that need someone to act, and why
+      description: >-
+        **The "needs attention" list** (16 October 2026 minutes, 4.1: a list of everything that requires action;
+        CHG-R8PRD-006). Wireframe of 9 October, B1-S01 Catalogue Command Center, panel "Needs attention". One row
+        per product and reason, computed at read time over the venue's products that are not archived;
+        `ProductAttentionReason` says what each reason checks. A product with three reasons is three rows.
+
+        **Order.** Sorted by `severity` (`blocking` first), then by `since` ascending (a row with no `since`
+        last), then by `productId`.
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: The venue to read, for a caller whose grants reach several; absent, the venue the caller acts at.
+        schema:
+          type: string
+          format: uuid
+      - name: reason
+        in: query
+        required: false
+        description: Only rows with this reason.
+        schema:
+          $ref: '#/components/schemas/ProductAttentionReason'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The rows
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ProductAttentionItem'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     EventResourceCostEstimate:
@@ -44924,6 +45028,140 @@ components:
                 allOf:
                 - $ref: '#/components/schemas/SalePermissionLevel'
                 nullable: true
+    ProductDashboard:
+      type: object
+      x-ticvai-persistence: none — counted on read over catalogue.product
+      description: The products dashboard's tiles (CHG-R8PRD-006); see `getProductDashboard`.
+      required:
+      - venueId
+      - countsByLifecycleState
+      - countsByKind
+      - attentionCount
+      properties:
+        venueId:
+          type: string
+          format: uuid
+        countsByLifecycleState:
+          type: object
+          required:
+          - draft
+          - inReview
+          - approved
+          - live
+          - withdrawn
+          - archived
+          description: One count per `ProductLifecycleState`. The wireframe's tiles are `live` (Active), `draft` (Draft), `inReview` (Pending approval) and `approved` (Approved).
+          properties:
+            draft:
+              type: integer
+              minimum: 0
+            inReview:
+              type: integer
+              minimum: 0
+            approved:
+              type: integer
+              minimum: 0
+            live:
+              type: integer
+              minimum: 0
+            withdrawn:
+              type: integer
+              minimum: 0
+            archived:
+              type: integer
+              minimum: 0
+        countsByKind:
+          type: array
+          description: One row per `ProductKind` the venue has a product of, archived products not counted, in the enum's order.
+          items:
+            type: object
+            required:
+            - kind
+            - count
+            properties:
+              kind:
+                $ref: '#/components/schemas/ProductKind'
+              count:
+                type: integer
+                minimum: 0
+        attentionCount:
+          type: integer
+          minimum: 0
+          description: The rows `listProductAttentionItems` returns for the venue, with no `reason` filter.
+        computedAt:
+          type: string
+          format: date-time
+    ProductAttentionReason:
+      type: string
+      description: >-
+        **Why a product is on the "needs attention" list** (CHG-R8PRD-006). Each is read from what the product
+        already stores; `blocking` ones stop it being approved or sold, the others are warnings.
+
+        - `awaitingApproval` (warning): `lifecycleState` is `inReview`.
+
+        - `approvedNotLive` (warning): `approved` and not yet `live`.
+
+        - `missingCategory` (blocking): no `categoryId`.
+
+        - `noVariants` (blocking): no active variant (`ProductVariant.isActive`).
+
+        - `noSalesChannel` (blocking): `channels` empty.
+
+        - `noPrice` (blocking): an active variant with no price in any active price list of the venue.
+
+        - `noEntitlement` (blocking): a product of a ticket kind (`admission`, `timedAdmission`,
+        `datedAdmission`, `openDated`, `seated`, `membership`) with no `entitlementTemplateId`.
+
+        - `endingSoon` (warning): `onSaleTo` within the next 30 days; `since` is `onSaleTo`.
+      enum:
+      - awaitingApproval
+      - approvedNotLive
+      - missingCategory
+      - noVariants
+      - noSalesChannel
+      - noPrice
+      - noEntitlement
+      - endingSoon
+    ProductAttentionItem:
+      type: object
+      x-ticvai-persistence: none — computed on read over catalogue.product, catalogue.variant and catalogue.price
+      description: One reason one product needs someone to act (CHG-R8PRD-006).
+      required:
+      - productId
+      - productCode
+      - productName
+      - kind
+      - lifecycleState
+      - reason
+      - severity
+      properties:
+        productId:
+          type: string
+          format: uuid
+        productCode:
+          type: string
+        productName:
+          type: string
+        kind:
+          $ref: '#/components/schemas/ProductKind'
+        lifecycleState:
+          $ref: '#/components/schemas/ProductLifecycleState'
+        reason:
+          $ref: '#/components/schemas/ProductAttentionReason'
+        severity:
+          type: string
+          enum:
+          - blocking
+          - warning
+        detail:
+          type: string
+          nullable: true
+          description: The particulars in a sentence, e.g. *Child (KID) has no price in any active price list*.
+        since:
+          type: string
+          format: date-time
+          nullable: true
+          description: For `endingSoon`, the product's `onSaleTo`; null for every other reason, because the product records no time for them.
   securitySchemes:
     serviceAuth:
       type: http
