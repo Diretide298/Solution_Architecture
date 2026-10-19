@@ -2719,8 +2719,8 @@ paths:
         through `platform.outbox` in the same transaction, and the ledger posts `gameCreditLoaded` from it for
         `amountPaid`.
 
-        **Two credit types are seeded for every tenant** (`wallet.credit_type`, loaded with the other seed data at
-        provisioning, SETUP-SEED): `gameCredit` (category `ride`, `monetary` false) and `gameBonusCredit` (category
+        **Two credit types are seeded for every tenant** (loaded with the other seed data at provisioning,
+        SETUP-SEED): `gameCredit` (category `ride`, `monetary` false) and `gameBonusCredit` (category
         `bonus`, `monetary` false). Proposed, client to confirm the two types and their names.
       tags:
       - card
