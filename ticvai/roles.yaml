@@ -82,14 +82,17 @@ roles:
     grants:
       - key: sale.create
         label: Create sale
+        permission: ORDER_CREATE
       - key: payment.take
         label: Take payment
+        permission: ORDER_CREATE
       - key: receipt.print
         label: Print receipt
       - key: sale.hold
         label: Hold sale
       - key: sale.resume
         label: Resume sale
+        permission: ORDER_MODIFY
       - key: discount.basic
         label: Basic discount
         note: Below the auto-approve threshold only. See `thresholds.discount`.
@@ -157,12 +160,15 @@ roles:
         label: Shift override
       - key: cash.variance.approve
         label: Approve a cash variance at close
+        permission: OVERSHORT_ACCEPT
       - key: shift.reopen
         label: Reopen or force-close a shift
+        permission: SHIFT_REOPEN
       - key: adjustment.manual
         label: Manual adjustment
       - key: inventory.conflict.resolve
         label: Resolve an inventory conflict raised on sync
+        permission: ORDER_MODIFY
       - key: product.publish
         label: Make an approved product live
         permission: PRODUCT_PUBLISH
