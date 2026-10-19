@@ -3273,6 +3273,7 @@ paths:
       description: '**Policies are versioned and never overwritten.** A guest who consented to version
         3 consented to version 3, and a privacy notice that changes silently under a recorded consent
         is a compliance failure. Publishing creates a new version; prior versions remain readable.
+        **There is no title to send**: the heading a guest sees is derived from `kind` (`PolicyKind`).
 
         **English and Arabic are both required before a policy can be published (decided 28 September,
         audit R096)**: `body` must carry non-empty `en` and `ar` entries, or 400. Other enabled languages
@@ -3485,6 +3486,10 @@ paths:
 
         Several are build-time on native apps and are flagged accordingly. A tenant enabling Apple Wallet
         should know it needs a release, not a publish.
+
+        **The caller sends only `featureKey` and `isEnabled`.** `displayName`, `changeScope` and
+        `requiresConfiguration` come from the feature catalogue on `FeatureKey`, and the server writes them into
+        each row it inserts, including every row of the whole-set replace.
 
         '
       tags:
@@ -7729,8 +7734,11 @@ components:
           type: string
           nullable: true
           writeOnly: true
-          description: App Store Connect API key or Play service-account key, sent once and kept in the secret
-            store; this is its reference. Needed only for `submitToStore`.
+          description: 'App Store Connect API key or Play service-account key. **What the browser sends** (r8
+            walk of ticket 27914): the request carries the secret itself once, as the key text (the .p8 text for
+            Apple, the service-account JSON for Google); the server puts it in the cell''s Key Vault and the row
+            keeps only the vault name. It is never returned: a read shows `hasApiCredential`, nothing else. Same
+            rule as `ai.setAiCredential`. Needed only for `submitToStore`.'
         hasApiCredential:
           type: boolean
           readOnly: true
@@ -7747,11 +7755,23 @@ components:
           type: string
           nullable: true
           writeOnly: true
-          description: '**The Pass Type ID certificate** (its .p12 and password), from the client''s Apple Developer
-            account, sent once and kept in Key Vault; this is its reference, as `apiCredentialSecretRef` is. It signs
+          description: '**The Pass Type ID certificate**, from the client''s Apple Developer account. **What the
+            browser sends** (r8 walk of ticket 27914): the request carries the .p12 file itself, base64 text, in this
+            field, and its password in `passCertificatePassword`; the server keeps both in Key Vault as one secret and
+            the row keeps only the vault name, as for `apiCredentialSecretRef`. A read shows `hasPassCertificate`
+            and `passCertificateExpiresAt`, never the certificate or the password. It signs
             every Apple pass the brand issues (orders `issueWalletPass`, `pushWalletPassUpdate`). On save the server
             reads the certificate''s Pass Type ID, team and expiry; a certificate whose Pass Type ID is not
             `passTypeIdentifier`, or whose team is not `developerAccountId`, is refused with 400 (CHG-R6-033).'
+        passCertificatePassword:
+          type: string
+          format: password
+          writeOnly: true
+          nullable: true
+          x-ticvai-persisted: false
+          description: 'The password of the .p12 sent in `passCertificateSecretRef`. Required with it, refused
+            without it (400). Kept with the certificate in Key Vault, never stored in the row, never returned, never
+            logged, masked in any audit record.'
         hasPassCertificate:
           type: boolean
           readOnly: true
@@ -8381,7 +8401,7 @@ components:
                 description: A `LinkTarget.kind`, or `bookingFlow`.
               pattern:
                 type: string
-                description: e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{flowKey}`.
+                description: e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{productId}`.
         appLinksEnabled:
           type: boolean
     SitePackage:
@@ -8961,6 +8981,13 @@ components:
         (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through
         `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.
 
+
+        **`storeUrl`** (r8 walk of ticket 27893): the store page GST-047''s "Update" button opens, one per
+        platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A
+        store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade
+        screen opens the URL for the platform it runs on; where it is null the screen shows the message without
+        the button and the guest updates from the store by hand.
+
         '
       properties:
         ios:
@@ -8971,6 +8998,21 @@ components:
           type: string
           nullable: true
           pattern: ^\d+\.\d+\.\d+$
+        storeUrl:
+          type: object
+          nullable: true
+          description: The store page of the tenant's app for each platform. https only.
+          properties:
+            ios:
+              type: string
+              format: uri
+              pattern: ^https://
+              nullable: true
+            android:
+              type: string
+              format: uri
+              pattern: ^https://
+              nullable: true
     VenueContact:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -9826,9 +9868,13 @@ components:
           - event
           - externalUrl
           - appSection
+          - bookingFlow
           - none
           description: '`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1),
-            so the bottom navigation can hold Home, Explore, Plan and Tickets.'
+            so the bottom navigation can hold Home, Explore, Plan and Tickets. `bookingFlow` (r8 walk of ticket
+            27905) opens the booking flow of one product, optionally on a date: `productId` is required, `date`
+            optional; the link is `/book/{productId}?date=YYYY-MM-DD` (see `DeepLinkScheme`), and the flow shown is
+            the one that product resolves to.'
         moduleKey:
           $ref: '#/components/schemas/ModuleKey'
         appSection:
@@ -9852,6 +9898,12 @@ components:
         eventId:
           type: string
           format: uuid
+        date:
+          type: string
+          format: date
+          nullable: true
+          description: Used when `kind` is `bookingFlow`, the date the flow opens on. Absent opens it on today or the
+            first date with availability, as the product page does.
         url:
           type: string
     NavigationConfig:
@@ -10525,6 +10577,26 @@ components:
           description: The partition key (ADR-0005). Written at `venue` scope.
     PolicyKind:
       type: string
+      description: 'The kinds of policy a tenant publishes. **Each kind has one fixed title in English and Arabic**
+        (r8 walk of ticket 27890), the only source of `PublishedPolicy.title`; `setPolicy` takes no title. The
+        Arabic labels are the standard names of each document and the client should approve them.
+
+
+        | kind | en | ar |
+
+        |---|---|---|
+
+        | privacy | Privacy policy | سياسة الخصوصية |
+
+        | termsAndConditions | Terms and conditions | الشروط والأحكام |
+
+        | refund | Refund policy | سياسة الاسترداد |
+
+        | cookie | Cookie policy | سياسة ملفات تعريف الارتباط |
+
+        | accessibility | Accessibility statement | بيان إمكانية الوصول |
+
+        '
       enum:
       - privacy
       - termsAndConditions
@@ -10545,7 +10617,10 @@ components:
           $ref: '#/components/schemas/PolicyKind'
         title:
           type: string
-          description: 'The heading a guest sees, and the field a refund question retrieves against.
+          nullable: true
+          readOnly: true
+          description: 'Not written by anyone: `setPolicy` takes no title and the column stays null. The heading a
+            guest sees is `PublishedPolicy.title`, derived from `kind` (see `PolicyKind`).
 
             '
         version:
@@ -10681,7 +10756,58 @@ components:
       description: 'The feature toggles a tenant can set — one list for `FeatureToggle` and the `setFeatureToggles`
         body, which took a free string where the response had this enum.
 
+
+        **The catalogue** (`x-ticvai-feature-catalogue`; r8 walk of ticket 27776): the table below is the one
+        source of each key''s `displayName`, `changeScope` and `requiresConfiguration`. `setFeatureToggles`
+        takes only `featureKey` and `isEnabled` from the caller; it fills the other three columns of the
+        `whitelabel.feature_toggle` row from this table when it inserts the row, and its whole-set replace does
+        the same for every row it writes, so no caller can set or change them. `buildTime` means a native app
+        needs a new release to take the change, a `runtime` one takes it on the next publish.
+        **Wallet and payment keys are `buildTime`** (stated before r8); the other values are proposals for the
+        owner to confirm and are marked below.
+
+        | featureKey | displayName | changeScope | requiresConfiguration |
+
+        |---|---|---|---|
+
+        | digitalCompanionMode | Digital companion mode | runtime | false (proposed) |
+
+        | aiConciergeChat | AI concierge chat | runtime | true: the platform must have set an AI provider (proposed) |
+
+        | lostAndFound | Lost and found | runtime | false (proposed) |
+
+        | pushNotifications | Push notifications | buildTime | true: push credentials in the app build (proposed) |
+
+        | socialSharing | Social sharing | runtime | false (proposed) |
+
+        | multiLanguage | Multiple languages | runtime | false (proposed) |
+
+        | appleWallet | Apple Wallet passes | buildTime | true: pass certificate on the store account |
+
+        | googlePay | Google Pay | buildTime | true: payment provider setup |
+
+        | applePay | Apple Pay | buildTime | true: payment provider setup |
+
+        | cashOnDelivery | Cash on delivery | runtime | false (proposed) |
+
+        | guestCheckout | Guest checkout | runtime | false |
+
+        | uaePassLogin | UAE PASS sign-in | buildTime | true: UAE PASS client credentials (proposed) |
+
         '
+      x-ticvai-feature-catalogue:
+        digitalCompanionMode: { displayName: Digital companion mode, changeScope: runtime, requiresConfiguration: false }
+        aiConciergeChat: { displayName: AI concierge chat, changeScope: runtime, requiresConfiguration: true }
+        lostAndFound: { displayName: Lost and found, changeScope: runtime, requiresConfiguration: false }
+        pushNotifications: { displayName: Push notifications, changeScope: buildTime, requiresConfiguration: true }
+        socialSharing: { displayName: Social sharing, changeScope: runtime, requiresConfiguration: false }
+        multiLanguage: { displayName: Multiple languages, changeScope: runtime, requiresConfiguration: false }
+        appleWallet: { displayName: Apple Wallet passes, changeScope: buildTime, requiresConfiguration: true }
+        googlePay: { displayName: Google Pay, changeScope: buildTime, requiresConfiguration: true }
+        applePay: { displayName: Apple Pay, changeScope: buildTime, requiresConfiguration: true }
+        cashOnDelivery: { displayName: Cash on delivery, changeScope: runtime, requiresConfiguration: false }
+        guestCheckout: { displayName: Guest checkout, changeScope: runtime, requiresConfiguration: false }
+        uaePassLogin: { displayName: UAE PASS sign-in, changeScope: buildTime, requiresConfiguration: true }
       enum:
       - digitalCompanionMode
       - aiConciergeChat
@@ -11536,7 +11662,16 @@ components:
         kind:
           $ref: '#/components/schemas/PolicyKind'
         title:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The heading, with `en` and `ar`, derived on read from `kind` by the fixed label table on
+            `PolicyKind`. Nothing is stored (`whitelabel.policy.title` stays unused), so a tenant cannot retitle a
+            policy and the heading is the same in the app, on the web and in a consent record.
+
+            '
         version:
           type: string
           description: The version a consent records (a guest who consented to version 3 consented to version 3).
