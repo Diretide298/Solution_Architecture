@@ -1610,6 +1610,12 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       summary: Rotate the access token
+      description: 'Exchanges a refresh token for a new access token **and a new refresh token**; the one sent is
+        retired (rotation). A staff refresh token slides: it lives `PasswordPolicy.refreshTokenHours` (12 hours by
+        default, proposed, client to correct) from its last use, and never past the session''s `expiresAt`. **A
+        retired refresh token sent again is a reuse**: the server ends the session, revokes every refresh token
+        issued from the same sign-in, and answers 401, so a stolen token works at most once (IDENTITY-C25,
+        FOUNDATION-AI-C27; CHG-R8SPN-014; the rule is written once on `bearerAuth`).'
       security: []
       requestBody:
         required: true
@@ -9392,6 +9398,30 @@ components:
           - PLATFORM_MIGRATION_VIEW
           - PLATFORM_MIGRATION_APPLY
           - PLATFORM_AI_MANAGE
+        accessTokenMinutes:
+          type: integer
+          default: 15
+          minimum: 5
+          maximum: 60
+          description: 'How long a staff access token lives (`TokenPair.expiresIn`). **15 minutes, proposed, client
+            to correct** (decided 20 October 2026, Chinmay, IDENTITY-C25; CHG-R8SPN-014). Staff tokens only; a
+            guest token follows `guestAuth`.'
+        refreshTokenHours:
+          type: integer
+          default: 12
+          minimum: 1
+          maximum: 24
+          description: 'How long a staff refresh token lives without use. Sliding: each refresh issues a new one
+            and retires the old, and a retired one presented again ends the session and revokes its family (see
+            `bearerAuth`). **12 hours, proposed, client to correct** (IDENTITY-C25; CHG-R8SPN-014).'
+        sessionMaxHours:
+          type: integer
+          default: 12
+          minimum: 1
+          maximum: 24
+          description: 'The longest a staff session lives (`Session.expiresAt`). A till session ends sooner, when
+            the shift on its workstation closes. **12 hours, proposed, client to correct** (IDENTITY-C25;
+            CHG-R8SPN-014).'
     SegregationViolation:
       type: object
       x-ticvai-persistence: none — computed from identity.grant against identity.segregation_rule
@@ -10698,7 +10728,10 @@ components:
           type: string
         expiresIn:
           type: integer
-          description: Seconds
+          description: 'Seconds until the access token expires: `PasswordPolicy.accessTokenMinutes` x 60, 900 by
+            default (15 minutes; proposed, client to correct). The refresh token, its rotation and reuse detection,
+            and the signing key are described once on `bearerAuth` in contracts/shared/common.yaml
+            (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014).'
     RoleSummary:
       x-ticvai-persistence: none — projection over role
       type: object
@@ -10786,6 +10819,10 @@ components:
         expiresAt:
           type: string
           format: date-time
+          description: 'When the session ends at the latest: `openedAt` plus `PasswordPolicy.sessionMaxHours` (12
+            hours by default; proposed, client to correct). A till session ends earlier, when the shift on its
+            workstation closes; any session ends at `logout` or a revocation. Refreshing the access token never
+            moves this time (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014).'
     WorkstationContext:
       type: object
       required:

@@ -1,0 +1,40 @@
+id: CHG-R8SPN-013
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A field a consumer keys on, or a stored copy, says exactly what it holds. issueOrderEntitlements lines[].lineId
+  is the orders.order_line id (uuid), the per-line idempotency key of the order.paid consumer. Workstation.saleBoard is
+  the effective board resolved on read: platform.workstation.sale_board holds only the till''s own override and is null
+  when the till inherits its outlet''s board, so updateOutlet and updateSaleBoard need no copy kept current.'
+decision:
+  what: 'R8 blocker causes FOUNDATION-AI-C04 (no decision needed: lineId format uuid with its meaning; the event file''s
+    lines[] notes are the surface lane''s part) and APPROVALS-TENANCY-C39 (lead answer: take the recommendation, option A:
+    store only the till''s override, resolve the outlet''s board on read). Making the column nullable is a storage fact,
+    requested from the storage-core lane.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Walk of the Sprint 1 and 2 tickets 27701 (PLATFORM-SAGA-PAID) and 27789 (ADAM gaps 27701/0, 27789/2): the order.paid
+  consumer keyed on orderId + lineId had no lineId to key on, and nothing said how an inherited sale board stayed current.
+  Finding: R8 blocker cause list, groups foundation-ai and approvals-tenancy.'
+keys_touched:
+  operations: [issueOrderEntitlements, getWorkstation, listWorkstations, configureWorkstation]
+  schemas: [Workstation]
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/tenancy.yaml
+root_class: 'contract gap: a carried or stored field does not say what it holds or how it stays current'
+tickets:
+  started: []
+  unstarted:
+  - '27701 and 27789 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, gaps 27701/0, 27789/2'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Requested from storage-core: platform.workstation.sale_board nullable (DROP NOT NULL in the next forward
+  migration). Requested from surface: events/order-paid.yaml lines[] notes name lineId (uuid), variantId, quantity,
+  lineTotal and performanceId (null for an untimed line).'

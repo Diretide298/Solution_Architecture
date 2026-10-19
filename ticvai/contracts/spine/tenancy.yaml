@@ -6370,6 +6370,14 @@ components:
 
             **The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it
             overrides the outlet, otherwise the outlet's (`saleBoardSource`).
+
+            **Resolved on read, never copied** (decided 20 October 2026, Chinmay, R8 blocker cause
+            APPROVALS-TENANCY-C39, option A; CHG-R8SPN-013). `platform.workstation.sale_board` holds only this
+            till's own override and is null when `saleBoardSource` is `outlet`. `getWorkstation`, `listWorkstations`
+            and `configureWorkstation`'s answer build `saleBoard` from the override when there is one, otherwise from
+            the outlet's `platform.outlet.sale_board_id` and that `platform.sale_board` row (its id, kind and name).
+            So `updateOutlet` and `updateSaleBoard` change what every inheriting till shows with no write to
+            `platform.workstation`, and no stored copy can go stale.
           required: [id, kind]
           properties:
             id: { type: string, format: uuid }
