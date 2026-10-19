@@ -61,7 +61,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/sign-in
-    component: apps/venue-scanner/src/routes/access/SignInDetail.tsx
+    component: src/routes/access/SignInDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -248,7 +248,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/access-point-direction
-    component: apps/venue-scanner/src/routes/access/AccessPointDirectionDetail.tsx
+    component: src/routes/access/AccessPointDirectionDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -450,7 +450,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/ready-to-scan
-    component: apps/venue-scanner/src/routes/access/ReadyToScanDetail.tsx
+    component: src/routes/access/ReadyToScanDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -733,7 +733,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/group-admission
-    component: apps/venue-scanner/src/routes/access/GroupAdmissionDetail.tsx
+    component: src/routes/access/GroupAdmissionDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -908,7 +908,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/manual-entry
-    component: apps/venue-scanner/src/routes/access/ManualEntryDetail.tsx
+    component: src/routes/access/ManualEntryDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1089,7 +1089,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/ticket-lookup
-    component: apps/venue-scanner/src/routes/access/TicketLookupDetail.tsx
+    component: src/routes/access/TicketLookupDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1294,7 +1294,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/delegated-right
-    component: apps/venue-scanner/src/routes/access/DelegatedRightDetail.tsx
+    component: src/routes/access/DelegatedRightDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1420,7 +1420,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/offline-journal
-    component: apps/venue-scanner/src/routes/access/OfflineJournalDetail.tsx
+    component: src/routes/access/OfflineJournalDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1647,7 +1647,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/sync-reconciliation
-    component: apps/venue-scanner/src/routes/access/SyncReconciliationDetail.tsx
+    component: src/routes/access/SyncReconciliationDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1944,7 +1944,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/offline-package
-    component: apps/venue-scanner/src/routes/access/OfflinePackageDetail.tsx
+    component: src/routes/access/OfflinePackageDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2097,7 +2097,7 @@ screens:
   implementation:
     app: venue-scanner
     route: /access/gate-mode
-    component: apps/venue-scanner/src/routes/access/GateModeDetail.tsx
+    component: src/routes/access/GateModeDetail.tsx
     status: notStarted
   navigation:
     exitTo:

@@ -64,7 +64,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/platform-login-mfa
-    component: apps/ticvai-web/src/routes/general/PlatformLoginMfaList.tsx
+    component: src/routes/general/PlatformLoginMfaList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -347,7 +347,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/platform-dashboard
-    component: apps/ticvai-web/src/routes/general/PlatformDashboard.tsx
+    component: src/routes/general/PlatformDashboard.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
@@ -970,7 +970,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/cross-tenant-health-dashboard
-    component: apps/ticvai-web/src/routes/general/CrossTenantHealthDashboard.tsx
+    component: src/routes/general/CrossTenantHealthDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1291,7 +1291,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/platform-audit-log
-    component: apps/ticvai-web/src/routes/general/PlatformAuditLogList.tsx
+    component: src/routes/general/PlatformAuditLogList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1526,7 +1526,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/tenant-directory
-    component: apps/ticvai-web/src/routes/general/TenantDirectoryList.tsx
+    component: src/routes/general/TenantDirectoryList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2039,7 +2039,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/tenant-hierarchy-explorer
-    component: apps/ticvai-web/src/routes/general/TenantHierarchyExplorerList.tsx
+    component: src/routes/general/TenantHierarchyExplorerList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2399,7 +2399,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/module-and-feature-entitlement
-    component: apps/ticvai-web/src/routes/general/ModuleAndFeatureEntitlementDetail.tsx
+    component: src/routes/general/ModuleAndFeatureEntitlementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2692,7 +2692,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/subscription-and-plan-management
-    component: apps/ticvai-web/src/routes/general/SubscriptionAndPlanManagementForm.tsx
+    component: src/routes/general/SubscriptionAndPlanManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3131,7 +3131,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/tenant-billing-and-invoicing
-    component: apps/ticvai-web/src/routes/general/TenantBillingAndInvoicingDetail.tsx
+    component: src/routes/general/TenantBillingAndInvoicingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3381,7 +3381,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/usage-metering
-    component: apps/ticvai-web/src/routes/general/UsageMeteringDetail.tsx
+    component: src/routes/general/UsageMeteringDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3583,7 +3583,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/licence-and-seat-management
-    component: apps/ticvai-web/src/routes/general/LicenceAndSeatManagementForm.tsx
+    component: src/routes/general/LicenceAndSeatManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3896,7 +3896,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/tenant-isolation-and-resource-pool
-    component: apps/ticvai-web/src/routes/general/TenantIsolationAndResourcePoolDetail.tsx
+    component: src/routes/general/TenantIsolationAndResourcePoolDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4155,7 +4155,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/tenant-performance-monitor
-    component: apps/ticvai-web/src/routes/general/TenantPerformanceMonitorDashboard.tsx
+    component: src/routes/general/TenantPerformanceMonitorDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4354,7 +4354,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/auto-scaling-configuration
-    component: apps/ticvai-web/src/routes/general/AutoScalingConfigurationForm.tsx
+    component: src/routes/general/AutoScalingConfigurationForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4565,7 +4565,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/api-rate-limit-and-quota-management
-    component: apps/ticvai-web/src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx
+    component: src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5005,7 +5005,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/white-label-branding-management
-    component: apps/ticvai-web/src/routes/general/WhiteLabelBrandingManagementForm.tsx
+    component: src/routes/general/WhiteLabelBrandingManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5513,7 +5513,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/domain-and-certificate-management
-    component: apps/ticvai-web/src/routes/general/DomainAndCertificateManagementForm.tsx
+    component: src/routes/general/DomainAndCertificateManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5807,7 +5807,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/localisation-and-language-pack
-    component: apps/ticvai-web/src/routes/general/LocalisationAndLanguagePackDetail.tsx
+    component: src/routes/general/LocalisationAndLanguagePackDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6060,7 +6060,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/global-configuration-and-defaults
-    component: apps/ticvai-web/src/routes/general/GlobalConfigurationAndDefaultsForm.tsx
+    component: src/routes/general/GlobalConfigurationAndDefaultsForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6312,7 +6312,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/platform-user-directory
-    component: apps/ticvai-web/src/routes/general/PlatformUserDirectoryList.tsx
+    component: src/routes/general/PlatformUserDirectoryList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6582,7 +6582,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/platform-role-management
-    component: apps/ticvai-web/src/routes/general/PlatformRoleManagementForm.tsx
+    component: src/routes/general/PlatformRoleManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6838,7 +6838,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /access-identity/my-account-security
-    component: apps/ticvai-web/src/routes/access-identity/MyAccountSecurity.tsx
+    component: src/routes/access-identity/MyAccountSecurity.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7100,7 +7100,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/release-and-version-management
-    component: apps/ticvai-web/src/routes/general/ReleaseAndVersionManagementForm.tsx
+    component: src/routes/general/ReleaseAndVersionManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7372,7 +7372,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/staging-promotion-and-approval
-    component: apps/ticvai-web/src/routes/general/StagingPromotionAndApprovalWizard.tsx
+    component: src/routes/general/StagingPromotionAndApprovalWizard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7609,7 +7609,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/release-notification-composer
-    component: apps/ticvai-web/src/routes/general/ReleaseNotificationComposerForm.tsx
+    component: src/routes/general/ReleaseNotificationComposerForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7790,7 +7790,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/tenant-upgrade-scheduler
-    component: apps/ticvai-web/src/routes/general/TenantUpgradeSchedulerForm.tsx
+    component: src/routes/general/TenantUpgradeSchedulerForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7931,7 +7931,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/end-of-support-notice-management
-    component: apps/ticvai-web/src/routes/general/EndOfSupportNoticeManagementForm.tsx
+    component: src/routes/general/EndOfSupportNoticeManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8201,7 +8201,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/database-migration-console
-    component: apps/ticvai-web/src/routes/general/DatabaseMigrationConsoleDetail.tsx
+    component: src/routes/general/DatabaseMigrationConsoleDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8442,7 +8442,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/environment-registry
-    component: apps/ticvai-web/src/routes/general/EnvironmentRegistryDetail.tsx
+    component: src/routes/general/EnvironmentRegistryDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8588,7 +8588,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /releases-environments/configuration-promotion
-    component: apps/ticvai-web/src/routes/releases-environments/ConfigurationPromotion.tsx
+    component: src/routes/releases-environments/ConfigurationPromotion.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8814,7 +8814,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/deployment-monitor
-    component: apps/ticvai-web/src/routes/general/DeploymentMonitorDashboard.tsx
+    component: src/routes/general/DeploymentMonitorDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9127,7 +9127,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/infrastructure-sizing-and-scaling-policy
-    component: apps/ticvai-web/src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx
+    component: src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9317,7 +9317,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/security-and-compliance-dashboard
-    component: apps/ticvai-web/src/routes/general/SecurityAndComplianceDashboard.tsx
+    component: src/routes/general/SecurityAndComplianceDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9609,7 +9609,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/waf-and-security-policy-view
-    component: apps/ticvai-web/src/routes/general/WafAndSecurityPolicyViewForm.tsx
+    component: src/routes/general/WafAndSecurityPolicyViewForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9800,7 +9800,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/backup-and-dr-status
-    component: apps/ticvai-web/src/routes/general/BackupAndDrStatusDashboard.tsx
+    component: src/routes/general/BackupAndDrStatusDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9971,7 +9971,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/archival-job-monitor
-    component: apps/ticvai-web/src/routes/general/ArchivalJobMonitorDashboard.tsx
+    component: src/routes/general/ArchivalJobMonitorDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10118,7 +10118,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/support-and-escalation-console
-    component: apps/ticvai-web/src/routes/general/SupportAndEscalationConsoleDetail.tsx
+    component: src/routes/general/SupportAndEscalationConsoleDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10276,7 +10276,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /general/platform-notification-broadcast
-    component: apps/ticvai-web/src/routes/general/PlatformNotificationBroadcastForm.tsx
+    component: src/routes/general/PlatformNotificationBroadcastForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10445,7 +10445,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /ai/providers
-    component: apps/ticvai-web/src/routes/AiProviderCredentials.tsx
+    component: src/routes/AiProviderCredentials.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10930,7 +10930,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /commercial/tax-fee-calculation-command-center-adm-068
-    component: apps/ticvai-web/src/routes/commercial/TaxFeeCalculationCommandCenter.tsx
+    component: src/routes/commercial/TaxFeeCalculationCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11274,7 +11274,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/dead-letters
-    component: apps/ticvai-web/src/routes/DeadLetters.tsx
+    component: src/routes/DeadLetters.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -11542,7 +11542,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-command-center-adm-369
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialCommandCenter.tsx
+    component: src/routes/tenants-licensing/CommercialCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11693,7 +11693,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/customer-subscription-commercial-portfolio-adm-370
-    component: apps/ticvai-web/src/routes/tenants-licensing/CustomerSubscriptionCommercialPortfolio.tsx
+    component: src/routes/tenants-licensing/CustomerSubscriptionCommercialPortfolio.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11841,7 +11841,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/customer-commercial-360-adm-371
-    component: apps/ticvai-web/src/routes/tenants-licensing/CustomerCommercial360.tsx
+    component: src/routes/tenants-licensing/CustomerCommercial360.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11922,7 +11922,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/operational-profile-vsi-commercial-model-intelligence-adm-372
-    component: apps/ticvai-web/src/routes/tenants-licensing/OperationalProfileVsiCommercialModelIntelligence.tsx
+    component: src/routes/tenants-licensing/OperationalProfileVsiCommercialModelIntelligence.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12029,7 +12029,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/revenue-commercial-model-analytics-adm-373
-    component: apps/ticvai-web/src/routes/tenants-licensing/RevenueCommercialModelAnalytics.tsx
+    component: src/routes/tenants-licensing/RevenueCommercialModelAnalytics.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12174,7 +12174,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/trial-conversion-monitor-adm-374
-    component: apps/ticvai-web/src/routes/tenants-licensing/TrialConversionMonitor.tsx
+    component: src/routes/tenants-licensing/TrialConversionMonitor.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12273,7 +12273,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/renewal-retention-center-adm-375
-    component: apps/ticvai-web/src/routes/tenants-licensing/RenewalRetentionCenter.tsx
+    component: src/routes/tenants-licensing/RenewalRetentionCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12427,7 +12427,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-optimization-expansion-opportunities-adm-376
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialOptimizationExpansionOpportunities.tsx
+    component: src/routes/tenants-licensing/CommercialOptimizationExpansionOpportunities.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12569,7 +12569,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/subscription-exceptions-commercial-alerts-adm-377
-    component: apps/ticvai-web/src/routes/tenants-licensing/SubscriptionExceptionsCommercialAlerts.tsx
+    component: src/routes/tenants-licensing/SubscriptionExceptionsCommercialAlerts.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12661,7 +12661,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/executive-ai-commercial-intelligence-adm-378
-    component: apps/ticvai-web/src/routes/tenants-licensing/ExecutiveAiCommercialIntelligence.tsx
+    component: src/routes/tenants-licensing/ExecutiveAiCommercialIntelligence.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12892,7 +12892,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/welcome-start-your-ticvai-journey-adm-379
-    component: apps/ticvai-web/src/routes/tenants-licensing/WelcomeStartYourTicvaiJourney.tsx
+    component: src/routes/tenants-licensing/WelcomeStartYourTicvaiJourney.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13006,7 +13006,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/customer-organization-registration-adm-380
-    component: apps/ticvai-web/src/routes/tenants-licensing/CustomerOrganizationRegistration.tsx
+    component: src/routes/tenants-licensing/CustomerOrganizationRegistration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13164,7 +13164,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/venue-type-business-profile-adm-381
-    component: apps/ticvai-web/src/routes/tenants-licensing/VenueTypeBusinessProfile.tsx
+    component: src/routes/tenants-licensing/VenueTypeBusinessProfile.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13266,7 +13266,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/visitor-capacity-operational-scale-adm-382
-    component: apps/ticvai-web/src/routes/tenants-licensing/VisitorCapacityOperationalScale.tsx
+    component: src/routes/tenants-licensing/VisitorCapacityOperationalScale.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13346,7 +13346,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/sales-channel-assessment-adm-383
-    component: apps/ticvai-web/src/routes/tenants-licensing/SalesChannelAssessment.tsx
+    component: src/routes/tenants-licensing/SalesChannelAssessment.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13457,7 +13457,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/ticketing-product-requirements-adm-384
-    component: apps/ticvai-web/src/routes/tenants-licensing/TicketingProductRequirements.tsx
+    component: src/routes/tenants-licensing/TicketingProductRequirements.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13577,7 +13577,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/access-queue-visitor-experience-assessment-adm-385
-    component: apps/ticvai-web/src/routes/tenants-licensing/AccessQueueVisitorExperienceAssessment.tsx
+    component: src/routes/tenants-licensing/AccessQueueVisitorExperienceAssessment.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13657,7 +13657,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/additional-business-module-assessment-adm-386
-    component: apps/ticvai-web/src/routes/tenants-licensing/AdditionalBusinessModuleAssessment.tsx
+    component: src/routes/tenants-licensing/AdditionalBusinessModuleAssessment.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13748,7 +13748,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/integration-payment-technical-readiness-adm-387
-    component: apps/ticvai-web/src/routes/tenants-licensing/IntegrationPaymentTechnicalReadiness.tsx
+    component: src/routes/tenants-licensing/IntegrationPaymentTechnicalReadiness.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13829,7 +13829,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/ai-assessment-summary-handoff-adm-388
-    component: apps/ticvai-web/src/routes/tenants-licensing/AiAssessmentSummaryHandoff.tsx
+    component: src/routes/tenants-licensing/AiAssessmentSummaryHandoff.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13910,7 +13910,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-rules-engine-overview-adm-389
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialRulesEngineOverview.tsx
+    component: src/routes/tenants-licensing/CommercialRulesEngineOverview.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14062,7 +14062,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/vsi-model-builder-adm-390
-    component: apps/ticvai-web/src/routes/tenants-licensing/VsiModelBuilder.tsx
+    component: src/routes/tenants-licensing/VsiModelBuilder.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14176,7 +14176,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/vsi-scoring-tier-threshold-configuration-adm-391
-    component: apps/ticvai-web/src/routes/tenants-licensing/VsiScoringTierThresholdConfiguration.tsx
+    component: src/routes/tenants-licensing/VsiScoringTierThresholdConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14259,7 +14259,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/subscription-tier-configuration-adm-392
-    component: apps/ticvai-web/src/routes/tenants-licensing/SubscriptionTierConfiguration.tsx
+    component: src/routes/tenants-licensing/SubscriptionTierConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14351,7 +14351,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/tier-included-allowances-adm-393
-    component: apps/ticvai-web/src/routes/tenants-licensing/TierIncludedAllowances.tsx
+    component: src/routes/tenants-licensing/TierIncludedAllowances.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14455,7 +14455,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-licensing-model-configuration-adm-394
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialLicensingModelConfiguration.tsx
+    component: src/routes/tenants-licensing/CommercialLicensingModelConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14629,7 +14629,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/billable-unit-minimum-guarantee-enforcement-rules-adm-395
-    component: apps/ticvai-web/src/routes/tenants-licensing/BillableUnitMinimumGuaranteeEnforcementRules.tsx
+    component: src/routes/tenants-licensing/BillableUnitMinimumGuaranteeEnforcementRules.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14765,7 +14765,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/overage-pricing-capacity-packs-adm-396
-    component: apps/ticvai-web/src/routes/tenants-licensing/OveragePricingCapacityPacks.tsx
+    component: src/routes/tenants-licensing/OveragePricingCapacityPacks.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14884,7 +14884,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-model-rule-simulation-adm-397
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialModelRuleSimulation.tsx
+    component: src/routes/tenants-licensing/CommercialModelRuleSimulation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14990,7 +14990,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/rule-versioning-approval-publication-adm-398
-    component: apps/ticvai-web/src/routes/tenants-licensing/RuleVersioningApprovalPublication.tsx
+    component: src/routes/tenants-licensing/RuleVersioningApprovalPublication.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15088,7 +15088,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/recommended-package-overview-adm-399
-    component: apps/ticvai-web/src/routes/tenants-licensing/RecommendedPackageOverview.tsx
+    component: src/routes/tenants-licensing/RecommendedPackageOverview.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15210,7 +15210,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-model-tier-selection-adm-400
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialModelTierSelection.tsx
+    component: src/routes/tenants-licensing/CommercialModelTierSelection.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15303,7 +15303,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/module-marketplace-adm-401
-    component: apps/ticvai-web/src/routes/tenants-licensing/ModuleMarketplace.tsx
+    component: src/routes/tenants-licensing/ModuleMarketplace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15412,7 +15412,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/ai-module-package-recommendations-adm-402
-    component: apps/ticvai-web/src/routes/tenants-licensing/AiModulePackageRecommendations.tsx
+    component: src/routes/tenants-licensing/AiModulePackageRecommendations.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15518,7 +15518,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/module-detail-commercial-treatment-adm-403
-    component: apps/ticvai-web/src/routes/tenants-licensing/ModuleDetailCommercialTreatment.tsx
+    component: src/routes/tenants-licensing/ModuleDetailCommercialTreatment.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15595,7 +15595,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/module-dependency-compatibility-manager-adm-404
-    component: apps/ticvai-web/src/routes/tenants-licensing/ModuleDependencyCompatibilityManager.tsx
+    component: src/routes/tenants-licensing/ModuleDependencyCompatibilityManager.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15683,7 +15683,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/add-ons-capacity-commercial-options-adm-405
-    component: apps/ticvai-web/src/routes/tenants-licensing/AddOnsCapacityCommercialOptions.tsx
+    component: src/routes/tenants-licensing/AddOnsCapacityCommercialOptions.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15766,7 +15766,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-package-simulator-adm-406
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialPackageSimulator.tsx
+    component: src/routes/tenants-licensing/CommercialPackageSimulator.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15876,7 +15876,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/package-review-commercial-summary-adm-407
-    component: apps/ticvai-web/src/routes/tenants-licensing/PackageReviewCommercialSummary.tsx
+    component: src/routes/tenants-licensing/PackageReviewCommercialSummary.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15977,7 +15977,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/final-package-approval-handoff-adm-408
-    component: apps/ticvai-web/src/routes/tenants-licensing/FinalPackageApprovalHandoff.tsx
+    component: src/routes/tenants-licensing/FinalPackageApprovalHandoff.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -16061,7 +16061,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/purchase-trial-journey-selection-adm-409
-    component: apps/ticvai-web/src/routes/tenants-licensing/PurchaseTrialJourneySelection.tsx
+    component: src/routes/tenants-licensing/PurchaseTrialJourneySelection.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -16173,7 +16173,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/contract-billing-cycle-selection-adm-410
-    component: apps/ticvai-web/src/routes/tenants-licensing/ContractBillingCycleSelection.tsx
+    component: src/routes/tenants-licensing/ContractBillingCycleSelection.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -16264,7 +16264,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/billing-legal-entity-information-adm-411
-    component: apps/ticvai-web/src/routes/tenants-licensing/BillingLegalEntityInformation.tsx
+    component: src/routes/tenants-licensing/BillingLegalEntityInformation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -16480,7 +16480,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/payment-method-settlement-setup-adm-412
-    component: apps/ticvai-web/src/routes/tenants-licensing/PaymentMethodSettlementSetup.tsx
+    component: src/routes/tenants-licensing/PaymentMethodSettlementSetup.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -16727,7 +16727,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/trial-configuration-conversion-rules-adm-413
-    component: apps/ticvai-web/src/routes/tenants-licensing/TrialConfigurationConversionRules.tsx
+    component: src/routes/tenants-licensing/TrialConfigurationConversionRules.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -16858,7 +16858,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/order-commercial-pricing-review-adm-414
-    component: apps/ticvai-web/src/routes/tenants-licensing/OrderCommercialPricingReview.tsx
+    component: src/routes/tenants-licensing/OrderCommercialPricingReview.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -16961,7 +16961,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-agreement-billable-definition-customer-accept-adm-415
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialAgreementBillableDefinitionCustomerAcc.tsx
+    component: src/routes/tenants-licensing/CommercialAgreementBillableDefinitionCustomerAcc.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -17067,7 +17067,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/payment-contract-commercial-validation-adm-416
-    component: apps/ticvai-web/src/routes/tenants-licensing/PaymentContractCommercialValidation.tsx
+    component: src/routes/tenants-licensing/PaymentContractCommercialValidation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -17147,7 +17147,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/subscription-confirmation-commercial-activation-adm-417
-    component: apps/ticvai-web/src/routes/tenants-licensing/SubscriptionConfirmationCommercialActivation.tsx
+    component: src/routes/tenants-licensing/SubscriptionConfirmationCommercialActivation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -17233,7 +17233,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/subscription-lifecycle-trial-to-paid-handoff-adm-418
-    component: apps/ticvai-web/src/routes/tenants-licensing/SubscriptionLifecycleTrialToPaidHandoff.tsx
+    component: src/routes/tenants-licensing/SubscriptionLifecycleTrialToPaidHandoff.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -17370,7 +17370,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/provisioning-command-center-adm-419
-    component: apps/ticvai-web/src/routes/tenants-licensing/ProvisioningCommandCenter.tsx
+    component: src/routes/tenants-licensing/ProvisioningCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -17507,7 +17507,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/tenant-organization-provisioning-adm-420
-    component: apps/ticvai-web/src/routes/tenants-licensing/TenantOrganizationProvisioning.tsx
+    component: src/routes/tenants-licensing/TenantOrganizationProvisioning.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -17696,7 +17696,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/venue-operational-structure-creation-adm-421
-    component: apps/ticvai-web/src/routes/tenants-licensing/VenueOperationalStructureCreation.tsx
+    component: src/routes/tenants-licensing/VenueOperationalStructureCreation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -17895,7 +17895,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/administrator-security-initialization-adm-422
-    component: apps/ticvai-web/src/routes/tenants-licensing/AdministratorSecurityInitialization.tsx
+    component: src/routes/tenants-licensing/AdministratorSecurityInitialization.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -18122,7 +18122,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/license-entitlement-activation-adm-423
-    component: apps/ticvai-web/src/routes/tenants-licensing/LicenseEntitlementActivation.tsx
+    component: src/routes/tenants-licensing/LicenseEntitlementActivation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -18199,7 +18199,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/module-activation-dependency-validation-adm-424
-    component: apps/ticvai-web/src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx
+    component: src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -18403,7 +18403,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/venue-template-application-adm-425
-    component: apps/ticvai-web/src/routes/tenants-licensing/VenueTemplateApplication.tsx
+    component: src/routes/tenants-licensing/VenueTemplateApplication.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -18577,7 +18577,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/initial-configuration-regional-defaults-adm-426
-    component: apps/ticvai-web/src/routes/tenants-licensing/InitialConfigurationRegionalDefaults.tsx
+    component: src/routes/tenants-licensing/InitialConfigurationRegionalDefaults.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -18827,7 +18827,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/provisioning-validation-exception-management-adm-427
-    component: apps/ticvai-web/src/routes/tenants-licensing/ProvisioningValidationExceptionManagement.tsx
+    component: src/routes/tenants-licensing/ProvisioningValidationExceptionManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -18898,7 +18898,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/usage-license-command-center-adm-449
-    component: apps/ticvai-web/src/routes/tenants-licensing/UsageLicenseCommandCenter.tsx
+    component: src/routes/tenants-licensing/UsageLicenseCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19015,7 +19015,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/entitlement-license-inventory-adm-450
-    component: apps/ticvai-web/src/routes/tenants-licensing/EntitlementLicenseInventory.tsx
+    component: src/routes/tenants-licensing/EntitlementLicenseInventory.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19096,7 +19096,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-consumption-billable-event-metering-adm-451
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialConsumptionBillableEventMetering.tsx
+    component: src/routes/tenants-licensing/CommercialConsumptionBillableEventMetering.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19177,7 +19177,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/operational-usage-threshold-monitor-adm-452
-    component: apps/ticvai-web/src/routes/tenants-licensing/OperationalUsageThresholdMonitor.tsx
+    component: src/routes/tenants-licensing/OperationalUsageThresholdMonitor.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19248,7 +19248,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/license-enforcement-decision-engine-adm-453
-    component: apps/ticvai-web/src/routes/tenants-licensing/LicenseEnforcementDecisionEngine.tsx
+    component: src/routes/tenants-licensing/LicenseEnforcementDecisionEngine.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19355,7 +19355,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/minimum-guarantee-variable-consumption-monitor-adm-454
-    component: apps/ticvai-web/src/routes/tenants-licensing/MinimumGuaranteeVariableConsumptionMonitor.tsx
+    component: src/routes/tenants-licensing/MinimumGuaranteeVariableConsumptionMonitor.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19446,7 +19446,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/overage-capacity-temporary-exception-management-adm-455
-    component: apps/ticvai-web/src/routes/tenants-licensing/OverageCapacityTemporaryExceptionManagement.tsx
+    component: src/routes/tenants-licensing/OverageCapacityTemporaryExceptionManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19543,7 +19543,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/usage-alerts-reconciliation-exception-center-adm-456
-    component: apps/ticvai-web/src/routes/tenants-licensing/UsageAlertsReconciliationExceptionCenter.tsx
+    component: src/routes/tenants-licensing/UsageAlertsReconciliationExceptionCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19618,7 +19618,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/ai-usage-forecast-commercial-optimization-adm-457
-    component: apps/ticvai-web/src/routes/tenants-licensing/AiUsageForecastCommercialOptimization.tsx
+    component: src/routes/tenants-licensing/AiUsageForecastCommercialOptimization.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19698,7 +19698,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/license-metering-commercial-synchronization-audit-adm-458
-    component: apps/ticvai-web/src/routes/tenants-licensing/LicenseMeteringCommercialSynchronizationAudit.tsx
+    component: src/routes/tenants-licensing/LicenseMeteringCommercialSynchronizationAudit.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -19811,7 +19811,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/billing-commercial-command-center-adm-459
-    component: apps/ticvai-web/src/routes/tenants-licensing/BillingCommercialCommandCenter.tsx
+    component: src/routes/tenants-licensing/BillingCommercialCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -20015,7 +20015,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/billing-calculation-charge-breakdown-adm-460
-    component: apps/ticvai-web/src/routes/tenants-licensing/BillingCalculationChargeBreakdown.tsx
+    component: src/routes/tenants-licensing/BillingCalculationChargeBreakdown.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -20167,7 +20167,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/consumption-reconciliation-billing-approval-adm-461
-    component: apps/ticvai-web/src/routes/tenants-licensing/ConsumptionReconciliationBillingApproval.tsx
+    component: src/routes/tenants-licensing/ConsumptionReconciliationBillingApproval.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -20253,7 +20253,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/invoice-payment-management-adm-462
-    component: apps/ticvai-web/src/routes/tenants-licensing/InvoicePaymentManagement.tsx
+    component: src/routes/tenants-licensing/InvoicePaymentManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -20358,7 +20358,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/subscription-commercial-change-management-adm-463
-    component: apps/ticvai-web/src/routes/tenants-licensing/SubscriptionCommercialChangeManagement.tsx
+    component: src/routes/tenants-licensing/SubscriptionCommercialChangeManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -20462,7 +20462,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/renewal-management-center-adm-464
-    component: apps/ticvai-web/src/routes/tenants-licensing/RenewalManagementCenter.tsx
+    component: src/routes/tenants-licensing/RenewalManagementCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -20620,7 +20620,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/ai-upgrade-downgrade-commercial-right-sizing-adm-465
-    component: apps/ticvai-web/src/routes/tenants-licensing/AiUpgradeDowngradeCommercialRightSizing.tsx
+    component: src/routes/tenants-licensing/AiUpgradeDowngradeCommercialRightSizing.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -20706,7 +20706,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/commercial-scenario-simulator-adm-466
-    component: apps/ticvai-web/src/routes/tenants-licensing/CommercialScenarioSimulator.tsx
+    component: src/routes/tenants-licensing/CommercialScenarioSimulator.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -20812,7 +20812,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/discount-credit-commercial-override-management-adm-467
-    component: apps/ticvai-web/src/routes/tenants-licensing/DiscountCreditCommercialOverrideManagement.tsx
+    component: src/routes/tenants-licensing/DiscountCreditCommercialOverrideManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -20926,7 +20926,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /tenants-licensing/renewal-approval-activation-commercial-handoff-adm-468
-    component: apps/ticvai-web/src/routes/tenants-licensing/RenewalApprovalActivationCommercialHandoff.tsx
+    component: src/routes/tenants-licensing/RenewalApprovalActivationCommercialHandoff.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -21006,7 +21006,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-configuration-home-start-adm-469
-    component: apps/ticvai-web/src/routes/platform/AiConfigurationHomeStart.tsx
+    component: src/routes/platform/AiConfigurationHomeStart.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -21301,7 +21301,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/setup-type-business-intent-discovery-adm-470
-    component: apps/ticvai-web/src/routes/platform/SetupTypeBusinessIntentDiscovery.tsx
+    component: src/routes/platform/SetupTypeBusinessIntentDiscovery.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -21529,7 +21529,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/venue-business-model-discovery-adm-471
-    component: apps/ticvai-web/src/routes/platform/VenueBusinessModelDiscovery.tsx
+    component: src/routes/platform/VenueBusinessModelDiscovery.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -21836,7 +21836,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/guided-question-answer-workspace-adm-472
-    component: apps/ticvai-web/src/routes/platform/GuidedQuestionAnswerWorkspace.tsx
+    component: src/routes/platform/GuidedQuestionAnswerWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -22021,7 +22021,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/product-admission-model-discovery-adm-473
-    component: apps/ticvai-web/src/routes/platform/ProductAdmissionModelDiscovery.tsx
+    component: src/routes/platform/ProductAdmissionModelDiscovery.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -22204,7 +22204,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/operational-requirement-discovery-adm-474
-    component: apps/ticvai-web/src/routes/platform/OperationalRequirementDiscovery.tsx
+    component: src/routes/platform/OperationalRequirementDiscovery.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -22394,7 +22394,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/commercial-requirement-discovery-adm-475
-    component: apps/ticvai-web/src/routes/platform/CommercialRequirementDiscovery.tsx
+    component: src/routes/platform/CommercialRequirementDiscovery.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -22579,7 +22579,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/required-recommended-optional-decisions-adm-476
-    component: apps/ticvai-web/src/routes/platform/RequiredRecommendedOptionalDecisions.tsx
+    component: src/routes/platform/RequiredRecommendedOptionalDecisions.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -22750,7 +22750,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/missing-information-clarification-center-adm-477
-    component: apps/ticvai-web/src/routes/platform/MissingInformationClarificationCenter.tsx
+    component: src/routes/platform/MissingInformationClarificationCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -22937,7 +22937,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/configuration-blueprint-dependency-map-adm-478
-    component: apps/ticvai-web/src/routes/platform/ConfigurationBlueprintDependencyMap.tsx
+    component: src/routes/platform/ConfigurationBlueprintDependencyMap.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -23118,7 +23118,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-configuration-build-command-center-adm-479
-    component: apps/ticvai-web/src/routes/platform/AiConfigurationBuildCommandCenter.tsx
+    component: src/routes/platform/AiConfigurationBuildCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -23366,7 +23366,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/venue-organization-configuration-adm-480
-    component: apps/ticvai-web/src/routes/platform/VenueOrganizationConfiguration.tsx
+    component: src/routes/platform/VenueOrganizationConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -23555,7 +23555,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/product-configuration-assistant-adm-481
-    component: apps/ticvai-web/src/routes/platform/ProductConfigurationAssistant.tsx
+    component: src/routes/platform/ProductConfigurationAssistant.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -23746,7 +23746,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/schedule-capacity-availability-configuration-adm-482
-    component: apps/ticvai-web/src/routes/platform/ScheduleCapacityAvailabilityConfiguration.tsx
+    component: src/routes/platform/ScheduleCapacityAvailabilityConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -23935,7 +23935,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/pricing-commercial-configuration-adm-483
-    component: apps/ticvai-web/src/routes/platform/PricingCommercialConfiguration.tsx
+    component: src/routes/platform/PricingCommercialConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -24142,7 +24142,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/promotion-bundle-upsell-configuration-adm-484
-    component: apps/ticvai-web/src/routes/platform/PromotionBundleUpsellConfiguration.tsx
+    component: src/routes/platform/PromotionBundleUpsellConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -24331,7 +24331,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/seating-access-operational-configuration-adm-485
-    component: apps/ticvai-web/src/routes/platform/SeatingAccessOperationalConfiguration.tsx
+    component: src/routes/platform/SeatingAccessOperationalConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -24522,7 +24522,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/channel-media-fulfillment-configuration-adm-486
-    component: apps/ticvai-web/src/routes/platform/ChannelMediaFulfillmentConfiguration.tsx
+    component: src/routes/platform/ChannelMediaFulfillmentConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -24710,7 +24710,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/cross-module-conflict-dependency-validation-adm-487
-    component: apps/ticvai-web/src/routes/platform/CrossModuleConflictDependencyValidation.tsx
+    component: src/routes/platform/CrossModuleConflictDependencyValidation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -24903,7 +24903,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/configuration-preview-impact-analysis-adm-488
-    component: apps/ticvai-web/src/routes/platform/ConfigurationPreviewImpactAnalysis.tsx
+    component: src/routes/platform/ConfigurationPreviewImpactAnalysis.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -25143,7 +25143,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-configuration-readiness-center-adm-489
-    component: apps/ticvai-web/src/routes/platform/AiConfigurationReadinessCenter.tsx
+    component: src/routes/platform/AiConfigurationReadinessCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -25443,7 +25443,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/configuration-validation-results-adm-490
-    component: apps/ticvai-web/src/routes/platform/ConfigurationValidationResults.tsx
+    component: src/routes/platform/ConfigurationValidationResults.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -25624,7 +25624,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-recommendations-best-practice-review-adm-491
-    component: apps/ticvai-web/src/routes/platform/AiRecommendationsBestPracticeReview.tsx
+    component: src/routes/platform/AiRecommendationsBestPracticeReview.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -25825,7 +25825,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/configuration-approval-workflow-adm-492
-    component: apps/ticvai-web/src/routes/platform/ConfigurationApprovalWorkflow.tsx
+    component: src/routes/platform/ConfigurationApprovalWorkflow.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -25993,7 +25993,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-configuration-execution-center-adm-493
-    component: apps/ticvai-web/src/routes/platform/AiConfigurationExecutionCenter.tsx
+    component: src/routes/platform/AiConfigurationExecutionCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -26186,7 +26186,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/execution-progress-dependency-monitor-adm-494
-    component: apps/ticvai-web/src/routes/platform/ExecutionProgressDependencyMonitor.tsx
+    component: src/routes/platform/ExecutionProgressDependencyMonitor.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -26414,7 +26414,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/configuration-results-object-mapping-adm-495
-    component: apps/ticvai-web/src/routes/platform/ConfigurationResultsObjectMapping.tsx
+    component: src/routes/platform/ConfigurationResultsObjectMapping.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -26608,7 +26608,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/configuration-change-modification-assistant-adm-496
-    component: apps/ticvai-web/src/routes/platform/ConfigurationChangeModificationAssistant.tsx
+    component: src/routes/platform/ConfigurationChangeModificationAssistant.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -26781,7 +26781,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/configuration-history-versions-rollback-adm-497
-    component: apps/ticvai-web/src/routes/platform/ConfigurationHistoryVersionsRollback.tsx
+    component: src/routes/platform/ConfigurationHistoryVersionsRollback.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -26973,7 +26973,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-configuration-audit-governance-adm-498
-    component: apps/ticvai-web/src/routes/platform/AiConfigurationAuditGovernance.tsx
+    component: src/routes/platform/AiConfigurationAuditGovernance.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -27317,7 +27317,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/forecasting-command-center-adm-499
-    component: apps/ticvai-web/src/routes/analytics/ForecastingCommandCenter.tsx
+    component: src/routes/analytics/ForecastingCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -27579,7 +27579,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/forecast-configuration-forecasting-strategy-adm-500
-    component: apps/ticvai-web/src/routes/analytics/ForecastConfigurationForecastingStrategy.tsx
+    component: src/routes/analytics/ForecastConfigurationForecastingStrategy.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -27858,7 +27858,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/forecast-data-signal-configuration-adm-501
-    component: apps/ticvai-web/src/routes/analytics/ForecastDataSignalConfiguration.tsx
+    component: src/routes/analytics/ForecastDataSignalConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -28050,7 +28050,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/attendance-visitation-forecast-adm-502
-    component: apps/ticvai-web/src/routes/analytics/AttendanceVisitationForecast.tsx
+    component: src/routes/analytics/AttendanceVisitationForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -28236,7 +28236,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/ticket-product-timeslot-demand-forecast-adm-503
-    component: apps/ticvai-web/src/routes/analytics/TicketProductTimeslotDemandForecast.tsx
+    component: src/routes/analytics/TicketProductTimeslotDemandForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -28469,7 +28469,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/channel-booking-pace-forecast-adm-504
-    component: apps/ticvai-web/src/routes/analytics/ChannelBookingPaceForecast.tsx
+    component: src/routes/analytics/ChannelBookingPaceForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -28686,7 +28686,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/revenue-commercial-forecast-adm-505
-    component: apps/ticvai-web/src/routes/analytics/RevenueCommercialForecast.tsx
+    component: src/routes/analytics/RevenueCommercialForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -28922,7 +28922,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/forecast-drivers-confidence-explainability-adm-506
-    component: apps/ticvai-web/src/routes/analytics/ForecastDriversConfidenceExplainability.tsx
+    component: src/routes/analytics/ForecastDriversConfidenceExplainability.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -29192,7 +29192,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/forecast-scenario-what-if-simulator-adm-507
-    component: apps/ticvai-web/src/routes/analytics/ForecastScenarioWhatIfSimulator.tsx
+    component: src/routes/analytics/ForecastScenarioWhatIfSimulator.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -29383,7 +29383,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/forecast-accuracy-review-publication-center-adm-508
-    component: apps/ticvai-web/src/routes/analytics/ForecastAccuracyReviewPublicationCenter.tsx
+    component: src/routes/analytics/ForecastAccuracyReviewPublicationCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -29658,7 +29658,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/operational-forecasting-command-center-adm-509
-    component: apps/ticvai-web/src/routes/analytics/OperationalForecastingCommandCenter.tsx
+    component: src/routes/analytics/OperationalForecastingCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -29927,7 +29927,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/capacity-occupancy-forecast-adm-510
-    component: apps/ticvai-web/src/routes/analytics/CapacityOccupancyForecast.tsx
+    component: src/routes/analytics/CapacityOccupancyForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -30119,7 +30119,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/attraction-utilization-queue-forecast-adm-511
-    component: apps/ticvai-web/src/routes/analytics/AttractionUtilizationQueueForecast.tsx
+    component: src/routes/analytics/AttractionUtilizationQueueForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -30299,7 +30299,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/entry-access-guest-flow-forecast-adm-512
-    component: apps/ticvai-web/src/routes/analytics/EntryAccessGuestFlowForecast.tsx
+    component: src/routes/analytics/EntryAccessGuestFlowForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -30463,7 +30463,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/workforce-demand-staffing-forecast-adm-513
-    component: apps/ticvai-web/src/routes/analytics/WorkforceDemandStaffingForecast.tsx
+    component: src/routes/analytics/WorkforceDemandStaffingForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -30657,7 +30657,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/pos-kiosk-frontline-service-forecast-adm-514
-    component: apps/ticvai-web/src/routes/analytics/PosKioskFrontlineServiceForecast.tsx
+    component: src/routes/analytics/PosKioskFrontlineServiceForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -30843,7 +30843,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/f-b-retail-inventory-demand-forecast-adm-515
-    component: apps/ticvai-web/src/routes/analytics/FBRetailInventoryDemandForecast.tsx
+    component: src/routes/analytics/FBRetailInventoryDemandForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -31009,7 +31009,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/resource-equipment-facility-requirement-forecast-adm-516
-    component: apps/ticvai-web/src/routes/analytics/ResourceEquipmentFacilityRequirementForecast.tsx
+    component: src/routes/analytics/ResourceEquipmentFacilityRequirementForecast.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -31173,7 +31173,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/operational-scenario-readiness-simulator-adm-517
-    component: apps/ticvai-web/src/routes/analytics/OperationalScenarioReadinessSimulator.tsx
+    component: src/routes/analytics/OperationalScenarioReadinessSimulator.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -31341,7 +31341,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /analytics/operational-forecast-review-recommendations-handover-adm-518
-    component: apps/ticvai-web/src/routes/analytics/OperationalForecastReviewRecommendationsHandover.tsx
+    component: src/routes/analytics/OperationalForecastReviewRecommendationsHandover.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -31534,7 +31534,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-governance-command-center-adm-519
-    component: apps/ticvai-web/src/routes/platform/AiGovernanceCommandCenter.tsx
+    component: src/routes/platform/AiGovernanceCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -31804,7 +31804,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-capability-registry-ownership-adm-520
-    component: apps/ticvai-web/src/routes/platform/AiCapabilityRegistryOwnership.tsx
+    component: src/routes/platform/AiCapabilityRegistryOwnership.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -32035,7 +32035,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-risk-classification-assessment-adm-521
-    component: apps/ticvai-web/src/routes/platform/AiRiskClassificationAssessment.tsx
+    component: src/routes/platform/AiRiskClassificationAssessment.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -32221,7 +32221,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-autonomy-level-configuration-adm-522
-    component: apps/ticvai-web/src/routes/platform/AiAutonomyLevelConfiguration.tsx
+    component: src/routes/platform/AiAutonomyLevelConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -32412,7 +32412,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-action-permission-policy-builder-adm-523
-    component: apps/ticvai-web/src/routes/platform/AiActionPermissionPolicyBuilder.tsx
+    component: src/routes/platform/AiActionPermissionPolicyBuilder.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -32683,7 +32683,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-data-access-usage-policy-adm-524
-    component: apps/ticvai-web/src/routes/platform/AiDataAccessUsagePolicy.tsx
+    component: src/routes/platform/AiDataAccessUsagePolicy.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -32870,7 +32870,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/environment-tenant-scope-governance-adm-525
-    component: apps/ticvai-web/src/routes/platform/EnvironmentTenantScopeGovernance.tsx
+    component: src/routes/platform/EnvironmentTenantScopeGovernance.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -33047,7 +33047,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-policy-conflict-exception-override-management-adm-526
-    component: apps/ticvai-web/src/routes/platform/AiPolicyConflictExceptionOverrideManagement.tsx
+    component: src/routes/platform/AiPolicyConflictExceptionOverrideManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -33288,7 +33288,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-policy-testing-governance-simulation-adm-527
-    component: apps/ticvai-web/src/routes/platform/AiPolicyTestingGovernanceSimulation.tsx
+    component: src/routes/platform/AiPolicyTestingGovernanceSimulation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -33487,7 +33487,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-governance-policy-publication-effective-policy-map-adm-528
-    component: apps/ticvai-web/src/routes/platform/AiGovernancePolicyPublicationEffectivePolicyMap.tsx
+    component: src/routes/platform/AiGovernancePolicyPublicationEffectivePolicyMap.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -33704,7 +33704,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-human-oversight-command-center-adm-529
-    component: apps/ticvai-web/src/routes/platform/AiHumanOversightCommandCenter.tsx
+    component: src/routes/platform/AiHumanOversightCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -33968,7 +33968,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-approval-requirement-routing-configuration-adm-530
-    component: apps/ticvai-web/src/routes/platform/AiApprovalRequirementRoutingConfiguration.tsx
+    component: src/routes/platform/AiApprovalRequirementRoutingConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -34210,7 +34210,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-approval-review-workspace-adm-531
-    component: apps/ticvai-web/src/routes/platform/AiApprovalReviewWorkspace.tsx
+    component: src/routes/platform/AiApprovalReviewWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -34373,7 +34373,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/conditional-approval-approval-conditions-adm-532
-    component: apps/ticvai-web/src/routes/platform/ConditionalApprovalApprovalConditions.tsx
+    component: src/routes/platform/ConditionalApprovalApprovalConditions.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -34583,7 +34583,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/human-review-challenge-ai-clarification-workspace-adm-533
-    component: apps/ticvai-web/src/routes/platform/HumanReviewChallengeAiClarificationWorkspace.tsx
+    component: src/routes/platform/HumanReviewChallengeAiClarificationWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -34783,7 +34783,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/escalation-delegation-approval-sla-management-adm-534
-    component: apps/ticvai-web/src/routes/platform/EscalationDelegationApprovalSlaManagement.tsx
+    component: src/routes/platform/EscalationDelegationApprovalSlaManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -35015,7 +35015,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/live-ai-execution-oversight-human-intervention-adm-535
-    component: apps/ticvai-web/src/routes/platform/LiveAiExecutionOversightHumanIntervention.tsx
+    component: src/routes/platform/LiveAiExecutionOversightHumanIntervention.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -35268,7 +35268,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/human-override-manual-control-center-adm-536
-    component: apps/ticvai-web/src/routes/platform/HumanOverrideManualControlCenter.tsx
+    component: src/routes/platform/HumanOverrideManualControlCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -35572,7 +35572,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/approval-intervention-history-decision-timeline-adm-537
-    component: apps/ticvai-web/src/routes/platform/ApprovalInterventionHistoryDecisionTimeline.tsx
+    component: src/routes/platform/ApprovalInterventionHistoryDecisionTimeline.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -35757,7 +35757,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/human-oversight-workflow-simulator-readiness-center-adm-538
-    component: apps/ticvai-web/src/routes/platform/HumanOversightWorkflowSimulatorReadinessCenter.tsx
+    component: src/routes/platform/HumanOversightWorkflowSimulatorReadinessCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -35953,7 +35953,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-explainability-audit-command-center-adm-539
-    component: apps/ticvai-web/src/routes/platform/AiExplainabilityAuditCommandCenter.tsx
+    component: src/routes/platform/AiExplainabilityAuditCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -36216,7 +36216,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-decision-explorer-search-adm-540
-    component: apps/ticvai-web/src/routes/platform/AiDecisionExplorerSearch.tsx
+    component: src/routes/platform/AiDecisionExplorerSearch.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -36426,7 +36426,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-decision-explanation-workspace-adm-541
-    component: apps/ticvai-web/src/routes/platform/AiDecisionExplanationWorkspace.tsx
+    component: src/routes/platform/AiDecisionExplanationWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -36614,7 +36614,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/data-feature-evidence-provenance-adm-542
-    component: apps/ticvai-web/src/routes/platform/DataFeatureEvidenceProvenance.tsx
+    component: src/routes/platform/DataFeatureEvidenceProvenance.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -36815,7 +36815,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/candidate-rule-decision-path-trace-adm-543
-    component: apps/ticvai-web/src/routes/platform/CandidateRuleDecisionPathTrace.tsx
+    component: src/routes/platform/CandidateRuleDecisionPathTrace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -37014,7 +37014,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/model-provider-ai-runtime-trace-adm-544
-    component: apps/ticvai-web/src/routes/platform/ModelProviderAiRuntimeTrace.tsx
+    component: src/routes/platform/ModelProviderAiRuntimeTrace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -37241,7 +37241,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/governance-approval-human-decision-trace-adm-545
-    component: apps/ticvai-web/src/routes/platform/GovernanceApprovalHumanDecisionTrace.tsx
+    component: src/routes/platform/GovernanceApprovalHumanDecisionTrace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -37425,7 +37425,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/execution-business-outcome-trace-adm-546
-    component: apps/ticvai-web/src/routes/platform/ExecutionBusinessOutcomeTrace.tsx
+    component: src/routes/platform/ExecutionBusinessOutcomeTrace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -37596,7 +37596,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-audit-record-evidence-package-adm-547
-    component: apps/ticvai-web/src/routes/platform/AiAuditRecordEvidencePackage.tsx
+    component: src/routes/platform/AiAuditRecordEvidencePackage.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -37785,7 +37785,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-trace-investigation-replay-simulator-adm-548
-    component: apps/ticvai-web/src/routes/platform/AiTraceInvestigationReplaySimulator.tsx
+    component: src/routes/platform/AiTraceInvestigationReplaySimulator.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -37982,7 +37982,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-governance-monitoring-command-center-adm-549
-    component: apps/ticvai-web/src/routes/platform/AiGovernanceMonitoringCommandCenter.tsx
+    component: src/routes/platform/AiGovernanceMonitoringCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -38298,7 +38298,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-risk-register-risk-exposure-management-adm-550
-    component: apps/ticvai-web/src/routes/platform/AiRiskRegisterRiskExposureManagement.tsx
+    component: src/routes/platform/AiRiskRegisterRiskExposureManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -38500,7 +38500,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-governance-control-library-control-effectiveness-adm-551
-    component: apps/ticvai-web/src/routes/platform/AiGovernanceControlLibraryControlEffectiveness.tsx
+    component: src/routes/platform/AiGovernanceControlLibraryControlEffectiveness.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -38684,7 +38684,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-policy-compliance-violation-monitoring-adm-552
-    component: apps/ticvai-web/src/routes/platform/AiPolicyComplianceViolationMonitoring.tsx
+    component: src/routes/platform/AiPolicyComplianceViolationMonitoring.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -38901,7 +38901,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-data-privacy-usage-compliance-monitoring-adm-553
-    component: apps/ticvai-web/src/routes/platform/AiDataPrivacyUsageComplianceMonitoring.tsx
+    component: src/routes/platform/AiDataPrivacyUsageComplianceMonitoring.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -39144,7 +39144,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-quality-behavior-governance-drift-monitoring-adm-554
-    component: apps/ticvai-web/src/routes/platform/AiQualityBehaviorGovernanceDriftMonitoring.tsx
+    component: src/routes/platform/AiQualityBehaviorGovernanceDriftMonitoring.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -39435,7 +39435,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-governance-alert-detection-center-adm-555
-    component: apps/ticvai-web/src/routes/platform/AiGovernanceAlertDetectionCenter.tsx
+    component: src/routes/platform/AiGovernanceAlertDetectionCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -39619,7 +39619,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-incident-remediation-management-adm-556
-    component: apps/ticvai-web/src/routes/platform/AiIncidentRemediationManagement.tsx
+    component: src/routes/platform/AiIncidentRemediationManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -39940,7 +39940,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-compliance-assurance-governance-reporting-adm-557
-    component: apps/ticvai-web/src/routes/platform/AiComplianceAssuranceGovernanceReporting.tsx
+    component: src/routes/platform/AiComplianceAssuranceGovernanceReporting.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -40137,7 +40137,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /platform/ai-governance-review-action-plan-continuous-improvement-adm-558
-    component: apps/ticvai-web/src/routes/platform/AiGovernanceReviewActionPlanContinuousImprovemen.tsx
+    component: src/routes/platform/AiGovernanceReviewActionPlanContinuousImprovemen.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -40302,7 +40302,7 @@ screens:
   implementation:
     app: ticvai-web
     route: /commercial/reconciliation-settlement-command-center-t139-adm-619
-    component: apps/ticvai-web/src/routes/commercial/ReconciliationSettlementCommandCenterT139.tsx
+    component: src/routes/commercial/ReconciliationSettlementCommandCenterT139.tsx
     status: notStarted
   navigation:
     entryFrom:

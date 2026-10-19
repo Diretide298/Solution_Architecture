@@ -1,0 +1,39 @@
+id: CHG-R8SCR-007
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Every Block A frontend platform names its repository (the lead, 20 October 2026, option A): the scanner
+  (P07) is built inside ticvai-employee-app with the staff app, the Venue CMS (P13) inside ticvai-venue-management
+  with the back office, and the platform console (P09) in a new repository, ticvai-web, which the lead creates.
+  The screens'' component paths on P07, P09 and P13 are rewritten from the repositories'' profiles, and ADAM
+  setup''s frontend table lists the three.'
+decision:
+  what: 'docs/active/frontend-repos.yaml (P06, P07, P08, P09, P13: repo, assumed, shared, observed);
+    screens/P07, P09, P13 implementation.component (tools/apply-repo-layout.py, line-level);
+    viewer/mcp/setup/starters/frontend/CLAUDE.md (the table and the profile block). Causes IDENTITY-C05 and
+    APPROVALS-TENANCY-C43.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round (surface lane): tickets 27761, 27769, 27886, 27810 (ADAM gaps
+  27761/0, 27769/0, 27886/0, 27810/0); answers.json of 20 October 2026.'
+keys_touched:
+  files:
+  - docs/active/frontend-repos.yaml
+  - screens/P07-staff-scanner.yaml
+  - screens/P09-platform-admin-console.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'decision-not-recorded: a ticket names no repository to build in'
+tickets:
+  started: []
+  unstarted:
+  - '27761, 27769, 27886, 27810 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-frontend-repos.py
+status: open
+notes: 'The setup CLAUDE.md ships in ADAM''s setup zip: it reaches developers at the next ADAM deploy. The ticket
+  text and frontend/*.yaml are regenerated at the lead''s refresh (derive-frontend, build-service-docs).'
