@@ -38,12 +38,10 @@ cd "$(dirname "$0")/.."
 # was holding nine: seven `relinquish*` operations renamed at some point from `release*`, and the
 # two step-up operations added the same day.
 #
-# **Additive only.** The entries that came with the original dump carry judgements a derivation
-# cannot reproduce -- an audience narrowed by hand, a service assignment that is a deployment
-# decision rather than a contract fact -- so an entry that exists is left exactly as it is. Verified
-# on the run that added those nine: 0 removed, 0 existing entries changed. `--audit` still reports
-# the 1,445 entries that differ, and reads only; the rebuild it argues for is a separate job that
-# somebody has to decide on rather than have happen to them.
+# **Derived since 20 October 2026, no longer additive** (CHG-R8GEN-001). Every entry's reads, writes, routes and
+# contract facts are re-read from the contracts, plus and minus handoff/api-data-lineage-overrides.json (what no
+# contract fact can state, each with its reason). Until then an entry that existed was never corrected, and 178 named
+# a permission the contract had dropped. check-lineage LN-DERIVED holds the file to this derivation.
 python3 tools/derive-lineage.py --apply
 
 # **The first-release slice: what the four platforms call, and the setup that feeds it.** Reads the
