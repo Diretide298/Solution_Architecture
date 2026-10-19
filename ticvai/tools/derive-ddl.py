@@ -712,7 +712,11 @@ $$;
 #   * `x-ticvai-rls: own-or-home-scope` (CHG-R8MIG-007; IDENTITY-C37): a principal's credential rows, read and written
 #     by that principal (`ticvai.principal_id`), by a grant over the principal's home scope (createPrincipal and
 #     resetPrincipalCredential at a venue) and by the tenant root.
-RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope")
+#   * `x-ticvai-rls: signed-in-read` (CHG-R8MIG-011; the storage-sat lane's request 6, ORDERS-MONEY-C27 and C33): any
+#     signed-in caller of the tenant, staff or guest, reads every row; writes keep the base rule. For rows that are not
+#     personal or whose secret is the key itself: badge definitions, a gift card read by its code.
+RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope",
+             "signed-in-read")
 
 # **A child that follows a split parent which the parent rule would not otherwise pick** (the parent sits at the tenant
 # root, so it is no owner). `identity.role_permission` is the rows of a role's permission set (CR-076 decision:
@@ -846,6 +850,18 @@ DECLARE
 BEGIN
     PERFORM platform.apply_split_rls(target, chk, chk);
 END
+$$;
+
+-- `x-ticvai-rls: signed-in-read` (CHG-R8MIG-011): any signed-in caller of the tenant, staff (a scope path set) or a
+-- guest (its subject set), reads; nobody unconfigured does.
+CREATE OR REPLACE FUNCTION platform.signed_in()
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT cardinality(platform.current_scope_paths()) > 0
+        OR NULLIF(current_setting('ticvai.subject_id', true), '') IS NOT NULL;
 $$;
 
 -- A child of a split row: read where the parent is visible, written only where the parent may be written
@@ -2743,6 +2759,9 @@ def main() -> int:
             call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
                     f"{sql_literal(write.format(a=''))});")
             base = "the tenant root or a grant over its home scope"
+        elif mark == "signed-in-read":
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, 'platform.signed_in()', "
+                    f"{sql_literal(write.format(a=''))});")
         elif mark == "own-or-home-scope":
             if "principal_id" not in has or base in ("scope_path", "venue_id"):
                 print(f"  ! {t}: x-ticvai-rls own-or-home-scope needs principal_id and no scope_path or venue_id; "

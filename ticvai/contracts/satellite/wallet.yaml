@@ -5960,7 +5960,7 @@ components:
       type: string
       enum: [topUp, spend, refund, adjustment, bonus, expiry, transfer]
     GiftCard:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by activateGiftCard, authoriseStoredValue, blockGiftCard, getGiftCard and others
+      x-ticvai-rls: signed-in-read   # MOD audit, CHG-MOD-007: read below the tenant by activateGiftCard, authoriseStoredValue, blockGiftCard, getGiftCard and others; any signed-in guest too (CHG-R8MIG-011: a card is read by its code, ORDERS-MONEY-C27)
       x-ticvai-persistence: "wallet.gift_card"
       type: object
       required: [cardCode, faceValue, balance, status, issuedAt]

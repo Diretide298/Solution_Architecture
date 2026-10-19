@@ -5444,6 +5444,14 @@ components:
         proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the
         sheet the client corrects, and where the two differ this contract is what runs.
       properties:
+        contact:
+          allOf:
+          - $ref: ../satellite/white-label.yaml#/components/schemas/VenueContact
+          nullable: true
+          description: '**How a guest reaches this venue** (R8 blocker WHITE-C16, the storage-sat lane''s request 5;
+            CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the
+            venue settings write and read by White-Label''s getTenantAppStatus through tenancy#venueSettingsRecords.
+            Null means the tenant''s contact is shown.'
         id:
           type: string
           format: uuid

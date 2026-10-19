@@ -470,6 +470,10 @@ MACHINERY_TABLES = {
     "kernel.inbox": "kernel machinery: the inbox per tenant database (ADR-0058; PLATFORM-OUTBOX, MIG-PARTITIONS)",
     "ai.inbox": "kernel machinery: the AI consumers' inbox, since only AI writes AI tables (ADR-0058, ADR-0020)",
     "control.outbox_relay": "kernel machinery: the relay lease per tenant database (ADR-0058; PLATFORM-OUTBOX)",
+    # AI's own outbox (R8 blocker FOUNDATION-AI-C41, the storage-sat lane's request 10; CHG-R8MIG-011): AI writes no
+    # other module's table, so its events leave through ai.outbox, allocated from ai.outbox_sequence, like ai.inbox.
+    "ai.outbox": "kernel machinery: AI's own outbox, written in AI's transactions (ADR-0058, ADR-0020)",
+    "ai.outbox_sequence": "kernel machinery: the per-aggregate sequence of ai.outbox (ADR-0058)",
 }
 # **Forward migration file numbers** (CHG-TBF-002). V0001 is the baseline and V0002-V0099 the first release, in
 # schema order; V0100-V0999 belong to derive-ddl's frozen-mode files (backend/<db>/V01xx__after_r1_<date>.sql);

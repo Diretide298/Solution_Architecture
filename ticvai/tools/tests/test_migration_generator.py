@@ -652,10 +652,10 @@ def test_a_column_check_that_only_gains_values_is_written_not_valid_then_validat
     assert not again.statements and not again.review, (again.statements, again.review)
 
 
-def test_a_column_check_that_loses_a_value_is_still_a_decision():
+def test_a_column_check_that_loses_a_value_is_added_not_valid_and_left_to_validate():
     p = fwd.diff("control", model(CH_NEW), model(CH_OLD))
-    assert not [s for s in p.statements if "tenant_domain_channel_chk" in s]
-    assert [r for r in p.review if r[0] == "column changed"]
+    assert not [s for s in p.statements if "VALIDATE CONSTRAINT tenant_domain_channel_chk" in s]
+    assert [r for r in p.review if r[0] == "constraint not validated"]
 
 
 PSG = ("CREATE TABLE IF NOT EXISTS identity.principal (id uuid PRIMARY KEY NOT NULL);\n"
@@ -692,3 +692,26 @@ def test_a_key_on_a_new_column_is_added_guarded_so_the_file_applies_twice():
     assert "conname = 'access_point_zone_id_fkey'" in fk[0] and "NOT VALID" not in fk[0]
     again = fwd.diff("tenant", fold(AP_OLD, p), model(AP_NEW))
     assert not again.statements and not again.review, (again.statements, again.review)
+
+
+CB_OLD = "CREATE TABLE IF NOT EXISTS marketing.customer_badge (id uuid PRIMARY KEY NOT NULL, status text);\n"
+CB_NEW = ("CREATE TABLE IF NOT EXISTS marketing.customer_badge (id uuid PRIMARY KEY NOT NULL, status text CONSTRAINT "
+          "customer_badge_status_chk CHECK (status IN ('awarded', 'expired', 'revoked')));\n")
+
+
+def test_a_check_added_to_an_existing_column_is_written_not_valid_and_validation_is_a_review_row():
+    p = fwd.diff("tenant", model(CB_OLD), model(CB_NEW))
+    add = [s for s in p.statements if "ADD CONSTRAINT customer_badge_status_chk" in s]
+    assert add and add[0].endswith("NOT VALID")
+    assert not [s for s in p.statements if "VALIDATE" in s]
+    assert [r for r in p.review if r[0] == "constraint not validated" and "VALIDATE CONSTRAINT" in r[3]]
+    assert not [r for r in p.review if r[0] == "column changed"]
+    again = fwd.diff("tenant", fold(CB_OLD, p), model(CB_NEW))
+    assert not again.statements and not again.review, (again.statements, again.review)
+
+
+def test_a_narrowed_check_is_written_not_valid_too():
+    narrow = CB_NEW.replace(", 'revoked'", "")
+    p = fwd.diff("tenant", model(CB_NEW), model(narrow))
+    assert [s for s in p.statements if "ADD CONSTRAINT customer_badge_status_chk" in s and "'revoked'" not in s]
+    assert [r for r in p.review if r[0] == "constraint not validated"]

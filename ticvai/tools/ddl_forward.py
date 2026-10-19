@@ -350,6 +350,20 @@ def widened_check(old_def: str, new_def: str):
     return n[0], n[1]
 
 
+def changed_check_only(old_def: str, new_def: str):
+    """(name, the new `CONSTRAINT ... CHECK (...)` clause) when the column changes only by gaining an inline CHECK or
+    by a CHECK of the same name that is not a widening (CHG-R8MIG-011); else None."""
+    n = _inline_check(new_def)
+    if not n:
+        return None
+    o = _inline_check(old_def)
+    if o and o[0] != n[0]:
+        return None
+    if norm(old_def.replace(o[1], "") if o else old_def) != norm(new_def.replace(n[1], "")):
+        return None
+    return n[0], n[1]
+
+
 def guard_add_constraint(t: str, name: str, stmt: str) -> str:
     """`stmt` (an ALTER TABLE ... ADD CONSTRAINT) only when the constraint is not there yet (CHG-R8MIG-010)."""
     return (f"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
@@ -547,9 +561,14 @@ class Model:
                         nm = _inline_check(added)
                         inline = [c_ for c_, d_ in tab.cols.items()
                                   if nm and (_inline_check(d_) or ("",))[0] == nm[0]]
+                        # a CHECK added to a column that had none (CHG-R8MIG-011): named `<table>_<column>_chk`
+                        bare = [c_ for c_, d_ in tab.cols.items() if nm and not _inline_check(d_)
+                                and nm[0] == f"{t.split('.', 1)[1]}_{c_}_chk"]
                         if inline:
                             d_ = tab.cols[inline[0]]
                             tab.cols[inline[0]] = norm(d_.replace(_inline_check(d_)[1], added))
+                        elif bare:
+                            tab.cols[bare[0]] = norm(tab.cols[bare[0]] + " " + added)
                         else:
                             tab.constraints.add(added)
                         handled = True
@@ -957,6 +976,20 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                         p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}; "
                                           f"ALTER TABLE {t} ADD {old_clause} NOT VALID;")
                         p.counts["other"] += 1
+                    elif changed_check_only(a.cols[c], d):
+                        # **A column CHECK added or narrowed is written NOT VALID** (CHG-R8MIG-011; the storage-sat
+                        # lane's request 3: marketing.customer_badge.source_type and status became enums). It binds
+                        # every new write at once; the rows already there are the migration owner's to check, so
+                        # VALIDATE is a review row, not a statement that could fail the migration.
+                        name, clause = changed_check_only(a.cols[c], d)
+                        p.statements += [f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}",
+                                         f"ALTER TABLE {t} ADD {clause} NOT VALID"]
+                        old_ic = _inline_check(a.cols[c])
+                        p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};"
+                                          + (f" ALTER TABLE {t} ADD {old_ic[1]} NOT VALID;" if old_ic else ""))
+                        p.counts["other"] += 1
+                        review("constraint not validated", f"{t} {name}", f"`{clause}`, added NOT VALID",
+                               f"check the rows, then ALTER TABLE {t} VALIDATE CONSTRAINT {name}")
                     elif only_not_null_dropped(a.cols[c], d):
                         # **A column the contract makes optional loses its NOT NULL here** (CHG-R8MIG-004, R8 blockers
                         # APPROVALS-TENANCY-C09, ORDERS-MONEY-C35, IDENTITY-C12): relaxing NOT NULL touches no row and

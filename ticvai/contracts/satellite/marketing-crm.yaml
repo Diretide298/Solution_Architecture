@@ -20410,7 +20410,7 @@ components:
           format: date-time
           nullable: true
     MarketingBadge:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listBadges, setBadge
+      x-ticvai-rls: signed-in-read   # MOD audit, CHG-MOD-007: read below the tenant by listBadges, setBadge; any signed-in guest too (CHG-R8MIG-011: badge definitions are not personal, ORDERS-MONEY-C33)
       type: object
       x-ticvai-persistence: marketing.badge
       description: '**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.'

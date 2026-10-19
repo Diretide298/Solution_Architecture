@@ -82,6 +82,12 @@ RENAMES = [
     # CHG-CRA-003 (ADAM CR-150, completing CR-097, 18 October 2026): the plan catalogue and the records about a
     # tenant rather than inside one leave the tenant template for the control database (ADR-0039). A move
     # between databases: the control forward migration creates the table and the tenant review drops it.
+    # CHG-R8MIG-011 (R8 blocker IDENTITY-C59, the lead's answer A; the storage-sat lane's request 4): content blocks are a
+    # tenant's own content, so they leave the control database for the tenant template. A move between databases the
+    # other way: the tenant forward migration creates whitelabel.content_block, and the control review row copies the
+    # rows across and drops control.content_block.
+    {"from": "control.content_block", "to": "whitelabel.content_block", "on": "2026-10-20",
+     "why": "IDENTITY-C59: a tenant's own content, read and written by White-Label in the tenant database"},
     {"from": "subscription.plan", "to": "control.plan", "on": "2026-10-18",
      "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"},
     {"from": "subscription.plan_limit", "to": "control.plan_limit", "on": "2026-10-18",

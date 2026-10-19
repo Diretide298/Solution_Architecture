@@ -101,7 +101,9 @@ or in the generated list that the tickets do not carry.
 and no task names are listed, with that reason, under "Tables no migration creates" in the generated
 `handoff/service-docs/backend/MIGRATIONS.md`; a table there that an operation does reach fails the check.
 The kernel's own tables (`kernel.inbox`, `ai.inbox`, `control.outbox_relay`, ADR-0058) go with the first
-release, and `platform.schema_version` with the baseline.
+release, and `platform.schema_version` with the baseline. So do AI's own outbox and its sequence (`ai.outbox`,
+`ai.outbox_sequence`, FOUNDATION-AI-C41; CHG-R8MIG-011): AI writes no other module's table, so its events leave
+through them as `ai.inbox` takes them in.
 
 `subscription` is a tenant schema with a first-release migration of its own; the Control Plane is the
 `control` database (ADR-0039), migrated as its own series and holding its own `platform.schema_version`.
