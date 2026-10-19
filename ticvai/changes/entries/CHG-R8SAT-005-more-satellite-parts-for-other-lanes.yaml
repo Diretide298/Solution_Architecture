@@ -9,7 +9,7 @@ summary: 'More satellite contract parts the core and storage-sat lanes asked of 
   automatic half of suggestGuidedChoice (FOUNDATION-AI-C39). seating: a standing zone is held by quantity
   (createSeatHold zoneId and quantity, SeatAvailability.zones, 409 zone-unavailable) and the seatHoldRecords query
   (GPS-C38, ORDERS-MONEY-C19). subscription: the membership view carries its catalogue product and variant
-  (GPS-C39). assets: MediaUsage.surface names the other modules'' uses (ORDERS-MONEY-C29; breaking for compat, an
+  (GPS-C39). getPreview reads a preview back until it expires (IDENTITY-C63). assets: MediaUsage.surface names the other modules'' uses (ORDERS-MONEY-C29; breaking for compat, an
   entry is requested of the lead).'
 decision:
   what: 'contracts/satellite/white-label.yaml, ai.yaml, seating.yaml, subscription.yaml, assets.yaml. New operations
@@ -20,7 +20,8 @@ why: 'Finding: R8 blocker cause list, second round: the core and storage-sat lan
   (relayed by the coordinator) and answers.json of 20 October 2026.'
 keys_touched:
   operations: [previewGuidedChoice, runGuidedChoiceSuggestionJob, createSeatHold, getSeatAvailability,
-    verifyCustomDomain, relinquishCustomDomain, setPrimaryDomain, listMembershipCommercialPricing, getMediaAsset]
+    verifyCustomDomain, relinquishCustomDomain, setPrimaryDomain, listMembershipCommercialPricing, getMediaAsset,
+    getPreview]
   schemas: [GuidedChoicePreviewRequest, GuidedChoicePreview, CreateSeatHoldRequest, SeatAvailability,
     MembershipCommercialPricingChannelAssociationView, MediaUsage]
   files:
