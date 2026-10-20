@@ -45,7 +45,7 @@
 
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
-import { closeSync, existsSync, openSync, readFileSync, readdirSync, realpathSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, linkSync, readFileSync, readdirSync, realpathSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -129,22 +129,65 @@ export function splitSql(text) {
 
 const TRANSACTION = /^(?:(?:--[^\n]*\n|\/\*[\s\S]*?\*\/|\s)*)(BEGIN|COMMIT|ROLLBACK|START\s+TRANSACTION|END|SAVEPOINT|RELEASE|ABORT)\b\s*(?:TRANSACTION|WORK)?\s*$/i;
 
-/** The tables a statement writes rows into, read from its text, or null for one that does not. */
-export function dataTargets(sql) {
+/**
+ * Statement kinds the check cannot judge, because what they change lives outside the database's
+ * own objects (the server's roles, the database itself) or hides a change the snapshot cannot see
+ * (a disabled foreign key trigger, a rule, privileges for tables not made yet). None is in the
+ * package. A ticket's file must not contain them.
+ */
+const FORBIDDEN = [
+  [/^ALTER\s+TABLE\b[\s\S]*\b(DISABLE\s+TRIGGER|ENABLE\s+(REPLICA|ALWAYS)\s+TRIGGER)\b/i, 'switches triggers off or to replica mode (foreign keys are triggers)'],
+  [/^ALTER\s+DEFAULT\s+PRIVILEGES\b/i, 'changes the privileges of tables not made yet'],
+  [/^(GRANT|REVOKE)\b[\s\S]*\bON\s+DATABASE\b/i, 'changes the privileges of the database itself'],
+  [/^CREATE\s+(OR\s+REPLACE\s+)?RULE\b/i, 'adds a rule'],
+  [/^(CREATE|ALTER|DROP)\s+(PUBLICATION|SUBSCRIPTION)\b/i, 'sets up logical replication'],
+  [/^CREATE\s+EVENT\s+TRIGGER\b/i, 'adds an event trigger'],
+  [/^(CREATE|ALTER|DROP)\s+(ROLE|USER|GROUP)\b/i, 'changes the server\'s roles, which every database shares'],
+  [/^ALTER\s+SYSTEM\b/i, 'changes the server\'s settings'],
+  [/^SET\s+(SESSION\s+|LOCAL\s+)?(ROLE|SESSION\s+AUTHORIZATION|session_replication_role)\b/i, 'runs the rest as another role or in replica mode'],
+];
+
+/** Why a statement may not be in a ticket's file, or null. */
+export function forbidden(sql) {
   const s = String(sql).replace(/^(?:\s|--[^\n]*\n|\/\*[\s\S]*?\*\/)*/, '');
+  return FORBIDDEN.find(([rx]) => rx.test(s))?.[1] ?? null;
+}
+
+/**
+ * The tables a statement writes rows into, read from its text: anywhere in it, so an UPDATE or a
+ * DELETE inside a WITH counts too. Null for a statement that writes none. Function, rule, trigger
+ * and view definitions are not running anything, so they are not read.
+ */
+export function dataTargets(sql) {
+  const raw = String(sql).replace(/^(?:\s|--[^\n]*\n|\/\*[\s\S]*?\*\/)*/, '');
+  if (/^CREATE\b/i.test(raw)) return null;
+  const s = raw.replace(/\$([A-Za-z_]\w*)?\$[\s\S]*?\$\1\$/g, ' ').replace(/--[^\n]*/g, ' ').replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/'(?:[^']|'')*'/g, "''");
   const name = '((?:"[^"]+"|[\\w$]+)(?:\\.(?:"[^"]+"|[\\w$]+))?)';
   const clean = (n) => (n.match(/"[^"]+"|[^.]+/g) ?? []).map((p) => (p.startsWith('"') ? p.slice(1, -1) : p.toLowerCase())).join('.');
+  const out = [];
   let m;
   if ((m = new RegExp(`^TRUNCATE\\s+(?:TABLE\\s+)?((?:(?:ONLY\\s+)?${name.slice(1, -1)}\\s*,?\\s*)+)`, 'i').exec(s))) {
-    return m[1].split(',').map((x) => clean(x.trim().replace(/^ONLY\s+/i, '').split(/\s+/)[0])).filter(Boolean);
+    out.push(...m[1].split(',').map((x) => clean(x.trim().replace(/^ONLY\s+/i, '').split(/\s+/)[0])).filter(Boolean));
   }
-  const body = /^WITH\b/i.test(s) ? s.replace(/^WITH[\s\S]*?\)\s*(?=(INSERT|UPDATE|DELETE|MERGE)\b)/i, '') : s;
-  if ((m = new RegExp(`^INSERT\\s+INTO\\s+${name}`, 'i').exec(body))) return [clean(m[1])];
-  if ((m = new RegExp(`^UPDATE\\s+(?:ONLY\\s+)?${name}`, 'i').exec(body))) return [clean(m[1])];
-  if ((m = new RegExp(`^DELETE\\s+FROM\\s+(?:ONLY\\s+)?${name}`, 'i').exec(body))) return [clean(m[1])];
-  if ((m = new RegExp(`^MERGE\\s+INTO\\s+(?:ONLY\\s+)?${name}`, 'i').exec(body))) return [clean(m[1])];
-  if ((m = new RegExp(`^COPY\\s+${name}`, 'i').exec(body))) return [clean(m[1])];
-  return null;
+  if ((m = new RegExp(`^COPY\\s+${name}`, 'i').exec(s))) out.push(clean(m[1]));
+  for (const rx of [
+    new RegExp(`\\bINSERT\\s+INTO\\s+${name}`, 'gi'),
+    new RegExp(`\\bUPDATE\\s+(?:ONLY\\s+)?${name}(?:\\s+(?:AS\\s+)?[\\w$]+)?\\s+SET\\b`, 'gi'),
+    new RegExp(`\\bDELETE\\s+FROM\\s+(?:ONLY\\s+)?${name}`, 'gi'),
+    new RegExp(`\\bMERGE\\s+INTO\\s+(?:ONLY\\s+)?${name}`, 'gi'),
+  ]) {
+    for (const hit of s.matchAll(rx)) out.push(clean(hit[1]));
+  }
+  return out.length ? [...new Set(out)] : null;
+}
+
+/** The search_path a `SET search_path` statement sets, or null. */
+function searchPathOf(sql) {
+  const m = /^(?:\s|--[^\n]*\n)*SET\s+(?:SESSION\s+)?search_path\s*(?:=|TO)\s*([^;]+)$/i.exec(String(sql))
+    ?? /set_config\s*\(\s*'search_path'\s*,\s*'([^']*)'/i.exec(String(sql));
+  if (!m) return null;
+  return m[1].split(',').map((p) => p.trim().replace(/^'|'$/g, '').replace(/"/g, '')).filter((p) => p && p !== '$user' && p.toLowerCase() !== 'default');
 }
 
 // ---- the snapshot: everything a migration can make, as PostgreSQL prints it --------------------
@@ -185,15 +228,23 @@ const SNAPSHOT_BODY = `(SELECT (coalesce(jsonb_object_agg(k, v), '{}') || pg_tem
   UNION ALL SELECT 'extension ' || extname, extversion FROM pg_extension
   UNION ALL SELECT 'database settings', coalesce((SELECT string_agg(array_to_string(s.setconfig, ','), ';' ORDER BY s.setrole)
       FROM pg_db_role_setting s JOIN pg_database d ON d.oid = s.setdatabase WHERE d.datname = current_database()), '-')
+  UNION ALL SELECT 'database', 'owner ' || datdba::regrole::text || ' acl ' || coalesce(datacl::text, '-') FROM pg_database WHERE datname = current_database()
+  UNION ALL SELECT 'publication ' || pubname, 'all tables ' || puballtables::text || ' owner ' || pubowner::regrole::text FROM pg_publication
+  UNION ALL SELECT 'event trigger ' || evtname, evtevent || ' ' || evtenabled::text FROM pg_event_trigger
+  UNION ALL SELECT 'default privileges ' || d.defaclrole::regrole::text || ' in ' || coalesce(n.nspname, '*') || ' for ' || d.defaclobjtype::text,
+      d.defaclacl::text FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid = d.defaclnamespace
   UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname,
       x.relkind::text || ' persistence ' || x.relpersistence::text || ' rls ' || x.relrowsecurity::text || ' force ' || x.relforcerowsecurity::text
       || coalesce(' partition by ' || pg_get_partkeydef(x.oid), '') || ' options ' || coalesce(x.reloptions::text, '-')
       || ' replica identity ' || x.relreplident::text || ' owner ' || x.relowner::regrole::text || ' acl ' || ${ACL('x.relacl')}
       || ' comment ' || coalesce(obj_description(x.oid, 'pg_class'), '-')
+      || ' triggers not on ' || (SELECT count(*) FROM pg_trigger t WHERE t.tgrelid = x.oid AND t.tgenabled <> 'O')::text
     FROM pg_class x JOIN pg_namespace n ON n.oid = x.relnamespace
     WHERE ${OWN} AND x.relkind IN ('r', 'p') AND NOT x.relispartition AND ${NOT_EXTENSION}
   UNION ALL SELECT 'table ' || pn.nspname || '.' || p.relname || ' default partition ' || n.nspname || '.' || x.relname,
-      'persistence ' || x.relpersistence::text || ' owner ' || x.relowner::regrole::text || ' acl ' || ${ACL('x.relacl')}
+      'persistence ' || x.relpersistence::text || ' rls ' || x.relrowsecurity::text || ' force ' || x.relforcerowsecurity::text
+      || ' owner ' || x.relowner::regrole::text || ' acl ' || ${ACL('x.relacl')}
+      || ' triggers not on ' || (SELECT count(*) FROM pg_trigger t WHERE t.tgrelid = x.oid AND t.tgenabled <> 'O')::text
     FROM pg_class x JOIN pg_namespace n ON n.oid = x.relnamespace JOIN pg_inherits h ON h.inhrelid = x.oid
     JOIN pg_class p ON p.oid = h.inhparent JOIN pg_namespace pn ON pn.oid = p.relnamespace
     WHERE ${OWN} AND x.relispartition AND pg_get_expr(x.relpartbound, x.oid) = 'DEFAULT'
@@ -211,11 +262,12 @@ const SNAPSHOT_BODY = `(SELECT (coalesce(jsonb_object_agg(k, v), '{}') || pg_tem
   UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' constraint ' || k.conname,
       pg_get_constraintdef(k.oid) || coalesce(' comment ' || obj_description(k.oid, 'pg_constraint'), '')
     FROM pg_constraint k JOIN pg_class x ON x.oid = k.conrelid JOIN pg_namespace n ON n.oid = x.relnamespace
-    WHERE ${OWN} AND NOT x.relispartition
+    WHERE ${OWN} AND (NOT x.relispartition OR (k.conislocal AND k.conparentid = 0))
   UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' index ' || i.relname,
       pg_get_indexdef(i.oid) || coalesce(' options ' || i.reloptions::text, '') || coalesce(' comment ' || obj_description(i.oid, 'pg_class'), '')
     FROM pg_index ix JOIN pg_class i ON i.oid = ix.indexrelid JOIN pg_class x ON x.oid = ix.indrelid
-    JOIN pg_namespace n ON n.oid = x.relnamespace WHERE ${OWN} AND NOT x.relispartition
+    JOIN pg_namespace n ON n.oid = x.relnamespace
+    WHERE ${OWN} AND (NOT x.relispartition OR NOT EXISTS (SELECT 1 FROM pg_inherits h WHERE h.inhrelid = i.oid))
   UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' policy ' || p.polname,
       CASE WHEN p.polpermissive THEN 'permissive' ELSE 'restrictive' END
       || ' for ' || CASE p.polcmd WHEN '*' THEN 'all' WHEN 'r' THEN 'select' WHEN 'a' THEN 'insert' WHEN 'w' THEN 'update' ELSE 'delete' END
@@ -223,10 +275,13 @@ const SNAPSHOT_BODY = `(SELECT (coalesce(jsonb_object_agg(k, v), '{}') || pg_tem
       || ' using ' || coalesce(pg_get_expr(p.polqual, p.polrelid), '-')
       || ' with check ' || coalesce(pg_get_expr(p.polwithcheck, p.polrelid), '-')
     FROM pg_policy p JOIN pg_class x ON x.oid = p.polrelid JOIN pg_namespace n ON n.oid = x.relnamespace
-    WHERE ${OWN} AND NOT x.relispartition
+    WHERE ${OWN}
   UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' trigger ' || t.tgname, pg_get_triggerdef(t.oid) || ' enabled ' || t.tgenabled::text
     FROM pg_trigger t JOIN pg_class x ON x.oid = t.tgrelid JOIN pg_namespace n ON n.oid = x.relnamespace
-    WHERE ${OWN} AND NOT t.tgisinternal AND NOT x.relispartition
+    WHERE ${OWN} AND NOT t.tgisinternal AND (NOT x.relispartition OR t.tgparentid = 0)
+  UNION ALL SELECT 'table ' || n.nspname || '.' || x.relname || ' rule ' || r.rulename, pg_get_ruledef(r.oid)
+    FROM pg_rewrite r JOIN pg_class x ON x.oid = r.ev_class JOIN pg_namespace n ON n.oid = x.relnamespace
+    WHERE ${OWN} AND r.rulename <> '_RETURN'
   UNION ALL SELECT CASE x.relkind WHEN 'v' THEN 'view ' ELSE 'materialized view ' END || n.nspname || '.' || x.relname,
       pg_get_viewdef(x.oid) || ' owner ' || x.relowner::regrole::text || ' acl ' || ${ACL('x.relacl')}
     FROM pg_class x JOIN pg_namespace n ON n.oid = x.relnamespace WHERE ${OWN} AND x.relkind IN ('v', 'm') AND ${NOT_EXTENSION}
@@ -317,14 +372,23 @@ export function againDiffs(first, second) {
   return out;
 }
 
-/** Statements that write rows into a table that is not the ticket's. */
+/**
+ * Statements the check cannot judge, and statements that write rows into a table that is not the
+ * ticket's. An unqualified table name is read with the search_path the file itself set last.
+ */
 export function dataDiffs(statements, owned, name) {
   const own = new Set(owned);
   const out = [];
+  let searchPath = ['public'];
   for (const [i, s] of statements.entries()) {
+    const where = `${name}, statement ${i + 1} (line ${s.line})`;
+    const why = forbidden(s.sql);
+    if (why) out.push(`${where} ${why}; that cannot be checked here and is not in the package, so it may not be in a ticket's file`);
+    searchPath = searchPathOf(s.sql) ?? searchPath;
     for (const t of dataTargets(s.sql) ?? []) {
-      const full = t.includes('.') ? t : `public.${t}`;
-      if (!own.has(full)) out.push(`${name}, statement ${i + 1} (line ${s.line}) writes rows into ${full}, which is not one of this ticket's tables`);
+      const full = t.includes('.') ? t
+        : (searchPath.map((p) => `${p}.${t}`).find((q) => own.has(q)) ?? `${searchPath[0] ?? 'public'}.${t}`);
+      if (!own.has(full)) out.push(`${where} writes rows into ${full}, which is not one of this ticket's tables`);
     }
   }
   return out;
@@ -336,7 +400,17 @@ export function dataDiffs(statements, owned, name) {
 // A session's answers come back as `<nonce>_TAG|value` lines (the nonce is new every run, so a
 // file's own SELECT cannot pass for one); everything else it prints is ignored.
 
-let CONTAINER = 'adam-db-check';
+// The check's own container. ADAM_DB_CHECK_CONTAINER names another one to own (the repository's
+// checks use it); --container borrows someone else's, which is never started, stopped or cleaned.
+const DEFAULT_CONTAINER = process.env.ADAM_DB_CHECK_CONTAINER || 'adam-db-check';
+let CONTAINER = DEFAULT_CONTAINER;
+
+/** Server-level state a file can change from inside one database: the roles and their settings. */
+const CLUSTER_SQL = `(SELECT json_build_object(
+  'server roles', coalesce((SELECT string_agg(rolname || CASE WHEN rolsuper THEN ' (superuser)' ELSE '' END, ', ' ORDER BY rolname)
+    FROM pg_roles WHERE rolname !~ '^pg_'), '-'),
+  'server role settings', coalesce((SELECT string_agg(coalesce(r.rolname, 'every role') || ': ' || array_to_string(s.setconfig, ','), '; ' ORDER BY 1)
+    FROM pg_db_role_setting s LEFT JOIN pg_roles r ON r.oid = s.setrole WHERE s.setdatabase = 0), '-'))::text)`;
 const NONCE = `n${randomBytes(5).toString('hex')}`;
 const tag = (name, valueSql) => `SELECT '${NONCE}_${name}|' || ${valueSql};\n`;
 const snap = (name) => SNAPSHOT_SETUP + snapshotSql((body) => tag(name, body));
@@ -512,12 +586,12 @@ async function ensureBase(names, dir, files, folder, image) {
     && Array.isArray(have.files) && have.files.length <= want.length && have.files.every((h, i) => h.name === want[i].name && h.sha === want[i].sha);
   const from = fits ? have.files.length : 0;
   const action = !fits ? 'built' : from < want.length ? 'extended' : 'reused';
-  const state = { complete: true, v: VERSION, server, image, extensions, files: want, used: new Date().toISOString().slice(0, 10) };
+  const state = { complete: true, v: VERSION, server, image, extensions, files: want, used: today() };
   const started = Date.now();
   if (from < want.length || !fits) {
     must(session('postgres', `DROP DATABASE IF EXISTS ${names.build} WITH (FORCE);\n`
       + `CREATE DATABASE ${names.build}${fits ? ` TEMPLATE ${names.base}` : ''};\n`
-      + `COMMENT ON DATABASE ${names.build} IS ${quote(JSON.stringify({ complete: false }))};\n`));
+      + `COMMENT ON DATABASE ${names.build} IS ${quote(JSON.stringify({ complete: false, used: today() }))};\n`));
     if (from < want.length) {
       const sql = want.slice(from).map((w) => fileSql(path.join(dir, w.name), folder, { record: true, label: 'previous state' })).join('');
       const result = session(names.build, sql);
@@ -544,66 +618,116 @@ function databaseNames(id, database) {
   return { base: `${p}_base`, build: `${p}_build`, ticket: `${p}_ticket`, expect: `${p}_expect`, full: `${p}_full` };
 }
 
+const lockFile = (id) => path.join(os.tmpdir(), `adam-db-ticket-${id}.lock`);
+
+/**
+ * Takes the lock if it is free: true when this process now holds it. The holder's pid is written
+ * to a file of its own first and then linked into place, so the lock never exists empty. One
+ * that is empty or unreadable anyway counts as held for a short grace, never as dead.
+ */
+function tryLock(id) {
+  const file = lockFile(id);
+  const tmp = `${file}.${process.pid}.${randomBytes(3).toString('hex')}`;
+  writeFileSync(tmp, String(process.pid));
+  try {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        linkSync(tmp, file);
+        return { held: true };
+      } catch (error) {
+        if (error.code !== 'EEXIST') throw error;
+      }
+      let holder = 0;
+      let age = 0;
+      try {
+        holder = Number(readFileSync(file, 'utf8').trim()) || 0;
+        age = Date.now() - statSync(file).mtimeMs;
+      } catch { return { held: false, holder: 0 }; }
+      let alive = true;
+      if (holder) {
+        try { process.kill(holder, 0); } catch (e) { alive = e.code === 'EPERM'; }
+      } else {
+        alive = age < 10_000;
+      }
+      if (alive) return { held: false, holder };
+      try { unlinkSync(file); } catch { /* another run took it */ }
+    }
+    return { held: false, holder: 0 };
+  } finally {
+    try { unlinkSync(tmp); } catch { /* gone already */ }
+  }
+}
+
+function unlock(id) {
+  try { unlinkSync(lockFile(id)); } catch { /* gone already */ }
+}
+
 async function withLock(id, work) {
-  const file = path.join(os.tmpdir(), `adam-db-ticket-${id}.lock`);
   let said = false;
   for (let waited = 0; ; waited += 500) {
-    try {
-      const fd = openSync(file, 'wx');
-      writeFileSync(fd, String(process.pid));
-      closeSync(fd);
-      break;
-    } catch (error) {
-      if (error.code !== 'EEXIST') throw error;
-      let holder = 0;
-      try { holder = Number(readFileSync(file, 'utf8').trim()) || 0; } catch { continue; }
-      let alive = false;
-      try { if (holder) { process.kill(holder, 0); alive = true; } } catch (e) { alive = e.code === 'EPERM'; }
-      if (!alive) { try { unlinkSync(file); } catch { /* another run took it */ } continue; }
-      if (waited > 20 * 60 * 1000) throw new Usage(`another check (process ${holder}) has held the lock for 20 minutes`);
-      if (!said && id !== 'container') { console.log(`Waiting for another check in this folder to finish (process ${holder})...`); said = true; }
-      await sleep(500);
-    }
+    const got = tryLock(id);
+    if (got.held) break;
+    if (waited > 20 * 60 * 1000) throw new Usage(`another check (process ${got.holder}) has held the lock for 20 minutes`);
+    if (!said && id !== 'container') { console.log(`Waiting for another check in this folder to finish (process ${got.holder || 'starting'})...`); said = true; }
+    await sleep(500);
   }
   try {
     return await work();
   } finally {
-    try { unlinkSync(file); } catch { /* gone already */ }
+    unlock(id);
   }
 }
+
+const today = () => new Date().toISOString().slice(0, 10);
 
 /**
- * Start of a run, holding the folder's lock: anything still connected to this folder's databases
- * is left over from a run that was killed, so it is stopped; a half-built template is dropped; and
- * the databases of folders unused for two weeks (removed worktrees, mostly) go.
+ * Start of a run, holding the folder's lock. Anything still connected to this folder's databases
+ * is left over from a run that was killed, so it is stopped, and a half-built template is dropped.
+ * The roles the server has the first time a run sees it are noted, for --clean. Then another
+ * folder whose databases (template, half-built template, --full) were last used more than two
+ * weeks ago loses them and its kept snapshots, but only after taking that folder's lock: a folder
+ * that is running, or building, is never touched.
  */
-async function tidy(id) {
+async function tidy(id, { unusedDays = UNUSED_DAYS } = {}) {
   const r = await ready(`SELECT count(pg_terminate_backend(pid)) FROM pg_stat_activity WHERE datname LIKE ${quote(`adam\\_${id}\\_%`)} AND pid <> pg_backend_pid();\n`
-    + tag('DBS', `coalesce((SELECT string_agg(datname || '=' || coalesce(shobj_description(oid, 'pg_database'), ''), E'\\t') FROM pg_database WHERE datname LIKE 'adam\\_%'), '')`));
+    + tag('DBS', `coalesce((SELECT string_agg(datname || '=' || coalesce(shobj_description(oid, 'pg_database'), ''), E'\\t') FROM pg_database WHERE datname LIKE 'adam\\_%'), '')`)
+    + tag('SETUP', "coalesce(shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database'), '')")
+    + tag('ROLES', "coalesce((SELECT json_agg(rolname ORDER BY rolname) FROM pg_roles WHERE rolname !~ '^pg_')::text, '[]')"));
+  if (CONTAINER === DEFAULT_CONTAINER && !/"adamRoles"/.test(r.last('SETUP') ?? '')) {
+    session('postgres', `COMMENT ON DATABASE postgres IS ${quote(JSON.stringify({ adamRoles: JSON.parse(r.last('ROLES') || '[]') }))};\n`);
+  }
   const dbs = (r.last('DBS') ?? '').split('\t').filter(Boolean).map((x) => {
     const at = x.indexOf('=');
-    return { name: x.slice(0, at), comment: x.slice(at + 1) };
-  });
-  const drop = dbs.filter((d) => d.name.startsWith(`adam_${id}_`) && d.name.endsWith('_build')).map((d) => d.name);
-  const cutoff = new Date(Date.now() - UNUSED_DAYS * 24 * 3600 * 1000).toISOString().slice(0, 10);
-  for (const d of dbs.filter((x) => x.name.endsWith('_base') && !x.name.startsWith(`adam_${id}_`))) {
     let used = null;
-    try { used = JSON.parse(d.comment).used ?? null; } catch { used = null; }
-    if (used && used < cutoff) {
-      const other = /^adam_([0-9a-f]{8})_/.exec(d.name)?.[1];
-      if (other) drop.push(...dbs.filter((x) => x.name.startsWith(`adam_${other}_`)).map((x) => x.name));
+    try { used = JSON.parse(x.slice(at + 1)).used ?? null; } catch { used = null; }
+    return { name: x.slice(0, at), used, folder: /^adam_([0-9a-f]{8})_/.exec(x.slice(0, at))?.[1] ?? null };
+  });
+  const dropped = dbs.filter((d) => d.folder === id && d.name.endsWith('_build')).map((d) => d.name);
+  if (dropped.length) session('postgres', dropped.map((d) => `DROP DATABASE IF EXISTS ${d} WITH (FORCE);\n`).join(''));
+  const cutoff = new Date(Date.now() - unusedDays * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  for (const other of [...new Set(dbs.map((d) => d.folder).filter((f) => f && f !== id))]) {
+    const mine = dbs.filter((d) => d.folder === other);
+    const last = mine.map((d) => d.used).filter(Boolean).sort().pop() ?? null;
+    if (last && last >= cutoff) continue;
+    const got = tryLock(other);
+    if (!got.held) continue; // running or building now: not ours to touch
+    try {
+      session('postgres', mine.map((d) => `DROP DATABASE IF EXISTS ${d.name} WITH (FORCE);\n`).join(''));
+      pruneCache(other, true);
+      dropped.push(...mine.map((d) => d.name));
+    } finally {
+      unlock(other);
     }
   }
-  if (drop.length) session('postgres', [...new Set(drop)].map((d) => `DROP DATABASE IF EXISTS ${d} WITH (FORCE);\n`).join(''));
-  return [...new Set(drop)];
+  return dropped;
 }
 
-/** Kept snapshots older than a week go. */
+/** Kept snapshots older than a week go, any folder's; with `all`, every one of this folder's. */
 function pruneCache(id, all = false) {
   try {
-    for (const f of readdirSync(os.tmpdir()).filter((n) => n.startsWith(`adam-db-ticket-${id}-`) && n.endsWith('.json'))) {
+    for (const f of readdirSync(os.tmpdir()).filter((n) => /^adam-db-ticket-[0-9a-f]{8}-.*\.json$/.test(n))) {
       const p = path.join(os.tmpdir(), f);
-      if (all || Date.now() - statSync(p).mtimeMs > 7 * 24 * 3600 * 1000) unlinkSync(p);
+      if ((all && f.startsWith(`adam-db-ticket-${id}-`)) || Date.now() - statSync(p).mtimeMs > 7 * 24 * 3600 * 1000) unlinkSync(p);
     }
   } catch { /* nothing to prune */ }
 }
@@ -632,7 +756,7 @@ async function checkOne(root, id, key, check, args, out, image) {
   const folder = `db/${database}`;
   const dir = path.join(root, 'db', database);
   const file = args.file ? path.resolve(root, args.file) : path.join(dir, check.migration);
-  out(`Ticket ${key}: ${path.relative(root, file).split(path.sep).join('/')}`);
+  if (args.many) out(`${path.relative(root, file).split(path.sep).join('/')}:`);
   if (!existsSync(file)) {
     const number = /^(V\d+[A-Za-z]?)__/.exec(check.migration ?? '')?.[1];
     const near = number ? sqlFiles(dir).filter((f) => f.startsWith(`${number}__`)) : [];
@@ -646,6 +770,10 @@ async function checkOne(root, id, key, check, args, out, image) {
   const owned = Object.keys(check.tables ?? {});
   const statements = check.statements ?? [];
   const mine = statementsOf(file);
+  // Statements the check cannot judge are refused before anything runs: some would also stay in
+  // the shared server (a role), or fail the second run for a reason that is not the point.
+  const refused = dataDiffs(mine, owned, name).filter((d) => /may not be in a ticket's file/.test(d));
+  if (refused.length) return { diffs: refused, gaps: [], empty: false, owned, data: [] };
 
   const base = await ensureBase(names, path.dirname(file), earlier, folder, image);
   out(`- previous state: ${plural(earlier.length, 'earlier file')} (template ${base.action}`
@@ -666,9 +794,9 @@ async function checkOne(root, id, key, check, args, out, image) {
   // The ticket's file on one copy: snapshot, apply (recorded), snapshot, apply again (not recorded),
   // snapshot. The package's statements on the other copy, at the same time.
   const time = tag('T', 'extract(epoch FROM clock_timestamp())');
-  const aSql = (cached ? '' : snap('SNAP0')) + time
+  const aSql = tag('C0', CLUSTER_SQL) + (cached ? '' : snap('SNAP0')) + time
     + fileSql(file, folder, { record: true, label: 'first run' }) + time + snap('SNAP1')
-    + fileSql(file, folder, { record: false, label: 'second run' }) + snap('SNAP2');
+    + fileSql(file, folder, { record: false, label: 'second run' }) + snap('SNAP2') + tag('C2', CLUSTER_SQL);
   let b = 'SET check_function_bodies = off;\nBEGIN;\n';
   statements.forEach((s, i) => {
     b += tag('AT', quote(`the package's statements|${s.file}|${i + 1}|-`));
@@ -707,7 +835,9 @@ async function checkOne(root, id, key, check, args, out, image) {
     + `${deferred.length ? `; ${plural(deferred.length, 'foreign key')} left for a later migration (the table is not created yet)` : ''}`);
   for (const d of deferred) out(`  - ${d}`);
 
-  const diffs = [...dataDiffs(mine, owned, name), ...again, ...diffSnapshots({ before: known.before, after, expected: known.expected, owned })];
+  const server = againDiffs(JSON.parse(a.last('C0')), JSON.parse(a.last('C2')))
+    .map((d) => `${d.replace('the second run', 'this file')}; that is the server's, shared by every database here, and stays: run --clean afterwards`);
+  const diffs = [...dataDiffs(mine, owned, name), ...server, ...again, ...diffSnapshots({ before: known.before, after, expected: known.expected, owned })];
   const gaps = [...(check.notInPackageDdl ?? []), ...(check.keysNotInPackageDdl ?? [])];
   return { diffs, gaps, empty: !statements.length, owned, data: backfills({ after, expected: known.expected, owned }) };
 }
@@ -730,6 +860,9 @@ async function ticket(root, id, key, args) {
   const lines = [];
   const out = (s = '') => { lines.push(s); console.log(s); };
   const started = Date.now();
+  args.many = checks.length > 1;
+  out(`Ticket ${key}: ${checks.map((c) => (args.file ? path.relative(root, path.resolve(root, args.file)).split(path.sep).join('/')
+    : `db/${c.database ?? 'tenant'}/${c.migration}`)).join(' and ')}`);
   pruneCache(id);
   let code = 0;
   try {
@@ -795,7 +928,8 @@ async function full(root, id, database, args) {
     console.log(`FAILED: ${error.message}`);
     return 1;
   }
-  await ready(`DROP DATABASE IF EXISTS ${names.full} WITH (FORCE);\nCREATE DATABASE ${names.full};\n`);
+  await ready(`DROP DATABASE IF EXISTS ${names.full} WITH (FORCE);\nCREATE DATABASE ${names.full};\n`
+    + `COMMENT ON DATABASE ${names.full} IS ${quote(JSON.stringify({ used: today() }))};\n`);
   const r = session(names.full, sql);
   if (!r.ok) {
     console.log(`FAILED: ${failure(r)}`);
@@ -815,6 +949,26 @@ async function clean(id) {
   if (dbs.length) must(session('postgres', dbs.map((d) => `DROP DATABASE IF EXISTS ${d} WITH (FORCE);\n`).join('')));
   console.log(`Dropped this folder's ${plural(dbs.length, 'database')} (${dbs.join(', ') || 'none'}) and its kept snapshots. `
     + `Other folders' databases stay. To remove the container too: docker rm -f ${CONTAINER}`);
+  // A role, or a role's setting, a file made lives in the server and every later run would see it.
+  // Only in the check's own container: someone else's roles are theirs.
+  if (CONTAINER === DEFAULT_CONTAINER) {
+    const s = await ready(tag('SETUP', "coalesce(shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database'), '')")
+      + tag('ROLES', "coalesce((SELECT json_agg(rolname) FROM pg_roles WHERE rolname !~ '^pg_' AND rolname <> current_user)::text, '[]')")
+      + tag('ALLDBS', "coalesce((SELECT string_agg(datname, ',') FROM pg_database WHERE datallowconn AND NOT datistemplate), '')"));
+    let setup = null;
+    try { setup = JSON.parse(s.last('SETUP')).adamRoles ?? null; } catch { setup = null; }
+    const extra = setup ? JSON.parse(s.last('ROLES') || '[]').filter((n) => !setup.includes(n)) : [];
+    for (const role of extra) {
+      const ident = `"${role.replace(/"/g, '""')}"`;
+      for (const db of (s.last('ALLDBS') ?? '').split(',').filter(Boolean)) {
+        session(db, `REASSIGN OWNED BY ${ident} TO CURRENT_USER;\nDROP OWNED BY ${ident};\n`);
+      }
+      must(session('postgres', `DROP ROLE IF EXISTS ${ident};\n`));
+    }
+    must(session('postgres', 'ALTER ROLE ALL RESET ALL;\nALTER ROLE CURRENT_USER RESET ALL;\n'));
+    console.log(extra.length ? `Removed ${plural(extra.length, 'role')} a file had made (${extra.join(', ')}), and reset role settings.`
+      : 'Reset role settings; no role a file had made.');
+  }
   return 0;
 }
 

@@ -321,13 +321,15 @@ function baseline(db) {
   return `SET check_function_bodies = off;\n${ticketStatements(pkgFiles(db), { kind: 'baseline', tables: [] }).map((s) => `${s.sql};`).join('\n')}\n`;
 }
 
+// The check's container is the script's own for these runs (it may start it, note its roles, clean them).
+const OWNED = { ...process.env, ADAM_DB_CHECK_CONTAINER: CONTAINER };
 function runScript(cwd, ...args) {
-  const r = spawnSync(process.execPath, [SCRIPT, ...args, '--container', CONTAINER], { cwd, encoding: 'utf8' });
+  const r = spawnSync(process.execPath, [SCRIPT, ...args], { cwd, encoding: 'utf8', env: OWNED });
   return { code: r.status, out: `${r.stdout}${r.stderr}` };
 }
 function runAsync(cwd, ...args) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [SCRIPT, ...args, '--container', CONTAINER], { cwd });
+    const child = spawn(process.execPath, [SCRIPT, ...args], { cwd, env: OWNED });
     let out = '';
     child.stdout.on('data', (d) => { out += d; });
     child.stderr.on('data', (d) => { out += d; });
@@ -425,6 +427,30 @@ if (!dockerUp) {
     ['an earlier table truncated', `${good}TRUNCATE tenancy.device_assignment;\n`, /writes rows into tenancy\.device_assignment, which is not one of this ticket's tables/, /DIFFERENT/],
     ['rows put into an earlier table where the text cannot show it', `${good}DO $$ BEGIN INSERT INTO kernel.inbox (consumer, event_id, processed_at) VALUES ('x', '00000000-0000-0000-0000-000000000001', now()) ON CONFLICT DO NOTHING; END $$;\n`,
       /kernel\.inbox: its row count was changed by this file/, /DIFFERENT/],
+    // What review 3 found: refused by their text, and, hidden in a DO block, seen by the snapshot.
+    ['triggers switched off on an earlier table', `${good}ALTER TABLE tenancy.device_assignment DISABLE TRIGGER ALL;\n`,
+      /statement \d+ \(line \d+\) switches triggers off or to replica mode/, /may not be in a ticket's file/],
+    ['triggers switched off on the ticket\'s own table', `${good}ALTER TABLE subscription.plan_limit DISABLE TRIGGER ALL;\n`, /switches triggers off/, /DIFFERENT/],
+    ['triggers switched off inside a DO block', `${good}DO $$ BEGIN EXECUTE 'ALTER TABLE subscription.plan_limit DISABLE TRIGGER ALL'; END $$;\n`,
+      /subscription\.plan_limit: the table is .*triggers not on [1-9]/, /DIFFERENT/],
+    ['ALTER DEFAULT PRIVILEGES', `${good}ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO PUBLIC;\n`, /changes the privileges of tables not made yet/, /DIFFERENT/],
+    ['ALTER DEFAULT PRIVILEGES IN SCHEMA, inside a DO block', `${good}DO $$ BEGIN EXECUTE 'ALTER DEFAULT PRIVILEGES IN SCHEMA kernel GRANT ALL ON TABLES TO PUBLIC'; END $$;\n`,
+      /default privileges postgres in kernel for r was created by this file/, /DIFFERENT/],
+    ['GRANT on the database', `${good}DO $$ BEGIN EXECUTE format('GRANT ALL ON DATABASE %I TO PUBLIC', current_database()); END $$;\n`,
+      /database was changed by this file/, /DIFFERENT/],
+    ['a rule on an earlier table', `${good}CREATE RULE r_ignore AS ON INSERT TO kernel.inbox DO INSTEAD NOTHING;\n`, /adds a rule/, /DIFFERENT/],
+    ['a rule hidden in a DO block', `${good}DO $$ BEGIN EXECUTE 'CREATE OR REPLACE RULE r_ignore AS ON INSERT TO kernel.inbox DO INSTEAD NOTHING'; END $$;\n`,
+      /kernel\.inbox: rule r_ignore was created by this file/, /DIFFERENT/],
+    ['a publication', `${good}DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'p_all') THEN CREATE PUBLICATION p_all FOR ALL TABLES; END IF; END $$;\n`,
+      /publication p_all was created by this file/, /DIFFERENT/],
+    ['a constraint on the default partition of an earlier table', `${good}ALTER TABLE kernel.inbox_default DROP CONSTRAINT IF EXISTS probe_no;\nALTER TABLE kernel.inbox_default ADD CONSTRAINT probe_no CHECK (false) NOT VALID;\n`,
+      /kernel\.inbox_default: constraint probe_no was created by this file/, /DIFFERENT/],
+    ['row-level security on the default partition', `${good}ALTER TABLE kernel.inbox_default ENABLE ROW LEVEL SECURITY;\n`,
+      /kernel\.inbox: default partition kernel\.inbox_default was changed by this file.*rls true/, /DIFFERENT/],
+    ['a DELETE inside a WITH', `${good}WITH d AS (DELETE FROM kernel.inbox RETURNING 1) SELECT count(*) FROM d;\n`,
+      /writes rows into kernel\.inbox, which is not one of this ticket's tables/, /DIFFERENT/],
+    ['a role made inside a DO block (it stays in the server until --clean)', `${good}DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_back') THEN CREATE ROLE probe_back LOGIN; END IF; END $$;\n`,
+      /this file changed server roles .*probe_back/, /run --clean afterwards/],
   ];
   docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', 'DROP ROLE IF EXISTS probe_owner; CREATE ROLE probe_owner']);
   for (const [what, sql, a, b] of cases) {
@@ -433,6 +459,9 @@ if (!dockerUp) {
   }
   const path1 = check(`SET search_path = subscription, public;\n${good}`);
   ok(path1.code === 0 && /MATCH: 5 tables/.test(path1.out), 'a file that sets search_path still matches (names print the same in every snapshot)', path1.out);
+  const path2 = check(`SET search_path = subscription, public;\n${good}INSERT INTO module_listing (id, module_code) VALUES ('00000000-0000-0000-0000-000000000002', 'core') ON CONFLICT (id) DO NOTHING;\n`);
+  ok(path2.code === 0 && /MATCH/.test(path2.out) && /subscription\.module_listing: 1 rows/.test(path2.out),
+    'an unqualified backfill after SET search_path is read as the ticket\'s own table', path2.out);
   const backfill = check(`${good}INSERT INTO subscription.module_listing (id, module_code) VALUES ('00000000-0000-0000-0000-000000000001', 'core') ON CONFLICT (id) DO NOTHING;\n`);
   ok(backfill.code === 0 && /MATCH/.test(backfill.out) && /rows this file leaves in the ticket's own tables[\s\S]*subscription\.module_listing: 1 rows/.test(backfill.out),
     'rows in the ticket\'s own table: MATCH, with the backfill listed for the person to judge', backfill.out);
@@ -440,12 +469,12 @@ if (!dockerUp) {
   // A run killed while it builds the template: the next run must not trust what it left.
   writeFileSync(path.join(tenant, 'V0004__slow.sql'), 'SELECT pg_sleep(8);\n');
   writeFileSync(ticketFile, good);
-  const killed = spawn(process.execPath, [SCRIPT, '9005', '--container', CONTAINER], { cwd: repo });
+  const killed = spawn(process.execPath, [SCRIPT, '9005'], { cwd: repo, env: OWNED });
   await new Promise((r) => { setTimeout(r, 4500); });
   killed.kill();
   await new Promise((r) => { setTimeout(r, 500); });
   const dbsAfterKill = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT string_agg(datname || ':' || coalesce(shobj_description(oid, 'pg_database'), ''), ' ') FROM pg_database WHERE datname LIKE 'adam\\_%\\_base' OR datname LIKE 'adam\\_%\\_build'"]).stdout;
-  ok(/_build:\{"complete":false\}/.test(dbsAfterKill) && !/V0004__slow/.test(dbsAfterKill.replace(/_build:[^ ]*/g, '')),
+  ok(/_build:\{"complete":false,/.test(dbsAfterKill) && !/V0004__slow/.test(dbsAfterKill.replace(/_build:[^ ]*/g, '')),
     'killed half way: the build is under its temporary name, and the template does not list the file', dbsAfterKill);
   const resumed = check(good);
   ok(resumed.code === 0 && /template extended, 1 applied/.test(resumed.out) && /MATCH: 5 tables/.test(resumed.out),
@@ -458,7 +487,7 @@ if (!dockerUp) {
   const link = path.join(SCRATCH, 'scripts-link');
   spawnSync('cmd', ['/c', 'mklink', '/J', link, path.dirname(SCRIPT)], { encoding: 'utf8' });
   writeFileSync(ticketFile, good);
-  const viaLink = spawnSync(process.execPath, [path.join(link, 'db-ticket.mjs'), '9005', '--container', CONTAINER], { cwd: repo, encoding: 'utf8' });
+  const viaLink = spawnSync(process.execPath, [path.join(link, 'db-ticket.mjs'), '9005'], { cwd: repo, encoding: 'utf8', env: OWNED });
   ok(viaLink.status === 0 && /MATCH: 5 tables/.test(viaLink.stdout), 'the script reached through a junction runs (it used to print nothing and exit 0)', `${viaLink.status} ${viaLink.stdout}`);
 
   // Two at once in one folder: one waits for the other, both match.
@@ -490,8 +519,10 @@ if (!dockerUp) {
   const badDb = runScript(repo, '--full', 'x;drop');
   ok(badDb.code === 2 && /is not a database name/.test(badDb.out), 'a database name that is not one is refused', badDb.out);
   docker(['stop', CONTAINER]);
-  const stopped = runScript(repo, '9005');
-  ok(stopped.code === 2 && /is not running; start it yourself/.test(stopped.out)
+  const stoppedRun = spawnSync(process.execPath, [SCRIPT, '9005', '--container', CONTAINER], { cwd: repo, encoding: 'utf8' });
+  const stopped = { code: stoppedRun.status, out: stoppedRun.stdout + stoppedRun.stderr };
+  ok(stopped.code === 2 && /^Ticket 9005: /.test(stopped.out) && /^Ticket 9005: /.test(readFileSync(path.join(repo, '.adam', 'work', '9005', 'db-check.md'), 'utf8').split('\n')[2])
+    && /is not running; start it yourself/.test(stopped.out)
     && docker(['inspect', '-f', '{{.State.Running}}', CONTAINER]).stdout.trim() === 'false', '--container never starts someone else\'s container', stopped.out);
   docker(['start', CONTAINER]);
   await startContainer();
@@ -499,6 +530,29 @@ if (!dockerUp) {
   const cleaned = runScript(repo, '--clean');
   const left = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT count(*) FROM pg_database WHERE datname LIKE 'adam\\_%'"]).stdout.trim();
   ok(cleaned.code === 0 && /Dropped this folder's \d+ databases \(adam_/.test(cleaned.out) && Number(left) > 0, '--clean drops this folder\'s databases and not the other folder\'s', `${cleaned.out} ${left} left`);
+  const roles = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT string_agg(rolname, ',') FROM pg_roles WHERE rolname IN ('probe_back', 'probe_owner')"]).stdout.trim();
+  ok(/Removed 2 roles a file had made \((probe_back, probe_owner|probe_owner, probe_back)\)/.test(cleaned.out) && roles === '',
+    '--clean removes the roles made after the container was first set up, in the check\'s own container', `${cleaned.out} [${roles}]`);
+
+  // Another folder's databases, last used more than two weeks ago: kept while that folder holds its
+  // lock (it may be building), dropped once it does not, with its kept snapshots.
+  const twinId = createHash('sha256').update(realpathSync.native(twin).toLowerCase()).digest('hex').slice(0, 8);
+  const twinDbs = () => docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', `SELECT count(*) FROM pg_database WHERE datname LIKE 'adam\\_${twinId}\\_%'`]).stdout.trim();
+  const stale = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', `SELECT shobj_description(oid, 'pg_database') FROM pg_database WHERE datname = 'adam_${twinId}_tenant_base'`]).stdout.trim();
+  docker(['exec', '-i', CONTAINER, 'psql', '-U', 'postgres', '-q', '-f', '-'],
+    `COMMENT ON DATABASE adam_${twinId}_tenant_base IS '${JSON.stringify({ ...JSON.parse(stale), used: '2026-09-01' }).replace(/'/g, "''")}';\n`);
+  const twinLock = path.join(tmpdir(), `adam-db-ticket-${twinId}.lock`);
+  writeFileSync(twinLock, String(process.pid));
+  writeFileSync(ticketFile, good);
+  const held = runScript(repo, '9005');
+  const keptWhileHeld = twinDbs();
+  rmSync(twinLock, { force: true });
+  const freed = runScript(repo, '9005');
+  ok(held.code === 0 && Number(keptWhileHeld) > 0 && !/dropped \d+ database/.test(held.out),
+    'a stale folder that holds its lock (running or building) is left alone', `${keptWhileHeld} kept\n${held.out}`);
+  ok(freed.code === 0 && twinDbs() === '0' && /^Ticket 9005: db\/tenant\/V0005__subscription\.sql\n- dropped \d+ databases left over or unused for 14 days/.test(freed.out)
+    && !readdirSync(tmpdir()).some((n) => n.startsWith(`adam-db-ticket-${twinId}-`)),
+  'once free, its databases and kept snapshots go after 14 days unused; the Ticket line still comes first', freed.out);
 }
 
 // ---- 5. the whole package against PostgreSQL ----------------------------------------------------
