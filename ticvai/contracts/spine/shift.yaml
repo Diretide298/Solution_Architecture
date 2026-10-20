@@ -1132,6 +1132,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: reopenShift
+      # The first count is left where the first close wrote it; reopening reads and writes no count line (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [orders.cash_count_line]
       x-ticvai-consumed-by:
         - "P04 POS-025 Till Home"
       x-ticvai-audience: [staff]

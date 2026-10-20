@@ -981,6 +981,9 @@ paths:
   /site-package:
     post:
       operationId: exportSitePackage
+      x-ticvai-reads:
+      - table: whitelabel.config_version
+        for: 'the published version''s snapshot the package is built from (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-014 Publishing Workflow"
@@ -3461,6 +3464,9 @@ paths:
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-007 Page Builder"
       x-ticvai-read-via:
+      - query: subscription#tenantRecords
+        route: in-process
+        for: 'the tenant''s cell address (Tenant.cellHost) a platform operator''s X-Tenant-Id resolves to, Platform''s data (r8 integration, CHG-R8INT-014)'
       - query: subscription#contractRecords
         route: in-process
         for: 'its read of control.contract, Platform''s data (CHG-MOD-001)'
@@ -4644,6 +4650,7 @@ paths:
         format: uuid
     post:
       operationId: previewGuidedChoice
+      x-ticvai-idempotency-exempt: A preview computed in process from the draft answers; it writes nothing, so a replay duplicates no row (r8 integration, CHG-R8INT-014).
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service

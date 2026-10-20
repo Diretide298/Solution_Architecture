@@ -1319,6 +1319,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: collectShopAndDrop
+      x-ticvai-read-via:
+      - query: fnb#deliveryLocationRecords
+        route: in-process
+        for: 'the collection point''s closing time behind the default collectBy, fnb.delivery_location, F&B''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-consumed-by:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
       x-ticvai-audience: [staff]

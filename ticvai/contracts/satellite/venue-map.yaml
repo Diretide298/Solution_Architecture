@@ -1682,6 +1682,10 @@ paths:
   /visit-plans:
     get:
       operationId: listMyVisitPlans
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'what its plans call "active venues" (VisitPlan.availableAtVenueIds): platform.scope, Tenancy''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-consumed-by:
         - "P02 GST-059 Plan in Progress"
       security:

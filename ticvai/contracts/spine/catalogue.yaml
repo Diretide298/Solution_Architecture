@@ -19087,6 +19087,9 @@ paths:
   /product-tags/{productTagId}:
     put:
       operationId: setProductTagDefinition
+      x-ticvai-writes:
+      - table: catalogue.audit_entry
+        for: 'the audit row of the tag change (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: white-label#guidedChoiceAnswerRecords
@@ -19410,6 +19413,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductChannelTexts
+      x-ticvai-writes:
+      - table: catalogue.audit_entry
+        for: 'the audit row (category channelTexts, the texts before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: white-label#tenantLanguageRecords
@@ -19552,6 +19558,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductOwnerForms
+      x-ticvai-writes:
+      - table: catalogue.audit_entry
+        for: 'the audit row (category ownerForms, the links before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: marketing-crm#formDefinitionRecords
@@ -19766,6 +19775,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductSalePermissionRules
+      x-ticvai-writes:
+      - table: catalogue.audit_entry
+        for: 'the audit row (category salePermissions, the rule set before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: tenancy#activeVenues

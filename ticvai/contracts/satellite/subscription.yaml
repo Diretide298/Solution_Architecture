@@ -176,8 +176,25 @@ x-ticvai-queries:
       them (the table's row-level security, under the caller's connection and transaction). It decides nothing: an
       asker that refuses or chooses on these rows states that rule in its own operation, and a question with a rule
       of its own (open, live, sellable) is declared as a query of its own. It is asked in process within operations,
-      through the C# query interface Platform implements.
-    served: [in-process]
+      through the C# query interface Platform implements, and from another deployable (tenancy's resolveTenantHost)
+      through the service route (serviceAuth; r8 integration, CHG-R8INT-014).
+    served: [in-process, service]
+  cellTenantRecords:
+    module: subscription
+    table: control.cell_tenant
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.cell_tenant rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as tenantId or cellId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CellTenant'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October; r8 integration, CHG-R8INT-014).
+      Platform answers with its control.cell_tenant rows, as it stores them. It decides nothing: resolveTenantHost,
+      which asks it, states its own rule (one database that is live, suspended or draining). It is asked from another
+      deployable through Platform's service route (serviceAuth).
+    served: [service]
 paths:
   /onboarding-applications:
     post:
@@ -1359,6 +1376,9 @@ paths:
         format: uuid
     post:
       operationId: suspendTenant
+      x-ticvai-writes:
+      - table: control.outbox
+        for: 'tenant.suspended, written to the control databases outbox when the suspension takes effect (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
       x-ticvai-write-via:

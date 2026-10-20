@@ -568,6 +568,10 @@ paths:
         format: uuid
     get:
       operationId: getMyCase
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'the case''s guest as CaseDetail shows them (pii.subject), Identity''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-consumed-by:
         - "P02 GST-040 Help & Support"
         - "P02 GST-068 Help & My Cases"
@@ -4260,6 +4264,9 @@ paths:
   /guests:
     get:
       operationId: searchGuests
+      x-ticvai-reads:
+      - table: marketing.consent_record
+        for: 'the hasConsentFor filter: the guest''s current consent record for the purpose (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
         - "P04 POS-030 Sales Journal"

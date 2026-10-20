@@ -1,0 +1,59 @@
+id: CHG-R8INT-014
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'More of the refresh rehearsal''s findings, fixed at the contracts and the checks: the tables an operation''s
+  text names are in its lineage (x-ticvai-reads / x-ticvai-writes for its own module''s, x-ticvai-names-for-context
+  where a table is named for context or read through another module''s query); the reads the r8 lanes named in
+  another module''s data ask that module''s query (resolveTenantHost through two new or widened Platform queries,
+  getGuestRefundPolicy, getModuleEnablement, collectShopAndDrop, getMyCase, listOwnRefundRequests, listMyVisitPlans,
+  verifyGuestEmail); listStepUpSupervisors says who may call it (self-service); captureStoredValue keeps its
+  Idempotency-Key lookup out of the lock; previewGuidedChoice is idempotency-exempt and runGuidedChoiceSuggestionJob
+  returns its consistency token; check-package reads `store:what` lineage names as stores, not tables; refresh.sh runs
+  derive-release-flags.'
+decision:
+  what: 'contracts: x-ticvai-reads on searchGuests, exportSitePackage, recordDeviceHeartbeat; x-ticvai-writes on
+    setProductChannelTexts, setProductOwnerForms, setProductSalePermissionRules, setProductTagDefinition (catalogue.
+    audit_entry), registerGuest (identity.otp_challenge), suspendTenant (control.outbox), pauseAiCapability (ai.outbox),
+    proposeTranslations (ai.translation_job); x-ticvai-names-for-context on replayEvents, checkOutRental, reopenShift,
+    configureWorkstation, proposeTranslations, resolveTenantHost; subscription.yaml cellTenantRecords (new, served
+    service) and cellRecords served [in-process, service]; read-vias on resolveTenantHost, getGuestRefundPolicy,
+    getModuleEnablement, collectShopAndDrop, getMyCase, listOwnRefundRequests, listMyVisitPlans, verifyGuestEmail;
+    identity.yaml listStepUpSupervisors x-ticvai-self-service; orders.yaml captureStoredValue lock-excludes
+    cache:idempotency; white-label.yaml previewGuidedChoice x-ticvai-idempotency-exempt; ai.yaml
+    runGuidedChoiceSuggestionJob 202 X-Consistency-Token. tools/check-package.py (rule 2+8 skips `store:what` names),
+    tools/refresh.sh (derive-release-flags after build-service-docs). handoff/api-data-lineage.json re-derived.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The coordinator''s addendum to the r8 integration brief (20 October 2026): the refresh rehearsal of the
+  integration branch failed check-parameter-columns (P-NAMED-TABLE), check-cross-module-reads (XR-FACT), check-package
+  (rule 23, rule 41, idempotency, consistency token, release:api-scopes) and refresh.sh''s tools coverage
+  (derive-release-flags neither run nor excused). Finding: refresh rehearsal of 20 October 2026.'
+keys_touched:
+  operations: [searchGuests, exportSitePackage, recordDeviceHeartbeat, setProductChannelTexts, setProductOwnerForms,
+    setProductSalePermissionRules, setProductTagDefinition, registerGuest, suspendTenant, pauseAiCapability,
+    proposeTranslations, replayEvents, checkOutRental, reopenShift, configureWorkstation, resolveTenantHost,
+    getGuestRefundPolicy, getModuleEnablement, collectShopAndDrop, getMyCase, listOwnRefundRequests,
+    listMyVisitPlans, verifyGuestEmail, listStepUpSupervisors, captureStoredValue, previewGuidedChoice,
+    runGuidedChoiceSuggestionJob]
+  files:
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/tenancy.yaml
+  - tools/check-package.py
+  - tools/refresh.sh
+  - handoff/api-data-lineage.json
+root_class: 'a gate finding the refresh rehearsal found on the integration branch'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: 'Left: check-cross-module-reads XR-FACT forceLogout (SupervisorStepUp''s text names orders.pos_shift) and
+  recordConsentIdentifier (names marketing.device_consent), both from shared text, not this pass''s; check-package''s
+  two build-readiness-21-september.md findings predate r8.'

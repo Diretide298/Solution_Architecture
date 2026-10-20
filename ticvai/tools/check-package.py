@@ -1598,6 +1598,10 @@ def main() -> int:
             WARNINGS.append(f"could not read the schema workbook: {e}")
     if tables:
         named = ({t for v in lin.values() for t in v["reads"]} - views) | {t for v in lin.values() for t in v["writes"]}
+        # **A store that is not a table is named `<store>:<what>`** (`cache:idempotency`, and since CHG-R8GEN-008
+        # `release:api-scopes`, the scope catalogue generated at release): no schema reference holds it, so it is not
+        # a table to look up (r8 integration, CHG-R8INT-014).
+        named = {t for t in named if ":" not in t}
         for t in sorted(named - tables):
             ERRORS.append(f"lineage names table '{t}' which the schema reference does not have")
         for t in sorted(tables):

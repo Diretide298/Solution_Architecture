@@ -612,6 +612,10 @@ paths:
   /auth/guest/verify-email:
     post:
       operationId: verifyGuestEmail
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s guest code attempt limit (VenueSettings.identity), Tenancy''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-consumed-by:
         - "P01 WEB-013 Booking Confirmation"
         - "P01 WEB-020 Profile & Preferences"
@@ -1711,8 +1715,11 @@ paths:
       tags:
       - identity
       # No permission: any staff session at the venue may ask who can sign for its own pending act; the answer is
-      # scoped to the caller's own venue and session (self-scoped) and carries names only (GPS-C31).
+      # scoped to the caller's own venue and session (self-scoped) and carries names only (GPS-C31). Self-service: the
+      # signed-in staff member acts on their own session's pending act, not on the platform (check-package rule 23;
+      # r8 integration, CHG-R8INT-014).
       x-ticvai-permission: null
+      x-ticvai-self-service: true
       x-ticvai-self-scoped: principal
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -2900,6 +2907,9 @@ paths:
   /auth/guest/register:
     post:
       operationId: registerGuest
+      x-ticvai-writes:
+      - table: identity.otp_challenge
+        for: 'the six-digit e-mail code sent with channel email (IDENTITY-C38) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
