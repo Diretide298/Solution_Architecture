@@ -19026,9 +19026,9 @@ paths:
         those tags, in the order sent. A tag a product carried before the tag list existed is kept only if it is
         sent again. **The wave 1 migration maps every value already stored to exactly one tag** of its product's
         venue (CHG-R8PRD-010; the rule is PRD-W1-DB's): trimmed, compared ignoring case, a value that fits the code
-        pattern becomes that code, one outside it a derived code with the original kept as the tag's `name` (literal
-        codes allocated before derived ones; a derived code is cut so that it fits 64 characters with its `-2`, `-3`
-        suffix), and each product's
+        pattern becomes that code, one outside it a derived code (literal codes allocated before derived ones; a
+        derived code is cut so that it fits 64 characters with its `-2`, `-3` suffix, and after any cut a trailing `/`
+        or `-` is trimmed); every tag's `name` is the original value cut to 80 characters; and each product's
         `segmentTags`, and each Help me choose answer filter of the venue that names them, is rewritten to those
         codes, so no product and no answer loses a tag.
 
@@ -19191,6 +19191,9 @@ paths:
       - query: white-label#tenantLanguageRecords
         route: service
         for: 'the tenant''s enabled (published) languages, which `missingTranslations` is counted against: whitelabel.config_version, WhiteLabel''s data'
+      - query: white-label#tenantConfigRecords
+        route: service
+        for: 'before the tenant''s first publish, its working draft''s languages: whitelabel.tenant_config, WhiteLabel''s data'
       summary: The product's texts per sales channel, in each of the tenant's languages
       description: >-
         **What each channel prints or shows for this product** (16 October 2026 minutes, 4.10: the POS button label
@@ -19199,8 +19202,9 @@ paths:
         The kiosk label, website and app description, visit instructions and terms are the other texts of the
         wireframe of 9 October, B1-S06 Content & Localization, section "Channel-specific content".
 
-        **The languages are the tenant's** (white-label `setLanguages`, the published `LanguageConfig.languages`; any
-        ISO 639-1 code since CHG-CSA-039; a language added to the draft counts once it is published): every text is keyed by those codes, as `LocalisedText` says, and no venue keeps a list of
+        **The languages are the tenant's** (white-label `setLanguages`, `LanguageConfig.languages`, published, or the draft
+        before the first publish; any ISO 639-1 code since CHG-CSA-039; once a version is published, a language added to
+        the draft counts when it is published; CHG-R8PRD-012): every text is keyed by those codes, as `LocalisedText` says, and no venue keeps a list of
         its own (CHG-R8PRD-009).
 
         **A product with nothing saved** answers every text null, which means each channel shows the product's own
@@ -19235,6 +19239,9 @@ paths:
       - query: white-label#tenantLanguageRecords
         route: service
         for: 'every key must be an enabled (published) language of the tenant: whitelabel.config_version, WhiteLabel''s data'
+      - query: white-label#tenantConfigRecords
+        route: service
+        for: 'before the tenant''s first publish, its working draft''s languages: whitelabel.tenant_config, WhiteLabel''s data'
       summary: Set the product's texts per sales channel
       description: >-
         **Replaces all of the product's channel texts** (CHG-R8PRD-003): a text sent as null, or left out, falls
@@ -19611,8 +19618,8 @@ paths:
         changed rule whose `targetId` is not one `listSalePermissionTargets` offers for the product at its level
         (`422 unknown-sale-permission-target`); a rule sent unchanged (same `level`, `targetId` and `effect` as a saved
         one) is kept as it is and not checked again, so a rule naming a principal since deactivated, or a venue outside
-        the editor's grants, does not block other changes; an `ALLOW` at level `principal` naming the caller,
-        or a removed or changed `DENY` whose target is the caller (`principal`) or the caller's selected role (`role`)
+        the editor's grants, does not block other changes; an `ALLOW` whose target is the caller (`principal`)
+        or the caller's selected role (`role`), or a removed or changed `DENY` whose target is either of them
         (`403 sale-permission-self-grant`: nobody grants themselves the right to sell, by adding an allow or lifting a
         deny, as an approver is never the submitter); an archived product (`409 product-archived`).
 
@@ -19659,8 +19666,8 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          description: The caller lacks the permission at this venue (`forbidden`), or the set adds an `ALLOW` naming
-            the caller or lifts a `DENY` on the caller or the caller's role (`sale-permission-self-grant`).
+          description: The caller lacks the permission at this venue (`forbidden`), or the set adds an `ALLOW` for, or
+            lifts a `DENY` on, the caller or the caller's role (`sale-permission-self-grant`).
           x-ticvai-problem-types:
           - forbidden
           - sale-permission-self-grant
@@ -44629,7 +44636,7 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: '**The partition key** (ADR-0005). Set by the server from the venue resolved for the write (`venueId`, else the session''s working venue).'
+          description: '**The partition key** (ADR-0005). Set by the server from the venue resolved for the write (`venueId`, else the session''s working venue) when the tag is created; a replace keeps it (`409 tag-venue-mismatch`).'
         productCount:
           type: integer
           readOnly: true

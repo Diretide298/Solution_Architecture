@@ -246,7 +246,7 @@ x-ticvai-queries:
       where: {type: object, additionalProperties: true, description: 'The rows whose columns equal these values; with none, the current published version (isCurrent).'}
     returns:
       type: array
-      description: 'The tenant''s current published configuration version, as WhiteLabel stores it; its `snapshot` carries the published `LanguageConfig`, whose `languages` are the enabled languages a caller keys texts by. The working draft (whitelabel.tenant_config) is not read while a version is published: a language added but not yet published is not enabled, and one removed in the draft stays enabled until published. A tenant that has never published answers its working draft''s `LanguageConfig` instead, so its languages count from the start.'
+      description: 'The tenant''s current published configuration version, as WhiteLabel stores it; its `snapshot` carries the published `LanguageConfig`, whose `languages` are the enabled languages a caller keys texts by. The working draft (whitelabel.tenant_config) is not read here (catalogue reads it through tenantConfigRecords before the first publish): a language added but not yet published is not enabled, and one removed in the draft stays enabled until published.'
       items: {$ref: '#/components/schemas/ConfigVersion'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
@@ -256,6 +256,24 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through WhiteLabel's service route (serviceAuth). Added for the products
       module, wave 1 (CHG-R8PRD-009).
+    served: [service]
+  tenantConfigRecords:
+    module: white-label
+    table: whitelabel.tenant_config
+    inputs:
+      where: {type: object, additionalProperties: true, description: 'The rows whose columns equal these values; the tenant''s one working configuration when empty.'}
+    returns:
+      type: array
+      description: 'The tenant''s working configuration (the draft), as WhiteLabel stores it; its languages are `LanguageConfig`.'
+      items: {$ref: '#/components/schemas/TenantConfig'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.tenant_config rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through WhiteLabel's service route (serviceAuth). Added for the products
+      module, wave 1 (CHG-R8PRD-012).
     served: [service]
 paths:
   /tenant-domains:

@@ -19001,7 +19001,9 @@ paths:
 
         **What Orders sends, and what is checked** (CHG-R8PRD-011): the order's venue (`venueId`) and the sale slot.
         The order must exist and be of that venue (`422 unknown-order`, `422 order-not-of-venue`); a reservation
-        owner's `subjectId` must be the order's buyer (`422 not-order-buyer`); a ticket owner's order line must be on
+        owner's `subjectId` must be the order's buyer (`422 not-order-buyer`), and an order with no buyer (an
+        anonymous walk-in till sale) takes no reservation-owner answer (`422 order-has-no-buyer`) while its ticket-owner
+        answers are accepted (CHG-R8PRD-012); a ticket owner's order line must be on
         the order and its unit within the line's quantity (`422 unknown-order-line`); the form must be a published form
         of that venue (`422 form-not-for-venue`) and the answers must fill its required fields (`422 answer-required`);
         the `subjectId` must be a subject (`422 unknown-subject`). The link row's `scopePath` is that venue, so the
@@ -19058,7 +19060,7 @@ paths:
           description: The form or version is unknown (`unknown-form`) or not a published form of the order's venue
             (`form-not-for-venue`), a required field has no answer (`answer-required`), the order is unknown
             (`unknown-order`) or of another venue (`order-not-of-venue`), the buyer is not the order's
-            (`not-order-buyer`), the line or unit is not on the order (`unknown-order-line`), or the subject is unknown
+            (`not-order-buyer`) or the order has no buyer for a reservation-owner answer (`order-has-no-buyer`), the line or unit is not on the order (`unknown-order-line`), or the subject is unknown
             (`unknown-subject`).
           x-ticvai-problem-types:
           - unknown-form
@@ -19067,6 +19069,7 @@ paths:
           - unknown-order
           - order-not-of-venue
           - not-order-buyer
+          - order-has-no-buyer
           - unknown-order-line
           - unknown-subject
           content:
