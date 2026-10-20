@@ -828,6 +828,14 @@ function alterTable(model, stmt, file, notModelled) {
     model.set(table.name, table);
     return;
   }
+  // r8's schema moves (platform.dsar_request -> sync.dsar_request): the table keeps its name in the new schema.
+  const moved = /^SET\s+SCHEMA\s+([\w"]+)$/i.exec(rest);
+  if (moved) {
+    model.delete(name);
+    table.name = `${ident(moved[1])}.${name.split('.').pop()}`;
+    model.set(table.name, table);
+    return;
+  }
   for (const action of splitTop(rest)) {
     let m;
     if ((m = /^ADD\s+CONSTRAINT\s+([\w"]+)\s+([\s\S]*)$/i.exec(action))) {
