@@ -1,0 +1,37 @@
+id: CHG-R8INT-020
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Two checks the integration pass''s own bindings broke, found by the final full run on the derived branch:
+  the guest purchase flows F01 (step 5) and F55 (step 1) call getGuestCouponCode at WEB-010, as the screen now does
+  (CHG-R8INT-009), and check-config-scope''s naming rules reach setVisitPlanPreset (a venue-defined preset, CHG-R8INT-007),
+  so its venue config scope is examined instead of skipped.'
+decision:
+  what: 'flows/F01-guest-online-purchase.yaml, flows/F55-a-guest-buys-on-the-web-and-transfers-to-a-frien.yaml:
+    getCouponCode -> getGuestCouponCode; tools/check-config-scope.py: IS_CONFIG gains VisitPlanPreset.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: run-checks on the derived copy of fix/r8-intpass at 3ecdff3d (20 October 2026): check-flows "step 5
+  calls getCouponCode from WEB-010, but WEB-010 does not declare it" (and F55 step 1), and check-config-scope
+  "venue-map.setVisitPlanPreset: declares a config scope but the naming rules do not reach it". Both passed at the
+  rehearsal, before items 4 and 6 (GPS-C21 answer B; ORDERS-MONEY-C32).'
+keys_touched:
+  operations: [getGuestCouponCode, getCouponCode, setVisitPlanPreset]
+  screens: [WEB-010]
+  files:
+  - flows/F01-guest-online-purchase.yaml
+  - flows/F55-a-guest-buys-on-the-web-and-transfers-to-a-frien.yaml
+  - tools/check-config-scope.py
+root_class: 'a binding changed and the flows and naming rules that name it did not follow'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-flows.py
+status: open
+notes: 'The flows name operations only; no screen text changes.'
