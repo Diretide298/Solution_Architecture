@@ -3865,11 +3865,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
         '401':
-          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+          x-ticvai-problem-types: [sso-state-invalid]
+          description: 'The `state` is unknown, already used or expired (`sso-state-invalid`; R8 blocker IDENTITY-C58,
+            CHG-R8MIG-015; r8 integration, CHG-R8INT-024): the sign-in page says the link has expired and starts
+            again. Not `unauthenticated`: this door takes no session.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          x-ticvai-problem-types: [sso-group-not-mapped]
-          description: 'Authenticated, but no group maps to a role in this tenant. The provider proved
-            who they are; it did not grant them anything.
+          x-ticvai-problem-types: [sso-group-not-mapped, sso-principal-not-provisioned, forbidden]
+          description: 'Authenticated, but no group maps to a role in this tenant (`sso-group-not-mapped`). The
+            provider proved who they are; it did not grant them anything. Or no principal is linked to the
+            provider''s subject and the provider is not set to provision one (`sso-principal-not-provisioned`; R8
+            blocker IDENTITY-C57, CHG-R8MIG-015, CHG-R8INT-024). A linked principal that is inactive is
+            `forbidden`.
 
             '
           content:

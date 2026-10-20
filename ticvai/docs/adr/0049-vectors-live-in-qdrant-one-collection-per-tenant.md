@@ -157,6 +157,12 @@ decision to run Qdrant from the start. D buys nothing B does not, at a cost per 
 - **Compliance:** the security approval for Qdrant, outstanding since 12 August, was given on 30 September (Chinmay) on one condition: Qdrant is hosted only on servers in the UAE. That condition binds every tier, including disaster recovery and backups.
 - **Skills:** nobody on the team has run Qdrant (skills matrix). The two AI engineers own it with DevOps.
 - Erasure has a second home: the tenant database records the point references so a delete can be proven.
+  How it is proven (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025; r8 integration, CHG-R8INT-024): Identity's erasure
+  job for `deleteGuestAccount` calls `ai.eraseSubject`, which deletes the subject's `ai.index_entry` and
+  `ai.chunk_embedding` rows in one transaction, then the Qdrant points with that `subjectId` in their payload (by
+  payload filter, which also catches a point whose row went first), retried until both are done. The proof it keeps is
+  zero rows with the subject and a Qdrant count of 0 for the payload key; its response carries the counts removed and
+  left.
 
 **Revisit**
 

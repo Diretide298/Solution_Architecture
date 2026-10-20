@@ -1046,6 +1046,11 @@ components:
 
         A caller presenting a valid token from the wrong certificate is rejected. Neither alone is sufficient.
 
+        **The connection context of a call with no user** (R8 blocker IDENTITY-C48, the lead''s option A; CHG-R8MIG-007;
+        backend/MIGRATIONS.md "The connection context"; r8 integration, CHG-R8INT-024): the tenant comes from the cell
+        token''s `tid` claim, `ticvai.scope_paths` is the tenant root, the calling cell is the audited actor, and its
+        idempotency records are claimed under that context.
+
         '
     deviceAuth:
       type: http

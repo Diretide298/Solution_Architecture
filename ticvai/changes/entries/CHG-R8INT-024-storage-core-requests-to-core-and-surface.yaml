@@ -1,0 +1,50 @@
+id: CHG-R8INT-024
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The storage-core lane''s requests to the core and surface lanes that no merged branch had applied, where each
+  is a small authored edit: completeSsoAuthorization names its 401 sso-state-invalid and 403
+  sso-principal-not-provisioned (and forbidden for an inactive principal); serviceAuth says the connection context of a
+  call with no user; permission-resolution.md states the three settings and the context before and without a session;
+  ADR-0039 says the control database has no row-level security; ADR-0071 says why a second factor''s secret and
+  destination are field-encrypted and not hashed; ADR-0019 says how a bundle reaches the cart in r8; ADR-0049 and the
+  AI system design say how ai.eraseSubject proves an erasure; states/media.yaml names the reviewer of a quarantined
+  asset; states/parking-entitlement.yaml gains the pushed -> pending plate change.'
+decision:
+  what: 'contracts/spine/identity.yaml (completeSsoAuthorization 401 inline with its type, 403 types),
+    contracts/shared/common.yaml (serviceAuth description), docs/architecture/specs/permission-resolution.md (7.1),
+    docs/adr/0039, 0071, 0019, 0049 (one paragraph each), docs/architecture/ai-system-design.md (erasure sentence),
+    states/media.yaml (quarantined -> ready guard), states/parking-entitlement.yaml (pushed -> pending). The screen
+    bindings and the two payment-token event changes are not here: they are listed in the merge report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the requests in audit/ticvai/r8-blockers/r8b-storage-core-report.md (IDENTITY-C16, C34, C48, C57, C58;
+  ORDERS-MONEY-C22, C24, C43; FOUNDATION-AI-C42), none applied on fix/r8-integration after the merges of storage-core
+  (e7b711c9) and the integration pass (98dc1e91).'
+keys_touched:
+  operations: [completeSsoAuthorization, updateMediaAsset, updateParkingEntitlement, eraseSubject]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/shared/common.yaml
+  - docs/architecture/specs/permission-resolution.md
+  - docs/adr/0039-control-plane-and-tenant-database-lifecycle.md
+  - docs/adr/0071-credentials-are-stored-as-argon2id-phc-strings.md
+  - docs/adr/0019-dynamic-bundle-pricing.md
+  - docs/adr/0049-vectors-live-in-qdrant-one-collection-per-tenant.md
+  - docs/architecture/ai-system-design.md
+  - states/media.yaml
+  - states/parking-entitlement.yaml
+root_class: 'a lane''s requests to other lanes that ran in parallel, left for the merge'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open
+notes: 'The problem types are operation-specific, so they are declared on the response (common.yaml''s rule), not added
+  to the shared catalogue.'

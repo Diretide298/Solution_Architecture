@@ -31,7 +31,8 @@ transitions:
   to: ready
   operation: updateMediaAsset
   trigger: operation
-  guard: Reviewed and cleared
+  guard: Reviewed and cleared by a holder of ASSET_LIBRARY_APPROVE (CHG-R8MIG-022), who is recorded as
+    releasedByPrincipalId with releasedAt
   isReversal: true
   requiresApproval: true
 - from: ready
