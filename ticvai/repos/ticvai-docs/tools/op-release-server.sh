@@ -30,6 +30,8 @@
 #          OpenProject 10 has no per-run mail switch, so apply turns notifications off for the whole instance
 #          first (the list is saved in .release-out/notified_events.json) and leaves them off: the CR settlement
 #          and child tasks that follow a release must not mail either (P-23, 15 October).
+# notify-off switches every OpenProject mail off now, saving the list (apply also does it first; r8, 21 October:
+#            the lead asked to stop PMS mails before the release).
 # notify-on  puts the saved notification list back. Run it once the release's follow-up writes are done.
 #            status shows whether notifications are on.
 #
@@ -237,6 +239,7 @@ case "$cmd" in
   dry-run) [ $# -ge 1 ] || usage; dry_run "$@" ;;
   apply)   [ $# -ge 1 ] || usage; apply "$@" ;;
   status)  status ;;
+  notify-off) notify_off ;;
   notify-on) notify_on ;;
   *)       usage ;;
 esac
