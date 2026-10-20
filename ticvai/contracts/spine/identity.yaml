@@ -9069,6 +9069,7 @@ components:
     OpenShiftMarker:
       x-ticvai-persistence: identity.open_shift_marker
       # Keyed on the shift; read by principal and workstation (storage-core request 2 at the merge, CHG-R8MIG-014).
+      # No enforced foreign key on any of its three ids: Identity's event consumers write it (CHG-R8INT-022).
       x-ticvai-primary-key: [shiftId]
       x-ticvai-index: [[principalId, workstationId]]
       type: object
@@ -9092,12 +9093,16 @@ components:
         principalId:
           type: string
           format: uuid
-          x-ticvai-references: identity.principal
-          description: The principal whose shift it is.
+          x-ticvai-references: none
+          description: The principal whose shift it is (`identity.principal.id`, carried by the event). Not an enforced
+            foreign key, since event consumers write this table and must never fail on a missing principal row (r8
+            integration, CHG-R8INT-022).
         workstationId:
           type: string
           format: uuid
-          x-ticvai-references: platform.workstation
+          x-ticvai-references: none
+          description: The till (`platform.workstation.id`, carried by the event). Not an enforced foreign key, for the
+            same reason (the `shift.opened` consumer must never fail on a missing workstation row; CHG-R8INT-022).
         venueId:
           type: string
           format: uuid

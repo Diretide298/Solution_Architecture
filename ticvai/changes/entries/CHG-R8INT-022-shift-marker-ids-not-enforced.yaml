@@ -1,0 +1,34 @@
+id: CHG-R8INT-022
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'identity.open_shift_marker''s principalId and workstationId are declared references `none`, not enforced
+  foreign keys: the table is written only by Identity''s event consumers (shift.opened, shift.closed), and a consumer
+  must never fail on a missing principal or workstation row. The primary key [shiftId] and the index
+  [[principalId, workstationId]] stay as the storage-core merge set them (CHG-R8MIG-014).'
+decision:
+  what: 'contracts/spine/identity.yaml OpenShiftMarker: principalId and workstationId `x-ticvai-references: none`
+    (were identity.principal and platform.workstation), each with a description saying why; a comment on the schema.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: concern 2 of the storage-core merge report (audit/ticvai/r8-blockers/merge-storage-core-report.md): enforced
+  foreign keys on a projection event consumers write would make a consumer fail, and retry forever, on an event that
+  arrives before or after the row it names. shiftId was already `none` (Identity does not depend on orders.pos_shift).'
+keys_touched:
+  schemas: [OpenShiftMarker]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'a projection written by event consumers declared with enforced foreign keys'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration'
+triage: blocker
+prevention:
+  type: none
+  ref: 'storage fact'
+  reason: 'a declared storage fact; check-storage-promises already requires every key column to be declared, and `none` is a declaration.'
+status: open
+notes: 'The table is new in r8 (CHG-R8SPN-036), so no applied migration drops a key; derive-ddl writes the table without the two foreign keys.'
