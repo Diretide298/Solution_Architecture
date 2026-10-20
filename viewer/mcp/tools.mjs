@@ -1132,41 +1132,226 @@ export function ticketStatements(files, ticket) {
 }
 
 /**
- * The server-level changes a database's package files make, read from their text (function bodies included):
- * the roles they create, with their attributes, the role memberships they grant and the role settings they set,
- * as the script's CLUSTER_SQL prints each item. A ticket's file may make these and no others (review 6: never
- * from watching the server, which another session can write to at the same time). r8 has one: V0105's
- * `CREATE ROLE ticvai_parent_visible NOLOGIN ...`, and its `GRANT ticvai_parent_visible TO %I` for whoever runs it.
+ * SQL text as the server runs it, for reading role statements (review 7, m3). Comments are dropped. A string or a
+ * dollar-quoted body is read as code only where it is code: a DO block or a function body (after DO, DO LANGUAGE x
+ * or AS), and the string EXECUTE runs, format()'s included, whose %I, %s and %L are filled from literal arguments
+ * and current_user (any other argument leaves %?, which no role statement reads). Every other string becomes
+ * '§n', its text kept in `literals[n]`: a comment, a COMMENT ... IS '...' or a function that only returns the words
+ * of a statement is never read as one.
+ */
+export function sqlCode(text, literals = []) {
+  const s = String(text ?? '');
+  let out = '';
+  const quoted = (at) => {
+    // A '...' literal from `at` (E'...' when out ends in E): its value and where it ends.
+    const escapes = /(^|[^\w$])[Ee]$/.test(out);
+    let j = at + 1;
+    let value = '';
+    while (j < s.length) {
+      if (escapes && s[j] === '\\') { value += s[j + 1] ?? ''; j += 2; continue; }
+      if (s[j] === "'") { if (s[j + 1] === "'") { value += "'"; j += 2; continue; } break; }
+      value += s[j++];
+    }
+    if (escapes) out = out.slice(0, -1);
+    return { value, end: j + 1 };
+  };
+  const args = (from) => {
+    // format()'s arguments after its format string, up to its closing parenthesis.
+    const list = [];
+    let cur = '';
+    let depth = 0;
+    for (let j = from; j < s.length; j++) {
+      const ch = s[j];
+      if (ch === "'") {
+        let k = j + 1;
+        while (k < s.length && !(s[k] === "'" && s[k + 1] !== "'")) k += s[k] === "'" ? 2 : 1;
+        cur += s.slice(j, k + 1);
+        j = k;
+        continue;
+      }
+      if (ch === '(') depth++;
+      if (ch === ')' && depth-- === 0) { list.push(cur.trim()); return { list, end: j + 1 }; }
+      if (ch === ',' && depth === 0) { list.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    return { list, end: s.length };
+  };
+  const fill = (format, list) => {
+    let next = 0;
+    return format.replace(/%(?:(\d+)\$)?-?\d*([sIL%])/g, (all, pos, kind) => {
+      if (kind === '%') return '%';
+      const a = String(list[pos ? Number(pos) - 1 : next++] ?? '');
+      if (/^(current_user|session_user|current_role)(\s*\(\s*\))?$/i.test(a)) return kind === 'L' ? "''" : 'CURRENT_USER';
+      const lit = /^'((?:[^']|'')*)'$/.exec(a)?.[1]?.replace(/''/g, "'");
+      if (lit === undefined) return '%?';
+      if (kind === 'L') return `'${lit.replace(/'/g, "''")}'`;
+      return kind === 'I' && !/^[a-z_][a-z0-9_$]*$/.test(lit) ? `"${lit.replace(/"/g, '""')}"` : lit;
+    });
+  };
+  for (let i = 0; i < s.length;) {
+    const two = s.slice(i, i + 2);
+    if (two === '--') { const end = s.indexOf('\n', i); i = end < 0 ? s.length : end; out += ' '; continue; }
+    if (two === '/*') {
+      let depth = 0;
+      let j = i;
+      for (; j < s.length; j++) {
+        if (s.startsWith('/*', j)) { depth++; j++; } else if (s.startsWith('*/', j)) { j++; if (--depth === 0) break; }
+      }
+      i = j + 1;
+      out += ' ';
+      continue;
+    }
+    const ch = s[i];
+    if (ch === '"') {
+      let j = i + 1;
+      while (j < s.length && !(s[j] === '"' && s[j + 1] !== '"')) j += s[j] === '"' ? 2 : 1;
+      out += s.slice(i, j + 1);
+      i = j + 1;
+      continue;
+    }
+    if (ch === "'") {
+      const q = quoted(i);
+      if (/\bEXECUTE\s+format\s*\(\s*$/i.test(out)) {
+        let j = q.end;
+        while (/\s/.test(s[j] ?? '')) j++;
+        const a = s[j] === ',' ? args(j + 1) : { list: [], end: s[j] === ')' ? j + 1 : j };
+        out = `${out.replace(/format\s*\(\s*$/i, '')} ${sqlCode(fill(q.value, a.list), literals)} `;
+        i = a.end;
+      } else if (/\bEXECUTE\s*$/i.test(out)) {
+        out += ` ${sqlCode(q.value, literals)} `;
+        i = q.end;
+      } else {
+        literals.push(q.value);
+        out += `'§${literals.length - 1}'`;
+        i = q.end;
+      }
+      continue;
+    }
+    if (ch === '$' && !/[\w$]$/.test(out)) {
+      const tag = /^\$(?:[A-Za-z_]\w*)?\$/.exec(s.slice(i, i + 64))?.[0];
+      if (tag) {
+        const end = s.indexOf(tag, i + tag.length);
+        const body = s.slice(i + tag.length, end < 0 ? s.length : end);
+        i = end < 0 ? s.length : end + tag.length;
+        if (/\b(DO|AS|EXECUTE)\s*$|\bDO\s+LANGUAGE\s+\w+\s*$/i.test(out)) out += ` ${sqlCode(body, literals)} `;
+        else { literals.push(body); out += `'§${literals.length - 1}'`; }
+        continue;
+      }
+    }
+    out += ch;
+    i++;
+  }
+  return out;
+}
+
+const ROLE_FLAGS = ['superuser', 'createrole', 'createdb', 'replication', 'bypassrls', 'login'];
+
+/**
+ * A role as the script's CLUSTER_SQL prints it: the name, then each attribute that is not CREATE ROLE's default.
+ * The script prints the server's roles the same way, so the two are compared as text.
+ */
+export function roleItem(name, a) {
+  return name + ROLE_FLAGS.filter((f) => a[f]).map((f) => ` (${f})`).join('')
+    + (a.inherit === false ? ' (noinherit)' : '')
+    + (a.connlimit !== undefined && a.connlimit !== -1 ? ` (connection limit ${a.connlimit})` : '')
+    + (a.validUntil ? ` (valid until ${a.validUntil})` : '')
+    + (a.password ? ' (password)' : '');
+}
+
+/** A role membership as CLUSTER_SQL prints it: member in role, with ADMIN, and INHERIT or SET when they are off. */
+export function memberItem(member, role, { admin = false, inherit = true, set = true } = {}) {
+  return `${member} in ${role}${admin ? ' (admin)' : ''}${inherit ? '' : ' (noinherit)'}${set ? '' : ' (noset)'}`;
+}
+
+/**
+ * The server-level state a database's package files make, read from their text (function bodies included): the
+ * roles they create, with every attribute that matters; the role memberships they grant, with their ADMIN,
+ * INHERIT and SET options; and the role settings they set. Each item is printed the way the script's CLUSTER_SQL
+ * prints the server's, and the script holds the server to exactly these (plus its own bootstrap superuser):
+ * nothing else may be there, however it got there (review 7, 20 October 2026). One parser: the script reads this
+ * from expected-schema.json and parses nothing itself. A role granted to whoever runs the file (`TO CURRENT_USER`,
+ * or `format(... TO %I ..., current_user)` as r8's V0105 does) is `current_user in <role>`. A statement whose role
+ * cannot be read from the text (a name built at run time) gives nothing, so the server's role shows as a difference.
  */
 export function serverAllowances(files) {
   const roles = new Map();
-  const memberships = new Set();
-  const settings = new Set();
-  const ATTRS = [['SUPERUSER', 'superuser'], ['BYPASSRLS', 'bypassrls'], ['CREATEROLE', 'createrole'],
-    ['CREATEDB', 'createdb'], ['REPLICATION', 'replication'], ['LOGIN', 'login']];
-  const item = (name, opts, login) => name + ATTRS
-    .filter(([word]) => new RegExp(`(^|\\s)${word}\\b`, 'i').test(opts) || (word === 'LOGIN' && login && !/\bNOLOGIN\b/i.test(opts)))
-    .map(([, label]) => ` (${label})`).join('');
+  const members = new Map();
+  const settings = new Map();
+  const NAME = '("(?:[^"]|"")+"|[\\w$]+)';
+  const ONE = '(?:"(?:[^"]|"")+"|[\\w$]+)';
+  const LIST = `(${ONE}(?: ?, ?${ONE})*)`;
+  const nameOf = (n) => (/^"/.test(n) ? n.slice(1, -1).replace(/""/g, '"') : n.toLowerCase());
+  const userOf = (n) => (/^(current_user|session_user|current_role)$/i.test(n) ? 'current_user' : nameOf(n));
+  const listOf = (l) => [...l.matchAll(new RegExp(ONE, 'g'))].map((m) => userOf(m[0]));
   for (const { text } of files) {
-    const s = String(text).replace(/--[^\n]*/g, ' ');
-    for (const m of s.matchAll(/\bCREATE\s+(ROLE|USER)\s+(?:IF\s+NOT\s+EXISTS\s+)?("?[\w$]+"?)([^;']*)/gi)) {
-      const name = m[2].replace(/"/g, '');
-      roles.set(name, item(name, ` ${m[3]}`, m[1].toUpperCase() === 'USER'));
-    }
-    for (const m of s.matchAll(/\bGRANT\s+("?[\w$]+"?)\s+TO\s+("?[\w$%]+"?)/gi)) {
-      const role = m[1].replace(/"/g, '');
-      if (/^(ALL|SELECT|INSERT|UPDATE|DELETE|USAGE|EXECUTE|CREATE|CONNECT|TEMP|TEMPORARY|TRUNCATE|REFERENCES|TRIGGER|SET|MAINTAIN)$/i.test(role)) continue;
-      const member = m[2].replace(/"/g, '');
-      memberships.add(`${/%/.test(member) ? '*' : member} in ${role}`);
-    }
-    for (const m of s.matchAll(/\bALTER\s+ROLE\s+("?[\w$]+"?)\s+(?:IN\s+DATABASE\s+\S+\s+)?SET\s+([\w.]+)\s*(?:=|TO)\s*([^;']*)/gi)) {
-      settings.add(`${m[1].replace(/"/g, '')}: ${m[2]}=${m[3].trim()}`);
+    const literals = [];
+    const lit = (v) => v.replace(/'§(\d+)'/g, (all, n) => literals[Number(n)] ?? '');
+    const until = (v) => {
+      const t = lit(v).trim();
+      if (/^infinity$/i.test(t)) return 'infinity';
+      const d = new Date(/^\d{4}-\d\d-\d\d$/.test(t) ? `${t}T00:00:00Z` : /(z|[+-]\d\d(:?\d\d)?)$/i.test(t) ? t.replace(' ', 'T') : `${t.replace(' ', 'T')}Z`);
+      return Number.isNaN(d.getTime()) ? t : d.toISOString().slice(0, 19).replace('T', ' ');
+    };
+    const options = (opts, a) => {
+      for (const f of [...ROLE_FLAGS, 'inherit']) {
+        if (new RegExp(`\\bNO${f}\\b`, 'i').test(opts)) a[f] = false;
+        else if (new RegExp(`\\b${f}\\b`, 'i').test(opts)) a[f] = true;
+      }
+      const limit = /\bCONNECTION LIMIT (-?\d+)/i.exec(opts);
+      if (limit) a.connlimit = Number(limit[1]);
+      const password = /\bPASSWORD (NULL|'§\d+')/i.exec(opts);
+      if (password) a.password = !/^NULL$/i.test(password[1]);
+      const valid = /\bVALID UNTIL ('§\d+')/i.exec(opts);
+      if (valid) a.validUntil = until(valid[1]);
+      return a;
+    };
+    const grant = (member, role, o = {}) => {
+      const inherit = o.inherit ?? roles.get(member)?.inherit ?? true;
+      members.set(`${member} in ${role}`, { member, role, admin: Boolean(o.admin), inherit, set: o.set ?? true });
+    };
+    for (const raw of sqlCode(text, literals).split(';')) {
+      const st = raw.replace(/\s+/g, ' ').trim();
+      let m;
+      if ((m = new RegExp(`\\bCREATE (ROLE|USER|GROUP) (?:IF NOT EXISTS )?${NAME}(?: WITH)?(.*)$`, 'i').exec(st))) {
+        const name = nameOf(m[2]);
+        let opts = ` ${m[3]} `;
+        roles.set(name, options(opts, { login: m[1].toUpperCase() === 'USER', inherit: true, connlimit: -1 }));
+        const take = (rx, each) => { opts = opts.replace(rx, (all, l) => { listOf(l).forEach(each); return ' '; }); };
+        take(new RegExp(`\\bIN (?:ROLE|GROUP) ${LIST}`, 'gi'), (r) => grant(name, r));
+        take(new RegExp(`\\bADMIN ${LIST}`, 'gi'), (u) => grant(u, name, { admin: true }));
+        take(new RegExp(`\\b(?:ROLE|USER) ${LIST}`, 'gi'), (u) => grant(u, name));
+      } else if ((m = new RegExp(`\\bALTER (?:ROLE|USER|GROUP) ${NAME}(?: IN DATABASE ${NAME})? (SET|RESET) ([\\w.]+)(?: ?(?:=|TO) ?(.*))?$`, 'i').exec(st))) {
+        const who = /^ALL$/i.test(m[1]) ? 'every role' : userOf(m[1]);
+        const key = `${who}${m[2] ? ` in database ${nameOf(m[2])}` : ''}: ${m[4].toLowerCase()}`;
+        if (/^SET$/i.test(m[3]) && m[5] !== undefined && !/^FROM CURRENT$/i.test(m[5])) settings.set(key, `${key}=${lit(m[5]).trim()}`);
+        else settings.delete(key);
+      } else if ((m = new RegExp(`\\bALTER (?:ROLE|USER|GROUP) ${NAME} RENAME TO ${NAME}`, 'i').exec(st))) {
+        if (roles.has(nameOf(m[1]))) { roles.set(nameOf(m[2]), roles.get(nameOf(m[1]))); roles.delete(nameOf(m[1])); }
+      } else if ((m = new RegExp(`\\bALTER GROUP ${NAME} (ADD|DROP) USER ${LIST}`, 'i').exec(st))) {
+        for (const u of listOf(m[3])) if (/^ADD$/i.test(m[2])) grant(u, nameOf(m[1])); else members.delete(`${u} in ${nameOf(m[1])}`);
+      } else if ((m = new RegExp(`\\bALTER (?:ROLE|USER) ${NAME}(?: WITH)? (.*)$`, 'i').exec(st))) {
+        if (roles.has(userOf(m[1]))) options(` ${m[2]} `, roles.get(userOf(m[1])));
+      } else if ((m = new RegExp(`\\bDROP (?:ROLE|USER|GROUP) (?:IF EXISTS )?${LIST}`, 'i').exec(st))) {
+        for (const r of listOf(m[1])) roles.delete(r);
+      } else if ((m = /\bGRANT (.+?) TO (.+?)(?: WITH (.+?))?(?: GRANTED BY .*)?$/i.exec(st)) && !/\bON\b/i.test(m[1])) {
+        const granted = listOf(m[1]);
+        if (granted.some((r) => /^(all|select|insert|update|delete|usage|execute|create|connect|temp|temporary|truncate|references|trigger|set|alter|maintain)$/.test(r))) continue;
+        if (!new RegExp(`^${LIST}$`).test(m[2].trim())) continue; // a member built at run time (%?): nothing
+        const w = m[3] ?? '';
+        const opt = (word) => (new RegExp(`\\b${word} (TRUE|ON|FALSE|OFF)\\b`, 'i').exec(w)?.[1] ?? '').toUpperCase();
+        const o = { admin: /\bADMIN OPTION\b/i.test(w) || ['TRUE', 'ON'].includes(opt('ADMIN')) };
+        if (opt('INHERIT')) o.inherit = ['TRUE', 'ON'].includes(opt('INHERIT'));
+        if (opt('SET')) o.set = ['TRUE', 'ON'].includes(opt('SET'));
+        for (const r of granted) for (const u of listOf(m[2])) if (u !== 'public') grant(u, r, o);
+      } else if ((m = /\bREVOKE (?:ADMIN OPTION FOR |INHERIT OPTION FOR |SET OPTION FOR )?(.+?) FROM (.+?)(?: GRANTED BY .*?)?(?: CASCADE| RESTRICT)?$/i.exec(st)) && !/\bON\b/i.test(m[1])) {
+        for (const r of listOf(m[1])) for (const u of listOf(m[2])) members.delete(`${u} in ${r}`);
+      }
     }
   }
   return {
-    'server roles': [...roles.values()].sort(),
-    'server role memberships': [...memberships].sort(),
-    'server role settings': [...settings].sort(),
+    'server roles': [...roles].map(([name, a]) => roleItem(name, a)).sort(),
+    'server role memberships': [...members.values()].map((x) => memberItem(x.member, x.role, x)).sort(),
+    'server role settings': [...settings.values()].sort(),
   };
 }
 
