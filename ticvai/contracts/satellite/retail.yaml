@@ -2363,8 +2363,29 @@ components:
         replacementLines:
           type: array
           minItems: 1
-          items: { $ref: '#/components/schemas/CreateRetailSaleLine' }
+          items: { $ref: '#/components/schemas/CreateExchangeReplacementLine' }
         recordedAt: { type: string, format: date-time }
+
+    CreateExchangeReplacementLine:
+      x-ticvai-persistence: "none — request only"
+      description: 'A replacement line of an exchange (createRetailExchange): the sale line as it was before the r8
+        re-walk. An exchange request names no Orders order (CreateExchangeRequest has no orderId), so its lines name no order line
+        (`CreateRetailSaleLine.orderLineId` is the sale''s; CHG-R8RW-004, r8 gate of 21 October).'
+      type: object
+      required: [id, merchandiseId, quantity]
+      properties:
+        id: { type: string, format: uuid }
+        merchandiseId: { type: string, format: uuid }
+        quantity: { type: integer, minimum: 1 }
+        serialNumbers:
+          type: array
+          items: { type: string }
+          description: Required where the item is serialised. One per unit.
+        overridePrice:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Manual price override. Requires PRICE_OVERRIDE and records a reason.
+        overrideReason: { type: string, maxLength: 200 }
 
     RetailExchange:
       x-ticvai-persistence: "retail.exchange"

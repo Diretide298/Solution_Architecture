@@ -18,7 +18,7 @@ decision:
     responses).'
   by: Chinmay
   date: '2026-10-20'
-why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (audit/ticvai/r8-blockers/rewalk-part2.md, outside git),
+why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (its report is kept outside the repository),
   SVC-WALLET-WALLET-2 #27817, promise-without-route: createPayment requires orderId and no order could be a top-up,
   and the rule credited any captured payment whose amount covered the top-up, so a payment for tickets could be
   reused as wallet credit (the security gap, fixed first).'

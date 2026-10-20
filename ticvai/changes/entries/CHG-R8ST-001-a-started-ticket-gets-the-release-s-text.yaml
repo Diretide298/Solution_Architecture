@@ -16,7 +16,7 @@ decision:
     in the phase''s transaction, BATCH applies. tools/tests/test_op_release_text.py runs the rule under Ruby 2.6.'
   by: Chinmay
   date: '2026-10-20'
-why: 'Finding: r8 re-walk part 1, class started-ticket-text-fix-not-delivered (audit/ticvai/r8-blockers/rewalk-part1.md).
+why: 'Finding: r8 re-walk part 1, class started-ticket-text-fix-not-delivered (its report is kept outside the repository).
   The lead, 20 October: "Whatever we find we should also fix the source so that next gen can clear those out by
   default".'
 keys_touched:

@@ -16,7 +16,7 @@ decision:
     x-ticvai-queries orderLineDiscountRecords.'
   by: Chinmay
   date: '2026-10-20'
-why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (audit/ticvai/r8-blockers/rewalk-part2.md, outside git),
+why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (its report is kept outside the repository),
   SVC-RETAIL-SALE-1 #27824, promise-without-route: CHG-R8WFC-003 moved pricing to Orders, but CreateRetailSaleLine had
   no price, discount or tax field and no read-via to Orders, so retail.sale and retail.sale_line amounts had no
   source; the lineage omitted the retail.merchandise and inventory.movement reads.'

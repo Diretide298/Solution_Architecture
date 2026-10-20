@@ -11,7 +11,7 @@ decision:
   what: 'tools/build-service-docs.py, the SETUP-CLIENTS foundation task text.'
   by: Chinmay
   date: '2026-10-20'
-why: 'Finding: the r8 re-walk of 20 October 2026, part 1 (audit/ticvai/r8-blockers/rewalk-part1.md, outside git),
+why: 'Finding: the r8 re-walk of 20 October 2026, part 1 (its report is kept outside the repository),
   SETUP-CLIENTS #27640: no ticvai-frontend repository or packages/api-client exists (docs/active/frontend-repos.yaml);
   the quickstart says ticvai-contracts holds the generated clients, and the ADR-0007 amendment and the dependencies
   register say @ticvai/api-client is published to the group''s npm registry.'

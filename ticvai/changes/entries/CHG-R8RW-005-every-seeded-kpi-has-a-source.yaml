@@ -15,7 +15,7 @@ decision:
     waitlistEntryRecords.'
   by: Chinmay
   date: '2026-10-20'
-why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (audit/ticvai/r8-blockers/rewalk-part2.md, outside git),
+why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (its report is kept outside the repository),
   VM-REPORTING-REPORTING-1 #28786, lineage-omits-tables: noShowRate, waitQuoteAccuracy, discounts, grossSales,
   deferredRevenue and the business-day default had no route.'
 keys_touched:

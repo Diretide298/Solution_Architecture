@@ -15,7 +15,7 @@ decision:
     docs/active/breaking-changes.yaml BC-463.'
   by: Chinmay
   date: '2026-10-20'
-why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (audit/ticvai/r8-blockers/rewalk-part2.md, outside git),
+why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (its report is kept outside the repository),
   VM-WALLET-WALLET-1 #28319, fix-text-contradicts-schema: CHG-R8WFC-003 said each act is one wallet.adjustment row,
   but no adjustment kind fitted, adjustment.wallet_id holds one wallet while an act spans wallets, and the text took
   the amount off the balance while the lineage wrote wallet.wallet and not wallet.balance.'
