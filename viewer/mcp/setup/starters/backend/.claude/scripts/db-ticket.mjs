@@ -5,7 +5,10 @@
  *     node .claude/scripts/db-ticket.mjs <ticket>             one ticket (pull it first)
  *     node .claude/scripts/db-ticket.mjs <ticket> --file db/tenant/V0027__access.sql
  *     node .claude/scripts/db-ticket.mjs --full tenant        every file from an empty database
- *     node .claude/scripts/db-ticket.mjs --clean              drop this folder's check databases
+ *     node .claude/scripts/db-ticket.mjs --clean              drop this folder's check databases and
+ *                                                             kept snapshots; in the check's own
+ *                                                             container also remove roles and role
+ *                                                             memberships a file made, reset role settings
  *
  * For one ticket it:
  *   1. keeps a template database at the state before the ticket's file: every earlier file in
@@ -18,10 +21,13 @@
  *   4. copies the template again and applies the package's own statements for the ticket, from
  *      .adam/work/<ticket>/expected-schema.json (written by adam_pull);
  *   5. compares a snapshot of the whole database of the two copies, as PostgreSQL itself prints it:
- *      schemas, extensions, tables (persistence, storage options, replica identity, owner,
- *      privileges, comment), columns, constraints, indexes, policies, triggers, views, sequences,
- *      functions, types, the database's settings, the register rows of the earlier files and every
- *      table's row count. The ticket's objects must be what the package's statements make; every
+ *      schemas, extensions, languages, tables (persistence, storage options, replica identity,
+ *      owner, privileges, comment, triggers not on), columns, constraints, indexes, policies,
+ *      triggers, rules, views, sequences, functions, types, default privileges, publications, event
+ *      triggers, partitions' own constraints, indexes and row-level security, the database's owner,
+ *      privileges, connection settings and settings, the register rows of the earlier files and
+ *      every table's row count; and the server's roles (with their attributes), memberships and role
+ *      settings before and after the file. The ticket's objects must be what the package's statements make; every
  *      other object must be exactly as it was before the file ran. A statement that changes rows of
  *      a table that is not the ticket's is a difference; rows the file leaves in the ticket's own
  *      tables (a backfill) are listed, to be right only if the ticket asks for them.
@@ -34,6 +40,11 @@
  * Each statement of a file is run through PL/pgSQL EXECUTE, so psql never reads it: no backslash
  * commands and no :variables, as with SqlMigrationRunner. A file must not BEGIN or COMMIT itself:
  * the runner already wraps each file in one transaction (BEGIN ATOMIC function bodies are fine).
+ * Statements whose effect the snapshot cannot judge are refused before anything runs (see
+ * FORBIDDEN): switching triggers off, default privileges, role membership, privileges on the
+ * database, a tablespace, a parameter, a language, a foreign server or large objects, rules,
+ * publications, event triggers, roles, ALTER SYSTEM, SET ROLE / SESSION AUTHORIZATION /
+ * session_replication_role and the same through set_config.
  *
  * Needs Docker Desktop running. PostgreSQL runs in its own container (adam-db-check,
  * pgvector/pgvector:pg16, no port published). --container <name> uses another container, which
@@ -138,19 +149,34 @@ const TRANSACTION = /^(?:(?:--[^\n]*\n|\/\*[\s\S]*?\*\/|\s)*)(BEGIN|COMMIT|ROLLB
 const FORBIDDEN = [
   [/^ALTER\s+TABLE\b[\s\S]*\b(DISABLE\s+TRIGGER|ENABLE\s+(REPLICA|ALWAYS)\s+TRIGGER)\b/i, 'switches triggers off or to replica mode (foreign keys are triggers)'],
   [/^ALTER\s+DEFAULT\s+PRIVILEGES\b/i, 'changes the privileges of tables not made yet'],
-  [/^(GRANT|REVOKE)\b[\s\S]*\bON\s+DATABASE\b/i, 'changes the privileges of the database itself'],
+  // Privileges the snapshot compares (tables, columns, sequences, functions, schemas, types) are left
+  // to it. A GRANT or REVOKE with no ON is role membership; these ON kinds live outside the tables.
+  [/^(GRANT|REVOKE)\b(?![\s\S]*\bON\b)/i, 'changes role membership, which the server shares between databases'],
+  [/^(GRANT|REVOKE)\b[\s\S]*\bON\s+(DATABASE|PARAMETER|TABLESPACE|(PROCEDURAL\s+)?LANGUAGE|FOREIGN\s+DATA\s+WRAPPER|FOREIGN\s+SERVER|LARGE\s+OBJECT)\b/i,
+    'changes privileges on the database, the server or a language, which the check does not compare'],
   [/^CREATE\s+(OR\s+REPLACE\s+)?RULE\b/i, 'adds a rule'],
   [/^(CREATE|ALTER|DROP)\s+(PUBLICATION|SUBSCRIPTION)\b/i, 'sets up logical replication'],
   [/^CREATE\s+EVENT\s+TRIGGER\b/i, 'adds an event trigger'],
   [/^(CREATE|ALTER|DROP)\s+(ROLE|USER|GROUP)\b/i, 'changes the server\'s roles, which every database shares'],
   [/^ALTER\s+SYSTEM\b/i, 'changes the server\'s settings'],
-  [/^SET\s+(SESSION\s+|LOCAL\s+)?(ROLE|SESSION\s+AUTHORIZATION|session_replication_role)\b/i, 'runs the rest as another role or in replica mode'],
+  [/^SET\s+(SESSION\s+|LOCAL\s+)?(ROLE|SESSION\s+AUTHORIZATION|session_replication_role)\b(?!\s*\.)/i, 'runs the rest as another role or in replica mode'],
 ];
 
-/** Why a statement may not be in a ticket's file, or null. */
+/** The statement with comments and dollar-quoted bodies blanked, and strings too unless `strings`. */
+function blanked(sql, { strings = true } = {}) {
+  const s = String(sql).replace(/\$([A-Za-z_]\w*)?\$[\s\S]*?\$\1\$/g, ' ').replace(/--[^\n]*/g, ' ').replace(/\/\*[\s\S]*?\*\//g, ' ');
+  return (strings ? s.replace(/'(?:[^']|'')*'/g, "''") : s).replace(/^\s+/, '');
+}
+
+/** Why a statement may not be in a ticket's file, or null. Words in comments or strings do not count. */
 export function forbidden(sql) {
-  const s = String(sql).replace(/^(?:\s|--[^\n]*\n|\/\*[\s\S]*?\*\/)*/, '');
-  return FORBIDDEN.find(([rx]) => rx.test(s))?.[1] ?? null;
+  const found = FORBIDDEN.find(([rx]) => rx.test(blanked(sql)))?.[1];
+  if (found) return found;
+  // The same switches made through set_config, which is a plain SELECT.
+  if (/\bset_config\s*\(\s*'(role|session_authorization|session_replication_role)'/i.test(blanked(sql, { strings: false }))) {
+    return 'runs the rest as another role or in replica mode (through set_config)';
+  }
+  return null;
 }
 
 /**
@@ -161,8 +187,7 @@ export function forbidden(sql) {
 export function dataTargets(sql) {
   const raw = String(sql).replace(/^(?:\s|--[^\n]*\n|\/\*[\s\S]*?\*\/)*/, '');
   if (/^CREATE\b/i.test(raw)) return null;
-  const s = raw.replace(/\$([A-Za-z_]\w*)?\$[\s\S]*?\$\1\$/g, ' ').replace(/--[^\n]*/g, ' ').replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/'(?:[^']|'')*'/g, "''");
+  const s = blanked(raw);
   const name = '((?:"[^"]+"|[\\w$]+)(?:\\.(?:"[^"]+"|[\\w$]+))?)';
   const clean = (n) => (n.match(/"[^"]+"|[^.]+/g) ?? []).map((p) => (p.startsWith('"') ? p.slice(1, -1) : p.toLowerCase())).join('.');
   const out = [];
@@ -184,8 +209,9 @@ export function dataTargets(sql) {
 
 /** The search_path a `SET search_path` statement sets, or null. */
 function searchPathOf(sql) {
-  const m = /^(?:\s|--[^\n]*\n)*SET\s+(?:SESSION\s+)?search_path\s*(?:=|TO)\s*([^;]+)$/i.exec(String(sql))
-    ?? /set_config\s*\(\s*'search_path'\s*,\s*'([^']*)'/i.exec(String(sql));
+  const s = blanked(sql, { strings: false }).trim();
+  const m = /^SET\s+(?:SESSION\s+|LOCAL\s+)?search_path\s*(?:=|TO)\s*([^;]+)$/i.exec(s)
+    ?? /^SELECT\s+(?:pg_catalog\.)?set_config\s*\(\s*'search_path'\s*,\s*'([^']*)'/i.exec(s);
   if (!m) return null;
   return m[1].split(',').map((p) => p.trim().replace(/^'|'$/g, '').replace(/"/g, '')).filter((p) => p && p !== '$user' && p.toLowerCase() !== 'default');
 }
@@ -228,7 +254,9 @@ const SNAPSHOT_BODY = `(SELECT (coalesce(jsonb_object_agg(k, v), '{}') || pg_tem
   UNION ALL SELECT 'extension ' || extname, extversion FROM pg_extension
   UNION ALL SELECT 'database settings', coalesce((SELECT string_agg(array_to_string(s.setconfig, ','), ';' ORDER BY s.setrole)
       FROM pg_db_role_setting s JOIN pg_database d ON d.oid = s.setdatabase WHERE d.datname = current_database()), '-')
-  UNION ALL SELECT 'database', 'owner ' || datdba::regrole::text || ' acl ' || coalesce(datacl::text, '-') FROM pg_database WHERE datname = current_database()
+  UNION ALL SELECT 'database', 'owner ' || datdba::regrole::text || ' acl ' || coalesce(datacl::text, '-')
+      || ' connection limit ' || datconnlimit::text || ' allow connections ' || datallowconn::text FROM pg_database WHERE datname = current_database()
+  UNION ALL SELECT 'language ' || lanname, 'owner ' || lanowner::regrole::text || ' acl ' || coalesce(lanacl::text, '-') FROM pg_language
   UNION ALL SELECT 'publication ' || pubname, 'all tables ' || puballtables::text || ' owner ' || pubowner::regrole::text FROM pg_publication
   UNION ALL SELECT 'event trigger ' || evtname, evtevent || ' ' || evtenabled::text FROM pg_event_trigger
   UNION ALL SELECT 'default privileges ' || d.defaclrole::regrole::text || ' in ' || coalesce(n.nspname, '*') || ' for ' || d.defaclobjtype::text,
@@ -407,10 +435,18 @@ let CONTAINER = DEFAULT_CONTAINER;
 
 /** Server-level state a file can change from inside one database: the roles and their settings. */
 const CLUSTER_SQL = `(SELECT json_build_object(
-  'server roles', coalesce((SELECT string_agg(rolname || CASE WHEN rolsuper THEN ' (superuser)' ELSE '' END, ', ' ORDER BY rolname)
+  'server roles', coalesce((SELECT string_agg(rolname || CASE WHEN rolsuper THEN ' (superuser)' ELSE '' END
+      || CASE WHEN rolbypassrls THEN ' (bypassrls)' ELSE '' END || CASE WHEN rolcreaterole THEN ' (createrole)' ELSE '' END
+      || CASE WHEN rolcreatedb THEN ' (createdb)' ELSE '' END || CASE WHEN rolreplication THEN ' (replication)' ELSE '' END
+      || CASE WHEN rolcanlogin THEN ' (login)' ELSE '' END, ', ' ORDER BY rolname)
     FROM pg_roles WHERE rolname !~ '^pg_'), '-'),
+  'server role memberships', coalesce((SELECT string_agg(m.rolname || ' in ' || g.rolname, ', ' ORDER BY 1)
+    FROM pg_auth_members a JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname !~ '^pg_'), '-'),
   'server role settings', coalesce((SELECT string_agg(coalesce(r.rolname, 'every role') || ': ' || array_to_string(s.setconfig, ','), '; ' ORDER BY 1)
     FROM pg_db_role_setting s LEFT JOIN pg_roles r ON r.oid = s.setrole WHERE s.setdatabase = 0), '-'))::text)`;
+/** Role memberships as "member>role", for --clean to compare with those the container started with. */
+const MEMBERS_SQL = `coalesce((SELECT json_agg(m.rolname || '>' || g.rolname ORDER BY 1) FROM pg_auth_members a
+  JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname !~ '^pg_')::text, '[]')`;
 const NONCE = `n${randomBytes(5).toString('hex')}`;
 const tag = (name, valueSql) => `SELECT '${NONCE}_${name}|' || ${valueSql};\n`;
 const snap = (name) => SNAPSHOT_SETUP + snapshotSql((body) => tag(name, body));
@@ -692,9 +728,15 @@ async function tidy(id, { unusedDays = UNUSED_DAYS } = {}) {
   const r = await ready(`SELECT count(pg_terminate_backend(pid)) FROM pg_stat_activity WHERE datname LIKE ${quote(`adam\\_${id}\\_%`)} AND pid <> pg_backend_pid();\n`
     + tag('DBS', `coalesce((SELECT string_agg(datname || '=' || coalesce(shobj_description(oid, 'pg_database'), ''), E'\\t') FROM pg_database WHERE datname LIKE 'adam\\_%'), '')`)
     + tag('SETUP', "coalesce(shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database'), '')")
-    + tag('ROLES', "coalesce((SELECT json_agg(rolname ORDER BY rolname) FROM pg_roles WHERE rolname !~ '^pg_')::text, '[]')"));
-  if (CONTAINER === DEFAULT_CONTAINER && !/"adamRoles"/.test(r.last('SETUP') ?? '')) {
-    session('postgres', `COMMENT ON DATABASE postgres IS ${quote(JSON.stringify({ adamRoles: JSON.parse(r.last('ROLES') || '[]') }))};\n`);
+    + tag('ROLES', "coalesce((SELECT json_agg(rolname ORDER BY rolname) FROM pg_roles WHERE rolname !~ '^pg_')::text, '[]')")
+    + tag('MEMBERS', MEMBERS_SQL));
+  if (CONTAINER === DEFAULT_CONTAINER && !/"adamMembers"/.test(r.last('SETUP') ?? '')) {
+    let setup = {};
+    try { setup = JSON.parse(r.last('SETUP') || '{}'); } catch { setup = {}; }
+    session('postgres', `COMMENT ON DATABASE postgres IS ${quote(JSON.stringify({
+      adamRoles: setup.adamRoles ?? JSON.parse(r.last('ROLES') || '[]'),
+      adamMembers: JSON.parse(r.last('MEMBERS') || '[]'),
+    }))};\n`);
   }
   const dbs = (r.last('DBS') ?? '').split('\t').filter(Boolean).map((x) => {
     const at = x.indexOf('=');
@@ -954,10 +996,19 @@ async function clean(id) {
   if (CONTAINER === DEFAULT_CONTAINER) {
     const s = await ready(tag('SETUP', "coalesce(shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database'), '')")
       + tag('ROLES', "coalesce((SELECT json_agg(rolname) FROM pg_roles WHERE rolname !~ '^pg_' AND rolname <> current_user)::text, '[]')")
-      + tag('ALLDBS', "coalesce((SELECT string_agg(datname, ',') FROM pg_database WHERE datallowconn AND NOT datistemplate), '')"));
-    let setup = null;
-    try { setup = JSON.parse(s.last('SETUP')).adamRoles ?? null; } catch { setup = null; }
+      + tag('ALLDBS', "coalesce((SELECT string_agg(datname, ',') FROM pg_database WHERE datallowconn AND NOT datistemplate), '')")
+      + tag('MEMBERS', MEMBERS_SQL));
+    let marker = {};
+    try { marker = JSON.parse(s.last('SETUP') || '{}'); } catch { marker = {}; }
+    const setup = marker.adamRoles ?? null;
     const extra = setup ? JSON.parse(s.last('ROLES') || '[]').filter((n) => !setup.includes(n)) : [];
+    // Memberships granted since the container was first seen, between roles that stay.
+    const q = (n) => `"${String(n).replace(/"/g, '""')}"`;
+    const members = marker.adamMembers ? JSON.parse(s.last('MEMBERS') || '[]')
+      .filter((p) => !marker.adamMembers.includes(p)).map((p) => p.split('>'))
+      .filter(([member]) => !extra.includes(member)) : [];
+    if (members.length) must(session('postgres', members.map(([member, role]) => `REVOKE ${q(role)} FROM ${q(member)};\n`).join('')));
+    if (members.length) console.log(`Revoked ${plural(members.length, 'role membership')} a file had granted (${members.map(([m, g]) => `${m} in ${g}`).join(', ')}).`);
     for (const role of extra) {
       const ident = `"${role.replace(/"/g, '""')}"`;
       for (const db of (s.last('ALLDBS') ?? '').split(',').filter(Boolean)) {

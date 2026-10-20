@@ -451,6 +451,21 @@ if (!dockerUp) {
       /writes rows into kernel\.inbox, which is not one of this ticket's tables/, /DIFFERENT/],
     ['a role made inside a DO block (it stays in the server until --clean)', `${good}DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_back') THEN CREATE ROLE probe_back LOGIN; END IF; END $$;\n`,
       /this file changed server roles .*probe_back/, /run --clean afterwards/],
+    // What review 4 found: privileges the snapshot did not judge, refused by text; hidden, seen.
+    ['role membership for another role', `${good}GRANT pg_write_all_data TO probe_owner;\n`, /changes role membership/, /DIFFERENT/],
+    ['role membership for the migration role', `${good}GRANT pg_read_all_data TO CURRENT_USER;\n`, /changes role membership/, /DIFFERENT/],
+    ['a privilege on a parameter', `${good}GRANT SET ON PARAMETER work_mem TO PUBLIC;\n`, /privileges on the database, the server or a language/, /DIFFERENT/],
+    ['a privilege on a tablespace', `${good}GRANT CREATE ON TABLESPACE pg_default TO PUBLIC;\n`, /privileges on the database, the server or a language/, /DIFFERENT/],
+    ['a privilege on a language', `${good}REVOKE USAGE ON LANGUAGE plpgsql FROM PUBLIC;\n`, /privileges on the database, the server or a language/, /DIFFERENT/],
+    ['replica mode through set_config', `${good}SELECT set_config('session_replication_role', 'replica', true);\n`, /through set_config/, /DIFFERENT/],
+    ['role membership hidden in a DO block', `${good}DO $$ BEGIN EXECUTE 'GRANT pg_read_all_data TO postgres'; END $$;\n`,
+      /this file changed server role memberships .*postgres in pg_read_all_data/, /run --clean afterwards/],
+    ['a role attribute hidden in a DO block', `${good}DO $$ BEGIN EXECUTE 'ALTER ROLE probe_owner BYPASSRLS'; END $$;\n`,
+      /this file changed server roles .*probe_owner \(bypassrls\)/, /DIFFERENT/],
+    ['a language privilege hidden in a DO block', `${good}DO $$ BEGIN EXECUTE 'REVOKE USAGE ON LANGUAGE plpgsql FROM PUBLIC'; END $$;\n`,
+      /language plpgsql was changed by this file/, /DIFFERENT/],
+    ['a connection limit hidden in a DO block', `${good}DO $$ BEGIN EXECUTE format('ALTER DATABASE %I CONNECTION LIMIT 50', current_database()); END $$;\n`,
+      /database was changed by this file.*connection limit 50/, /DIFFERENT/],
   ];
   docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', 'DROP ROLE IF EXISTS probe_owner; CREATE ROLE probe_owner']);
   for (const [what, sql, a, b] of cases) {
@@ -462,6 +477,11 @@ if (!dockerUp) {
   const path2 = check(`SET search_path = subscription, public;\n${good}INSERT INTO module_listing (id, module_code) VALUES ('00000000-0000-0000-0000-000000000002', 'core') ON CONFLICT (id) DO NOTHING;\n`);
   ok(path2.code === 0 && /MATCH/.test(path2.out) && /subscription\.module_listing: 1 rows/.test(path2.out),
     'an unqualified backfill after SET search_path is read as the ticket\'s own table', path2.out);
+  const path3 = check(`SET LOCAL search_path = subscription, public; -- the file's own transaction\n${good}INSERT INTO module_listing (id, module_code) VALUES ('00000000-0000-0000-0000-000000000003', 'core') ON CONFLICT (id) DO NOTHING;\n`);
+  ok(path3.code === 0 && /MATCH/.test(path3.out) && /subscription\.module_listing: 1 rows/.test(path3.out),
+    'SET LOCAL search_path is followed too, with a comment on its line', path3.out);
+  const words = check(`${good}ALTER TABLE subscription.plan\n-- a backfill here must not DISABLE TRIGGER: the keys are triggers\nALTER COLUMN description DROP NOT NULL;\n`);
+  ok(words.code === 0 && /MATCH: 5 tables/.test(words.out), 'a refused word in a comment inside a statement is not a refusal', words.out);
   const backfill = check(`${good}INSERT INTO subscription.module_listing (id, module_code) VALUES ('00000000-0000-0000-0000-000000000001', 'core') ON CONFLICT (id) DO NOTHING;\n`);
   ok(backfill.code === 0 && /MATCH/.test(backfill.out) && /rows this file leaves in the ticket's own tables[\s\S]*subscription\.module_listing: 1 rows/.test(backfill.out),
     'rows in the ticket\'s own table: MATCH, with the backfill listed for the person to judge', backfill.out);
@@ -533,6 +553,9 @@ if (!dockerUp) {
   const roles = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT string_agg(rolname, ',') FROM pg_roles WHERE rolname IN ('probe_back', 'probe_owner')"]).stdout.trim();
   ok(/Removed 2 roles a file had made \((probe_back, probe_owner|probe_owner, probe_back)\)/.test(cleaned.out) && roles === '',
     '--clean removes the roles made after the container was first set up, in the check\'s own container', `${cleaned.out} [${roles}]`);
+  const membership = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT count(*) FROM pg_auth_members a JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname = 'postgres' AND g.rolname = 'pg_read_all_data'"]).stdout.trim();
+  ok(/Revoked 1 role membership a file had granted \(postgres in pg_read_all_data\)/.test(cleaned.out) && membership === '0',
+    '--clean revokes the role memberships granted after the container was first set up', `${cleaned.out} [${membership}]`);
 
   // Another folder's databases, last used more than two weeks ago: kept while that folder holds its
   // lock (it may be building), dropped once it does not, with its kept snapshots.

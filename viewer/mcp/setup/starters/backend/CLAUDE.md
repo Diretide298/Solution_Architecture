@@ -119,9 +119,12 @@ wherever you meet it (the ticket's Done when, `backend-patterns.md`, an older co
    `DROP ... IF EXISTS` before an `ADD CONSTRAINT`. Do not `BEGIN` or `COMMIT`: the runner wraps each
    file in one transaction. No GRANT, OWNER, COMMENT or UNLOGGED the package does not have, and no
    rows written into tables that are not the ticket's. The check refuses these outright: `DISABLE` or
-   `ENABLE REPLICA/ALWAYS TRIGGER`, `ALTER DEFAULT PRIVILEGES`, `GRANT`/`REVOKE ... ON DATABASE`,
-   `CREATE RULE`, publications and subscriptions, event triggers, `CREATE/ALTER/DROP ROLE` or `USER`,
-   `ALTER SYSTEM`, and `SET ROLE`. Files already applied stay as they are.
+   `ENABLE REPLICA/ALWAYS TRIGGER`, `ALTER DEFAULT PRIVILEGES`, role membership (`GRANT <role> TO`,
+   `REVOKE <role> FROM`), `GRANT`/`REVOKE` on a database, parameter, tablespace, language, foreign
+   server or data wrapper, or large object, `CREATE RULE`, publications and subscriptions, event
+   triggers, `CREATE/ALTER/DROP ROLE`, `USER` or `GROUP`, `ALTER SYSTEM`, and `SET ROLE`,
+   `SET SESSION AUTHORIZATION` or `session_replication_role` (also through `set_config`). Files
+   already applied stay as they are.
 2. Run `node .claude/scripts/db-ticket.mjs <ticket>`. It applies only this file to a copy of the
    database at the previous state, applies it a second time (which must succeed and change nothing),
    applies the package statements to a second copy, and compares the two databases whole: the ticket's
@@ -143,9 +146,10 @@ wherever you meet it (the ticket's Done when, `backend-patterns.md`, an older co
 If MATCH cannot be reached because the package itself is wrong (a type no file creates, a policy on a
 table a later migration creates), the check says so; that is a change request, as in "When the package
 is wrong". `node .claude/scripts/db-ticket.mjs --clean` drops this folder's check databases (template,
-copies, the --full database) and its kept snapshots, and in its own container removes any role a file
-made and resets role settings. Another folder's databases (template, half-built template, --full) go
-by themselves after two weeks unused, but never while that folder is running.
+copies, the --full database) and its kept snapshots, and in its own container removes any role or role
+membership a file made and resets role settings. Another folder's databases (template, half-built
+template, --full) go by themselves after two weeks unused, or at once when none of them carries a
+date of use (leftovers of an older version), but never while that folder is running.
 
 ## Searching pulled files
 
