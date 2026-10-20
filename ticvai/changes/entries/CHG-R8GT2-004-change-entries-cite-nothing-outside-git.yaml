@@ -1,0 +1,41 @@
+id: CHG-R8GT2-004
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'Ten r8 change entries named a report path under the audit folder (outside git) or a file the package does
+  not have. Each now names the report in words (which report, its date, that it is kept outside git) and keeps the
+  facts it took from it inline, as ticvai/CLAUDE.md rule 12 says.'
+decision:
+  what: 'changes/entries CHG-R8INT-021 to 027, CHG-R8INT-029, CHG-R8MIG-008: the report path replaced by the report''s
+    name in words. CHG-R8MIG-022: the requested paymentToken.revoked event file is described, not cited as a path,
+    because it was never written.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-cited-sources CS-OUTSIDE-GIT (9 new) and CS-MISSING (1 new) at the r8 release rehearsal on
+  5dc6fe1f.'
+keys_touched:
+  files:
+  - changes/entries/CHG-R8INT-021-parking-read-refusals-reconciled.yaml
+  - changes/entries/CHG-R8INT-022-shift-marker-ids-not-enforced.yaml
+  - changes/entries/CHG-R8INT-023-plan-versions-keyed.yaml
+  - changes/entries/CHG-R8INT-024-storage-core-requests-to-core-and-surface.yaml
+  - changes/entries/CHG-R8INT-025-sale-permissions-ui-builds-nothing-it-calls.yaml
+  - changes/entries/CHG-R8INT-026-channel-text-column-named-for-the-workstation.yaml
+  - changes/entries/CHG-R8INT-027-five-unreached-reads-known-in-refresh-safe.yaml
+  - changes/entries/CHG-R8INT-029-db-ticket-done-rule-in-the-package-copies.yaml
+  - changes/entries/CHG-R8MIG-008-db-tickets-apply-as-written.yaml
+  - changes/entries/CHG-R8MIG-022-cards-consent-purposes-asset-release.yaml
+root_class: 'a lane report cited by its local path from a decision document'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cited-sources.py
+status: open
+notes: 'CHG-R8MIG-022''s requests of the surface lane (an event file for paymentToken.revoked, paymentToken.stored
+  without its consent-record consumer) are still not applied on this branch; this entry only rewords the citation.'

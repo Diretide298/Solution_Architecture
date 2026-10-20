@@ -16,7 +16,7 @@ decision:
   date: '2026-10-20'
 waivers:
   cooling_off: {by: Chinmay, date: '2026-10-20', quote: 'Waive it for this one'}
-why: 'Finding: the integration pass report (audit/ticvai/r8-blockers/integration-pass-report.md, left 3) and check-plan-closure
+why: 'Finding: the integration pass report of 20 October 2026 (outside git; its left item 3) and check-plan-closure
   C-DECIDED on products wave 1. The plan has no field for operations a task calls but does not build: CHG-R8PRD-008 keeps
   an existing operation a task uses in `builds` ("existing operations a task also uses and the tables stay in
   `builds`"), and an operation in `builds` is read as built (check-plan-closure built(), the "Builds:" lead). That is

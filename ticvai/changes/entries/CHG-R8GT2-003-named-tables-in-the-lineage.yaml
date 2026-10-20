@@ -1,0 +1,46 @@
+id: CHG-R8GT2-003
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Six r8 operations whose descriptions name a table they write or read now say so as contract facts, and the
+  outcome call says which column its request id matches: reportBundleApplied writes catalogue.bundle_application,
+  forceLogout names identity.authz_audit for context (the authorisation layer writes it), guestSocialLogin and guestUaePassLogin read and write pii.subject_identity,
+  completeSsoAuthorization reads and writes identity.principal_external_identity, listCellEndpoints no longer names
+  control.cell (it reads the endpoints only), and recordApprovedActionOutcome''s requestId is
+  approved_action_execution.approval_request_id.'
+decision:
+  what: 'contracts/spine/catalogue.yaml reportBundleApplied, contracts/spine/identity.yaml guestSocialLogin,
+    guestUaePassLogin, completeSsoAuthorization: `x-ticvai-writes` / `x-ticvai-reads` naming the table and what for.
+    forceLogout: `x-ticvai-names-for-context: [identity.authz_audit]`, because the decision''s audit row is the
+    authorisation layer''s, appended for every decision a request takes (CHG-R6-014), not the operation''s own write
+    (written into its lineage, the key-only trail table failed check-stored-request-fields SR-STUB-WRITE).
+    contracts/spine/tenancy.yaml listCellEndpoints and PlatformCellEndpoint: "with
+    `control.cell`" and "keyed to `control.cell`" reworded to the cell it serves. contracts/spine/approvals.yaml
+    recordApprovedActionOutcome path parameter
+    requestId: `x-ticvai-column: approvals.approved_action_execution.approval_request_id`.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-parameter-columns P-NAMED-TABLE (6 new) and P-PARAM-NO-COLUMN (1 new) at the r8 release rehearsal
+  on 5dc6fe1f. The tables are new in r8 (CHG-R8MIG-015, CHG-R8MIG-018) and the outcome call is CHG-R8DEC-002; the
+  descriptions named them before the lineage did, which derive-lineage reads only from contract facts since
+  CHG-R8GEN-001.'
+keys_touched:
+  operations: [reportBundleApplied, forceLogout, guestSocialLogin, guestUaePassLogin, completeSsoAuthorization,
+    listCellEndpoints, recordApprovedActionOutcome]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/approvals.yaml
+root_class: 'a write stated in words that no contract fact gives the lineage'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open

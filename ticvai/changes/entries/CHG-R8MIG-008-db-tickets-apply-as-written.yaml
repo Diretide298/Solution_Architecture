@@ -18,7 +18,7 @@ decision:
     migration tickets. No frozen file is edited.'
   by: Chinmay
   date: '2026-10-20'
-why: 'Finding: ADAM faster-db-tickets report (audit/adam-faster-db-tickets-report.md in the ADAM workspace, "Request for the
+why: 'Finding: ADAM faster-db-tickets report (in the ADAM workspace, outside git: "Request for the
   package''s ticket generator" item 5 point 6 and "Package problems found on the way" 1 to 3), from applying the package
   DDL to PostgreSQL ticket by ticket: MIG-PII failed on the undefined types, the baseline helpers did not create on an
   empty database, and three parent policies pointed at tables a later migration creates. ADAM CR-001.'

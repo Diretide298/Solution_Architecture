@@ -1,0 +1,48 @@
+id: CHG-R8GT2-007
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The 42 new XR-FACT findings of the r8 rehearsal are real, not renames re-keyed: each operation''s text names
+  another module''s table or field that r8 added. Where the operation reads it, it now asks the owner''s query; where
+  the text only mentions it, the text no longer names it. The 27 baseline entries gone are separate: the CR-150 moves
+  (subscription.plan, subscription.tier_allowance), venue settings and outbox texts the r8 lanes reworded or routed.'
+decision:
+  what: 'Asked: Tenancy''s workstation reads (getWorkstation, listWorkstations, configureWorkstation) ask
+    catalogue#bundleApplicationRecords and the new catalogue#publishedBundleRecords for CatalogueState; Identity''s
+    createDelegatedAccess and listDelegatedAccess ask tenancy#regionSettingsRecords for overSubjectIsMinor; Access''s
+    issueOrderEntitlements and validateGroupAccess ask catalogue#productRecords for productName and imageUrl, and
+    catalogue#productRecords declares `reads: [catalogue.product_media]` (a Product''s media[] are those rows), which
+    covers getEntitlement, listEntitlements and listMyEntitlements too. Reworded: OrderLineAttributes.bundle says "the
+    bundle''s own price" instead of `Bundle.price` (28 order and cart operations return it and price nothing);
+    BundleApplication says Tenancy''s workstation row instead of `platform.workstation` (a sentence saying it is not
+    written); listCellEndpoints no longer names control.cell (with CHG-R8GT2-003).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-cross-module-reads XR-FACT, 42 new and 27 gone at the r8 release rehearsal on 5dc6fe1f. Paired by
+  key, no new finding is a gone one renamed (the gone keys are on other operations or other tables); the new ones come
+  from CHG-R8MIG-009 (ticket card names, minor flag), CHG-R8MIG-015 (bundle applications), CHG-R8MIG-018 (cell
+  endpoints) and CHG-R8MIG-023 (bundle lines).'
+keys_touched:
+  operations: [getWorkstation, listWorkstations, configureWorkstation, createDelegatedAccess, listDelegatedAccess,
+    issueOrderEntitlements, validateGroupAccess, listCellEndpoints]
+  schemas: [OrderLineAttributes, BundleApplication]
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/orders.yaml
+root_class: 'a computed response field that names another module''s data, added without the query that reads it'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'addCartLine, which prices a bundle line, does not name the bundle price and asks no promotions#bundleRecords;
+  the check does not see it and this entry does not add it (a question for the orders owner).'

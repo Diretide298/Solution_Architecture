@@ -1,0 +1,32 @@
+id: CHG-R8GT2-005
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'check-plan-owners O-MOVE holds a task the lead''s ownerMoves move to its plan owner only, when the lead holds
+  the task: the schedule gives a held task no week, no capacity and no owner by design (CHG-R8DEC-006), so "nobody''s in
+  the schedule" is the hold working, not a stale move. The move list and the plan are unchanged; this is not a plan
+  change.'
+decision:
+  what: 'tools/check-plan-owners.py O-MOVE: a key in block-a-schedule.json `held` is checked in the plan only, and the
+    note counts those moves.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-plan-owners O-MOVE (3 new: VM-ADM-260, VM-ADM-263, VM-ADM-269, "nobody''s in the schedule") at the
+  r8 release rehearsal on 5dc6fe1f. All three are back-office screen tasks held by CHG-R8DEC-005 and owned in the plan
+  by the person their move names (Pranay Shinde, Narayan Gaonkar); the scheduler drops held tasks since CHG-R8DEC-006.'
+keys_touched:
+  tickets: [VM-ADM-260, VM-ADM-263, VM-ADM-269]
+  files:
+  - tools/check-plan-owners.py
+root_class: 'a checker written before the plan could hold a task'
+tickets:
+  started: []
+  unstarted: [VM-ADM-260, VM-ADM-263, VM-ADM-269]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-owners.py
+status: open

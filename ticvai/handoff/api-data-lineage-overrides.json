@@ -16277,10 +16277,7 @@
     "marketing.consent_record",
     "payments.provider"
    ],
-   "writes": [
-    "marketing.consent_record"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001). Its write of marketing.consent_record dropped the same day: the guest's consent is recorded first by recordConsent and only read here (CHG-R8MIG-022; r8 gate, CHG-R8GT2-008)",
    "carried": true
   },
   "submitAccreditationApplication": {

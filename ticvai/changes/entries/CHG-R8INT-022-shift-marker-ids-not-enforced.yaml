@@ -11,7 +11,8 @@ decision:
     (were identity.principal and platform.workstation), each with a description saying why; a comment on the schema.'
   by: Chinmay
   date: '2026-10-20'
-why: 'Finding: concern 2 of the storage-core merge report (audit/ticvai/r8-blockers/merge-storage-core-report.md): enforced
+why: 'Finding: concern 2 of the storage-core merge report (the r8 merge report of 20 October 2026, kept with the lead''s audit
+  notes outside git): enforced
   foreign keys on a projection event consumers write would make a consumer fail, and retry forever, on an event that
   arrives before or after the row it names. shiftId was already `none` (Identity does not depend on orders.pos_shift).'
 keys_touched:

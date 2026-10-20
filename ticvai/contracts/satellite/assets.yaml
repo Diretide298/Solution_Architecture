@@ -629,6 +629,10 @@ paths:
   /media/guest-uploads:
     post:
       operationId: createGuestUpload
+      x-ticvai-writes:
+      - table: assets.guest_upload
+        for: 'the guest''s upload row, written `pending` with its purpose, content type and size (GuestUpload; r8 gate,
+          CHG-R8GT2-002; check-request-fields-stored RF-REQUEST-NOT-STORED)'
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject

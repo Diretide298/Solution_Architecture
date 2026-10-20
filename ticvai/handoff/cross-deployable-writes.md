@@ -14,8 +14,8 @@
 
 | | writes |
 |---|---:|
-| Cross-deployable writes in the lineage (64 operations) | 73 |
-| by event | 29 |
+| Cross-deployable writes in the lineage (63 operations) | 72 |
+| by event | 28 |
 | by the owner's operation | 44 |
 | on the exception list | 0 |
 
@@ -99,7 +99,6 @@ Sorted by the owning deployable, then the table.
 | `loadGameCredits` | commerce / WalletService | `games.card` | operations / VenueOpsService | event `wallet.credited` |
 | `checkoutCart` | commerce / OrderService | `marketing.consent_record` | operations / MarketingService | event `order.created` |
 | `enrolFacePass` | access / AccessService | `marketing.consent_record` | operations / MarketingService | event `biometric.enrolmentChanged` |
-| `storePaymentToken` | commerce / OrderService | `marketing.consent_record` | operations / MarketingService | event `paymentToken.stored` |
 | `broadcastToGuests` | commerce / TenancyService | `marketing.message_dispatch` | operations / MarketingService | operation `sendTransactionalMessage` |
 | `createPaymentLink` | commerce / OrderService | `marketing.message_dispatch` | operations / MarketingService | operation `sendTransactionalMessage` |
 | `resendPaymentLink` | commerce / OrderService | `marketing.message_dispatch` | operations / MarketingService | operation `sendTransactionalMessage` |

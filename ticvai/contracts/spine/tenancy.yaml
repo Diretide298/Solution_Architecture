@@ -1701,6 +1701,15 @@ paths:
         - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
       description: '**Order.** Sorted by `name` ascending, then by `id`.'
+      x-ticvai-read-via:
+      - query: catalogue#bundleApplicationRecords
+        route: in-process
+        for: 'each workstation''s catalogueState, from catalogue.bundle_application, Catalogue''s data (R8 blocker
+          FOUNDATION-AI-C44) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)'
+      - query: catalogue#publishedBundleRecords
+        route: in-process
+        for: 'catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue''s data (r8
+          gate, CHG-R8GT2-007)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List workstations
@@ -1749,6 +1758,10 @@ paths:
       - query: catalogue#bundleApplicationRecords
         route: in-process
         for: 'catalogueState, from catalogue.bundle_application, Catalogue''s data (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015)'
+      - query: catalogue#publishedBundleRecords
+        route: in-process
+        for: 'catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue''s data (r8
+          gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a workstation
@@ -1847,6 +1860,12 @@ paths:
         - query: shift#openShiftForWorkstation
           route: in-process
           for: "the open-shift refusal (409 shift-open), asked after locking the workstation row"
+        - query: catalogue#bundleApplicationRecords
+          route: in-process
+          for: "the returned workstation's catalogueState, from catalogue.bundle_application, Catalogue's data (R8 blocker FOUNDATION-AI-C44) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
+        - query: catalogue#publishedBundleRecords
+          route: in-process
+          for: "catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue's data (r8 gate, CHG-R8GT2-007)"
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -3565,7 +3584,7 @@ paths:
         way.
 
         **Read from the control plane** (R8 blocker APPROVALS-TENANCY-C10, CHG-R8MIG-018): the rows are
-        `control.cell_endpoint`, which Platform keeps with `control.cell` and serves through
+        `control.cell_endpoint`, which Platform keeps for each cell it provisions and serves through
         `subscription#cellEndpointRecords`; the control plane writes a cell's rows at provisioning, so no rows means a
         cell it does not know, `404`.
       tags:
@@ -4240,7 +4259,7 @@ components:
       x-ticvai-persistence: control.cell_endpoint
       description: '**Taken from the backend workbook, 20 September.** Stores how another Cell/service can securely reach a particular Cell, especially its CrossCell service endpoint.
         **A control-plane fact, kept in the control database** (R8 blocker APPROVALS-TENANCY-C10, the lead''s answer A,
-        as CR-150 moved the plan catalogue; CHG-R8MIG-018): `control.cell_endpoint`, keyed to `control.cell`. The control
+        as CR-150 moved the plan catalogue; CHG-R8MIG-018): `control.cell_endpoint`, keyed to the cell it serves (`cellId`). The control
         plane writes a cell''s rows when it provisions the cell and when its CrossCell service moves; no tenant database
         holds a copy.'
       required:

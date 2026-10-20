@@ -18,7 +18,7 @@ decision:
     bindings and the two payment-token event changes are not here: they are listed in the merge report.'
   by: Chinmay
   date: '2026-10-20'
-why: 'Finding: the requests in audit/ticvai/r8-blockers/r8b-storage-core-report.md (IDENTITY-C16, C34, C48, C57, C58;
+why: 'Finding: the requests in the r8b storage-core lane report of 20 October 2026 (outside git) (IDENTITY-C16, C34, C48, C57, C58;
   ORDERS-MONEY-C22, C24, C43; FOUNDATION-AI-C42), none applied on fix/r8-integration after the merges of storage-core
   (e7b711c9) and the integration pass (98dc1e91).'
 keys_touched:

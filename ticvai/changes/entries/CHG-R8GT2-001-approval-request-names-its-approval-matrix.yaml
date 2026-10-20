@@ -1,0 +1,32 @@
+id: CHG-R8GT2-001
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'ApprovalRequest''s new reference to the matrix routing chose is approvalMatrixId, not matrixId: a bare
+  "matrix" is the word the glossary bans for a Metric Sheet (audit class A-GLOSSARY). The field is new in r8
+  (CHG-R8MIG-009) and no release has carried it, so nothing is renamed on the wire or in a database.'
+decision:
+  what: 'contracts/spine/approvals.yaml ApprovalRequest.matrixId -> approvalMatrixId (its column follows:
+    approvals.request.approval_matrix_id, added by the r8 forward migration). The path parameter of
+    /approval-matrices/{matrixId} is not a schema field and stays.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-glossary-terms G-BANNED-NAME "approvals ApprovalRequest.matrixId: matrix - the glossary says
+  Metric Sheet", new at the r8 release rehearsal on the integration head 5dc6fe1f; the field came with CHG-R8MIG-009
+  (eecc3a3d), after r7.'
+keys_touched:
+  schemas: [ApprovalRequest]
+  files:
+  - contracts/spine/approvals.yaml
+root_class: 'a new reference field named by its target''s bare noun, which the glossary bans'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-glossary-terms.py
+status: open

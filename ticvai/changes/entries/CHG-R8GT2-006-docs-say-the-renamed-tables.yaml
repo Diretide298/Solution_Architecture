@@ -1,0 +1,33 @@
+id: CHG-R8GT2-006
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Three authored working documents name the tables CR-150 moved to the control database by their new names
+  (subscription.contract -> control.contract, subscription.plan -> control.plan): the action register of 22 September,
+  current-work.md and the 3 September dump audit. The three other old names check-doc-tables found sit in quotations
+  and stay as written.'
+decision:
+  what: 'docs/active/action-register-22-september.md, docs/active/current-work.md, docs/active/dump-audit-3-september.md:
+    `python3 tools/check-doc-tables.py --fix`, four names rewritten. None of the three is about the rename, so none is
+    exempted.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-doc-tables at the r8 release rehearsal on 5dc6fe1f, once derive-schema-history recorded the CR-150
+  moves of 18 October (subscription.* to control.*) as renames.'
+keys_touched:
+  files:
+  - docs/active/action-register-22-september.md
+  - docs/active/current-work.md
+  - docs/active/dump-audit-3-september.md
+root_class: 'a rename recorded after the documents that name the old table were written'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-doc-tables.py
+status: open
