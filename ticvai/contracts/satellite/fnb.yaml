@@ -119,6 +119,21 @@ x-ticvai-queries:
       a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
       deployable through F&B's service route (serviceAuth).
     served: [service]
+  tableVisitRecords:
+    module: fnb
+    table: fnb.table_visit
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.table_visit rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as venueId or outletId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/TableVisit'}
+    rule: >-
+      A data read, not a rule question (r8 walk fix, CHG-R8WFC-004: reporting getKpiValues computes covers and table
+      turn time from table visits). F&B answers with its fnb.table_visit rows, as it stores them and as the caller's
+      scope lets it see them. It decides nothing.
+    served: [in-process, service]
   productionPlanRecords:
     module: fnb
     table: fnb.production_plan
@@ -200,8 +215,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFnbReservationPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per outlet, the one the body''s `outletId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [outletId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `outletId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per outlet within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `outletId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-names-for-context: [fnb.service_charge_policy, orders.order_fee]
       summary: Set turn times and seating buffers
       description: '**The booking keeps its own duration as the snapshot.** A turn time revised in
@@ -5326,8 +5341,8 @@ paths:
       operationId: setFnbDeliveryPolicy
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per outlet, the one the body''s `outletId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [outletId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `outletId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per outlet within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Set takeaway and delivery rules
       description: '**Design gap, 23 September.** The dining design offers takeaway with a collection time
         and delivery to an address with a delivery window, a minimum order, a fee, free delivery above a
@@ -7727,6 +7742,9 @@ paths:
         format: uuid
     post:
       operationId: recordWaste
+      x-ticvai-reads:
+      - table: fnb.menu_item
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
         - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"

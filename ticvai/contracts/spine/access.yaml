@@ -2925,6 +2925,12 @@ paths:
         type: string
     delete:
       operationId: removeBlacklistEntry
+      x-ticvai-writes:
+      - table: access.blacklist
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: access.blacklist
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
       x-ticvai-audience:
@@ -3956,8 +3962,8 @@ paths:
       operationId: setDigitalBarcodeTicket
       x-ticvai-consumed-by:
         - "P08 BO-345 Digital QR & Barcode Ticket Designer"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [templateId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.24-25 (15.2.2); MoM
@@ -4061,8 +4067,8 @@ paths:
       operationId: setPdfPrintablePos
       x-ticvai-consumed-by:
         - "P08 BO-346 PDF, Printable & POS Ticket Designer"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [templateId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.26 (15.2.3); MoM 15
@@ -4118,8 +4124,8 @@ paths:
       operationId: setAppleWalletPass
       x-ticvai-consumed-by:
         - "P08 BO-347 Apple Wallet Pass Designer"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [templateId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.27-28 (15.2.4); MoM
@@ -4182,8 +4188,8 @@ paths:
       operationId: setGoogleWalletPass
       x-ticvai-consumed-by:
         - "P08 BO-348 Google Wallet Pass Designer"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [templateId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.29 (15.2.5); MoM 2 Sep
@@ -4244,8 +4250,8 @@ paths:
       operationId: setRfidNfcCard
       x-ticvai-consumed-by:
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [templateId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.30 (15.2.6); MoM 2 Sep
@@ -4303,8 +4309,8 @@ paths:
       operationId: setDigitalCardMembership
       x-ticvai-consumed-by:
         - "P08 BO-350 Digital Card, Membership & Wearable Designer"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [templateId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.31 (15.2.7); MoM 2 Sep
@@ -4361,8 +4367,8 @@ paths:
       operationId: setDynamicFieldData
       x-ticvai-consumed-by:
         - "P08 BO-351 Dynamic Fields, Data Mapping & Content Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per dynamic field, the one the body''s `fieldKey` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [fieldKey]
+      x-ticvai-body-key-note: 'Keyed by the body''s `fieldKey`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per dynamic field within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.32-33 (15.2.8); our
@@ -4469,8 +4475,8 @@ paths:
       operationId: setBrandingLocalizationTemplate
       x-ticvai-consumed-by:
         - "P08 BO-352 Branding, Localization & Template Inheritance"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per scope node, the one the body''s `scopeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [scopeId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `scopeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per scope node within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -4527,8 +4533,8 @@ paths:
       operationId: approveMultiMediaPreview
       x-ticvai-consumed-by:
         - "P08 BO-353 Multi-Media Preview, Testing, Approval & Publication"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [templateId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.36-40 (15.2.10); MoM
@@ -4739,8 +4745,8 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per virtual ticket, the one the body''s `virtualTicketId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [virtualTicketId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `virtualTicketId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per virtual ticket within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.43-44 (15.3.2); MoM
@@ -4975,8 +4981,8 @@ paths:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per virtual ticket, the one the body''s `virtualTicketId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [virtualTicketId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `virtualTicketId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per virtual ticket within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.48-49 (15.3.5); MoM
@@ -5627,8 +5633,8 @@ paths:
       operationId: setAccessAreaZone
       x-ticvai-consumed-by:
         - "P08 BO-146 Access Area & Zone Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access zone, the one the body''s `zoneId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [zoneId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `zoneId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access zone within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.8 [Create], [Each zone receives]; our
@@ -5684,8 +5690,8 @@ paths:
       operationId: setAttractionAccess
       x-ticvai-consumed-by:
         - "P08 BO-147 Attraction Access Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per attraction, the one the body''s `attractionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [attractionId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `attractionId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per attraction within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.9 [For each attraction], [Eligibility]
@@ -5741,8 +5747,8 @@ paths:
       operationId: setGateLane
       x-ticvai-consumed-by:
         - "P08 BO-149 Gate & Lane Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per gate, the one the body''s `gateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [gateId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `gateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per gate within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.11 [Direction], [Gate type], [Operational
@@ -5806,8 +5812,8 @@ paths:
       - query: venue-map#mapRecords
         route: service
         for: 'its read of venuemap.map, VenueOps''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue access map, the one the body''s `mapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [mapId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `mapId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per venue access map within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.12 [Administrator uploads], [AI can
@@ -5960,8 +5966,8 @@ paths:
       operationId: publishTopologyValidation
       x-ticvai-consumed-by:
         - "P08 BO-153 Topology Validation & Publication"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access configuration version, the one the body''s `configurationVersionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [configurationVersionId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `configurationVersionId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access configuration version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.14 [Configuration lifecycle], [Publication
@@ -6146,8 +6152,8 @@ paths:
       operationId: setVisualAccessRule
       x-ticvai-consumed-by:
         - "P08 BO-155 Visual Access Rule Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [ruleId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.18 [WHEN]/[IF]/[THEN]/[AND perform
@@ -6679,8 +6685,8 @@ paths:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access rule version, the one the body''s `ruleVersionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [ruleVersionId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `ruleVersionId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access rule version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.26 [Decision Trace], [For denial],
@@ -6801,8 +6807,8 @@ paths:
       operationId: setDynamicSecurityProfile
       x-ticvai-consumed-by:
         - "P08 BO-165 Dynamic QR Security Profile Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per dynamic QR security profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [profileId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `profileId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per dynamic QR security profile within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.30 [QR Mode], [Options], [Configuration
@@ -7067,8 +7073,8 @@ paths:
       operationId: setBleBeaconGeofence
       x-ticvai-consumed-by:
         - "P08 BO-168 BLE Beacon & Geofence Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per beacon, the one the body''s `beaconId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [beaconId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `beaconId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per beacon within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.34 [Configure], [Support], [Example]
@@ -7281,8 +7287,8 @@ paths:
       operationId: setEmbeddedEntitlementPayload
       x-ticvai-consumed-by:
         - "P08 BO-172 Embedded Entitlement Payload Designer"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per payload profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [profileId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `profileId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per payload profile within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.38 [Identity]/[Access]/[Validity]/[Entitlements],
@@ -7905,8 +7911,8 @@ paths:
       operationId: setRfidNfc
       x-ticvai-consumed-by:
         - "P08 BO-180 RFID & NFC Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per RFID/NFC profile, the one the body''s `rfidNfcProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [rfidNfcProfileId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `rfidNfcProfileId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per RFID/NFC profile within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.50 (4.7); pack ''Access Control Module''
@@ -8130,8 +8136,8 @@ paths:
       operationId: publishMediaCompatibilityTesting
       x-ticvai-consumed-by:
         - "P08 BO-183 Media Compatibility, Testing & Publication"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per media profile, the one the body''s `mediaProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [mediaProfileId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `mediaProfileId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per media profile within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.54 (4.10); MoM 2 Sep 2026 (media compatibility
@@ -8278,8 +8284,8 @@ paths:
       operationId: setBiometricVerificationProfile
       x-ticvai-consumed-by:
         - "P08 BO-185 Biometric Verification Profile Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per biometric verification profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [profileId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `profileId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per biometric verification profile within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.58 (5.2); MoM 2 Sep 2026 (Face Pass,
@@ -9308,8 +9314,8 @@ paths:
       operationId: setTurnstileLaneBehavior
       x-ticvai-consumed-by:
         - "P08 BO-197 Turnstile & Lane Behavior Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access point, the one the body''s `accessPointId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [accessPointId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `accessPointId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access point within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.74 (6.4); MoM 2 Sep 2026 (turnstile
@@ -9370,8 +9376,8 @@ paths:
       operationId: setValidationOutcomeGuest
       x-ticvai-consumed-by:
         - "P08 BO-198 Validation Outcome & Guest Feedback Designer"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per outcome profile, the one the body''s `outcomeProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [outcomeProfileId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `outcomeProfileId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per outcome profile within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.76 (6.5); MoM 2 Sep 2026 (light and
@@ -9430,8 +9436,8 @@ paths:
       operationId: setReaderScannerPeripheral
       x-ticvai-consumed-by:
         - "P08 BO-199 Reader, Scanner & Peripheral Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access point, the one the body''s `accessPointId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [accessPointId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `accessPointId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access point within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.77 (6.6); MoM 2 Sep 2026 (handheld
@@ -9487,8 +9493,8 @@ paths:
       operationId: setHandheldMobileAccess
       x-ticvai-consumed-by:
         - "P08 BO-200 Handheld & Mobile Access Device Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per handheld device profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [profileId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `profileId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per handheld device profile within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.78 (6.7); MoM 15 Sep 2026 (devices
@@ -9599,8 +9605,8 @@ paths:
       operationId: setDeviceSoftwareContent
       x-ticvai-consumed-by:
         - "P08 BO-202 Device Software, Content & Remote Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per device group, the one the body''s `deviceGroupId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [deviceGroupId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `deviceGroupId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per device group within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.81 (6.9); MoM 15 Sep 2026 (remote configuration
@@ -9785,8 +9791,8 @@ paths:
       operationId: setEdgeNodeLocal
       x-ticvai-consumed-by:
         - "P08 BO-205 Edge Node & Local Processing Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per edge node, the one the body''s `edgeNodeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [edgeNodeId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `edgeNodeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per edge node within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 7.2 p.87; MoM 2 Sep 2026 (offline local
@@ -10274,8 +10280,8 @@ paths:
       operationId: setGroupAdmissionProfile
       x-ticvai-consumed-by:
         - "P08 BO-215 Group & B2B Admission Profile Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per group admission profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [profileId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `profileId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per group admission profile within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 8.2 p.102; MoM 2 Sep 2026 (group admission:
@@ -11030,8 +11036,8 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [scanId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `scanId`, not a singleton (r8 walk fix, CHG-R8WFC-001; the 14 October shapes pass had flagged it one per venue): the denied scan the supervisor overrides. It writes what `overrideAccess` writes and nothing else: one new `access.scan_event` row with `outcome` `overridden` and `overrides_scan_id` the body''s `scanId`; the denied scan is never updated (R228). A denied scan has at most one override, so a second call for the same `scanId` is refused `409 scan-already-overridden`, and a scan that was not a denial `409 scan-not-denied`. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 9.5 p.121; R228 (override keeps the denial
@@ -11087,6 +11093,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ManualOverrideSupervisorApprovalView'
+        '409':
+          x-ticvai-problem-types: [scan-not-denied, scan-already-overridden]
+          description: The body's `scanId` was not a denial (`scan-not-denied`), or has already been overridden
+            (`scan-already-overridden`), exactly as `overrideAccess` refuses it (r8 walk fix, CHG-R8WFC-001).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -11281,8 +11295,8 @@ paths:
       operationId: setOperationalIncidentException
       x-ticvai-consumed-by:
         - "P08 BO-232 Operational Incident & Exception Workspace"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per incident, the one the body''s `incidentId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [incidentId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `incidentId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per incident within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 9.9 p.127; MoM 2 Sep 2026 (fraud assessment
@@ -11580,8 +11594,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-236 Visual Dynamic Policy Builder"
         - "P08 BO-238 Identity, Membership & Accreditation Policies"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per dynamic policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [policyId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `policyId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per dynamic policy within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.136 (10.3 IF/AND/OR/NOT/IN builder,
@@ -11642,8 +11656,8 @@ paths:
       operationId: setContextTimeEvent
       x-ticvai-consumed-by:
         - "P08 BO-237 Context, Time, Event & Capacity Policy Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [policyId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `policyId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access policy within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.137 (10.4 Support list, occupancy bands
@@ -11968,8 +11982,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [policyId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `policyId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access policy within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.144 (10.9 scenario results, Show list,
@@ -12487,8 +12501,8 @@ paths:
       operationId: setRealTimeSecurity
       x-ticvai-consumed-by:
         - "P08 BO-251 Real-Time Security Response & Playbook Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per security playbook, the one the body''s `playbookId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [playbookId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `playbookId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per security playbook within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.161 (11.8 trigger Risk Score > 75,
@@ -12546,8 +12560,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-248 Biometric & Identity Integrity Monitoring"
         - "P08 BO-252 Security Investigation & Evidence Workspace"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per investigation, the one the body''s `investigationId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [investigationId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `investigationId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per investigation within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.162 (11.9 Automatically correlate,
@@ -15415,8 +15429,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-170 Credential Revocation & Lifecycle Events"
         - "P08 BO-340 Entitlement & Cross-Media Synchronization Rules"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket lifecycle event, the one the body''s `triggerEvent` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [triggerEvent]
+      x-ticvai-body-key-note: 'Keyed by the body''s `triggerEvent`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket lifecycle event within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listEntitlementCrossMedia and listCredentialRevocationLifecycle
@@ -15616,8 +15630,8 @@ paths:
       operationId: setTicketStatusTransition
       x-ticvai-consumed-by:
         - "P08 BO-336 Virtual Ticket Status & Lifecycle Model"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per status transition (fromStatus, toStatus), the one the body''s `fromStatus` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [fromStatus]
+      x-ticvai-body-key-note: 'Keyed by the body''s `fromStatus`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per status transition (fromStatus, toStatus) within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listVirtualTicketStatus reads (pack ''Ticket
@@ -15697,8 +15711,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [productId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listVerificationMethodSelection reads (pack ''Access
@@ -16250,8 +16264,8 @@ paths:
       operationId: setPolicyEvaluationSetting
       x-ticvai-consumed-by:
         - "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per policy category, the one the body''s `policyCategory` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [policyCategory]
+      x-ticvai-body-key-note: 'Keyed by the body''s `policyCategory`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per policy category within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPolicyEvaluationArchitecture reads (pack
@@ -16392,8 +16406,8 @@ paths:
       operationId: setRelationshipFraudRule
       x-ticvai-consumed-by:
         - "P08 BO-249 Relationship & Companion Fraud Monitoring"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per relationship fraud rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [ruleId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per relationship fraud rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listRelationshipCompanionFraud reads (pack ''Access
@@ -36829,10 +36843,14 @@ components:
       properties:
         supervisorId:
           type: string
-          description: Approving supervisor
+          description: Approving supervisor. Stored as the override row's `overridden_by_principal_id`; the caller
+            is its `operator_principal_id` (r8 walk fix, CHG-R8WFC-001).
+          x-ticvai-stored-as: access.scan_event.overridden_by_principal_id
         scanId:
           type: string
-          description: The denied scan being overridden
+          description: The denied scan being overridden, and the key of this write (`x-ticvai-body-key`). Stored as
+            the override row's `overrides_scan_id`.
+          x-ticvai-stored-as: access.scan_event.overrides_scan_id
         selectType:
           type: string
           enum:
@@ -36843,10 +36861,14 @@ components:
           - technicalFailure
           - eventException
           - other
-          description: Override reason category
+          description: 'Override reason category. **One column holds the reason** (r8 walk fix, CHG-R8WFC-001):
+            `override_reason` is the category, then `: ` and `reasonNote` where one is sent (`technicalFailure:
+            reader did not respond`), or the category alone.'
+          x-ticvai-stored-as: access.scan_event.override_reason
         reasonNote:
           type: string
-          description: Free-text justification
+          description: Free-text justification, stored after the category in `override_reason` (see `selectType`).
+          x-ticvai-stored-as: access.scan_event.override_reason
         accessPointId:
           type: string
           description: Gate
@@ -36855,7 +36877,9 @@ components:
           description: Device
         originalDecision:
           type: string
-          description: Original validation decision, read only and never rewritten
+          description: Original validation decision, read only and never rewritten. Not stored on the override
+            row; the denied scan keeps it (r8 walk fix, CHG-R8WFC-001).
+          x-ticvai-persisted: false
       required:
       - scanId
       - selectType

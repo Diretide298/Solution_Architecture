@@ -1,6 +1,6 @@
 {
  "about": "What the contracts cannot state about an operation's tables, one entry per operation, each with its reason. tools/derive-lineage.py adds `reads`/`writes` to what the contract derives and takes `notReads`/`notWrites` away. Authored by hand: nothing in the refresh writes it. An entry marked `carried` was copied from the hand-kept lineage when it became derived (20 October 2026, CHG-R8GEN-001); their number may only fall (carriedCeiling, check-lineage LN-OVERRIDE). To change an operation's tables, change its contract (a persisted schema, x-ticvai-read-via, x-ticvai-write-via, x-ticvai-config-change-log); add an override only for what no contract fact can say, with a reason, and without `carried`.",
- "carriedCeiling": 1671,
+ "carriedCeiling": 1616,
  "operations": {
   "abandonCart": {
    "reads": [
@@ -334,13 +334,6 @@
     "assets.media_fingerprint"
    ],
    "reason": "analysis job writes proposed tags and replaces media_fingerprint under the current model_version (amend by hand; derived entry writes nothing) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "analysePromotionConflicts": {
-   "reads": [
-    "promotions.promotion"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "answerConfigurationQuestion": {
@@ -753,17 +746,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "assignCoupon": {
-   "reads": [
-    "promotions.coupon_code"
-   ],
-   "writes": [
-    "promotions.coupon_code",
-    "promotions.promotion_audit"
-   ],
-   "reason": "audit couponCode assigned. Existing lineage entry: derive-lineage --apply is additive-only, so the coordinator must update this entry in handoff/api-data-lineage.json by hand. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "assignKiosk": {
    "reads": [
     "platform.workstation",
@@ -986,18 +968,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "callNextParties": {
-   "reads": [
-    "queue.entry",
-    "queue.queue"
-   ],
-   "writes": [
-    "queue.entry",
-    "queue.queue"
-   ],
-   "reason": "4 October 2026 (CHG-FXC-004): entries move to called (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "cancelActionPlan": {
    "reads": [
     "ai.action_step"
@@ -1016,16 +986,6 @@
     "approvals.escalation"
    ],
    "reason": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "cancelDecommission": {
-   "reads": [
-    "control.cell"
-   ],
-   "writes": [
-    "control.cell"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "cancelFnbOrder": {
@@ -1067,16 +1027,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "cancelPerformance": {
-   "reads": [
-    "catalogue.performance"
-   ],
-   "writes": [
-    "catalogue.performance"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "cancelPricingRollback": {
    "writes": [
     "catalogue.audit_entry",
@@ -1107,17 +1057,6 @@
     "inventory.requisition_line"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "cancelReservation": {
-   "reads": [
-    "orders.reservation"
-   ],
-   "writes": [
-    "orders.order_event",
-    "orders.reservation"
-   ],
-   "reason": "order_event writer (29 September: writers pass; DM5 open item) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "cancelStockCount": {
@@ -1452,21 +1391,13 @@
   "closeFiscalPeriod": {
    "reads": [
     "approvals.rule",
-    "ledger.journal_entry",
-    "ledger.journal_line",
-    "ledger.legal_entity",
-    "ledger.price_variance",
-    "ledger.recognition_schedule",
-    "ledger.settlement",
-    "ledger.settlement_exception",
     "orders.pos_shift",
     "wallet.balance"
    ],
    "writes": [
     "approvals.request"
    ],
-   "reason": "14 October 2026 (ADAM CR-085, CHG-FIN-012): noOpenShifts asks Orders' shift#unclosedShiftsInPeriod, walletChecks and walletRollForward ask wallet#periodCloseChecks, and the approval asks approvals#approvalRequirement, all in process (readVia); the 202's approvalRequestId is the approvals.request raised through Approvals' in-process createApprovalRequest; the owners' tables those queries read in the close's transaction are orders.pos_shift, wallet.balance and approvals.rule (as CHG-TEN-004 lists orders.pos_shift for configureWorkstation); ledger.legal_entity gives the scope path the queries are asked for; recognitionRunComplete is runRecognition's computation run dry (4 October, CHG-FXC-004: the close checks and the run record) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: 14 October 2026 (ADAM CR-085, CHG-FIN-012): noOpenShifts asks Orders' shift#unclosedShiftsInPeriod, walletChecks and walletRollForward ask wallet#periodCloseChecks, and the approval asks approvals#approvalRequirement, all in process (readVia); the 202's approvalRequestId is the approvals.request raised through Approvals' in-process createApprovalRequest; the owners' tables those queries read in the close's transaction are orders.pos_shift, wallet.balance and approvals.rule (as CHG-TEN-004 lists orders.pos_shift for configureWorkstation); ledger.legal_entity gives the scope path the queries are asked for; recognitionRunComplete is runRecognition's computation run dry (4 October, CHG-FXC-004: the close checks and the run record) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))"
   },
   "closePurchaseOrderShort": {
    "notWrites": [
@@ -1519,8 +1450,7 @@
    "notWrites": [
     "inventory.transfer_line"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)"
   },
   "closeWallet": {
    "reads": [
@@ -1827,18 +1757,10 @@
    "carried": true
   },
   "createBulkRefund": {
-   "reads": [
-    "orders.refund"
-   ],
-   "writes": [
-    "orders.order_event",
-    "orders.refund"
-   ],
    "notWrites": [
     "orders.refund_batch"
    ],
-   "reason": "order_event writer (29 September: writers pass; DM5 open item) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: order_event writer (29 September: writers pass; DM5 open item) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))"
   },
   "createBundle": {
    "reads": [
@@ -2289,14 +2211,10 @@
    "carried": true
   },
   "createPreview": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
    "writes": [
     "whitelabel.tenant_config"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description, which says the preview is held in Redis (cache:preview) and nothing is stored in a table. The write of whitelabel.tenant_config the path suggested is kept only because check-write-lineage W-NOTABLE needs a POST that writes no table to be marked pure in the lineage, an annotation a branch cannot carry through the refresh; the lead marks it pure (or the surface lane's preview read decides a table) and this entry goes."
   },
   "createPrincipal": {
    "reads": [
@@ -2797,16 +2715,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "decommissionCell": {
-   "reads": [
-    "control.cell"
-   ],
-   "writes": [
-    "control.cell"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "deleteAccessPointGroup": {
    "reads": [
     "access.access_point_group",
@@ -2816,17 +2724,6 @@
     "access.access_point_group"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "deleteBanner": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
-   "writes": [
-    "whitelabel.banner",
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "deleteBookingFlow": {
@@ -2840,17 +2737,6 @@
     "whitelabel.booking_flow_step"
    ],
    "reason": "Reads the catalogue to refuse a flow still named (409); cross-context read through the catalogue API. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "deleteContentPage": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
-   "writes": [
-    "whitelabel.content_page",
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "deleteDashboard": {
@@ -2996,16 +2882,6 @@
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "deleteReport": {
-   "reads": [
-    "reporting.report_definition"
-   ],
-   "writes": [
-    "reporting.report_definition"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "deleteReportSchedule": {
    "reads": [
     "reporting.schedule"
@@ -3082,14 +2958,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "diffConfigVersion": {
-   "reads": [
-    "whitelabel.config_version",
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "diffSeatMapVersions": {
    "reads": [
     "seating.seat_map",
@@ -3155,19 +3023,6 @@
     "identity.guest_session"
    ],
    "reason": "14 October 2026: reads identity.guest_session, writes identity.guest_session (CHG-MOD-009: ends a guest's sessions on one device in the session registry) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "endPromotion": {
-   "reads": [
-    "promotions.promotion",
-    "promotions.promotion_channel_publication"
-   ],
-   "writes": [
-    "promotions.promotion",
-    "promotions.promotion_audit",
-    "promotions.promotion_channel_publication"
-   ],
-   "reason": "adds platform.outbox (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "enrolDevice": {
@@ -3277,34 +3132,11 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "evaluatePromotions": {
-   "reads": [
-    "catalogue.price_list",
-    "promotions.coupon_code",
-    "promotions.promotion",
-    "promotions.promotion_rule"
-   ],
-   "writes": [
-    "promotions.promotion_evaluation_trace"
-   ],
-   "reason": "Reads promotion_rule via PromotionConditions.eligibilityRuleIds. New optional request field orderId: when the order service calls it to price an order for payment (createOrder, convertReservation) it writes one promotion_evaluation_trace row; cart/till/back-office calls store nothing. Existing lineage entry: derive-lineage --apply is additive-only, so the coordinator must update this entry in handoff/api-data-lineage.json by hand. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "exchangeOrderLines": {
-   "reads": [
-    "orders.order_line",
-    "orders.refund",
-    "orders.refund_policy",
-    "orders.sales_order"
-   ],
    "writes": [
-    "orders.order_event",
-    "orders.order_line",
-    "orders.sales_order",
     "platform.outbox"
    ],
-   "reason": "emits order.exchanged (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause IDENTITY-C61 (CHG-R8GEN-009): the difference is settled or refunded under orders.refund_policy against the order lines (orders.refund)",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: emits order.exchanged (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause IDENTITY-C61 (CHG-R8GEN-009): the difference is settled or refunded under orders.refund_policy against the order lines (orders.refund)"
   },
   "expireCreditLots": {
    "reads": [
@@ -3478,20 +3310,9 @@
   },
   "forceLogout": {
    "reads": [
-    "identity.delegated_access",
-    "identity.password_policy",
-    "identity.principal",
-    "identity.principal_credential",
-    "identity.role_permission",
-    "identity.session",
     "platform.workstation"
    ],
-   "writes": [
-    "identity.principal_credential",
-    "identity.session"
-   ],
-   "reason": "14 October 2026 (CHG-CRD-001, ADAM CR-078): a wrong supervisor PIN counts towards the PIN lockout (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: 14 October 2026 (CHG-CRD-001, ADAM CR-078): a wrong supervisor PIN counts towards the PIN lockout (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))"
   },
   "forceReleaseInventoryHold": {
    "reads": [
@@ -3647,26 +3468,11 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "getAppIcons": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "getApprovalAnalytics": {
    "reads": [
     "approvals.decision",
     "approvals.escalation",
     "approvals.request"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "getAssetHistory": {
-   "reads": [
-    "maintenance.asset",
-    "maintenance.asset_status_change"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
@@ -3737,13 +3543,6 @@
    "carried": true
   },
   "getBookingFlowConfig": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "getBrandIdentity": {
    "reads": [
     "whitelabel.tenant_config"
    ],
@@ -3944,14 +3743,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "getExpiringRights": {
-   "reads": [
-    "assets.media_asset",
-    "assets.media_usage"
-   ],
-   "reason": "4 October 2026 (CHG-FXC-004): isInUse and liveUsageCount count live usage (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "getFacePassEnrollmentConfiguration": {
    "reads": [
     "access.biometric_profile"
@@ -3975,13 +3766,6 @@
     "ledger.event_budget",
     "ledger.fiscal_period",
     "ledger.posting"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "getFonts": {
-   "reads": [
-    "whitelabel.tenant_config"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
@@ -4173,15 +3957,21 @@
   },
   "getKpiValues": {
    "reads": [
+    "access.scan_event",
     "accreditation.application",
     "accreditation.credential",
     "accreditation.holder",
     "accreditation.validity",
+    "fnb.table_visit",
+    "ledger.posting",
+    "marketing.loyalty_position",
+    "orders.order_line",
+    "orders.payment",
+    "orders.refund",
     "reporting.kpi_definition",
     "reporting.kpi_target"
    ],
-   "reason": "accreditation system KPIs read the analytical replica of the accreditation tables (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: the always-offered KPIs read their sources through each owner's query (x-ticvai-read-via): admissions access.scan_event, takings orders.payment and orders.refund, the finance measures orders.order_line and ledger.posting, covers and table turn fnb.table_visit, loyalty marketing.loyalty_position; the accreditation KPIs read the accreditation tables the same way. Earlier: accreditation system KPIs read the analytical replica of the accreditation tables (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))"
   },
   "getLabourCost": {
    "reads": [
@@ -4506,13 +4296,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "getPromotionUsage": {
-   "reads": [
-    "promotions.promotion"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "getPublishedBookingFlow": {
    "reads": [
     "catalogue.product",
@@ -4536,13 +4319,6 @@
     "whitelabel.analytics_provider",
     "whitelabel.config_version",
     "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "getQueueFeedHealth": {
-   "reads": [
-    "queue.feed"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
@@ -4891,14 +4667,12 @@
   },
   "getTheme": {
    "reads": [
-    "cache:resolution",
-    "whitelabel.tenant_config"
+    "cache:resolution"
    ],
    "writes": [
     "cache:resolution"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)"
   },
   "getTranslationProposals": {
    "reads": [
@@ -5481,16 +5255,6 @@
     "marketing.message_dispatch"
    ],
    "reason": "per-recipient hour from ai.requestSuggestion kind sendTime (a service call, not a table read); dispatch rows carry campaign_variant_id and planned_send_at (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "leaveQueue": {
-   "reads": [
-    "queue.entry"
-   ],
-   "writes": [
-    "queue.entry"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "leaveWaitlist": {
@@ -10611,13 +10375,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "lookupMerchandise": {
-   "reads": [
-    "retail.merchandise"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "lookupShopAndDrop": {
    "reads": [
     "retail.sale",
@@ -10858,16 +10615,6 @@
    "reason": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "overrideWaitingGuest": {
-   "reads": [
-    "queue.entry"
-   ],
-   "writes": [
-    "queue.entry"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "pauseActionPlan": {
    "writes": [
     "ai.decision_record",
@@ -10894,19 +10641,6 @@
     "marketing.segment_criterion"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "pausePromotion": {
-   "reads": [
-    "promotions.promotion",
-    "promotions.promotion_channel_publication"
-   ],
-   "writes": [
-    "promotions.promotion",
-    "promotions.promotion_audit",
-    "promotions.promotion_channel_publication"
-   ],
-   "reason": "adds platform.outbox (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "pauseWorkOrder": {
@@ -11019,12 +10753,9 @@
   },
   "previewSubscriptionChange": {
    "reads": [
-    "control.contract",
-    "control.plan",
     "platform.tenant"
    ],
-   "reason": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: 18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))"
   },
   "printOrderLabel": {
    "reads": [
@@ -11228,20 +10959,11 @@
   },
   "publishBundle": {
    "reads": [
-    "catalogue.price",
-    "catalogue.price_list",
-    "catalogue.product",
-    "catalogue.published_bundle",
-    "catalogue.variant",
     "platform.sale_board_for_catalogue",
     "platform.sale_board_page_for_catalogue",
     "platform.sale_board_tile_for_catalogue"
    ],
-   "writes": [
-    "catalogue.published_bundle"
-   ],
-   "reason": "4 October 2026 (CHG-FXC-004): the snapshot is built from the catalogue and the sale boards; 14 October 2026: reads platform.sale_board_page (CHG-TEN-001: the bundle carries every page of a board (ADAM CR-080)); 14 October 2026: platform.sale_board read as platform.sale_board_for_catalogue, platform.sale_board_page read as platform.sale_board_page_for_catalogue, platform.sale_board_tile read as platform.sale_board_tile_for_catalogue (CHG-R6G-007: the boards through the views named for Catalogue, bulk data within commerce (ADR-0055 rule 2)) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: 4 October 2026 (CHG-FXC-004): the snapshot is built from the catalogue and the sale boards; 14 October 2026: reads platform.sale_board_page (CHG-TEN-001: the bundle carries every page of a board (ADAM CR-080)); 14 October 2026: platform.sale_board read as platform.sale_board_for_catalogue, platform.sale_board_page read as platform.sale_board_page_for_catalogue, platform.sale_board_tile read as platform.sale_board_tile_for_catalogue (CHG-R6G-007: the boards through the views named for Catalogue, bulk data within commerce (ADR-0055 rule 2)) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))"
   },
   "publishChannelAvailability": {
    "reads": [
@@ -11611,21 +11333,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "recommendSeats": {
-   "reads": [
-    "catalogue.performance",
-    "seating.accessible",
-    "seating.recommendation_rule",
-    "seating.seat",
-    "seating.seat_block_item",
-    "seating.seat_category",
-    "seating.seat_price_band",
-    "seating.seat_reservation",
-    "seating.seat_reservation_item"
-   ],
-   "reason": "4 October 2026 (CHG-FXC-004): seat ids, contiguity, category and price (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "reconcileBurstEnvironment": {
    "reads": [
     "orders.sales_order"
@@ -11796,16 +11503,6 @@
    "reason": "RB's lineage + outbox for consent.deviceConsentRecorded (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "recordDeviceHeartbeat": {
-   "reads": [
-    "platform.device"
-   ],
-   "writes": [
-    "platform.device"
-   ],
-   "reason": "every RegisteredDevice.status change emits device.statusChanged (never on an unchanged heartbeat) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "recordDeviceTamperEvent": {
    "reads": [
     "platform.device"
@@ -11966,14 +11663,12 @@
   },
   "recordWaste": {
    "reads": [
-    "fnb.menu_item",
     "platform.outlet"
    ],
    "writes": [
     "inventory.movement"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)"
   },
   "recordWorkOrderParts": {
    "reads": [
@@ -12017,16 +11712,6 @@
    ],
    "writes": [
     "orders.stored_value_authorisation"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "redeemWaitingGuest": {
-   "reads": [
-    "queue.entry"
-   ],
-   "writes": [
-    "queue.entry"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
@@ -12271,16 +11956,6 @@
    "reason": "held->available emits seat.released (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "removeBlacklistEntry": {
-   "reads": [
-    "access.blacklist"
-   ],
-   "writes": [
-    "access.blacklist"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "removeCartLine": {
    "writes": [
     "catalogue.inventory_reservation"
@@ -12315,17 +11990,6 @@
     "qdrant:knowledge"
    ],
    "reason": "qdrant:knowledge replaced by ai.chunk_embedding. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "removeLicenceAddOn": {
-   "reads": [
-    "control.licence_add_on"
-   ],
-   "writes": [
-    "control.contract",
-    "control.licence_add_on"
-   ],
-   "reason": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "removeMfaMethod": {
@@ -12444,16 +12108,6 @@
    "reason": "18 October 2026: CHG-CRA-004 (ADAM CR-140): queues a control.webhook_replay row; the workers dispatcher reads the outbox and writes the deliveries (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "reportBundleApplied": {
-   "reads": [
-    "catalogue.published_bundle"
-   ],
-   "writes": [
-    "catalogue.published_bundle"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "reportIncident": {
    "writes": [
     "maintenance.incident_involved_party"
@@ -12466,29 +12120,6 @@
     "games.reader"
    ],
    "reason": "new: replaces the reader's one games.reader_sync_status row (pending_transactions, pending_value, oldest_pending_at, reported_at); syncGamePlays stamps last_sync_at only (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "reprintOrder": {
-   "reads": [
-    "orders.order_line",
-    "orders.sales_order"
-   ],
-   "writes": [
-    "orders.order_event",
-    "orders.order_line",
-    "orders.sales_order"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "reprintReceipt": {
-   "reads": [
-    "retail.sale"
-   ],
-   "writes": [
-    "retail.sale"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "republishOutbox": {
@@ -12631,20 +12262,6 @@
     "platform.outbox"
    ],
    "reason": "14 October 2026: CHG-XDW-003: the owner requeues a dead letter for replayDeadLetter (XDW-012 removed) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "rescheduleOrder": {
-   "reads": [
-    "orders.order_line",
-    "orders.refund",
-    "orders.refund_policy",
-    "orders.sales_order"
-   ],
-   "writes": [
-    "orders.order_event",
-    "orders.sales_order"
-   ],
-   "reason": "order_event writer (29 September: writers pass; DM5 open item) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause IDENTITY-C61 (CHG-R8GEN-009): the difference is settled or refunded under orders.refund_policy against the order lines (orders.refund)",
    "carried": true
   },
   "resendPaymentLink": {
@@ -13627,16 +13244,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "setAppIcons": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
-   "writes": [
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "setAppleWalletPass": {
    "reads": [
     "access.media_template"
@@ -13744,16 +13351,6 @@
     "pricing.dynamic_price_rule"
    ],
    "reason": "DM3: rule rows name their strategy (new dynamicPricingStrategyId on pricing.dynamic_price_rule) | L2: desc: rules persist through the dynamic-rule model (PricingDynamicPriceRule/Condition/Action), as setDynamicPriceRule writes them (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setBrandIdentity": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
-   "writes": [
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "setBrandingLocalizationTemplate": {
@@ -14315,16 +13912,6 @@
    "reason": "W-WE (new, writers pass): upsert by code; active needs a change request (409) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "setFonts": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
-   "writes": [
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "setFooter": {
    "writes": [
     "cache:resolution"
@@ -14495,16 +14082,6 @@
    "reason": "profileId is an access.device_configuration row with configurationKind handheldProfile (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "setHeader": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
-   "writes": [
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "setHotelWalletExternal": {
    "reads": [
     "access.external_credential_integration"
@@ -14571,16 +14148,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "setLanguages": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
-   "writes": [
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "setLifecycleStatuWorkflow": {
    "reads": [
     "catalogue.lifecycle_workflow"
@@ -14590,18 +14157,6 @@
     "catalogue.lifecycle_workflow"
    ],
    "reason": "DM3: LifecycleWorkflowPolicy row per scope; configuration change audited | L2: input persistence says no existing table shares a field; transitions config needs catalogue.lifecycle_workflow (missing); idempotent PUT (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setMaintenanceMode": {
-   "reads": [
-    "whitelabel.content_page",
-    "whitelabel.module_enablement",
-    "whitelabel.tenant_config"
-   ],
-   "writes": [
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause IDENTITY-C47 (CHG-R8GEN-009): activeModuleCount and licensedModuleCount from whitelabel.module_enablement, activePageCount from whitelabel.content_page (own tables)",
    "carried": true
   },
   "setMapZones": {
@@ -15118,15 +14673,10 @@
    "carried": true
   },
   "setPrices": {
-   "reads": [
-    "catalogue.price_list"
-   ],
    "writes": [
-    "cache:resolution",
-    "catalogue.price_list"
+    "cache:resolution"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)"
   },
   "setPricing": {
    "reads": [
@@ -15667,15 +15217,10 @@
    "carried": true
   },
   "setTheme": {
-   "reads": [
-    "whitelabel.tenant_config"
-   ],
    "writes": [
-    "cache:resolution",
-    "whitelabel.tenant_config"
+    "cache:resolution"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
+   "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)"
   },
   "setTransportFareTable": {
    "reads": [
@@ -15862,16 +15407,6 @@
     "approvals.workflow_version"
    ],
    "reason": "Upserts the workflow (approvals.workflow_definition) and saves its graph as the draft approvals.workflow_version; editing a tested version returns it to draft (states/workflow-version.yaml). DM2. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "setWaitTime": {
-   "reads": [
-    "queue.queue"
-   ],
-   "writes": [
-    "queue.queue"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "setWaiverException": {
@@ -16541,18 +16076,6 @@
    "reason": "a replayed offline deny, or a server downgrade of an offline admit, emits access.rejected (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "terminateTenant": {
-   "reads": [
-    "control.contract",
-    "control.tenant"
-   ],
-   "writes": [
-    "control.contract",
-    "control.tenant"
-   ],
-   "reason": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "testAiProvider": {
    "reads": [
     "ai.byok_enablement",
@@ -16742,17 +16265,6 @@
     "marketing.segment_criterion"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "unschedulePromotion": {
-   "reads": [
-    "promotions.promotion"
-   ],
-   "writes": [
-    "promotions.promotion",
-    "promotions.promotion_audit"
-   ],
-   "reason": "audit promotionUnscheduled (new eventType value). Existing lineage entry: derive-lineage --apply is additive-only, so the coordinator must update this entry in handoff/api-data-lineage.json by hand. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "updateAccessDevicePlacement": {

@@ -233,6 +233,15 @@ paths:
         drop-off** — an item disposed of on a policy nobody stated is a paid item destroyed.
 
         Recorded with who authorised it, because this destroys something a guest owns.
+
+        **What is recorded, and where** (r8 walk fix, CHG-R8WFC-002). On the `retail.shop_and_drop` row:
+        `disposalMethod` (the body's `method`), `disposalNote` (its `note`), `disposalDecidedAt` (the server's
+        time) and `disposalDecidedByPrincipalId`, the caller, who holds `PRODUCT_CONFIGURE` and is the person
+        who authorised it. `donated`, `destroyed` and `returnedToStock` move the item to `disposed`.
+        **`heldLonger` disposes of nothing**: the item stays `uncollected`, the decision is recorded the same
+        way, and a later call may dispose of it (which replaces the recorded decision). `returnedToStock`
+        records the decision only; the goods go back into stock through Inventory's own stock adjustment or
+        count, which this call does not post.
       tags: [retail]
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
@@ -248,8 +257,8 @@ paths:
               type: object
               required: [method]
               properties:
-                method: { type: string, enum: [donated, destroyed, returnedToStock, heldLonger] }
-                note: { type: string, maxLength: 300 }
+                method: { type: string, enum: [donated, destroyed, returnedToStock, heldLonger], x-ticvai-column: disposal_method }
+                note: { type: string, maxLength: 300, x-ticvai-column: disposal_note }
       responses:
         '200':
           headers:
@@ -484,6 +493,9 @@ paths:
   /merchandise/lookup:
     get:
       operationId: lookupMerchandise
+      x-ticvai-reads:
+      - table: retail.merchandise
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
         - "P02 GST-026 Retail / Merchandise"
@@ -643,9 +655,15 @@ paths:
         leased the way a timed product can, so a terminal without a connection cannot
         complete a retail sale.
 
-        Creates an order in the Order & Payment context and a `saleDepletion` movement in the
-        inventory ledger, in one transaction. There is no second stock counter maintained by
-        the till.
+        **The order is Orders', made before this call; this records the retail side of it** (r8 walk
+        fix, CHG-R8WFC-003; was "creates an order in the Order & Payment context ... in one
+        transaction", which no route made true: Retail runs in the operations deployable and Orders in
+        commerce, and they share no transaction, ADR-0055). The till sells merchandise on its one cart
+        and order (`createOrder`, "one cart, one order, one receipt"), priced there with any coupon,
+        and sends that order's id as `orderId`. This call then writes the sale, its lines and a
+        `saleDepletion` movement in the inventory ledger (Inventory runs in the same deployable) in one
+        transaction of its own. A retry with the same Idempotency-Key answers the sale already written.
+        There is no second stock counter maintained by the till.
 
         **A kit sells as one line and leaves stock as its components** (4.4.20, 29 September
         build). Where the line's item has an `inventory.kit_component` bill of materials
@@ -791,6 +809,12 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: reprintReceipt
+      x-ticvai-writes:
+      - table: retail.sale
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: retail.sale
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
         - "P04 POS-026 Receipt & Reprint"
@@ -1967,6 +1991,19 @@ components:
         couponCodes:
           type: array
           items: { type: string }
+          description: '**Not applied here** (r8 walk fix, CHG-R8WFC-003). A coupon prices the order, so it is
+            applied on the till''s cart in Orders (`applyCartPromoCode`, `promotions.evaluatePromotions`) before the
+            order exists; the discount it gave reaches this sale on its lines. Retail keeps no coupon and reads
+            none; kept in the schema only so a client built at r1 still validates.'
+          x-ticvai-persisted: false
+        orderId:
+          type: string
+          format: uuid
+          description: '**The order the till took payment on** (r8 walk fix, CHG-R8WFC-003), as fnb''s
+            `CreateFnbOrderRequest.salesOrderId` does: `RetailSale.orderId`, stored in `retail.sale.order_id`.
+            Required in fact: a body without it is refused `400 validation`; optional in the schema only so a client
+            built at r1 still validates.'
+          x-ticvai-references: orders.sales_order
         recordedAt: { type: string, format: date-time }
 
     RetailSale:
@@ -2325,6 +2362,32 @@ components:
       x-ticvai-persistence: "retail.shop_and_drop + retail.shop_and_drop_line"
       required: [id, dropReference, collectionPointId, status, collectBy]
       properties:
+        disposalMethod:
+          type: string
+          enum: [donated, destroyed, returnedToStock, heldLonger]
+          nullable: true
+          readOnly: true
+          description: What `disposeShopAndDrop` decided for an uncollected item; null until it is called. `heldLonger`
+            leaves the item `uncollected` (r8 walk fix, CHG-R8WFC-002).
+        disposalNote:
+          type: string
+          maxLength: 300
+          nullable: true
+          readOnly: true
+          description: The note sent with that decision; null when none was sent.
+        disposalDecidedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the decision was recorded (the server's time).
+        disposalDecidedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Who authorised it, the caller, from the session ("recorded with who authorised it").
+          x-ticvai-references: identity.principal
         id: { type: string }
         dropReference:
           type: string

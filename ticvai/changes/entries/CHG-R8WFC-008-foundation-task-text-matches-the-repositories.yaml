@@ -1,0 +1,49 @@
+id: CHG-R8WFC-008
+date: '2026-10-20'
+source: audit
+kind: plan
+proposed: '2026-10-20T19:55'
+summary: 'Five foundation tasks in docs/active/block-a-extra-tasks.json describe the repositories and decisions as
+  they are, not the r6 package starter: SETUP-HOSTS and ARCH-TESTS work on the clean-architecture solution, where a
+  module is a TICVAI.Application/Features folder (no IModule, no Ticvai.Modules.* assemblies); KERNEL-ID says the
+  backend already has TICVAI.Domain.Identity.Id.New() and the offline generator goes in each frontend repository that
+  creates ids offline (one GitLab repository per app since 13 October); KERNEL-TENANT-LIMITS reads the plan''s limits
+  through subscription#tenantRequestLimits, not getPlan; PLATFORM-RLS drops the venue_id partitioning ADR-0056
+  deferred (sales_order is unpartitioned, scan_event is range-partitioned by month on recorded_at).'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: the `detail` of SETUP-HOSTS, ARCH-TESTS, KERNEL-ID and PLATFORM-RLS
+    rewritten, and two passages of KERNEL-TENANT-LIMITS; no key, subject, points, dependency or `builds` changes.
+    PRD-W1-SALE-PERMISSIONS-UI is untouched (the controller edits it on the integration branch).'
+  by: Chinmay
+  date: '2026-10-20'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-20', quote: '1 run,2 waive,3 waive, 4 dont worry about it'}
+why: 'Finding: the r8 sample walk of 20 October 2026 (outside git; sample-walk-part2), classes ticket-text-stale-vs-repo
+  (ARCH-TESTS #27688, SETUP-HOSTS #27643, KERNEL-ID #27689), ticket-text-stale-vs-decision (KERNEL-TENANT-LIMITS #27693)
+  and ticket-text-contradicts-ddl (PLATFORM-RLS #27698): the text was written at r6 against the package starter, before
+  the clean-architecture backend (repos/ticvai-docs/setup/backend-patterns.md 3.1-3.2), the one-repository-per-app
+  frontend (docs/active/frontend-repos.yaml, 13 October) and ADR-0056''s deferral of venue partitioning, and a
+  foundation developer met it on day one.'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'hand-written foundation task text not regenerated when the repositories and decisions it names changed'
+tickets:
+  started: [27643, 27688, 27689, 27698]
+  unstarted: [27693]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Foundation task text is prose about repositories the package cannot read (GitLab), so no check can compare
+    it; the next plan review reads it against backend-patterns.md and frontend-repos.yaml.'
+status: open
+notes: 'A plan change. The lead waived its 24-hour cooling-off on 20 October evening, verbatim "1 run,2 waive,3 waive,
+  4 dont worry about it"; item 3 of his reply was this foundation ticket text. Kept as its own commit, last on the
+  branch, so it can be kept or dropped alone. Statuses from the rehearsal pull (ticket.json, 20 October 13:01):
+  SETUP-HOSTS #27643 Ready for QA, ARCH-TESTS #27688 Ready for QA, KERNEL-ID #27689 In progress, PLATFORM-RLS #27698
+  Ready for QA, KERNEL-TENANT-LIMITS #27693 New. Started tickets are not rewritten in OpenProject: they learn of it
+  through the change notice. SETUP-CI #27626 and SETUP-CLIENTS #27640 (New) say "CI on GitHub Actions": that text is
+  written by tools/build-service-docs.py (lines 1440 and 1472), the migrations lane''s file, so it is not changed here.'

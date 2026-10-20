@@ -4498,7 +4498,7 @@ screens:
   module: Reports
   requiresModule: analytics
   wave: 1
-  permission: REPORT_VIEW_VENUE
+  permission: REPORT_VIEW_OWN
   capability: C21
   implementation:
     app: venue-pos
@@ -4518,7 +4518,15 @@ screens:
       trigger: Staffing against takings is read
       provenance: flow F74 step 2→3
       operation: runReport
-  notes: 'Design: Park_POS_dc.html reports view. Read routing is analytical — never the primary, under
+  notes: '**Gated on REPORT_VIEW_OWN, not REPORT_VIEW_VENUE** (r8 walk fix, CHG-R8WFC-007): the screen shows a
+    cashier''s own day (REPORT_VIEW_OWN) or this terminal''s (REPORT_VIEW_WORKSTATION), as its no-access state says;
+    listReports, getReport and runReport admit either for the seeded till report `terminalDayView`
+    (x-ticvai-permission-note). `askReportingQuestion` still needs REPORT_VIEW_VENUE, so a cashier sees that
+    action disabled, naming it. The chart, table and panel the design draws with no operation (Revenue by hour,
+    Top selling products, Sales channels and terminal health) stay unbound: left for the post-r8 release.
+
+
+    Design: Park_POS_dc.html reports view. Read routing is analytical — never the primary, under
     any load. **Authoring operations removed 24 August**: createReport, updateReport. **A till sells the
     catalogue; it does not author it.** These arrived in the 18 August bulk attach — the same defect that
     put 21 of 39 review rows in one bucket — and a flow walking a ticket sale is what surfaced them.
@@ -6233,7 +6241,14 @@ screens:
 
     `id` and `recordedAt` of a no-sale are set by the till (design-notes correction ticketing-guest POS-014;
     CHG-SPO-015). The approval modal has a reject path: the supervisor declines with a reason, and the
-    drawer stays shut.'
+    drawer stays shut.
+
+
+    **The approval modal is the supervisor step-up** (r8 walk fix, CHG-R8WFC-005). A cashier without
+    `CASH_NO_SALE` (no-sale) or `ORDER_VOID` (void) gets the modal; the supervisor''s PIN travels as
+    `supervisorStepUp` on `recordNoSale` or `voidOrder`, and the supervisor is recorded as
+    `approvedByPrincipalId`. Declining sends nothing: `approvalRejected` is drawn by the till from the
+    supervisor''s choice, with no call. A cashier who holds the permission sees no modal.'
   density: touchLarge
   pattern: configEditor
   patternReason: the screen declares only writes (`recordNoSale`, `voidOrder`, `applyManualDiscount`)

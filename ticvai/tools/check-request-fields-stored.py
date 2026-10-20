@@ -44,8 +44,15 @@ RULES = {
     "RF-REQUEST-NOT-STORED": "a configuration write's request field is not on its persisted resource, has no column "
                              "in a table it writes, and is not marked x-ticvai-persisted: false (CR-082)",
     "RF-READONLY-REQUEST": "a readOnly field on a request-only schema, which nothing returns (CR-082)",
+    "RF-ACTION-NOT-STORED": "the same rule for every other write whose 200/201 resource is persisted (addTip, voidOrder, "
+                            "disposeShopAndDrop: an act's request field with no column; r8 walk, CHG-R8WFC-002)",
 }
 WRITES = re.compile(r"^(create|update|configure|set)[A-Z]")
+# **Not only the configuration writes** (r8 walk, 20 October 2026, CHG-R8WFC-002). The rule read writes named create*,
+# update*, configure* and set* only, so addTip (a tip with no column), voidOrder (a reason and note with none) and
+# disposeShopAndDrop (a method and an authoriser with none) were never read: a verb the name list did not have was a
+# write the check could not see. Every other POST, PUT or PATCH whose answer is a persisted resource is read the same
+# way, under its own rule so its findings are counted apart.
 TABLE = re.compile(r"[a-z_]+\.[a-z_0-9]+")
 
 
@@ -139,8 +146,7 @@ def main() -> int:
                             seen_ro.add(key)
                             guard.add("RF-READONLY-REQUEST", key,
                                       f"{key}: readOnly on a request schema nothing returns")
-                if not WRITES.match(oid):
-                    continue
+                rule = "RF-REQUEST-NOT-STORED" if WRITES.match(oid) else "RF-ACTION-NOT-STORED"
                 resp = (None, None, stem)
                 for code in ("200", "201"):
                     r = (op.get("responses") or {}).get(code)
@@ -195,7 +201,7 @@ def main() -> int:
                             t.split(".", 1)[1].endswith("_" + "_".join(words(base)))
                             or t.split(".", 1)[1].endswith("_" + sb) for t in tables):
                         continue
-                    guard.add("RF-REQUEST-NOT-STORED", f"{oid}.{p}",
+                    guard.add(rule, f"{oid}.{p}",
                               f"{oid}.{p}: on {rq_name}, not on {rs_name} ({pers.split('+')[0].strip()}), "
                               f"no column in {', '.join(sorted(tables)) or 'any written table'}")
     guard.note(f"{n_ops} configuration writes whose resource is persisted were read")
