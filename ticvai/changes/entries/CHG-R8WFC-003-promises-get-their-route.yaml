@@ -1,0 +1,57 @@
+id: CHG-R8WFC-003
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Five operations whose text promised what no route, rule or error carried now say what is built: createRetailSale
+  records the retail side of an order Orders made first (orderId in the body, as fnbs salesOrderId; couponCodes applied
+  on the cart, not here) instead of "creates an order in one transaction" across two deployables; removeLicenceAddOn gets
+  its description, its plan-table reads and a 409 module-in-use asked of the tenants cell with serviceAuth; updateRegionSettings
+  asks Orders the new rule question orders#transactionsExistInScope and names 409 currency-change-refused; topUpWallet takes
+  the paymentId its 402 needs (stored as the credit lots source_reference, 409 payment-already-used); expireCreditLots emits
+  the new event wallet.creditExpired that the ledger posts as breakage, and names the reason and approver rule.'
+decision:
+  what: contracts/satellite/retail.yaml, subscription.yaml, wallet.yaml; contracts/spine/tenancy.yaml, orders.yaml (x-ticvai-queries
+    transactionsExistInScope); events/wallet-creditExpired.yaml (new).
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (outside git; sample-walk-part1/part2), class promise-without-route:
+  SVC-RETAIL-SALE-1 #27824, SVC-PLATFORM-LICENSING-3 #27970, SVC-TENANCY-REGION-1 #28723, SVC-WALLET-WALLET-2 #27817, VM-WALLET-WALLET-1
+  #28319.'
+keys_touched:
+  operations:
+  - createRetailSale
+  - removeLicenceAddOn
+  - updateRegionSettings
+  - topUpWallet
+  - expireCreditLots
+  files:
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/orders.yaml
+  - events/wallet-creditExpired.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-problem-types.py
+root_class: a description that promises a cross-module act with no x-ticvai-read-via, x-ticvai-write-via, event or error
+  that makes it true
+tickets:
+  started: []
+  unstarted:
+  - 27824
+  - 27970
+  - 28723
+  - 27817
+  - 28319
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: The orderId and paymentId fields are optional in the schema and refused 400 without them, the packages pattern for
+  a field an r1 client cannot send (supervisorStepUp), so no breaking change is recorded. check-cross-module-reads XR-FACT
+  (text names a fact not asked) is the nearest check; the open-ended reach (728 facts named in text and not asked, its own
+  note) is a post-r8 light release.

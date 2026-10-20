@@ -94,6 +94,18 @@ x-ticvai-queries:
   # Rule questions other modules ask Orders, answered by the owner (ADR-0055 amendment, 14 October 2026; the shape is
   # the r6 shared convention: module, inputs, returns, rule, served). An asking operation names one in
   # `x-ticvai-read-via`.
+  transactionsExistInScope:
+    module: orders
+    inputs:
+      scopePath: {type: string, description: 'The scope asked about: a region''s scope path (platform.region_settings), so every venue at it or beneath it counts.'}
+    returns:
+      exists: {type: boolean, description: True when any order was ever recorded at or beneath scopePath.}
+    rule: >-
+      A rule question (r8 walk fix, CHG-R8WFC-003): tenancy updateRegionSettings refuses a change of currencyCode or
+      currencyScale "after transactions exist", and the transactions are Orders'. True when an orders.sales_order row
+      exists whose scope_path is scopePath or beneath it, in any status (a voided or refunded order still carried
+      amounts at the old scale). Orders answers in process; Tenancy reads none of Orders' tables.
+    served: [in-process, service]
   openOrdersForSubject:
     module: orders
     inputs:
@@ -5431,9 +5443,30 @@ paths:
 
         **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
         change it makes, with the previous and new state, the actor and the correlation id (decided 29
-        September, writers pass).
+        September, writers pass). **The void''s `reason` and `note` are kept on that row**, as
+        `OrderEvent.reasonCode` and `OrderEvent.note` (r8 walk fix, CHG-R8WFC-002): the quarterly review of
+        `other` notes reads them there.
+
+
+        **The supervisor''s approval, and its reject path** (r8 walk fix, CHG-R8WFC-005; POS-014''s approved
+        "AUTHORISATION REQUIRED" modal). A caller who holds `ORDER_VOID` acts alone and sends no step-up. A
+        cashier who does not is not simply refused at the till: the modal asks a supervisor to approve, and
+        the call carries `supervisorStepUp` (common.yaml `SupervisorStepUp`, verified by Identity in process:
+        the supervisor holds `ORDER_VOID` at the till''s venue and is not the caller); the act is recorded with
+        that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the
+        call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is
+        the modal''s reject path and sends nothing**: the order stays as it was and the till shows the reason the supervisor
+        picked; no record is written for a request that was declined. A step-up needs the server, so offline
+        only a caller who holds `ORDER_VOID` can do this.
 
         '
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-carrier: body:supervisorStepUp
+      x-ticvai-step-up-reason: A cashier without ORDER_VOID voids only with a supervisor's PIN on the till (POS-014's approval modal).
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity (r8 walk fix, CHG-R8WFC-005); same deployable (commerce)'
       tags:
       - order
       x-ticvai-permission: ORDER_VOID
@@ -5460,11 +5493,20 @@ paths:
                     equal the `Idempotency-Key` header.
                 reason:
                   $ref: '#/components/schemas/VoidReason'
+                  x-ticvai-stored-as: orders.order_event.reason_code
                 note:
                   type: string
                   minLength: 3
                   maxLength: 500
                   nullable: true
+                  x-ticvai-stored-as: orders.order_event.note
+                supervisorStepUp:
+                  allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/SupervisorStepUp
+                  description: The supervisor approving for a cashier without ORDER_VOID (r8 walk fix,
+                    CHG-R8WFC-005). Absent when the caller holds it. Its principal is stored on the void's
+                    order_event row as `approvedByPrincipalId`.
+                  x-ticvai-stored-as: orders.order_event.approved_by_principal_id
                   description: Required when `reason` is `other` (audit R222); optional otherwise.
                 recordedAt:
                   type: string
@@ -5859,6 +5901,14 @@ paths:
   /refunds/bulk:
     post:
       operationId: createBulkRefund
+      x-ticvai-writes:
+      - table: orders.order_event
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.refund
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: orders.refund
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P08 BO-023 Refunds & Exchanges"
       x-ticvai-audience:
@@ -6497,6 +6547,12 @@ paths:
         Where the terminal captured the tip, this records what it reported. Where the guest wrote it on
         a slip, a cashier enters it, and that path needs the same attribution as a manual discount.
 
+        **Where the tip is kept** (r8 walk fix, CHG-R8WFC-002). On the payment it belongs to, in
+        `orders.payment`: `tipAmount`, `tipSource`, `tipAllocatedToPrincipalId`, `tipRecordedAt` and
+        `tipRecordedByPrincipalId` (the caller, from the session). A payment holds one tip: where
+        `tip_amount` is already set the call is refused `409 tipAlreadyRecorded`, and a payment that is not
+        `captured` `409 notCaptured`. The answer is the payment with its tip.
+
         '
       tags:
       - payment
@@ -6520,6 +6576,7 @@ paths:
               properties:
                 amount:
                   $ref: ../shared/common.yaml#/components/schemas/Money
+                  x-ticvai-column: tip_amount
                 source:
                   type: string
                   enum:
@@ -6531,13 +6588,16 @@ paths:
                     in most jurisdictions, and pooling it with tips is how a payroll dispute starts.
 
                     '
+                  x-ticvai-column: tip_source
                 allocateToPrincipalId:
                   type: string
                   format: uuid
                   description: Where the venue allocates rather than pools.
+                  x-ticvai-column: tip_allocated_to_principal_id
                 recordedAt:
                   type: string
                   format: date-time
+                  x-ticvai-column: tip_recorded_at
       responses:
         '200':
           headers:
@@ -7203,6 +7263,22 @@ paths:
         format: uuid
     post:
       operationId: exchangeOrderLines
+      x-ticvai-writes:
+      - table: orders.order_event
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.order_line
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.sales_order
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: orders.order_line
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.refund
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.refund_policy
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.sales_order
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P04 POS-006 Held Orders"
         - "P04 POS-010 Add to Existing Ticket"
@@ -7287,6 +7363,20 @@ paths:
         format: uuid
     post:
       operationId: rescheduleOrder
+      x-ticvai-writes:
+      - table: orders.order_event
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.sales_order
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: orders.order_line
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.refund
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.refund_policy
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.sales_order
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P04 POS-006 Held Orders"
         - "P06 EMP-034 Walk-up sale"
@@ -7396,6 +7486,18 @@ paths:
         format: uuid
     post:
       operationId: reprintOrder
+      x-ticvai-writes:
+      - table: orders.order_event
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.order_line
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.sales_order
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: orders.order_line
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.sales_order
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P01 WEB-013 Booking Confirmation"
         - "P02 GST-010 Booking Confirmation"
@@ -8020,6 +8122,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: cancelReservation
+      x-ticvai-writes:
+      - table: orders.order_event
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.reservation
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: orders.reservation
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-016 My Reservations"
@@ -19118,6 +19228,25 @@ components:
       - eventType
       - occurredAt
       properties:
+        reasonCode:
+          type: string
+          maxLength: 60
+          nullable: true
+          description: '**The reason the act was given with, where it takes one** (r8 walk fix, CHG-R8WFC-002): a void''s
+            `VoidReason` (`voidOrder`), as sent. Null on an event whose act takes no reason.'
+        approvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The supervisor whose step-up approved the act for a caller without its permission (a
+            void, r8 walk fix, CHG-R8WFC-005); null otherwise.
+          x-ticvai-references: identity.principal
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: The free-text note sent with the act (`voidOrder`'s `note`, required when the reason is `other`;
+            the notes are reviewed quarterly). Null when none was sent.
         id:
           type: string
           format: uuid
@@ -24391,6 +24520,48 @@ components:
       - status
       - recordedAt
       properties:
+        tipAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          readOnly: true
+          description: '**The tip recorded against this payment** (`addTip`; r8 walk fix, CHG-R8WFC-002). Null until
+            one is recorded; a payment holds at most one tip, so `addTip` answers `409 tipAlreadyRecorded` once this is
+            set. Money held for staff, posted to a liability, never to sales. The retired stub table
+            `orders.payment_tip` (CHG-STO-008: "no field carries a tip") is not brought back: the tip is four columns of
+            the payment it belongs to.'
+        tipSource:
+          type: string
+          enum:
+          - terminalPrompt
+          - cashierEntered
+          - guestApp
+          - serviceCharge
+          nullable: true
+          readOnly: true
+          description: Where the tip came from (`addTip`'s `source`); null with no tip.
+        tipAllocatedToPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The staff member the venue allocates the tip to (`addTip`'s `allocateToPrincipalId`); null when
+            tips are pooled or there is no tip.
+          x-ticvai-references: identity.principal
+        tipRecordedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the till or app recorded the tip (`addTip`'s `recordedAt`); null with no tip.
+        tipRecordedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual
+            discount does); null with no tip.
+          x-ticvai-references: identity.principal
         id:
           type: string
           format: uuid

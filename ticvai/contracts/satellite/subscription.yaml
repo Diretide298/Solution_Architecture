@@ -1680,6 +1680,16 @@ paths:
         format: uuid
     post:
       operationId: terminateTenant
+      x-ticvai-writes:
+      - table: control.contract
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: control.tenant
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: control.contract
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: control.tenant
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
       x-ticvai-audience:
@@ -2077,6 +2087,11 @@ paths:
         format: uuid
     post:
       operationId: previewSubscriptionChange
+      x-ticvai-reads:
+      - table: control.contract
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: control.plan
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-011 Licence & Seat Management"
@@ -2240,7 +2255,41 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
       x-ticvai-audience:
       - staff
+      x-ticvai-calls:
+      - white-label.getModuleEnablement
+      x-ticvai-reads:
+      - table: control.tenant
+        for: 'the tenant''s plan (plan_id), the base of the LicencePosition it answers'
+      - table: control.plan_module
+        for: 'the modules the plan licenses, half of LicencePosition'
+      - table: control.plan_limit
+        for: 'the limits the plan sets, half of LicencePosition'
+      - table: control.licence_add_on
+        for: 'the add-on removed (by tenant and moduleKey) and the add-ons that remain'
+      - table: control.licence_add_on_limit
+        for: 'the limits the remaining add-ons raise, the other half of LicencePosition'
+      x-ticvai-writes:
+      - table: control.licence_add_on
+        for: 'the add-on row removed'
+      - table: control.contract
+        for: 'the change to the tenant''s contract the removal is recorded on, with `reason`'
       summary: Remove an add-on
+      description: '**Takes a licensed add-on away from a tenant** (r8 walk fix, CHG-R8WFC-003: the operation had no
+        description). The add-on keyed by the body''s `moduleKey` is removed from the tenant''s `control.licence_add_on`
+        rows and the removal is recorded on its contract with `reason`; the answer is the tenant''s
+        `LicencePosition` after it: the plan''s modules and limits (control.tenant.plan_id -> control.plan_module,
+        control.plan_limit) and the add-ons that remain (control.licence_add_on, control.licence_add_on_limit).
+
+
+        **The 409, and how the control plane knows** (r8 walk fix, CHG-R8WFC-003). Whether the tenant has the module
+        switched on lives in the tenant''s cell (white-label''s module enablement), which the control plane does not read.
+        Before removing, the Control Plane asks the tenant''s cell, with `serviceAuth`, for white-label
+        `getModuleEnablement`, as `terminateTenant` asks it for `finance.getTrialBalance`. Where the module is enabled
+        there and the plan does not license it either, the call is refused `409 module-in-use` with
+        `DowngradeConflictProblem.modulesInUse` naming it, and nothing changes: the tenant disables it first. A cell
+        that does not answer refuses the call `503`; the add-on is never removed on a guess.
+
+        '
       tags:
       - licensing
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -2278,7 +2327,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/LicencePosition'
         '409':
-          description: Module is currently enabled by the tenant. Disable it there first
+          x-ticvai-problem-types: [module-in-use]
+          description: Module is currently enabled by the tenant (`module-in-use`, asked of the tenant's cell; see
+            the description). Disable it there first
           content:
             application/problem+json:
               schema:
@@ -2550,6 +2601,12 @@ paths:
         type: string
     post:
       operationId: decommissionCell
+      x-ticvai-writes:
+      - table: control.cell
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: control.cell
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
       x-ticvai-audience:
@@ -2602,6 +2659,12 @@ paths:
         type: string
     post:
       operationId: cancelDecommission
+      x-ticvai-writes:
+      - table: control.cell
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: control.cell
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
       x-ticvai-audience:

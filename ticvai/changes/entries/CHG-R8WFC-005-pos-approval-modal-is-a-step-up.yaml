@@ -1,0 +1,39 @@
+id: CHG-R8WFC-005
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'POS-014s approved "AUTHORISATION REQUIRED" modal and its reject path have an operation behind them: recordNoSale
+  and voidOrder take an optional supervisorStepUp (common SupervisorStepUp, verified by Identity in process) so a cashier
+  without CASH_NO_SALE or ORDER_VOID can act with a supervisors PIN, recorded as approvedByPrincipalId; a declined request
+  sends nothing. The screen does not change.'
+decision:
+  what: contracts/spine/shift.yaml (recordNoSale step-up, 403, NoSaleEvent.approvedByPrincipalId), contracts/spine/orders.yaml
+    (voidOrder step-up, OrderEvent.approvedByPrincipalId), screens/P04-point-of-sale.yaml POS-014 notes (invisible).
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (outside git; sample-walk-part1/part2), class screen-promise-without-operation:
+  APP-POS-POS-014 #28259.'
+keys_touched:
+  operations:
+  - recordNoSale
+  - voidOrder
+  screens:
+  - POS-014
+  files:
+  - contracts/spine/shift.yaml
+  - contracts/spine/orders.yaml
+  - screens/P04-point-of-sale.yaml
+root_class: an approved screens behaviour carried from the board with no operation behind it
+tickets:
+  started: []
+  unstarted:
+  - 28259
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: Offline, only a caller who holds the permission can void or open the drawer (a step-up needs the server).

@@ -1,0 +1,50 @@
+id: CHG-R8WFC-004
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Lineage that omitted tables states them: getKpiValues asks every source of its always-offered KPIs (access scan
+  events, orders payments, refunds and lines, ledger postings, F&B table visits through the new fnb#tableVisitRecords, loyalty
+  positions); buildDeepLink and getDeepLinkScheme read the primary domain and the published configuration; removeLicenceAddOn
+  reads the plan tables its answer is built from. The 55 Block A operations whose lineage was path-inferred state their
+  own tables on their contracts (x-ticvai-reads / x-ticvai-writes) and keep an override only for another modules table or
+  a cache, with a reviewed reason (createPreview: the preview is Redis, not tenant_config). derive-lineage relabels an entry
+  once its tables are stated.'
+decision:
+  what: 'contracts (17 files: x-ticvai-reads / x-ticvai-writes on 55 operations), contracts/satellite/reporting.yaml (getKpiValues
+    x-ticvai-read-via), fnb.yaml (x-ticvai-queries tableVisitRecords), white-label.yaml, subscription.yaml; handoff/api-data-lineage-overrides.json
+    (55 carried entries removed or reviewed, carriedCeiling 1671 to 1616); tools/derive-lineage.py (source relabel).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (outside git; sample-walk-part1/part2), class lineage-omits-tables:
+  SVC-ORDER-PAYMENT-1 #28144 (addTip), VM-REPORTING-REPORTING-1 #28786 (getKpiValues), SVC-PLATFORM-LICENSING-3 #27970,
+  SVC-WHITELABEL-NAVIGATION-1 #27883; and the 86 path-inferred entries package-wide.'
+keys_touched:
+  operations:
+  - getKpiValues
+  - buildDeepLink
+  - getDeepLinkScheme
+  - removeLicenceAddOn
+  - createPreview
+  files:
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/white-label.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/derive-lineage.py
+root_class: lineage entries carried from the hand-kept file with the label they were guessed under
+tickets:
+  started: []
+  unstarted:
+  - 28786
+  - 27970
+  - 27883
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-lineage.py::expected
+status: open
+notes: 30 path-inferred entries remain, none built in Block A (Blocks B, C and D); they are the reach for the post-r8 light
+  release.

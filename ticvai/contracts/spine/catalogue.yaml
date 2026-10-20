@@ -3316,6 +3316,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrices
+      x-ticvai-writes:
+      - table: catalogue.price_list
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: catalogue.price_list
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
@@ -4011,6 +4017,20 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: publishBundle
+      x-ticvai-writes:
+      - table: catalogue.published_bundle
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: catalogue.price
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: catalogue.price_list
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: catalogue.product
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: catalogue.published_bundle
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: catalogue.variant
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-014 Catalogue Publishing"
@@ -4206,6 +4226,9 @@ paths:
         type: string
     post:
       operationId: reportBundleApplied
+      x-ticvai-reads:
+      - table: catalogue.published_bundle
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P06 EMP-018 Offline package"
         - "P08 BO-037 Offline Package Status"
@@ -4213,6 +4236,8 @@ paths:
       - table: catalogue.bundle_application
         for: 'the one report row each call appends (BundleApplication; R8 blocker FOUNDATION-AI-C44) (r8 gate,
           CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE)'
+      - table: catalogue.published_bundle
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-audience:
       - staff
       summary: Report that a workstation applied a bundle
@@ -5638,6 +5663,12 @@ paths:
         format: uuid
     post:
       operationId: cancelPerformance
+      x-ticvai-writes:
+      - table: catalogue.performance
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: catalogue.performance
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"

@@ -1,0 +1,45 @@
+id: CHG-R8WFC-006
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Four screens that promised what no operation serves are bound or say why not, with nothing a user sees changed:
+  EMP-026 is gated on INCIDENT_REPORT and lists the reporters own incidents (listIncidents reportedBy=me, which a reporter
+  without INCIDENT_VIEW may call), and keeps photos and people on the device until reportIncident has answered; ADM-603
+  binds six of its nine selects to setB2bPaymentTerms fields and says the other three have no field and the save control
+  waits on the client; ADM-108 binds its twelve tiles to listRevenue and rules its six actions out of Block A; SCN-001s
+  offline sign-in was already ruled for r9 (CHG-R8SPN-027) and its notes carry the build instruction.'
+decision:
+  what: screens/P06-staff-app.yaml EMP-026 (permission, notes), contracts/satellite/maintenance.yaml listIncidents (reportedBy,
+    x-ticvai-permission-note), screens/P08-venue-back-office.yaml ADM-603 and ADM-108 (bindings, notes, gaps).
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (outside git; sample-walk-part1/part2), class screen-promise-without-operation
+  and screen-permission-contradiction: APP-STAFF-EMP-026 #28657, APP-SETUP-ADM-603 #28054, VM-ADM-108 #29844, APP-SCANNER-SCN-001
+  #27761.'
+keys_touched:
+  operations:
+  - listIncidents
+  screens:
+  - EMP-026
+  - ADM-603
+  - ADM-108
+  files:
+  - screens/P06-staff-app.yaml
+  - screens/P08-venue-back-office.yaml
+  - contracts/satellite/maintenance.yaml
+root_class: screen notes, states and components carried from the boards with no operation behind them
+tickets:
+  started: []
+  unstarted:
+  - 28657
+  - 28054
+  - 29844
+  - 27761
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open

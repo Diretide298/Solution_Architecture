@@ -1,0 +1,49 @@
+id: CHG-R8WFC-002
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'A request field of an act is stored or says where: addTips tip goes on the payment it belongs to (orders.payment
+  tip_amount, tip_source, tip_allocated_to_principal_id, tip_recorded_at, tip_recorded_by_principal_id; one tip per payment
+  is what 409 tipAlreadyRecorded checks), voidOrders reason and note on its order_event row (OrderEvent.reasonCode, note),
+  disposeShopAndDrops method, note, time and authoriser on the shop_and_drop row, with what heldLonger and returnedToStock
+  do. check-request-fields-stored read only writes named create/update/configure/set, which is why it missed all three;
+  it now reads every write whose answer is persisted, under RF-ACTION-NOT-STORED.'
+decision:
+  what: contracts/spine/orders.yaml (Payment five tip fields, OrderEvent reasonCode and note, addTip x-ticvai-column and
+    its storage rule, voidOrder x-ticvai-stored-as), contracts/satellite/retail.yaml (ShopAndDrop four disposal fields,
+    disposeShopAndDrop x-ticvai-column and its rule), tools/check-request-fields-stored.py (RF-ACTION-NOT-STORED, every
+    other POST/PUT/PATCH whose 200/201 resource is persisted; todays findings are its baseline). New columns reach the DDL
+    as a forward migration at the next refresh.
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (outside git; sample-walk-part1/part2), class request-field-no-column:
+  addTip (#28144 SVC-ORDER-PAYMENT-1; orders.payment_tip was retired on 14 October, CHG-STO-008, because no field carried
+  a tip), voidOrder (#27861 SVC-ORDER-ORDER-5), disposeShopAndDrop (#28392 VM-RETAIL-RETAIL-1).'
+keys_touched:
+  operations:
+  - addTip
+  - voidOrder
+  - disposeShopAndDrop
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/retail.yaml
+  - tools/check-request-fields-stored.py
+  - handoff/audit-baseline.json
+root_class: a stored-field rule that chose writes by their name, not by what they answer
+tickets:
+  started: []
+  unstarted:
+  - 28144
+  - 27861
+  - 28392
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open
+notes: RF-ACTION-NOT-STORED finds 364 fields on about 200 operations package-wide, 6 of them on started tickets (they need
+  the leads --acknowledge-started) (baselined, the list only falls); per the controllers time-box they are a post-r8 light
+  release, not hunted here.

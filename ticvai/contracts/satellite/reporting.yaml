@@ -511,6 +511,7 @@ paths:
   /reports:
     get:
       operationId: listReports
+      x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE lists only the seeded till reports (`terminalDayView`)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P08 BO-029 Report Builder"
@@ -645,6 +646,7 @@ paths:
         format: uuid
     get:
       operationId: getReport
+      x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE reads only the seeded till reports (`terminalDayView`)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P08 BO-029 Report Builder"
@@ -749,6 +751,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: deleteReport
+      x-ticvai-writes:
+      - table: reporting.report_definition
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: reporting.report_definition
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
@@ -843,6 +851,7 @@ paths:
         format: uuid
     post:
       operationId: runReport
+      x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE runs only the seeded till report `terminalDayView`, over the caller''s own sales (REPORT_VIEW_OWN) or this workstation''s (REPORT_VIEW_WORKSTATION)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P04 POS-020 Shift Exceptions & Alerts"
@@ -2234,6 +2243,28 @@ paths:
       - query: accreditation#validityRecords
         route: service
         for: 'its read of accreditation.validity, Tenancy''s data (CHG-MOD-001)'
+      # The always-offered KPIs name their sources (r8 walk fix, CHG-R8WFC-004): each is asked of its owner.
+      - query: access#scanEventRecords
+        route: service
+        for: 'admissions: admitted in-direction scans in the period (access.scan_event)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'takings: the money taken in the period, by tender, workstation and shift (orders.payment)'
+      - query: orders#refundRecords
+        route: service
+        for: 'takings and refunds: the money paid back in the period (orders.refund)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'grossSales, discounts, netRevenue and taxCollected, split by the dimensions order lines carry (orders.order_line)'
+      - query: finance#postingRecords
+        route: service
+        for: 'recognisedRevenue and deferredRevenue: the revenue postings of the period (ledger.posting)'
+      - query: fnb#tableVisitRecords
+        route: in-process
+        for: 'covers and tableTurnTime, where F&B is on (fnb.table_visit)'
+      - query: marketing-crm#loyaltyPositionRecords
+        route: in-process
+        for: 'the loyalty KPIs, split by tierCode (marketing.loyalty_position)'
       summary: Current values, against target, with movement
       description: 'BI boards 1 and 10.3. **The scorecard read.** Value, target, variance, direction and
         freshness in one call — a dashboard assembling those from four places will render three of them

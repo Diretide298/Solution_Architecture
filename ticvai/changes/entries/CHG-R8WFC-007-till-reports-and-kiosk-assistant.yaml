@@ -1,0 +1,45 @@
+id: CHG-R8WFC-007
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: POS-008 is gated on REPORT_VIEW_OWN as its no-access state says, and listReports, getReport and runReport admit
+  REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION for the seeded till report terminalDayView (x-ticvai-permission-note); KSK-015s
+  assistant records, as a gap, that the anonymous kiosk session has no credential the subject-scoped assistant operations
+  accept, so it is not built on a guess until the lead chooses.
+decision:
+  what: contracts/satellite/reporting.yaml (three x-ticvai-permission-note), screens/P04-point-of-sale.yaml POS-008 (permission,
+    notes), screens/P05-guest-kiosk.yaml KSK-015 (gaps).
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (outside git; sample-walk-part1/part2), class screen-permission-contradiction
+  APP-POS-POS-008 #28997 and screen-op-auth-mismatch APP-KIOSK-KSK-015 #28867.'
+keys_touched:
+  operations:
+  - listReports
+  - getReport
+  - runReport
+  screens:
+  - POS-008
+  - KSK-015
+  files:
+  - contracts/satellite/reporting.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P05-guest-kiosk.yaml
+root_class: 'a screens stated gate compared with nothing: check-screen-permissions reads only backticked permissions in
+  emptyNoAccess'
+tickets:
+  started: []
+  unstarted:
+  - 28997
+  - 28867
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-permissions.py
+status: open
+notes: 'KSK-015 needs the lead: (a) a session-bound anonymous conversation and a migration relaxing ai.activity activity_subject_id_when_chk
+  for it, (b) the kiosk calling as its registered device with a device audience on ai.activity, or (c) the kiosk assistant
+  after r8.'

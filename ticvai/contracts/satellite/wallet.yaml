@@ -633,7 +633,19 @@ paths:
         Extension exists because a venue will want it: a goodwill gesture, a closure, a dispute. **It is
         recorded with a reason and an approver** rather than done by editing a date.
 
+
+        **How finance is told, and who the approver is** (r8 walk fix, CHG-R8WFC-003). In `mode` `apply`, an
+        `expire` or `forfeit` closes each lot, writes one `wallet.wallet_transaction` taking its remaining amount
+        off the balance, and emits `wallet.creditExpired` per lot to the outbox in the same transaction; the
+        ledger consumes it and posts the breakage on the accounts `wallet.accounting_mapping` names. Each act is
+        recorded as one `wallet.adjustment` row: `reason` is required for `extend` and `forfeit` in `apply`
+        (`400 validation` without it), and the approver is the caller, who holds `WALLET_OPERATE`
+        (`performed_by` and `approved_by` are both the caller''s principal; no second person is asked). A
+        `preview` writes and emits nothing.
+
         '
+      x-ticvai-emits:
+      - wallet.creditExpired
       tags:
       - wallet
       x-ticvai-permission: WALLET_OPERATE
@@ -2285,6 +2297,16 @@ paths:
       description: >
         Creates a liability, not revenue. Recognition happens when the value is spent, or as
         breakage if the wallet expires.
+
+        **Paid first, then credited** (r8 walk fix, CHG-R8WFC-003; the 402 named a payment the body
+        never identified). The till or the guest app takes the money with Orders' payment operations
+        (`createPayment`, and `capturePayment` where the provider authorises first) and sends that
+        payment's id as `paymentId`. Wallet reads it through `orders#paymentRecords` in process: a
+        payment that is `captured` and whose amount covers `amount` is credited, and its id is kept as
+        the new credit lot's `source_reference` (`source_kind` `topUp`), so one payment funds one top-up;
+        a payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined` and
+        nothing is credited; a payment already used for a top-up is refused `409
+        payment-already-used`. `tender` stays the receipt's label.
       tags: [wallet]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-scope-level: workstation
@@ -2303,6 +2325,14 @@ paths:
                 id: { type: string, format: uuid }
                 amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
                 tender: { type: string }
+                paymentId:
+                  type: string
+                  format: uuid
+                  description: 'The orders.payment that paid for this top-up (r8 walk fix, CHG-R8WFC-003). Required in
+                    fact: a body without it is refused `400 validation`; optional in the schema only so a client built at
+                    r1 still validates.'
+                  x-ticvai-references: orders.payment
+                  x-ticvai-stored-as: wallet.credit_lot.source_reference
                 bonusAmount:
                   allOf:
                     - $ref: '../shared/common.yaml#/components/schemas/Money'
@@ -2321,7 +2351,13 @@ paths:
               schema: { $ref: '#/components/schemas/Wallet' }
         '402':
           x-ticvai-problem-types: [payment-declined]
-          description: Payment declined
+          description: Payment declined, failed or not captured (the body's `paymentId`)
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          x-ticvai-problem-types: [payment-already-used]
+          description: The body's `paymentId` has already funded a top-up (r8 walk fix, CHG-R8WFC-003)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }

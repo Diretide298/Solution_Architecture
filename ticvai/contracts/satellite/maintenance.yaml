@@ -398,6 +398,11 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getAssetHistory
+      x-ticvai-reads:
+      - table: maintenance.asset
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: maintenance.asset_status_change
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
         - "P08 BO-580 Asset Maintenance History & Lifecycle"
@@ -1987,6 +1992,9 @@ paths:
   /incidents:
     get:
       operationId: listIncidents
+      x-ticvai-permission-note: 'INCIDENT_VIEW lists every incident in scope. A caller who holds only INCIDENT_REPORT
+        may call it with `reportedBy=me` and is answered with the incidents they reported (r8 walk fix, CHG-R8WFC-006;
+        EMP-026, the reporter''s own list); without the filter such a caller is refused 403.'
       x-ticvai-consumed-by:
         - "P06 EMP-003 Home — on duty"
         - "P06 EMP-026 Incident report"
@@ -2015,6 +2023,11 @@ paths:
           in: query
           description: Incidents requiring notification to an external authority.
           schema: { type: boolean }
+        - name: reportedBy
+          in: query
+          description: '`me`: only the incidents the caller reported (`Incident.reportedByPrincipalId` is the caller).
+            The one form a reporter without INCIDENT_VIEW may call (r8 walk fix, CHG-R8WFC-006).'
+          schema: { type: string, enum: [me] }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
