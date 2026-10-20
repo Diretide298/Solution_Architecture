@@ -1409,10 +1409,13 @@ paths:
         suspension keeps its time, mode and notice) and the grant is recorded as applied with nothing to do (a
         no-op). No longer `active` (`onboarding`, `terminating` or `terminated` by then): nothing changes, with the
         reason `tenant-not-active`. **The approved request does not change**: approvals keeps a request immutable once
-        approved, and both outcomes are recorded on the request''s approved-action execution
+        approved, and **the consumer records every outcome by calling approvals'' `recordApprovedActionOutcome`**
+        (route `service`, after its own transaction commits, with the event''s id as `Idempotency-Key`; the lead,
+        20 October 2026, option A, CHG-R8DEC-002) on the request''s approved-action execution
         (`listApprovedActionExecutions`, BO-382), which is where approvals keeps whether an approved action ran:
-        `succeeded` with a note for the no-op, `failed` with `failureReason` `tenant-not-active` for the refusal
-        (review 3 N-2; the execution has no "not applied" status, and `failed` is the closest). **A Retry on BO-382
+        `applied` when the suspension is applied, `noOp` with its reason for the already-suspended case (`succeeded`
+        with a note), `notApplied` with `tenant-not-active` for the refusal (`failed` with that `failureReason`;
+        review 3 N-2; the execution has no "not applied" status, and `failed` is the closest). **A Retry on BO-382
         would be refused again** by the same re-check while the tenant stays as it is, so the refusal is closed there
         with `investigate` and a note, not retried; a new suspension, if still wanted, is a new `suspendTenant`.
 
@@ -1545,8 +1548,9 @@ paths:
         **Re-checked when the grant arrives.** Already `active` with nothing pending: nothing changes, and the grant
         is recorded as applied with nothing to do (a no-op). `terminated` by then (`tenant-terminated`), or
         `onboarding` (`tenant-not-suspended`): nothing changes, with that reason. The approved request does not
-        change; both outcomes are recorded on the request''s approved-action execution as for `suspendTenant`
-        (`succeeded` with a note, or `failed` with the reason), and a Retry of the refusal on BO-382 would be refused
+        change; the consumer records every outcome on the request''s approved-action execution by calling approvals''
+        `recordApprovedActionOutcome` as for `suspendTenant` (CHG-R8DEC-002): `applied`, `noOp` with its reason
+        (`succeeded` with a note), or `notApplied` with the reason (`failed`), and a Retry of the refusal on BO-382 would be refused
         again by the same re-check, so it is closed there with `investigate` and a note.
 
         **ADM-005 does not change** (client-approved). After the 202 it re-reads the tenant, whose row keeps its

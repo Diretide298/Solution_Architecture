@@ -73,6 +73,10 @@ And one rule per decision for the CRs of 18 October 2026 (class 9, "rules nobody
                    login's 409 says since when and on what; verifyMfaChallenge's 422 carries it too.
   BR-GATE-CANCEL   (CR-171, 19 October 2026; CHG-CRA-010) a cancelled gate mode change records who, when and why in
                    its own columns, leaving the scheduler's untouched.
+  BR-APPROVED-OUTCOME (20 October 2026, option A; CHG-R8DEC-002) an approved action's outcome has a writer:
+                   approvals' recordApprovedActionOutcome, service-only, takes applied, notApplied or noOp and returns
+                   the execution; the lineage has it write approvals.approved_action_execution; suspendTenant's and
+                   reactivateTenant's grant consumers call it.
 
 The step-up rule of `rejectShiftVariance` (CHG-RUL-014), and of `closeShift`, `acceptShiftVariance`,
 `withdrawFromDepositBox` and the 20 MFA step-ups (CHG-RUL-019, CHG-RUL-020), is held by `check-step-up.py`
@@ -474,6 +478,31 @@ def main() -> int:
     need("BR-GATE-CANCEL", "left as they were" in text(op("cancelGateModeChange")[3]),
          "cancelGateModeChange does not leave the scheduler's columns untouched")
 
+    # -------------------------------------------------------------- BR-APPROVED-OUTCOME (CHG-R8DEC-002)
+    # Decided by Chinmay Parab on 20 October 2026, option A: approvals.approved_action_execution was "updated by the
+    # requesting contract as it executes" with no operation or event able to write it. One internal operation is that
+    # writer, and the contracts that apply a grant say they call it.
+    ro = op("recordApprovedActionOutcome")
+    need("BR-APPROVED-OUTCOME", ro[0] is not None and ro[0].stem == "approvals",
+         "approvals has no recordApprovedActionOutcome (the writer of an approved action's outcome)")
+    if ro[0] is not None:
+        o = ro[3]
+        need("BR-APPROVED-OUTCOME", o.get("x-ticvai-audience") == ["service"] and o.get("x-ticvai-auth") == "service"
+             and {"serviceAuth": []} in (o.get("security") or []),
+             "recordApprovedActionOutcome is not service-only (audience service, x-ticvai-auth service, serviceAuth)")
+        oc = props(ro[4], body_schema(o)).get("outcome") or {}
+        need("BR-APPROVED-OUTCOME", set(oc.get("enum") or []) == {"applied", "notApplied", "noOp"},
+             "recordApprovedActionOutcome's outcome is not applied, notApplied or noOp")
+        need("BR-APPROVED-OUTCOME", "ApprovedActionExecutionView" in text((o.get("responses") or {}).get("200") or {}),
+             "recordApprovedActionOutcome does not return the execution (ApprovedActionExecutionView)")
+    lin_ = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    need("BR-APPROVED-OUTCOME", "approvals.approved_action_execution"
+         in ((lin_.get("recordApprovedActionOutcome") or {}).get("writes") or []),
+         "the lineage does not have recordApprovedActionOutcome write approvals.approved_action_execution")
+    for oid in ("suspendTenant", "reactivateTenant"):
+        need("BR-APPROVED-OUTCOME", "recordApprovedActionOutcome" in text(op(oid)[3]),
+             f"{oid}'s grant consumer does not record its outcome through recordApprovedActionOutcome")
+
     # -------------------------------------------------------------- r8 second round (core lane's requests, CHG-R8GEN-013)
     # BR-APPROVAL-ROUTE (CHG-R8SPN-016): a matrix condition the engine cannot evaluate is refused when it is saved, and a
     # submission that no longer needs approval, or finds no approver, says so with its own problem type.
@@ -506,7 +535,8 @@ def main() -> int:
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
              "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
-             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403"]
+             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403",
+             "BR-APPROVED-OUTCOME"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

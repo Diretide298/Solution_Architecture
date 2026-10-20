@@ -102290,6 +102290,51 @@
    ]
   }
  },
+ "recordApprovedActionOutcome": {
+  "contract": "approvals",
+  "verb": "POST",
+  "path": "/internal/approval-requests/{requestId}/action-outcome",
+  "reads": [
+   "approvals.approved_action_execution",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "approvals.approved_action_execution",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Record whether an approved action was applied",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "approvals.approved_action_execution": [
+    "action_type",
+    "approval_request_id",
+    "assignee_id",
+    "attempts",
+    "failure_reason",
+    "id",
+    "last_action",
+    "last_attempt_at",
+    "note",
+    "scope_path",
+    "source_module",
+    "status",
+    "subject_ref",
+    "updated_at"
+   ]
+  }
+ },
  "resolveCredentialException": {
   "contract": "access",
   "verb": "POST",
