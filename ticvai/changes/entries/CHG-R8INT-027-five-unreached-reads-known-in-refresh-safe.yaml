@@ -1,0 +1,36 @@
+id: CHG-R8INT-027
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The five reads a person sees on an approved screen that has no element to show them (GST-059
+  listMyVisitPlans, GST-048 listProductVariants, BO-015 listProductCategories, BO-291 listTaxProfiles, POS-004
+  listPerformances) are a known failure of check-screen-wiring in refresh-safe, with the reason "approved screen lacks
+  the element; listed for the client note", the way DEV-001 and BO-293 are known to check-screen-permissions. They stay
+  visible in the check (not baselined) until the client decides.'
+decision:
+  what: 'tools/refresh-safe-baseline.json: checkers.check-screen-wiring, one pattern accepting S-OP-UNREACHED with
+    exactly five new findings (the line carries counts, not screen ids), and its why naming the five.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the integration pass report (audit/ticvai/r8-blockers/integration-pass-report.md, item 5 and left 2):
+  the lead''s ruling "no read a person sees is background" keeps them out of the check''s baseline, and the approved
+  screens change only with the client''s approval (check-approved-ui), so refresh-safe would otherwise report them as
+  new on every run (CHG-R8INT-008).'
+keys_touched:
+  screens: [GST-059, GST-048, BO-015, BO-291, POS-004]
+  files:
+  - tools/refresh-safe-baseline.json
+root_class: 'a known gate failure waiting on the client, not yet named where refresh-safe reads it'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/refresh-safe.sh
+status: open
+notes: 'check-screen-wiring still fails refresh-safe on its started-ticket findings until the lead acknowledges them
+  (--acknowledge-started); this entry covers only the five reads.'

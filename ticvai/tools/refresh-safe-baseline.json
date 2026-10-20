@@ -32,6 +32,12 @@
     "^SP-NOACCESS\\s+P14-developer-portal\\.yaml DEV-001: emptyNoAccess names DEVELOPER_VIEW, which none of its operations requires \\(none\\)$",
     "^SP-NOACCESS\\s+P08-venue-back-office\\.yaml BO-293: emptyNoAccess names PLATFORM_CELL_MANAGE, which none of its operations requires \\(MEMBERSHIP_MANAGE, MEMBERSHIP_VIEW\\)$"
    ]
+  },
+  "check-screen-wiring": {
+   "why": "approved screen lacks the element; listed for the client note: five reads a person sees on an approved screen that has no element to show them (GST-059 listMyVisitPlans, GST-048 listProductVariants, BO-015 listProductCategories, BO-291 listTaxProfiles, POS-004 listPerformances; S-OP-UNREACHED). The lead's ruling: no read a person sees is background, so they are not baselined in the check; the approved screens change only with the client's approval (check-approved-ui), so they stay visible until the client decides (r8 integration pass, CHG-R8INT-008; listed here as DEV-001 and BO-293 are, CHG-R8INT-027). The check prints S-OP-UNREACHED with counts, not screen ids, so the pattern accepts exactly five new: a sixth fails.",
+   "known": [
+    "^S-OP-UNREACHED\\s+\\d+ found,\\s+5 new,"
+   ]
   }
  },
  "refresh_tools_coverage": {
