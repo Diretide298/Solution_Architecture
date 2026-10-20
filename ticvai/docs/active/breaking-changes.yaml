@@ -1110,3 +1110,63 @@ changes:
     tag: r8
     producer-tickets: [SVC-CATALOGUE-CATALOGUE-12, VM-ADM-094]
     consumer-tickets: [AM-SETUP-TICKETING-GUEST-COMMERCE-P08, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, APP-SETUP-ADM-094-REST, TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST]
+  - id: BC-403
+    contract: tenancy
+    operation: resolveTenantHost
+    operations: [resolveTenantHost, setTenantDomainMapping]
+    change: "gained enum value(s) ['staffApp']"
+    reason: 'R8 blocker FOUNDATION-AI-C26 option A (CHG-R8MIG-006): an installed staff app names its tenant by host, so
+      TenantDomain.channel gains staffApp and resolveTenantHost answers it. A value added to a response enum cannot be
+      additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-TENANCY-TENANCY-4]
+    consumer-tickets: [AM-TENANCY-VENUES-P08-BLOCK-A]
+  - id: BC-404
+    contract: approvals
+    operation: listApprovalRequests
+    operations: [listApprovalRequests, createApprovalRequest, submitApprovalRequest, decideApprovalRequest, withdrawApprovalRequest, cancelApprovalRequest, reopenApprovalRequest, assignApprovalRequest, escalateApprovalRequest, resubmitApprovalRequest, recordExternalApprovalDecision, getApprovalRequest]
+    change: "decision` gained enum value(s) ['requestInformation', 'return']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C02 (CHG-R8MIG-009): returning a request and asking for more information are
+      stored decisions, so a decision''s `decision` gains return and requestInformation. A value added to a response
+      enum cannot be additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-TENANCY-REQUEST-1, SVC-TENANCY-REQUEST-2, SVC-TENANCY-REQUEST-3, VM-TENANCY-REQUEST-1]
+    consumer-tickets: [AM-ADMISSION-ACCESS-P08, AM-ADMISSION-ACCESS-P08-5, AM-APPROVALS-P04, AM-APPROVALS-P08, AM-APPROVALS-P08-4, AM-APPROVALS-P08-5, AM-APPROVALS-P08-BLOCK-A, AM-APPROVALS-P09, AM-FOOD-BEVERAGE-P08-BLOCK-A, AM-ORDERS-RESERVATIONS-P04, AM-PAYMENTS-P08, AM-PRICING-PROMOTIONS-P08-4, AM-TICKETING-P08-2, AM-TICKETING-P08-7, AM-WALLET-CASHLESS-P08-7, AM-WORKFORCE-P06, APP-SETUP-BO-045, APP-SETUP-BO-045-REST, TEST-AM-APPROVALS-P04, TEST-AM-APPROVALS-P08-BLOCK-A]
+  - id: BC-405
+    contract: approvals
+    operation: listApprovalRequests
+    operations: [listApprovalRequests, createApprovalRequest, submitApprovalRequest, decideApprovalRequest, withdrawApprovalRequest, cancelApprovalRequest, reopenApprovalRequest, assignApprovalRequest, escalateApprovalRequest, resubmitApprovalRequest, recordExternalApprovalDecision, getApprovalRequest]
+    change: "principalId` is no longer guaranteed"
+    reason: 'R8 blocker APPROVALS-TENANCY-C02 (CHG-R8MIG-009): an external approver''s decision is stored with the
+      approver''s external reference and name and no principal, so a decision''s principalId is null for it (exactly
+      one of the two is set). A response field that may now be absent cannot be additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-TENANCY-REQUEST-1, SVC-TENANCY-REQUEST-2, SVC-TENANCY-REQUEST-3, VM-TENANCY-REQUEST-1]
+    consumer-tickets: [AM-ADMISSION-ACCESS-P08, AM-ADMISSION-ACCESS-P08-5, AM-APPROVALS-P04, AM-APPROVALS-P08, AM-APPROVALS-P08-4, AM-APPROVALS-P08-5, AM-APPROVALS-P08-BLOCK-A, AM-APPROVALS-P09, AM-FOOD-BEVERAGE-P08-BLOCK-A, AM-ORDERS-RESERVATIONS-P04, AM-PAYMENTS-P08, AM-PRICING-PROMOTIONS-P08-4, AM-TICKETING-P08-2, AM-TICKETING-P08-7, AM-WALLET-CASHLESS-P08-7, AM-WORKFORCE-P06, APP-SETUP-BO-045, APP-SETUP-BO-045-REST, TEST-AM-APPROVALS-P04, TEST-AM-APPROVALS-P08-BLOCK-A]
+  - id: BC-406
+    contract: catalogue
+    operation: getGroupPackageDefinition
+    operations: [getGroupPackageDefinition, setGroupPackageDefinition, listGroupPackages]
+    change: "gained enum value(s) ['community', 'corporate', 'tourOperator']"
+    reason: 'R8 blocker ORDERS-MONEY-C20 / CHG-SGU-024 (CHG-R8MIG-009): the approved group-booking screens draw the
+      corporate, tour-operator and community package types, so GroupPackageDefinition.kind gains them. A value added
+      to a response enum cannot be additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-CATALOGUE-PRODUCT-1, SVC-CATALOGUE-PRODUCT-2, SVC-CATALOGUE-PRODUCT-3]
+    consumer-tickets: [AM-ORDERS-RESERVATIONS-P01, AM-ORDERS-RESERVATIONS-P02, AM-ORDERS-RESERVATIONS-P08-7, AM-SETUP-TICKETING-GUEST-COMMERCE-P08, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, AM-TICKETING-P01, AM-WHITE-LABEL-P01, APP-SETUP-BO-011, APP-SETUP-BO-011-REST]
+  - id: BC-407
+    contract: marketing-crm
+    operation: getGuestProfile
+    operations: [getGuestProfile, updateGuestProfile, mergeGuestProfiles, getGuestConsents, recordConsent, getConsentHistory, listConsentPurposes, listDataProcessingPurpose, setMinorGuardianAge, listCustomerPrivacyConsent, listConsentEvidenceWithdrawal, claimDeviceConsent]
+    change: "gained enum value(s) ['facePassEnrolment', 'storedPaymentCredential']"
+    reason: 'R8 blocker ORDERS-MONEY-C21 option A (CHG-R8MIG-022): a stored card and a Face Pass enrolment each have a
+      consent purpose of their own, so ConsentPurpose gains storedPaymentCredential and facePassEnrolment (twelve
+      operations return it). A value added to a response enum cannot be additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-MARKETING-CONSENT-1, SVC-MARKETING-CONSENT-2, SVC-MARKETING-CONSENT-3, SVC-MARKETING-GUEST-4]
+    consumer-tickets: [AM-AI-P08, AM-IDENTITY-SECURITY-P01, AM-IDENTITY-SECURITY-P02, AM-MARKETING-CRM-P01, AM-MARKETING-CRM-P02, AM-MARKETING-CRM-P04, AM-MARKETING-CRM-P06, AM-MARKETING-CRM-P08, AM-MARKETING-CRM-P08-2, AM-MARKETING-CRM-P08-BLOCK-A, AM-MARKETING-CRM-P13, AM-MARKETING-CRM-P13-2, AM-SETUP-CUSTOMER-MARKETING-P08-REST, AM-WALLET-CASHLESS-P02, AM-WHITE-LABEL-P13, APP-SETUP-BO-799, APP-SETUP-BO-799-REST, TEST-AM-SETUP-CUSTOMER-MARKETING-P08-REST]
